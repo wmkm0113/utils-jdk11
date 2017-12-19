@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>tiff</extensionName>
+	<identifiedCode>49492A00</identifiedCode>
+	<mimeType>image/tiff</mimeType>
+	<fileType>0</fileType>
+	<printing>true</printing>
+	<mediaFile>true</mediaFile>
+	<compressFile>false</compressFile>
+</FileExtensionInfo>

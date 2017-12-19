@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>eml</extensionName>
+	<identifiedCode>44656C69766572792D646174653A</identifiedCode>
+	<mimeType>message/rfc822</mimeType>
+	<fileType>14</fileType>
+	<printing>true</printing>
+	<mediaFile>false</mediaFile>
+	<compressFile>false</compressFile>
+</FileExtensionInfo>

@@ -1,0 +1,26 @@
+Nervousync Utils Package
+[12/19/2017]
+Add IP Address convert support, IP/Long value convert
+Add location utils, support GPS/GCJ/BD location point convert
+
+[12/05/2017]
+Add FileZip class, support zip file oprtate utils
+
+[04/24/2017]
+Add Download Utils
+
+[06/23/2015]
+Add XML Utils
+
+[05/07/2014]
+Include Utils:
+1. Class Utils
+2. Collection Utils
+3. Convert Utils
+4. Cookie Utils
+5. Date/Time Utils
+6. File Utils
+7. Reflection Utils
+8. Request Utils
+9. String Utils
+10. E-mail Utils

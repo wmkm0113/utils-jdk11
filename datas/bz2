@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>bz2</extensionName>
+	<identifiedCode>425A6839314159265359</identifiedCode>
+	<mimeType>application/x-bzip2</mimeType>
+	<fileType>7</fileType>
+	<printing>false</printing>
+	<mediaFile>false</mediaFile>
+	<compressFile>true</compressFile>
+</FileExtensionInfo>

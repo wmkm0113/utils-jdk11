@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>gz</extensionName>
+	<identifiedCode>1F8B0800</identifiedCode>
+	<mimeType>application/x-gzip</mimeType>
+	<fileType>7</fileType>
+	<printing>false</printing>
+	<mediaFile>false</mediaFile>
+	<compressFile>true</compressFile>
+</FileExtensionInfo>

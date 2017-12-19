@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>dwg</extensionName>
+	<identifiedCode>41433130</identifiedCode>
+	<mimeType>image/vnd.dwg</mimeType>
+	<fileType>0</fileType>
+	<printing>true</printing>
+	<mediaFile>true</mediaFile>
+	<compressFile>false</compressFile>
+</FileExtensionInfo>

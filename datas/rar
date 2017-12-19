@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileExtensionInfo>
+	<extensionName>rar</extensionName>
+	<identifiedCode>52617221</identifiedCode>
+	<mimeType>application/x-rar-compressed</mimeType>
+	<fileType>7</fileType>
+	<printing>false</printing>
+	<mediaFile>false</mediaFile>
+	<compressFile>true</compressFile>
+</FileExtensionInfo>
