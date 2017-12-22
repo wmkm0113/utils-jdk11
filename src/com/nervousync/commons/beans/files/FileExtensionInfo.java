@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
+import com.nervousync.utils.StringUtils;
 
 /**
  * @author wmkm0	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -56,6 +57,22 @@ public final class FileExtensionInfo extends BaseElement {
 		this.compressFile = compressFile;
 	}
 
+	public FileExtensionInfo(int fileType, boolean printing, boolean mediaFile, 
+			boolean compressFile, String contentInfo) {
+		this.fileType = fileType;
+		this.printing = printing;
+		this.mediaFile = mediaFile;
+		this.compressFile = compressFile;
+		
+		String[] splitItems = StringUtils.delimitedListToStringArray(contentInfo, "|");
+		
+		if (splitItems.length == 3) {
+			this.extensionName = splitItems[0];
+			this.identifiedCode = splitItems[1];
+			this.mimeType = splitItems[2];
+		}
+	}
+	
 	/**
 	 * @return the serialversionuid
 	 */
