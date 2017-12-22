@@ -7,6 +7,9 @@ public final class Globals {
 
 	public static final String CONTENT_TYPE_APPLICATION_XML = "application/xml";
 	public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
+
+	public static final String READ_MODE = "r";
+	public static final String WRITE_MODE = "rw";
 	
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
 	

@@ -7,22 +7,17 @@
  */
 package com.nervousync.commons.zip.io;
 
-import java.io.DataOutput;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.raf.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
 import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.StringUtils;
-
-import jcifs.smb.SmbFile;
-import jcifs.smb.SmbRandomAccessFile;
-
-import java.io.RandomAccessFile;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -46,7 +41,7 @@ public class SplitOutputStream extends OutputStream {
 		HEADER_SIGNATURES[10] = ZipConstants.AESSIG;
 	}
 	
-	private DataOutput dataOutput = null;
+	private NervousyncRandomAccessFile dataOutput = null;
 	private String fileName = null;
 	private String filePath = null;
 	private String currentFullPath = null;
@@ -66,16 +61,11 @@ public class SplitOutputStream extends OutputStream {
 		if (savePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
 			this.filePath = savePath.substring(0, savePath.lastIndexOf("/"));
 			this.fileName = StringUtils.stripFilenameExtension(savePath.substring(savePath.lastIndexOf("/") + 1));
-			try {
-				this.dataOutput = new SmbRandomAccessFile(new SmbFile(savePath), ZipConstants.WRITE_MODE);
-			} catch (Exception e) {
-				throw new ZipException("Create samba file output error", e);
-			}
 		} else {
 			this.filePath = savePath.substring(0, savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
 			this.fileName = StringUtils.stripFilenameExtension(savePath.substring(savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR) + 1));
-			this.dataOutput = new RandomAccessFile(FileUtils.getFile(savePath), ZipConstants.WRITE_MODE);
 		}
+		this.dataOutput = new NervousyncRandomAccessFile(savePath, Globals.WRITE_MODE);
 		this.currentFullPath = savePath;
 		this.splitLength = splitLength;
 		this.currentSplitFileIndex = 0;
@@ -158,35 +148,17 @@ public class SplitOutputStream extends OutputStream {
 			return true;
 		}
 	}
-	
-	public void seek(long position) throws IOException {
-		if (filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			((SmbRandomAccessFile)this.dataOutput).seek(position);
-		} else {
-			((RandomAccessFile)this.dataOutput).seek(position);
-		}
+
+	public void seek(long pos) throws IOException {
+		this.dataOutput.seek(pos);
 	}
-	
-	public void close() throws IOException {
-		if (this.dataOutput != null) {
-			if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				((SmbRandomAccessFile)this.dataOutput).close();
-			} else {
-				((RandomAccessFile)this.dataOutput).close();
-			}
-		}
+
+	public long getFilePointer() throws IOException {
+		return this.dataOutput.getFilePointer();
 	}
 	
 	public void flush() {
 		
-	}
-	
-	public long getFilePointer() throws IOException {
-		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			return ((SmbRandomAccessFile)this.dataOutput).getFilePointer();
-		} else {
-			return ((RandomAccessFile)this.dataOutput).getFilePointer();
-		}
 	}
 	
 	public boolean isSplitZipFile() {
@@ -224,11 +196,7 @@ public class SplitOutputStream extends OutputStream {
 				currentSplitFile = folderPath + fileName + ".zip." + (this.currentSplitFileIndex + 1);
 			}
 
-			if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				((SmbRandomAccessFile)this.dataOutput).close();
-			} else {
-				((RandomAccessFile)this.dataOutput).close();
-			}
+			this.dataOutput.close();
 			
 			if (FileUtils.isExists(currentSplitFile)) {
 				throw new IOException("split file: " + currentSplitFile
@@ -239,15 +207,7 @@ public class SplitOutputStream extends OutputStream {
 				throw new IOException("Cannot create split file!");
 			}
 
-			if (this.currentFullPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				try {
-					this.dataOutput = new SmbRandomAccessFile(new SmbFile(this.currentFullPath), ZipConstants.WRITE_MODE);
-				} catch (Exception e) {
-					throw new ZipException("Create samba file output error", e);
-				}
-			} else {
-				this.dataOutput = new RandomAccessFile(FileUtils.getFile(this.currentFullPath), ZipConstants.WRITE_MODE);
-			}
+			this.dataOutput = new NervousyncRandomAccessFile(this.currentFullPath, Globals.WRITE_MODE);
 			this.currentSplitFileIndex++;
 		} catch (ZipException e) {
 			throw new IOException(e);

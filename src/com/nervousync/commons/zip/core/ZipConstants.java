@@ -78,9 +78,6 @@ public final class ZipConstants {
 	public static final int FILE_MODE_READ_ONLY = 1;
 	public static final int FOLDER_MODE_NONE = 16;
 
-	public static final String READ_MODE = "r";
-	public static final String WRITE_MODE = "rw";
-
 	public static final String CHARSET_CP850 = "Cp850";
 	public static final String CHARSET_COMMENTS_DEFAULT = "windows-1254";
 

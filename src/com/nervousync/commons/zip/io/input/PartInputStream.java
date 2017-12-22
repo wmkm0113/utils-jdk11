@@ -7,19 +7,16 @@
  */
 package com.nervousync.commons.zip.io.input;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.raf.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.crypto.impl.AESDecryptor;
 import com.nervousync.exceptions.zip.ZipException;
-
-import jcifs.smb.SmbRandomAccessFile;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -28,7 +25,7 @@ import jcifs.smb.SmbRandomAccessFile;
 public class PartInputStream extends InputStream {
 
 	private ZipFile zipFile = null;
-	private DataInput input = null;
+	private NervousyncRandomAccessFile input = null;
 	private long readBytes = Globals.DEFAULT_VALUE_LONG;
 	private long length = Globals.DEFAULT_VALUE_LONG;
 	private Decryptor decryptor = null;
@@ -38,7 +35,7 @@ public class PartInputStream extends InputStream {
 	private boolean isAESEncryptedFile = Globals.DEFAULT_VALUE_BOOLEAN;
 	private int count = Globals.DEFAULT_VALUE_INT;
 	
-	public PartInputStream(ZipFile zipFile, DataInput input, 
+	public PartInputStream(ZipFile zipFile, NervousyncRandomAccessFile input, 
 			long length, Decryptor decryptor, boolean isAESEncryptedFile) {
 		this.zipFile = zipFile;
 		this.input = input;
@@ -87,31 +84,16 @@ public class PartInputStream extends InputStream {
 		}
 		
 		synchronized (this.input) {
-			if (this.input instanceof RandomAccessFile) {
-				this.count = ((RandomAccessFile)this.input).read(b, off, len);
-			} else if (this.input instanceof SmbRandomAccessFile) {
-				this.count = ((SmbRandomAccessFile)this.input).read(b, off, len);
-			} else {
-				throw new IOException("Input stream type error");
-			}
+			this.count = this.input.read(b, off, len);
 			if ((this.count < len) && this.zipFile.isSplitArchive()) {
-				if (this.input instanceof RandomAccessFile) {
-					((RandomAccessFile)this.input).close();
-				}
+				this.input.close();
 				this.input = this.zipFile.startNextSplitFile();
 				
 				if (this.count < 0) {
 					this.count = 0;
 				}
 				
-				int readCount = 0;
-				if (this.input instanceof RandomAccessFile) {
-					readCount = ((RandomAccessFile)this.input).read(b, this.count, len - this.count);
-				} else if (this.input instanceof SmbRandomAccessFile) {
-					readCount = ((SmbRandomAccessFile)this.input).read(b, this.count, len - this.count);
-				} else {
-					throw new IOException("Input stream type error");
-				}
+				int readCount = this.input.read(b, this.count, len - this.count);
 				if (readCount > 0) {
 					this.count += readCount;
 				}
@@ -159,33 +141,15 @@ public class PartInputStream extends InputStream {
 	}
 	
 	public void seek(long pos) throws IOException {
-		if (this.input instanceof RandomAccessFile) {
-			((RandomAccessFile)input).seek(pos);
-		} else if (this.input instanceof SmbRandomAccessFile) {
-			((SmbRandomAccessFile)input).seek(pos);
-		} else {
-			throw new IOException("Parameter input type error!");
-		}
+		this.input.seek(pos);
 	}
 	
 	public void close() throws IOException {
-		if (this.input instanceof RandomAccessFile) {
-			((RandomAccessFile)this.input).close();
-		} else if (this.input instanceof SmbRandomAccessFile) {
-			((SmbRandomAccessFile)input).close();
-		} else {
-			throw new IOException("Parameter input type error!");
-		}
+		this.input.close();
 	}
 	
 	protected void seekToEnd() throws IOException {
-		if (this.input instanceof RandomAccessFile) {
-			((RandomAccessFile)this.input).seek(this.length);
-		} else if (this.input instanceof SmbRandomAccessFile) {
-			((SmbRandomAccessFile)this.input).seek(this.length);
-		} else {
-			throw new IOException("Input stream type error");
-		}
+		this.seek(this.length);
 	}
 	
 	protected void checkAndReadAESMacBytes() throws IOException {
@@ -197,35 +161,14 @@ public class PartInputStream extends InputStream {
 			}
 			
 			byte[] storedMac = new byte[ZipConstants.AES_AUTH_LENGTH];
-			int readLength = 0;
-			if (this.input instanceof RandomAccessFile) {
-				readLength = ((RandomAccessFile)this.input).read(storedMac);
-			} else if (this.input instanceof SmbRandomAccessFile) {
-				readLength = ((SmbRandomAccessFile)this.input).read(storedMac);
-			} else {
-				throw new IOException("Input stream type error");
-			}
+			int readLength = this.input.read(storedMac);
 			
 			if (readLength != ZipConstants.AES_AUTH_LENGTH) {
 				if (this.zipFile.isSplitArchive()) {
-					if (this.input instanceof RandomAccessFile) {
-						((RandomAccessFile)this.input).close();
-					} else if (this.input instanceof SmbRandomAccessFile) {
-						((SmbRandomAccessFile)this.input).close();
-					} else {
-						throw new IOException("Input stream type error");
-					}
+					this.input.close();
 					this.input = this.zipFile.startNextSplitFile();
-					int newReadLength = 0;
-					if (this.input instanceof RandomAccessFile) {
-						newReadLength = ((RandomAccessFile)this.input).read(storedMac, 
-								readLength, ZipConstants.AES_AUTH_LENGTH - readLength);
-					} else if (this.input instanceof SmbRandomAccessFile) {
-						newReadLength = ((SmbRandomAccessFile)this.input).read(storedMac, 
-								readLength, ZipConstants.AES_AUTH_LENGTH - readLength);
-					} else {
-						throw new IOException("Input stream type error");
-					}
+					int newReadLength = this.input.read(storedMac, 
+							readLength, ZipConstants.AES_AUTH_LENGTH - readLength);
 					
 					readLength += newReadLength;
 				} else {

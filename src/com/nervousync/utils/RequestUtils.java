@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -79,38 +80,78 @@ public final class RequestUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 	private static final String STOWED_REQUEST_ATTRIBS = "ssl.redirect.attrib.stowed";
 	private static final int DEFAULT_TIME_OUT = 5;
-	private static final String IPADDR_REGEX = "((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))";
+	private static final String IPV4_REGEX = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
+	private static final String IPV6_REGEX = "^([\\da-fA-F]{1,4}(:[\\da-fA-F]{1,4}){7}|([\\da-fA-F]{1,4}){0,1}:(:[\\da-fA-F]{1,4}){1,7}|[\\da-fA-F]{1,4}::|::)$";
+	private static final String IPV6_COMPRESS_REGEX = "(^|:)(0+(:|$)){2,8}";
 	
 	private RequestUtils() {
 		
 	}
-
-	public static long convertIPAddrToLong(String ipAddress) {
-		if (StringUtils.matches(ipAddress, IPADDR_REGEX)) {
+	
+	public static long convertIPv4ToNum(String ipAddress) {
+		if (StringUtils.matches(ipAddress, IPV4_REGEX)) {
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			if (splitAddr.length == 4) {
-				return (Long.parseLong(splitAddr[0]) << 24) + (Long.parseLong(splitAddr[1]) << 16) 
-						+ (Long.parseLong(splitAddr[2]) << 8) + Long.parseLong(splitAddr[3]);
+				long result = 0L;
+				result += Long.parseLong(splitAddr[3]);
+				result += Long.parseLong(splitAddr[2]) << 8;
+				result += Long.parseLong(splitAddr[1]) << 16;
+				result += Long.parseLong(splitAddr[0]) << 24;
+				return result;
 			}
 		}
 		return Globals.DEFAULT_VALUE_LONG;
 	}
 	
-	public static String convertLongToIpAddr(long ipAddress) {
+	public static BigInteger convertIPv6ToNum(String ipAddress) {
+		if (!ipAddress.endsWith(":")) {
+			String lastSplit = ipAddress.substring(ipAddress.lastIndexOf(":") + 1);
+			if (lastSplit.length() > 4 && StringUtils.matches(lastSplit, IPV4_REGEX)) {
+				return null;
+			}
+		}
+		
+		if (StringUtils.matches(ipAddress, IPV6_REGEX)) {
+			ipAddress = appendIgnore(ipAddress);
+			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ":");
+			if (splitAddr.length == 8) {
+				BigInteger bigInteger = BigInteger.ZERO;
+				int index = 0;
+				for (String split : splitAddr) {
+					bigInteger = bigInteger.add(BigInteger.valueOf(Long.valueOf(split, 16))
+							.shiftLeft(16 * (splitAddr.length - index - 1)));
+					index++;
+				}
+				return bigInteger;
+			}
+		}
+		return null;
+	}
+	
+	public static String convertNumToIPv4(long num) {
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		stringBuilder.append(String.valueOf(ipAddress >>> 24));
+		stringBuilder.append(String.valueOf(num >>> 24));
 		stringBuilder.append(".");
-		
-		stringBuilder.append(String.valueOf((ipAddress & 0x00FFFFFF) >>> 16));
+		stringBuilder.append(String.valueOf((num & 0x00FFFFFF) >>> 16));
 		stringBuilder.append(".");
-
-		stringBuilder.append(String.valueOf((ipAddress & 0x0000FFFF) >>> 8));
+		stringBuilder.append(String.valueOf((num & 0x0000FFFF) >>> 8));
 		stringBuilder.append(".");
-		
-		stringBuilder.append(String.valueOf(ipAddress & 0x000000FF));
+		stringBuilder.append(String.valueOf(num & 0x000000FF));
 		
 		return stringBuilder.toString();
+	}
+	
+	public static String convertNumToIPv6Addr(BigInteger bigInteger) {
+		String ipv6Addr = "";
+		BigInteger ff = BigInteger.valueOf(0xFFFFL);
+		
+		for (int i = 0 ; i < 8 ; i++) {
+			ipv6Addr = bigInteger.and(ff).toString(16) + ":" + ipv6Addr;
+			bigInteger = bigInteger.shiftRight(16);
+		}
+		
+		return ipv6Addr.substring(0, ipv6Addr.length() - 1).replaceFirst(IPV6_COMPRESS_REGEX, "::");
 	}
 	
 	public static <T> T generateSOAPClient(String endPointUrl, Class<T> serviceEndpointInterface, HandlerResolver handlerResolver) 
@@ -1103,5 +1144,24 @@ public final class RequestUtils {
 			// do nothing
 		}
 		return queryString;
+	}
+
+	private static String appendIgnore(String ipv6Address) {
+		if (ipv6Address.indexOf("::") != Globals.DEFAULT_VALUE_INT) {
+			int count = StringUtils.countOccurrencesOf(ipv6Address, ":");
+			StringBuilder stringBuilder = new StringBuilder();
+			for (int i = count ; i < 8 ; i++) {
+				stringBuilder.append(":0");
+			}
+			ipv6Address = StringUtils.replace(ipv6Address, "::", stringBuilder.toString() + ":");
+			if (ipv6Address.startsWith(":")) {
+				ipv6Address = "0" + ipv6Address;
+			}
+			if (ipv6Address.endsWith(":")) {
+				ipv6Address += "0";
+			}
+		}
+		
+		return ipv6Address;
 	}
 }

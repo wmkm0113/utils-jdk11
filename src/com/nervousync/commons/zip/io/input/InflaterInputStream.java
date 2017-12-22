@@ -7,13 +7,13 @@
  */
 package com.nervousync.commons.zip.io.input;
 
-import java.io.DataInput;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.raf.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.crypto.Decryptor;
 
@@ -29,7 +29,7 @@ public class InflaterInputStream extends PartInputStream {
 	private long writeBytes = Globals.DEFAULT_VALUE_LONG;
 	private long originalSize = Globals.DEFAULT_VALUE_LONG;
 	
-	public InflaterInputStream(ZipFile zipFile, DataInput input, 
+	public InflaterInputStream(ZipFile zipFile, NervousyncRandomAccessFile input, 
 			long length, long originalSize, Decryptor decryptor, boolean isAESEncryptedFile) {
 		super(zipFile, input, length, decryptor, isAESEncryptedFile);
 		this.inflater = new Inflater(true);
