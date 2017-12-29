@@ -375,16 +375,27 @@ public final class FileUtils {
 	 * @return <code>Globals.DEFAULT_VALUE_LONG</code> for others
 	 */
 	public static long lastModify(String resourceLocation) {
-		try {
-			File file = FileUtils.getFile(resourceLocation);
-			if (file == null || !file.exists()) {
-				return Globals.DEFAULT_VALUE_LONG;
-			}
-			
-			return file.lastModified();
-		} catch (Exception e) {
+		if (resourceLocation == null || resourceLocation.trim().length() == 0) {
 			return Globals.DEFAULT_VALUE_LONG;
 		}
+		try {
+			if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+				SmbFile smbFile = new SmbFile(resourceLocation);
+				if (smbFile.exists()) {
+					return smbFile.getLastModified();
+				}
+			} else {
+				File file = FileUtils.getFile(resourceLocation);
+				if (file != null && file.exists()) {
+					return file.lastModified();
+				}
+			}
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Read file last modify error! ", e);
+			}
+		}
+		return Globals.DEFAULT_VALUE_LONG;
 	}
 	
 	/**
@@ -2445,7 +2456,7 @@ public final class FileUtils {
 		InputStream inputStream = null;
 		
 		try {
-			inputStream = FileUtils.class.getResourceAsStream("/datas/NervousyncFileIden.dat");
+			inputStream = FileUtils.class.getResourceAsStream("/datas/FileIden.dat");
 			bytes = FileUtils.readFileBytes(inputStream);
 		} catch (IOException e) {
 			if (FileUtils.LOGGER.isDebugEnabled()) {

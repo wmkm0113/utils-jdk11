@@ -104,13 +104,6 @@ public final class RequestUtils {
 	}
 	
 	public static BigInteger convertIPv6ToNum(String ipAddress) {
-		if (!ipAddress.endsWith(":")) {
-			String lastSplit = ipAddress.substring(ipAddress.lastIndexOf(":") + 1);
-			if (lastSplit.length() > 4 && StringUtils.matches(lastSplit, IPV4_REGEX)) {
-				return null;
-			}
-		}
-		
 		if (StringUtils.matches(ipAddress, IPV6_REGEX)) {
 			ipAddress = appendIgnore(ipAddress);
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ":");
@@ -118,8 +111,13 @@ public final class RequestUtils {
 				BigInteger bigInteger = BigInteger.ZERO;
 				int index = 0;
 				for (String split : splitAddr) {
-					bigInteger = bigInteger.add(BigInteger.valueOf(Long.valueOf(split, 16))
-							.shiftLeft(16 * (splitAddr.length - index - 1)));
+					if (StringUtils.matches(split, IPV4_REGEX)) {
+						bigInteger = bigInteger.add(BigInteger.valueOf(convertIPv4ToNum(split))
+								.shiftLeft(16 * (splitAddr.length - index - 1)));
+					} else {
+						bigInteger = bigInteger.add(BigInteger.valueOf(Long.valueOf(split, 16))
+								.shiftLeft(16 * (splitAddr.length - index - 1)));
+					}
 					index++;
 				}
 				return bigInteger;
