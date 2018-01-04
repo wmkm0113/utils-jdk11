@@ -76,6 +76,7 @@ public final class StringUtils {
 
 	private static final char EXTENSION_SEPARATOR = '.';
 	
+	private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	private static final String AUTHCODEITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
 	
 	private static final String CHN_IDEN_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
@@ -128,6 +129,69 @@ public final class StringUtils {
 		}
 		
 		return true;
+	}
+	
+	public static String base64Encode(byte[] bytes) {
+		int length = bytes.length;
+		byte[] tempBytes = null;
+		if (length % 3 == 0) {
+			tempBytes = bytes;
+		} else {
+			while (length % 3 != 0) {
+				length++;
+			}
+			tempBytes = new byte[length];
+			System.arraycopy(bytes, 0, tempBytes, 0, bytes.length);
+			for (int i = bytes.length ; i < length ; i++) {
+				tempBytes[i] = 0;
+			}
+		}
+		char[] charArray = new char[((length + 2) / 3) * 4];
+		
+		int index = 0;
+		while ((index * 3) < length) {
+			charArray[index * 4] = BASE64.charAt((tempBytes[index * 3] >> 2) & 0x3F);
+			charArray[index * 4 + 1] = BASE64.charAt(((tempBytes[index * 3] << 4) | ((tempBytes[index * 3 + 1] & 0xFF) >> 4)) & 0x3F);
+			if (index * 3 + 1 >= bytes.length) {
+				charArray[index * 4 + 2] = '=';
+			} else {
+				charArray[index * 4 + 2] = BASE64.charAt(((tempBytes[index * 3 + 1] << 2) | ((tempBytes[index * 3 + 2] & 0xFF) >> 6)) & 0x3F);
+			}
+			if (index * 3 + 2 >= bytes.length) {
+				charArray[index * 4 + 3] = '=';
+			} else {
+				charArray[index * 4 + 3] = BASE64.charAt(tempBytes[index * 3 + 2] & 0x3F);
+			}
+			index++;
+		}
+		
+		return new String(charArray);
+	}
+	
+	public static byte[] base64Decode(String string) {
+		while (string.endsWith("=")) {
+			string = string.substring(0, string.length() - 1);
+		}
+		
+		byte[] bytes = new byte[string.length() * 3 / 4];
+		
+		int index = 0;
+		for (int i = 0 ; i < string.length() ; i += 4) {
+			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (BASE64.indexOf(string.charAt(i + 1)) >> 4)) & 0xFF);
+			if (index * 3 + 1 >= bytes.length) {
+				break;
+			}
+			
+			bytes[index * 3 + 1] = (byte)(((BASE64.indexOf(string.charAt(i + 1)) << 4) | (BASE64.indexOf(string.charAt(i + 2)) >> 2)) & 0xFF);
+			if (index * 3 + 2 >= bytes.length) {
+				break;
+			}
+
+			bytes[index * 3 + 2] = (byte)(((BASE64.indexOf(string.charAt(i + 2)) << 6) | BASE64.indexOf(string.charAt(i + 3))) & 0xFF);
+			index++;
+		}
+		
+		return bytes;
 	}
 	
 	/**

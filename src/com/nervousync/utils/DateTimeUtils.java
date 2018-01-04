@@ -24,6 +24,10 @@ import com.nervousync.commons.core.Globals;
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 11:15:20 AM $
  */
 public final class DateTimeUtils {
+
+	public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
+	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String COOKIE_DATETIME_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss 'GMT'";
 	
 	private DateTimeUtils() {
 		
@@ -38,7 +42,7 @@ public final class DateTimeUtils {
 		if (date == null) {
 			return null;
 		}
-		return formatDate(date, Globals.DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
+		return formatDate(date, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	}
 	
 	/**
@@ -49,7 +53,7 @@ public final class DateTimeUtils {
 	 * @throws ParseException
 	 */
 	public static Date parseSitemapDate(String string) throws ParseException {
-		return parseDate(string, Globals.DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
+		return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	}
 
 	/**
@@ -61,7 +65,17 @@ public final class DateTimeUtils {
 		if (date == null) {
 			return null;
 		}
-		return formatDate(date, Globals.DEFAULT_DATETIME_PATTERN_ISO8601) + "Z";
+		return formatDate(date, DEFAULT_DATETIME_PATTERN_ISO8601) + "Z";
+	}
+	
+	/**
+	 * Parses given cookie expire string according to java.util.Date
+	 * @param string
+	 * @return
+	 * @throws ParseException
+	 */
+	public static Date parseGMTDate(String string) throws ParseException {
+		return parseDate(string, COOKIE_DATETIME_PATTERN);
 	}
 	
 	/**
@@ -77,7 +91,7 @@ public final class DateTimeUtils {
 		}
 		
 		if (format == null) {
-			format = Globals.DEFAULT_DATE_PATTERN;
+			format = DEFAULT_DATE_PATTERN;
 		}
 		Date date = new SimpleDateFormat(format).parse(string);
 		

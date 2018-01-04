@@ -1,4 +1,9 @@
 Nervousync Utils Package
+[01/04/2018]
+Discard Apache HttpClient and more Apache package
+Add Original Http/Https request utils
+Add Base64 Encode/Decode utility for under than Java 1.7
+
 [12/19/2017]
 Add IP Address convert support, IP/Long value convert
 Add location utils, support GPS/GCJ/BD location point convert

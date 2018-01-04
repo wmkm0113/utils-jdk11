@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.Header;
-
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.http.header.SimpleHeader;
+import com.nervousync.commons.http.proxy.ProxyInfo;
 import com.nervousync.enumeration.web.HttpMethodOption;
 import com.nervousync.utils.RequestUtils;
 
@@ -32,17 +32,19 @@ public final class RequestInfo implements Serializable {
 	private static final long serialVersionUID = 7350946565537957232L;
 
 	private HttpMethodOption httpMethodOption = HttpMethodOption.DEFAULT;
+	private ProxyInfo proxyInfo = null;
 	private String requestUrl = null;
+	private String charset = Globals.DEFAULT_ENCODING;
 	private int timeOut = Globals.DEFAULT_VALUE_INT;
 	private int beginPosition = Globals.DEFAULT_VALUE_INT;
 	private int endPosition = Globals.DEFAULT_VALUE_INT;
-	private List<Header> headers = null;
+	private List<SimpleHeader> headers = null;
 	private Map<String, String[]> parameters = null;
 	private Map<String, File> uploadParam = null;
 	
 	public RequestInfo(String requestUrl) {
 		this.requestUrl = requestUrl;
-		this.headers = new ArrayList<Header>();
+		this.headers = new ArrayList<SimpleHeader>();
 		this.parameters = new HashMap<String, String[]>();
 		this.uploadParam = new HashMap<String, File>();
 	}
@@ -62,29 +64,51 @@ public final class RequestInfo implements Serializable {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
 		this.parameters = RequestUtils.getRequestParametersFromString(data);
-		this.headers = new ArrayList<Header>();
+		this.headers = new ArrayList<SimpleHeader>();
 		this.uploadParam = new HashMap<String, File>();
 	}
 	
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, Map<String, String[]> parameters) {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
-		this.parameters = parameters;
-		this.headers = new ArrayList<Header>();
+		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
+		this.headers = new ArrayList<SimpleHeader>();
 		this.uploadParam = new HashMap<String, File>();
 	}
 	
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, 
-			int timeOut, int beginPosition, int endPosition, List<Header> headers, 
+			int timeOut, int beginPosition, int endPosition, List<SimpleHeader> headers, 
 			Map<String, String[]> parameters, Map<String, File> uploadParam) {
 		this.httpMethodOption = httpMethodOption;
-		this.requestUrl = requestUrl;
 		this.timeOut = timeOut;
 		this.beginPosition = beginPosition;
 		this.endPosition = endPosition;
-		this.headers = headers;
-		this.parameters = parameters;
-		this.uploadParam = uploadParam;
+		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
+		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
+		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
+		if (requestUrl.indexOf("?") != Globals.DEFAULT_VALUE_INT) {
+			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
+			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
+		}
+		this.requestUrl = requestUrl;
+	}
+	
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset, 
+			int timeOut, int beginPosition, int endPosition, List<SimpleHeader> headers, 
+			Map<String, String[]> parameters, Map<String, File> uploadParam) {
+		this.httpMethodOption = httpMethodOption;
+		this.charset = charset;
+		this.timeOut = timeOut;
+		this.beginPosition = beginPosition;
+		this.endPosition = endPosition;
+		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
+		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
+		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
+		if (requestUrl.indexOf("?") != Globals.DEFAULT_VALUE_INT) {
+			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
+			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
+		}
+		this.requestUrl = requestUrl;
 	}
 
 	/**
@@ -98,7 +122,32 @@ public final class RequestInfo implements Serializable {
 	 * @return the httpMethodOption
 	 */
 	public HttpMethodOption getHttpMethodOption() {
+		if (HttpMethodOption.DEFAULT.equals(this.httpMethodOption)) {
+			if (!this.uploadParam.isEmpty()) {
+				this.httpMethodOption = HttpMethodOption.POST;
+			} else {
+				if (RequestUtils.appendParams(this.requestUrl, this.parameters).length() > 1024) {
+					this.httpMethodOption = HttpMethodOption.POST;
+				} else {
+					this.httpMethodOption = HttpMethodOption.GET;
+				}
+			}
+		}
 		return httpMethodOption;
+	}
+
+	/**
+	 * @return the proxyInfo
+	 */
+	public ProxyInfo getProxyInfo() {
+		return proxyInfo;
+	}
+
+	/**
+	 * @param proxyInfo the proxyInfo to set
+	 */
+	public void setProxyInfo(ProxyInfo proxyInfo) {
+		this.proxyInfo = proxyInfo;
 	}
 
 	/**
@@ -106,6 +155,13 @@ public final class RequestInfo implements Serializable {
 	 */
 	public String getRequestUrl() {
 		return requestUrl;
+	}
+
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
 	}
 
 	/**
@@ -132,7 +188,7 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * @return the headers
 	 */
-	public List<Header> getHeaders() {
+	public List<SimpleHeader> getHeaders() {
 		return headers;
 	}
 

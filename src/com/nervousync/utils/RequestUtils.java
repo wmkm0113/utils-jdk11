@@ -7,58 +7,53 @@
  */
 package com.nervousync.utils;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpTrace;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.nervousync.commons.beans.servlet.request.RequestAttribute;
 import com.nervousync.commons.beans.servlet.request.RequestInfo;
 import com.nervousync.commons.beans.servlet.response.HttpResponseContent;
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.http.cookie.CookieInfo;
+import com.nervousync.commons.http.entity.HttpEntity;
+import com.nervousync.commons.http.header.SimpleHeader;
+import com.nervousync.commons.http.proxy.ProxyInfo;
 import com.nervousync.enumeration.web.HttpMethodOption;
 
 import javax.jws.WebService;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.HandlerResolver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,11 +73,30 @@ import java.util.regex.Pattern;
 public final class RequestUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
+	
 	private static final String STOWED_REQUEST_ATTRIBS = "ssl.redirect.attrib.stowed";
 	private static final int DEFAULT_TIME_OUT = 5;
 	private static final String IPV4_REGEX = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
 	private static final String IPV6_REGEX = "^([\\da-fA-F]{1,4}(:[\\da-fA-F]{1,4}){7}|([\\da-fA-F]{1,4}){0,1}:(:[\\da-fA-F]{1,4}){1,7}|[\\da-fA-F]{1,4}::|::)$";
 	private static final String IPV6_COMPRESS_REGEX = "(^|:)(0+(:|$)){2,8}";
+	
+	private static final String HTTP_METHOD_GET = "GET";
+	private static final String HTTP_METHOD_POST = "POST";
+	private static final String HTTP_METHOD_PUT = "PUT";
+	private static final String HTTP_METHOD_TRACE = "TRACE";
+	private static final String HTTP_METHOD_HEAD = "HEAD";
+	private static final String HTTP_METHOD_DELETE = "DELETE";
+	private static final String HTTP_METHOD_OPTIONS = "OPTIONS";
+
+	static {
+		try {
+			RequestUtils.initTrustManager("changeit");
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Initialize trust manager error! ", e);
+			}
+		}
+	}
 	
 	private RequestUtils() {
 		
@@ -198,7 +212,7 @@ public final class RequestUtils {
 	public static long retrieveContentLength(String requestUrl) throws UnsupportedEncodingException {
 		HttpResponseContent httpResponseContent = sendRequest(requestUrl, HttpMethodOption.HEAD);
 		long contentLength = Globals.DEFAULT_VALUE_LONG;
-		if (httpResponseContent.getStatusCode() == HttpStatus.SC_OK) {
+		if (httpResponseContent.getStatusCode() == HttpURLConnection.HTTP_OK) {
 			contentLength = httpResponseContent.getContentLength();
 		}
 		return contentLength;
@@ -238,45 +252,45 @@ public final class RequestUtils {
 		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, beginPosition, endPosition);
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers) 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, int timeOut) 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, int beginPosition, int endPosition) 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				beginPosition, endPosition, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, int beginPosition, int endPosition, int timeOut) 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				beginPosition, endPosition, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers) 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, int timeOut) 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, int timeOut) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -284,7 +298,7 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -357,28 +371,28 @@ public final class RequestUtils {
 		return sendRequest(requestUrl, data, null, httpMethodOption, beginPosition, endPosition);
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				beginPosition, endPosition, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		
@@ -386,7 +400,7 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, null, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -394,7 +408,7 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -402,7 +416,7 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -410,7 +424,7 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<Header> headers, 
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -433,14 +447,14 @@ public final class RequestUtils {
 	}
 
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			List<Header> headers, HttpMethodOption httpMethodOption) 
+			List<SimpleHeader> headers, HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			List<Header> headers, HttpMethodOption httpMethodOption, int timeOut) 
+			List<SimpleHeader> headers, HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
@@ -461,186 +475,100 @@ public final class RequestUtils {
 	}
 	
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			Map<String, File> uploadParam, List<Header> headers, HttpMethodOption httpMethodOption) 
+			Map<String, File> uploadParam, List<SimpleHeader> headers, HttpMethodOption httpMethodOption) 
 					throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
 	}
 
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			Map<String, File> uploadParam, List<Header> headers, 
+			Map<String, File> uploadParam, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 					throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
 	}
 	
-	public static HttpResponseContent sendRequest(RequestInfo requestInfo) 
-					throws UnsupportedEncodingException {
-		HttpRequestBase method = null;
-		HttpMethodOption httpMethodOption = requestInfo.getHttpMethodOption();
-		if (httpMethodOption == null) {
-			httpMethodOption = HttpMethodOption.DEFAULT;
-		}
+	public static HttpResponseContent sendRequest(RequestInfo requestInfo) {
+		return RequestUtils.sendRequest(requestInfo, null);
+	}
+	
+	public static HttpResponseContent sendRequest(RequestInfo requestInfo, List<CookieInfo> cookieInfos) {
+		HttpURLConnection urlConnection = null;
+		OutputStream outputStream = null;
 		
-		String requestUrl = requestInfo.getRequestUrl();
-		
-		if (requestUrl.indexOf("://") == Globals.DEFAULT_VALUE_INT) {
-			requestUrl = Globals.DEFAULT_PROTOCOL_PREFIX_HTTP + requestUrl;
-		}
-		
-		String uri = null;
-		String data = null;
-		
-		if (HttpMethodOption.POST.equals(httpMethodOption) 
-				|| HttpMethodOption.PUT.equals(httpMethodOption)) {
-			if (requestUrl.indexOf('?') != -1) {
-				uri = requestUrl.substring(0, requestUrl.indexOf('?'));
-				data = requestUrl.substring(requestUrl.indexOf("?") + 1);
-			} else {
-				uri = requestUrl;
-				data = "";
-			}
-		} else if (HttpMethodOption.DEFAULT.equals(httpMethodOption)) {
-			if (requestInfo.getParameters() == null) {
-				if ((requestUrl.indexOf("?") != -1 && requestUrl.length() > 255)) {
-					uri = requestUrl.substring(0, requestUrl.indexOf('?'));
-					data = requestUrl.substring(requestUrl.indexOf("?") + 1);
-					httpMethodOption = HttpMethodOption.POST;
-				} else {
-					uri = requestUrl;
-					httpMethodOption = HttpMethodOption.GET;
-				}
-			} else {
-				String generateUrl = appendParams(requestUrl, requestInfo.getParameters());
-				if (generateUrl.length() > 255) {
-					uri = generateUrl.substring(0, generateUrl.indexOf('?'));
-					data = generateUrl.substring(generateUrl.indexOf("?") + 1);
-					httpMethodOption = HttpMethodOption.POST;
-				} else {
-					uri = generateUrl;
-					httpMethodOption = HttpMethodOption.GET;
-				}
-			}
-		} else {
-			if (requestInfo.getParameters() != null) {
-				uri = appendParams(requestUrl, requestInfo.getParameters());
-			} else {
-				uri = requestUrl;
-			}
-		}
-		
-		switch (httpMethodOption) {
-		case GET:
-			method = new HttpGet(uri);
-			break;
-		case POST:
-			method = new HttpPost(uri);
-			((HttpPost)method).setEntity(generateEntity(data, requestInfo.getParameters(), requestInfo.getUploadParam()));
-			break;
-		case PUT:
-			method = new HttpPut(uri);
-			((HttpPut)method).setEntity(generateEntity(data, requestInfo.getParameters(), requestInfo.getUploadParam()));
-			break;
-		case TRACE:
-			method = new HttpTrace(uri);
-			break;
-		case HEAD:
-			method = new HttpHead(uri);
-			break;
-		case DELETE:
-			method = new HttpDelete(uri);
-			break;
-		case OPTIONS:
-			method = new HttpOptions(uri);
-			break;
-			default:
-				throw new UnsupportedEncodingException("Unknown Request Method");
-		}
-		
-		//	Add gzip supported
-		method.addHeader("Accept-Encoding", "gzip, deflate");
-		
-		if (requestInfo.getBeginPosition() != Globals.DEFAULT_VALUE_INT 
-				&& requestInfo.getBeginPosition() >= 0 
-				&& requestInfo.getEndPosition() != Globals.DEFAULT_VALUE_INT 
-				&& requestInfo.getEndPosition() >= 0 
-				&& requestInfo.getBeginPosition() < requestInfo.getEndPosition()) {
-			method.addHeader("Range", "bytes=" + requestInfo.getBeginPosition() + "-" + requestInfo.getEndPosition());
-		}
-		
-		if (requestInfo.getHeaders() != null) {
-			for (Header header : requestInfo.getHeaders()) {
-				method.addHeader(header);
-			}
-		}
-		
-		CloseableHttpClient httpClient = null;
-		CloseableHttpResponse httpResponse = null;
 		try {
-			httpClient = HttpClients.createDefault();
-			
-			Builder builder = RequestConfig.custom();
-			
-			builder.setCookieSpec(CookieSpecs.DEFAULT);
-			
+			urlConnection = openConnection(requestInfo, cookieInfos);
 			int timeout = requestInfo.getTimeOut() == Globals.DEFAULT_VALUE_INT ? DEFAULT_TIME_OUT : requestInfo.getTimeOut();
-			builder.setSocketTimeout(timeout * 1000);
-			builder.setConnectionRequestTimeout(timeout * 1000);
+			urlConnection.setConnectTimeout(timeout * 1000);
+			urlConnection.setReadTimeout(timeout * 1000);
 			
-			RequestConfig requestConfig = builder.build();
-			method.setConfig(requestConfig);
+			HttpEntity httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
 			
-			HttpClientContext context = HttpClientContext.create();
-			httpResponse = httpClient.execute(method, context);
-			List<URI> redirectLocations = context.getRedirectLocations();
-			if (redirectLocations != null) {
-				URI location = URIUtils.resolve(method.getURI(), context.getTargetHost(), redirectLocations);
-				return sendRequest(new RequestInfo(location.toASCIIString(), requestInfo));
-			} else {
-				HttpResponseContent responseContent = new HttpResponseContent(httpResponse);
+			urlConnection.setRequestProperty("Content-Type", 
+					httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getHttpMethodOption()));
+			
+			if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption()) 
+					|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+				outputStream = urlConnection.getOutputStream();
+				httpEntity.writeData(requestInfo.getCharset(), outputStream);
+			}
+			
+			String redirectUrl = urlConnection.getHeaderField("Location");
+			if (redirectUrl != null) {
+				if (cookieInfos == null) {
+					cookieInfos = new ArrayList<CookieInfo>();
+				}
 				
-				if (responseContent.getStatusCode() == HttpStatus.SC_OK) {
-					if (RequestUtils.LOGGER.isDebugEnabled()) {
-						RequestUtils.LOGGER.debug("Read entity length: " + responseContent.getContentLength());
+				Iterator<Entry<String, List<String>>> iterator = urlConnection.getHeaderFields().entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<String, List<String>> entry = iterator.next();
+					if ("Set-Cookie".equals(entry.getKey())) {
+						for (String cookieValue : entry.getValue()) {
+							cookieInfos.add(new CookieInfo(cookieValue));
+						}
 					}
 				}
-				return responseContent;
+				
+				return RequestUtils.sendRequest(new RequestInfo(redirectUrl, requestInfo), cookieInfos);
 			}
+			return new HttpResponseContent(urlConnection);
 		} catch (Exception e) {
 			if (RequestUtils.LOGGER.isDebugEnabled()) {
 				RequestUtils.LOGGER.debug("Send Request ERROR: ", e);
 			}
-			method.abort();
+			return null;
 		} finally {
-			if (method != null) {
-				method.reset();
-			}
-			
-			if (httpResponse != null) {
+			if (outputStream != null) {
 				try {
-					httpResponse.close();
+					outputStream.close();
 				} catch (IOException e) {
-					if (RequestUtils.LOGGER.isDebugEnabled()) {
-						RequestUtils.LOGGER.debug("Close response error! ", e);
-					}
+					
 				}
 			}
 			
-			if (httpClient != null) {
-				try {
-					httpClient.close();
-				} catch (IOException e) {
-					if (RequestUtils.LOGGER.isDebugEnabled()) {
-						RequestUtils.LOGGER.debug("Close client error! ", e);
-					}
-				}
+			if (urlConnection != null) {
+				urlConnection.disconnect();
 			}
 		}
-		
-		return null;
+	}
+	
+	public static void initTrustManager(String passPhrase) throws Exception {
+		NervousyncX509TrustManager.init(passPhrase);
+
+		SSLContext sslContext = SSLContext.getInstance("TLS");
+		sslContext.init(new KeyManager[0], new TrustManager[]{NervousyncX509TrustManager.getInstance()}, new SecureRandom());
+		SSLContext.setDefault(sslContext);
+	}
+	
+	public static void addCustomCert(String certPath, String passPhrase) throws Exception {
+		NervousyncX509TrustManager.getInstance().addCustomCert(new TrustedCert(certPath, passPhrase));
 	}
 
+	public static void removeCustomCert(String certPath, String passPhrase) throws Exception {
+		NervousyncX509TrustManager.getInstance().removeCustomCert(certPath);
+	}
+	
 	/**
 	 * Creates query String from request body parameters
      *
@@ -1011,6 +939,131 @@ public final class RequestUtils {
 		return null;
 	}
 
+	private static String generateCookie(String requestUrl, List<CookieInfo> cookieInfos) {
+		if (cookieInfos == null || cookieInfos.size() == 0) {
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (CookieInfo cookieInfo : cookieInfos) {
+			if ((!requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)
+					&& cookieInfo.isSecure()) || (cookieInfo.getExpires() > DateTimeUtils.currentGMTTimeMillis())
+					|| cookieInfo.getMaxAge() == Globals.DEFAULT_VALUE_LONG || cookieInfo.getMaxAge() == 0L) {
+				continue;
+			}
+			
+			String domain = null;
+			String requestPath = null;
+			
+			if (requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)) {
+				domain = requestUrl.substring(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS.length());
+			} else if (requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTP)) {
+				domain = requestUrl.substring(Globals.DEFAULT_PROTOCOL_PREFIX_HTTP.length());
+			} else {
+				return null;
+			}
+			
+			if (domain.indexOf("/") > 0) {
+				requestPath = domain.substring(domain.indexOf("/") + 1);
+				domain = domain.substring(0, domain.indexOf("/"));
+			} else {
+				requestPath = "/";
+			}
+			
+			if (!domain.toLowerCase().endsWith(cookieInfo.getDomain().toLowerCase())
+					|| !requestPath.startsWith(cookieInfo.getPath())) {
+				continue;
+			}
+			
+			stringBuilder.append("; " + cookieInfo.getName() + "=" + cookieInfo.getValue());
+		}
+		
+		if (stringBuilder.length() == 0) {
+			return null;
+		}
+		return stringBuilder.substring(2);
+	}
+
+	private static HttpURLConnection openConnection(RequestInfo requestInfo, List<CookieInfo> cookieInfos, 
+			TrustedCert... trustedCerts) throws UnsupportedEncodingException {
+		String method = null;
+		switch (requestInfo.getHttpMethodOption()) {
+		case GET:
+			method = HTTP_METHOD_GET;
+			break;
+		case POST:
+			method = HTTP_METHOD_POST;
+			break;
+		case PUT:
+			method = HTTP_METHOD_PUT;
+			break;
+		case TRACE:
+			method = HTTP_METHOD_TRACE;
+			break;
+		case HEAD:
+			method = HTTP_METHOD_HEAD;
+			break;
+		case DELETE:
+			method = HTTP_METHOD_DELETE;
+			break;
+		case OPTIONS:
+			method = HTTP_METHOD_OPTIONS;
+			break;
+			default:
+				throw new UnsupportedEncodingException("Unknown Request Method");
+		}
+		
+		String urlAddress = null;
+
+		if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption()) 
+				|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+			urlAddress = requestInfo.getRequestUrl();
+		} else {
+			urlAddress = appendParams(requestInfo.getRequestUrl(), requestInfo.getParameters());
+		}
+		
+		HttpURLConnection connection = null;
+		try {
+			URL url = new URL(urlAddress);
+			if (requestInfo.getProxyInfo() != null) {
+				ProxyInfo proxyInfo = requestInfo.getProxyInfo();
+				connection = (HttpURLConnection)url.openConnection(new Proxy(proxyInfo.getProxyType(), 
+						new InetSocketAddress(proxyInfo.getProxyAddress(), proxyInfo.getProxyPort())));
+				if (proxyInfo.getUserName() != null && proxyInfo.getUserName().length() > 0) {
+					String authentication = proxyInfo.getUserName() + ":";
+					if (proxyInfo.getPassword() != null && proxyInfo.getPassword().length() > 0) {
+						authentication += proxyInfo.getPassword();
+					}
+					
+					connection.setRequestProperty("Proxy-Authorization", 
+							StringUtils.base64Encode(authentication.getBytes()));
+				}
+			} else {
+				connection = (HttpURLConnection)url.openConnection();
+			}
+			connection.setRequestMethod(method);
+			connection.setDoInput(true);
+			if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption()) 
+					|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+				connection.setDoOutput(true);
+			}
+			connection.setRequestProperty("Accept", "text/html,text/javascript,text/xml");
+			connection.addRequestProperty("Accept-Encoding", "gzip, deflate");
+			connection.setRequestProperty("User-Agent", "NervousyncBot");
+			String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), cookieInfos);
+			if (cookie != null) {
+				connection.setRequestProperty("Cookie", cookie);
+			}
+			
+			if (urlAddress.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)) {
+				((HttpsURLConnection)connection).setHostnameVerifier(new NervousyncHostnameVerifier());
+			}
+		} catch (Exception e) {
+			connection = null;
+		}
+		return connection;
+	}
+	
 	/**
 	 * Merges values into one array. Instances of <code>java.lang.String</code>,
 	 * <code>java.lang.String[]</code> and <code>java.util.Collection</code> are supported
@@ -1051,66 +1104,42 @@ public final class RequestUtils {
 	 *
 	 * @param parentGridTag The grid tag
 	 * @return URL for this grid tag
+	 * @throws FileNotFoundException 
 	 */
 
-	private static HttpEntity generateEntity(String data, Map<String, String[]> parameters, 
-			Map<String, File> uploadFileMap) throws UnsupportedEncodingException {
+	private static HttpEntity generateEntity(Map<String, String[]> parameters, 
+			Map<String, File> uploadFileMap) throws FileNotFoundException {
 		if (parameters == null) {
 			parameters = new HashMap<String, String[]>();
 		}
 		
-		Map<String, String[]> parameter = getRequestParametersFromString(data);
+		HttpEntity httpEntity = HttpEntity.newInstance();
 		
-		Iterator<String> iterator = parameter.keySet().iterator();
+		Iterator<String> iterator = parameters.keySet().iterator();
 		
 		while (iterator.hasNext()) {
 			String key = iterator.next();
-			if (parameters.containsKey(key) && RequestUtils.LOGGER.isDebugEnabled()) {
-				RequestUtils.LOGGER.debug("Override parameter : {}", key);
+			String[] values = parameters.get(key);
+
+			for (String value : values) {
+				httpEntity.addTextEntity(key, value);
 			}
-			parameters.put(key, parameter.get(key));
 		}
 		
-		if (uploadFileMap == null || uploadFileMap.isEmpty()) {
-			iterator = parameters.keySet().iterator();
-			
-			List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-			
-			while (iterator.hasNext()) {
-				String key = iterator.next();
-				String[] values = parameters.get(key);
-
-				for (String value : values) {
-					requestParams.add(new BasicNameValuePair(key, value));
-				}
-			}
-			
-			return new UrlEncodedFormEntity(requestParams, Globals.DEFAULT_ENCODING);
-		} else {
-			MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-			
-			iterator = parameters.keySet().iterator();
-			
-			while (iterator.hasNext()) {
-				String key = iterator.next();
-				String[] values = parameters.get(key);
-
-				for (String value : values) {
-					entityBuilder = entityBuilder.addPart(key, new StringBody(value, ContentType.TEXT_PLAIN));
-				}
-			}
-
+		if (uploadFileMap != null && !uploadFileMap.isEmpty()) {
 			iterator = uploadFileMap.keySet().iterator();
 			
 			while (iterator.hasNext()) {
 				String key = iterator.next();
 				File uploadFile = uploadFileMap.get(key);
-
-				entityBuilder = entityBuilder.addPart(key, new FileBody(uploadFile));
+				
+				if (uploadFile != null) {
+					httpEntity.addBinaryEntity(key, uploadFile.getAbsolutePath());
+				}
 			}
-			
-			return entityBuilder.build();
 		}
+		
+		return httpEntity;
 	}
 	
 	/**
@@ -1161,5 +1190,166 @@ public final class RequestUtils {
 		}
 		
 		return ipv6Address;
+	}
+	
+	private static final class TrustedCert {
+		
+		private String certPath = null;
+		private String certPassphrase = null;
+		
+		public TrustedCert(String certPath, String certPassphrase) {
+			this.certPath = certPath;
+			this.certPassphrase = certPassphrase;
+		}
+		
+		/**
+		 * @return the certPath
+		 */
+		public String getCertPath() {
+			return certPath;
+		}
+
+		/**
+		 * @return the certPassphrase
+		 */
+		public String getCertPassphrase() {
+			return certPassphrase;
+		}
+	}
+	
+	private static final class NervousyncX509TrustManager implements X509TrustManager {
+
+		private static final String JAVA_CERT_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "lib" 
+					+ Globals.DEFAULT_PAGE_SEPARATOR + "security" + Globals.DEFAULT_PAGE_SEPARATOR + "cacerts";
+		
+		private static NervousyncX509TrustManager INSTANCE = null;
+		
+		private final Logger logger = LoggerFactory.getLogger(this.getClass());
+		
+		private String passPhrase = null;
+		private List<TrustedCert> customCerts = null;
+		private X509TrustManager trustManager = null;
+		
+		private NervousyncX509TrustManager(String passPhrase) throws Exception {
+			if (passPhrase == null) {
+				this.passPhrase = "changeit";
+			} else {
+				this.passPhrase = passPhrase;
+			}
+			
+			this.customCerts = new ArrayList<TrustedCert>();
+			this.initManager();
+		}
+		
+		public static void init(String passPhrase) throws Exception {
+			if (INSTANCE == null) {
+				INSTANCE = new NervousyncX509TrustManager(passPhrase);
+			}
+		}
+		
+		public static NervousyncX509TrustManager getInstance() {
+			return INSTANCE;
+		}
+		
+		public void addCustomCert(TrustedCert customCert) throws Exception {
+			if (this.certIndex(customCert.getCertPath()) == Globals.DEFAULT_VALUE_INT) {
+				this.customCerts.add(customCert);
+				this.initManager();
+			}
+		}
+
+		public void removeCustomCert(String certPath) throws Exception {
+			int certIndex = this.certIndex(certPath);
+			if (certIndex != Globals.DEFAULT_VALUE_INT) {
+				this.customCerts.remove(certIndex);
+				this.initManager();
+			}
+		}
+		
+		@Override
+		public void checkClientTrusted(X509Certificate[] ax509certificate, String s) throws CertificateException {
+			this.trustManager.checkClientTrusted(ax509certificate, s);
+		}
+		
+		@Override
+		public void checkServerTrusted(X509Certificate[] ax509certificate, String s) throws CertificateException {
+			this.trustManager.checkServerTrusted(ax509certificate, s);
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return this.trustManager.getAcceptedIssuers();
+		}
+		
+		private int certIndex(String certPath) {
+			int i = 0;
+			for (TrustedCert trustedCert : this.customCerts) {
+				if (trustedCert.getCertPath().equalsIgnoreCase(certPath)) {
+					return i;
+				}
+				i++;
+			}
+			return Globals.DEFAULT_VALUE_INT;
+		}
+		
+		private void initManager() throws Exception {
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			String sysCertPath = SystemUtils.JAVA_HOME + JAVA_CERT_PATH;
+			if (!FileUtils.isExists(sysCertPath)) {
+				this.logger.warn("System cert file not found!");
+			} else {
+				try {
+					keyStore.load(FileUtils.loadFile(sysCertPath), this.passPhrase.toCharArray());
+				} catch (Exception e) {
+					this.logger.warn("Load system cert file using default passphrase error! ");
+				}
+			}
+			
+			if (!this.customCerts.isEmpty()) {
+				for (TrustedCert trustedCert : this.customCerts) {
+					keyStore.load(FileUtils.loadFile(trustedCert.getCertPath()), 
+							trustedCert.getCertPassphrase().toCharArray());
+				}
+			}
+			
+			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+			trustManagerFactory.init(keyStore);
+			
+			for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+				if (trustManager instanceof X509TrustManager) {
+					this.trustManager = (X509TrustManager)trustManager;
+					return;
+				}
+			}
+			
+			throw new Exception("Can't found X509TrustManager");
+		}
+	}
+
+	private static final class NervousyncHostnameVerifier implements HostnameVerifier {
+
+		private final Logger logger = LoggerFactory.getLogger(this.getClass());
+		
+		@Override
+		public boolean verify(String s, SSLSession sslSession) {
+			try {
+				String hostName = sslSession.getPeerHost();
+				for (X509Certificate certificate : (X509Certificate[])sslSession.getPeerCertificates()) {
+					String certDomainNames = certificate.getSubjectX500Principal().getName();
+					for (String certDomain : StringUtils.delimitedListToStringArray(certDomainNames, ",")) {
+						if (certDomain.startsWith("CN")) {
+							if (certDomain.contains(s) && certDomain.contains(hostName)) {
+								return true;
+							}
+						}
+					}
+				}
+			} catch (SSLPeerUnverifiedException e) {
+				if (this.logger.isDebugEnabled()) {
+					this.logger.debug("Verify host name error! ", e);
+				}
+			}
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
 	}
 }

@@ -58,9 +58,6 @@ public final class Globals {
 	public static final String DEFAULT_PROTOCOL_PREFIX_HTTP = "http://";
 	public static final String DEFAULT_PROTOCOL_PREFIX_HTTPS = "https://";
 	
-	public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
-	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
-
 	public static final int INITIALIZE_INT_VALUE = 0;
 	
 	public static final int SNMP_VERSION_1 = 0;
