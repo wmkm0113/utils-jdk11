@@ -1,9 +1,9 @@
 /*
  * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
- * Nervous Studio, Inc. You shall not disclose such Confidential
+ * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervous Studio.
+ * license agreement you entered into with Nervousync Studio.
  */
 package com.nervousync.commons.zip.io.input;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.raf.NervousyncRandomAccessFile;
+import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.crypto.Decryptor;

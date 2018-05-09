@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -24,6 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nervousync.commons.core.Globals;
 import com.nervousync.matcher.Assert;
 
 /**
@@ -488,15 +489,31 @@ public final class ReflectionUtils {
 		}
 		return false;
 	}
-
-
+	
+	public static boolean isPublic(Field field) {
+		if (field != null) {
+			return Modifier.isPublic(field.getModifiers());
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+	
+	public static boolean isStatic(Field field) {
+		if (field != null) {
+			return Modifier.isStatic(field.getModifiers());
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+	
 	/**
 	 * Determine whether the given field is a "public static final" constant.
 	 * @param field the field to check
 	 */
 	public static boolean isPublicStaticFinal(Field field) {
-		int modifiers = field.getModifiers();
-		return (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers));
+		if (field != null) {
+			int modifiers = field.getModifiers();
+			return (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers));
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
 	/**

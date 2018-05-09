@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -136,6 +136,17 @@ public final class DateTimeUtils {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 		return Integer.valueOf(simpleDateFormat.format(new Date(expireDate))).intValue();
 	}
+
+	/**
+	 * Return expire day value with format "yyyyMMdd"
+	 * @param expireTime expire time
+	 * @return
+	 */
+	public static int expireGMTDay(long expireTime) {
+		long expireDate = DateTimeUtils.currentGMTTimeMillis() + expireTime;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+		return Integer.valueOf(simpleDateFormat.format(new Date(expireDate))).intValue();
+	}
 	
 	/**
 	 * Converts input time from Java to DOS format
@@ -181,6 +192,14 @@ public final class DateTimeUtils {
 	public static long currentTime() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 		return Long.valueOf(simpleDateFormat.format(new Date())).longValue();
+	}
+
+	/**
+	 * Return current time in milliseconds.
+	 * @return
+	 */
+	public static long currentTimeMillis() {
+		return System.currentTimeMillis();
 	}
 	
 	/**

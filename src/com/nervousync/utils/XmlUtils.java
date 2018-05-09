@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2009 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -104,7 +105,7 @@ public final class XmlUtils {
 
 	public static String convertToXml(Object object, String indent, String encoding, 
 			boolean expandEmptyElements) throws XmlException {
-		Document document = XmlUtils.convertToXmlDocument(object);
+		Document document = XmlUtils.convertToXmlDocument(object, !expandEmptyElements);
 		return XmlUtils.convertToXmlString(document, indent, encoding, expandEmptyElements);
 	}
 
@@ -316,7 +317,7 @@ public final class XmlUtils {
 		if (String.class.equals(targetClass) || int.class.equals(targetClass) || Integer.class.equals(targetClass) 
 				|| double.class.equals(targetClass) || Double.class.equals(targetClass) || float.class.equals(targetClass) || Float.class.equals(targetClass)
 				|| boolean.class.equals(targetClass) || Boolean.class.equals(targetClass) || short.class.equals(targetClass) || Short.class.equals(targetClass)
-				|| long.class.equals(targetClass) || Long.class.equals(targetClass)) {
+				|| long.class.equals(targetClass) || Long.class.equals(targetClass) || BigInteger.class.equals(targetClass)) {
 			return true;
 		}
 		
@@ -369,7 +370,7 @@ public final class XmlUtils {
 		}
 	}
 	
-	private static Document convertToXmlDocument(Object object) {
+	private static Document convertToXmlDocument(Object object, boolean ignoreNullElement) {
 		if (object == null) {
 			return null;
 		}
@@ -381,7 +382,6 @@ public final class XmlUtils {
 		Class<?> paramClass = null;
 		String rootElemName = null;
 		Object[] arrayObjects = null;
-		boolean ignoreNullElement = false;
 		
 		if (classType.isArray()) {
 			paramClass = classType.getComponentType();

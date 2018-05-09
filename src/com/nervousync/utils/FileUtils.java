@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -50,6 +50,7 @@ import com.nervousync.commons.beans.files.FileExtensionInfo;
 import com.nervousync.commons.beans.xml.files.SegmentationFileInfo;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.MIMETypes;
+import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.xml.files.SegmentationException;
 
@@ -149,13 +150,13 @@ public final class FileUtils {
 	 * @param compressFile		is compress file
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, 
-			int fileType, boolean printing, boolean mediaFile, boolean compressFile) {
+			int fileType, boolean printing) {
 		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
 			FileUtils.LOGGER.warn("Override file type define! Ext name: " + extensionName);
 		}
 		
 		FileUtils.REGISTER_IDEN_MAP.put(extensionName, 
-				new FileExtensionInfo(extensionName, identifiedCode, null, fileType, printing, mediaFile, compressFile));
+				new FileExtensionInfo(extensionName, identifiedCode, null, fileType, printing));
 	}
 	
 	/**
@@ -169,7 +170,7 @@ public final class FileUtils {
 	 * @param compressFile		is compress file
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, String mimeType, 
-			int fileType, boolean printing, boolean mediaFile, boolean compressFile) {
+			int fileType, boolean printing) {
 		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
 			FileUtils.LOGGER.warn("Override file type define! Ext name: " + extensionName);
 		}
@@ -179,7 +180,7 @@ public final class FileUtils {
 		}
 		
 		FileUtils.REGISTER_IDEN_MAP.put(extensionName, 
-				new FileExtensionInfo(extensionName, identifiedCode, mimeType, fileType, printing, mediaFile, compressFile));
+				new FileExtensionInfo(extensionName, identifiedCode, mimeType, fileType, printing));
 	}
 	
 	public static boolean matchFolder(String entryPath, String folderPath) {
@@ -815,13 +816,14 @@ public final class FileUtils {
 	 * @param length	read length
 	 * @return
 	 */
-	public static byte[] readFileBytes(String resourceLocation, int offset, int length) {
+	public static byte[] readFileBytes(String resourceLocation, long position, int length) {
 		RandomAccessFile randomAccessFile = null;
 		byte[] readByte = new byte[length];
 		
 		try {
 			randomAccessFile = new RandomAccessFile(resourceLocation, "r");
-			randomAccessFile.read(readByte, offset, length);
+			randomAccessFile.seek(position);
+			randomAccessFile.read(readByte);
 		} catch (Exception e) {
 			readByte = new byte[0];
 		} finally {
@@ -2079,6 +2081,22 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
+	public static boolean isPicture(String resourceLocation) {
+		if (!FileUtils.validateFileType(resourceLocation)) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
+		
+		if (extensionName != null) {
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			if (fileExtensionInfo != null) {
+				return fileExtensionInfo.isPicture();
+			}
+		}
+
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+	
 	/**
 	 * Check current file is exists
 	 * @param filePath
@@ -2102,6 +2120,39 @@ public final class FileUtils {
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
+	}
+	
+	public static boolean isEntryExists(String filePath, String entryPath) {
+		if (filePath.endsWith(URL_PROTOCOL_JAR)) {
+			JarFile jarFile = null;
+			try {
+				jarFile = new JarFile(getFile(filePath));
+				
+				JarEntry packageEntry = jarFile.getJarEntry(entryPath);
+				
+				if(packageEntry != null){
+					return true;
+				}
+			} catch (Exception e) {
+				if (FileUtils.LOGGER.isDebugEnabled()) {
+					FileUtils.LOGGER.debug("Load jar entry content error! ", e);
+				}
+			} finally {
+				if (jarFile != null) {
+					try {
+						jarFile.close();
+					} catch (Exception e) {
+						if (FileUtils.LOGGER.isDebugEnabled()) {
+							FileUtils.LOGGER.debug("Close jar file error! ", e);
+						}
+					}
+				}
+			}
+		} else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
+			ZipFile zipFile = new ZipFile(filePath);
+			return zipFile.isEntryExists(entryPath);
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
 	/**
@@ -2479,14 +2530,12 @@ public final class FileUtils {
 			int dataLength = RawOperator.readIntFromLittleEndian(bytes, index);
 			if (dataLength > 0) {
 				readBuffer = new byte[dataLength];
-				System.arraycopy(bytes, index + 4, readBuffer, 0, dataLength);
+				System.arraycopy(bytes, index + 2, readBuffer, 0, dataLength);
 				int fileType = (int)readBuffer[0];
 				boolean printing = ((int)readBuffer[1]) == 1;
-				boolean mediaFile = ((int)readBuffer[2]) == 1;
-				boolean compressFile = ((int)readBuffer[3]) == 1;
-				String contentInfo = new String(Arrays.copyOfRange(readBuffer, 4, dataLength));
+				String contentInfo = new String(Arrays.copyOfRange(readBuffer, 2, dataLength));
 				
-				extensionInfoList.add(new FileExtensionInfo(fileType, printing, mediaFile, compressFile, contentInfo));
+				extensionInfoList.add(new FileExtensionInfo(fileType, printing, contentInfo));
 				index += (dataLength + 4);
 			} else {
 				break;

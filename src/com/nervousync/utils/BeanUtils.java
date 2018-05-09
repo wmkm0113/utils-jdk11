@@ -85,9 +85,9 @@ public final class BeanUtils {
 	
 	private static String generateKey(Class<?> origClass, Class<?> destClass, Class<?> converterClass) throws IOException {
 		if (converterClass == null) {
-			return SecurityUtils.MD5Encode(origClass.getName() + "To" + destClass.getName());
+			return SecurityUtils.MD5(origClass.getName() + "To" + destClass.getName());
 		} else {
-			return SecurityUtils.MD5Encode(origClass.getName() + "To" + destClass.getName() + "Converter:" + converterClass.getName());
+			return SecurityUtils.MD5(origClass.getName() + "To" + destClass.getName() + "Converter:" + converterClass.getName());
 		}
 	}
 }

@@ -1,11 +1,13 @@
 /*
  * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
- * Nervous Studio, Inc. You shall not disclose such Confidential
+ * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervous Studio.
+ * license agreement you entered into with Nervousync Studio.
  */
 package com.nervousync.commons.zip.operator;
+
+import java.io.UnsupportedEncodingException;
 
 import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.zip.ZipException;
@@ -48,6 +50,49 @@ public final class RawOperator {
 	public static int readIntFromLittleEndian(byte[] bytes, int position) {
 		return ((bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8) 
 				| ((bytes[position + 2] & 0xFF) | (bytes[position + 3] & 0xFF) << 8) << 16;
+	}
+	
+	public static String readStringFromLittleEndian(byte[] bytes, int position, int length) {
+		return RawOperator.readStringFromLittleEndian(bytes, position, length, Globals.DEFAULT_ENCODING);
+	}
+	
+	public static String readStringFromLittleEndian(byte[] bytes, int position, int length, String encoding) {
+		if (position < 0 || length < 0 || bytes == null 
+				|| (position + length) > bytes.length) {
+			return null;
+		}
+		byte[] readBuffer = new byte[length];
+		System.arraycopy(bytes, position, readBuffer, 0, length);
+		try {
+			return new String(readBuffer, encoding);
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+	}
+	
+	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value) {
+		writeStringFromLittleEndian(bytes, position, value, Globals.DEFAULT_ENCODING);
+	}
+	
+	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value, String encoding) {
+		if (value == null) {
+			return;
+		}
+		
+		byte[] valueBytes = null;
+		try {
+			valueBytes = value.getBytes(encoding);
+		} catch (UnsupportedEncodingException e) {
+			valueBytes = null;
+		}
+		if (valueBytes == null) {
+			return;
+		}
+		if ((position + valueBytes.length) <= bytes.length) {
+			for (int i = 0 ; i < valueBytes.length ; i++) {
+				bytes[position + i] = valueBytes[i];
+			}
+		}
 	}
 	
 	public static void writeShortFromLittleEndian(byte[] bytes, int position, short value) {
@@ -114,19 +159,19 @@ public final class RawOperator {
 			throw new ZipException("Invalid bit array length!");
 		}
 		
-		if (!RawOperator.checkBits(bitArray)) {
-			throw new ZipException("Invalid bits provided!");
+		if (RawOperator.checkBitArray(bitArray)) {
+			int calValue = 0;
+			for (int i = 0 ; i < bitArray.length ; i++) {
+				calValue += Math.pow(2, i) * bitArray[i];
+			}
+			
+			return (byte)calValue;
 		}
 		
-		int calValue = 0;
-		for (int i = 0 ; i < bitArray.length ; i++) {
-			calValue += Math.pow(2, i) * bitArray[i];
-		}
-		
-		return (byte)calValue;
+		throw new ZipException("Invalid bits provided!");
 	}
 	
-	private static boolean checkBits(int[] bitArray) {
+	private static boolean checkBitArray(int[] bitArray) {
 		for (int bit : bitArray) {
 			if (bit != 0 && bit != 1) {
 				return Globals.DEFAULT_VALUE_BOOLEAN;

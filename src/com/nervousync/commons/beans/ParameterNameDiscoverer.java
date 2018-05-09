@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 

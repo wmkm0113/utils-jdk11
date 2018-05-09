@@ -12,10 +12,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
+import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
- * @author wmkm0	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Aug 11, 2015 11:03:43 AM $
  */
 @XmlType
@@ -37,32 +38,23 @@ public final class FileExtensionInfo extends BaseElement {
 	private int fileType;
 	@XmlElement
 	private boolean printing = false;
-	@XmlElement
-	private boolean mediaFile = false;
-	@XmlElement
-	private boolean compressFile = false;
 	
 	public FileExtensionInfo() {
 		
 	}
 	
-	public FileExtensionInfo(String extensionName, String identifiedCode, String mimeType, 
-			int fileType, boolean printing, boolean mediaFile, boolean compressFile) {
+	public FileExtensionInfo(String extensionName, String identifiedCode, 
+			String mimeType, int fileType, boolean printing) {
 		this.extensionName = extensionName;
 		this.identifiedCode = identifiedCode;
 		this.mimeType = mimeType;
 		this.fileType = fileType;
 		this.printing = printing;
-		this.mediaFile = mediaFile;
-		this.compressFile = compressFile;
 	}
 
-	public FileExtensionInfo(int fileType, boolean printing, boolean mediaFile, 
-			boolean compressFile, String contentInfo) {
+	public FileExtensionInfo(int fileType, boolean printing, String contentInfo) {
 		this.fileType = fileType;
 		this.printing = printing;
-		this.mediaFile = mediaFile;
-		this.compressFile = compressFile;
 		
 		String[] splitItems = StringUtils.delimitedListToStringArray(contentInfo, "|");
 		
@@ -119,13 +111,18 @@ public final class FileExtensionInfo extends BaseElement {
 	 * @return the mediaFile
 	 */
 	public boolean isMediaFile() {
-		return mediaFile;
+		return this.fileType == FileUtils.FILE_TYPE_AUDIO 
+				|| this.fileType == FileUtils.FILE_TYPE_VIDEO;
 	}
 
 	/**
 	 * @return the compressFile
 	 */
 	public boolean isCompressFile() {
-		return compressFile;
+		return this.fileType == FileUtils.FILE_TYPE_COMPRESS;
+	}
+	
+	public boolean isPicture() {
+		return this.fileType == FileUtils.FILE_TYPE_PIC;
 	}
 }

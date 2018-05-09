@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.xml.XmlException;
 import com.nervousync.utils.BeanUtils;
 import com.nervousync.utils.ReflectionUtils;
@@ -42,46 +43,46 @@ public class BaseElement implements Serializable {
 	}
 	
 	/**
-	 * Convert Object to XML String By Nervous XML Util
+	 * Convert Object to XML String By Nervousync XML Util
 	 * @return XML String
 	 */
-	public String toXML() throws XmlException {
-		return XmlUtils.convertToXml(this, null, null, false);
+	public String toString() throws XmlException {
+		return this.toString(null);
 	}
 
 	/**
-	 * Convert Object to XML String By Nervous XML Util 
+	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
 	 * @param indent 
 	 * @param expainEmptyElement expain empty element status
 	 * @return XML String
 	 */
-	public String toXML(String indent) throws XmlException {
-		return XmlUtils.convertToXml(this, indent, null, false);
+	public String toString(String indent) throws XmlException {
+		return this.toString(indent, null);
 	}
 	
 	/**
-	 * Convert Object to XML String By Nervous XML Util 
+	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
 	 * @param indent 
 	 * @param expainEmptyElement expain empty element status
 	 * @return XML String
 	 */
-	public String toXML(String indent, String encoding) throws XmlException {
-		return XmlUtils.convertToXml(this, indent, encoding, false);
+	public String toString(String indent, String encoding) throws XmlException {
+		return this.toString(indent, encoding, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
 	/**
-	 * Convert Object to XML String By Nervous XML Util 
+	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
 	 * @param indent 
 	 * @param expainEmptyElement expain empty element status
 	 * @return XML String
 	 */
-	public String toXML(String indent, String encoding, boolean expandEmptyElements) throws XmlException {
+	public String toString(String indent, String encoding, boolean expandEmptyElements) throws XmlException {
 		return XmlUtils.convertToXml(this, indent, encoding, expandEmptyElements);
 	}
 	

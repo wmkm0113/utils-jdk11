@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -9,6 +9,7 @@ package com.nervousync.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -290,7 +291,7 @@ public final class ObjectUtils {
 				|| clazz.equals(Double.class) || clazz.equals(double.class)
 				|| clazz.equals(Short.class) || clazz.equals(short.class)
 				|| clazz.equals(Long.class) || clazz.equals(long.class)
-				|| clazz.equals(Number.class)) {
+				|| clazz.equals(BigInteger.class) || clazz.equals(Number.class)) {
 			return DataType.NUMBER;
 		} else if (clazz.equals(String.class)) {
 			return DataType.STRING;

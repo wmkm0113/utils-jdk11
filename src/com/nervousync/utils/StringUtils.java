@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -1363,25 +1364,39 @@ public final class StringUtils {
 	}
 	
 	public static String convertObjectToJSONString(Object object) {
-		List<String> fieldNameList = ReflectionUtils.getAllDeclaredFieldNames(object.getClass());
 		TreeMap<String, Object> valueMap = new TreeMap<String, Object>();
-		for (String fieldName : fieldNameList) {
-			Object fieldValue = ReflectionUtils.getFieldValue(fieldName, object);
-			Object mapValue = null;
-			if (fieldValue instanceof byte[]) {
-				mapValue = new Base64().encodeAsString((byte[])fieldValue);
-			} else {
-				mapValue = fieldValue;
+		if (object instanceof Map) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				return objectMapper.writeValueAsString(object);
+			} catch (JsonProcessingException e) {
+				if (StringUtils.LOGGER.isDebugEnabled()) {
+					StringUtils.LOGGER.debug("Convert object to string error! ", e);
+				}
 			}
-			valueMap.put(fieldName, mapValue);
-		}
-		
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.writeValueAsString(valueMap);
-		} catch (JsonProcessingException e) {
-			if (StringUtils.LOGGER.isDebugEnabled()) {
-				StringUtils.LOGGER.debug("Convert object to string error! ", e);
+		} else {
+			Field[] fields = object.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if (ReflectionUtils.isStatic(field)) {
+					continue;
+				}
+				Object fieldValue = ReflectionUtils.getFieldValue(field, object);
+				Object mapValue = null;
+				if (fieldValue instanceof byte[]) {
+					mapValue = new Base64().encodeAsString((byte[])fieldValue);
+				} else {
+					mapValue = fieldValue;
+				}
+				valueMap.put(field.getName(), mapValue);
+			}
+			
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				return objectMapper.writeValueAsString(valueMap);
+			} catch (JsonProcessingException e) {
+				if (StringUtils.LOGGER.isDebugEnabled()) {
+					StringUtils.LOGGER.debug("Convert object to string error! ", e);
+				}
 			}
 		}
 		
@@ -1389,26 +1404,7 @@ public final class StringUtils {
 	}
 	
 	public static <T> T convertJSONStringToObject(String jsonData, Class<T> clazz) {
-		try {
-			Map<String, Object> dataMap = StringUtils.convertJSONStringToMap(jsonData);
-			List<String> fieldNameList = ReflectionUtils.getAllDeclaredFieldNames(clazz);
-			T object = clazz.newInstance();
-			for (String fieldName : fieldNameList) {
-				Object fieldValue = dataMap.get(fieldName);
-				Field field = ReflectionUtils.findField(clazz, fieldName);
-				if (byte[].class.equals(field.getType())) {
-					fieldValue = new Base64().decode(fieldValue);
-				}
-				ReflectionUtils.setField(fieldName, object, fieldValue);
-			}
-			return object;
-		} catch (Exception e) {
-			if (StringUtils.LOGGER.isDebugEnabled()) {
-				StringUtils.LOGGER.debug("Convert json string to object bean error! ", e);
-			}
-		}
-		
-		return null;
+		return ConvertUtils.convertMapToObject(StringUtils.convertJSONStringToMap(jsonData), clazz);
 	}
 	
 	public static <T> List<T> convertJSONStringToList(String jsonData, Class<T> clazz) {
@@ -1949,6 +1945,8 @@ public final class StringUtils {
 				} else if (typeClass.equals(Long.class)
 						|| typeClass.equals(long.class)) {
 					paramObj = Long.valueOf(dataValue);
+				} else if (typeClass.equals(BigInteger.class)) {
+					paramObj = new BigInteger(dataValue);
 				}
 				break;
 			case CDATA:

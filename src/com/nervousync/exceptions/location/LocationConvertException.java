@@ -1,9 +1,9 @@
 /*
  * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
- * Nervous Studio, Inc. You shall not disclose such Confidential
+ * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervous Studio.
+ * license agreement you entered into with Nervousync Studio.
  */
 package com.nervousync.exceptions.location;
 

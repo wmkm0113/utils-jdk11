@@ -48,7 +48,7 @@ public final class HttpResponseContent implements Serializable {
 	private String contentType;
 	private String charset = null;
 	private String identifiedCode;
-	private long contentLength;
+	private int contentLength;
 	private byte[] responseContent;
 	
 	/**
@@ -82,7 +82,7 @@ public final class HttpResponseContent implements Serializable {
 	/**
 	 * @return the contentLength
 	 */
-	public long getContentLength() {
+	public int getContentLength() {
 		return contentLength;
 	}
 	
@@ -113,7 +113,7 @@ public final class HttpResponseContent implements Serializable {
 		
 		try {
 			this.statusCode = urlConnection.getResponseCode();
-			this.contentLength = urlConnection.getContentLengthLong();
+			this.contentLength = urlConnection.getContentLength();
 			if (this.statusCode == HttpsURLConnection.HTTP_OK) {
 				if (this.isGZipResponse(urlConnection.getContentEncoding())) {
 					inputStream = new GZIPInputStream(urlConnection.getInputStream());

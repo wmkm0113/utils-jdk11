@@ -47,8 +47,8 @@ public class SegmentationFileInfo extends BaseElement {
 	}
 	
 	public SegmentationFileInfo(long position, long totalSize, byte[] dataContent) throws SegmentationException {
-		this.md5 = SecurityUtils.MD5Encode(dataContent);
-		this.sha = SecurityUtils.SHAEncode(dataContent);
+		this.md5 = SecurityUtils.MD5(dataContent);
+		this.sha = SecurityUtils.SHA256(dataContent);
 		this.position = position;
 		this.totalSize = totalSize;
 		this.dataInfo = new String(new Base64().encode(dataContent));
@@ -106,8 +106,8 @@ public class SegmentationFileInfo extends BaseElement {
 	public boolean securityCheck() {
 		byte[] dataContent = new Base64().decode(this.dataInfo.getBytes());
 		try {
-			return SecurityUtils.MD5Encode(dataContent).equals(this.md5) 
-					&& SecurityUtils.SHAEncode(dataContent).equals(this.sha);
+			return SecurityUtils.MD5(dataContent).equals(this.md5) 
+					&& SecurityUtils.SHA256(dataContent).equals(this.sha);
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}

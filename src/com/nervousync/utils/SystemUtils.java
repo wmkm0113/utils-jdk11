@@ -290,7 +290,7 @@ public final class SystemUtils {
 			}
 			
 			Collections.sort(macAddrList);
-			return SecurityUtils.MD5Encode(macAddrList);
+			return SecurityUtils.MD5(macAddrList);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Generate identified key error!", e);

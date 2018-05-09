@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -14,6 +14,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -283,6 +285,71 @@ public final class ConvertUtils {
 			}
 		}
 		return object;
+	}
+	
+	public static <T> T convertMapToObject(Map<?, ?> dataMap, Class<T> clazz) {
+		try {
+			List<String> fieldNameList = ReflectionUtils.getAllDeclaredFieldNames(clazz);
+			T object = clazz.newInstance();
+			for (String fieldName : fieldNameList) {
+				Object fieldValue = dataMap.get(fieldName);
+				Field field = ReflectionUtils.findField(clazz, fieldName);
+				if (byte[].class.equals(field.getType())) {
+					ReflectionUtils.setField(fieldName, object, StringUtils.base64Decode((String)fieldValue));
+				} else if (fieldValue instanceof Map) {
+					ReflectionUtils.setField(fieldName, object, 
+							(Object)convertMapToObject((Map<?, ?>)fieldValue, field.getType()));
+				} else if (field.getType().isArray() 
+						|| List.class.isAssignableFrom(field.getType())) {
+					List<Object> valueList = new ArrayList<Object>();
+
+					Class<?> paramClass = null;
+					
+					if (field.getType().isArray()) {
+						paramClass = field.getType().getComponentType();
+					} else {
+						paramClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+					}
+					
+					if (fieldValue.getClass().isArray()) {
+						Object[] values = (Object[])fieldValue;
+						
+						for (Object value : values) {
+							if (value instanceof Map) {
+								valueList.add((Object)convertMapToObject((Map<?, ?>)value, paramClass));
+							} else {
+								valueList.add(value);
+							}
+						}
+					} else if (List.class.isAssignableFrom(fieldValue.getClass())) {
+						Object[] values = ((List<?>)fieldValue).toArray();
+						
+						for (Object value : values) {
+							if (value instanceof Map) {
+								valueList.add((Object)convertMapToObject((Map<?, ?>)value, paramClass));
+							} else {
+								valueList.add(value);
+							}
+						}
+					}
+					
+					if (field.getType().isArray()) {
+						ReflectionUtils.setField(fieldName, object, valueList.toArray());
+					} else {
+						ReflectionUtils.setField(fieldName, object, valueList);
+					}
+				} else {
+					ReflectionUtils.setField(fieldName, object, fieldValue);
+				}
+			}
+			return object;
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Convert json string to object bean error! ", e);
+			}
+		}
+		
+		return null;
 	}
 
 	public static byte[] zipByteArray(byte[] str) throws IOException {

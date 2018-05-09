@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2009 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -28,7 +28,6 @@ public class EntityResolverWithLocalDTD implements EntityResolver {
 
 	public InputSource resolveEntity(String publicId, String systemId)
 			throws SAXException, IOException {
-		// TODO Auto-generated method stub
 		InputStream inputStream = new FileInputStream(this.DTDFile);
 		InputSource inputSource = new InputSource(inputStream);
 		inputSource.setPublicId(publicId);

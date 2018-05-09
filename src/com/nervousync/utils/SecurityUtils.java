@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2010 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -25,6 +25,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
@@ -68,36 +69,17 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
 	
-	/* AES Utils Variables */
-	private static boolean SUPPORT_ADVANCE_MODE = false;
-	private static final int AES_NORMAL_KEYSIZE = 128;
-	private static final int AES_ADVANCE_KEYSIZE = 256;
-
 	/**
 	 * Default key value
 	 */
 	private static final String PRIVATE_KEY = StringUtils.randomString(32);
 
-	static {
-		try {
-			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-			String keyContent = StringUtils.randomString(32);
-			byte[] seed = keyContent.getBytes();
-			keyGenerator.init(AES_ADVANCE_KEYSIZE, new SecureRandom(seed));
-			
-			SecurityUtils.SUPPORT_ADVANCE_MODE = true;
-		} catch (Exception e) {
-			LOGGER.warn("AES/SHA is running at normal mode, please update security settings to use advance mode");
-			SecurityUtils.SUPPORT_ADVANCE_MODE = false;
-		}
-	}
-	
 	private SecurityUtils() {
 		
 	}
 	
-	public static boolean isSupportAdvanceMode() {
-		return SUPPORT_ADVANCE_MODE;
+	static {
+		Security.addProvider(new BouncyCastleProvider());
 	}
 	
 	/* MD5 Method */
@@ -107,38 +89,41 @@ public final class SecurityUtils implements Serializable {
 	 * @param source
 	 * @return MD5 value
 	 */
-	public static String MD5Encode(Object source) {
+	public static String MD5(Object source) {
 		return digestEncode(source, "MD5");
 	}
 	
 	/* SHA Method */
 	
 	/**
-	 * Get SHA value. Only encode <code>String</code>
+	 * Get SHA1 value. Only encode <code>String</code>
+	 * Using SHA256 instead
 	 * @param source
 	 * @return MD5 value
 	 */
-	public static String SHAEncode(Object source) {
-		return SHAEncode(source, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	@Deprecated
+	public static String SHA1(Object source) {
+		return digestEncode(source, "SHA1");
 	}
 	
 	/**
-	 * Get SHA value. Only encode <code>String</code>
+	 * Get SHA256 value. Only encode <code>String</code>
 	 * @param source
 	 * @param advanceMode
 	 * @return MD5 value
 	 */
-	public static String SHAEncode(Object source, boolean advanceModeIfSupport) {
-		String algorithm = null;
-		if (SecurityUtils.SUPPORT_ADVANCE_MODE && advanceModeIfSupport) {
-			algorithm = "SHA-512";
-		}
-
-		if (algorithm == null) {
-			algorithm = "SHA-256";
-		}
-		
-		return digestEncode(source, algorithm);
+	public static String SHA256(Object source) {
+		return digestEncode(source, "SHA-256");
+	}
+	
+	/**
+	 * Get SHA512 value. Only encode <code>String</code>
+	 * @param source
+	 * @param advanceMode
+	 * @return MD5 value
+	 */
+	public static String SHA512(Object source) {
+		return digestEncode(source, "SHA-512");
 	}
 
 	/* AES Method */
@@ -153,8 +138,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESEncrypt(byte[] arrB, String strKey) throws Exception {
-		return AESEncrypt(arrB, strKey, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static byte[] AES128Encrypt(byte[] arrB, String strKey) throws Exception {
+		return AESEncrypt(arrB, strKey, 128);
 	}
 
 	/**
@@ -167,16 +152,30 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESEncrypt(byte[] arrB, String strKey, boolean advanceModeIfSupport) throws Exception {
+	public static byte[] AES256Encrypt(byte[] arrB, String strKey) throws Exception {
+		return AESEncrypt(arrB, strKey, 256);
+	}
+
+	/**
+	 * 加密字节数组
+	 * 
+	 * @param arrB						需加密的字节数组
+	 * @param strKey					使用的加密密钥
+	 * @param keySize					密钥长度
+	 * @param advanceModeIfSupport		强制指定高级模式加密
+	 * @return							加密后的字节数组
+	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 */
+	public static byte[] AESEncrypt(byte[] arrB, String strKey, int keySize) throws Exception {
 		if (strKey == null || strKey.length() % 16 != 0) {
 			throw new Exception("Data length error");
 		}
 		Cipher encryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), advanceModeIfSupport);
+		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), keySize);
 		encryptCipher.init(Cipher.ENCRYPT_MODE, key);
 		return encryptCipher.doFinal(arrB);
 	}
-
+	
 	/**
 	 * 加密字符串
 	 * 
@@ -185,9 +184,9 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESEncrypt(String strIn, String strKey) throws Exception {
-		return ConvertUtils.byteArrayToHexString(AESEncrypt(ConvertUtils.convertToByteArray(strIn), 
-				strKey, SecurityUtils.SUPPORT_ADVANCE_MODE));
+	public static String AES128Encrypt(String strIn, String strKey) throws Exception {
+		return ConvertUtils.byteArrayToHexString(
+				AES128Encrypt(ConvertUtils.convertToByteArray(strIn), strKey));
 	}
 
 	/**
@@ -199,8 +198,9 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESEncrypt(String strIn, String strKey, boolean advanceModeIfSupport) throws Exception {
-		return ConvertUtils.byteArrayToHexString(AESEncrypt(ConvertUtils.convertToByteArray(strIn), strKey, advanceModeIfSupport));
+	public static String AES256Encrypt(String strIn, String strKey) throws Exception {
+		return ConvertUtils.byteArrayToHexString(
+				AES256Encrypt(ConvertUtils.convertToByteArray(strIn), strKey));
 	}
 
 	/**
@@ -210,8 +210,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESEncrypt(byte[] arrB) throws Exception {
-		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static byte[] AES128Encrypt(byte[] arrB) throws Exception {
+		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
 	}
 
 	/**
@@ -222,8 +222,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESEncrypt(byte[] arrB, boolean advanceModeIfSupport) throws Exception {
-		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, advanceModeIfSupport);
+	public static byte[] AES256Encrypt(byte[] arrB) throws Exception {
+		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
 	}
 
 	/**
@@ -233,8 +233,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESEncrypt(String strIn) throws Exception {
-		return AESEncrypt(strIn, SecurityUtils.PRIVATE_KEY, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static String AES128Encrypt(String strIn) throws Exception {
+		return AES128Encrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
@@ -245,8 +245,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							加密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESEncrypt(String strIn, boolean advanceModeIfSupport) throws Exception {
-		return AESEncrypt(strIn, SecurityUtils.PRIVATE_KEY, advanceModeIfSupport);
+	public static String AES256Encrypt(String strIn) throws Exception {
+		return AES256Encrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 	
 	/**
@@ -257,8 +257,20 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESDecrypt(byte[] arrB, String strKey) throws Exception {
-		return AESDecrypt(arrB, strKey, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static byte[] AES128Decrypt(byte[] arrB, String strKey) throws Exception {
+		return AESDecrypt(arrB, strKey, 128);
+	}
+
+	/**
+	 * 解密字节数组
+	 * 
+	 * @param arrB						需解密的字节数组
+	 * @param strKey					使用的解密密钥
+	 * @return							解密后的字节数组
+	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 */
+	public static byte[] AES256Decrypt(byte[] arrB, String strKey) throws Exception {
+		return AESDecrypt(arrB, strKey, 256);
 	}
 	
 	/**
@@ -270,12 +282,12 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESDecrypt(byte[] arrB, String strKey, boolean advanceModeIfSupport) throws Exception {
+	public static byte[] AESDecrypt(byte[] arrB, String strKey, int keySize) throws Exception {
 		if (strKey == null || strKey.length() % 16 != 0) {
 			throw new Exception("Data length error");
 		}
 		Cipher decryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), advanceModeIfSupport);
+		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), keySize);
 		decryptCipher.init(Cipher.DECRYPT_MODE, key);
 		return decryptCipher.doFinal(arrB);
 	}
@@ -288,8 +300,16 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESDecrypt(String strIn, String strKey) throws Exception {
-		return AESDecrypt(strIn, strKey, SUPPORT_ADVANCE_MODE);
+	public static String AES128Decrypt(String strIn, String strKey) throws Exception {
+		try {
+			byte[] decryptData = AESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey, 128);
+			return ConvertUtils.convertToString(decryptData);
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Decrypt data error! ", e);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -301,9 +321,9 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESDecrypt(String strIn, String strKey, boolean advanceModeIfSupport) throws Exception {
+	public static String AES256Decrypt(String strIn, String strKey) throws Exception {
 		try {
-			byte[] decryptData = AESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey, advanceModeIfSupport);
+			byte[] decryptData = AESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey, 256);
 			return ConvertUtils.convertToString(decryptData);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
@@ -321,8 +341,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESDecrypt(byte[] arrB) throws Exception {
-		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static byte[] AES128Decrypt(byte[] arrB) throws Exception {
+		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
 	}
 
 	/**
@@ -334,8 +354,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字节数组
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static byte[] AESDecrypt(byte[] arrB, boolean advanceModeIfSupport) throws Exception {
-		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, advanceModeIfSupport);
+	public static byte[] AES256Decrypt(byte[] arrB) throws Exception {
+		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
 	}
 
 	/**
@@ -346,8 +366,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESDecrypt(String strIn) throws Exception {
-		return AESDecrypt(strIn, SecurityUtils.PRIVATE_KEY, SecurityUtils.SUPPORT_ADVANCE_MODE);
+	public static String AES128Decrypt(String strIn) throws Exception {
+		return AES128Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
@@ -359,8 +379,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							解密后的字符串
 	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
 	 */
-	public static String AESDecrypt(String strIn, boolean advanceModeIfSupport) throws Exception {
-		return AESDecrypt(strIn, SecurityUtils.PRIVATE_KEY, advanceModeIfSupport);
+	public static String AES256Decrypt(String strIn) throws Exception {
+		return AES256Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 	
 	/* DES Method */
@@ -554,29 +574,38 @@ public final class SecurityUtils implements Serializable {
 		}
 	}
 
-	public static KeyPair generateKeyPair() throws Exception {
-		return SecurityUtils.generateKeyPair(1024);
+	public static KeyPair RSAKeyPair() throws Exception {
+		return SecurityUtils.KeyPair("RSA", 1024);
 	}
 
-	public static KeyPair generateKeyPair(int keySize) throws Exception {
-		if (keySize % 128 != 0) {
-			throw new Exception("Keysize is invalid");
-		}
-		//	Initialize keyPair instance
-		KeyPairGenerator keyPairGenerator = 
-			KeyPairGenerator.getInstance("RSA", new BouncyCastleProvider());
-		keyPairGenerator.initialize(keySize, new SecureRandom());
-		
-		//	Generate keyPair
-		return keyPairGenerator.generateKeyPair();
+	public static KeyPair RSAKeyPair(int keySize) throws Exception {
+		return SecurityUtils.KeyPair("RSA", keySize);
 	}
 
-	public static PublicKey generateRSAPublicKey(byte[] keyContent) 
+	public static KeyPair DSAKeyPair() throws Exception {
+		return SecurityUtils.KeyPair("DSA", 1024);
+	}
+
+	public static KeyPair DSAKeyPair(int keySize) throws Exception {
+		return SecurityUtils.KeyPair("DSA", keySize);
+	}
+
+	public static PublicKey DSAPublicKey(byte[] keyContent) 
+			throws InvalidKeySpecException, NoSuchAlgorithmException {
+		return KeyFactory.getInstance("DSA").generatePublic(new X509EncodedKeySpec(keyContent));
+	}
+	
+	public static PrivateKey DSAPrivateKey(byte[] keyContent) 
+			throws InvalidKeySpecException, NoSuchAlgorithmException {
+		return KeyFactory.getInstance("DSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
+	}
+
+	public static PublicKey RSAPublicKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyContent));
 	}
 	
-	public static PublicKey generateRSAPublicKey(BigInteger modulus, BigInteger exponent) 
+	public static PublicKey RSAPublicKey(BigInteger modulus, BigInteger exponent) 
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
 		RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, exponent);
@@ -584,12 +613,12 @@ public final class SecurityUtils implements Serializable {
 		return keyFactory.generatePublic(publicKeySpec);
 	}
 	
-	public static PrivateKey generateRSAPrivateKey(byte[] keyContent) 
+	public static PrivateKey RSAPrivateKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
 	}
 	
-	public static PrivateKey generateRSAPrivateKey(BigInteger modulus, BigInteger exponent) 
+	public static PrivateKey RSAPrivateKey(BigInteger modulus, BigInteger exponent) 
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
 		RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
@@ -597,8 +626,73 @@ public final class SecurityUtils implements Serializable {
 		return keyFactory.generatePrivate(privateKeySpec);
 	}
 	
+	public static byte[] SignDataWithDSA(PrivateKey privateKey, String message) {
+		return SignData(privateKey, message.getBytes(), "SHA256withDSA");
+	}
+
+	public static byte[] SignDataWithDSA(PrivateKey privateKey, byte[] datas) {
+		return SignData(privateKey, datas, "SHA256withDSA");
+	}
+	
+	public static boolean VerifyDSASign(PublicKey publicKey, 
+			byte[] datas, byte[] signature) {
+		return VerifySign(publicKey, datas, signature, "SHA256withDSA");
+	}
+	
+	public static byte[] SignDataWithRSA(PrivateKey privateKey, String message) {
+		return SignData(privateKey, message.getBytes(), "SHA256withRSA");
+	}
+
+	public static byte[] SignDataWithRSA(PrivateKey privateKey, byte[] datas) {
+		return SignData(privateKey, datas, "SHA256withRSA");
+	}
+	
+	public static boolean VerifyRSASign(PublicKey publicKey, 
+			byte[] datas, byte[] signature) {
+		return VerifySign(publicKey, datas, signature, "SHA256withRSA");
+	}
+	
+	private static KeyPair KeyPair(String algorithm, int keySize) throws Exception {
+		if (keySize % 128 != 0) {
+			throw new Exception("Keysize is invalid");
+		}
+		//	Initialize keyPair instance
+		KeyPairGenerator keyPairGenerator = 
+			KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
+		keyPairGenerator.initialize(keySize, new SecureRandom());
+		
+		//	Generate keyPair
+		return keyPairGenerator.generateKeyPair();
+	}
+	
+	private static byte[] SignData(PrivateKey privateKey, byte[] datas, String algorithm) {
+		try {
+			Signature signature = Signature.getInstance(algorithm);
+			signature.initSign(privateKey);
+			signature.update(datas);
+			
+			return signature.sign();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	private static boolean VerifySign(PublicKey publicKey, 
+			byte[] datas, byte[] signature, String algorithm) {
+		try {
+			Signature signInstance = Signature.getInstance(algorithm);
+			
+			signInstance.initVerify(publicKey);
+			signInstance.update(datas);
+			
+			return signInstance.verify(signature);
+		} catch (Exception e) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+	}
+	
 	/**
-	 * Get MD5 value
+	 * Get digest value
 	 * @param source	Input source
 	 * @param isFile	<code>true</code> Is file <code>false</code> Is String
 	 * @return MD5 value
@@ -655,10 +749,6 @@ public final class SecurityUtils implements Serializable {
 				return "";
 			}
 			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
-		} else if (source instanceof String) {
-			byte[] strTemp = ((String)source).getBytes();
-			messageDigest.update(strTemp);
-			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 		} else {
 			byte[] tempBytes = ConvertUtils.convertToByteArray(source);
 			messageDigest.update(tempBytes);
@@ -692,21 +782,9 @@ public final class SecurityUtils implements Serializable {
 		}
 	}
 	
-	private static Key generateAESKey(byte[] keyContent, boolean advanceModeIfSupport) throws NoSuchAlgorithmException {
+	private static Key generateAESKey(byte[] keyContent, int keySize) throws NoSuchAlgorithmException {
 		if (keyContent == null) {
 			return null;
-		}
-		
-		int keySize = Globals.DEFAULT_VALUE_INT;
-
-		if (SUPPORT_ADVANCE_MODE) {
-			keySize = AES_ADVANCE_KEYSIZE;
-		} else {
-			keySize = AES_NORMAL_KEYSIZE;
-		}
-		
-		if (SUPPORT_ADVANCE_MODE && !advanceModeIfSupport) {
-			keySize = AES_NORMAL_KEYSIZE;
 		}
 		
 		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

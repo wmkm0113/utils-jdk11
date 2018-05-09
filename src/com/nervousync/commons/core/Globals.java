@@ -58,8 +58,11 @@ public final class Globals {
 	public static final String DEFAULT_PROTOCOL_PREFIX_HTTP = "http://";
 	public static final String DEFAULT_PROTOCOL_PREFIX_HTTPS = "https://";
 	
-	public static final int INITIALIZE_INT_VALUE = 0;
+	public static final int NERVOUSYNC_STATUS_FALSE = 0;
+	public static final int NERVOUSYNC_STATUS_TRUE = 1;
 	
+	public static final int INITIALIZE_INT_VALUE = 0;
+
 	public static final int SNMP_VERSION_1 = 0;
 	public static final int SNMP_VERSION_2C = 1;
 	public static final int SNMP_VERSION_3 = 2;

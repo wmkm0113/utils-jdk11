@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.raf.NervousyncRandomAccessFile;
+import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.core.ZipOptions;
 import com.nervousync.commons.zip.crypto.Decryptor;
@@ -239,6 +239,15 @@ public final class ZipFile implements Cloneable {
 			entryList.add(generalFileHeader.getEntryPath());
 		}
 		return entryList;
+	}
+	
+	public boolean isEntryExists(String entryPath) {
+		for (GeneralFileHeader generalFileHeader : this.centralDirectory.getFileHeaders()) {
+			if (generalFileHeader.getEntryPath().equals(entryPath)) {
+				return true;
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
 	public byte[] readEntry(String entryPath) throws ZipException {

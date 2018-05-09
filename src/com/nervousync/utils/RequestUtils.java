@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003 - 2009 Nervousync Studio, Inc. All rights reserved.
+ * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
  * This software is the confidential and proprietary information of 
  * Nervousync Studio, Inc. You shall not disclose such Confidential
  * Information and shall use it only in accordance with the terms of the 
@@ -11,6 +11,7 @@ import com.nervousync.commons.beans.servlet.request.RequestAttribute;
 import com.nervousync.commons.beans.servlet.request.RequestInfo;
 import com.nervousync.commons.beans.servlet.response.HttpResponseContent;
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.RegexGlobals;
 import com.nervousync.commons.http.cookie.CookieInfo;
 import com.nervousync.commons.http.entity.HttpEntity;
 import com.nervousync.commons.http.header.SimpleHeader;
@@ -44,12 +45,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -76,9 +79,6 @@ public final class RequestUtils {
 	
 	private static final String STOWED_REQUEST_ATTRIBS = "ssl.redirect.attrib.stowed";
 	private static final int DEFAULT_TIME_OUT = 5;
-	private static final String IPV4_REGEX = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
-	private static final String IPV6_REGEX = "^([\\da-fA-F]{1,4}(:[\\da-fA-F]{1,4}){7}|([\\da-fA-F]{1,4}){0,1}:(:[\\da-fA-F]{1,4}){1,7}|[\\da-fA-F]{1,4}::|::)$";
-	private static final String IPV6_COMPRESS_REGEX = "(^|:)(0+(:|$)){2,8}";
 	
 	private static final String HTTP_METHOD_GET = "GET";
 	private static final String HTTP_METHOD_POST = "POST";
@@ -102,36 +102,71 @@ public final class RequestUtils {
 		
 	}
 	
-	public static long convertIPv4ToNum(String ipAddress) {
-		if (StringUtils.matches(ipAddress, IPV4_REGEX)) {
-			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
-			if (splitAddr.length == 4) {
-				long result = 0L;
-				result += Long.parseLong(splitAddr[3]);
-				result += Long.parseLong(splitAddr[2]) << 8;
-				result += Long.parseLong(splitAddr[1]) << 16;
-				result += Long.parseLong(splitAddr[0]) << 24;
-				return result;
+	public static String resolveDomain(String domainName) {
+		try {
+			return InetAddress.getByName(domainName).getHostAddress();
+		} catch (UnknownHostException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Resolve domain error! ", e);
 			}
 		}
-		return Globals.DEFAULT_VALUE_LONG;
+		return null;
 	}
 	
-	public static BigInteger convertIPv6ToNum(String ipAddress) {
-		if (StringUtils.matches(ipAddress, IPV6_REGEX)) {
+	public static byte[] convertIPv4ToBytes(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			byte[] addrBytes = new byte[4];
+			
+			addrBytes[0] = (byte)Integer.parseInt(splitAddr[0]);
+			addrBytes[1] = (byte)Integer.parseInt(splitAddr[1]);
+			addrBytes[2] = (byte)Integer.parseInt(splitAddr[2]);
+			addrBytes[3] = (byte)Integer.parseInt(splitAddr[3]);
+			
+			return addrBytes;
+		}
+		return null;
+	}
+	
+	public static BigInteger convertIPtoBigInteger(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			return RequestUtils.convertIPv4ToBigInteger(ipAddress);
+		} else {
+			return RequestUtils.convertIPv6ToBigInteger(ipAddress);
+		}
+	}
+
+	public static BigInteger convertIPv4ToBigInteger(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			if (splitAddr.length == 4) {
+				BigInteger bigInteger = BigInteger.ZERO;
+				
+				for (int i = 0 ; i < splitAddr.length ; i++) {
+					BigInteger currentInteger = BigInteger.valueOf(Long.parseLong(splitAddr[3 - i])).shiftLeft(i * 8);
+					bigInteger = bigInteger.add(currentInteger);
+				}
+				return bigInteger;
+			}
+		}
+		return null;
+	}
+	
+	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)) {
 			ipAddress = appendIgnore(ipAddress);
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ":");
 			if (splitAddr.length == 8) {
 				BigInteger bigInteger = BigInteger.ZERO;
 				int index = 0;
 				for (String split : splitAddr) {
-					if (StringUtils.matches(split, IPV4_REGEX)) {
-						bigInteger = bigInteger.add(BigInteger.valueOf(convertIPv4ToNum(split))
-								.shiftLeft(16 * (splitAddr.length - index - 1)));
+					BigInteger currentInteger = null;
+					if (StringUtils.matches(split, RegexGlobals.IPV4_REGEX)) {
+						currentInteger = convertIPv4ToBigInteger(split);
 					} else {
-						bigInteger = bigInteger.add(BigInteger.valueOf(Long.valueOf(split, 16))
-								.shiftLeft(16 * (splitAddr.length - index - 1)));
+						currentInteger = BigInteger.valueOf(Long.valueOf(split, 16));
 					}
+					bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddr.length - index - 1)));
 					index++;
 				}
 				return bigInteger;
@@ -140,21 +175,19 @@ public final class RequestUtils {
 		return null;
 	}
 	
-	public static String convertNumToIPv4(long num) {
-		StringBuilder stringBuilder = new StringBuilder();
+	public static String convertBigIntegerToIPv4(BigInteger bigInteger) {
+		String ipv4Addr = "";
+		BigInteger ff = BigInteger.valueOf(0xFFL);
 		
-		stringBuilder.append(String.valueOf(num >>> 24));
-		stringBuilder.append(".");
-		stringBuilder.append(String.valueOf((num & 0x00FFFFFF) >>> 16));
-		stringBuilder.append(".");
-		stringBuilder.append(String.valueOf((num & 0x0000FFFF) >>> 8));
-		stringBuilder.append(".");
-		stringBuilder.append(String.valueOf(num & 0x000000FF));
+		for (int i = 0 ; i < 4 ; i++) {
+			ipv4Addr = bigInteger.and(ff).toString() + "." + ipv4Addr;
+			bigInteger = bigInteger.shiftRight(8);
+		}
 		
-		return stringBuilder.toString();
+		return ipv4Addr.substring(0, ipv4Addr.length() - 1);
 	}
 	
-	public static String convertNumToIPv6Addr(BigInteger bigInteger) {
+	public static String convertBigIntegerToIPv6Addr(BigInteger bigInteger) {
 		String ipv6Addr = "";
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
 		
@@ -163,7 +196,7 @@ public final class RequestUtils {
 			bigInteger = bigInteger.shiftRight(16);
 		}
 		
-		return ipv6Addr.substring(0, ipv6Addr.length() - 1).replaceFirst(IPV6_COMPRESS_REGEX, "::");
+		return ipv6Addr.substring(0, ipv6Addr.length() - 1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
 	}
 	
 	public static <T> T generateSOAPClient(String endPointUrl, Class<T> serviceEndpointInterface, HandlerResolver handlerResolver) 
