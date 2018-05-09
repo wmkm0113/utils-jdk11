@@ -20,9 +20,10 @@
 		</license>
 	</licenses>
 	<scm>
+		<tag>master</tag>
 		<url>https://github.com/wmkm0113/NervousyncUtils</url>
-		<connection>https://github.com/wmkm0113/NervousyncUtils.git</connection>
-		<developerConnection>https://development.nervousync.com</developerConnection>
+		<connection>scm:git:https://github.com/wmkm0113/NervousyncUtils.git</connection>
+		<developerConnection>https://development.nervousync.com/NervousyncUtils</developerConnection>
 	</scm>
 	<developers>
 		<developer>
@@ -35,6 +36,11 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.version>3.7.0</maven.compiler.version>
+		<maven.jar.version>3.1.0</maven.jar.version>
+		<maven.source.version>3.0.1</maven.source.version>
+		<maven.javadoc.version>3.0.0</maven.javadoc.version>
+		<maven.gpg.version>1.6</maven.gpg.version>
 		<bcprov.version>1.59</bcprov.version>
 		<cglib.version>3.2.6</cglib.version>
 		<dom4j.version>2.0.2</dom4j.version>
@@ -272,7 +278,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.1</version>
+					<version>${maven.compiler.version}</version>
 					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
@@ -281,7 +287,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>${maven.jar.version}</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -297,6 +303,51 @@
 							<exclude>*.dat</exclude>
 						</excludes>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven.source.version}</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven.javadoc.version}</version>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>${maven.gpg.version}</version>
+					<executions>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+							<configuration>
+								<executable>gpg</executable>
+								<keyname>${gpg.keyname}</keyname>
+								<passphraseServerId>${gpg.keyname}</passphraseServerId>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
