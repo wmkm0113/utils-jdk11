@@ -816,7 +816,8 @@ public final class RequestUtils {
 		requestUrl.append(scheme);
 		requestUrl.append("://");
 		requestUrl.append(request.getServerName());
-		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
+		if ((scheme.equalsIgnoreCase("http") && (port != 80)) 
+				|| (scheme.equalsIgnoreCase("https") && (port != 443))) {
 			requestUrl.append(':');
 			requestUrl.append(port);
 		}

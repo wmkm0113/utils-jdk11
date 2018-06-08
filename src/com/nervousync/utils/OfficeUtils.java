@@ -313,7 +313,7 @@ public final class OfficeUtils {
 					workbook = new HSSFWorkbook(inputStream);
 				}
 			} else if (EXCEL_FILE_EXT_NAME_2007.equals(fileExtName)) {
-				if (inputStream == null) {
+				if (inputStream != null) {
 					workbook = new XSSFWorkbook(inputStream);
 				}
 			}
@@ -402,7 +402,12 @@ public final class OfficeUtils {
 			return;
 		}
 		
-		Sheet sheet = workbook.createSheet(sheetName);
+		Sheet sheet = null;
+		if (workbook.getSheet(sheetName) != null) {
+			sheet = workbook.getSheet(sheetName);
+		} else {
+			sheet = workbook.createSheet(sheetName);
+		}
 		
 		for (int j = 0 ; j < sheetValues.size() ; j++) {
 			Row row = sheet.createRow(j);

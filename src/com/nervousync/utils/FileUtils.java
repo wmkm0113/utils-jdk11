@@ -22,12 +22,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -2507,7 +2507,7 @@ public final class FileUtils {
 		InputStream inputStream = null;
 		
 		try {
-			inputStream = FileUtils.class.getResourceAsStream("/datas/FileIden.dat");
+			inputStream = FileUtils.class.getClassLoader().getResourceAsStream("com/nervousync/datas/File.dat");
 			bytes = FileUtils.readFileBytes(inputStream);
 		} catch (IOException e) {
 			if (FileUtils.LOGGER.isDebugEnabled()) {
@@ -2525,20 +2525,26 @@ public final class FileUtils {
 		
 		List<FileExtensionInfo> extensionInfoList = new ArrayList<FileExtensionInfo>();
 		byte[] readBuffer = null;
-		int index = 0;
-		while (index < bytes.length) {
-			int dataLength = RawOperator.readIntFromLittleEndian(bytes, index);
-			if (dataLength > 0) {
-				readBuffer = new byte[dataLength];
-				System.arraycopy(bytes, index + 2, readBuffer, 0, dataLength);
-				int fileType = (int)readBuffer[0];
-				boolean printing = ((int)readBuffer[1]) == 1;
-				String contentInfo = new String(Arrays.copyOfRange(readBuffer, 2, dataLength));
-				
+		byte[] intBuffer = new byte[4];
+		System.arraycopy(bytes, 0, intBuffer, 0, 4);
+		int dataCount = RawOperator.readIntFromLittleEndian(intBuffer, 0);
+		int srcPos = 4;
+		for (int i = 0 ; i < dataCount ; i++) {
+			byte[] indexData = new byte[6];
+			System.arraycopy(bytes, srcPos, indexData, 0, indexData.length);
+			srcPos += 6;
+			
+			int fileType = (int)indexData[0];
+			boolean printing = ((int)indexData[1]) == 1;
+			int dataLength = RawOperator.readIntFromLittleEndian(indexData, 2);
+			
+			readBuffer = new byte[dataLength];
+			System.arraycopy(bytes, srcPos, readBuffer, 0, dataLength);
+			srcPos += dataLength;
+			try {
+				String contentInfo = new String(readBuffer, Globals.DEFAULT_ENCODING);
 				extensionInfoList.add(new FileExtensionInfo(fileType, printing, contentInfo));
-				index += (dataLength + 4);
-			} else {
-				break;
+			} catch (UnsupportedEncodingException e) {
 			}
 		}
 		

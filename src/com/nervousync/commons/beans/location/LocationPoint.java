@@ -43,6 +43,10 @@ public final class LocationPoint implements Serializable {
 	public static LocationPoint bd09Point(double longitude, double latitude) {
 		return new LocationPoint(LocationType.BD_09, longitude, latitude);
 	}
+
+	public static LocationPoint deltaPoint(double longitude, double latitude) {
+		return new LocationPoint(LocationType.DELTA, longitude, latitude);
+	}
 	
 	/**
 	 * @return the locationType
@@ -78,6 +82,6 @@ public final class LocationPoint implements Serializable {
 	}
 	
 	public static enum LocationType {
-		GPS, GCJ_02, BD_09
+		GPS, GCJ_02, BD_09, DELTA
 	}
 }

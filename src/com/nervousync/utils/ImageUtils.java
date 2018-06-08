@@ -201,6 +201,7 @@ public final class ImageUtils {
 						targetHeight = Double.valueOf(ratio * origHeight).intValue();
 					}
 				}
+				
 				return resizeImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
@@ -211,35 +212,27 @@ public final class ImageUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
-	/**
-	 * Process image resize operate
-	 * @param srcImage				original image object
-	 * @param destPath				target output path
-	 * @param targetWidth			target width
-	 * @param targetHeight			target height
-	 * @param markOptions			image mark options
-	 * @return		<code>true</code>success	<code>false</code>failed
-	 */
-	private static boolean resizeImage(BufferedImage srcImage, String destPath, 
-			int targetWidth, int targetHeight, MarkOptions markOptions) {
-		if (srcImage != null && destPath != null && targetWidth > 0 && targetHeight > 0) {
-			try {
-				BufferedImage bufferedImage = 
-						new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-				Graphics2D graphics = bufferedImage.createGraphics();
-				graphics.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
-
-				if (markOptions != null) {
-					markImage(graphics, targetWidth, targetHeight, markOptions);
-				}
-				graphics.dispose();
-				
-				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), 
-						FileUtils.getFile(destPath));
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Resize picture error! ", e);
-				}
+	public static boolean markImage(String filePath, String targetPath, MarkOptions markOptions) {
+		int imageWidth = ImageUtils.imageWidth(filePath);
+		int imageHeight = ImageUtils.imageHeight(filePath);
+		try {
+			BufferedImage srcImage = ImageIO.read(FileUtils.getFile(filePath));
+			
+			BufferedImage bufferedImage = 
+					new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphics = bufferedImage.createGraphics();
+			graphics.drawImage(srcImage, 0, 0, imageWidth, imageHeight, null);
+			
+			if (markOptions != null) {
+				markImage(graphics, imageWidth, imageHeight, markOptions);
+			}
+			graphics.dispose();
+			
+			return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(targetPath), 
+					FileUtils.getFile(targetPath));
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Mark picture error! ", e);
 			}
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -285,5 +278,39 @@ public final class ImageUtils {
 				break;
 			}
 		}
+	}
+	
+	/**
+	 * Process image resize operate
+	 * @param srcImage				original image object
+	 * @param destPath				target output path
+	 * @param targetWidth			target width
+	 * @param targetHeight			target height
+	 * @param markOptions			image mark options
+	 * @return		<code>true</code>success	<code>false</code>failed
+	 */
+	private static boolean resizeImage(BufferedImage srcImage, String destPath, 
+			int targetWidth, int targetHeight, MarkOptions markOptions) {
+		if (srcImage != null && destPath != null && targetWidth > 0 && targetHeight > 0) {
+			try {
+				BufferedImage bufferedImage = 
+						new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+				Graphics2D graphics = bufferedImage.createGraphics();
+				graphics.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
+
+				if (markOptions != null) {
+					markImage(graphics, targetWidth, targetHeight, markOptions);
+				}
+				graphics.dispose();
+				
+				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), 
+						FileUtils.getFile(destPath));
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Resize picture error! ", e);
+				}
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 }

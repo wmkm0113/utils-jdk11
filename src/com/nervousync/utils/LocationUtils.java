@@ -110,50 +110,25 @@ public final class LocationUtils {
 	}
 	
 	private static LocationPoint convertGCJ02ToGPS(double longitude, double latitude) {
-		double initDelta = 0.01;
-		double threshold = 0.000000001;
-		double mLat = latitude - initDelta;
-		double mLon = longitude - initDelta;
-		double pLat = latitude + initDelta;
-		double pLon = longitude + initDelta;
-		double gpsLat = 0.0;
-		double gpsLon = 0.0;
-		int index = 0;
-		while (true) {
-			gpsLat = (mLat + pLat) / 2;
-			gpsLon = (mLon + pLon) / 2;
-			
-			LocationPoint fixedPoint = convertGPSToGCJ02(gpsLon, gpsLat);
-			
-			if ((Math.abs(fixedPoint.getLatitude() - latitude) < threshold) 
-					&& (Math.abs(fixedPoint.getLongitude()) < threshold)) {
-				break;
-			}
-			
-			if (fixedPoint.getLatitude() - latitude > 0) {
-				pLat = gpsLat;
-			} else {
-				mLat = gpsLat;
-			}
-			
-			if (fixedPoint.getLongitude() - longitude > 0) {
-				pLon = gpsLon;
-			} else {
-				mLon = gpsLon;
-			}
-			
-			if (++index > 10000) {
-				break;
-			}
+		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
+			return LocationPoint.gpsPoint(longitude, latitude);
+		} else {
+			LocationPoint deltaPoint = deltaPoint(longitude, latitude);
+			return LocationPoint.gpsPoint(longitude - deltaPoint.getLongitude(), 
+					latitude - deltaPoint.getLatitude());
 		}
-		
-		return LocationPoint.gpsPoint(gpsLon, gpsLat);
 	}
 	
 	private static LocationPoint convertGPSToGCJ02(double longitude, double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
 			return LocationPoint.gcj02Point(longitude, latitude);
 		}
+		LocationPoint deltaPoint = deltaPoint(longitude, latitude);
+		return LocationPoint.gcj02Point(longitude + deltaPoint.getLongitude(), 
+				latitude + deltaPoint.getLatitude());
+	}
+	
+	private static LocationPoint deltaPoint(double longitude, double latitude) {
 		double radiLati = latitude / 180.0 * Math.PI;
 		double magic = 1 - EARTH_EE * Math.pow(Math.sin(radiLati), 2);
 		double magicSqrt = Math.sqrt(magic);
@@ -161,7 +136,7 @@ public final class LocationUtils {
 				/ ((EARTH_R * (1 - EARTH_EE)) / (magic * magicSqrt) * Math.PI));
 		double fixedLongitude = ((transformLongidute(longitude - 105.0, latitude - 35.0) * 180.0) 
 				/ (EARTH_R / magicSqrt * Math.cos(radiLati) * Math.PI));
-		return LocationPoint.gcj02Point(longitude + fixedLongitude, latitude + fixedLatitude);
+		return LocationPoint.deltaPoint(fixedLongitude, fixedLatitude);
 	}
 	
 	private static double transformLatidute(double longitude, double latitude) {

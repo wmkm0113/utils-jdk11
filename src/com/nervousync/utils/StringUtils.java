@@ -1365,7 +1365,8 @@ public final class StringUtils {
 	
 	public static String convertObjectToJSONString(Object object) {
 		TreeMap<String, Object> valueMap = new TreeMap<String, Object>();
-		if (object instanceof Map) {
+		if (object instanceof Map || object.getClass().isArray() 
+				|| Collection.class.isAssignableFrom(object.getClass())) {
 			ObjectMapper objectMapper = new ObjectMapper();
 			try {
 				return objectMapper.writeValueAsString(object);

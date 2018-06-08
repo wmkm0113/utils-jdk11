@@ -7,11 +7,15 @@
  */
 package com.nervousync.commons.beans.files;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
+import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.StringUtils;
 
@@ -124,5 +128,18 @@ public final class FileExtensionInfo extends BaseElement {
 	
 	public boolean isPicture() {
 		return this.fileType == FileUtils.FILE_TYPE_PIC;
+	}
+	
+	public byte[] convertToByteArray() throws UnsupportedEncodingException {
+		String content = this.extensionName + "|" + this.identifiedCode + "|" + this.mimeType;
+		byte[] datas = content.getBytes(Globals.DEFAULT_ENCODING);
+		byte[] dataItem = new byte[6 + datas.length];
+		
+		dataItem[0] = (byte)this.fileType;
+		dataItem[1] = this.printing ? (byte)Globals.NERVOUSYNC_STATUS_TRUE : (byte)Globals.NERVOUSYNC_STATUS_FALSE;
+		RawOperator.writeIntFromLittleEndian(dataItem, 2, datas.length);
+		RawOperator.writeStringFromLittleEndian(dataItem, 6, content);
+		
+		return dataItem;
 	}
 }
