@@ -8,7 +8,7 @@
 package com.nervousync.commons.zip.crypto.impl;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Encryptor;
 import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;

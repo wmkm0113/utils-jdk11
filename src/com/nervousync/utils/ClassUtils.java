@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.nervousync.matcher.Assert;
-
 /**
  * Miscellaneous class utility methods. Mainly for internal use within the
  * framework; consider Jakarta's Commons Lang for a more comprehensive suite
@@ -205,7 +203,9 @@ public final class ClassUtils {
 	 * @see Class#forName(String, boolean, ClassLoader)
 	 */
 	public static Class<?> forName(String name, ClassLoader classLoader) throws ClassNotFoundException, LinkageError {
-		Assert.notNull(name, "Name must not be null");
+		if (name == null) {
+			throw new IllegalArgumentException("Name must not be null");
+		}
 
 		Class<?> clazz = resolvePrimitiveClassName(name);
 		if (clazz != null) {
@@ -297,7 +297,9 @@ public final class ClassUtils {
 	 * @return the user-defined class
 	 */
 	public static Class<?> getUserClass(Object instance) {
-		Assert.notNull(instance, "Instance must not be null");
+		if (instance == null) {
+			throw new IllegalArgumentException("Instance must not be null");
+		}
 		return getUserClass(instance.getClass());
 	}
 
@@ -319,7 +321,9 @@ public final class ClassUtils {
 	 * @param classLoader the ClassLoader to potentially cache metadata in
 	 */
 	public static boolean isCacheSafe(Class<?> clazz, ClassLoader classLoader) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		ClassLoader target = clazz.getClassLoader();
 		if (target == null) {
 			return false;
@@ -345,7 +349,9 @@ public final class ClassUtils {
 	 * @throws IllegalArgumentException if the className is empty
 	 */
 	public static String getShortName(String className) {
-		Assert.hasLength(className, "Class name must not be empty");
+		if (!StringUtils.hasLength(className)) {
+			throw new IllegalArgumentException("Class name must not be empty");
+		}
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
 		int nameEndIndex = className.indexOf(CGLIB_CLASS_SEPARATOR);
 		if (nameEndIndex == -1) {
@@ -386,7 +392,9 @@ public final class ClassUtils {
 	 * @return the file name of the ".class" file
 	 */
 	public static String getClassFileName(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		String className = clazz.getName();
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
 		return className.substring(lastDotIndex + 1) + CLASS_FILE_SUFFIX;
@@ -400,7 +408,9 @@ public final class ClassUtils {
 	 * is defined in the default package
 	 */
 	public static String getPackageName(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		String className = clazz.getName();
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
 		return (lastDotIndex != -1 ? className.substring(0, lastDotIndex) : "");
@@ -413,7 +423,9 @@ public final class ClassUtils {
 	 * @return the qualified name of the class
 	 */
 	public static String getQualifiedName(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		if (clazz.isArray()) {
 			return getQualifiedNameForArray(clazz);
 		} else {
@@ -428,7 +440,9 @@ public final class ClassUtils {
 	 * @return the qualified name of the method
 	 */
 	public static String getQualifiedMethodName(Method method) {
-		Assert.notNull(method, "Method must not be null");
+		if (method == null) {
+			throw new IllegalArgumentException("Method must not be null");
+		}
 		return method.getDeclaringClass().getName() + "." + method.getName();
 	}
 
@@ -485,7 +499,9 @@ public final class ClassUtils {
 	 * @see java.lang.Class#getConstructor
 	 */
 	public static Constructor<?> getConstructorIfAvailable(Class<?> clazz, Class<?>[] paramTypes) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		try {
 			return clazz.getConstructor(paramTypes);
 		} catch (NoSuchMethodException ex) {
@@ -504,8 +520,12 @@ public final class ClassUtils {
 	}
 	
 	public static Field getFieldIfAvaliable(Class<?> clazz, String fieldName) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(fieldName, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (fieldName == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		try {
 			return clazz.getField(fieldName);
 		} catch (SecurityException e) {
@@ -539,8 +559,12 @@ public final class ClassUtils {
 	 * @see java.lang.Class#getMethod
 	 */
 	public static Method getMethodIfAvailable(Class<?> clazz, String methodName, Class<?>[] paramTypes) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(methodName, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (methodName == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		try {
 			return clazz.getMethod(methodName, paramTypes);
 		} catch (NoSuchMethodException ex) {
@@ -556,8 +580,12 @@ public final class ClassUtils {
 	 * @return the number of methods with the given name
 	 */
 	public static int getMethodCountForName(Class<?> clazz, String methodName) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(methodName, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (methodName == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		int count = 0;
 		Method[] declaredMethods = clazz.getDeclaredMethods();
 		for (int i = 0; i < declaredMethods.length; i++) {
@@ -584,8 +612,12 @@ public final class ClassUtils {
 	 * @return whether there is at least one method with the given name
 	 */
 	public static boolean hasAtLeastOneMethodWithName(Class<?> clazz, String methodName) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(methodName, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (methodName == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		Method[] declaredMethods = clazz.getDeclaredMethods();
 		for (int i = 0; i < declaredMethods.length; i++) {
 			Method method = declaredMethods[i];
@@ -641,8 +673,12 @@ public final class ClassUtils {
 	 * @throws IllegalArgumentException if the method name is blank or the clazz is null
 	 */
 	public static Method getStaticMethod(Class<?> clazz, String methodName, Class<?>[] args) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(methodName, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (methodName == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		try {
 			Method method = clazz.getDeclaredMethod(methodName, args);
 			if ((method.getModifiers() & Modifier.STATIC) != 0) {
@@ -662,7 +698,9 @@ public final class ClassUtils {
 	 * @return whether the given class is a primitive wrapper class
 	 */
 	public static boolean isPrimitiveWrapper(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		return PRIMITIVE_WRAPPER_TYPE_MAP.containsKey(clazz);
 	}
 
@@ -674,7 +712,9 @@ public final class ClassUtils {
 	 * @return whether the given class is a primitive or primitive wrapper class
 	 */
 	public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		return (clazz.isPrimitive() || isPrimitiveWrapper(clazz));
 	}
 
@@ -685,7 +725,9 @@ public final class ClassUtils {
 	 * @return whether the given class is a primitive array class
 	 */
 	public static boolean isPrimitiveArray(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		return (clazz.isArray() && clazz.getComponentType().isPrimitive());
 	}
 
@@ -696,7 +738,9 @@ public final class ClassUtils {
 	 * @return whether the given class is a primitive wrapper array class
 	 */
 	public static boolean isPrimitiveWrapperArray(Class<?> clazz) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		return (clazz.isArray() && isPrimitiveWrapper(clazz.getComponentType()));
 	}
 
@@ -710,8 +754,12 @@ public final class ClassUtils {
 	 * @see TypeUtils#isAssignable
 	 */
 	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
-		Assert.notNull(lhsType, "Left-hand side type must not be null");
-		Assert.notNull(rhsType, "Right-hand side type must not be null");
+		if (lhsType == null) {
+			throw new IllegalArgumentException("Left-hand side type must not be null");
+		}
+		if (rhsType == null) {
+			throw new IllegalArgumentException("Right-hand side type must not be null");
+		}
 		return (lhsType.isAssignableFrom(rhsType) ||
 				lhsType.equals(PRIMITIVE_WRAPPER_TYPE_MAP.get(rhsType)));
 	}
@@ -725,7 +773,9 @@ public final class ClassUtils {
 	 * @return if the type is assignable from the value
 	 */
 	public static boolean isAssignableValue(Class<?> type, Object value) {
-		Assert.notNull(type, "Type must not be null");
+		if (type == null) {
+			throw new IllegalArgumentException("Type must not be null");
+		}
 		return (value != null ? isAssignable(type, value.getClass()) : !type.isPrimitive());
 	}
 
@@ -765,7 +815,9 @@ public final class ClassUtils {
 	 * @see java.lang.Class#getResource
 	 */
 	public static String addResourcePathToPackagePath(Class<?> clazz, String resourceName) {
-		Assert.notNull(resourceName, "Resource name must not be null");
+		if (resourceName == null) {
+			throw new IllegalArgumentException("Resource name must not be null");
+		}
 		if (!resourceName.startsWith("/")) {
 			return classPackageAsResourcePath(clazz) + "/" + resourceName;
 		}
@@ -845,7 +897,9 @@ public final class ClassUtils {
 	 * @return all interfaces that the given instance implements as array
 	 */
 	public static Class<?>[] getAllInterfaces(Object instance) {
-		Assert.notNull(instance, "Instance must not be null");
+		if (instance == null) {
+			throw new IllegalArgumentException("Instance must not be null");
+		}
 		return getAllInterfacesForClass(instance.getClass());
 	}
 
@@ -870,7 +924,9 @@ public final class ClassUtils {
 	 * @return all interfaces that the given object implements as array
 	 */
 	public static Class<?>[] getAllInterfacesForClass(Class<?> clazz, ClassLoader classLoader) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		if (clazz.isInterface()) {
 			return new Class[] {clazz};
 		}
@@ -895,7 +951,9 @@ public final class ClassUtils {
 	 * @return all interfaces that the given instance implements as Set
 	 */
 	public static Set<?> getAllInterfacesAsSet(Object instance) {
-		Assert.notNull(instance, "Instance must not be null");
+		if (instance == null) {
+			throw new IllegalArgumentException("Instance must not be null");
+		}
 		return getAllInterfacesForClassAsSet(instance.getClass());
 	}
 
@@ -920,7 +978,9 @@ public final class ClassUtils {
 	 * @return all interfaces that the given object implements as Set
 	 */
 	public static Set<?> getAllInterfacesForClassAsSet(Class<?> clazz, ClassLoader classLoader) {
-		Assert.notNull(clazz, "Class must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
 		if (clazz.isInterface()) {
 			return Collections.singleton(clazz);
 		}
@@ -947,8 +1007,12 @@ public final class ClassUtils {
 	 * @see java.lang.reflect.Proxy#getProxyClass
 	 */
 	public static Class<?> createCompositeInterface(Class<?>[] interfaces, ClassLoader classLoader) {
-		Assert.notEmpty(interfaces, "Interfaces must not be empty");
-		Assert.notNull(classLoader, "ClassLoader must not be null");
+		if (ObjectUtils.isEmpty(interfaces)) {
+			throw new IllegalArgumentException("Interfaces must not be empty");
+		}
+		if (classLoader == null) {
+			throw new IllegalArgumentException("ClassLoader must not be null");
+		}
 		return Proxy.getProxyClass(classLoader, interfaces);
 	}
 

@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.zip.ZipConstants;
+import com.nervousync.commons.core.zip.ZipOptions;
 import com.nervousync.commons.zip.ZipFile;
-import com.nervousync.commons.zip.core.ZipConstants;
-import com.nervousync.commons.zip.core.ZipOptions;
 import com.nervousync.commons.zip.crypto.Encryptor;
 import com.nervousync.commons.zip.crypto.impl.AESEncryptor;
 import com.nervousync.commons.zip.crypto.impl.StandardEncryptor;

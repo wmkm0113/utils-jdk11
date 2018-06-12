@@ -14,7 +14,7 @@ import javax.mail.PasswordAuthentication;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:56:49 PM $
  */
-public class DefaultAuthenticator extends Authenticator {
+public final class DefaultAuthenticator extends Authenticator {
 
 	private PasswordAuthentication passwordAuthentication;
 	

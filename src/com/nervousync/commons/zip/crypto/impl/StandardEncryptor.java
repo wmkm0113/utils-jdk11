@@ -9,7 +9,7 @@ package com.nervousync.commons.zip.crypto.impl;
 
 import java.util.Random;
 
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Encryptor;
 import com.nervousync.commons.zip.engine.ZipCryptoEngine;
 import com.nervousync.exceptions.zip.ZipException;

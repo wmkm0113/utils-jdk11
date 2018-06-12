@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.PBKDF2.MacBasedPRF;
 import com.nervousync.commons.zip.crypto.PBKDF2.PBKDF2Options;
 import com.nervousync.commons.zip.engine.AESEngine;

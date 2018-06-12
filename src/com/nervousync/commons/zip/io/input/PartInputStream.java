@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
-import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.crypto.impl.AESDecryptor;
 import com.nervousync.exceptions.zip.ZipException;

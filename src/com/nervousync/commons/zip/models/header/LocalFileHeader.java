@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.impl.AESCrypto;
 import com.nervousync.exceptions.zip.ZipException;
 

@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.matcher.Assert;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -139,8 +138,12 @@ public final class ReflectionUtils {
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
 	public static Field findField(Class<?> clazz, String name, Class<?> type) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.isTrue(name != null || type != null, "Either name or type of the field must be specified");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (name == null && type == null) {
+			throw new IllegalArgumentException("Either name or type of the field must be specified");
+		}
 		Class<?> searchType = clazz;
 		while (!Object.class.equals(searchType) && searchType != null) {
 			Field[] fields = searchType.getDeclaredFields();
@@ -291,8 +294,12 @@ public final class ReflectionUtils {
 	 * @return the Method object, or <code>null</code> if none found
 	 */
 	public static Method findMethod(Class<?> clazz, String name, Class<?>[] paramTypes) {
-		Assert.notNull(clazz, "Class must not be null");
-		Assert.notNull(name, "Method name must not be null");
+		if (clazz == null) {
+			throw new IllegalArgumentException("Class must not be null");
+		}
+		if (name == null) {
+			throw new IllegalArgumentException("Method name must not be null");
+		}
 		Class<?> searchType = clazz;
 		while (!Object.class.equals(searchType) && searchType != null) {
 			Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());
@@ -479,7 +486,9 @@ public final class ReflectionUtils {
 	 * <code>false</code> if it needs to be wrapped
 	 */
 	public static boolean declaresException(Method method, Class<?> exceptionType) {
-		Assert.notNull(method, "Method must not be null");
+		if (method == null) {
+			throw new IllegalArgumentException("Method must not be null");
+		}
 		Class<?>[] declaredExceptions = method.getExceptionTypes();
 		for (int i = 0; i < declaredExceptions.length; i++) {
 			Class<?> declaredException = declaredExceptions[i];

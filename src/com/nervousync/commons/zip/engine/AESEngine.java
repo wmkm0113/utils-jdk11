@@ -7,7 +7,7 @@
  */
 package com.nervousync.commons.zip.engine;
 
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**

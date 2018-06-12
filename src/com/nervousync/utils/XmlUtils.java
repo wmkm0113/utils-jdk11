@@ -46,8 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.beans.xml.BaseElement;
-import com.nervousync.commons.beans.xml.DataType;
 import com.nervousync.commons.core.Globals;
+import com.nervousync.enumeration.xml.DataType;
 import com.nervousync.exceptions.xml.XmlException;
 
 /**

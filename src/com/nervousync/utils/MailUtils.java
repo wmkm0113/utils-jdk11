@@ -47,8 +47,8 @@ import com.sun.mail.pop3.POP3Folder;
 import com.nervousync.commons.beans.mail.MailObject;
 import com.nervousync.commons.beans.mail.MailServerConfig;
 import com.nervousync.commons.beans.mail.authenticator.DefaultAuthenticator;
-import com.nervousync.commons.beans.mail.protocol.ProtocolOption;
 import com.nervousync.commons.core.Globals;
+import com.nervousync.enumeration.mail.ProtocolOption;
 
 /**
  * @author Steven Wee <a

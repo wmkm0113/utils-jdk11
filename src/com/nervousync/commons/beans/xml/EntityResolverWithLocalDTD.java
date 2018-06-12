@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: 2009/09/28 14:32:00 $
  */
-public class EntityResolverWithLocalDTD implements EntityResolver {
+public final class EntityResolverWithLocalDTD implements EntityResolver {
 	private String DTDFile = null;
 	
 	public EntityResolverWithLocalDTD( String dtdFile ) {

@@ -8,7 +8,7 @@
 package com.nervousync.commons.beans.mail.protocol.impl;
 
 import com.nervousync.commons.beans.mail.protocol.BaseProtocol;
-import com.nervousync.commons.beans.mail.protocol.ProtocolOption;
+import com.nervousync.enumeration.mail.ProtocolOption;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

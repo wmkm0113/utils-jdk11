@@ -7,7 +7,7 @@
  */
 package com.nervousync.commons.zip.crypto.impl;
 
-import com.nervousync.commons.zip.core.ZipConstants;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.engine.ZipCryptoEngine;
 import com.nervousync.commons.zip.models.header.LocalFileHeader;

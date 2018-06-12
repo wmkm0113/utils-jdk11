@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
-import com.nervousync.commons.beans.xml.DataType;
+import com.nervousync.enumeration.xml.DataType;
 import com.nervousync.interceptor.beans.BaseHandlerInterceptor;
 
 import net.sf.cglib.proxy.Enhancer;

@@ -13,9 +13,9 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.zip.ZipConstants;
+import com.nervousync.commons.core.zip.ZipOptions;
 import com.nervousync.commons.zip.ZipFile;
-import com.nervousync.commons.zip.core.ZipConstants;
-import com.nervousync.commons.zip.core.ZipOptions;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**

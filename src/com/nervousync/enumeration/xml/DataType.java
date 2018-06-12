@@ -5,12 +5,20 @@
  * Information and shall use it only in accordance with the terms of the 
  * license agreement you entered into with Nervousync Studio.
  */
-package com.nervousync.commons.beans.mail.protocol;
+package com.nervousync.enumeration.xml;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:24:12 PM $
+ * @version $Revision: 1.0 $ $Date: 2009/09/28 14:32:00 $
  */
-public enum ProtocolOption {
-	SMTP, POP3, IMAP, UNKNOWN
+public enum DataType {
+	BINARY, 
+	BOOLEAN, 
+	DATE, 
+	ENUM, 
+	UNKNOWN, 
+	NUMBER, 
+	STRING, 
+	OBJECT,
+	CDATA;
 }

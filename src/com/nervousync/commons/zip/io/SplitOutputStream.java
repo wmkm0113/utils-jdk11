@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
-import com.nervousync.commons.zip.core.ZipConstants;
 import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
 import com.nervousync.utils.FileUtils;

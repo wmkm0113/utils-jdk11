@@ -5,7 +5,7 @@
  * Information and shall use it only in accordance with the terms of the 
  * license agreement you entered into with Nervousync Studio.
  */
-package com.nervousync.commons.zip.core;
+package com.nervousync.commons.core.zip;
 
 import java.util.TimeZone;
 

@@ -79,7 +79,7 @@ public final class BeanUtils {
 			
 			beanCopier.copy(orig, dest, converter);
 		} catch (IOException e) {
-			throw new BeansException("", e);
+			throw new BeansException("Copy properties error! ", e);
 		}
 	}
 	

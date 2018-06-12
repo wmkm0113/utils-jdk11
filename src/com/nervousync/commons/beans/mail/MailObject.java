@@ -7,6 +7,7 @@
  */
 package com.nervousync.commons.beans.mail;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,13 @@ import com.nervousync.commons.core.Globals;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:03:47 PM $
  */
-public class MailObject {
+public final class MailObject implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4277408041510934598L;
+	
 	private String uid;
 	private String subject;
 	private String content;
@@ -243,5 +249,12 @@ public class MailObject {
 	 */
 	public void setContentMap(Map<String, String> contentMap) {
 		this.contentMap = contentMap;
+	}
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

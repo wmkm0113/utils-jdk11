@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.core.zip.ZipConstants;
+import com.nervousync.commons.core.zip.ZipOptions;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
-import com.nervousync.commons.zip.core.ZipConstants;
-import com.nervousync.commons.zip.core.ZipOptions;
 import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.crypto.impl.AESDecryptor;
 import com.nervousync.commons.zip.crypto.impl.StandardDecryptor;

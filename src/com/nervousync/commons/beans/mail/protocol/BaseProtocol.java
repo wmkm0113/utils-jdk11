@@ -12,6 +12,7 @@ import java.security.Security;
 import java.util.Properties;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.enumeration.mail.ProtocolOption;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

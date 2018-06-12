@@ -11,17 +11,17 @@ import java.io.Serializable;
 import java.util.Properties;
 
 import com.nervousync.commons.beans.mail.protocol.BaseProtocol;
-import com.nervousync.commons.beans.mail.protocol.ProtocolOption;
 import com.nervousync.commons.beans.mail.protocol.impl.IMAPProtocol;
 import com.nervousync.commons.beans.mail.protocol.impl.POP3Protocol;
 import com.nervousync.commons.beans.mail.protocol.impl.SMTPProtocol;
 import com.nervousync.commons.core.Globals;
+import com.nervousync.enumeration.mail.ProtocolOption;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Sep 18, 2012 9:54:37 PM $
  */
-public class MailServerConfig implements Serializable {
+public final class MailServerConfig implements Serializable {
 
 	/**
 	 * 

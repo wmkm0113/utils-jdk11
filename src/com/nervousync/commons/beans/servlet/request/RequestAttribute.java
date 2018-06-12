@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 19, 2015 8:56:50 AM $
  */
-public class RequestAttribute implements Serializable {
+public final class RequestAttribute implements Serializable {
 
 	/**
 	 * 
