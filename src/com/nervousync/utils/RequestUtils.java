@@ -113,6 +113,40 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	public static String convertIPv4ToCompatibleIPv6(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			return "::" + ipAddress;
+		}
+		return null;
+	}
+	
+	public static String convertIPv4ToIPv6(String ipAddress) {
+		return convertIPv4ToIPv6(ipAddress, true);
+	}
+	
+	public static String convertIPv4ToIPv6(String ipAddress, boolean collapse) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			StringBuilder stringBuilder = null;
+			if (collapse) {
+				stringBuilder = new StringBuilder(":");
+			} else {
+				stringBuilder = new StringBuilder("0000:0000:0000:0000:0000:0000");
+			}
+			int index = 0;
+			for (String addrItem : splitAddr) {
+				if (index % 2 == 0) {
+					stringBuilder.append(":");
+				}
+				stringBuilder.append(Integer.toHexString(Integer.parseInt(addrItem)));
+				index++;
+			}
+			
+			return stringBuilder.toString().toUpperCase();
+		}
+		return null;
+	}
+	
 	public static byte[] convertIPv4ToBytes(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
