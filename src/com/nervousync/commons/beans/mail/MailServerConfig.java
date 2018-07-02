@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.mail;
 
@@ -15,9 +24,10 @@ import com.nervousync.commons.beans.mail.protocol.impl.IMAPProtocol;
 import com.nervousync.commons.beans.mail.protocol.impl.POP3Protocol;
 import com.nervousync.commons.beans.mail.protocol.impl.SMTPProtocol;
 import com.nervousync.commons.core.Globals;
-import com.nervousync.enumeration.mail.ProtocolOption;
+import com.nervousync.enumerations.mail.ProtocolOption;
 
 /**
+ * Mail server configuration
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Sep 18, 2012 9:54:37 PM $
  */
@@ -28,9 +38,29 @@ public final class MailServerConfig implements Serializable {
 	 */
 	private static final long serialVersionUID = -2026891055081503726L;
 	
+	/**
+	 * Send server configuration, using SMTP
+	 */
 	private ServerConfig sendServerConfig;
+	/**
+	 * Receive server configuration, supported POP3 and IMAP
+	 */
 	private ServerConfig recvServerConfig;
 	
+	/**
+	 * Initialize MailServerConfig
+	 * @param recvProtocolName		Receive protocol name, "IMAP" or "POP3"
+	 * @param recvHostName			Receive server domain name or address
+	 * @param recvHostPort			Receive server port
+	 * @param recvSsl				Using SSL to connect receive server
+	 * @param recvAuthLogin			Receive server authentication login status
+	 * @param sendProtocolName		Send protocol name, "SMTP" only at this time
+	 * @param sendHostName			Send server domain name or address
+	 * @param sendHostPort			Send server port
+	 * @param sendSsl				Using SSL to connect send server
+	 * @param sendAuthLogin			Send server authentication login status
+	 * @throws Exception
+	 */
 	public MailServerConfig(String recvProtocolName, String recvHostName, int recvHostPort, boolean recvSsl, boolean recvAuthLogin, 
 			String sendProtocolName, String sendHostName, int sendHostPort, boolean sendSsl, boolean sendAuthLogin) throws Exception {
 		if (recvProtocolName == null || recvHostName == null || sendProtocolName == null || sendHostName == null) {
@@ -50,26 +80,50 @@ public final class MailServerConfig implements Serializable {
 		this.sendServerConfig = new ServerConfig(new SMTPProtocol(), sendHostName, sendHostPort, sendSsl, sendAuthLogin);
 	}
 	
+	/**
+	 * Read send config info
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getSendConfigInfo() {
 		return this.sendServerConfig.getConfigInfo();
 	}
-	
+
+	/**
+	 * Read send config info by given user name
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getSendConfigInfo(String userName) {
 		return this.sendServerConfig.getConfigInfo(userName);
 	}
-	
+
+	/**
+	 * Read send config info by given user name and timeout settings
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getSendConfigInfo(String userName, int connectionTimeout, int timeout) {
 		return this.sendServerConfig.getConfigInfo(userName, connectionTimeout, timeout);
 	}
 
+	/**
+	 * Read receive config info
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getRecvConfigInfo() {
 		return this.recvServerConfig.getConfigInfo();
 	}
-	
+
+	/**
+	 * Read send receive info by given user name
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getRecvConfigInfo(String userName) {
 		return this.recvServerConfig.getConfigInfo(userName);
 	}
-	
+
+	/**
+	 * Read send receive info by given user name and timeout settings
+	 * @return	java.util.Properties for JavaMail using
+	 */
 	public Properties getRecvConfigInfo(String userName, int connectionTimeout, int timeout) {
 		return this.recvServerConfig.getConfigInfo(userName, connectionTimeout, timeout);
 	}

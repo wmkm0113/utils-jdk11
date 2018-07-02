@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.files;
 
@@ -20,6 +29,7 @@ import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
+ * File identified information
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Aug 11, 2015 11:03:43 AM $
  */
@@ -32,33 +42,49 @@ public final class FileExtensionInfo extends BaseElement {
 	 */
 	private static final long serialVersionUID = 5402883763271419949L;
 
+	/**
+	 * File extension name
+	 */
 	@XmlElement
 	private String extensionName = null;
+	/**
+	 * Header identified code, convert hex to String
+	 */
 	@XmlElement
 	private String identifiedCode = null;
+	/**
+	 * Mime type define
+	 */
 	@XmlElement
 	private String mimeType = null;
+	/**
+	 * File type code
+	 * @see com.nervousync.utils.FileUtils.FILE_TYPE_*
+	 */
 	@XmlElement
 	private int fileType;
+	/**
+	 * Is printable file
+	 */
 	@XmlElement
-	private boolean printing = false;
+	private boolean printable = false;
 	
 	public FileExtensionInfo() {
 		
 	}
 	
 	public FileExtensionInfo(String extensionName, String identifiedCode, 
-			String mimeType, int fileType, boolean printing) {
+			String mimeType, int fileType, boolean printable) {
 		this.extensionName = extensionName;
 		this.identifiedCode = identifiedCode;
 		this.mimeType = mimeType;
 		this.fileType = fileType;
-		this.printing = printing;
+		this.printable = printable;
 	}
 
-	public FileExtensionInfo(int fileType, boolean printing, String contentInfo) {
+	public FileExtensionInfo(int fileType, boolean printable, String contentInfo) {
 		this.fileType = fileType;
-		this.printing = printing;
+		this.printable = printable;
 		
 		String[] splitItems = StringUtils.delimitedListToStringArray(contentInfo, "|");
 		
@@ -105,10 +131,10 @@ public final class FileExtensionInfo extends BaseElement {
 	}
 
 	/**
-	 * @return the printing
+	 * @return the printable
 	 */
-	public boolean isPrinting() {
-		return printing;
+	public boolean isPrintable() {
+		return printable;
 	}
 
 	/**
@@ -136,7 +162,7 @@ public final class FileExtensionInfo extends BaseElement {
 		byte[] dataItem = new byte[6 + datas.length];
 		
 		dataItem[0] = (byte)this.fileType;
-		dataItem[1] = this.printing ? (byte)Globals.NERVOUSYNC_STATUS_TRUE : (byte)Globals.NERVOUSYNC_STATUS_FALSE;
+		dataItem[1] = this.printable ? (byte)Globals.NERVOUSYNC_STATUS_TRUE : (byte)Globals.NERVOUSYNC_STATUS_FALSE;
 		RawOperator.writeIntFromLittleEndian(dataItem, 2, datas.length);
 		RawOperator.writeStringFromLittleEndian(dataItem, 6, content);
 		

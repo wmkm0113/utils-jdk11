@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.mail.protocol;
 
@@ -12,9 +21,10 @@ import java.security.Security;
 import java.util.Properties;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.enumeration.mail.ProtocolOption;
+import com.nervousync.enumerations.mail.ProtocolOption;
 
 /**
+ * JavaMail base protocol
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:07:08 PM $
  */
@@ -27,40 +37,113 @@ public class BaseProtocol implements Serializable {
 	
 	private static final String SSL_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
 	
+	/**
+	 * Connection timeout parameter name
+	 */
 	protected String connectionTimeoutParam;
+	/**
+	 * Host parameter name
+	 */
 	protected String hostParam;
+	/**
+	 * Port parameter name
+	 */
 	protected String portParam;
+	/**
+	 * Timeout parameter name
+	 */
 	protected String timeoutParam;
+	/**
+	 * Protocol type
+	 * @see com.nervousync.enumerations.mail.ProtocolOption
+	 */
 	private ProtocolOption protocolOption;
 	
+	/**
+	 * Default constructor 
+	 */
 	public BaseProtocol() {
 		
 	}
 	
+	/**
+	 * Constructor for define protocol type
+	 * @param protocolOption		Protocol type
+	 * @see com.nervousync.enumerations.mail.ProtocolOption
+	 */
 	protected BaseProtocol(ProtocolOption protocolOption) {
 		this.protocolOption = protocolOption;
 	}
 
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host		Target server domain name or address
+	 * @param port		Target server port
+	 * @return			java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port) {
 		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, false);
 	}
 
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host			Target server domain name or address
+	 * @param port			Target server port
+	 * @param authLogin		Server must authentication login
+	 * @return				java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port, boolean authLogin) {
 		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, authLogin);
 	}
 
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host			Target server domain name or address
+	 * @param port			Target server port
+	 * @param ssl			The connection must using SSL
+	 * @param authLogin		Server must authentication login
+	 * @return				java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port, boolean ssl, boolean authLogin) {
 		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, ssl, authLogin);
 	}
 	
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host			Target server domain name or address
+	 * @param port			Target server port
+	 * @param sendAddress	Sender e-mail address, using for SMTP
+	 * @param authLogin		Server must authentication login
+	 * @return				java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port, String sendAddress, boolean authLogin) {
 		return getConfigInfo(host, port, sendAddress, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, authLogin);
 	}
 	
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host			Target server domain name or address
+	 * @param port			Target server port
+	 * @param sendAddress	Sender e-mail address, using for SMTP
+	 * @param ssl			The connection must using SSL
+	 * @param authLogin		Server must authentication login
+	 * @return				java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port, String sendAddress, boolean ssl, boolean authLogin) {
 		return getConfigInfo(host, port, sendAddress, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, ssl, authLogin);
 	}
 	
+	/**
+	 * Read configuration for JavaMail using
+	 * @param host						Target server domain name or address
+	 * @param port						Target server port
+	 * @param sendAddress				Sender e-mail address, using for SMTP
+	 * @param connectionTimeout			Connection timeout value
+	 * @param timeout					Operate timeout value
+	 * @param ssl						The connection must using SSL
+	 * @param authLogin					Server must authentication login
+	 * @return							java.util.Properties for JavaMail using
+	 */
 	public Properties getConfigInfo(String host, int port, String sendAddress, 
 			int connectionTimeout, int timeout, boolean ssl, boolean authLogin) {
 		Properties properties = new Properties();

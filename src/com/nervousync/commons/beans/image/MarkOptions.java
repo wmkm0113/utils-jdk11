@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.image;
 
@@ -15,18 +24,45 @@ import javax.swing.ImageIcon;
 import com.nervousync.commons.core.Globals;
 
 /**
+ * Image options for mark operate
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: May 1, 2018 4:11:01 PM $
  */
 public final class MarkOptions {
 	
+	/**
+	 * Mark type
+	 * @see com.nervousync.commons.beans.image.MarkOptions.MarkType
+	 */
 	private MarkType markType;
+	/**
+	 * Mark location define
+	 * @see com.nervousync.commons.beans.image.MarkOptions.MarkLocation
+	 */
 	private MarkLocation markLocation;
+	/**
+	 * Mark image path if mark type is MarkType.ICON
+	 */
 	private String markPath = null;
+	/**
+	 * Mark image transparent value, default is 1, valid value is between 0 and 1
+	 */
 	private float transparency = 1f;
+	/**
+	 * Mark text value if mark type is MarkType.TEXT
+	 */
 	private String markText = null;
+	/**
+	 * Mark text color setting
+	 */
 	private Color color = Color.BLACK;
+	/**
+	 * Mark text font name
+	 */
 	private String fontName = null;
+	/**
+	 * Mark text font size
+	 */
 	private int fontSize = 12;
 	
 	private MarkOptions(MarkType markType, MarkLocation markLocation, 
@@ -42,12 +78,28 @@ public final class MarkOptions {
 		this.fontSize = fontSize;
 	}
 	
+	/**
+	 * Initialize ICON MarkOptions
+	 * @param markLocation		Mark location define
+	 * @param markPath			Mark icon file path
+	 * @param transparency		Icon transparent setting
+	 * @return
+	 */
 	public static MarkOptions markIcon(MarkLocation markLocation, 
 			String markPath, float transparency) {
 		return new MarkOptions(MarkType.ICON, markLocation, markPath, transparency, null, null, 
 				null, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Initialize TEXT MarkOptions
+	 * @param markLocation		Mark location define
+	 * @param markText			Mark text value
+	 * @param color				Mark text color
+	 * @param fontName			Mark text font name
+	 * @param fontSize			Mark text font size
+	 * @return
+	 */
 	public static MarkOptions markText(MarkLocation markLocation, 
 			String markText, Color color, String fontName, int fontSize) {
 		return new MarkOptions(MarkType.TEXT, markLocation, null, Globals.DEFAULT_VALUE_FLOAT, 

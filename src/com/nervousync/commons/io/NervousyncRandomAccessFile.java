@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.io;
 
@@ -20,12 +29,19 @@ import jcifs.smb.SmbFile;
 import jcifs.smb.SmbRandomAccessFile;
 
 /**
+ * RandomAccessFile Supported local files and NAS files
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Dec 22, 2017 11:49:46 AM $
  */
 public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closeable {
 	
+	/**
+	 * Operate file path
+	 */
 	private String filePath = null;
+	/**
+	 * The object of RandomAccessFile/SmbRandomAccessFile
+	 */
 	private Object originObject = null;
 	
 	public NervousyncRandomAccessFile(String filePath, String mode) throws FileNotFoundException {
@@ -33,6 +49,11 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		this.openFile(mode);
 	}
 
+	/**
+	 * Read file length
+	 * @return
+	 * @throws IOException
+	 */
 	public long length() throws IOException {
 		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
 			return FileUtils.getSMBFileSize(this.filePath);
@@ -41,6 +62,11 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/**
+	 * Return current file pointer prsition
+	 * @return
+	 * @throws IOException
+	 */
 	public long getFilePointer() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			return ((SmbRandomAccessFile)this.originObject).getFilePointer();
@@ -49,6 +75,11 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/**
+	 * Set the file-pointer to position
+	 * @param pos			target position 
+	 * @throws IOException
+	 */
 	public void seek(long pos) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).seek(pos);

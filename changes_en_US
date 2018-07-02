@@ -1,4 +1,9 @@
 Nervousync Utils Package
+[07/02/2018]
+Add image utils, implements operation of resize, cut and mark to given images
+Update to Apache License 2.0
+Remove Office utils
+
 [01/04/2018]
 Discard Apache HttpClient and more Apache package
 Add Original Http/Https request utils
@@ -10,6 +15,7 @@ Add location utils, support GPS/GCJ/BD location point convert
 
 [12/05/2017]
 Add FileZip class, support zip file oprtate utils
+Add SNMP utils, support monitor system by SNMP service
 
 [04/24/2017]
 Add Download Utils

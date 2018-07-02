@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.servlet.response;
 
@@ -32,6 +41,7 @@ import com.nervousync.utils.StringUtils;
 import com.nervousync.utils.XmlUtils;
 
 /**
+ * Response content of request
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
  */
@@ -44,11 +54,29 @@ public final class HttpResponseContent implements Serializable {
 	
 	private transient final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	/**
+	 * Response status code
+	 */
 	private int statusCode;
+	/**
+	 * Response content type
+	 */
 	private String contentType;
+	/**
+	 * Response charset encoding
+	 */
 	private String charset = null;
+	/**
+	 * Value of response header whick header name is "identified"
+	 */
 	private String identifiedCode;
+	/**
+	 * Response content length
+	 */
 	private int contentLength;
+	/**
+	 * Response content datas
+	 */
 	private byte[] responseContent;
 	
 	/**

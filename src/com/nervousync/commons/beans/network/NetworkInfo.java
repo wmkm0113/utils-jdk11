@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.beans.network;
 
@@ -24,6 +33,7 @@ import com.nervousync.exceptions.beans.network.NetworkInfoException;
 import com.nervousync.utils.StringUtils;
 
 /**
+ * System interface network information
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 24, 2015 11:53:10 AM $
  */
@@ -46,11 +56,28 @@ public final class NetworkInfo implements Serializable {
 			+ "|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))" 
 			+ "|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?\\s*$";
 	
+	/**
+	 * Is virtual adapter
+	 */
 	private boolean virtual = Globals.DEFAULT_VALUE_BOOLEAN;
+	/**
+	 * Interface display name in system
+	 */
 	private String displayName = null;
+	/**
+	 * Interface adapter physical address
+	 */
 	private String macAddress = "";
+	/**
+	 * IP address list of interface configured
+	 */
 	private List<IPAddrInfo> ipAddrInfos = new ArrayList<IPAddrInfo>();
 	
+	/**
+	 * Constructor for NetworkInfo
+	 * @param networkInterface			NetworkInterface value
+	 * @throws NetworkInfoException		If value of NetworkInterface is null or catch other SocketException
+	 */
 	public NetworkInfo(NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {
 			throw new NetworkInfoException("NetworkInterface is null");
@@ -152,6 +179,11 @@ public final class NetworkInfo implements Serializable {
 		return serialVersionUID;
 	}
 
+	/**
+	 * Configured ip address information
+	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+	 * @version $Revision: 1.0 $ $Date: Jul 2, 2018 $
+	 */
 	public static final class IPAddrInfo implements Serializable {
 
 		/**
@@ -159,15 +191,28 @@ public final class NetworkInfo implements Serializable {
 		 */
 		private static final long serialVersionUID = -2882813548945783456L;
 		
+		/**
+		 * IP address, supported IPv4 and IPv6
+		 */
 		private String ipAddress = null;
+		/**
+		 * Is site local address
+		 */
 		private boolean local = false;
+		/**
+		 * Is loop back address
+		 */
 		private boolean loop = false;
+		/**
+		 * Is link local status
+		 */
 		private boolean linkLocal = false;
 		
-		public IPAddrInfo() {
-			
-		}
-		
+		/**
+		 * Constructor
+		 * @param inetAddress				InetAddress object read from interface
+		 * @throws IPAddressException		Given inetAddress is null
+		 */
 		public IPAddrInfo(InetAddress inetAddress) throws IPAddressException {
 			if (inetAddress == null) {
 				throw new IPAddressException("InetAddress is null");

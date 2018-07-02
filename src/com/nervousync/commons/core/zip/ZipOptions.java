@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.core.zip;
 
@@ -14,24 +23,68 @@ import com.nervousync.exceptions.zip.ZipException;
 import com.nervousync.utils.StringUtils;
 
 /**
+ * ZIP options
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Nov 29, 2017 3:51:12 PM $
  */
 public final class ZipOptions implements Cloneable {
 
+	/**
+	 * Compress method
+	 */
 	private int compressionMethod = ZipConstants.COMP_DEFLATE;
+	/**
+	 * Compress level
+	 */
 	private int compressionLevel = ZipConstants.DEFLATE_LEVEL_NORMAL;
+	/**
+	 * Encrypt files status
+	 */
 	private boolean encryptFiles = Globals.DEFAULT_VALUE_BOOLEAN;
+	/**
+	 * Encrypt method
+	 */
 	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
+	/**
+	 * Status of read hidden file
+	 */
 	private boolean readHiddenFiles = true;
+	/**
+	 * Encrypt/Decrypt password
+	 */
 	private char[] password = null;
+	/**
+	 * AES key length
+	 */
 	private int aesKeyStrength = Globals.DEFAULT_VALUE_INT;
+	/**
+	 * Include root folder
+	 */
 	private boolean includeRootFolder = true;
+	/**
+	 * Root folder path
+	 */
 	private String rootFolderInZip = "";
+	/**
+	 * Timezone setting
+	 * @see java.util.TimeZone
+	 */
 	private TimeZone timeZone = TimeZone.getDefault();
+	/**
+	 * CRC
+	 */
 	private long sourceFileCRC = Globals.DEFAULT_VALUE_LONG;
+	/**
+	 * Default folder path
+	 */
 	private String defaultFolderPath = "";
+	/**
+	 * File name in zip
+	 */
 	private String fileNameInZip = null;
+	/**
+	 * Status of source external stream
+	 */
 	private boolean isSourceExternalStream = Globals.DEFAULT_VALUE_BOOLEAN;
 	
 	private ZipOptions() {

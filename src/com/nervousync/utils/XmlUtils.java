@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.utils;
 
@@ -35,7 +44,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.apache.commons.codec.binary.Base64;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -47,7 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.beans.xml.BaseElement;
 import com.nervousync.commons.core.Globals;
-import com.nervousync.enumeration.xml.DataType;
+import com.nervousync.enumerations.xml.DataType;
 import com.nervousync.exceptions.xml.XmlException;
 
 /**
@@ -583,7 +591,7 @@ public final class XmlUtils {
 											}
 										}
 									}
-									nodeValue = new String(new Base64().encode(binary));
+									nodeValue = StringUtils.base64Encode(binary);
 								} else {
 									if (fieldValue != null) {
 										nodeValue = StringUtils.formatTextForXML(fieldValue.toString());
@@ -697,7 +705,7 @@ public final class XmlUtils {
 											}
 										}
 									}
-									nodeValue = new String(new Base64().encode(binary));
+									nodeValue = StringUtils.base64Encode(binary);
 								} else {
 									nodeValue = StringUtils.formatTextForXML(childObj.toString());
 								}

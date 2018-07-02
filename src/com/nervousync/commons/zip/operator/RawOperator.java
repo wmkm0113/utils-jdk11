@@ -1,9 +1,18 @@
 /*
- * Copyright © 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.commons.zip.operator;
 
@@ -18,6 +27,12 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public final class RawOperator {
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @return
+	 */
 	public static short readShortFromBigEndian(byte[] bytes, int position) {
 		short readValue = 0;
 		
@@ -28,6 +43,12 @@ public final class RawOperator {
 		return readValue;
 	}
 
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @return
+	 */
 	public static long readLongFromLittleEndian(byte[] bytes, int position) {
 		long readValue = 0L;
 		int i = 8;
@@ -43,19 +64,46 @@ public final class RawOperator {
 		return readValue;
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @return
+	 */
 	public static int readShortFromLittleEndian(byte[] bytes, int position) {
 		return (bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8;
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @return
+	 */
 	public static int readIntFromLittleEndian(byte[] bytes, int position) {
 		return ((bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8) 
 				| ((bytes[position + 2] & 0xFF) | (bytes[position + 3] & 0xFF) << 8) << 16;
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param length
+	 * @return
+	 */
 	public static String readStringFromLittleEndian(byte[] bytes, int position, int length) {
 		return RawOperator.readStringFromLittleEndian(bytes, position, length, Globals.DEFAULT_ENCODING);
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param length
+	 * @param encoding
+	 * @return
+	 */
 	public static String readStringFromLittleEndian(byte[] bytes, int position, int length, String encoding) {
 		if (position < 0 || length < 0 || bytes == null 
 				|| (position + length) > bytes.length) {
@@ -70,10 +118,23 @@ public final class RawOperator {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param value
+	 */
 	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value) {
 		writeStringFromLittleEndian(bytes, position, value, Globals.DEFAULT_ENCODING);
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param value
+	 * @param encoding
+	 */
 	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value, String encoding) {
 		if (value == null) {
 			return;
@@ -95,11 +156,23 @@ public final class RawOperator {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param value
+	 */
 	public static void writeShortFromLittleEndian(byte[] bytes, int position, short value) {
 		bytes[position + 1] = (byte)(value >>> 8);
 		bytes[position] = (byte)(value & 0xFF);
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param value
+	 */
 	public static void writeIntFromLittleEndian(byte[] bytes, int position, int value) {
 		int i = 4;
 		while (i > 0) {
@@ -112,6 +185,12 @@ public final class RawOperator {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param bytes
+	 * @param position
+	 * @param value
+	 */
 	public static void writeLongFromLittleEndian(byte[] bytes, int position, long value) {
 		int i = 8;
 		while (i > 0) {
@@ -124,18 +203,39 @@ public final class RawOperator {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
 	public static byte[] convertIntToByteArray(int value) {
 		return RawOperator.convertIntToByteArray(value, 4, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 * @param arraySize
+	 * @return
+	 */
 	public static byte[] convertIntToByteArray(int value, int arraySize) {
 		return RawOperator.convertIntToByteArray(value, arraySize, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
+	/**
+	 * 
+	 * @param nonce
+	 * @return
+	 */
 	public static byte[] prepareAESBuffer(int nonce) {
 		return RawOperator.convertIntToByteArray(nonce, 16, true);
 	}
 	
+	/**
+	 * 
+	 * @param charArray
+	 * @return
+	 */
 	public static byte[] convertCharArrayToByteArray(char[] charArray) {
 		if (charArray == null) {
 			throw new NullPointerException();
@@ -150,6 +250,12 @@ public final class RawOperator {
 		return bytes;
 	}
 	
+	/**
+	 * 
+	 * @param bitArray
+	 * @return
+	 * @throws ZipException
+	 */
 	public static byte convertBitArrayToByte(int[] bitArray) throws ZipException {
 		if (bitArray == null) {
 			throw new ZipException("Bit array is null!");

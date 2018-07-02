@@ -1,9 +1,18 @@
 /*
- * Copyright � 2003 Nervousync Studio, Inc. All rights reserved.
- * This software is the confidential and proprietary information of 
- * Nervousync Studio, Inc. You shall not disclose such Confidential
- * Information and shall use it only in accordance with the terms of the 
- * license agreement you entered into with Nervousync Studio.
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.nervousync.utils;
 
@@ -509,16 +518,34 @@ public final class ClassUtils {
 		}
 	}
 	
+	/**
+	 * Determine all fields include private, protected and public
+	 * @param clazz				
+	 * @param includeParent		Determine parent class fields
+	 * @return
+	 */
 	public static List<Field> getDeclaredFields(Class<?> clazz, boolean includeParent) {
 		List<Field> fieldList = new ArrayList<Field>();
 		getDeclaredFields(clazz, includeParent, fieldList);
 		return fieldList;
 	}
 	
+	/**
+	 * Check given field name is field of given class
+	 * @param clazz
+	 * @param fieldName
+	 * @return
+	 */
 	public static boolean hasField(Class<?> clazz, String fieldName) {
 		return (getFieldIfAvaliable(clazz, fieldName) != null);
 	}
 	
+	/**
+	 * Determine whether the given class has a field with the given field name.
+	 * @param clazz
+	 * @param fieldName
+	 * @return
+	 */
 	public static Field getFieldIfAvaliable(Class<?> clazz, String fieldName) {
 		if (clazz == null) {
 			throw new IllegalArgumentException("Class must not be null");
