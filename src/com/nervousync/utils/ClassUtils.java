@@ -328,6 +328,7 @@ public final class ClassUtils {
 	 * i.e. whether it is loaded by the given ClassLoader or a parent of it.
 	 * @param clazz the class to analyze
 	 * @param classLoader the ClassLoader to potentially cache metadata in
+	 * @return cache safe result
 	 */
 	public static boolean isCacheSafe(Class<?> clazz, ClassLoader classLoader) {
 		if (clazz == null) {
@@ -520,9 +521,9 @@ public final class ClassUtils {
 	
 	/**
 	 * Determine all fields include private, protected and public
-	 * @param clazz				
+	 * @param clazz				Target define class
 	 * @param includeParent		Determine parent class fields
-	 * @return
+	 * @return					List of all fields
 	 */
 	public static List<Field> getDeclaredFields(Class<?> clazz, boolean includeParent) {
 		List<Field> fieldList = new ArrayList<Field>();
@@ -532,9 +533,9 @@ public final class ClassUtils {
 	
 	/**
 	 * Check given field name is field of given class
-	 * @param clazz
-	 * @param fieldName
-	 * @return
+	 * @param clazz				Target define class
+	 * @param fieldName			Field name
+	 * @return					Check result
 	 */
 	public static boolean hasField(Class<?> clazz, String fieldName) {
 		return (getFieldIfAvaliable(clazz, fieldName) != null);
@@ -542,9 +543,9 @@ public final class ClassUtils {
 	
 	/**
 	 * Determine whether the given class has a field with the given field name.
-	 * @param clazz
-	 * @param fieldName
-	 * @return
+	 * @param clazz				Target define class
+	 * @param fieldName			Field name
+	 * @return					Field object
 	 */
 	public static Field getFieldIfAvaliable(Class<?> clazz, String fieldName) {
 		if (clazz == null) {
@@ -667,17 +668,11 @@ public final class ClassUtils {
 	 * if there is one. E.g. the method may be <code>IFoo.bar()</code> and the
 	 * target class may be <code>DefaultFoo</code>. In this case, the method may be
 	 * <code>DefaultFoo.bar()</code>. This enables attributes on that method to be found.
-	 * <p><b>NOTE:</b> In contrast to {@link org.springframework.aop.support.AopUtils#getMostSpecificMethod},
-	 * this method does <i>not</i> resolve Java 5 bridge methods automatically.
-	 * Call {@link org.springframework.core.BridgeMethodResolver#findBridgedMethod}
-	 * if bridge method resolution is desirable (e.g. for obtaining metadata from
-	 * the original method definition).
 	 * @param method the method to be invoked, which may come from an interface
 	 * @param targetClass the target class for the current invocation.
 	 * May be <code>null</code> or may not even implement the method.
 	 * @return the specific target method, or the original method if the
 	 * <code>targetClass</code> doesn't implement it or is <code>null</code>
-	 * @see org.springframework.aop.support.AopUtils#getMostSpecificMethod
 	 */
 	public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
 		if (method != null && targetClass != null && !targetClass.equals(method.getDeclaringClass())) {
@@ -778,7 +773,6 @@ public final class ClassUtils {
 	 * @param lhsType the target type
 	 * @param rhsType	the value type that should be assigned to the target type
 	 * @return if the target type is assignable from the value type
-	 * @see TypeUtils#isAssignable
 	 */
 	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
 		if (lhsType == null) {
@@ -831,10 +825,8 @@ public final class ClassUtils {
 	 * slash ('/') to the return value. Built by taking the package of the specified
 	 * class file, converting all dots ('.') to slashes ('/'), adding a trailing slash
 	 * if necesssary, and concatenating the specified resource name to this.
-	 * <br/>As such, this function may be used to build a path suitable for
+	 * As such, this function may be used to build a path suitable for
 	 * loading a resource file that is in the same package as a class file,
-	 * although {@link org.springframework.core.io.ClassPathResource} is usually
-	 * even more convenient.
 	 * @param clazz	the Class whose package will be used as the base
 	 * @param resourceName the resource name to append. A leading slash is optional.
 	 * @return the built-up resource path
@@ -1048,6 +1040,7 @@ public final class ClassUtils {
 	 * @param clazz the class to check (typically an interface)
 	 * @param classLoader the ClassLoader to check against (may be <code>null</code>,
 	 * in which case this method will always return <code>true</code>)
+	 * @return class is visible
 	 */
 	public static boolean isVisible(Class<?> clazz, ClassLoader classLoader) {
 		if (classLoader == null) {

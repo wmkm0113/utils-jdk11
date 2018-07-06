@@ -47,6 +47,11 @@ public final class ReflectionUtils {
 		
 	}
 	
+	/**
+	 * Parse field name from getter/setter method name
+	 * @param methodName		method name
+	 * @return  parsed field name
+	 */
 	public static String parseFieldName(String methodName) {
 		String fieldName = null;
 		
@@ -65,6 +70,14 @@ public final class ReflectionUtils {
 		return fieldName;
 	}
 	
+	/**
+	 * Parse method name by given field name, field define class and method type
+	 * @param fieldName		field name
+	 * @param fieldClass	field define class
+	 * @param methodType	method type
+	 * @see com.nervousync.utils.ReflectionUtils.MethodType
+	 * @return	parsed method name
+	 */
 	public static String parseMethodName(String fieldName, Class<?> fieldClass, MethodType methodType) {
 		String methodName = null;
 		
@@ -86,6 +99,11 @@ public final class ReflectionUtils {
 		return methodName;
 	}
 	
+	/**
+	 * Retrieve child enum define in given define class
+	 * @param enumClass	Define class
+	 * @return	enum data map
+	 */
 	public static Map<String, Object> parseEnum(Class<?> enumClass) {
 		Map<String, Object> enumMap = new HashMap<String, Object>();
 		
@@ -100,6 +118,11 @@ public final class ReflectionUtils {
 		return enumMap;
 	}
 	
+	/**
+	 * Retrieve all declared field names
+	 * @param clazz		Define class
+	 * @return			List of field name
+	 */
 	public static List<String> getAllDeclaredFieldNames(Class<?> clazz) {
 		if (clazz == null) {
 			return new ArrayList<String>(0);
@@ -475,17 +498,6 @@ public final class ReflectionUtils {
 	}
 
 	/**
-	 * Throws an IllegalStateException with the given exception as root cause.
-	 * @param ex the unexpected exception
-	 */
-	private static void handleUnexpectedException(Throwable ex) {
-		// Needs to avoid the chained constructor for JDK 1.4 compatibility.
-		IllegalStateException isex = new IllegalStateException("Unexpected exception thrown");
-		isex.initCause(ex);
-		throw isex;
-	}
-
-	/**
 	 * Determine whether the given method explicitly declares the given exception
 	 * or one of its superclasses, which means that an exception of that type
 	 * can be propagated as-is within a reflective invocation.
@@ -507,14 +519,24 @@ public final class ReflectionUtils {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * Determine whether the given field is a "public" constant.
+	 * @param field the field to check
+	 * @return is a "public" constant.
+	 */
 	public static boolean isPublic(Field field) {
 		if (field != null) {
 			return Modifier.isPublic(field.getModifiers());
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
-	
+
+	/**
+	 * Determine whether the given field is a "static" constant.
+	 * @param field the field to check
+	 * @return is a "static" constant.
+	 */
 	public static boolean isStatic(Field field) {
 		if (field != null) {
 			return Modifier.isStatic(field.getModifiers());
@@ -525,6 +547,7 @@ public final class ReflectionUtils {
 	/**
 	 * Determine whether the given field is a "public static final" constant.
 	 * @param field the field to check
+	 * @return is a "public static final" constant.
 	 */
 	public static boolean isPublicStaticFinal(Field field) {
 		if (field != null) {
@@ -625,6 +648,8 @@ public final class ReflectionUtils {
 	/**
 	 * Get all declared methods on the leaf class and all superclasses.
 	 * Leaf class methods are included first.
+	 * @param leafClass	leaf class
+	 * @return All declared method arrays
 	 */
 	public static Method[] getAllDeclaredMethods(Class<?> leafClass) throws IllegalArgumentException {
 		final List<Method> list = new ArrayList<Method>(32);
@@ -683,6 +708,8 @@ public final class ReflectionUtils {
 	 * Given the source object and the destination, which must be the same class
 	 * or a subclass, copy all fields, including inherited fields. Designed to
 	 * work on objects with public no-arg constructors.
+	 * @param src   	source object
+	 * @param dest		target object
 	 * @throws IllegalArgumentException if the arguments are incompatible
 	 */
 	public static void shallowCopyFieldState(final Object src, final Object dest) throws IllegalArgumentException {
@@ -705,6 +732,12 @@ public final class ReflectionUtils {
 		}, COPYABLE_FIELDS);
 	}
 	
+	/**
+	 * Retrieve field object if avaliable
+	 * @param clazz			Define class
+	 * @param fieldName		field name
+	 * @return				Retrieve field object or null if not exists
+	 */
 	public static Field getFieldIfAvailable(Class<?> clazz, String fieldName) {
 		if (clazz == null) {
 			return null;
@@ -717,6 +750,11 @@ public final class ReflectionUtils {
 		}
 	}
 	
+	/**
+	 * Set field value values
+	 * @param target			target object
+	 * @param parameterMap		field value map
+	 */
 	public static void setField(Object target, Map<String, ?> parameterMap) {
 		if (target == null || parameterMap == null) {
 			return;
@@ -742,6 +780,13 @@ public final class ReflectionUtils {
 		}
 	}
 	
+	/**
+	 * Set field value
+	 * @param fieldName		field name
+	 * @param target		target object
+	 * @param value			field value
+	 * @return				operate result
+	 */
 	public static boolean setField(String fieldName, Object target, Object value) {
 		try {
 			Method setMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.SetMethod);
@@ -928,7 +973,18 @@ public final class ReflectionUtils {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Throws an IllegalStateException with the given exception as root cause.
+	 * @param ex the unexpected exception
+	 */
+	private static void handleUnexpectedException(Throwable ex) {
+		// Needs to avoid the chained constructor for JDK 1.4 compatibility.
+		IllegalStateException isex = new IllegalStateException("Unexpected exception thrown");
+		isex.initCause(ex);
+		throw isex;
+	}
+
 	private static Method retrieveMethod(String fieldName, Class<?> targetClass, MethodType methodType) {
 		Field field = ReflectionUtils.getFieldIfAvailable(targetClass, fieldName);
 		if (field == null) {
@@ -969,6 +1025,8 @@ public final class ReflectionUtils {
 		/**
 		 * Perform an operation using the given method.
 		 * @param method the method to operate on
+		 * @throws IllegalArgumentException	 @see java.lang.IllegalArgumentException
+		 * @throws IllegalAccessException  @see java.lang.IllegalAccessException
 		 */
 		void doWith(Method method) throws IllegalArgumentException, IllegalAccessException;
 	}
@@ -982,6 +1040,7 @@ public final class ReflectionUtils {
 		/**
 		 * Determine whether the given method matches.
 		 * @param method the method to check
+		 * @return check result
 		 */
 		boolean matches(Method method);
 	}
@@ -995,6 +1054,8 @@ public final class ReflectionUtils {
 		/**
 		 * Perform an operation using the given field.
 		 * @param field the field to operate on
+		 * @throws IllegalArgumentException	 @see java.lang.IllegalArgumentException
+		 * @throws IllegalAccessException  @see java.lang.IllegalAccessException
 		 */
 		void doWith(Field field) throws IllegalArgumentException, IllegalAccessException;
 	}
@@ -1008,6 +1069,7 @@ public final class ReflectionUtils {
 		/**
 		 * Determine whether the given field matches.
 		 * @param field the field to check
+		 * @return check result
 		 */
 		boolean matches(Field field);
 	}

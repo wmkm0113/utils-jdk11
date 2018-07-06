@@ -755,7 +755,7 @@ public final class RequestUtils {
 	 * Builds a query string from a given map of parameters
 	 *
 	 * @param m         A map of parameters
-	 * @param ampersand String to use for ampersands (e.g. "&" or "&amp;")
+	 * @param ampersand String to use for ampersands (e.g. "&amp;" or "&amp;amp;")
 	 * @param encode    Whether or not to encode non-ASCII characters
 	 * @return query string (with no leading "?")
 	 */
@@ -784,7 +784,7 @@ public final class RequestUtils {
 	 * Builds a query string from a given map of parameters
 	 *
 	 * @param m         A map of parameters
-	 * @param ampersand String to use for ampersands (e.g. "&" or "&amp;")
+	 * @param ampersand String to use for ampersands (e.g. "&amp;" or "&amp;amp;")
 	 * @return query string (with no leading "?")
 	 */
 	public static StringBuffer createQueryStringFromMap(Map<String, String[]> m, String ampersand) {
@@ -1225,7 +1225,7 @@ public final class RequestUtils {
 	 * @param key         parameter name
 	 * @param value       value of parameter
 	 * @param queryString existing query string
-	 * @param ampersand   string to use for ampersand (e.g. "&" or "&amp;")
+	 * @param ampersand   string to use for ampersand (e.g. "&amp;" or "&amp;amp;")
      * @param encode      whether to encode value
 	 * @return query string (with no leading "?")
 	 */

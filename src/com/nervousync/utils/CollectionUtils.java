@@ -38,8 +38,8 @@ public final class CollectionUtils {
 
 	/**
 	 * Sort number collection
-	 * @param collection
-	 * @return
+	 * @param collection	collection
+	 * @return				Sorted collection
 	 */
 	public static List<Integer> sort(Collection<Integer> collection) {
 		List<Integer> returnList = new ArrayList<Integer>();
@@ -55,8 +55,8 @@ public final class CollectionUtils {
 
 	/**
 	 * Sort number collection and reverse result
-	 * @param collection
-	 * @return
+	 * @param collection	collection
+	 * @return				Sorted and reverse collection
 	 */
 	public static List<Integer> sortAndReverse(Collection<Integer> collection) {
 		List<Integer> returnList = new ArrayList<Integer>();
@@ -106,8 +106,9 @@ public final class CollectionUtils {
 
 	/**
 	 * Convert arrays to list
-	 * @param a
-	 * @return
+	 * @param a		arrays
+	 * @param <T>	T
+	 * @return		Convert list
 	 */
 	public static <T> List<T> asList(T[] a) {
 		return Arrays.asList(a);

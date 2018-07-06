@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
 	<url>https://development.nervousync.com/project/NervousyncUtils</url>
@@ -34,6 +34,8 @@
 			<name>Steven Wee</name>
 			<email>wmkm0113@gmail.com</email>
 			<url>https://development.nervousync.com/wmkm0113</url>
+			<organization>Nervousync Studio</organization>
+			<organizationUrl>https://development.nervousync.com/</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
@@ -45,13 +47,13 @@
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<bcprov.version>1.59</bcprov.version>
-		<cglib.version>3.2.6</cglib.version>
-		<dom4j.version>2.1.0</dom4j.version>
+		<cglib.version>3.2.7</cglib.version>
+		<dom4j.version>2.1.1</dom4j.version>
 		<jaxb.version>2.3.0</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
 		<log4j.version>2.11.0</log4j.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<jackson.version>2.9.5</jackson.version>
+		<jackson.version>2.9.6</jackson.version>
 		<snmp4j.version>2.6.2</snmp4j.version>
 		<java.mail.version>1.6.1</java.mail.version>
 		<aspectj.version>1.9.1</aspectj.version>

@@ -59,7 +59,7 @@ public final class MailServerConfig implements Serializable {
 	 * @param sendHostPort			Send server port
 	 * @param sendSsl				Using SSL to connect send server
 	 * @param sendAuthLogin			Send server authentication login status
-	 * @throws Exception
+	 * @throws Exception			Parameter is null or protocol name is invalid
 	 */
 	public MailServerConfig(String recvProtocolName, String recvHostName, int recvHostPort, boolean recvSsl, boolean recvAuthLogin, 
 			String sendProtocolName, String sendHostName, int sendHostPort, boolean sendSsl, boolean sendAuthLogin) throws Exception {
@@ -90,6 +90,7 @@ public final class MailServerConfig implements Serializable {
 
 	/**
 	 * Read send config info by given user name
+	 * @param userName			User name
 	 * @return	java.util.Properties for JavaMail using
 	 */
 	public Properties getSendConfigInfo(String userName) {
@@ -98,6 +99,9 @@ public final class MailServerConfig implements Serializable {
 
 	/**
 	 * Read send config info by given user name and timeout settings
+	 * @param userName				User name
+	 * @param connectionTimeout		Connect timeout
+	 * @param timeout				Operate timeout
 	 * @return	java.util.Properties for JavaMail using
 	 */
 	public Properties getSendConfigInfo(String userName, int connectionTimeout, int timeout) {
@@ -114,6 +118,7 @@ public final class MailServerConfig implements Serializable {
 
 	/**
 	 * Read send receive info by given user name
+	 * @param userName				User name
 	 * @return	java.util.Properties for JavaMail using
 	 */
 	public Properties getRecvConfigInfo(String userName) {
@@ -122,6 +127,9 @@ public final class MailServerConfig implements Serializable {
 
 	/**
 	 * Read send receive info by given user name and timeout settings
+	 * @param userName				User name
+	 * @param connectionTimeout		Connect timeout
+	 * @param timeout				Operate timeout
 	 * @return	java.util.Properties for JavaMail using
 	 */
 	public Properties getRecvConfigInfo(String userName, int connectionTimeout, int timeout) {

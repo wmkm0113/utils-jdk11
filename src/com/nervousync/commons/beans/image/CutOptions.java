@@ -44,8 +44,8 @@ public final class CutOptions {
 	
 	/**
 	 * Initialize cut options using default position X and Y
-	 * @param cutWidth
-	 * @param cutHeight
+	 * @param cutWidth		Cut width
+	 * @param cutHeight		Cut height
 	 */
 	public CutOptions(int cutWidth, int cutHeight) {
 		this.positionX = 0;
@@ -56,10 +56,10 @@ public final class CutOptions {
 	
 	/**
 	 * Initialize cut options with given position X and Y
-	 * @param positionX
-	 * @param positionY
-	 * @param cutWidth
-	 * @param cutHeight
+	 * @param positionX			Cut begin position X
+	 * @param positionY			Cut begin position Y
+	 * @param cutWidth			Cut width
+	 * @param cutHeight			Cut height
 	 */
 	public CutOptions(int positionX, int positionY, int cutWidth, int cutHeight) {
 		this.positionX = positionX;

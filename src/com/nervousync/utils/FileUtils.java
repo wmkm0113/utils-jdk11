@@ -48,7 +48,6 @@ import java.util.zip.CRC32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
@@ -148,12 +147,10 @@ public final class FileUtils {
 	
 	/**
 	 * Register user define file type
-	 * @param extName 			file extension name
+	 * @param extensionName		file extension name
 	 * @param identifiedCode	file identified code
 	 * @param fileType			file type code
 	 * @param printing			file is ready for printing
-	 * @param mediaFile			is media file
-	 * @param compressFile		is compress file
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, 
 			int fileType, boolean printing) {
@@ -167,13 +164,11 @@ public final class FileUtils {
 	
 	/**
 	 * Register user define file type
-	 * @param extName 			file extension name
+	 * @param extensionName		file extension name
 	 * @param identifiedCode	file identified code
 	 * @param mimeType			file mime type
 	 * @param fileType			file type code
 	 * @param printing			file is ready for printing
-	 * @param mediaFile			is media file
-	 * @param compressFile		is compress file
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, String mimeType, 
 			int fileType, boolean printing) {
@@ -215,9 +210,9 @@ public final class FileUtils {
 	
 	/**
 	 * Check the resource location is compressed jar file
-	 * @param resourceLocation
+	 * @param resourceLocation	resource location
 	 * @return check status
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException	resource location file was not exists
 	 */
 	public static boolean isJarFile(String resourceLocation) throws FileNotFoundException {
 		if (resourceLocation == null) {
@@ -232,7 +227,7 @@ public final class FileUtils {
 	
 	/**
 	 * Retrieve exists file type code
-	 * @param resourceLocation
+	 * @param extensionName	extension name
 	 * @return found file type code or #FILE_TYPE_UNKNOWN for not found or file identify code check error
 	 */
 	public static int retrieveFileType(String extensionName) {
@@ -246,6 +241,11 @@ public final class FileUtils {
 		return FileUtils.FILE_TYPE_UNKNOWN;
 	}
 	
+	/**
+	 * Retrieve MIMEType string
+	 * @param extensionName	extension name
+	 * @return	MIMEType
+	 */
 	public static String retrieveMimeType(String extensionName) {
 		if (extensionName != null) {
 			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
@@ -259,9 +259,8 @@ public final class FileUtils {
 	
 	/**
 	 * Validate resource file with identify code
-	 * @param resourceLocation
+	 * @param resourceLocation		resource location
 	 * @return validate result
-	 * @throws FileNotFoundException
 	 */
 	public static boolean validateFileType(String resourceLocation) {
 		if (resourceLocation == null) {
@@ -280,6 +279,12 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
+	/**
+	 * Identified file type
+	 * @param extensionName	extension name
+	 * @param fileContent	File datas as byte arrays
+	 * @return				identified result
+	 */
 	public static boolean validateFileType(String extensionName, byte[] fileContent) {
 		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
 			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
@@ -378,7 +383,7 @@ public final class FileUtils {
 
 	/**
 	 * Read file last modified time
-	 * @param resourceLocation
+	 * @param resourceLocation	resource location
 	 * @return last modified time with long type if file exists 
 	 * @return <code>Globals.DEFAULT_VALUE_LONG</code> for others
 	 */
@@ -408,7 +413,7 @@ public final class FileUtils {
 	
 	/**
 	 * Read file last modified time
-	 * @param resourceLocation
+	 * @param resourceLocation	resource location
 	 * @return last modified time with <code>java.util.Date</code> type if file exists 
 	 * @return null for others
 	 */
@@ -423,9 +428,9 @@ public final class FileUtils {
 	
 	/**
 	 * Open Samba file input stream
-	 * @param resourceLocation
-	 * @return
-	 * @throws IOException
+	 * @param resourceLocation	resource location
+	 * @return	input stream
+	 * @throws IOException when opening input stream error
 	 */
 	public static InputStream loadSMBFile(String resourceLocation) throws IOException {
 		if (resourceLocation == null || !resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
@@ -436,9 +441,10 @@ public final class FileUtils {
 	
 	/**
 	 * Load resource and convert to java.io.InputStream used <code>Globals.DEFAULT_ENCODING</code>
-	 * @param resourceLocation
+	 * @param resourceLocation	resource location
 	 * @return <code>java.io.InputStream</code>
-	 * @throws Exception
+	 * @throws FileNotFoundException	target file does not exists
+	 * @throws IOException when opening input stream error
 	 */
 	public static InputStream loadFile(String resourceLocation) 
 			throws FileNotFoundException, IOException {
@@ -447,10 +453,11 @@ public final class FileUtils {
 	
 	/**
 	 * Load resource and convert to java.io.InputStream used encode
-	 * @param resourceLocation
-	 * @param encode 
+	 * @param resourceLocation	resource location
+	 * @param encode 			charset encoding
 	 * @return <code>java.io.InputStream</code>
-	 * @throws Exception
+	 * @throws FileNotFoundException	target file does not exists
+	 * @throws IOException when opening input stream error
 	 */
 	public static InputStream loadFile(String resourceLocation, String encode) 
 			throws FileNotFoundException, IOException {
@@ -675,9 +682,8 @@ public final class FileUtils {
 	 * @param filePath			jar file location
 	 * @param entryPath			read entry path
 	 * @return					entry content or null if not exists
-	 * @throws IOException
 	 */
-	public static byte[] readJarEntryBytes(String filePath, String entryPath) throws IOException {
+	public static byte[] readJarEntryBytes(String filePath, String entryPath) {
 		byte[] classContent = null;
 		InputStream inputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
@@ -741,8 +747,9 @@ public final class FileUtils {
 
 	/**
 	 * Read file to byte[] from current input stream use default charset: UTF-8
-	 * @param inputStream
-	 * @return
+	 * @param inputStream		File input stream
+	 * @return	File data by byte arrays
+	 * @throws IOException	if an I/O error occurs
 	 */
 	public static byte[] readFileBytes(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = null;
@@ -773,8 +780,8 @@ public final class FileUtils {
 	/**
 	 * Read resource content
 	 * @param file object
-	 * @return	
-	 * @throws IOException
+	 * @return	File data by byte arrays
+	 * @throws IOException	if an I/O error occurs
 	 */
 	public static byte[] readFileBytes(File file) throws IOException {
 		if (file == null || !file.exists()) {
@@ -814,9 +821,9 @@ public final class FileUtils {
 	
 	/**
 	 * Read resource content
-	 * @param resourceLocation
-	 * @return	
-	 * @throws IOException
+	 * @param resourceLocation		Resource location
+	 * @return	File data by byte arrays
+	 * @throws IOException	if an I/O error occurs
 	 */
 	public static byte[] readFileBytes(String resourceLocation) throws IOException {
 		return FileUtils.readFileBytes(FileUtils.getFile(resourceLocation));
@@ -824,10 +831,10 @@ public final class FileUtils {
 	
 	/**
 	 * Read resource content info in define length
-	 * @param resourceLocation
-	 * @param offset	start point
+	 * @param resourceLocation	resource location
+	 * @param position	start point
 	 * @param length	read length
-	 * @return
+	 * @return	File data by byte arrays
 	 */
 	public static byte[] readFileBytes(String resourceLocation, long position, int length) {
 		RandomAccessFile randomAccessFile = null;
@@ -852,6 +859,11 @@ public final class FileUtils {
 		return readByte;
 	}
 	
+	/**
+	 * Retrieve SMB file size
+	 * @param resourceLocation		resource location
+	 * @return	File size
+	 */
 	public static long getSMBFileSize(String resourceLocation) {
 		try {
 			SmbFile smbFile = new SmbFile(resourceLocation);
@@ -863,8 +875,8 @@ public final class FileUtils {
 	
 	/**
 	 * Retrieve resource location size
-	 * @param resourceLocation
-	 * @return
+	 * @param resourceLocation		resource location
+	 * @return	File size
 	 */
 	public static long getFileSize(String resourceLocation) {
 		try {
@@ -876,8 +888,8 @@ public final class FileUtils {
 
 	/**
 	 * Retrieve file size
-	 * @param file
-	 * @return
+	 * @param file		File object
+	 * @return	File size
 	 */
 	public static long getFileSize(File file) {
 		long fileSize = 0L;
@@ -970,6 +982,12 @@ public final class FileUtils {
 		return new URI(StringUtils.replace(location, " ", "%20"));
 	}
 	
+	/**
+	 * List jar entry
+	 * @param uri		Jar file URI
+	 * @return			List of entry names
+	 * @throws IOException		read jar file error
+	 */
 	public static List<String> listJarEntry(URI uri) throws IOException {
 		List<String> returnList = new ArrayList<String>();
 		
@@ -1022,30 +1040,33 @@ public final class FileUtils {
 	 * List child files
 	 * @param filePath		parent file path
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(String filePath) throws IOException {
+	public static List<String> listFiles(String filePath) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath));
 	}
 
 	/**
 	 * List child files
-	 * @param filePath		parent file path
+	 * @param filePath			parent file path
+	 * @param readHiddenFiles	List include hidden files
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(String filePath, boolean readHiddenFiles) throws IOException {
+	public static List<String> listFiles(String filePath, boolean readHiddenFiles) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), readHiddenFiles);
 	}
 
 	/**
 	 * List child files
 	 * @param filePath		parent file path
+	 * @param readHiddenFiles	List include hidden files
+	 * @param includeRootFolder	List include directories
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listFiles(String filePath, 
-			boolean readHiddenFiles, boolean includeRootFolder) throws IOException {
+			boolean readHiddenFiles, boolean includeRootFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), readHiddenFiles, includeRootFolder);
 	}
 
@@ -1053,29 +1074,33 @@ public final class FileUtils {
 	 * List child files
 	 * @param file			parent file object
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file) throws IOException {
+	public static List<String> listFiles(File file) throws FileNotFoundException {
 		return FileUtils.listFiles(file, null);
 	}
 
 	/**
 	 * List child files
 	 * @param file			parent file object
+	 * @param readHiddenFiles	List include hidden files
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, boolean readHiddenFiles) throws IOException {
+	public static List<String> listFiles(File file, boolean readHiddenFiles) throws FileNotFoundException {
 		return FileUtils.listFiles(file, null, readHiddenFiles);
 	}
 
 	/**
 	 * List child files
 	 * @param file			parent file object
+	 * @param readHiddenFiles	List include hidden files
+	 * @param includeRootFolder	List include directories
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, boolean readHiddenFiles, boolean includeRootFolder) throws IOException {
+	public static List<String> listFiles(File file, boolean readHiddenFiles, 
+			boolean includeRootFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(file, null, readHiddenFiles, includeRootFolder);
 	}
 	
@@ -1084,20 +1109,23 @@ public final class FileUtils {
 	 * @param filePath		parent file path
 	 * @param filter		file name filter
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(String filePath, FilenameFilter filter) throws IOException {
+	public static List<String> listFiles(String filePath, FilenameFilter filter) 
+			throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), filter);
 	}
 
 	/**
 	 * List child files by file name filter
-	 * @param filePath		parent file path
-	 * @param filter		file name filter
-	 * @return				list of child file path 
-	 * @throws IOException
+	 * @param filePath			parent file path
+	 * @param filter			file name filter
+	 * @param readHiddenFiles	List include hidden files
+	 * @return					list of child file path 
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(String filePath, FilenameFilter filter, boolean readHiddenFiles) throws IOException {
+	public static List<String> listFiles(String filePath, FilenameFilter filter, 
+			boolean readHiddenFiles) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), filter, readHiddenFiles);
 	}
 
@@ -1106,9 +1134,9 @@ public final class FileUtils {
 	 * @param file			parent file object
 	 * @param filter		file name filter
 	 * @return				list of child file path 
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, FilenameFilter filter) throws IOException {
+	public static List<String> listFiles(File file, FilenameFilter filter) throws FileNotFoundException {
 		List<String> returnList = new ArrayList<String>();
 		FileUtils.listFiles(file, filter, returnList, true, Globals.DEFAULT_VALUE_BOOLEAN);
 		return returnList;
@@ -1116,12 +1144,14 @@ public final class FileUtils {
 
 	/**
 	 * List child files by file name filter
-	 * @param file			parent file object
-	 * @param filter		file name filter
-	 * @return				list of child file path 
-	 * @throws IOException
+	 * @param file				parent file object
+	 * @param filter			file name filter
+	 * @param readHiddenFiles	List include hidden files
+	 * @return					list of child file path 
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, FilenameFilter filter, boolean readHiddenFiles) throws IOException {
+	public static List<String> listFiles(File file, FilenameFilter filter, 
+			boolean readHiddenFiles) throws FileNotFoundException {
 		List<String> returnList = new ArrayList<String>();
 		FileUtils.listFiles(file, filter, returnList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN);
 		return returnList;
@@ -1129,12 +1159,15 @@ public final class FileUtils {
 
 	/**
 	 * List child files by file name filter
-	 * @param file			parent file object
-	 * @param filter		file name filter
-	 * @return				list of child file path 
-	 * @throws IOException
+	 * @param file				parent file object
+	 * @param filter			file name filter
+	 * @param readHiddenFiles	List include hidden files
+	 * @param includeRootFolder	List include directories
+	 * @return					list of child file path 
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, FilenameFilter filter, boolean readHiddenFiles, boolean includeRootFolder) throws IOException {
+	public static List<String> listFiles(File file, FilenameFilter filter, 
+			boolean readHiddenFiles, boolean includeRootFolder) throws FileNotFoundException {
 		List<String> returnList = new ArrayList<String>();
 		FileUtils.listFiles(file, filter, returnList, readHiddenFiles, includeRootFolder);
 		return returnList;
@@ -1144,7 +1177,7 @@ public final class FileUtils {
 	 * List child files and append file path to current list
 	 * @param filePath		parent file path
 	 * @param fileList		current child file list
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, List<String> fileList) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, true, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1152,9 +1185,10 @@ public final class FileUtils {
 
 	/**
 	 * List child files and append file path to current list
-	 * @param filePath		parent file path
-	 * @param fileList		current child file list
-	 * @throws IOException
+	 * @param filePath			parent file path
+	 * @param fileList			current child file list
+	 * @param readHiddenFiles	List include hidden files
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1162,9 +1196,11 @@ public final class FileUtils {
 
 	/**
 	 * List child files and append file path to current list
-	 * @param filePath		parent file path
-	 * @param fileList		current child file list
-	 * @throws IOException
+	 * @param filePath			parent file path
+	 * @param fileList			current child file list
+	 * @param readHiddenFiles	List include hidden files
+	 * @param includeRootFolder	List include directories
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, List<String> fileList, 
 			boolean readHiddenFiles, boolean includeRootFolder) throws IOException {
@@ -1176,7 +1212,7 @@ public final class FileUtils {
 	 * @param filePath		parent file path
 	 * @param filter		file name filter
 	 * @param fileList		current child file list
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter, List<String> fileList) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1184,14 +1220,14 @@ public final class FileUtils {
 
 	/**
 	 * List child files by file name filter and append file path to current list
-	 * @param filePath				parent file path
-	 * @param filter				file name filter
-	 * @param fileList				current child file list
-	 * @param includeRootFolder		include root folder
-	 * @throws IOException
+	 * @param filePath					parent file path
+	 * @param filter					file name filter
+	 * @param fileList					current child file list
+	 * @param includeRootFolder			include root folder
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter, 
-			List<String> fileList, boolean includeRootFolder) throws IOException {
+			List<String> fileList, boolean includeRootFolder) throws FileNotFoundException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true, includeRootFolder);
 	}
 
@@ -1202,10 +1238,9 @@ public final class FileUtils {
 	 * @param fileList				current child file list
 	 * @param readHiddenFiles		include hidden file
 	 * @param includeRootFolder		include root folder
-	 * @throws IOException
 	 */
 	public static void listFiles(File file, FilenameFilter filter, List<String> fileList, 
-			boolean readHiddenFiles, boolean includeRootFolder) throws IOException {
+			boolean readHiddenFiles, boolean includeRootFolder) {
 		if (fileList == null) {
 			fileList = new ArrayList<String>();
 		}
@@ -1245,9 +1280,9 @@ public final class FileUtils {
 	 * List child directory
 	 * @param filePath		parent path
 	 * @return				list of child directory path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listDirectory(String filePath) throws IOException {
+	public static List<String> listDirectory(String filePath) throws FileNotFoundException {
 		List<String> directoryList = new ArrayList<String>();
 		FileUtils.listDirectory(FileUtils.getFile(filePath), directoryList);
 		return directoryList;
@@ -1257,9 +1292,8 @@ public final class FileUtils {
 	 * List child directory
 	 * @param directory		parent directory object
 	 * @return				list of child directory path
-	 * @throws IOException
 	 */
-	public static List<String> listDirectory(File directory) throws IOException {
+	public static List<String> listDirectory(File directory) {
 		List<String> directoryList = new ArrayList<String>();
 		FileUtils.listDirectory(directory, directoryList);
 		return directoryList;
@@ -1269,9 +1303,8 @@ public final class FileUtils {
 	 * List child directory and append to current directory list
 	 * @param file				parent directory object
 	 * @param directoryList		current directory list
-	 * @throws IOException
 	 */
-	public static void listDirectory(File file, List<String> directoryList) throws IOException {
+	public static void listDirectory(File file, List<String> directoryList) {
 		if (file == null || !file.isDirectory() || directoryList == null) {
 			return;
 		}
@@ -1293,9 +1326,9 @@ public final class FileUtils {
 	 * @param filePath			parent file path
 	 * @param fileExtName		extension name
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listExtNameFiles(String filePath, String fileExtName) throws IOException {
+	public static List<String> listExtNameFiles(String filePath, String fileExtName) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName));
 	}
 
@@ -1303,9 +1336,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .class
 	 * @param filePath			parent file path
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listClassesFiles(String filePath) throws IOException {
+	public static List<String> listClassesFiles(String filePath) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter("class"));
 	}
 
@@ -1313,9 +1346,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .class
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listClassesFiles(File file) throws IOException {
+	public static List<String> listClassesFiles(File file) throws FileNotFoundException {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter("class"));
 	}
 
@@ -1323,9 +1356,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .jar
 	 * @param filePath			parent file path
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listJarFiles(String filePath) throws IOException {
+	public static List<String> listJarFiles(String filePath) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_JAR));
 	}
 
@@ -1333,9 +1366,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .jar
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listJarFiles(File file) throws IOException {
+	public static List<String> listJarFiles(File file) throws FileNotFoundException {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_JAR));
 	}
 
@@ -1343,9 +1376,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .zip
 	 * @param filePath			parent file path
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listZipFiles(String filePath) throws IOException {
+	public static List<String> listZipFiles(String filePath) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_ZIP));
 	}
 
@@ -1353,9 +1386,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .zip
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listZipFiles(File file) throws IOException {
+	public static List<String> listZipFiles(File file) throws FileNotFoundException {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_ZIP));
 	}
 
@@ -1363,9 +1396,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .wsjar
 	 * @param filePath			parent file path
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listWebSphereJarFiles(String filePath) throws IOException {
+	public static List<String> listWebSphereJarFiles(String filePath) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_WSJAR));
 	}
 
@@ -1373,9 +1406,9 @@ public final class FileUtils {
 	 * List child files by filter extension name is .wsjar
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws IOException
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listWebSphereJarFiles(File file) throws IOException {
+	public static List<String> listWebSphereJarFiles(File file) throws FileNotFoundException {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_WSJAR));
 	}
 	
@@ -1443,10 +1476,10 @@ public final class FileUtils {
 	
 	/**
 	 * Save String to File use default charset: UTF-8
-	 * @param fileName
-	 * @param filePath
-	 * @param content
-	 * @return
+	 * @param fileName			File name
+	 * @param filePath			File path
+	 * @param content			File content
+	 * @return					Save result
 	 */
 	public static boolean saveFile(String fileName, String filePath, String content) {
 		return FileUtils.saveFile(fileName, filePath, content, Globals.DEFAULT_ENCODING);
@@ -1454,11 +1487,11 @@ public final class FileUtils {
 	
 	/**
 	 * Save String to File
-	 * @param fileName
-	 * @param filePath
-	 * @param content		File Content
-	 * @param encoding
-	 * @return
+	 * @param fileName			File name
+	 * @param filePath			File path
+	 * @param content			File content
+	 * @param encoding			Charset encoding
+	 * @return					Save result
 	 */
 	public static boolean saveFile(String fileName, String filePath, String content,String encoding) {
 		PrintWriter printWriter = null;
@@ -1491,8 +1524,8 @@ public final class FileUtils {
 	
 	/**
 	 * Read File to String use default charset: UTF-8
-	 * @param filePath
-	 * @return
+	 * @param filePath			File path
+	 * @return File content as string
 	 */
 	public static String readFile(String filePath) {
 		return FileUtils.readFile(filePath, Globals.DEFAULT_ENCODING);
@@ -1500,9 +1533,9 @@ public final class FileUtils {
 
 	/**
 	 * Read File to String
-	 * @param filePath
-	 * @param encoding
-	 * @return
+	 * @param filePath		File path
+	 * @param encoding		Charset encoding
+	 * @return File content as string
 	 */
 	public static String readFile(String filePath, String encoding) {
 		try {
@@ -1514,8 +1547,8 @@ public final class FileUtils {
 
 	/**
 	 * Read file to String from current input stream use default charset: UTF-8
-	 * @param inputStream
-	 * @return
+	 * @param inputStream		File input stream
+	 * @return File content as string
 	 */
 	public static String readFile(InputStream inputStream) {
 		return FileUtils.readFile(inputStream, null);
@@ -1523,9 +1556,9 @@ public final class FileUtils {
 	
 	/**
 	 * Read file to String from current input stream use current encoding
-	 * @param inputStream
-	 * @param encoding
-	 * @return
+	 * @param inputStream		File input stream
+	 * @param encoding			Charset encoding
+	 * @return File content as string
 	 */
 	public static String readFile(InputStream inputStream, String encoding) {
 		if (encoding == null) {
@@ -1567,9 +1600,8 @@ public final class FileUtils {
 	
 	/**
 	 * Remove File by current file path
-	 * @param filePath
-	 * @return
-	 * @throws FileNotFoundException 
+	 * @param filePath		File path
+	 * @return Remove result
 	 */
 	public static boolean removeFile(String filePath) {
 		try {
@@ -1592,8 +1624,8 @@ public final class FileUtils {
 	
 	/**
 	 * Remove File by current file object
-	 * @param file
-	 * @return
+	 * @param file	File instance
+	 * @return Remove result
 	 */
 	public static boolean removeFile(File file) {
 		if (file == null) {
@@ -1612,8 +1644,8 @@ public final class FileUtils {
 
 	/**
 	 * Remove File by current file object
-	 * @param file
-	 * @return
+	 * @param smbFile	SMB file instance
+	 * @return Remove result
 	 */
 	public static boolean removeSmbFile(SmbFile smbFile) {
 		if (smbFile == null) {
@@ -1637,6 +1669,12 @@ public final class FileUtils {
 		}
 	}
 	
+	/**
+	 * Rename smb file
+	 * @param origFile		Oringial file
+	 * @param destFile		Rename file
+	 * @return Rename result
+	 */
 	public static boolean renameSmbFile(String origFile, String destFile) {
 		if (origFile.startsWith(FileUtils.SAMBA_URL_PREFIX) 
 				&& destFile.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
@@ -1657,10 +1695,9 @@ public final class FileUtils {
 	
 	/**
 	 * Move file from basePath to moveToPath
-	 * @param fileName
-	 * @param basePath
-	 * @param moveToPath
-	 * @return
+	 * @param basePath			Original path
+	 * @param moveToPath		Target path
+	 * @return Move result
 	 */
 	public static boolean moveFile(String basePath, String moveToPath) {
 		return FileUtils.moveFile(basePath, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1668,10 +1705,10 @@ public final class FileUtils {
 	
 	/**
 	 * Move file from basePath to moveToPath
-	 * @param fileName
-	 * @param basePath
-	 * @param moveToPath
-	 * @return
+	 * @param basePath			Original path
+	 * @param moveToPath		Target path
+	 * @param override			Override target file if exists
+	 * @return					Operate result
 	 */
 	public static boolean moveFile(String basePath, String moveToPath, boolean override) {
 		if (FileUtils.isExists(basePath) && FileUtils.canRead(basePath)) {
@@ -1698,9 +1735,9 @@ public final class FileUtils {
 	
 	/**
 	 * Move directory from basePath to moveToPath and ignore exists file
-	 * @param basePath
-	 * @param moveToPath
-	 * @return
+	 * @param basePath		Original directory
+	 * @param moveToPath	Target directory
+	 * @return Move result
 	 */
 	public static boolean moveDir(String basePath, String moveToPath) {
 		return FileUtils.moveDir(basePath, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1708,10 +1745,10 @@ public final class FileUtils {
 	
 	/**
 	 * Move directory from basePath to moveToPath and override by user defined
-	 * @param basePath
-	 * @param moveToPath
-	 * @param override
-	 * @return
+	 * @param basePath		Original directory
+	 * @param moveToPath	Target directory
+	 * @param override		Override target file if it's exists
+	 * @return Move result
 	 */
 	public static boolean moveDir(String basePath, String moveToPath, boolean override) {
 		try {
@@ -1723,9 +1760,9 @@ public final class FileUtils {
 	
 	/**
 	 * Move directory from baseFile object to moveToPath and ignore exists file
-	 * @param baseFile
-	 * @param moveToPath
-	 * @return
+	 * @param baseFile			Original file instance
+	 * @param moveToPath	Target directory
+	 * @return Move result
 	 */
 	public static boolean moveDir(File baseFile, String moveToPath) {
 		return FileUtils.moveDir(baseFile, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1733,9 +1770,10 @@ public final class FileUtils {
 	
 	/**
 	 * Move dir from baseFile object to moveToPath and override by user defined
-	 * @param basePath
-	 * @param moveToPath
-	 * @return
+	 * @param baseFile			Original file path
+	 * @param moveToPath		Target path
+	 * @param override			Override target file
+	 * @return Move result
 	 */
 	public static boolean moveDir(File baseFile, String moveToPath, boolean override) {
 		if (baseFile == null || !baseFile.exists()) {
@@ -1776,10 +1814,9 @@ public final class FileUtils {
 	
 	/**
 	 * Copy file from basePath to copyToPath
-	 * @param fileName
-	 * @param basePath
-	 * @param copyToPath
-	 * @return
+	 * @param basePath			Original path
+	 * @param copyToPath		Target path
+	 * @return Copy result
 	 */
 	public static boolean copyFile(String basePath, String copyToPath) {
 		InputStream inputStream = null;
@@ -1835,6 +1872,11 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
+	/**
+	 * Make directory
+	 * @param destPath		Target directory path
+	 * @return Operate result
+	 */
 	public static boolean makeDir(String destPath) {
 		if (FileUtils.isExists(destPath)) {
 			return true;
@@ -1852,8 +1894,8 @@ public final class FileUtils {
 	
 	/**
 	 * Create file directory
-	 * @param homePath
-	 * @return
+	 * @param homePath		Check and create parent directory if it's not exists
+	 * @return Operate result
 	 */
 	public static boolean makeHome(String homePath) {
 		if (homePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
@@ -1895,8 +1937,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check filePath is exists
-	 * @param path
-	 * @return
+	 * @param resourceLocation		Resource location
+	 * @return						Check result
 	 */
 	public static boolean isDirectory(String resourceLocation) {
 		if (resourceLocation == null) {
@@ -1916,9 +1958,9 @@ public final class FileUtils {
 	
 	/**
 	 * Copy directory from baseDir to destDir
-	 * @param baseDir
-	 * @param destDir
-	 * @return
+	 * @param baseDir		Original directory
+	 * @param destDir		Target directory
+	 * @return Operate result
 	 */
 	public static boolean copyDir(String baseDir, String destDir) {
 		if (!FileUtils.isDirectory(baseDir)) {
@@ -1956,8 +1998,8 @@ public final class FileUtils {
 	
 	/**
 	 * Delete directory
-	 * @param directory
-	 * @return
+	 * @param directory		directory will be removed
+	 * @return Operate result
 	 */
 	public static boolean removeDir(File directory) {
 		if (!directory.exists()) {
@@ -1986,10 +2028,8 @@ public final class FileUtils {
 
 	/**
 	 * Delete directory
-	 * @param directory
-	 * @return
-	 * @throws SmbException 
-	 * @throws MalformedURLException 
+	 * @param directory		Which directory will be removed
+	 * @return Operate result
 	 */
 	public static boolean removeSmbDir(SmbFile directory) {
 		try {
@@ -2021,6 +2061,11 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * Calculate file CRC value
+	 * @param filePath		file path
+	 * @return	CRC value
+	 */
 	public static long calcFileCRC(String filePath) {
 		InputStream inputStream = null;
 		try {
@@ -2054,8 +2099,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file type is compress file
-	 * @param pathName
-	 * @return boolean
+	 * @param resourceLocation		Resource location
+	 * @return 						Check result
 	 */
 	public static boolean isCompressFile(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
@@ -2075,8 +2120,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file type is ready for printing
-	 * @param resourceLocation
-	 * @return
+	 * @param resourceLocation		Resource location
+	 * @return 						Check result
 	 */
 	public static boolean isPrintable(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
@@ -2094,6 +2139,11 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
+	/**
+	 * Check current file type is a picture file
+	 * @param resourceLocation		Resource location
+	 * @return 						Check result
+	 */
 	public static boolean isPicture(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2112,8 +2162,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file is exists
-	 * @param filePath
-	 * @return
+	 * @param filePath		File path
+	 * @return 				Check result
 	 */
 	public static boolean isExists(String filePath) {
 		if (filePath == null) {
@@ -2135,6 +2185,12 @@ public final class FileUtils {
 		}
 	}
 	
+	/**
+	 * Check given entry path is exists in zip/jar file
+	 * @param filePath			Zip/jar file path
+	 * @param entryPath			Check entry path
+	 * @return					Check result
+	 */
 	public static boolean isEntryExists(String filePath, String entryPath) {
 		if (filePath.endsWith(URL_PROTOCOL_JAR)) {
 			JarFile jarFile = null;
@@ -2170,8 +2226,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file can read
-	 * @param filePath
-	 * @return
+	 * @param filePath		File path
+	 * @return				Check result
 	 */
 	public static boolean canRead(String filePath) {
 		if (filePath == null) {
@@ -2195,8 +2251,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file can write
-	 * @param filePath
-	 * @return
+	 * @param filePath		File path
+	 * @return				Check result
 	 */
 	public static boolean canWrite(String filePath) {
 		if (filePath == null) {
@@ -2220,8 +2276,8 @@ public final class FileUtils {
 	
 	/**
 	 * Check current file can execute
-	 * @param filePath
-	 * @return
+	 * @param filePath		File path
+	 * @return				Check result
 	 */
 	public static boolean canExecute(String filePath) {
 		try {
@@ -2237,9 +2293,9 @@ public final class FileUtils {
 	
 	/**
 	 * Merge file to save path
-	 * @param savePath
-	 * @param segmentationFileInfos
-	 * @return
+	 * @param savePath					Target save directory
+	 * @param segmentationFileInfos		Segmentation file infos
+	 * @return							Operate result
 	 */
 	public static boolean mergeFileInfo(String savePath, List<SegmentationFileInfo> segmentationFileInfos) {
 		RandomAccessFile randomAccessFile = null;
@@ -2294,9 +2350,9 @@ public final class FileUtils {
 	
 	/**
 	 * Merge file to save path
-	 * @param savePath
-	 * @param segmentationFilePaths
-	 * @return
+	 * @param savePath					Target save path
+	 * @param segmentationFilePaths		Segmentation file infos
+	 * @return							Operate result
 	 */
 	public static boolean mergeFile(String savePath, List<String> segmentationFilePaths) {
 		RandomAccessFile randomAccessFile = null;
@@ -2353,9 +2409,9 @@ public final class FileUtils {
 	
 	/**
 	 * Segment file by current block size
-	 * @param filePath
-	 * @param blockSize
-	 * @return
+	 * @param filePath			Which file will be split
+	 * @param blockSize			Block size
+	 * @return					List of split file
 	 */
 	public static List<SegmentationFileInfo> segmentFile(String filePath, int blockSize) {
 		if (!FileUtils.isExists(filePath)) {
@@ -2443,11 +2499,6 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
-	/**
-	 * 
-	 * @param resourceLocation
-	 * @return
-	 */
 	private static boolean isSMBFileExists(String filePath) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2465,11 +2516,6 @@ public final class FileUtils {
 		}
 	}
 
-	/**
-	 * Check current file can read
-	 * @param filePath
-	 * @return
-	 */
 	private static boolean isSMBFileCanRead(String filePath) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2487,11 +2533,6 @@ public final class FileUtils {
 		}
 	}
 
-	/**
-	 * Check current file can read
-	 * @param filePath
-	 * @return
-	 */
 	private static boolean isSMBFileCanWrite(String filePath) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2536,6 +2577,7 @@ public final class FileUtils {
 		System.arraycopy(bytes, 0, intBuffer, 0, 4);
 		int dataCount = RawOperator.readIntFromLittleEndian(intBuffer, 0);
 		int srcPos = 4;
+		LOGGER.info("File identified information count: {}", dataCount);
 		for (int i = 0 ; i < dataCount ; i++) {
 			byte[] indexData = new byte[6];
 			System.arraycopy(bytes, srcPos, indexData, 0, indexData.length);

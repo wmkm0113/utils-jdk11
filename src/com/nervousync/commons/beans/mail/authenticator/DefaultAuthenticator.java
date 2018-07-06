@@ -30,8 +30,8 @@ public final class DefaultAuthenticator extends Authenticator {
 	
 	/**
 	 * Initialize authenticator
-	 * @param username
-	 * @param password
+	 * @param username		Authenticate user name
+	 * @param password		Authenticate passsword
 	 */
 	public DefaultAuthenticator(String username, String password){
 		this.passwordAuthentication = new PasswordAuthentication(username, password);

@@ -44,8 +44,8 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Formats given date according to string with ISO8601 format
-	 * @param date
-	 * @return
+	 * @param date		date instance
+	 * @return			formated result by ISO8601
 	 */
 	public static String formatDateForSitemap(Date date) {
 		if (date == null) {
@@ -56,10 +56,9 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given string according to <code>java.util.Date</code> with ISO8601 format
-	 * @param string
-	 * @param format
-	 * @return
-	 * @throws ParseException
+	 * @param string			String value with ISO8601 format
+	 * @return					Date object
+	 * @throws ParseException	given string is null
 	 */
 	public static Date parseSitemapDate(String string) throws ParseException {
 		return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
@@ -67,8 +66,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to string with vCard format
-	 * @param date
-	 * @return
+	 * @param date		date instance
+	 * @return			formated result by ISO8601
 	 */
 	public static String formatDateForVCard(Date date) {
 		if (date == null) {
@@ -79,9 +78,9 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given cookie expire string according to java.util.Date
-	 * @param string
-	 * @return
-	 * @throws ParseException
+	 * @param string			string will be parsed
+	 * @return					Date object
+	 * @throws ParseException	given string is null
 	 */
 	public static Date parseGMTDate(String string) throws ParseException {
 		return parseDate(string, COOKIE_DATETIME_PATTERN);
@@ -89,10 +88,10 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given string according to format style
-	 * @param string
-	 * @param format
-	 * @return
-	 * @throws ParseException
+	 * @param string			string will be parsed
+	 * @param format			Date format
+	 * @return					Date object
+	 * @throws ParseException	given string is null or format was not matched
 	 */
 	public static Date parseDate(String string, String format) throws ParseException {
 		if (string == null || string.length() == 0) {
@@ -109,8 +108,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to system style
-	 * @param date
-	 * @return
+	 * @param date		date instance
+	 * @return			formated result by given format
 	 */
 	public static String formatDate(Date date) {
 		return formatDate(date, "");
@@ -118,7 +117,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Return current day value with format "yyyyMMdd"
-	 * @return
+	 * @return		current day
 	 */
 	public static int currentDay() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -127,7 +126,7 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return current GMT day value with format "yyyyMMdd"
-	 * @return
+	 * @return		current GMT day
 	 */
 	public static int currentGMTDay() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -138,7 +137,7 @@ public final class DateTimeUtils {
 	/**
 	 * Return expire day value with format "yyyyMMdd"
 	 * @param expireTime expire time
-	 * @return
+	 * @return		expire day
 	 */
 	public static int expireDay(long expireTime) {
 		long expireDate = System.currentTimeMillis() + expireTime;
@@ -149,7 +148,7 @@ public final class DateTimeUtils {
 	/**
 	 * Return expire day value with format "yyyyMMdd"
 	 * @param expireTime expire time
-	 * @return
+	 * @return		expire GMT day
 	 */
 	public static int expireGMTDay(long expireTime) {
 		long expireDate = DateTimeUtils.currentGMTTimeMillis() + expireTime;
@@ -159,7 +158,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Converts input time from Java to DOS format
-	 * @param time
+	 * @param time		time value
 	 * @return time in DOS format 
 	 */
 	public static long toDosTime(long time) {
@@ -177,7 +176,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Converts time in dos format to Java format
-	 * @param dosTime
+	 * @param dosTime		dos time
 	 * @return time in java format
 	 */
 	public static long dosToJavaTme(int dosTime) {
@@ -196,7 +195,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Return current time value with format "yyyyMMddHHmm"
-	 * @return
+	 * @return		current time with format "yyyyMMddHHmm"
 	 */
 	public static long currentTime() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -205,7 +204,7 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return current time in milliseconds.
-	 * @return
+	 * @return		current time in milliseconds.
 	 */
 	public static long currentTimeMillis() {
 		return System.currentTimeMillis();
@@ -213,7 +212,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Return current GMT time value with format "yyyyMMddHHmm"
-	 * @return
+	 * @return		current GMT time value with format "yyyyMMddHHmm"
 	 */
 	public static long currentGMTTime() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
@@ -223,7 +222,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Returns the GMT time in milliseconds.
-	 * @return
+	 * @return		current GMT time in milliseconds.
 	 */
 	public static long currentGMTTimeMillis() {
 		long currentTime = System.currentTimeMillis();
@@ -232,9 +231,9 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to format style
-	 * @param date
-	 * @param format
-	 * @return
+	 * @param date			Date instance
+	 * @param format		String format
+	 * @return				Format date value as string
 	 */
 	public static String formatDate(Date date, String format) {
 		return DateTimeUtils.formatDate(date, format, TimeZone.getDefault());
@@ -242,9 +241,10 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Formats given date according to format style
-	 * @param date
-	 * @param format
-	 * @return
+	 * @param date			Date instance
+	 * @param format		String format
+	 * @param timeZone		Time zone
+	 * @return				Time value of String
 	 */
 	public static String formatDate(Date date, String format, TimeZone timeZone) {
 		if (date == null) {
@@ -493,6 +493,10 @@ public final class DateTimeUtils {
 		return formatter.parse(source);
 	}
 	
+	/**
+	 * Check current year is leap year
+	 * @return		check result
+	 */
 	public static boolean isLeapYear() {
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		

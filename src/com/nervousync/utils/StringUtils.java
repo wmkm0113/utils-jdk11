@@ -140,6 +140,11 @@ public final class StringUtils {
 		return true;
 	}
 	
+	/**
+	 * Base64 encoder
+	 * @param bytes		byte arrays
+	 * @return			Encoded base64 result
+	 */
 	public static String base64Encode(byte[] bytes) {
 		int length = bytes.length;
 		byte[] tempBytes = null;
@@ -177,6 +182,11 @@ public final class StringUtils {
 		return new String(charArray);
 	}
 	
+	/**
+	 * Base64 decoder
+	 * @param string	Encoded base64 string
+	 * @return			Decode byte arrays
+	 */
 	public static byte[] base64Decode(String string) {
 		while (string.endsWith("=")) {
 			string = string.substring(0, string.length() - 1);
@@ -207,9 +217,9 @@ public final class StringUtils {
 	 * returns the length of the string by wrapping it in a byte buffer with
 	 * the appropriate charset of the input string and returns the limit of the 
 	 * byte buffer
-	 * @param str
+	 * @param str string
 	 * @return length of the string
-	 * @throws ZipException
+	 * @throws ZipException	if input string is null. In case of any other exception this method returns default System charset
 	 */
 	public static int getEncodedStringLength(String str) throws ZipException {
 		if (!isNotNullAndNotEmpty(str)) {
@@ -222,10 +232,10 @@ public final class StringUtils {
 	
 	/**
 	 * returns the length of the string in the input encoding
-	 * @param str
-	 * @param charset
-	 * @return int
-	 * @throws ZipException
+	 * @param str string
+	 * @param charset	charset encoding
+	 * @return length of the string
+	 * @throws ZipException	if input string is null. In case of any other exception this method returns default System charset
 	 */
 	public static int getEncodedStringLength(String str, String charset) throws ZipException {
 		if (!isNotNullAndNotEmpty(str)) {
@@ -257,12 +267,9 @@ public final class StringUtils {
 
 	/**
 	 * Detects the encoding charset for the input string
-	 * 
-	 * @param str
+	 * @param str string
 	 * @return String - charset for the String
-	 * @throws ZipException
-	 *             - if input string is null. In case of any other exception
-	 *             this method returns default System charset
+	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
 	 */
 	public static String detectCharSet(String str) throws ZipException {
 		if (str == null) {
@@ -279,11 +286,11 @@ public final class StringUtils {
 
 			byteString = str.getBytes(Globals.DEFAULT_ENCODING);
 			tempString = new String(byteString, Globals.DEFAULT_ENCODING);
-
+			
 			if (str.equals(tempString)) {
 				return Globals.DEFAULT_ENCODING;
 			}
-
+			
 			return Globals.DEFAULT_SYSTEM_CHARSET;
 		} catch (UnsupportedEncodingException e) {
 			return Globals.DEFAULT_SYSTEM_CHARSET;
@@ -292,10 +299,21 @@ public final class StringUtils {
 		}
 	}
 
+	/**
+	 * Encode with Huffman Tree
+	 * @param codeMapping	code mapping
+	 * @param content		data content
+	 * @return				encoded result
+	 */
 	public static String encodeWithHuffman(Hashtable<String, Object> codeMapping, String content) {
 		return HuffmanTree.encodeString(codeMapping, content);
 	}
 	
+	/**
+	 * Encode a string to HuffmanTree
+	 * @param content	string
+	 * @return			HuffmanTree object
+	 */
 	public static HuffmanObject encodeWithHuffman(String content) {
 		HuffmanTree huffmanTree = new HuffmanTree();
 		
@@ -323,7 +341,7 @@ public final class StringUtils {
 	/**
 	 * Check that the given CharSequence is neither <code>null</code> nor of length 0.
 	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
-	 * <p><pre>
+	 * <pre>
 	 * StringUtils.hasLength(null) = false
 	 * StringUtils.hasLength("") = false
 	 * StringUtils.hasLength(" ") = true
@@ -352,7 +370,7 @@ public final class StringUtils {
 	 * Check whether the given CharSequence has actual text.
 	 * More specifically, returns <code>true</code> if the string not <code>null</code>,
 	 * its length is greater than 0, and it contains at least one non-whitespace character.
-	 * <p><pre>
+	 * <pre>
 	 * StringUtils.hasText(null) = false
 	 * StringUtils.hasText("") = false
 	 * StringUtils.hasText(" ") = false
@@ -540,6 +558,7 @@ public final class StringUtils {
 	 * @param str the String to check
 	 * @param prefix the prefix to look for
 	 * @see java.lang.String#startsWith
+	 * @return check result
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -562,6 +581,7 @@ public final class StringUtils {
 	 * @param str the String to check
 	 * @param suffix the suffix to look for
 	 * @see java.lang.String#endsWith
+	 * @return check result
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -585,6 +605,7 @@ public final class StringUtils {
 	 * @param str the original string (or StringBuffer)
 	 * @param index the index in the original string to start matching against
 	 * @param substring the substring to match at the given index
+	 * @return check result
 	 */
 	public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
 		for (int j = 0; j < substring.length(); j++) {
@@ -600,6 +621,7 @@ public final class StringUtils {
 	 * Count the occurrences of the substring in string s.
 	 * @param str string to search in. Return 0 if this is null.
 	 * @param sub string to search for. Return 0 if this is null.
+	 * @return count result
 	 */
 	public static int countOccurrencesOf(String str, String sub) {
 		if (str == null || sub == null || str.length() == 0 || sub.length() == 0) {
@@ -687,7 +709,7 @@ public final class StringUtils {
 	 * Quote the given String with single quotes.
 	 * @param str the input String (e.g. "myString")
 	 * @return the quoted String (e.g. "'myString'"),
-	 * or <code>null<code> if the input was <code>null</code>
+	 * or <code>null</code> if the input was <code>null</code>
 	 */
 	public static String quote(String str) {
 		return (str != null ? "'" + str + "'" : null);
@@ -708,6 +730,7 @@ public final class StringUtils {
 	 * Unqualify a string qualified by a '.' dot character. For example,
 	 * "this.name.is.qualified", returns "qualified".
 	 * @param qualifiedName the qualified name
+	 * @return qualified string
 	 */
 	public static String unqualify(String qualifiedName) {
 		return unqualify(qualifiedName, '.');
@@ -718,6 +741,7 @@ public final class StringUtils {
 	 * "this:name:is:qualified" returns "qualified" if using a ':' separator.
 	 * @param qualifiedName the qualified name
 	 * @param separator the separator
+	 * @return qualified string
 	 */
 	public static String unqualify(String qualifiedName, char separator) {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
@@ -747,7 +771,7 @@ public final class StringUtils {
 
 	/**
 	 * Extract the filename from the given path,
-	 * e.g. "mypath/myfile.txt" -> "myfile.txt".
+	 * e.g. "mypath/myfile.txt" -&gt; "myfile.txt".
 	 * @param path the file path (may be <code>null</code>)
 	 * @return the extracted filename, or <code>null</code> if none
 	 */
@@ -762,7 +786,7 @@ public final class StringUtils {
 
 	/**
 	 * Extract the filename extension from the given path,
-	 * e.g. "mypath/myfile.txt" -> "txt".
+	 * e.g. "mypath/myfile.txt" -&gt; "txt".
 	 * @param path the file path (may be <code>null</code>)
 	 * @return the extracted filename extension, or <code>null</code> if none
 	 */
@@ -776,7 +800,7 @@ public final class StringUtils {
 
 	/**
 	 * Strip the filename extension from the given path,
-	 * e.g. "mypath/myfile.txt" -> "mypath/myfile".
+	 * e.g. "mypath/myfile.txt" -&gt; "mypath/myfile".
 	 * @param path the file path (may be <code>null</code>)
 	 * @return the path with stripped filename extension,
 	 * or <code>null</code> if none
@@ -1358,19 +1382,24 @@ public final class StringUtils {
 	public static String arrayToCommaDelimitedString(Object[] arr) {
 		return arrayToDelimitedString(arr, ",");
 	}
+	
 	/**
-	 * 转换数据库中BLOB类型的数据，并过滤HTML非法代码
-	 * @param content		BLOB类型数据
-	 * @return
-	 * @throws Exception
+	 * Convert BLOB to string and format for HTML
+	 * @param content		BLOB datas
+	 * @return				Convert string
 	 */
-	public static String convertContent(byte [] content) throws Exception {
+	public static String convertContent(byte [] content) {
 		if (content == null) {
 			return null;
 		}
 		return TextToHtml(ConvertUtils.convertToString(content));
 	}
 	
+	/**
+	 * Convert object to JSON string
+	 * @param object	object
+	 * @return			JSON string
+	 */
 	public static String convertObjectToJSONString(Object object) {
 		TreeMap<String, Object> valueMap = new TreeMap<String, Object>();
 		if (object instanceof Map || object.getClass().isArray() 
@@ -1412,10 +1441,24 @@ public final class StringUtils {
 		return null;
 	}
 	
+	/**
+	 * Parse JSON string and bind data to JavaBean
+	 * @param jsonData	JSON String
+	 * @param clazz		JavaBean define class
+	 * @param <T>		T
+	 * @return			Convert JavaBean object
+	 */
 	public static <T> T convertJSONStringToObject(String jsonData, Class<T> clazz) {
 		return ConvertUtils.convertMapToObject(StringUtils.convertJSONStringToMap(jsonData), clazz);
 	}
 	
+	/**
+	 * Convert JSON string to List and bind data to java bean
+	 * @param jsonData	JSON String
+	 * @param clazz		Bind JavaBean define class
+	 * @param <T>		T
+	 * @return			List of JavaBean
+	 */
 	public static <T> List<T> convertJSONStringToList(String jsonData, Class<T> clazz) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -1437,6 +1480,11 @@ public final class StringUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert JSON string to map
+	 * @param jsonData		JSON string
+	 * @return				Convert map
+	 */
 	public static Map<String, Object> convertJSONStringToMap(String jsonData) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -1452,9 +1500,12 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 	判断字符串是否为象形文字
+	 * 	Check given string is ASCII
+	 * @param s	String
+	 * @return check result code
+	 * @throws UnsupportedEncodingException If the named charset is not supported
 	 */
-	public static int isASCII(String s) throws Exception {
+	public static int isASCII(String s) throws UnsupportedEncodingException {
 		byte[] testString = s.getBytes("UTF-8");
 		
 		if (testString == null || testString.length > 3 || testString.length <= 0) {
@@ -1471,9 +1522,9 @@ public final class StringUtils {
 	}
 
 	/**
-	 * 过滤字符串，防止XML文件中出现非法字符
-	 * @param sourceString	要过滤的字符串
-	 * @return	过滤后的字符串
+	 * Replace special XMl character with converted character in string
+	 * @param sourceString	input string
+	 * @return	replaced string
 	 */
 	public static String formatTextForXML(String sourceString) {
 		if (sourceString == null) {
@@ -1511,9 +1562,9 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 过滤字符串，将格式化后的字符串转换为初始状态
-	 * @param sourceString
-	 * @return
+	 * Replace converted character with special XMl character in string
+	 * @param sourceString	input string
+	 * @return	replaced string
 	 */
 	public static String formatXMLForText(String sourceString) {
 		
@@ -1530,9 +1581,9 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 过滤字符串，防止Html中出现非法字符
-	 * @param sourceString
-	 * @return
+	 * Replace special HTML character with converted character in string
+	 * @param sourceString	input string
+	 * @return	replaced string
 	 */
 	public static String TextToHtml (String sourceString) {
 		int strLen = 0;
@@ -1569,9 +1620,9 @@ public final class StringUtils {
 	/**
 	 * Get message key
 	 * 
-	 * @param locale
-	 * @param key
-	 * @return
+	 * @param locale	Locale instance
+	 * @param key		message key
+	 * @return			Locale message key
 	 */
 	public static String messageKey(Locale locale, String key) {
 		StringBuffer messageKey = new StringBuffer();
@@ -1587,9 +1638,9 @@ public final class StringUtils {
 	/**
 	 * Append localeKey and key
 	 * 
-	 * @param localeKey
-	 * @param key
-	 * @return
+	 * @param localeKey	Locale key
+	 * @param key		message key
+	 * @return			Locale message key
 	 */
 	public static String messageKey(String localeKey, String key) {
 		return (localeKey + "." + key).toUpperCase();
@@ -1599,8 +1650,8 @@ public final class StringUtils {
 	 * Convert <code>Locale</code> to <code>String</code>
 	 * 		use toString() method. If locale is null, return ""
 	 * 
-	 * @param locale
-	 * @return
+	 * @param locale	Locale instance
+	 * @return	Locale key
 	 */
 	public static String localeKey(Locale locale) {
 		return locale == null ? "" : locale.toString();
@@ -1608,9 +1659,9 @@ public final class StringUtils {
 	
 	/**
 	 * Matches with regex
-	 * @param str
-	 * @param regex
-	 * @return
+	 * @param str		input string
+	 * @param regex		regex message
+	 * @return	match result
 	 */
 	public static boolean matches(String str, String regex) {
 		if (str == null || regex == null) {
@@ -1621,9 +1672,9 @@ public final class StringUtils {
 	
 	/**
 	 * Replace template string with regex
-	 * @param str
-	 * @param regex
-	 * @param template
+	 * @param str		input string
+	 * @param regex		regex message
+	 * @param template	template string
 	 * @return replaced string. null for match failed
 	 */
 	public static String replaceWithRegex(String str, String regex, String template) {
@@ -1643,6 +1694,11 @@ public final class StringUtils {
 		return matchesString;
 	}
 
+	/**
+	 * Random string
+	 * @param length	string length
+	 * @return	Random generate string
+	 */
 	public static String randomString(int length) {
 		StringBuffer generateKey = new StringBuffer();
 		Random random = new Random();
@@ -1652,6 +1708,11 @@ public final class StringUtils {
 		return generateKey.toString();
 	}
 
+	/**
+	 * Random number string
+	 * @param length	string length
+	 * @return	Random generate number string
+	 */
 	public static String randomNumber(int length) {
 		StringBuffer generateKey = new StringBuffer();
 		for (int i = 0 ; i < length ; i++) {
@@ -1670,8 +1731,8 @@ public final class StringUtils {
 	
 	/**
 	 * Escape url address
-	 * @param str
-	 * @return
+	 * @param str	original url address
+	 * @return	escape url address
 	 */
 	public static String escape(String str) {
 		int length;
@@ -1699,8 +1760,8 @@ public final class StringUtils {
 	
 	/**
 	 * Unescape url address
-	 * @param str
-	 * @return
+	 * @param str	escaped url address string
+	 * @return		unecsape url address
 	 */
 	public static String unescape(String str) {
 		if (str == null) {
@@ -1736,10 +1797,19 @@ public final class StringUtils {
 		return stringBuffer.toString();
 	}
 	
+	/**
+	 * Generate UUID string
+	 * @return	UUID string
+	 */
 	public static String getUUID() {
 		return UUID.randomUUID().toString();
 	}
 	
+	/**
+	 * Convert ASCII to pinyin first spell
+	 * @param chines	Chinese ASCII string
+	 * @return			First spell pinyin string
+	 */
 	public static String converterToFirstSpell(String chines) {
 		String pinyinName = "";
 		char[] nameChar = chines.toCharArray();
@@ -1762,10 +1832,9 @@ public final class StringUtils {
 	}
 
 	/**
-	 * 汉字转换位汉语拼音，英文字符不变
-	 * 
-	 * @param chinese	汉字
-	 * @return 拼音
+	 * Convert ASCII to pinyin
+	 * @param chinese	Chinese ASCII string
+	 * @return Pinyin string
 	 */
 	public static String converterToSpell(String chinese) {
 		String pinyinName = "";
@@ -1788,6 +1857,11 @@ public final class StringUtils {
 		return pinyinName.trim();
 	}
 	
+	/**
+	 * Compress string
+	 * @param content	string
+	 * @return			Compressed string
+	 */
 	public static String compress(String content) {
 		if (content == null || content.length() == 0) {
 			return content;
@@ -1828,6 +1902,11 @@ public final class StringUtils {
 		return stringBuffer.toString();
 	}
 
+	/**
+	 * Decompress string
+	 * @param strIn		Compressed string
+	 * @return			Decompressed string
+	 */
 	public static String deCompress(String strIn) {
 		byte[] arrB = strIn.getBytes();
 		int iLen = arrB.length;
@@ -1846,9 +1925,9 @@ public final class StringUtils {
 	}
 
 	/**
-	 * 判断字符是否为空白字符
-	 * @param letter
-	 * @return
+	 * Check given character is space
+	 * @param letter	character
+	 * @return	check result
 	 */
 	public static boolean isSpace(char letter) {
 		if (letter == 8 || letter == 9 || letter == 10 || 
@@ -1860,9 +1939,9 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 判断字符是否为英文字母
-	 * @param letter
-	 * @return
+	 * Check given character is English character
+	 * @param letter	character
+	 * @return	check result
 	 */
 	public static boolean isEnglish(char letter) {
 		if ((letter > 'a' && letter < 'z') || (letter > 'A' && letter < 'Z')) {
@@ -1873,9 +1952,9 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 判断字符是否为数字
-	 * @param letter
-	 * @return
+	 * Check given character is number
+	 * @param letter	character
+	 * @return	check result
 	 */
 	public static boolean isNumber(char letter) {
 		if (letter >= '0' && letter <= '9') {
@@ -1886,9 +1965,9 @@ public final class StringUtils {
 	}
 	
 	/**
-	 * 判断字符是否为中日韩字符
-	 * @param character
-	 * @return
+	 * Check given character is Chinese/Japanese/Korean
+	 * @param character	character
+	 * @return	check result
 	 */
 	public static boolean isCJK(char character) {
 		UnicodeBlock unicodeBlock = UnicodeBlock.of(character);
@@ -1914,7 +1993,14 @@ public final class StringUtils {
 		}
 	}
 
-	public static Object parseSimpleData(String dataValue, Class<?> typeClass) throws ParseException, IOException {
+	/**
+	 * Parse simple data to target class
+	 * @param dataValue		value
+	 * @param typeClass		target define class
+	 * @return				target object
+	 * @throws ParseException		given string is null
+	 */
+	public static Object parseSimpleData(String dataValue, Class<?> typeClass) throws ParseException {
 		Object paramObj = null;
 		if (dataValue == null || typeClass == null || Globals.DEFAULT_VALUE_STRING.equals(dataValue)) {
 			return paramObj;
@@ -1974,9 +2060,9 @@ public final class StringUtils {
 	}
 
 	/**
-	 * 格式化字符
-	 * @param character
-	 * @return
+	 * Format character
+	 * @param character	character
+	 * @return	formatted character
 	 */
 	public static char format(char character) {
 		if (character == 12288) {
@@ -1992,9 +2078,8 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN ID
-	 * 验证身份证号码
-	 * @param idenCode
-	 * @return
+	 * @param idenCode	CHN identified code
+	 * @return	Check result
 	 */
 	public static boolean validateCHNIdenCode(String idenCode) {
 		idenCode = idenCode.toUpperCase();
@@ -2015,9 +2100,8 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN organization code
-	 * 验证组织机构代码
-	 * @param orgCode
-	 * @return
+	 * @param orgCode	CHN organization code
+	 * @return	Check result
 	 */
 	public static boolean validateCHNOrgCode(String orgCode) {
 		orgCode = orgCode.toUpperCase();
@@ -2048,9 +2132,8 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN social credit code
-	 * 验证统一信用代码
-	 * @param socialCreditCode
-	 * @return
+	 * @param socialCreditCode	CHN social credit code
+	 * @return	Check result
 	 */
 	public static boolean validateCHNSocialCreditCode(String socialCreditCode) {
 		socialCreditCode = socialCreditCode.toUpperCase();

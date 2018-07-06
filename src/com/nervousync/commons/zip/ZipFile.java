@@ -133,7 +133,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * ZipFile Constructor
 	 * @param filePath			Zip file path
-	 * @throws ZipException
+	 * @throws ZipException		Zip file cannot access and read
 	 */
 	public ZipFile(String filePath) throws ZipException {
 		this(filePath, null);
@@ -142,7 +142,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * ZipFile Constructor
 	 * @param file				File object
-	 * @throws ZipException
+	 * @throws ZipException		Zip file cannot access and read
 	 */
 	public ZipFile(File file) throws ZipException {
 		this(file == null ? null : file.getPath());
@@ -152,7 +152,7 @@ public final class ZipFile implements Cloneable {
 	 * ZipFile Constructor
 	 * @param file				File object
 	 * @param fileNameCharset	File name charset encoding
-	 * @throws ZipException
+	 * @throws ZipException		Zip file cannot access and read
 	 */
 	public ZipFile(File file, String fileNameCharset) throws ZipException {
 		this(file == null ? null : file.getPath(), fileNameCharset);
@@ -162,7 +162,7 @@ public final class ZipFile implements Cloneable {
 	 * ZipFile Constructor
 	 * @param filePath			Zip file path
 	 * @param fileNameCharset	File name charset encoding
-	 * @throws ZipException
+	 * @throws ZipException		Zip file cannot access and read
 	 */
 	public ZipFile(String filePath, String fileNameCharset) throws ZipException {
 		this.filePath = filePath;
@@ -178,12 +178,12 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create zip file
-	 * @param filePath		Zip file path
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param addFiles		List of files in zip file
-	 * @return
-	 * @throws ZipException
+	 * @param addFiles			List of files in zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or add files is null or empty
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			String... addFiles) throws ZipException {
@@ -193,13 +193,13 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create zip file
-	 * @param filePath		Zip file path
-	 * @param charsetName	File name charset encoding
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param charsetName		File name charset encoding
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param addFiles		List of files in zip file
-	 * @return
-	 * @throws ZipException
+	 * @param addFiles			List of files in zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or add files is null or empty
 	 */
 	public static ZipFile createZipFile(String filePath, String charsetName, ZipOptions zipOptions, 
 			String... addFiles) throws ZipException {
@@ -209,14 +209,14 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create a split archive zip file
-	 * @param filePath		Zip file path
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param splitArchive	Status of split archive
-	 * @param splitLength	Maximum size of split file
-	 * @param addFiles		List of files in zip file
-	 * @return
-	 * @throws ZipException
+	 * @param splitArchive		Status of split archive
+	 * @param splitLength		Maximum size of split file
+	 * @param addFiles			List of files in zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or add files is null or empty
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
@@ -225,15 +225,15 @@ public final class ZipFile implements Cloneable {
 
 	/**
 	 * Create a split archive zip file
-	 * @param filePath		Zip file path
-	 * @param charsetName	File name charset encoding
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param charsetName		File name charset encoding
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param splitArchive	Status of split archive
-	 * @param splitLength	Maximum size of split file
-	 * @param addFiles		List of files in zip file
-	 * @return
-	 * @throws ZipException
+	 * @param splitArchive		Status of split archive
+	 * @param splitLength		Maximum size of split file
+	 * @param addFiles			List of files in zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or add files is null or empty
 	 */
 	public static ZipFile createZipFile(String filePath, String charsetName, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
@@ -257,12 +257,12 @@ public final class ZipFile implements Cloneable {
 
 	/**
 	 * Create zip file and add folder to zip file
-	 * @param filePath		Zip file path
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param folderPath	Folder will add to zip file
-	 * @return
-	 * @throws ZipException
+	 * @param folderPath		Folder will add to zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or folder is empty
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
 			String folderPath) throws ZipException {
@@ -272,13 +272,13 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create zip file and add folder to zip file
-	 * @param filePath		Zip file path
-	 * @param charsetName	File name charset encoding
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param charsetName		File name charset encoding
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param folderPath	Folder will add to zip file
-	 * @return
-	 * @throws ZipException
+	 * @param folderPath		Folder will add to zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or folder is empty
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, String charsetName, ZipOptions zipOptions, 
 			String folderPath) throws ZipException {
@@ -288,14 +288,14 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create zip file and add folder to zip file
-	 * @param filePath		Zip file path
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param splitArchive	Status of split archive
-	 * @param splitLength	Maximum size of split file
-	 * @param folderPath	Folder will add to zip file
-	 * @return
-	 * @throws ZipException
+	 * @param splitArchive		Status of split archive
+	 * @param splitLength		Maximum size of split file
+	 * @param folderPath		Folder will add to zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or folder is empty
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String folderPath) throws ZipException {
@@ -304,15 +304,15 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Create zip file and add folder to zip file
-	 * @param filePath		Zip file path
-	 * @param charsetName	File name charset encoding
-	 * @param zipOptions	Zip options
+	 * @param filePath			Zip file path
+	 * @param charsetName		File name charset encoding
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @param splitArchive	Status of split archive
-	 * @param splitLength	Maximum size of split file
-	 * @param folderPath	Folder will add to zip file
-	 * @return
-	 * @throws ZipException
+	 * @param splitArchive		Status of split archive
+	 * @param splitLength		Maximum size of split file
+	 * @param folderPath		Folder will add to zip file
+	 * @return					ZipFile instance
+	 * @throws ZipException		If target file was exists or folder is empty
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, String charsetName, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String folderPath) throws ZipException {
@@ -342,8 +342,8 @@ public final class ZipFile implements Cloneable {
 	 * @param file				Which file path will add to zip file
 	 * @param rootFolderInZip	prefix path of zip file
 	 * @param rootFolderPath	root path of folder
-	 * @return
-	 * @throws ZipException
+	 * @return					Generated entry path
+	 * @throws ZipException		given file is null
 	 */
 	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(file)) {
@@ -404,7 +404,7 @@ public final class ZipFile implements Cloneable {
 
 	/**
 	 * Get entry path list
-	 * @return
+	 * @return		entry path list
 	 */
 	public List<String> entryList() {
 		List<String> entryList = new ArrayList<String>();
@@ -416,8 +416,8 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Check the given entry path is extsis
-	 * @param entryPath
-	 * @return
+	 * @param entryPath		entry path
+	 * @return				check result
 	 */
 	public boolean isEntryExists(String entryPath) {
 		for (GeneralFileHeader generalFileHeader : this.centralDirectory.getFileHeaders()) {
@@ -431,8 +431,8 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Read entry datas
 	 * @param entryPath		Check entry path
-	 * @return
-	 * @throws ZipException
+	 * @return				entry datas as byte arrays
+	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public byte[] readEntry(String entryPath) throws ZipException {
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
@@ -445,7 +445,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add file to zip file
 	 * @param file		Target file will add to zip file
-	 * @throws ZipException
+	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public void addFile(File file) throws ZipException {
 		this.addFile(file, ZipOptions.newOptions());
@@ -456,7 +456,7 @@ public final class ZipFile implements Cloneable {
 	 * @param file			Target file will add to zip file
 	 * @param zipOptions	Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @throws ZipException
+	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public void addFile(File file, ZipOptions zipOptions) throws ZipException {
 		this.addFiles(Arrays.asList(file.getAbsolutePath()), zipOptions);
@@ -465,7 +465,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add files to zip file
 	 * @param fileList			Target files will add to zip file
-	 * @throws ZipException
+	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public void addFiles(List<String> fileList) throws ZipException {
 		this.addFiles(fileList, ZipOptions.newOptions());
@@ -476,7 +476,7 @@ public final class ZipFile implements Cloneable {
 	 * @param fileList			Target files will add to zip file
 	 * @param zipOptions	Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @throws ZipException
+	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public void addFiles(List<String> fileList, ZipOptions zipOptions) throws ZipException {
 		if (fileList == null || fileList.isEmpty()) {
@@ -497,7 +497,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add InputStream to zip file
 	 * @param inputStream		Entity input stream
-	 * @throws ZipException
+	 * @throws ZipException		Input stream is null
 	 */
 	public void addStream(InputStream inputStream) throws ZipException {
 		this.addStream(inputStream, ZipOptions.newOptions());
@@ -506,9 +506,9 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add InputStream to zip file with zip options
 	 * @param inputStream		Entity input stream
-	 * @param zipOptions	Zip options
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @throws ZipException
+	 * @throws ZipException		input stream is null or zipOptions is null
 	 */
 	public void addStream(InputStream inputStream, ZipOptions zipOptions) throws ZipException {
 		if (inputStream == null) {
@@ -529,7 +529,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add folder to zip file
 	 * @param folderPath		Target folder path will add to zip file
-	 * @throws ZipException
+	 * @throws ZipException		folder path is null or folder was not exists
 	 */
 	public void addFolder(String folderPath) throws ZipException {
 		this.addFolder(folderPath, ZipOptions.newOptions(), true);
@@ -538,9 +538,9 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Add folder to zip file with zip options
 	 * @param folderPath		Target folder path will add to zip file
-	 * @param zipOptions	Zip options
+	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
-	 * @throws ZipException
+	 * @throws ZipException		folder path is null or folder was not exists or zipOptions is null
 	 */
 	public void addFolder(String folderPath, ZipOptions zipOptions) throws ZipException {
 		this.addFolder(folderPath, zipOptions, true);
@@ -549,7 +549,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Entract all entries in zip file to target extract file path
 	 * @param destPath			Target extract file path
-	 * @throws ZipException
+	 * @throws ZipException		Target path is null or file exists
 	 */
 	public void extractAll(String destPath) throws ZipException {
 		this.extractAll(destPath, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -559,7 +559,7 @@ public final class ZipFile implements Cloneable {
 	 * Entract all entries in zip file to target extract file path
 	 * @param destPath			Target extract file path
 	 * @param ignoreFileAttr	Status of process file attribute
-	 * @throws ZipException
+	 * @throws ZipException		Target path is null or zip file invalid
 	 */
 	public void extractAll(String destPath, boolean ignoreFileAttr) throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(destPath)) {
@@ -579,7 +579,7 @@ public final class ZipFile implements Cloneable {
 	 * Extract entry path file to target extra file path
 	 * @param entryPath			Which entry path will extract
 	 * @param destPath			Target extract file path
-	 * @throws ZipException
+	 * @throws ZipException		Target path is null or entry path is null/not exists or zip file invalid
 	 */
 	public void extractFile(String entryPath, String destPath) throws ZipException {
 		this.extractFile(entryPath, destPath, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -590,7 +590,7 @@ public final class ZipFile implements Cloneable {
 	 * @param entryPath			Which entry path will extract
 	 * @param destPath			Target extract file path
 	 * @param ignoreFileAttr	Status of process file attribute
-	 * @throws ZipException
+	 * @throws ZipException		Target path is null or entry path is null/not exists or zip file invalid
 	 */
 	public void extractFile(String entryPath, String destPath, boolean ignoreFileAttr) throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(entryPath)) {
@@ -607,7 +607,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Remove entry folder from zip file
 	 * @param folderPath		Which entry folder will removed
-	 * @throws ZipException
+	 * @throws ZipException		Given path was not a directory
 	 */
 	public void removeFolder(String folderPath) throws ZipException {
 		if (this.isDirectory(folderPath)) {
@@ -619,7 +619,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Remove entry path from zip file
 	 * @param entryPath			Which entry path will removed
-	 * @throws ZipException
+	 * @throws ZipException		given entry path is null or zip file was not exists
 	 */
 	public void removeExistsEntry(String entryPath) throws ZipException {
 		this.removeExistsEntries(new String[]{entryPath});
@@ -628,7 +628,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Remove entry paths from zip file
 	 * @param existsEntries		Which entry paths will removed
-	 * @throws ZipException
+	 * @throws ZipException		given entry path is null or zip file was not exists
 	 */
 	public void removeExistsEntries(String... existsEntries) throws ZipException {
 		if (existsEntries == null) {
@@ -648,8 +648,8 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Setting password
-	 * @param password
-	 * @throws ZipException
+	 * @param password			password
+	 * @throws ZipException		given password is null
 	 */
 	public void setPassword(String password) throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(password)) {
@@ -660,8 +660,8 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Setting password
-	 * @param password
-	 * @throws ZipException
+	 * @param password			password char arrays
+	 * @throws ZipException		given password is null
 	 */
 	public void setPassword(char[] password) throws ZipException {
 		if (this.centralDirectory == null 
@@ -679,8 +679,8 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Setting comment
-	 * @param comment
-	 * @throws ZipException
+	 * @param comment				comment information
+	 * @throws ZipException			comment is null or zip file was not exists
 	 */
 	public void setComment(String comment) throws ZipException {
 		if (comment == null) {
@@ -752,8 +752,8 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Read comment
-	 * @return
-	 * @throws ZipException
+	 * @return		Readed comment content
+	 * @throws ZipException		zip file was not exists
 	 */
 	public String getComment() throws ZipException {
 		return this.getComment(null);
@@ -761,9 +761,9 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Read comment by given charset encoding
-	 * @param charset
-	 * @return
-	 * @throws ZipException
+	 * @param charset			charset encoding
+	 * @return					Readed comment content
+	 * @throws ZipException		zip file was not exists, zip file does not include comment content or charset encoding was not supported
 	 */
 	public String getComment(String charset) throws ZipException {
 		if (charset == null) {
@@ -797,7 +797,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Merge split files and write merge file to target output path
 	 * @param outputPath			Merge file output path
-	 * @throws ZipException
+	 * @throws ZipException			Zip file was not a split file or zip file invalid
 	 */
 	public void mergeSplitFile(String outputPath) throws ZipException {
 		if (!this.splitArchive) {
@@ -871,9 +871,9 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * 
-	 * @param outputStream
-	 * @throws ZipException
+	 * Finallize zip file
+	 * @param outputStream			Output stream
+	 * @throws ZipException			Write datas to output stream error
 	 */
 	public void finalizeZipFile(OutputStream outputStream) throws ZipException {
 		if (outputStream == null) {
@@ -921,9 +921,9 @@ public final class ZipFile implements Cloneable {
 
 	/**
 	 * Open new split file 
-	 * @return
-	 * @throws IOException
-	 * @throws ZipException
+	 * @return					NervousyncRandomAccessFile instance
+	 * @throws IOException		Read next split file error
+	 * @throws ZipException		Can't found next split file
 	 */
 	public NervousyncRandomAccessFile startNextSplitFile() throws IOException, ZipException {
 		String currentSplitFile = null;

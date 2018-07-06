@@ -56,7 +56,7 @@ public final class LocationPoint implements Serializable {
 	 * Define a GPS location point
 	 * @param longitude		Location longitude value
 	 * @param latitude		Location latitude value
-	 * @return
+	 * @return				LocationPoint object
 	 */
 	public static LocationPoint gpsPoint(double longitude, double latitude) {
 		return new LocationPoint(LocationType.GPS, longitude, latitude);
@@ -66,7 +66,7 @@ public final class LocationPoint implements Serializable {
 	 * Define a GCJ02 location point
 	 * @param longitude		Location longitude value
 	 * @param latitude		Location latitude value
-	 * @return
+	 * @return				LocationPoint object
 	 */
 	public static LocationPoint gcj02Point(double longitude, double latitude) {
 		return new LocationPoint(LocationType.GCJ_02, longitude, latitude);
@@ -76,7 +76,7 @@ public final class LocationPoint implements Serializable {
 	 * Define a BD09 location point
 	 * @param longitude		Location longitude value
 	 * @param latitude		Location latitude value
-	 * @return
+	 * @return				LocationPoint object
 	 */
 	public static LocationPoint bd09Point(double longitude, double latitude) {
 		return new LocationPoint(LocationType.BD_09, longitude, latitude);
@@ -86,7 +86,7 @@ public final class LocationPoint implements Serializable {
 	 * Define a DELTA location point
 	 * @param longitude		Location longitude value
 	 * @param latitude		Location latitude value
-	 * @return
+	 * @return				LocationPoint object
 	 */
 	public static LocationPoint deltaPoint(double longitude, double latitude) {
 		return new LocationPoint(LocationType.DELTA, longitude, latitude);

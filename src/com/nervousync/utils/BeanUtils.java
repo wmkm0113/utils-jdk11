@@ -46,7 +46,6 @@ public final class BeanUtils {
 	 * @param orig the source bean
 	 * @param dest the target bean
 	 * @throws BeansException if the copying failed
-	 * @see BeanWrapper
 	 */
 	public static void copyProperties(Object orig, Object dest) throws BeansException {
 		BeanUtils.copyProperties(orig, dest, null);
@@ -63,7 +62,6 @@ public final class BeanUtils {
 	 * @param dest the target bean
 	 * @param converter converter instance
 	 * @throws BeansException if the copying failed
-	 * @see BeanWrapper
 	 */
 	public static void copyProperties(Object orig, Object dest, Converter converter) throws BeansException {
 		BeanCopier beanCopier = null;

@@ -83,7 +83,7 @@ public final class MarkOptions {
 	 * @param markLocation		Mark location define
 	 * @param markPath			Mark icon file path
 	 * @param transparency		Icon transparent setting
-	 * @return
+	 * @return					MarkOption object
 	 */
 	public static MarkOptions markIcon(MarkLocation markLocation, 
 			String markPath, float transparency) {
@@ -98,7 +98,7 @@ public final class MarkOptions {
 	 * @param color				Mark text color
 	 * @param fontName			Mark text font name
 	 * @param fontSize			Mark text font size
-	 * @return
+	 * @return					MarkOption object
 	 */
 	public static MarkOptions markText(MarkLocation markLocation, 
 			String markText, Color color, String fontName, int fontSize) {

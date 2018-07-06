@@ -53,8 +53,8 @@ public final class PartialCollection<T> implements Serializable {
 	/**
 	 * Creates new instance of PartialCollection with specified collection and total
 	 *
-	 * @param collection Part of some collection of entities
-	 * @param total      Total size of collection, which part is contained in this instance
+	 * @param resultList	Result list
+	 * @param totalCount   	Total size of collection, which part is contained in this instance
 	 */
 	public PartialCollection(List<T> resultList, long totalCount) {
 		this.resultList = resultList;

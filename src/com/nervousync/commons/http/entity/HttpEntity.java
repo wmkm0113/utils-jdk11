@@ -72,7 +72,7 @@ public final class HttpEntity {
 	
 	/**
 	 * Generate a new HttpEntity
-	 * @return
+	 * @return		HttpEntity instance
 	 */
 	public static HttpEntity newInstance() {
 		return new HttpEntity();
@@ -91,7 +91,7 @@ public final class HttpEntity {
 	 * Add binary parameter
 	 * @param name		Parameter name
 	 * @param value		Upload file path
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException	Upload file is not exists
 	 */
 	public void addBinaryEntity(String name, String value) throws FileNotFoundException {
 		this.entityList.add(EntityInfo.generateBinaryEntity(name, value));
@@ -105,8 +105,8 @@ public final class HttpEntity {
 	 * @param charset			Charset encoding
 	 * @param methodOption		Http method type
 	 * @see com.nervousync.enumerations.web.HttpMethodOption
-	 * @return
-	 * @throws UnsupportedEncodingException
+	 * @return					Content type
+	 * @throws UnsupportedEncodingException		Charset encoding is not supported
 	 */
 	public String generateContentType(String charset, HttpMethodOption methodOption) 
 			throws UnsupportedEncodingException {
@@ -141,7 +141,7 @@ public final class HttpEntity {
 	 * Write data to output stream
 	 * @param charset			Charset encoding
 	 * @param outputStream		Target output stream
-	 * @throws IOException
+	 * @throws IOException		Write data to output stream error
 	 */
 	public void writeData(String charset, OutputStream outputStream) throws IOException {
 		if (this.entityList.isEmpty()) {

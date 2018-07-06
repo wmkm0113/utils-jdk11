@@ -48,7 +48,7 @@ public final class ImageUtils {
 
 	/**
 	 * Read image width
-	 * @param imagePath
+	 * @param imagePath		image file path
 	 * @return	image width value
 	 */
 	public static int imageWidth(String imagePath) {
@@ -67,7 +67,7 @@ public final class ImageUtils {
 
 	/**
 	 * Read image height
-	 * @param imagePath
+	 * @param imagePath		image file path
 	 * @return	image height value
 	 */
 	public static int imageHeight(String imagePath) {
@@ -141,8 +141,8 @@ public final class ImageUtils {
 	 * @param origPath		original picture file path
 	 * @param destPath		target picture file path
 	 * @param ratio			resize ratio
-	 * @param markPath		mark file path
-	 * @param alpha			between 0 and 1
+	 * @param markOptions	mark options
+	 * @see com.nervousync.commons.beans.image.MarkOptions
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
 	public static boolean resizeByRatio(String origPath, String destPath, double ratio, 
@@ -186,8 +186,8 @@ public final class ImageUtils {
 	 * @param destPath			target picture file path
 	 * @param targetWidth		target width	(if -1 width will auto set by height ratio)
 	 * @param targetHeight		target height	(if -1 height will auto set by width ratio)
-	 * @param markPath			mark file path
-	 * @param alpha				between 0 and 1
+	 * @param markOptions		mark options
+	 * @see com.nervousync.commons.beans.image.MarkOptions
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
 	public static boolean resizeTo(String origPath, String destPath, 

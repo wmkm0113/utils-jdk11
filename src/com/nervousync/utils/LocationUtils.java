@@ -31,9 +31,9 @@ public final class LocationUtils {
 	
 	/**
 	 * Convert to GPS point
-	 * @param currentPoint
-	 * @return
-	 * @throws LocationConvertException
+	 * @param currentPoint		current location point object
+	 * @return					convert location point object
+	 * @throws LocationConvertException  location type is invalid
 	 */
 	public static LocationPoint convertToGPS(LocationPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
@@ -55,9 +55,9 @@ public final class LocationUtils {
 
 	/**
 	 * Convert to GCJ-02 point
-	 * @param currentPoint
-	 * @return
-	 * @throws LocationConvertException
+	 * @param currentPoint		current location point object
+	 * @return					convert location point object
+	 * @throws LocationConvertException  location type is invalid
 	 */
 	public static LocationPoint convertToGCJ02(LocationPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
@@ -78,9 +78,9 @@ public final class LocationUtils {
 
 	/**
 	 * Convert to BD-09 point
-	 * @param currentPoint
-	 * @return
-	 * @throws LocationConvertException
+	 * @param currentPoint		current location point object
+	 * @return					convert location point object
+	 * @throws LocationConvertException  location type is invalid
 	 */
 	public static LocationPoint convertToBD09(LocationPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {

@@ -28,10 +28,10 @@ import com.nervousync.exceptions.zip.ZipException;
 public final class RawOperator {
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @return
+	 * Read short value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read short value
 	 */
 	public static short readShortFromBigEndian(byte[] bytes, int position) {
 		short readValue = 0;
@@ -44,10 +44,10 @@ public final class RawOperator {
 	}
 
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @return
+	 * Read long value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read long value
 	 */
 	public static long readLongFromLittleEndian(byte[] bytes, int position) {
 		long readValue = 0L;
@@ -65,20 +65,20 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @return
+	 * Read short value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read long value
 	 */
 	public static int readShortFromLittleEndian(byte[] bytes, int position) {
 		return (bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8;
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @return
+	 * Read int value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read int value
 	 */
 	public static int readIntFromLittleEndian(byte[] bytes, int position) {
 		return ((bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8) 
@@ -86,23 +86,23 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param length
-	 * @return
+	 * Read string value from little endian of byte arrays by default charset encoding
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param length		Read length
+	 * @return				Read String value
 	 */
 	public static String readStringFromLittleEndian(byte[] bytes, int position, int length) {
 		return RawOperator.readStringFromLittleEndian(bytes, position, length, Globals.DEFAULT_ENCODING);
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param length
-	 * @param encoding
-	 * @return
+	 * Read string value from little endian of byte arrays by given charset encoding
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param length		Read length
+	 * @param encoding		Charset encoding
+	 * @return				Read String value or null if given length was out of array length or charset encoding does not supported
 	 */
 	public static String readStringFromLittleEndian(byte[] bytes, int position, int length, String encoding) {
 		if (position < 0 || length < 0 || bytes == null 
@@ -119,21 +119,21 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param value
+	 * Write string value from little endian of byte arrays by default charset encoding
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			Write value
 	 */
 	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value) {
 		writeStringFromLittleEndian(bytes, position, value, Globals.DEFAULT_ENCODING);
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param value
-	 * @param encoding
+	 * Write string value from little endian of byte arrays by given charset encoding
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			Write value
+	 * @param encoding		Charset encoding
 	 */
 	public static void writeStringFromLittleEndian(byte[] bytes, int position, String value, String encoding) {
 		if (value == null) {
@@ -157,10 +157,10 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param value
+	 * Write short value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			Short value 
 	 */
 	public static void writeShortFromLittleEndian(byte[] bytes, int position, short value) {
 		bytes[position + 1] = (byte)(value >>> 8);
@@ -168,10 +168,10 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param value
+	 * Write int value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			int value 
 	 */
 	public static void writeIntFromLittleEndian(byte[] bytes, int position, int value) {
 		int i = 4;
@@ -186,10 +186,10 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bytes
-	 * @param position
-	 * @param value
+	 * Write long value from little endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			long value 
 	 */
 	public static void writeLongFromLittleEndian(byte[] bytes, int position, long value) {
 		int i = 8;
@@ -204,37 +204,37 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param value
-	 * @return
+	 * Convert int to byte arrays
+	 * @param value		int value
+	 * @return			Convert byte arrays
 	 */
 	public static byte[] convertIntToByteArray(int value) {
 		return RawOperator.convertIntToByteArray(value, 4, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
 	/**
-	 * 
-	 * @param value
-	 * @param arraySize
-	 * @return
+	 * Convert int to byte arrays by given array size
+	 * @param value			int value
+	 * @param arraySize		array size
+	 * @return				Convert byte arrays
 	 */
 	public static byte[] convertIntToByteArray(int value, int arraySize) {
 		return RawOperator.convertIntToByteArray(value, arraySize, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
 	/**
-	 * 
-	 * @param nonce
-	 * @return
+	 * Prepare AES buffer
+	 * @param nonce		nonce
+	 * @return			Prepared buffer
 	 */
 	public static byte[] prepareAESBuffer(int nonce) {
 		return RawOperator.convertIntToByteArray(nonce, 16, true);
 	}
 	
 	/**
-	 * 
-	 * @param charArray
-	 * @return
+	 * Convert char arrays to byte arrays
+	 * @param charArray		char arrays
+	 * @return				Convert byte arrays
 	 */
 	public static byte[] convertCharArrayToByteArray(char[] charArray) {
 		if (charArray == null) {
@@ -251,10 +251,10 @@ public final class RawOperator {
 	}
 	
 	/**
-	 * 
-	 * @param bitArray
-	 * @return
-	 * @throws ZipException
+	 * Convert bit arrays to byte
+	 * @param bitArray			bit arrays
+	 * @return					Convert byte value
+	 * @throws ZipException		bitArray is null or invalid
 	 */
 	public static byte convertBitArrayToByte(int[] bitArray) throws ZipException {
 		if (bitArray == null) {
@@ -277,6 +277,11 @@ public final class RawOperator {
 		throw new ZipException("Invalid bits provided!");
 	}
 	
+	/**
+	 * Check bit array is valid
+	 * @param bitArray		bit array
+	 * @return				Check result
+	 */
 	private static boolean checkBitArray(int[] bitArray) {
 		for (int bit : bitArray) {
 			if (bit != 0 && bit != 1) {
@@ -286,6 +291,13 @@ public final class RawOperator {
 		return true;
 	}
 	
+	/**
+	 * Convert int to byte arrays
+	 * @param value				int value
+	 * @param arraySize			array size
+	 * @param appendZero		append zero if array is empty
+	 * @return
+	 */
 	private static byte[] convertIntToByteArray(int value, int arraySize, boolean appendZero) {
 		if (arraySize < 4) {
 			throw new ZipException("Array size must lager than 4");

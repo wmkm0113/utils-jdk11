@@ -123,8 +123,8 @@ public final class MIMETypes implements Serializable {
 	
 	/**
 	 * Identify mimeType is image
-	 * @param mimeType
-	 * @return
+	 * @param mimeType		MIME type
+	 * @return				Check result
 	 */
 	public static boolean isImage(String mimeType) {
 		for (String imageType : MIME_TYPE_IMAGES) {
@@ -137,8 +137,8 @@ public final class MIMETypes implements Serializable {
 	
 	/**
 	 * Identify mimeType is media
-	 * @param mimeType
-	 * @return
+	 * @param mimeType		MIME type
+	 * @return				Check result
 	 */
 	public static boolean isMedia(String mimeType) {
 		for (String mediaType : MIME_TYPE_MEDIAS) {
@@ -151,8 +151,8 @@ public final class MIMETypes implements Serializable {
 	
 	/**
 	 * Identify mimeType is XML
-	 * @param mimeType
-	 * @return
+	 * @param mimeType		MIME type
+	 * @return				Check result
 	 */
 	public static boolean isXml(String mimeType) {
 		if (mimeType.indexOf(MIME_TYPE_TEXT_XML) != Globals.DEFAULT_VALUE_INT
@@ -164,8 +164,8 @@ public final class MIMETypes implements Serializable {
 	
 	/**
 	 * Identify mimeType is JSON
-	 * @param mimeType
-	 * @return
+	 * @param mimeType		MIME type
+	 * @return				Check result
 	 */
 	public static boolean isJSON(String mimeType) {
 		if (mimeType.indexOf(MIME_TYPE_JSON) != Globals.DEFAULT_VALUE_INT) {
@@ -176,8 +176,8 @@ public final class MIMETypes implements Serializable {
 	
 	/**
 	 * Identify mimeType is Text
-	 * @param mimeType
-	 * @return
+	 * @param mimeType		MIME type
+	 * @return				Check result
 	 */
 	public static boolean isText(String mimeType) {
 		for (String textType : MIME_TYPE_TEXTS) {

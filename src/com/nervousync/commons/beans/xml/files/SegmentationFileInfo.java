@@ -130,7 +130,7 @@ public class SegmentationFileInfo extends BaseElement {
 	
 	/**
 	 * Read item datas
-	 * @return
+	 * @return		Data with byte array
 	 */
 	public byte[] getDataContent() {
 		if (this.securityCheck()) {

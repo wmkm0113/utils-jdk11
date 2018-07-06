@@ -68,8 +68,7 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
-	 * @param indent 
-	 * @param expainEmptyElement expain empty element status
+	 * @param indent 				Indent string
 	 * @return XML String
 	 */
 	public String toString(String indent) throws XmlException {
@@ -80,8 +79,8 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
-	 * @param indent 
-	 * @param expainEmptyElement expain empty element status
+	 * @param indent 				Indent string
+	 * @param encoding				Charset encoding
 	 * @return XML String
 	 */
 	public String toString(String indent, String encoding) throws XmlException {
@@ -92,8 +91,9 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String By Nervousync XML Util 
 	 * Expain all empty element
 	 * 
-	 * @param indent 
-	 * @param expainEmptyElement expain empty element status
+	 * @param indent 				Indent string
+	 * @param encoding				Charset encoding
+	 * @param expandEmptyElements 	Expain empty element status
 	 * @return XML String
 	 */
 	public String toString(String indent, String encoding, boolean expandEmptyElements) throws XmlException {

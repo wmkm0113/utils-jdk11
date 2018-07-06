@@ -59,7 +59,6 @@ public final class FileExtensionInfo extends BaseElement {
 	private String mimeType = null;
 	/**
 	 * File type code
-	 * @see com.nervousync.utils.FileUtils.FILE_TYPE_*
 	 */
 	@XmlElement
 	private int fileType;
@@ -69,10 +68,21 @@ public final class FileExtensionInfo extends BaseElement {
 	@XmlElement
 	private boolean printable = false;
 	
+	/**
+	 * Default Constructor
+	 */
 	public FileExtensionInfo() {
 		
 	}
 	
+	/**
+	 * Constructor
+	 * @param extensionName			File extension name
+	 * @param identifiedCode		File identified code
+	 * @param mimeType				File mime type
+	 * @param fileType				File type (define with FileUtils.FILE_TYPE_*)
+	 * @param printable				File can printable
+	 */
 	public FileExtensionInfo(String extensionName, String identifiedCode, 
 			String mimeType, int fileType, boolean printable) {
 		this.extensionName = extensionName;
@@ -82,6 +92,12 @@ public final class FileExtensionInfo extends BaseElement {
 		this.printable = printable;
 	}
 
+	/**
+	 * Constructor for parse data which read from .dat file
+	 * @param fileType				File type (define with FileUtils.FILE_TYPE_*)
+	 * @param printable				File can printable
+	 * @param contentInfo			File identified information read from .dat file
+	 */
 	public FileExtensionInfo(int fileType, boolean printable, String contentInfo) {
 		this.fileType = fileType;
 		this.printable = printable;

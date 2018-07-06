@@ -52,16 +52,40 @@ public final class ObjectUtils {
 		
 	}
 
+	/**
+	 * Create a proxy object instance
+	 * @param className		class name
+	 * @return				object instance
+	 * @throws ClassNotFoundException	if class was not found
+	 * @throws LinkageError				if class link error
+	 */
 	public static Object newInstance(String className) 
 			throws ClassNotFoundException, LinkageError {
 		return newInstance(className, new Object[]{}, null);
 	}
 
+	/**
+	 * Create a proxy object instance
+	 * @param className		class name
+	 * @param args			Constructor parameters
+	 * @return				object instance
+	 * @throws ClassNotFoundException	if class was not found
+	 * @throws LinkageError				if class link error
+	 */
 	public static Object newInstance(String className, Object[] args) 
 			throws ClassNotFoundException, LinkageError {
 		return newInstance(className, args, null);
 	}
 	
+	/**
+	 * Create a proxy object instance
+	 * @param className		class name
+	 * @param args			Constructor parameters
+	 * @param methodInterceptor method interceptor instance
+	 * @return				object instance
+	 * @throws ClassNotFoundException	if class was not found
+	 * @throws LinkageError				if class link error
+	 */
 	public static Object newInstance(String className, Object[] args, BaseHandlerInterceptor methodInterceptor) 
 			throws ClassNotFoundException, LinkageError {
 		BaseHandlerInterceptor[] methodInterceptors = null;
@@ -71,10 +95,23 @@ public final class ObjectUtils {
 		return createProxyInstance(ClassUtils.forName(className), args, methodInterceptors);
 	}
 
+	/**
+	 * Create a proxy object instance
+	 * @param clazz		define class
+	 * @param <T>		T
+	 * @return			object instance
+	 */
 	public static <T> T newInstance(Class<T> clazz) {
 		return createProxyInstance(clazz, null, new BaseHandlerInterceptor[]{});
 	}
 	
+	/**
+	 * Create a proxy object instance
+	 * @param clazz		define class
+	 * @param methodInterceptor method interceptor instance
+	 * @param <T>		T
+	 * @return			object instance
+	 */
 	public static <T> T createProxyInstance(Class<T> clazz, BaseHandlerInterceptor methodInterceptor) {
 		BaseHandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
@@ -83,6 +120,14 @@ public final class ObjectUtils {
 		return createProxyInstance(clazz, null, methodInterceptors);
 	}
 	
+	/**
+	 * Create a proxy object instance
+	 * @param clazz		define class
+	 * @param args		Constructor parameters
+	 * @param methodInterceptor method interceptor instance
+	 * @param <T>		T
+	 * @return			object instance
+	 */
 	public static <T> T createProxyInstance(Class<T> clazz, Object[] args, BaseHandlerInterceptor methodInterceptor) {
 		BaseHandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
@@ -91,6 +136,14 @@ public final class ObjectUtils {
 		return createProxyInstance(clazz, args, methodInterceptors);
 	}
 
+	/**
+	 * Create a proxy object instance
+	 * @param clazz		define class
+	 * @param args		Constructor parameters
+	 * @param methodInterceptors  method interceptor instance arrays
+	 * @param <T>		T
+	 * @return			object instance
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T createProxyInstance(Class<T> clazz, Object[] args, BaseHandlerInterceptor[] methodInterceptors) {
 		T object = null;
@@ -185,7 +238,7 @@ public final class ObjectUtils {
 	/**
 	 * Return whether the given array is empty: that is, <code>null</code>
 	 * or of zero length.
-	 * @param array the array to check
+	 * @param object the object to check
 	 * @return whether the given array is empty
 	 */
 	public static boolean isNull(Object object) {
@@ -377,6 +430,7 @@ public final class ObjectUtils {
 	 * this method will delegate to any of the <code>nullSafeHashCode</code>
 	 * methods for arrays in this class. If the object is <code>null</code>,
 	 * this method returns 0.
+	 * @param obj		check object
 	 * @see #nullSafeHashCode(Object[])
 	 * @see #nullSafeHashCode(boolean[])
 	 * @see #nullSafeHashCode(byte[])
@@ -386,6 +440,7 @@ public final class ObjectUtils {
 	 * @see #nullSafeHashCode(int[])
 	 * @see #nullSafeHashCode(long[])
 	 * @see #nullSafeHashCode(short[])
+	 * @return object hash code
 	 */
 	public static int nullSafeHashCode(Object obj) {
 		if (obj == null) {
@@ -426,6 +481,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(Object[] array) {
 		if (array == null) {
@@ -442,6 +499,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(boolean[] array) {
 		if (array == null) {
@@ -458,6 +517,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(byte[] array) {
 		if (array == null) {
@@ -474,6 +535,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(char[] array) {
 		if (array == null) {
@@ -490,6 +553,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(double[] array) {
 		if (array == null) {
@@ -506,6 +571,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(float[] array) {
 		if (array == null) {
@@ -522,6 +589,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(int[] array) {
 		if (array == null) {
@@ -538,6 +607,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(long[] array) {
 		if (array == null) {
@@ -554,6 +625,8 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * @param array	  specified array
+	 * @return 	hash code result
 	 */
 	public static int nullSafeHashCode(short[] array) {
 		if (array == null) {
@@ -570,6 +643,8 @@ public final class ObjectUtils {
 	/**
 	 * Return the same value as <code>{@link Boolean#hashCode()}</code>.
 	 * @see Boolean#hashCode()
+	 * @param bool	  boolean value
+	 * @return 	hash code result
 	 */
 	public static int hashCode(boolean bool) {
 		return bool ? 1231 : 1237;
@@ -578,6 +653,8 @@ public final class ObjectUtils {
 	/**
 	 * Return the same value as <code>{@link Double#hashCode()}</code>.
 	 * @see Double#hashCode()
+	 * @param dbl	  double value
+	 * @return 	hash code result
 	 */
 	public static int hashCode(double dbl) {
 		long bits = Double.doubleToLongBits(dbl);
@@ -587,6 +664,8 @@ public final class ObjectUtils {
 	/**
 	 * Return the same value as <code>{@link Float#hashCode()}</code>.
 	 * @see Float#hashCode()
+	 * @param flt	  float value
+	 * @return 	hash code result
 	 */
 	public static int hashCode(float flt) {
 		return Float.floatToIntBits(flt);
@@ -595,6 +674,8 @@ public final class ObjectUtils {
 	/**
 	 * Return the same value as <code>{@link Long#hashCode()}</code>.
 	 * @see Long#hashCode()
+	 * @param lng	  long value
+	 * @return 	hash code result
 	 */
 	public static int hashCode(long lng) {
 		return (int) (lng ^ (lng >>> 32));

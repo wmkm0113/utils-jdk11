@@ -60,8 +60,7 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.enumerations.mail.ProtocolOption;
 
 /**
- * @author Steven Wee <a
- *         href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:54:04 PM $
  */
 public final class MailUtils {

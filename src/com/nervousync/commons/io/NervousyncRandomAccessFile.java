@@ -51,8 +51,8 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 
 	/**
 	 * Read file length
-	 * @return
-	 * @throws IOException
+	 * @return	file length
+	 * @throws IOException	If read file length failed
 	 */
 	public long length() throws IOException {
 		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
@@ -64,8 +64,8 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 
 	/**
 	 * Return current file pointer prsition
-	 * @return
-	 * @throws IOException
+	 * @return		file pointer position
+	 * @throws IOException		Retrieve position failed
 	 */
 	public long getFilePointer() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -78,7 +78,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	/**
 	 * Set the file-pointer to position
 	 * @param pos			target position 
-	 * @throws IOException
+	 * @throws IOException		Seek position failed
 	 */
 	public void seek(long pos) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {

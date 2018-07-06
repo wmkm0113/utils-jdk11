@@ -95,7 +95,7 @@ public final class SecurityUtils implements Serializable {
 	
 	/**
 	 * Get MD5 value. Only encode <code>String</code>
-	 * @param source
+	 * @param source		source object
 	 * @return MD5 value
 	 */
 	public static String MD5(Object source) {
@@ -107,8 +107,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Get SHA1 value. Only encode <code>String</code>
 	 * Using SHA256 instead
-	 * @param source
-	 * @return MD5 value
+	 * @param source		source object
+	 * @return SHA1 value
 	 */
 	@Deprecated
 	public static String SHA1(Object source) {
@@ -117,9 +117,8 @@ public final class SecurityUtils implements Serializable {
 	
 	/**
 	 * Get SHA256 value. Only encode <code>String</code>
-	 * @param source
-	 * @param advanceMode
-	 * @return MD5 value
+	 * @param source		source object
+	 * @return SHA256 value
 	 */
 	public static String SHA256(Object source) {
 		return digestEncode(source, "SHA-256");
@@ -127,9 +126,8 @@ public final class SecurityUtils implements Serializable {
 	
 	/**
 	 * Get SHA512 value. Only encode <code>String</code>
-	 * @param source
-	 * @param advanceMode
-	 * @return MD5 value
+	 * @param source		source object
+	 * @return SHA512 value
 	 */
 	public static String SHA512(Object source) {
 		return digestEncode(source, "SHA-512");
@@ -138,42 +136,34 @@ public final class SecurityUtils implements Serializable {
 	/* AES Method */
 	
 	/**
-	 * 加密字节数组
-	 * 
-	 * @param arrB						需加密的字节数组
-	 * @param strKey					使用的加密密钥
-	 * @param keySize					密钥长度
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with given encrypt key by AES128
+	 * @param arrB						Byte arrays will be encrypted
+	 * @param strKey					encrypt key
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AES128Encrypt(byte[] arrB, String strKey) throws Exception {
 		return AESEncrypt(arrB, strKey, 128);
 	}
 
 	/**
-	 * 加密字节数组
-	 * 
-	 * @param arrB						需加密的字节数组
-	 * @param strKey					使用的加密密钥
-	 * @param keySize					密钥长度
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with given encrypt key by AES256
+	 * @param arrB						Byte arrays will be encrypted
+	 * @param strKey					encrypt key
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AES256Encrypt(byte[] arrB, String strKey) throws Exception {
 		return AESEncrypt(arrB, strKey, 256);
 	}
 
 	/**
-	 * 加密字节数组
-	 * 
-	 * @param arrB						需加密的字节数组
-	 * @param strKey					使用的加密密钥
-	 * @param keySize					密钥长度
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with given encrypt key by AES
+	 * @param arrB						Byte arrays will be encrypted
+	 * @param strKey					encrypt key
+	 * @param keySize					AES key size
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AESEncrypt(byte[] arrB, String strKey, int keySize) throws Exception {
 		if (strKey == null || strKey.length() % 16 != 0) {
@@ -186,12 +176,31 @@ public final class SecurityUtils implements Serializable {
 	}
 	
 	/**
-	 * 加密字符串
-	 * 
-	 * @param strIn						需加密的字符串
-	 * @param strKey					使用的加密密钥
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with default encrypt key by AES128
+	 * @param arrB						Byte arrays will be encrypted
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
+	 */
+	public static byte[] AES128Encrypt(byte[] arrB) throws Exception {
+		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
+	}
+
+	/**
+	 * Encrypt byte arrays with default encrypt key by AES256
+	 * @param arrB						Byte arrays will be encrypted
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
+	 */
+	public static byte[] AES256Encrypt(byte[] arrB) throws Exception {
+		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
+	}
+
+	/**
+	 * Encrypt string with given encrypt key by AES128
+	 * @param strIn						String will be encrypted
+	 * @param strKey					encrypt key
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES128Encrypt(String strIn, String strKey) throws Exception {
 		return ConvertUtils.byteArrayToHexString(
@@ -199,13 +208,11 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 加密字符串
-	 * 
-	 * @param strIn						需加密的字符串
-	 * @param strKey					使用的加密密钥
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with given encrypt key by AES256
+	 * @param strIn						String will be encrypted
+	 * @param strKey					encrypt key
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES256Encrypt(String strIn, String strKey) throws Exception {
 		return ConvertUtils.byteArrayToHexString(
@@ -213,83 +220,54 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 使用默认密钥加密字节数组
-	 * 
-	 * @param arrB						需加密的字节数组
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
-	 */
-	public static byte[] AES128Encrypt(byte[] arrB) throws Exception {
-		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
-	}
-
-	/**
-	 * 使用默认密钥加密字节数组
-	 * 
-	 * @param arrB						需加密的字节数组
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
-	 */
-	public static byte[] AES256Encrypt(byte[] arrB) throws Exception {
-		return AESEncrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
-	}
-
-	/**
-	 * 使用默认密钥加密字符串
-	 * 
-	 * @param strIn						需加密的字符串
-	 * @return							加密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with default encrypt key by AES128
+	 * @param strIn						String will be encrypted
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES128Encrypt(String strIn) throws Exception {
 		return AES128Encrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 使用默认密钥加密字符串
-	 * 
-	 * @param strIn						需加密的字符串
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							加密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with default encrypt key by AES256
+	 * @param strIn						String will be encrypted
+	 * @return							Encrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES256Encrypt(String strIn) throws Exception {
 		return AES256Encrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 	
 	/**
-	 * 解密字节数组
-	 * 
-	 * @param arrB						需解密的字节数组
-	 * @param strKey					使用的解密密钥
-	 * @return							解密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with given decrypt key by AES128
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AES128Decrypt(byte[] arrB, String strKey) throws Exception {
 		return AESDecrypt(arrB, strKey, 128);
 	}
 
 	/**
-	 * 解密字节数组
-	 * 
-	 * @param arrB						需解密的字节数组
-	 * @param strKey					使用的解密密钥
-	 * @return							解密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with given decrypt key by AES256
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AES256Decrypt(byte[] arrB, String strKey) throws Exception {
 		return AESDecrypt(arrB, strKey, 256);
 	}
 	
 	/**
-	 * 解密字节数组
-	 * 
-	 * @param arrB						需解密的字节数组
-	 * @param strKey					使用的解密密钥
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							解密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with given decrypt key by AES
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @param keySize					AES key size
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AESDecrypt(byte[] arrB, String strKey, int keySize) throws Exception {
 		if (strKey == null || strKey.length() % 16 != 0) {
@@ -302,12 +280,31 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 解密字符串
-	 * 
-	 * @param strIn						需解密的字符串
-	 * @param strKey					使用的解密密钥
-	 * @return							解密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with default decrypt key by AES128
+	 * @param arrB						Byte arrays will be decrypted
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
+	 */
+	public static byte[] AES128Decrypt(byte[] arrB) throws Exception {
+		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
+	}
+
+	/**
+	 * Decrypt byte arrays with default decrypt key by AES256
+	 * @param arrB						Byte arrays will be decrypted
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
+	 */
+	public static byte[] AES256Decrypt(byte[] arrB) throws Exception {
+		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
+	}
+
+	/**
+	 * Decrypt string with given decrypt key by AES128
+	 * @param strIn						String will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES128Decrypt(String strIn, String strKey) throws Exception {
 		try {
@@ -322,13 +319,11 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 解密字符串
-	 * 
-	 * @param strIn						需解密的字符串
-	 * @param strKey					使用的解密密钥
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							解密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with given decrypt key by AES256
+	 * @param strIn						String will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES256Decrypt(String strIn, String strKey) throws Exception {
 		try {
@@ -343,50 +338,20 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 使用默认密钥解密字节数组
-	 * 
-	 * @param arrB						需解密的字节数组
-	 * @param strKey					使用的解密密钥
-	 * @return							解密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
-	 */
-	public static byte[] AES128Decrypt(byte[] arrB) throws Exception {
-		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 128);
-	}
-
-	/**
-	 * 使用默认密钥解密字节数组
-	 * 
-	 * @param arrB						需解密的字节数组
-	 * @param strKey					使用的解密密钥
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							解密后的字节数组
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
-	 */
-	public static byte[] AES256Decrypt(byte[] arrB) throws Exception {
-		return AESDecrypt(arrB, SecurityUtils.PRIVATE_KEY, 256);
-	}
-
-	/**
-	 * 使用默认密钥解密字符串
-	 * 
-	 * @param strIn						需解密的字符串
-	 * @param strKey					使用的解密密钥
-	 * @return							解密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with default decrypt key by AES128
+	 * @param strIn						String will be decrypted
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES128Decrypt(String strIn) throws Exception {
 		return AES128Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 使用默认密钥解密字符串
-	 * 
-	 * @param strIn						需解密的字符串
-	 * @param strKey					使用的解密密钥
-	 * @param advanceModeIfSupport		强制指定高级模式加密
-	 * @return							解密后的字符串
-	 * @throws Exception				本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with default decrypt key by AES128
+	 * @param strIn						String will be decrypted
+	 * @return							Decrypted result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String AES256Decrypt(String strIn) throws Exception {
 		return AES256Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
@@ -395,12 +360,11 @@ public final class SecurityUtils implements Serializable {
 	/* DES Method */
 
 	/**
-	 * 加密字节数组
-	 * 
-	 * @param arrB			需加密的字节数组
-	 * @param strKey		使用的加密密钥
-	 * @return				加密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with given encrypt key by DES
+	 * @param arrB						Byte arrays will be encrypted
+	 * @param strKey					Encrypt key
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] DESEncrypt(byte[] arrB, String strKey) throws Exception {
 		Cipher encryptCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
@@ -411,46 +375,42 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 加密字符串
-	 * 
-	 * @param strIn			需加密的字符串
-	 * @param strKey		使用的加密密钥
-	 * @return				加密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with given encrypt key by DES
+	 * @param strIn						String will be encrypted
+	 * @param strKey					Encrypt key
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String DESEncrypt(String strIn, String strKey) throws Exception {
 		return ConvertUtils.byteArrayToHexString(SecurityUtils.DESEncrypt(ConvertUtils.convertToByteArray(strIn), strKey));
 	}
 	
 	/**
-	 * 使用默认密钥加密字节数组
-	 * 
-	 * @param arrB			需加密的字节数组
-	 * @return				加密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with default encrypt key by DES
+	 * @param arrB						Byte arrays will be encrypted
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] DESEncrypt(byte[] arrB) throws Exception {
 		return SecurityUtils.DESEncrypt(arrB, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 使用默认密钥加密字符串
-	 * 
-	 * @param strIn			需加密的字符串
-	 * @return				加密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with default encrypt key by DES
+	 * @param strIn						String will be encrypted
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String DESEncrypt(String strIn) throws Exception {
 		return SecurityUtils.DESEncrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 解密字节数组
-	 * 
-	 * @param arrB			需解密的字节数组
-	 * @param strKey		使用的解密密钥
-	 * @return				解密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with given decrypt key by DES
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] DESDecrypt(byte[] arrB, String strKey) throws Exception {
 		Cipher decryptCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
@@ -461,60 +421,53 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 解密字符串
-	 * 
-	 * @param strIn			需解密的字符串
-	 * @param strKey		使用的解密密钥
-	 * @return				解密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with given decrypt key by DES
+	 * @param strIn						String will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String DESDecrypt(String strIn, String strKey) throws Exception {
 		return ConvertUtils.convertToString(SecurityUtils.DESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey));
 	}
 
 	/**
-	 * 使用默认密钥解密字节数组
-	 * 
-	 * @param arrB			需解密的字节数组
-	 * @param strKey		使用的解密密钥
-	 * @return				解密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte arrays with default decrypt key by DES
+	 * @param arrB						Byte arrays will be decrypted
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] DESDecrypt(byte[] arrB) throws Exception {
 		return SecurityUtils.DESDecrypt(arrB, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 使用默认密钥解密字符串
-	 * 
-	 * @param strIn			需解密的字符串
-	 * @param strKey		使用的解密密钥
-	 * @return				解密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with default decrypt key by DES
+	 * @param strIn						String will be decrypted
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String DESDecrypt(String strIn) throws Exception {
 		return SecurityUtils.DESDecrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
 	/**
-	 * 加密字符串
-	 * 
-	 * @param strIn			需加密的字符串
-	 * @param strKey		使用的加密密钥
-	 * @return				加密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt string with given key by RSA
+	 * @param strIn						String will be encrypted
+	 * @param key						RSA key
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String RSAEncrypt(String strIn, Key key) throws Exception {
 		return ConvertUtils.byteArrayToHexString(SecurityUtils.RSAEncrypt(ConvertUtils.convertToByteArray(strIn), key));
 	}
 	
 	/**
-	 * 加密字节数组
-	 * 
-	 * @param arrB			需加密的字节数组
-	 * @param strKey		使用的加密密钥
-	 * @return				加密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Encrypt byte arrays with given key by RSA
+	 * @param arrB						Byte arrays will be encrypted
+	 * @param key						RSA key
+	 * @return							Encrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] RSAEncrypt(byte[] arrB, Key key) throws Exception {
 		Cipher encryptCipher = SecurityUtils.initRSAEncryptClipher(key);
@@ -545,24 +498,22 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * 解密字符串
-	 * 
-	 * @param strIn			需解密的字符串
-	 * @param strKey		使用的解密密钥
-	 * @return				解密后的字符串
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt string with given key by RSA
+	 * @param strIn						String will be encrypted
+	 * @param key						RSA key
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static String RSADecrypt(String strIn, Key key) throws Exception {
 		return new String(SecurityUtils.RSADecrypt(ConvertUtils.hexStrToByteArr(strIn), key));
 	}
 	
 	/**
-	 * 解密字节数组
-	 * 
-	 * @param arrB			需解密的字节数组
-	 * @param privateKey	使用的解密密钥
-	 * @return				解密后的字节数组
-	 * @throws Exception	本方法不处理任何异常，所有异常全部抛出
+	 * Decrypt byte array with given key by RSA
+	 * @param arrB						Byte array will be encrypted
+	 * @param key						RSA key
+	 * @return							Decrypt result
+	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] RSADecrypt(byte[] arrB, Key key) throws Exception {
 		Cipher decryptCipher = initRSADecryptClipher(key);
@@ -583,37 +534,92 @@ public final class SecurityUtils implements Serializable {
 		}
 	}
 
+	/**
+	 * Generate RSA key pair with default key size: 1024
+	 * @return	Key pair
+	 * @throws Exception	Any exception of this operate will be throw up
+	 */
 	public static KeyPair RSAKeyPair() throws Exception {
 		return SecurityUtils.KeyPair("RSA", 1024);
 	}
 
+	/**
+	 * Generate RSA key pair with given key size
+	 * @param keySize	key size
+	 * @return	Key pair
+	 * @throws Exception	Any exception of this operate will be throw up
+	 */
 	public static KeyPair RSAKeyPair(int keySize) throws Exception {
 		return SecurityUtils.KeyPair("RSA", keySize);
 	}
 
+	/**
+	 * Generate DSA key pair with default key size: 1024
+	 * @return	Key pair
+	 * @throws Exception	key size invalid or 
+	 * if a KeyPairGeneratorSpi implementation for the specified algorithm is not available from the specified Provider object.
+	 * if the specified provider is null.
+	 */
 	public static KeyPair DSAKeyPair() throws Exception {
 		return SecurityUtils.KeyPair("DSA", 1024);
 	}
 
+	/**
+	 * Generate DSA key pair with given key size
+	 * @param keySize	key size
+	 * @return	Key pair
+	 * @throws Exception	key size invalid or 
+	 * if a KeyPairGeneratorSpi implementation for the specified algorithm is not available from the specified Provider object.
+	 * if the specified provider is null.
+	 */
 	public static KeyPair DSAKeyPair(int keySize) throws Exception {
 		return SecurityUtils.KeyPair("DSA", keySize);
 	}
 
+	/**
+	 * Generate DSA public key with given key content
+	 * @param keyContent	key content
+	 * @return	DSA public key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PublicKey DSAPublicKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("DSA").generatePublic(new X509EncodedKeySpec(keyContent));
 	}
 	
+	/**
+	 * Generate DSA private key with given key content
+	 * @param keyContent	key content
+	 * @return	DSA private key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PrivateKey DSAPrivateKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("DSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
 	}
 
+	/**
+	 * Generate RSA public key with given key content
+	 * @param keyContent	key content
+	 * @return	RSA public key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PublicKey RSAPublicKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyContent));
 	}
-	
+
+	/**
+	 * Generate RSA public key with given modulus and exponent
+	 * @param modulus	modulus
+	 * @param exponent	exponent
+	 * @return	RSA public key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PublicKey RSAPublicKey(BigInteger modulus, BigInteger exponent) 
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
@@ -621,12 +627,27 @@ public final class SecurityUtils implements Serializable {
 		
 		return keyFactory.generatePublic(publicKeySpec);
 	}
-	
+
+	/**
+	 * Generate RSA private key with given key content
+	 * @param keyContent	key content
+	 * @return	RSA private key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PrivateKey RSAPrivateKey(byte[] keyContent) 
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
 	}
-	
+
+	/**
+	 * Generate RSA private key with given modulus and exponent
+	 * @param modulus	modulus
+	 * @param exponent	exponent
+	 * @return	RSA private key object
+	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
+	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 */
 	public static PrivateKey RSAPrivateKey(BigInteger modulus, BigInteger exponent) 
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
@@ -635,27 +656,65 @@ public final class SecurityUtils implements Serializable {
 		return keyFactory.generatePrivate(privateKeySpec);
 	}
 	
+	/**
+	 * Signature data with DSA
+	 * @param privateKey	Signature private key
+	 * @param message		Signature datas
+	 * @return				Signature info
+	 */
 	public static byte[] SignDataWithDSA(PrivateKey privateKey, String message) {
 		return SignData(privateKey, message.getBytes(), "SHA256withDSA");
 	}
 
+	/**
+	 * Signature data with DSA
+	 * @param privateKey	Signature private key
+	 * @param datas			Signature datas
+	 * @return				Signature info
+	 */
 	public static byte[] SignDataWithDSA(PrivateKey privateKey, byte[] datas) {
 		return SignData(privateKey, datas, "SHA256withDSA");
 	}
 	
+	/**
+	 * Verify signature info is valid
+	 * @param publicKey		Verify public key
+	 * @param datas			Signature datas
+	 * @param signature		Signature info
+	 * @return				Verify result
+	 */
 	public static boolean VerifyDSASign(PublicKey publicKey, 
 			byte[] datas, byte[] signature) {
 		return VerifySign(publicKey, datas, signature, "SHA256withDSA");
 	}
-	
+
+	/**
+	 * Signature data with RSA
+	 * @param privateKey	Signature private key
+	 * @param message		Signature datas
+	 * @return				Signature info
+	 */
 	public static byte[] SignDataWithRSA(PrivateKey privateKey, String message) {
 		return SignData(privateKey, message.getBytes(), "SHA256withRSA");
 	}
 
+	/**
+	 * Signature data with RSA
+	 * @param privateKey	Signature private key
+	 * @param datas			Signature datas
+	 * @return				Signature info
+	 */
 	public static byte[] SignDataWithRSA(PrivateKey privateKey, byte[] datas) {
 		return SignData(privateKey, datas, "SHA256withRSA");
 	}
-	
+
+	/**
+	 * Verify signature info is valid
+	 * @param publicKey		Verify public key
+	 * @param datas			Signature datas
+	 * @param signature		Signature info
+	 * @return				Verify result
+	 */
 	public static boolean VerifyRSASign(PublicKey publicKey, 
 			byte[] datas, byte[] signature) {
 		return VerifySign(publicKey, datas, signature, "SHA256withRSA");

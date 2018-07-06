@@ -51,11 +51,11 @@ public final class ProxyInfo {
 	
 	/**
 	 * Default constructor
-	 * @param proxyType
-	 * @param proxyAddress
-	 * @param proxyPort
-	 * @param userName
-	 * @param password
+	 * @param proxyType			proxy type
+	 * @param proxyAddress		proxy server address
+	 * @param proxyPort			proxy port number
+	 * @param userName			proxy user name
+	 * @param password			proxy password
 	 */
 	private ProxyInfo(Type proxyType, String proxyAddress, 
 			int proxyPort, String userName, String password) {
@@ -70,7 +70,7 @@ public final class ProxyInfo {
 	 * Generate ProxyInfo
 	 * @param proxyType			Proxy type
 	 * @param proxyAddress		Proxy server address
-	 * @return
+	 * @return					Proxy info instance
 	 */
 	public static ProxyInfo newInstance(Type proxyType, String proxyAddress) {
 		int proxyPort = Globals.DEFAULT_VALUE_INT;
@@ -93,7 +93,7 @@ public final class ProxyInfo {
 	 * @param proxyType			Proxy type
 	 * @param proxyAddress		Proxy server address
 	 * @param proxyPort			Proxy server port
-	 * @return
+	 * @return					Proxy info instance
 	 */
 	public static ProxyInfo newInstance(Type proxyType, String proxyAddress, int proxyPort) {
 		return new ProxyInfo(proxyType, proxyAddress, proxyPort, null, null);
@@ -106,7 +106,7 @@ public final class ProxyInfo {
 	 * @param proxyPort			Proxy server port
 	 * @param userName			Proxy server user name
 	 * @param password			Proxy server password
-	 * @return
+	 * @return					Proxy info instance
 	 */
 	public static ProxyInfo newInstance(Type proxyType, String proxyAddress, 
 			int proxyPort, String userName, String password) {

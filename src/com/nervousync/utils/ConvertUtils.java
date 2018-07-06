@@ -52,6 +52,11 @@ public final class ConvertUtils {
 		
 	}
 	
+	/**
+	 * Convert collection to List
+	 * @param collection	collection
+	 * @return				Convert list
+	 */
 	public static List<Object> convertCollectionToList(Object collection) {
 		
 		if (collection == null) {
@@ -91,6 +96,11 @@ public final class ConvertUtils {
 		return list;
 	}
 	
+	/**
+	 * Convert primitives to object arrays
+	 * @param primitiveArray		primitive arrays
+	 * @return		Object arrays
+	 */
 	public static Object[] convertPrimitivesToObjects(Object primitiveArray) {
 		
 		if (primitiveArray == null) {
@@ -114,6 +124,12 @@ public final class ConvertUtils {
 		return result;
 	}
 
+	/**
+	 * Convert hex string to byte arrays
+	 * @param strIn			Hex string
+	 * @return				Convert byte arrays
+	 * @throws Exception	Data invalid
+	 */
 	public static byte[] hexStrToByteArr(String strIn) throws Exception {
 		byte[] arrB = strIn.getBytes();
 		int iLen = arrB.length;
@@ -128,7 +144,7 @@ public final class ConvertUtils {
 	
 	/**
 	 * Convert hex to String
-	 * @param source
+	 * @param source	hex byte arrays
 	 * @return convert String
 	 */
 	public static String byteArrayToHexString(byte [] source) {
@@ -218,8 +234,7 @@ public final class ConvertUtils {
 	
 	/**
 	 * Convert object to byte array
-	 * @param object
-	 * @param if <code>null</code> convert error
+	 * @param object		if <code>null</code> convert error
 	 * @return byte array
 	 */
 	public static byte[] convertToByteArray(Object object) {
