@@ -23,8 +23,8 @@ import java.util.List;
 
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.models.header.LocalFileHeader;
-import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
+import com.nervousync.utils.RawUtils;
 
 /**
  * @author Steven Wee   <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -42,11 +42,11 @@ public final class HeaderOperator {
 		byte[] intBuffer = new byte[4];
 
 		// Extended local file header signature
-		RawOperator.writeIntFromLittleEndian(intBuffer, 0, (int) ZipConstants.EXTSIG);
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) ZipConstants.EXTSIG);
 		copyByteArrayToArrayList(intBuffer, byteArrayList);
 
 		// CRC
-		RawOperator.writeIntFromLittleEndian(intBuffer, 0, (int) localFileHeader.getCrc32());
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) localFileHeader.getCrc32());
 		copyByteArrayToArrayList(intBuffer, byteArrayList);
 
 		// Compressed size
@@ -54,7 +54,7 @@ public final class HeaderOperator {
 		if (compressedSize > Integer.MAX_VALUE) {
 			compressedSize = Integer.MAX_VALUE;
 		}
-		RawOperator.writeIntFromLittleEndian(intBuffer, 0, (int) compressedSize);
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) compressedSize);
 		copyByteArrayToArrayList(intBuffer, byteArrayList);
 
 		// Original size
@@ -62,7 +62,7 @@ public final class HeaderOperator {
 		if (originalSize > Integer.MAX_VALUE) {
 			originalSize = Integer.MAX_VALUE;
 		}
-		RawOperator.writeIntFromLittleEndian(intBuffer, 0, (int) originalSize);
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) originalSize);
 		copyByteArrayToArrayList(intBuffer, byteArrayList);
 
 		byte[] extendLocationHdrBytes = convertByteArrayListToByteArray(byteArrayList);

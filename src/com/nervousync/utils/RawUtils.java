@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nervousync.commons.zip.operator;
+package com.nervousync.utils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -25,24 +25,8 @@ import com.nervousync.exceptions.zip.ZipException;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Nov 28, 2017 5:34:55 PM $
  */
-public final class RawOperator {
+public final class RawUtils {
 	
-	/**
-	 * Read short value from big endian of byte arrays
-	 * @param bytes			Byte arrays
-	 * @param position		Begin position
-	 * @return				Read short value
-	 */
-	public static short readShortFromBigEndian(byte[] bytes, int position) {
-		short readValue = 0;
-		
-		readValue |= bytes[position] & 0xFF;
-		readValue <<= 8;
-		readValue |= bytes[position + 1] & 0xFF;
-		
-		return readValue;
-	}
-
 	/**
 	 * Read long value from little endian of byte arrays
 	 * @param bytes			Byte arrays
@@ -63,6 +47,27 @@ public final class RawOperator {
 		}
 		return readValue;
 	}
+
+	/**
+	 * Read long value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read long value
+	 */
+	public static long readLongFromBigEndian(byte[] bytes, int position) {
+		long readValue = 0L;
+		int i = 0;
+		while (true) {
+			readValue |= bytes[position + i] & 0xFF;
+			if (i == 7) {
+				break;
+			} else {
+				readValue <<= 8;
+				i++;
+			}
+		}
+		return readValue;
+	}
 	
 	/**
 	 * Read short value from little endian of byte arrays
@@ -75,6 +80,16 @@ public final class RawOperator {
 	}
 	
 	/**
+	 * Read short value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read long value
+	 */
+	public static int readShortFromBigEndian(byte[] bytes, int position) {
+		return (bytes[position] & 0xFF) << 8 | (bytes[position + 1] & 0xFF);
+	}
+
+	/**
 	 * Read int value from little endian of byte arrays
 	 * @param bytes			Byte arrays
 	 * @param position		Begin position
@@ -83,6 +98,17 @@ public final class RawOperator {
 	public static int readIntFromLittleEndian(byte[] bytes, int position) {
 		return ((bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8) 
 				| ((bytes[position + 2] & 0xFF) | (bytes[position + 3] & 0xFF) << 8) << 16;
+	}
+
+	/**
+	 * Read int value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @return				Read int value
+	 */
+	public static int readIntFromBigEndian(byte[] bytes, int position) {
+		return ((bytes[position + 3] & 0xFF) | (bytes[position + 2] & 0xFF) << 8) 
+				| ((bytes[position + 1] & 0xFF) | (bytes[position] & 0xFF) << 8) << 16;
 	}
 	
 	/**
@@ -93,7 +119,7 @@ public final class RawOperator {
 	 * @return				Read String value
 	 */
 	public static String readStringFromLittleEndian(byte[] bytes, int position, int length) {
-		return RawOperator.readStringFromLittleEndian(bytes, position, length, Globals.DEFAULT_ENCODING);
+		return RawUtils.readStringFromLittleEndian(bytes, position, length, Globals.DEFAULT_ENCODING);
 	}
 	
 	/**
@@ -168,6 +194,17 @@ public final class RawOperator {
 	}
 	
 	/**
+	 * Write short value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			Short value 
+	 */
+	public static void writeShortFromBigEndian(byte[] bytes, int position, short value) {
+		bytes[position] = (byte)(value >>> 8);
+		bytes[position + 1] = (byte)(value & 0xFF);
+	}
+	
+	/**
 	 * Write int value from little endian of byte arrays
 	 * @param bytes			Byte arrays
 	 * @param position		Begin position
@@ -182,6 +219,25 @@ public final class RawOperator {
 			} else {
 				bytes[position + i] = (byte)(value >>> (i * 8));
 			}
+		}
+	}
+	
+	/**
+	 * Write int value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			int value 
+	 */
+	public static void writeIntFromBigEndian(byte[] bytes, int position, int value) {
+		int i = 0;
+		while (true) {
+			if (i == 3) {
+				bytes[position + i] = (byte)(value & 0xFF);
+				break;
+			} else {
+				bytes[position + i] = (byte)(value >>> ((3 - i) * 8));
+			}
+			i++;
 		}
 	}
 	
@@ -204,12 +260,31 @@ public final class RawOperator {
 	}
 	
 	/**
+	 * Write long value from big endian of byte arrays
+	 * @param bytes			Byte arrays
+	 * @param position		Begin position
+	 * @param value			long value 
+	 */
+	public static void writeLongFromBigEndian(byte[] bytes, int position, long value) {
+		int i = 0;
+		while (true) {
+			if (i == 7) {
+				bytes[position + i] = (byte)(value & 0xFF);
+				break;
+			} else {
+				bytes[position + i] = (byte)(value >>> ((7 - i) * 8));
+			}
+			i++;
+		}
+	}
+	
+	/**
 	 * Convert int to byte arrays
 	 * @param value		int value
 	 * @return			Convert byte arrays
 	 */
 	public static byte[] convertIntToByteArray(int value) {
-		return RawOperator.convertIntToByteArray(value, 4, Globals.DEFAULT_VALUE_BOOLEAN);
+		return RawUtils.convertIntToByteArray(value, 4, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
 	/**
@@ -219,7 +294,7 @@ public final class RawOperator {
 	 * @return				Convert byte arrays
 	 */
 	public static byte[] convertIntToByteArray(int value, int arraySize) {
-		return RawOperator.convertIntToByteArray(value, arraySize, Globals.DEFAULT_VALUE_BOOLEAN);
+		return RawUtils.convertIntToByteArray(value, arraySize, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 	
 	/**
@@ -228,7 +303,7 @@ public final class RawOperator {
 	 * @return			Prepared buffer
 	 */
 	public static byte[] prepareAESBuffer(int nonce) {
-		return RawOperator.convertIntToByteArray(nonce, 16, true);
+		return RawUtils.convertIntToByteArray(nonce, 16, true);
 	}
 	
 	/**
@@ -265,7 +340,7 @@ public final class RawOperator {
 			throw new ZipException("Invalid bit array length!");
 		}
 		
-		if (RawOperator.checkBitArray(bitArray)) {
+		if (RawUtils.checkBitArray(bitArray)) {
 			int calValue = 0;
 			for (int i = 0 ; i < bitArray.length ; i++) {
 				calValue += Math.pow(2, i) * bitArray[i];

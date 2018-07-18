@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.utils.FileUtils;
+import com.nervousync.utils.RawUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
@@ -179,8 +179,8 @@ public final class FileExtensionInfo extends BaseElement {
 		
 		dataItem[0] = (byte)this.fileType;
 		dataItem[1] = this.printable ? (byte)Globals.NERVOUSYNC_STATUS_TRUE : (byte)Globals.NERVOUSYNC_STATUS_FALSE;
-		RawOperator.writeIntFromLittleEndian(dataItem, 2, datas.length);
-		RawOperator.writeStringFromLittleEndian(dataItem, 6, content);
+		RawUtils.writeIntFromLittleEndian(dataItem, 2, datas.length);
+		RawUtils.writeStringFromLittleEndian(dataItem, 6, content);
 		
 		return dataItem;
 	}

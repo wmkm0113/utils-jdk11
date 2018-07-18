@@ -23,6 +23,7 @@ import com.nervousync.utils.ReflectionUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
+ * Partial collection
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:07:14 PM $
  */

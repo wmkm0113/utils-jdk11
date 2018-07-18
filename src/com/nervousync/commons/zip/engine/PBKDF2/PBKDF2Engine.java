@@ -19,7 +19,7 @@ package com.nervousync.commons.zip.engine.PBKDF2;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.zip.crypto.PBKDF2.MacBasedPRF;
 import com.nervousync.commons.zip.crypto.PBKDF2.PBKDF2Options;
-import com.nervousync.commons.zip.operator.RawOperator;
+import com.nervousync.utils.RawUtils;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -49,7 +49,7 @@ public final class PBKDF2Engine {
 			throw new NullPointerException();
 		}
 		
-		byte[] passwordBytes = RawOperator.convertCharArrayToByteArray(password);
+		byte[] passwordBytes = RawUtils.convertCharArrayToByteArray(password);
 		this.assertPRF(passwordBytes);
 		
 		if (dkLen == 0) {

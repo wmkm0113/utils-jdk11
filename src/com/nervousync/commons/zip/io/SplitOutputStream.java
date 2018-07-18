@@ -23,9 +23,9 @@ import java.io.OutputStream;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
-import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
 import com.nervousync.utils.FileUtils;
+import com.nervousync.utils.RawUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
@@ -225,7 +225,7 @@ public class SplitOutputStream extends OutputStream {
 	
 	private boolean isHeaderData(byte[] buffer) {
 		if (buffer != null && buffer.length >= 4) {
-			int signature = RawOperator.readIntFromLittleEndian(buffer, 0);
+			int signature = RawUtils.readIntFromLittleEndian(buffer, 0);
 			
 			for (long headerSignature : HEADER_SIGNATURES) {
 				if (headerSignature != ZipConstants.SPLITSIG && headerSignature == signature) {

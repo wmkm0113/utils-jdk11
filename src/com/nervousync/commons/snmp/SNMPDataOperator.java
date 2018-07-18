@@ -25,5 +25,9 @@ import com.nervousync.commons.beans.snmp.SNMPData;
  */
 public interface SNMPDataOperator {
 
+	/**
+	 * Parse and analyze datas
+	 * @param snmpData	SNMP data
+	 */
 	public void operateData(SNMPData snmpData);
 }

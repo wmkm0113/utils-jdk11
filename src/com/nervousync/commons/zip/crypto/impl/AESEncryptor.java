@@ -19,8 +19,8 @@ package com.nervousync.commons.zip.crypto.impl;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Encryptor;
-import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
+import com.nervousync.utils.RawUtils;
 
 /**
  * Encryptor implement of AES
@@ -57,7 +57,7 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 		for (int i = start ; i < (start + len) ; i += ZipConstants.AES_BLOCK_SIZE) {
 			this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ? 
 					ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
-			this.iv = RawOperator.prepareAESBuffer(this.nonce);
+			this.iv = RawUtils.prepareAESBuffer(this.nonce);
 			this.aesEngine.processBlock(this.iv, this.countBlock);
 			
 			for (int j = 0 ; j < this.loopCount ; j++) {

@@ -44,6 +44,12 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 */
 	private Object originObject = null;
 	
+	/**
+	 * Constructor
+	 * @param filePath target file path
+	 * @param mode	Open type(Read-Only/Read-Write)
+	 * @throws FileNotFoundException	if target file was not found
+	 */
 	public NervousyncRandomAccessFile(String filePath, String mode) throws FileNotFoundException {
 		this.filePath = filePath;
 		this.openFile(mode);
@@ -88,6 +94,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
 	@Override
 	public void close() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -97,6 +107,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#write(int)
+	 */
 	@Override
 	public void write(int b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -106,6 +120,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#write(byte[])
+	 */
 	@Override
 	public void write(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -115,6 +133,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#write(byte[], int, int)
+	 */
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -124,6 +146,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeBoolean(boolean)
+	 */
 	@Override
 	public void writeBoolean(boolean v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -133,6 +159,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeByte(int)
+	 */
 	@Override
 	public void writeByte(int v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -142,6 +172,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeShort(int)
+	 */
 	@Override
 	public void writeShort(int v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -151,6 +185,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeChar(int)
+	 */
 	@Override
 	public void writeChar(int v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -160,6 +198,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeInt(int)
+	 */
 	@Override
 	public void writeInt(int v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -169,6 +211,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeLong(long)
+	 */
 	@Override
 	public void writeLong(long v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -178,6 +224,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeFloat(float)
+	 */
 	@Override
 	public void writeFloat(float v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -187,6 +237,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeDouble(double)
+	 */
 	@Override
 	public void writeDouble(double v) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -196,6 +250,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeBytes(java.lang.String)
+	 */
 	@Override
 	public void writeBytes(String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -205,6 +263,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeChars(java.lang.String)
+	 */
 	@Override
 	public void writeChars(String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -214,6 +276,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataOutput#writeUTF(java.lang.String)
+	 */
 	@Override
 	public void writeUTF(String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -223,6 +289,12 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 	
+	/**
+	 * Read data
+	 * @param b		read buffer
+	 * @return		readed length
+	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 */
 	public int read(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			return ((SmbRandomAccessFile)this.originObject).read(b, 0, b.length);
@@ -231,6 +303,14 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 	
+	/**
+	 * Read data
+	 * @param b		read buffer
+	 * @param off	buffer offset
+	 * @param len	read length
+	 * @return		readed length
+	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 */
 	public int read(byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			return ((SmbRandomAccessFile)this.originObject).read(b, off, len);
@@ -239,6 +319,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readFully(byte[])
+	 */
 	@Override
 	public void readFully(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -248,6 +332,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readFully(byte[], int, int)
+	 */
 	@Override
 	public void readFully(byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -257,6 +345,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#skipBytes(int)
+	 */
 	@Override
 	public int skipBytes(int n) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -266,6 +358,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readBoolean()
+	 */
 	@Override
 	public boolean readBoolean() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -275,6 +371,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readByte()
+	 */
 	@Override
 	public byte readByte() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -284,6 +384,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readUnsignedByte()
+	 */
 	@Override
 	public int readUnsignedByte() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -293,6 +397,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readShort()
+	 */
 	@Override
 	public short readShort() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -302,6 +410,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readUnsignedShort()
+	 */
 	@Override
 	public int readUnsignedShort() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -311,6 +423,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readChar()
+	 */
 	@Override
 	public char readChar() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -320,6 +436,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readInt()
+	 */
 	@Override
 	public int readInt() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -329,6 +449,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readLong()
+	 */
 	@Override
 	public long readLong() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -338,6 +462,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readFloat()
+	 */
 	@Override
 	public float readFloat() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -347,6 +475,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readDouble()
+	 */
 	@Override
 	public double readDouble() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -356,6 +488,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readLine()
+	 */
 	@Override
 	public String readLine() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -365,6 +501,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.DataInput#readUTF()
+	 */
 	@Override
 	public String readUTF() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -374,6 +514,11 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 		}
 	}
 	
+	/**
+	 * Open target file
+	 * @param mode	Open type(Read-Only/Read-Write)
+	 * @throws FileNotFoundException	if target file was not found
+	 */
 	private void openFile(String mode) throws FileNotFoundException {
 		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
 			try {

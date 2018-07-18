@@ -62,6 +62,10 @@ public final class CookieInfo {
 	 */
 	private int version = 0;
 	
+	/**
+	 * Constructor
+	 * @param responseCookieValue cookie value from response header information
+	 */
 	public CookieInfo(String responseCookieValue) {
 		if (responseCookieValue != null && responseCookieValue.length() > 0) {
 			String[] cookieItems = StringUtils.delimitedListToStringArray(responseCookieValue, ";");

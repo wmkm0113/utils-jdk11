@@ -99,7 +99,7 @@ public final class RequestUtils {
 
 	static {
 		try {
-			RequestUtils.initTrustManager("changeit");
+			RequestUtils.initTrustManager(null);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Initialize trust manager error! ", e);
@@ -111,6 +111,11 @@ public final class RequestUtils {
 		
 	}
 	
+	/**
+	 * Resolve domain name to IP address
+	 * @param domainName	domain name
+	 * @return	IP address
+	 */
 	public static String resolveDomain(String domainName) {
 		try {
 			return InetAddress.getByName(domainName).getHostAddress();
@@ -122,6 +127,122 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Calculate IP range begin address
+	 * @param ipAddress		IP address in range
+	 * @param cidr			CIDR
+	 * @return				Begin IP address
+	 */
+	public static String beginIP(String ipAddress, int cidr) {
+		return RequestUtils.beginIP(ipAddress, convertCIDRToNetmask(cidr));
+	}
+
+	/**
+	 * Calculate IP range end address
+	 * @param beginIP		Begin address of range
+	 * @param cidr			CIDR
+	 * @return				End IP address
+	 */
+	public static String endIP(String beginIP, int cidr) {
+		return RequestUtils.endIP(beginIP, convertCIDRToNetmask(cidr));
+	}
+	
+	/**
+	 * Calculate IP range begin address
+	 * @param ipAddress		IP address in range
+	 * @param netmask		Net mask address
+	 * @return				Begin IP address
+	 */
+	public static String beginIP(String ipAddress, String netmask) {
+		String[] addrItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (int i = 0 ; i < 4 ; i++) {
+			int beginItem = Integer.parseInt(addrItems[i]) & Integer.parseInt(maskItems[i]);
+			if (i == 3) {
+				beginItem++;
+			}
+			stringBuilder.append("." + beginItem);
+		}
+		
+		return stringBuilder.toString().substring(1);
+	}
+
+	/**
+	 * Calculate IP range end address
+	 * @param beginIP		Begin address of range
+	 * @param netmask		Net mask address
+	 * @return				End IP address
+	 */
+	public static String endIP(String beginIP, String netmask) {
+		String[] addrItems = StringUtils.tokenizeToStringArray(beginIP, ".");
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for (int i = 0 ; i < 4 ; i++) {
+			int endItem = 255 - Integer.parseInt(addrItems[i]) ^ Integer.parseInt(maskItems[i]);
+			stringBuilder.append("." + endItem);
+		}
+		
+		return stringBuilder.toString().substring(1);
+	}
+	
+	/**
+	 * Convert net mask to CIDR
+	 * @param netmask	Net mask address
+	 * @return			CIDR
+	 */
+	public static int convertNetmaskToCIDR(String netmask) {
+		int result = 0;
+		
+		String[] splitItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		
+		for (String splitItem : splitItems) {
+			int number = Integer.parseInt(splitItem);
+			while (number > 0) {
+				if ((number % 2) == 1) {
+					result++;
+				}
+				number /= 2;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Convert CIDR to net mask address
+	 * @param cidr		CIDR
+	 * @return			Net mask address
+	 */
+	public static String convertCIDRToNetmask(int cidr) {
+		if (cidr >= 0 && cidr <= 32) {
+			int[] arrays = new int[]{0, 0, 0, 0};
+			int index = 0;
+			while (cidr >= 0) {
+				arrays[index] = RequestUtils.fillBitsFromLeft(cidr);
+				cidr -= 8;
+				index++;
+			}
+			
+			StringBuilder stringBuilder = new StringBuilder();
+			
+			for (int mask : arrays) {
+				stringBuilder.append("." + mask);
+			}
+			return stringBuilder.toString().substring(1);
+		}
+		return null;
+	}
+	
+	/**
+	 * Convert IPv4 address to compatible IPv6 address
+	 * @param ipAddress		IPv4 address
+	 * @return				Compatible IPv6 address
+	 */
 	public static String convertIPv4ToCompatibleIPv6(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return "::" + ipAddress;
@@ -129,10 +250,21 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert IPv4 address to IPv6 address and collapse
+	 * @param ipAddress		IPv4 address
+	 * @return				Collapse IPv6 address
+	 */
 	public static String convertIPv4ToIPv6(String ipAddress) {
 		return convertIPv4ToIPv6(ipAddress, true);
 	}
 	
+	/**
+	 * Convert IPv4 address to IPv6 address
+	 * @param ipAddress		IPv4 address
+	 * @param collapse		Collapse IPv6 address
+	 * @return				IPv6 address
+	 */
 	public static String convertIPv4ToIPv6(String ipAddress, boolean collapse) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
@@ -156,6 +288,11 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert IPv4 address to byte array
+	 * @param ipAddress		IPv4 address
+	 * @return				byte array
+	 */
 	public static byte[] convertIPv4ToBytes(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
@@ -171,6 +308,11 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert IP address to BigInteger(supported IPv4 and IPv6)
+	 * @param ipAddress		IP address
+	 * @return				BigInteger
+	 */
 	public static BigInteger convertIPtoBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return RequestUtils.convertIPv4ToBigInteger(ipAddress);
@@ -179,6 +321,11 @@ public final class RequestUtils {
 		}
 	}
 
+	/**
+	 * Convert IPv4 address to BigInteger
+	 * @param ipAddress		IPv4 address
+	 * @return				BigInteger
+	 */
 	public static BigInteger convertIPv4ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
@@ -195,6 +342,11 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert IPv6 address to BigInteger
+	 * @param ipAddress		IPv6 address
+	 * @return				BigInteger
+	 */
 	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)) {
 			ipAddress = appendIgnore(ipAddress);
@@ -218,6 +370,11 @@ public final class RequestUtils {
 		return null;
 	}
 	
+	/**
+	 * Convert BigInteger value to IPv4 address(x.x.x.x)
+	 * @param bigInteger		BigInteger value
+	 * @return					IPv4 address
+	 */
 	public static String convertBigIntegerToIPv4(BigInteger bigInteger) {
 		String ipv4Addr = "";
 		BigInteger ff = BigInteger.valueOf(0xFFL);
@@ -230,6 +387,11 @@ public final class RequestUtils {
 		return ipv4Addr.substring(0, ipv4Addr.length() - 1);
 	}
 	
+	/**
+	 * Convert BigInteger value to IPv6 address(xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx or :xxxx:xxxx::xxxx)
+	 * @param bigInteger		BigInteger value
+	 * @return					IPv6 address
+	 */
 	public static String convertBigIntegerToIPv6Addr(BigInteger bigInteger) {
 		String ipv6Addr = "";
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
@@ -242,7 +404,16 @@ public final class RequestUtils {
 		return ipv6Addr.substring(0, ipv6Addr.length() - 1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
 	}
 	
-	public static <T> T generateSOAPClient(String endPointUrl, Class<T> serviceEndpointInterface, HandlerResolver handlerResolver) 
+	/**
+	 * Generate SOAP client instance
+	 * @param endPointUrl					End point URL
+	 * @param serviceEndpointInterface		End point interface
+	 * @param handlerResolver				Handler resolver
+	 * @return								Generated instance
+	 * @throws MalformedURLException		if no protocol is specified, or an unknown protocol is found, or spec is null.
+	 */
+	public static <T> T generateSOAPClient(String endPointUrl, 
+			Class<T> serviceEndpointInterface, HandlerResolver handlerResolver) 
 			throws MalformedURLException {
 		if (endPointUrl == null || endPointUrl.length() == 0 || serviceEndpointInterface == null 
 				|| !serviceEndpointInterface.isAnnotationPresent(WebService.class)) {
@@ -285,6 +456,12 @@ public final class RequestUtils {
 		return service.getPort(new QName(namespaceURI, portName), serviceEndpointInterface);
 	}
 	
+	/**
+	 * Retrieve response content length
+	 * @param requestUrl		URL address
+	 * @return					Response content length
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static long retrieveContentLength(String requestUrl) throws UnsupportedEncodingException {
 		HttpResponseContent httpResponseContent = sendRequest(requestUrl, HttpMethodOption.HEAD);
 		long contentLength = Globals.DEFAULT_VALUE_LONG;
@@ -294,64 +471,152 @@ public final class RequestUtils {
 		return contentLength;
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				beginPosition, endPosition, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				beginPosition, endPosition, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data) 
 			throws UnsupportedEncodingException {
 		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, beginPosition, endPosition);
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				beginPosition, endPosition, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				beginPosition, endPosition, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -359,6 +624,15 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, int timeOut) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -366,6 +640,16 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -374,6 +658,17 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -382,18 +677,42 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -401,6 +720,16 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -408,18 +737,42 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, 
 			int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -427,6 +780,16 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, 
 			int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -434,6 +797,14 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
@@ -441,12 +812,30 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
 		return sendRequest(requestUrl, data, null, httpMethodOption, beginPosition, endPosition);
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
@@ -454,6 +843,15 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -461,6 +859,16 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -468,6 +876,17 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -476,6 +895,15 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, null, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
@@ -484,6 +912,16 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -492,6 +930,17 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -500,6 +949,18 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -508,6 +969,14 @@ public final class RequestUtils {
 				beginPosition, endPosition, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
@@ -515,13 +984,31 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
-
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			List<SimpleHeader> headers, HttpMethodOption httpMethodOption) 
 			throws UnsupportedEncodingException {
@@ -529,6 +1016,16 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			List<SimpleHeader> headers, HttpMethodOption httpMethodOption, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -536,6 +1033,16 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) 
 			throws UnsupportedEncodingException {
@@ -543,6 +1050,17 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, parameters, null));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @param beginPosition		Response content begin position
+	 * @param endPosition		Response content end position
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) 
 			throws UnsupportedEncodingException {
@@ -550,6 +1068,16 @@ public final class RequestUtils {
 				beginPosition, endPosition, null, parameters, null));
 	}
 	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param uploadParam		Upload resource parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			Map<String, File> uploadParam, List<SimpleHeader> headers, HttpMethodOption httpMethodOption) 
 					throws UnsupportedEncodingException {
@@ -557,6 +1085,17 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
 	}
 
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param uploadParam		Upload resource parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @return					HttpResponseContent
+	 * @throws UnsupportedEncodingException	if charset encoding was not supported
+	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			Map<String, File> uploadParam, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) 
@@ -565,10 +1104,21 @@ public final class RequestUtils {
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
 	}
 	
+	/**
+	 * Send request and receive response
+	 * @param requestInfo		Request info
+	 * @return					HttpResponseContent
+	 */
 	public static HttpResponseContent sendRequest(RequestInfo requestInfo) {
 		return RequestUtils.sendRequest(requestInfo, null);
 	}
 	
+	/**
+	 * Send request and receive response
+	 * @param requestInfo		Request info
+	 * @param cookieInfos		Cookie infos
+	 * @return					HttpResponseContent
+	 */
 	public static HttpResponseContent sendRequest(RequestInfo requestInfo, List<CookieInfo> cookieInfos) {
 		HttpURLConnection urlConnection = null;
 		OutputStream outputStream = null;
@@ -629,6 +1179,11 @@ public final class RequestUtils {
 		}
 	}
 	
+	/**
+	 * Initialize certificate trust manager
+	 * @param passPhrase		pass phrase
+	 * @throws Exception		if initialize failed
+	 */
 	public static void initTrustManager(String passPhrase) throws Exception {
 		NervousyncX509TrustManager.init(passPhrase);
 
@@ -637,10 +1192,22 @@ public final class RequestUtils {
 		SSLContext.setDefault(sslContext);
 	}
 	
+	/**
+	 * Add custom certificate
+	 * @param certPath			certificate path
+	 * @param passPhrase		certificate pass phrase
+	 * @throws Exception		if certificate was not found
+	 */
 	public static void addCustomCert(String certPath, String passPhrase) throws Exception {
 		NervousyncX509TrustManager.getInstance().addCustomCert(new TrustedCert(certPath, passPhrase));
 	}
 
+	/**
+	 * Remove custom certificate
+	 * @param certPath			certificate path
+	 * @param passPhrase		certificate pass phrase
+	 * @throws Exception		if certificate was not found
+	 */
 	public static void removeCustomCert(String certPath, String passPhrase) throws Exception {
 		NervousyncX509TrustManager.getInstance().removeCustomCert(certPath);
 	}
@@ -652,8 +1219,6 @@ public final class RequestUtils {
      * @return Query string corresponding to that request parameters
 	 */
 	public static String getRequestParameters(HttpServletRequest request) {
-		// set the ALGORIGTHM as defined for the application
-		//ALGORITHM = (String) aRequest.getAttribute(Constants.ENC_ALGORITHM);
 		Map<String, String[]> m = request.getParameterMap();
 		return createQueryStringFromMap(m, "&").toString();
 	}
@@ -1016,6 +1581,14 @@ public final class RequestUtils {
 		return null;
 	}
 
+	private static int fillBitsFromLeft(int value) {
+		if (value >= 8) {
+			return 255;
+		} else {
+			return 256 - Double.valueOf(Math.pow(2, (8 - value))).intValue();
+		}
+	}
+	
 	private static String generateCookie(String requestUrl, List<CookieInfo> cookieInfos) {
 		if (cookieInfos == null || cookieInfos.size() == 0) {
 			return null;

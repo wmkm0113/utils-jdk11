@@ -34,25 +34,94 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public class AESCrypto {
 
+	/**
+	 * Salt datas
+	 */
 	private byte[] saltBytes;
 	
+	/**
+	 * key length
+	 */
 	protected int keyLength;
+	/**
+	 * mac length
+	 */
 	protected int macLength;
+	/**
+	 * salt length
+	 */
 	protected int saltLength;
 	
+	/**
+	 * AES key bytes
+	 */
 	protected byte[] aesKey = null;
+	/**
+	 * Mac key bytes
+	 */
 	protected byte[] macKey = null;
+	/**
+	 * current password bytes
+	 */
 	protected byte[] derviedPasswordVerifier = null;
 
+	/**
+	 * nonce
+	 */
 	protected int nonce = 1;
+	/**
+	 * loop count
+	 */
 	protected int loopCount = 0;
 	
+	/**
+	 * iv bytes
+	 */
 	protected byte[] iv = null;
+	/**
+	 * count block bytes
+	 */
 	protected byte[] countBlock = null;
 
+	/**
+	 * AES engine
+	 */
 	protected AESEngine aesEngine = null;
+	/**
+	 * MacBasedPRF instance
+	 */
 	protected MacBasedPRF macBasedPRF = null;
-	
+
+	/**
+	 * Verify given password
+	 * @param aesStrength		AES key strength
+	 * @param salt				salt bytes
+	 * @param password			password 
+	 * @param passwordBytes		password bytes
+	 * @return	verify result
+	 */
+	public static boolean verifyPassword(int aesStrength, byte[] salt, 
+			char[] password, byte[] passwordBytes) {
+		if (password == null || password.length == 0 || passwordBytes == null || passwordBytes.length == 0) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+		AESCrypto aesCrypto = new AESCrypto();
+		aesCrypto.preInit(aesStrength);
+		aesCrypto.init(salt, password);
+		return aesCrypto.verifyPassword(passwordBytes);
+	}
+
+	/**
+	 * @return the saltBytes
+	 */
+	public byte[] getSaltBytes() {
+		return saltBytes;
+	}
+
+	/**
+	 * Prepare initialize
+	 * @param aesStrength	AES key strength
+	 */
 	protected void preInit(int aesStrength) {
 		if (aesStrength != ZipConstants.AES_STRENGTH_128
 				&& aesStrength != ZipConstants.AES_STRENGTH_192
@@ -84,6 +153,10 @@ public class AESCrypto {
 		}
 	}
 	
+	/**
+	 * Initialize by given password
+	 * @param password	password
+	 */
 	protected void init(char[] password) {
 		if (password == null || password.length == 0) {
 			throw new ZipException("Password is null or empty");
@@ -92,6 +165,11 @@ public class AESCrypto {
 		this.initCrypto(password);
 	}
 	
+	/**
+	 * Initialize by given password and salt
+	 * @param salt			salt bytes
+	 * @param password		password char arrays
+	 */
 	protected void init(byte[] salt, char[] password) {
 		if (password == null || password.length == 0) {
 			throw new ZipException("Password is null or empty");
@@ -100,6 +178,36 @@ public class AESCrypto {
 		this.initCrypto(password);
 	}
 	
+	/**
+	 * Derive key
+	 * @param salt			salt bytes
+	 * @param password		password
+	 * @param dkLen			length
+	 * @return				processed data bytes
+	 */
+	protected byte[] deriveKey(byte[] salt, char[] password, int dkLen) {
+		PBKDF2Options options = new PBKDF2Options("HmacSHA1", "ISO-8859-1", salt, 1000);
+		PBKDF2Engine engine = new PBKDF2Engine(options);
+		return engine.deriveKey(password, dkLen);
+	}
+	
+	/**
+	 * Verify given password
+	 * @param password	password
+	 * @return	verify result
+	 */
+	protected boolean verifyPassword(byte[] password) {
+		if (this.derviedPasswordVerifier == null) {
+			throw new ZipException("Invalid dervied password verifier!");
+		}
+
+		return Arrays.equals(password, this.derviedPasswordVerifier);
+	}
+	
+	/**
+	 * Initialize cryptor
+	 * @param password	password
+	 */
 	private void initCrypto(char[] password) {
 		byte[] keyBytes = this.deriveKey(this.saltBytes, password, 
 				this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH);
@@ -123,42 +231,10 @@ public class AESCrypto {
 		this.macBasedPRF.init(this.macKey);
 	}
 	
-	protected byte[] deriveKey(byte[] salt, char[] password, int dkLen) throws ZipException {
-		try {
-			PBKDF2Options options = new PBKDF2Options("HmacSHA1", "ISO-8859-1", salt, 1000);
-			PBKDF2Engine engine = new PBKDF2Engine(options);
-			return engine.deriveKey(password, dkLen);
-		} catch (Exception e) {
-			throw new ZipException(e);
-		}
-	}
-	
-	protected boolean verifyPassword(byte[] password) {
-		if (this.derviedPasswordVerifier == null) {
-			throw new ZipException("Invalid dervied password verifier!");
-		}
-
-		return Arrays.equals(password, this.derviedPasswordVerifier);
-	}
-	
-	public static boolean verifyPassword(int aesStrength, byte[] salt, 
-			char[] password, byte[] passwordBytes) {
-		if (password == null || password.length == 0 || passwordBytes == null || passwordBytes.length == 0) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
-		AESCrypto aesCrypto = new AESCrypto();
-		aesCrypto.preInit(aesStrength);
-		aesCrypto.init(salt, password);
-		return aesCrypto.verifyPassword(passwordBytes);
-	}
-
 	/**
-	 * @return the saltBytes
+	 * Generate salt data
+	 * @throws ZipException
 	 */
-	public byte[] getSaltBytes() {
-		return saltBytes;
-	}
-	
 	private void generateSalt() throws ZipException {
 		int rounds = 0;
 		

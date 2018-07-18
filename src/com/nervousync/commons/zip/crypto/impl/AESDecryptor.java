@@ -19,8 +19,8 @@ package com.nervousync.commons.zip.crypto.impl;
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.models.header.LocalFileHeader;
-import com.nervousync.commons.zip.operator.RawOperator;
 import com.nervousync.exceptions.zip.ZipException;
+import com.nervousync.utils.RawUtils;
 
 /**
  * Decryptor implement of AES
@@ -68,7 +68,7 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 						ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
 				
 				this.macBasedPRF.update(buff, i, this.loopCount);
-				this.iv = RawOperator.prepareAESBuffer(this.nonce);
+				this.iv = RawUtils.prepareAESBuffer(this.nonce);
 				this.aesEngine.processBlock(this.iv, this.countBlock);
 				
 				for (int j = 0 ; j < this.loopCount ; j++) {

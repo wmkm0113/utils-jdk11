@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
 	<url>https://development.nervousync.com/project/NervousyncUtils</url>
@@ -46,7 +46,7 @@
 		<maven.source.version>3.0.1</maven.source.version>
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
-		<bcprov.version>1.59</bcprov.version>
+		<bcprov.version>1.60</bcprov.version>
 		<cglib.version>3.2.7</cglib.version>
 		<dom4j.version>2.1.1</dom4j.version>
 		<jaxb.version>2.3.0</jaxb.version>
@@ -511,6 +511,7 @@
 								</manifestEntries>
 							</archive>
 							<excludes>
+								<exclude>log4j2.xml</exclude>
 								<exclude>*.dat</exclude>
 							</excludes>
 						</configuration>

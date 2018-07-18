@@ -57,7 +57,6 @@ import com.nervousync.commons.beans.xml.files.SegmentationFileInfo;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.MIMETypes;
 import com.nervousync.commons.zip.ZipFile;
-import com.nervousync.commons.zip.operator.RawOperator;
 
 /**
  * File operate utils
@@ -96,6 +95,9 @@ public final class FileUtils {
 
 	/** Separator between JAR URL and file path within the JAR */
 	public static final String JAR_URL_SEPARATOR = "!/";
+	
+	/** Line break character */
+	public static final String NEWLINE_CHARACTER = "\n";
 
 	private static Hashtable<String, FileExtensionInfo> REGISTER_IDEN_MAP = new Hashtable<String, FileExtensionInfo>();
 	
@@ -184,6 +186,12 @@ public final class FileUtils {
 				new FileExtensionInfo(extensionName, identifiedCode, mimeType, fileType, printing));
 	}
 	
+	/**
+	 * Match folder path in entry path
+	 * @param entryPath		entry path
+	 * @param folderPath	folder path
+	 * @return	Match result
+	 */
 	public static boolean matchFolder(String entryPath, String folderPath) {
 		if (entryPath == null || folderPath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -193,6 +201,13 @@ public final class FileUtils {
 		return FileUtils.replacePageSeparator(entryPath).startsWith(convertFolderPath);
 	}
 	
+	/**
+	 * Match two path was same
+	 * @param origPath		orig path
+	 * @param destPath		dest path
+	 * @param ignoreCase	ignore character case
+	 * @return	Match result
+	 */
 	public static boolean matchFilePath(String origPath, String destPath, boolean ignoreCase) {
 		if (origPath == null || destPath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -1413,6 +1428,34 @@ public final class FileUtils {
 	}
 	
 	/**
+	 * List files, filter by file name regex string
+	 * @param filePath			folder path
+	 * @param fileNameRegex		file name regex
+	 * @return					list of file path
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
+	 */
+	public static List<String> listFilesByRegex(String filePath, String fileNameRegex) throws FileNotFoundException {
+		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true, Globals.DEFAULT_VALUE_BOOLEAN);
+	}
+
+	/**
+	 * List files, filter by file name regex string
+	 * @param filePath				folder path
+	 * @param fileNameRegex			file name regex
+	 * @param readHiddenFiles		include hidden file
+	 * @param includeRootFolder		include root folder
+	 * @return						list of file path
+	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
+	 */
+	public static List<String> listFilesByRegex(String filePath, String fileNameRegex, 
+			boolean readHiddenFiles, boolean includeRootFolder) throws FileNotFoundException {
+		List<String> fileList = new ArrayList<String>();
+		FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameRegexFilter(fileNameRegex), 
+				fileList, readHiddenFiles, includeRootFolder);
+		return fileList;
+	}
+	
+	/**
 	 * Write file content to local file path
 	 * @param fileData			file content
 	 * @param filePath			write path
@@ -2575,7 +2618,7 @@ public final class FileUtils {
 		byte[] readBuffer = null;
 		byte[] intBuffer = new byte[4];
 		System.arraycopy(bytes, 0, intBuffer, 0, 4);
-		int dataCount = RawOperator.readIntFromLittleEndian(intBuffer, 0);
+		int dataCount = RawUtils.readIntFromLittleEndian(intBuffer, 0);
 		int srcPos = 4;
 		LOGGER.info("File identified information count: {}", dataCount);
 		for (int i = 0 ; i < dataCount ; i++) {
@@ -2585,7 +2628,7 @@ public final class FileUtils {
 			
 			int fileType = (int)indexData[0];
 			boolean printing = ((int)indexData[1]) == 1;
-			int dataLength = RawOperator.readIntFromLittleEndian(indexData, 2);
+			int dataLength = RawUtils.readIntFromLittleEndian(indexData, 2);
 			
 			readBuffer = new byte[dataLength];
 			System.arraycopy(bytes, srcPos, readBuffer, 0, dataLength);
@@ -2602,6 +2645,23 @@ public final class FileUtils {
 				FileUtils.LOGGER.warn("Override file extension info, extension name: " + fileExtensionInfo.getExtensionName());
 			}
 			REGISTER_IDEN_MAP.put(fileExtensionInfo.getExtensionName(), fileExtensionInfo);
+		}
+	}
+	
+	private static final class FilenameRegexFilter implements FilenameFilter {
+		private String fileNameRegex = null;
+		
+		public FilenameRegexFilter(String fileNameRegex) {
+			this.fileNameRegex = fileNameRegex;
+		}
+		
+		public boolean accept(File dir, String name) {
+			if (this.fileNameRegex != null && dir != null && dir.isDirectory() 
+					&& dir.exists() && name != null) {
+				String fileName = StringUtils.getFilename(name);
+				return StringUtils.matches(fileName, this.fileNameRegex);
+			}
+			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 	}
 	

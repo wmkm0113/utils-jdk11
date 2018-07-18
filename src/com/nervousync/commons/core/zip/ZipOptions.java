@@ -87,16 +87,28 @@ public final class ZipOptions implements Cloneable {
 	 */
 	private boolean isSourceExternalStream = Globals.DEFAULT_VALUE_BOOLEAN;
 	
+	/**
+	 * Default Constructor
+	 */
 	private ZipOptions() {
 		
 	}
 	
+	/**
+	 * Constructor by given password
+	 * @param password
+	 */
 	private ZipOptions(String password) {
 		this.encryptFiles = true;
 		this.password = password.toCharArray();
 		this.encryptionMethod = ZipConstants.ENC_METHOD_STANDARD;
 	}
 	
+	/**
+	 * Constructor by given password and key strength
+	 * @param password encrypt password
+	 * @param aesKeyStrength AES key strength
+	 */
 	private ZipOptions(String password, int aesKeyStrength) {
 		this.encryptFiles = true;
 		this.password = password.toCharArray();
@@ -104,10 +116,20 @@ public final class ZipOptions implements Cloneable {
 		this.aesKeyStrength = aesKeyStrength;
 	}
 	
+	/**
+	 * Generate default ZipOptions instance
+	 * @return generated instance
+	 */
 	public static ZipOptions newOptions() {
 		return new ZipOptions();
 	}
 	
+	/**
+	 * Generate a standard encrypt ZipOptions instance by given password
+	 * @param password encrypt password
+	 * @return generated instance
+	 * @throws ZipException	if password is null
+	 */
 	public static ZipOptions standardEncryptOptions(String password) 
 			throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(password)) {
@@ -116,11 +138,24 @@ public final class ZipOptions implements Cloneable {
 		return new ZipOptions(password);
 	}
 	
+	/**
+	 * Generate an AES encrypt ZipOptions instance by given password
+	 * @param password encrypt password
+	 * @return generated instance
+	 * @throws ZipException	if password is null
+	 */
 	public static ZipOptions aesEncryptOptions(String password) 
 			throws ZipException {
 		return ZipOptions.aesEncryptOptions(password, ZipConstants.AES_STRENGTH_128);
 	}
-	
+
+	/**
+	 * Generate an AES encrypt ZipOptions instance by given password and key strength
+	 * @param password encrypt password
+	 * @param aesKeyStrength AES key strength
+	 * @return generated instance
+	 * @throws ZipException	if password is null
+	 */
 	public static ZipOptions aesEncryptOptions(String password, 
 			int aesKeyStrength) throws ZipException {
 		if (!StringUtils.isNotNullAndNotEmpty(password)) {
