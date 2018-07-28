@@ -41,9 +41,13 @@ public final class SnowflakeUtils {
 	 */
 	private static final long SEQUENCE_MASK = -1L ^ (-1L << 12L);
 	/**
-	 * Node identified id (between 0 and 1023)
+	 * Node identified id (between 0 and 63)
 	 */
-	private static final long DEVICE_ID = SystemUtils.identifiedKey().hashCode() % 1024L;
+	private static final long DEVICE_ID = SystemUtils.identifiedKey().hashCode() % 64L;
+	/**
+	 * Node instance id (between 0 and 63), default: 1L
+	 */
+	private long instanceId = 1L;
 	/**
 	 * Begin timestamp value
 	 */
@@ -60,12 +64,18 @@ public final class SnowflakeUtils {
 	/**
 	 * Constructor
 	 * @param referenceTime		Reference time value
+	 * @param instanceId		Instance id
 	 */
-	private SnowflakeUtils(long referenceTime) {
+	private SnowflakeUtils(long referenceTime, long instanceId) {
 		if (referenceTime < 0L) {
 			this.referenceTime = REFERENCE_TIME;
 		} else {
 			this.referenceTime = referenceTime;
+		}
+		if (instanceId >= 0L && instanceId < 64L) {
+			this.instanceId = instanceId;
+		} else {
+			this.instanceId = 1L;
 		}
 		this.sequenceIndex = 0L;
 	}
@@ -74,16 +84,17 @@ public final class SnowflakeUtils {
 	 * Initialize by default reference time value
 	 */
 	public static void initialize() {
-		initialize(Globals.DEFAULT_VALUE_LONG);
+		initialize(Globals.DEFAULT_VALUE_LONG, Globals.DEFAULT_VALUE_LONG);
 	}
 	
 	/**
 	 * Initialize by given reference time
 	 * @param referenceTime	reference time
+	 * @param instanceId Instance id
 	 */
-	public static void initialize(long referenceTime) {
+	public static void initialize(long referenceTime, long instanceId) {
 		if (INSTANCE == null) {
-			INSTANCE = new SnowflakeUtils(referenceTime);
+			INSTANCE = new SnowflakeUtils(referenceTime, instanceId);
 		}
 	}
 	
@@ -174,9 +185,9 @@ public final class SnowflakeUtils {
 		}
 		
 		if (calcTime) {
-			return ((this.lastTime - this.referenceTime) << 22L) | (DEVICE_ID << 12L) | this.sequenceIndex;
+			return ((this.lastTime - this.referenceTime) << 22L) | (DEVICE_ID << 17L) | (this.instanceId << 12L) | this.sequenceIndex;
 		} else {
-			return (DEVICE_ID << 12L) | this.sequenceIndex;
+			return (DEVICE_ID << 17L) | (this.instanceId << 12L) | this.sequenceIndex;
 		}
 	}
 }

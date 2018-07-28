@@ -51,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -109,6 +110,62 @@ public final class RequestUtils {
 	
 	private RequestUtils() {
 		
+	}
+
+	/**
+	 * Retrieve default value of target class
+	 * @param clazz	target class
+	 * @return	default value or null if not defined
+	 */
+	public static Object getDefaultValue(Class<?> clazz) {
+		if (clazz.isArray()) {
+			return Array.newInstance(clazz.getComponentType(), 0);
+		} else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+			return Globals.DEFAULT_VALUE_INT;
+		} else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+			return Globals.DEFAULT_VALUE_LONG;
+		} else if (clazz.equals(Short.class) || clazz.equals(short.class)) {
+			return Globals.DEFAULT_VALUE_SHORT;
+		} else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+			return Globals.DEFAULT_VALUE_DOUBLE;
+		} else if (clazz.equals(Float.class) || clazz.equals(float.class)) {
+			return Globals.DEFAULT_VALUE_FLOAT;
+		} else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		} else if (clazz.equals(String.class)) {
+			return Globals.DEFAULT_VALUE_STRING;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Parse HTTP method from string to com.nervousync.enumerations.web.HttpMethodOption
+	 * @param method	string of HTTP method
+	 * @return	com.nervousync.enumerations.web.HttpMethodOption
+	 */
+	public static HttpMethodOption httpMethodOption(String method) {
+		if (method == null) {
+			return HttpMethodOption.DEFAULT;
+		}
+		
+		if (HTTP_METHOD_GET.equalsIgnoreCase(method)) {
+			return HttpMethodOption.GET;
+		} else if (HTTP_METHOD_HEAD.equalsIgnoreCase(method)) {
+			return HttpMethodOption.HEAD;
+		} else if (HTTP_METHOD_PUT.equalsIgnoreCase(method)) {
+			return HttpMethodOption.PUT;
+		} else if (HTTP_METHOD_POST.equalsIgnoreCase(method)) {
+			return HttpMethodOption.POST;
+		} else if (HTTP_METHOD_TRACE.equalsIgnoreCase(method)) {
+			return HttpMethodOption.TRACE;
+		} else if (HTTP_METHOD_DELETE.equalsIgnoreCase(method)) {
+			return HttpMethodOption.DELETE;
+		} else if (HTTP_METHOD_OPTIONS.equalsIgnoreCase(method)) {
+			return HttpMethodOption.OPTIONS;
+		} else {
+			return HttpMethodOption.DEFAULT;
+		}
 	}
 	
 	/**

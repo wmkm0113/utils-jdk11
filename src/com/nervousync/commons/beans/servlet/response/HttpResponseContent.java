@@ -122,18 +122,6 @@ public final class HttpResponseContent implements Serializable {
 	}
 	
 	public HttpResponseContent(HttpURLConnection urlConnection) {
-		this.contentType = urlConnection.getContentType();
-		if (this.contentType.indexOf("charset=") != Globals.DEFAULT_VALUE_INT) {
-			this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
-			if (this.contentType.indexOf("\"") != Globals.DEFAULT_VALUE_INT) {
-				this.charset = this.charset.substring(0, this.charset.indexOf("\""));
-			}
-			this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-			if (this.charset.indexOf(";") != Globals.DEFAULT_VALUE_INT) {
-				this.charset = this.charset.substring(0, this.charset.indexOf(";"));
-			}
-		}
-		
 		InputStream inputStream = null;
 		InputStreamReader inputStreamReader = null;
 		BufferedReader bufferedReader = null;
@@ -143,6 +131,19 @@ public final class HttpResponseContent implements Serializable {
 			this.statusCode = urlConnection.getResponseCode();
 			this.contentLength = urlConnection.getContentLength();
 			if (this.statusCode == HttpsURLConnection.HTTP_OK) {
+				this.contentType = urlConnection.getContentType();
+				if (this.contentType != null 
+						&& this.contentType.indexOf("charset=") != Globals.DEFAULT_VALUE_INT) {
+					this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
+					if (this.contentType.indexOf("\"") != Globals.DEFAULT_VALUE_INT) {
+						this.charset = this.charset.substring(0, this.charset.indexOf("\""));
+					}
+					this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
+					if (this.charset.indexOf(";") != Globals.DEFAULT_VALUE_INT) {
+						this.charset = this.charset.substring(0, this.charset.indexOf(";"));
+					}
+				}
+				
 				if (this.isGZipResponse(urlConnection.getContentEncoding())) {
 					inputStream = new GZIPInputStream(urlConnection.getInputStream());
 				} else {
@@ -212,19 +213,11 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		if (Globals.CONTENT_TYPE_APPLICATION_XML.equalsIgnoreCase(this.contentType)) {
-			return XmlUtils.convertToObject(this.parseString(), clazz);
-		}
-		
-		throw new XmlException("Data type error! ");
+		return XmlUtils.convertToObject(this.parseString(), clazz);
 	}
 
 	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		if (Globals.CONTENT_TYPE_APPLICATION_JSON.equalsIgnoreCase(this.contentType)) {
-			return StringUtils.convertJSONStringToObject(this.parseString(), clazz);
-		}
-		
-		throw new XmlException("Data type error! ");
+		return StringUtils.convertJSONStringToObject(this.parseString(), clazz);
 	}
 	
 	public Object parseObject() throws XmlException, UnsupportedEncodingException {

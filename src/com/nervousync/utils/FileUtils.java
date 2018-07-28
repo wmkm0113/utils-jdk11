@@ -1928,7 +1928,8 @@ public final class FileUtils {
 		if (FileUtils.makeHome(destPath)) {
 			try {
 				File destFile = FileUtils.getFile(destPath);
-				return destFile.mkdirs();
+				destFile.mkdirs();
+				return destFile.exists();
 			} catch (Exception e) {
 			}
 		}
@@ -1967,7 +1968,8 @@ public final class FileUtils {
 					return true;
 				} else {
 					try {
-						return homeDir.mkdirs();
+						homeDir.mkdirs();
+						return FileUtils.isExists(homePath);
 					} catch (Exception e) {
 						return Globals.DEFAULT_VALUE_BOOLEAN;
 					}

@@ -1448,7 +1448,15 @@ public final class StringUtils {
 	 * @param <T>		T
 	 * @return			Convert JavaBean object
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T convertJSONStringToObject(String jsonData, Class<T> clazz) {
+		if (StringUtils.isSimpleDataType(clazz)) {
+			try {
+				return (T)StringUtils.parseSimpleData(jsonData, clazz);
+			} catch (ParseException e) {
+				return null;
+			}
+		}
 		return ConvertUtils.convertMapToObject(StringUtils.convertJSONStringToMap(jsonData), clazz);
 	}
 	
@@ -1566,7 +1574,7 @@ public final class StringUtils {
 	 * @param sourceString	input string
 	 * @return	replaced string
 	 */
-	public static String formatXMLForText(String sourceString) {
+	public static String formatForText(String sourceString) {
 		
 		if (sourceString == null) {
 			return null;
@@ -1576,8 +1584,59 @@ public final class StringUtils {
 		sourceString = replace(sourceString, "&lt;", "<");
 		sourceString = replace(sourceString, "&gt;", ">");
 		sourceString = replace(sourceString, "&quot;", "\"");
+		sourceString = replace(sourceString, "&#39;", "\'");
+		sourceString = replace(sourceString, "\\\\", "\\");
+		sourceString = replace(sourceString, "\\n", "\n");
+		sourceString = replace(sourceString, "\\r", "\r");
+		sourceString = replace(sourceString, "<br/>", "\r");
 		
 		return sourceString;
+	}
+	
+	/**
+	 * Replace special HTML character with converted character in string
+	 * @param sourceString	input string
+	 * @return	replaced string
+	 */
+	public static String TextToJSON (String sourceString) {
+		int strLen = 0;
+		StringBuffer reString = new StringBuffer();
+		String deString = "";
+		strLen = sourceString.length();
+		
+		for (int i = 0 ; i < strLen ; i++) {
+			char ch = sourceString.charAt(i);
+			switch (ch) {
+			case '<':
+				deString = "&lt;";
+				break;
+			case '>':
+				deString = "&gt;";
+				break;
+			case '\"':
+				deString = "&quot;";
+				break;
+			case '&':
+				deString = "&amp;";
+				break;
+			case '\'':
+				deString = "&#39;";
+				break;
+			case '\\':
+				deString = "\\\\";
+				break;
+			case '\n':
+				deString = "\\n";
+				break;
+			case '\r':
+				deString = "\\r";
+				break;
+				default:
+					deString = "" + ch;
+			}
+			reString.append(deString);
+		}
+		return reString.toString();
 	}
 	
 	/**
@@ -1606,7 +1665,16 @@ public final class StringUtils {
 			case '&':
 				deString = "&amp;";
 				break;
-			case 13:
+			case '\'':
+				deString = "&#39;";
+				break;
+			case '\\':
+				deString = "\\\\";
+				break;
+			case '\n':
+				deString = "\\n";
+				break;
+			case '\r':
 				deString = "<br/>";
 				break;
 				default:
@@ -1992,6 +2060,42 @@ public final class StringUtils {
 			return false;
 		}
 	}
+	
+	/**
+	 * Check type class is simple data class, e.g. Number(include int, Integer, long, Long...), String, boolean and Date
+	 * @param typeClass	type class
+	 * @return	check result
+	 */
+	public static boolean isSimpleDataType(Class<?> typeClass) {
+		if (typeClass != null) {
+			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
+
+			switch (dataType) {
+			case NUMBER:
+				if (typeClass.equals(Integer.class)
+						|| typeClass.equals(int.class)
+						|| typeClass.equals(Float.class)
+						|| typeClass.equals(float.class)
+						|| typeClass.equals(Double.class)
+						|| typeClass.equals(double.class)
+						|| typeClass.equals(Short.class)
+						|| typeClass.equals(short.class)
+						|| typeClass.equals(Long.class)
+						|| typeClass.equals(long.class)
+						|| typeClass.equals(BigInteger.class)) {
+					return true;
+				}
+				break;
+			case STRING:
+			case BOOLEAN:
+			case DATE:
+				return true;
+				default:
+					break;
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
 
 	/**
 	 * Parse simple data to target class
@@ -2013,7 +2117,7 @@ public final class StringUtils {
 			
 			switch (dataType) {
 			case STRING:
-				paramObj = StringUtils.formatXMLForText(dataValue);
+				paramObj = StringUtils.formatForText(dataValue);
 				break;
 			case BOOLEAN:
 				paramObj = new Boolean(dataValue);
@@ -2045,14 +2149,14 @@ public final class StringUtils {
 				}
 				break;
 			case CDATA:
-				paramObj = StringUtils.formatXMLForText(dataValue).toCharArray();
+				paramObj = StringUtils.formatForText(dataValue).toCharArray();
 				break;
 			case BINARY:
 				dataValue = StringUtils.replace(dataValue, " ", "");
 				paramObj = StringUtils.base64Decode(dataValue);
 				break;
 				default:
-					paramObj = StringUtils.formatXMLForText(dataValue);
+					paramObj = StringUtils.formatForText(dataValue);
 			}
 		}
 		

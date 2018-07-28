@@ -123,7 +123,7 @@ public class FileHeader {
 	 * @return the crc32
 	 */
 	public long getCrc32() {
-		return crc32;
+		return crc32 & 0xFFFFFFFFL;
 	}
 
 	/**

@@ -1283,7 +1283,9 @@ public final class ZipFile implements Cloneable {
 			}
 			
 			if (generalFileHeader.isDirectory()) {
-				if (!FileUtils.makeDir(destPath + generalFileHeader.getEntryPath())) {
+				String targetPath = destPath + generalFileHeader.getEntryPath();
+				targetPath = StringUtils.replace(targetPath, "/", Globals.DEFAULT_PAGE_SEPARATOR);
+				if (!FileUtils.makeDir(targetPath)) {
 					throw new ZipException("Create output folder error!");
 				}
 			} else {
@@ -1309,10 +1311,6 @@ public final class ZipFile implements Cloneable {
 	private void addFilesToZip(List<String> fileList, ZipOptions zipOptions) throws ZipException {
 		if (fileList == null || fileList.isEmpty()) {
 			throw new ZipException("No file to added");
-		}
-		
-		if (!FileUtils.canWrite(this.filePath)) {
-			throw new ZipException("Zip file cannot writeable");
 		}
 		
 		if (this.endCentralDirectoryRecord == null) {
@@ -1680,7 +1678,7 @@ public final class ZipFile implements Cloneable {
 					}
 				}
 			} else {
-				long calculatedCRC = inputStream.crcValue();
+				long calculatedCRC = inputStream.crcValue() & 0xFFFFFFFFL;
 				if (calculatedCRC != generalFileHeader.getCrc32()) {
 					throw new ZipException("CRC check failed!");
 				}
