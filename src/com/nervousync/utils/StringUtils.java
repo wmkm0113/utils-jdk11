@@ -16,7 +16,6 @@
  */
 package com.nervousync.utils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
@@ -99,7 +98,7 @@ public final class StringUtils {
 	private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1|5|9|Y][0-9A-Z]{17}$";
 	private static final String CHN_SOCIAL_CREDIT_AUTHCODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
 	private static final int[] CHN_SOCIAL_CREDIT_WEIGHT = {1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28};
-	
+
 	private StringUtils() {
 		
 	}
@@ -115,14 +114,18 @@ public final class StringUtils {
 
 	public static byte[] convertCharset(String str) throws ZipException {
 		try {
-			byte[] converted = null;
+			byte[] converted;
 			String charSet = detectCharSet(str);
-			if (charSet.equals(ZipConstants.CHARSET_CP850)) {
-				converted = str.getBytes(ZipConstants.CHARSET_CP850);
-			} else if (charSet.equals(Globals.DEFAULT_ENCODING)) {
-				converted = str.getBytes(Globals.DEFAULT_ENCODING);
-			} else {
-				converted = str.getBytes();
+			switch (charSet) {
+				case ZipConstants.CHARSET_CP850:
+					converted = str.getBytes(ZipConstants.CHARSET_CP850);
+					break;
+				case Globals.DEFAULT_ENCODING:
+					converted = str.getBytes(Globals.DEFAULT_ENCODING);
+					break;
+				default:
+					converted = str.getBytes();
+					break;
 			}
 			return converted;
 		} catch (UnsupportedEncodingException err) {
@@ -133,11 +136,7 @@ public final class StringUtils {
 	}
 	
 	public static boolean isNotNullAndNotEmpty(String str) {
-		if (str == null || str.trim().length() <= 0) {
-			return false;
-		}
-		
-		return true;
+		return str != null && str.trim().length() > 0;
 	}
 	
 	/**
@@ -147,7 +146,7 @@ public final class StringUtils {
 	 */
 	public static String base64Encode(byte[] bytes) {
 		int length = bytes.length;
-		byte[] tempBytes = null;
+		byte[] tempBytes;
 		if (length % 3 == 0) {
 			tempBytes = bytes;
 		} else {
@@ -246,22 +245,26 @@ public final class StringUtils {
 			throw new ZipException("encoding is not defined, cannot calculate string length");
 		}
 		
-		ByteBuffer byteBuffer = null;
+		ByteBuffer byteBuffer;
 		
 		try {
-			if (charset.equals(ZipConstants.CHARSET_CP850)) {
-				byteBuffer = ByteBuffer.wrap(str.getBytes(ZipConstants.CHARSET_CP850));
-			} else if (charset.equals(Globals.DEFAULT_ENCODING)) {
-				byteBuffer = ByteBuffer.wrap(str.getBytes(Globals.DEFAULT_ENCODING));
-			} else {
-				byteBuffer = ByteBuffer.wrap(str.getBytes(charset));
+			switch (charset) {
+				case ZipConstants.CHARSET_CP850:
+					byteBuffer = ByteBuffer.wrap(str.getBytes(ZipConstants.CHARSET_CP850));
+					break;
+				case Globals.DEFAULT_ENCODING:
+					byteBuffer = ByteBuffer.wrap(str.getBytes(Globals.DEFAULT_ENCODING));
+					break;
+				default:
+					byteBuffer = ByteBuffer.wrap(str.getBytes(charset));
+					break;
 			}
 		} catch (UnsupportedEncodingException e) {
 			byteBuffer = ByteBuffer.wrap(str.getBytes());
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}
-		
+
 		return byteBuffer.limit();
 	}
 
@@ -292,8 +295,6 @@ public final class StringUtils {
 			}
 			
 			return Globals.DEFAULT_SYSTEM_CHARSET;
-		} catch (UnsupportedEncodingException e) {
-			return Globals.DEFAULT_SYSTEM_CHARSET;
 		} catch (Exception e) {
 			return Globals.DEFAULT_SYSTEM_CHARSET;
 		}
@@ -318,7 +319,7 @@ public final class StringUtils {
 		HuffmanTree huffmanTree = new HuffmanTree();
 		
 		String temp = content;
-		List<String> checkedStrings = new ArrayList<String>();
+		List<String> checkedStrings = new ArrayList<>();
 		
 		while (temp.length() > 0) {
 			String keyword = temp.substring(0, 1);
@@ -343,7 +344,7 @@ public final class StringUtils {
 	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
 	 * <pre>
 	 * StringUtils.hasLength(null) = false
-	 * StringUtils.hasLength("") = false
+	 * StringUtils.hasLength(Globals.DEFAULT_VALUE_STRING) = false
 	 * StringUtils.hasLength(" ") = true
 	 * StringUtils.hasLength("Hello") = true
 	 * </pre>
@@ -356,23 +357,12 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Check that the given String is neither <code>null</code> nor of length 0.
-	 * Note: Will return <code>true</code> for a String that purely consists of whitespace.
-	 * @param str the String to check (may be <code>null</code>)
-	 * @return <code>true</code> if the String is not null and has length
-	 * @see #hasLength(CharSequence)
-	 */
-	public static boolean hasLength(String str) {
-		return hasLength((CharSequence) str);
-	}
-
-	/**
 	 * Check whether the given CharSequence has actual text.
 	 * More specifically, returns <code>true</code> if the string not <code>null</code>,
 	 * its length is greater than 0, and it contains at least one non-whitespace character.
 	 * <pre>
 	 * StringUtils.hasText(null) = false
-	 * StringUtils.hasText("") = false
+	 * StringUtils.hasText(Globals.DEFAULT_VALUE_STRING) = false
 	 * StringUtils.hasText(" ") = false
 	 * StringUtils.hasText("12345") = true
 	 * StringUtils.hasText(" 12345 ") = true
@@ -449,7 +439,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		while (buf.length() > 0 && Character.isWhitespace(buf.charAt(0))) {
 			buf.deleteCharAt(0);
 		}
@@ -470,7 +460,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		int index = 0;
 		while (buf.length() > index) {
 			if (Character.isWhitespace(buf.charAt(index))) {
@@ -493,7 +483,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		while (buf.length() > 0 && Character.isWhitespace(buf.charAt(0))) {
 			buf.deleteCharAt(0);
 		}
@@ -510,7 +500,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		while (buf.length() > 0 && Character.isWhitespace(buf.charAt(buf.length() - 1))) {
 			buf.deleteCharAt(buf.length() - 1);
 		}
@@ -527,7 +517,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		while (buf.length() > 0 && buf.charAt(0) == leadingCharacter) {
 			buf.deleteCharAt(0);
 		}
@@ -544,7 +534,7 @@ public final class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str);
+		StringBuilder buf = new StringBuilder(str);
 		while (buf.length() > 0 && buf.charAt(buf.length() - 1) == trailingCharacter) {
 			buf.deleteCharAt(buf.length() - 1);
 		}
@@ -602,7 +592,7 @@ public final class StringUtils {
 	/**
 	 * Test whether the given string matches the given substring
 	 * at the given index.
-	 * @param str the original string (or StringBuffer)
+	 * @param str the original string (or StringBuilder)
 	 * @param index the index in the original string to start matching against
 	 * @param substring the substring to match at the given index
 	 * @return check result
@@ -627,7 +617,7 @@ public final class StringUtils {
 		if (str == null || sub == null || str.length() == 0 || sub.length() == 0) {
 			return 0;
 		}
-		int count = 0, pos = 0, idx = 0;
+		int count = 0, pos = 0, idx;
 		while ((idx = str.indexOf(sub, pos)) != -1) {
 			++count;
 			pos = idx + sub.length();
@@ -651,14 +641,14 @@ public final class StringUtils {
 			return inString;
 		}
 
-		StringBuffer sbuf = new StringBuffer();
-		// output StringBuffer we'll build up
+		StringBuilder sbuf = new StringBuilder();
+		// output StringBuilder we'll build up
 		int pos = 0; // our position in the old string
 		int index = inString.indexOf(oldPattern);
 		// the index of an occurrence we've found, or -1
 		int patLen = oldPattern.length();
 		while (index >= 0) {
-			sbuf.append(inString.substring(pos, index));
+			sbuf.append(inString, pos, index);
 			sbuf.append(newPattern);
 			pos = index + patLen;
 			index = inString.indexOf(oldPattern, pos);
@@ -676,7 +666,7 @@ public final class StringUtils {
 	 * @return the resulting String
 	 */
 	public static String delete(String inString, String pattern) {
-		return replace(inString, pattern, "");
+		return replace(inString, pattern, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
@@ -690,7 +680,7 @@ public final class StringUtils {
 		if (!hasLength(inString) || !hasLength(charsToDelete)) {
 			return inString;
 		}
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for (int i = 0; i < inString.length(); i++) {
 			char c = inString.charAt(i);
 			if (charsToDelete.indexOf(c) == -1) {
@@ -851,30 +841,27 @@ public final class StringUtils {
 		// "file:core/../core/io/Resource.class", where the ".." should just
 		// strip the first "core" directory while keeping the "file:" prefix.
 		int prefixIndex = pathToUse.indexOf(":");
-		String prefix = "";
+		String prefix = Globals.DEFAULT_VALUE_STRING;
 		if (prefixIndex != -1) {
 			prefix = pathToUse.substring(0, prefixIndex + 1);
 			pathToUse = pathToUse.substring(prefixIndex + 1);
 		}
 
 		String[] pathArray = delimitedListToStringArray(pathToUse, FOLDER_SEPARATOR);
-		List<String> pathElements = new LinkedList<String>();
+		List<String> pathElements = new LinkedList<>();
 		int tops = 0;
 
 		for (int i = pathArray.length - 1; i >= 0; i--) {
 			if (CURRENT_PATH.equals(pathArray[i])) {
 				// Points to current directory - drop it.
-			}
-			else if (TOP_PATH.equals(pathArray[i])) {
+			} else if (TOP_PATH.equals(pathArray[i])) {
 				// Registering top path found.
 				tops++;
-			}
-			else {
+			} else {
 				if (tops > 0) {
 					// Merging path element with corresponding to top path.
 					tops--;
-				}
-				else {
+				} else {
 					// Normal path element found.
 					pathElements.add(0, pathArray[i]);
 				}
@@ -917,9 +904,9 @@ public final class StringUtils {
 			return null;
 		}
 		
-		String language = (parts.length > 0 ? parts[0] : "");
-		String country = (parts.length > 1 ? parts[1] : "");
-		String variant = "";
+		String language = (parts.length > 0 ? parts[0] : Globals.DEFAULT_VALUE_STRING);
+		String country = (parts.length > 1 ? parts[1] : Globals.DEFAULT_VALUE_STRING);
+		String variant = Globals.DEFAULT_VALUE_STRING;
 		if (parts.length >= 2) {
 			// There is definitely a variant, and it is everything after the country
 			// code sans the separator between the country code and the variant.
@@ -992,10 +979,8 @@ public final class StringUtils {
 		if (ObjectUtils.isEmpty(array2)) {
 			return array1;
 		}
-		List<String> result = new ArrayList<String>();
-		result.addAll(Arrays.asList(array1));
-		for (int i = 0; i < array2.length; i++) {
-			String str = array2[i];
+		List<String> result = new ArrayList<>(Arrays.asList(array1));
+		for (String str : array2) {
 			if (!result.contains(str)) {
 				result.add(str);
 			}
@@ -1025,9 +1010,9 @@ public final class StringUtils {
 	 */
 	public static String[] toStringArray(Collection<String> collection) {
 		if (collection == null) {
-			return null;
+			return new String[0];
 		}
-		return (String[]) collection.toArray(new String[collection.size()]);
+		return collection.toArray(new String[0]);
 	}
 
 	/**
@@ -1039,10 +1024,10 @@ public final class StringUtils {
 	 */
 	public static String[] toStringArray(Enumeration<String> enumeration) {
 		if (enumeration == null) {
-			return null;
+			return new String[0];
 		}
 		List<String> list = Collections.list(enumeration);
-		return (String[]) list.toArray(new String[list.size()]);
+		return list.toArray(new String[0]);
 	}
 
 	/**
@@ -1073,10 +1058,8 @@ public final class StringUtils {
 		if (ObjectUtils.isEmpty(array)) {
 			return array;
 		}
-		Set<String> set = new TreeSet<String>();
-		for (int i = 0; i < array.length; i++) {
-			set.add(array[i]);
-		}
+		Set<String> set = new TreeSet<>();
+		Collections.addAll(set, array);
 		return toStringArray(set);
 	}
 
@@ -1138,10 +1121,10 @@ public final class StringUtils {
 			return null;
 		}
 		Properties result = new Properties();
-		for (int i = 0; i < array.length; i++) {
-			String element = array[i];
+		for (String string : array) {
+			String element = string;
 			if (charsToDelete != null) {
-				element = deleteAny(array[i], charsToDelete);
+				element = deleteAny(string, charsToDelete);
 			}
 			String[] splittedElement = split(element, delimiter);
 			if (splittedElement == null) {
@@ -1197,7 +1180,7 @@ public final class StringUtils {
 			return null;
 		}
 		StringTokenizer st = new StringTokenizer(str, delimiters);
-		List<String> tokens = new ArrayList<String>();
+		List<String> tokens = new ArrayList<>();
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
 			if (trimTokens) {
@@ -1245,15 +1228,15 @@ public final class StringUtils {
 		if (delimiter == null) {
 			return new String[] {str};
 		}
-		List<String> result = new ArrayList<String>();
-		if ("".equals(delimiter)) {
+		List<String> result = new ArrayList<>();
+		if (Globals.DEFAULT_VALUE_STRING.equals(delimiter)) {
 			for (int i = 0; i < str.length(); i++) {
 				result.add(deleteAny(str.substring(i, i + 1), charsToDelete));
 			}
 		}
 		else {
 			int pos = 0;
-			int delPos = 0;
+			int delPos;
 			while ((delPos = str.indexOf(delimiter, pos)) != -1) {
 				result.add(deleteAny(str.substring(pos, delPos), charsToDelete));
 				pos = delPos + delimiter.length();
@@ -1282,11 +1265,9 @@ public final class StringUtils {
 	 * @return a Set of String entries in the list
 	 */
 	public static Set<String> commaDelimitedListToSet(String str) {
-		Set<String> set = new TreeSet<String>();
+		Set<String> set = new TreeSet<>();
 		String[] tokens = commaDelimitedListToStringArray(str);
-		for (int i = 0; i < tokens.length; i++) {
-			set.add(tokens[i]);
-		}
+		Collections.addAll(set, tokens);
 		return set;
 	}
 
@@ -1302,9 +1283,9 @@ public final class StringUtils {
 	public static String collectionToDelimitedString(Collection<String> coll, 
 			String delim, String prefix, String suffix) {
 		if (CollectionUtils.isEmpty(coll)) {
-			return "";
+			return Globals.DEFAULT_VALUE_STRING;
 		}
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		Iterator<String> it = coll.iterator();
 		while (it.hasNext()) {
 			sb.append(prefix).append(it.next()).append(suffix);
@@ -1323,7 +1304,7 @@ public final class StringUtils {
 	 * @return the delimited String
 	 */
 	public static String collectionToDelimitedString(Collection<String> coll, String delim) {
-		return collectionToDelimitedString(coll, delim, "", "");
+		return collectionToDelimitedString(coll, delim, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
@@ -1361,9 +1342,9 @@ public final class StringUtils {
 	 */
 	public static String arrayToDelimitedString(Object[] arr, String delim) {
 		if (ObjectUtils.isEmpty(arr)) {
-			return "";
+			return Globals.DEFAULT_VALUE_STRING;
 		}
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < arr.length; i++) {
 			if (i > 0) {
 				sb.append(delim);
@@ -1401,7 +1382,7 @@ public final class StringUtils {
 	 * @return			JSON string
 	 */
 	public static String convertObjectToJSONString(Object object) {
-		TreeMap<String, Object> valueMap = new TreeMap<String, Object>();
+		TreeMap<String, Object> valueMap = new TreeMap<>();
 		if (object instanceof Map || object.getClass().isArray() 
 				|| Collection.class.isAssignableFrom(object.getClass())) {
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -1419,7 +1400,7 @@ public final class StringUtils {
 					continue;
 				}
 				Object fieldValue = ReflectionUtils.getFieldValue(field, object);
-				Object mapValue = null;
+				Object mapValue;
 				if (fieldValue instanceof byte[]) {
 					mapValue = StringUtils.base64Encode((byte[])fieldValue);
 				} else {
@@ -1470,15 +1451,8 @@ public final class StringUtils {
 	public static <T> List<T> convertJSONStringToList(String jsonData, Class<T> clazz) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, String.class);
-			List<String> dataList = objectMapper.readValue(jsonData, javaType);
-			
-			List<T> returnList = new ArrayList<T>();
-			for (String itemData : dataList) {
-				returnList.add(StringUtils.convertJSONStringToObject(itemData, clazz));
-			}
-			
-			return returnList;
+			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
+			return objectMapper.readValue(jsonData, javaType);
 		} catch (Exception e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
 				StringUtils.LOGGER.debug("Convert json string to object bean error! ", e);
@@ -1504,7 +1478,7 @@ public final class StringUtils {
 			}
 		}
 		
-		return new HashMap<String, Object>();
+		return new HashMap<>();
 	}
 	
 	/**
@@ -1514,17 +1488,16 @@ public final class StringUtils {
 	 * @throws UnsupportedEncodingException If the named charset is not supported
 	 */
 	public static int isASCII(String s) throws UnsupportedEncodingException {
-		byte[] testString = s.getBytes("UTF-8");
+		byte[] testString = s.getBytes(Globals.DEFAULT_ENCODING);
 		
-		if (testString == null || testString.length > 3 || testString.length <= 0) {
+		if (testString.length > 3 || testString.length <= 0) {
 			return 0;
 		} else if (testString.length == 1) {
 			return testString[0];
 		} else if (testString.length == 3) {
 			int hightByte = 256 + testString[0];
 			int lowByte = 256 + testString[1];
-			int ascii = (256 * hightByte + lowByte) - 256 * 256;
-			return ascii;
+			return (256 * hightByte + lowByte) - 256 * 256;
 		}
 		return 0;
 	}
@@ -1538,9 +1511,9 @@ public final class StringUtils {
 		if (sourceString == null) {
 			return null;
 		}
-		int strLen = 0;
-		StringBuffer reString = new StringBuffer();
-		String deString = "";
+		int strLen;
+		StringBuilder reString = new StringBuilder();
+		String deString;
 		strLen = sourceString.length();
 		
 		for (int i = 0 ; i < strLen ; i++) {
@@ -1559,10 +1532,10 @@ public final class StringUtils {
 				deString = "&amp;";
 				break;
 			case 13:
-				deString = "";
+				deString = Globals.DEFAULT_VALUE_STRING;
 				break;
 				default:
-					deString = "" + ch;
+					deString = Globals.DEFAULT_VALUE_STRING + ch;
 			}
 			reString.append(deString);
 		}
@@ -1599,42 +1572,40 @@ public final class StringUtils {
 	 * @return	replaced string
 	 */
 	public static String TextToJSON (String sourceString) {
-		int strLen = 0;
-		StringBuffer reString = new StringBuffer();
-		String deString = "";
+		int strLen;
+		StringBuilder reString = new StringBuilder();
 		strLen = sourceString.length();
 		
 		for (int i = 0 ; i < strLen ; i++) {
 			char ch = sourceString.charAt(i);
 			switch (ch) {
 			case '<':
-				deString = "&lt;";
+				reString.append("&lt;");
 				break;
 			case '>':
-				deString = "&gt;";
+				reString.append("&gt;");
 				break;
 			case '\"':
-				deString = "&quot;";
+				reString.append("&quot;");
 				break;
 			case '&':
-				deString = "&amp;";
+				reString.append("&amp;");
 				break;
 			case '\'':
-				deString = "&#39;";
+				reString.append("&#39;");
 				break;
 			case '\\':
-				deString = "\\\\";
+				reString.append("\\\\");
 				break;
 			case '\n':
-				deString = "\\n";
+				reString.append("\\n");
 				break;
 			case '\r':
-				deString = "\\r";
+				reString.append("\\r");
 				break;
 				default:
-					deString = "" + ch;
+					reString.append(Globals.DEFAULT_VALUE_STRING).append(ch);
 			}
-			reString.append(deString);
 		}
 		return reString.toString();
 	}
@@ -1645,42 +1616,40 @@ public final class StringUtils {
 	 * @return	replaced string
 	 */
 	public static String TextToHtml (String sourceString) {
-		int strLen = 0;
-		StringBuffer reString = new StringBuffer();
-		String deString = "";
+		int strLen;
+		StringBuilder reString = new StringBuilder();
 		strLen = sourceString.length();
 		
 		for (int i = 0 ; i < strLen ; i++) {
 			char ch = sourceString.charAt(i);
 			switch (ch) {
 			case '<':
-				deString = "&lt;";
+				reString.append("&lt;");
 				break;
 			case '>':
-				deString = "&gt;";
+				reString.append("&gt;");
 				break;
 			case '\"':
-				deString = "&quot;";
+				reString.append("&quot;");
 				break;
 			case '&':
-				deString = "&amp;";
+				reString.append("&amp;");
 				break;
 			case '\'':
-				deString = "&#39;";
+				reString.append("&#39;");
 				break;
 			case '\\':
-				deString = "\\\\";
+				reString.append("\\\\");
 				break;
 			case '\n':
-				deString = "\\n";
+				reString.append("\\n");
 				break;
 			case '\r':
-				deString = "<br/>";
+				reString.append("<br/>");
 				break;
 				default:
-					deString = "" + ch;
+					reString.append(Globals.DEFAULT_VALUE_STRING).append(ch);
 			}
-			reString.append(deString);
 		}
 		return reString.toString();
 	}
@@ -1693,10 +1662,10 @@ public final class StringUtils {
 	 * @return			Locale message key
 	 */
 	public static String messageKey(Locale locale, String key) {
-		StringBuffer messageKey = new StringBuffer();
+		StringBuilder messageKey = new StringBuilder();
 		String localeKey = localeKey(locale);
 		if (localeKey.length() > 0) {
-			messageKey.append(localeKey(locale) + ".");
+			messageKey.append(localeKey(locale)).append(".");
 		}
 		messageKey.append(key);
 		
@@ -1716,13 +1685,13 @@ public final class StringUtils {
 	
 	/**
 	 * Convert <code>Locale</code> to <code>String</code>
-	 * 		use toString() method. If locale is null, return ""
+	 * 		use toString() method. If locale is null, return Globals.DEFAULT_VALUE_STRING
 	 * 
 	 * @param locale	Locale instance
 	 * @return	Locale key
 	 */
 	public static String localeKey(Locale locale) {
-		return locale == null ? "" : locale.toString();
+		return locale == null ? Globals.DEFAULT_VALUE_STRING : locale.toString();
 	}
 	
 	/**
@@ -1752,14 +1721,15 @@ public final class StringUtils {
 		
 		String matchesString = template;
 		Matcher matcher = Pattern.compile(regex).matcher(str);
-		matcher.find();
-		
-		for (int i = 0 ; i < matcher.groupCount() ; i++) {
-			int index = i + 1;
-			matchesString = replace(matchesString, "$" + index, matcher.group(index));
+		if (matcher.find()) {
+			for (int i = 0 ; i < matcher.groupCount() ; i++) {
+				int index = i + 1;
+				matchesString = replace(matchesString, "$" + index, matcher.group(index));
+			}
+
+			return matchesString;
 		}
-		
-		return matchesString;
+		return str;
 	}
 
 	/**
@@ -1768,7 +1738,7 @@ public final class StringUtils {
 	 * @return	Random generate string
 	 */
 	public static String randomString(int length) {
-		StringBuffer generateKey = new StringBuffer();
+		StringBuilder generateKey = new StringBuilder();
 		Random random = new Random();
 		for (int i = 0 ; i < length ; i++) {
 			generateKey.append(AUTHCODEITEMS.charAt(random.nextInt(AUTHCODEITEMS.length())));
@@ -1782,7 +1752,7 @@ public final class StringUtils {
 	 * @return	Random generate number string
 	 */
 	public static String randomNumber(int length) {
-		StringBuffer generateKey = new StringBuffer();
+		StringBuilder generateKey = new StringBuilder();
 		for (int i = 0 ; i < length ; i++) {
 			generateKey.append((char)(Math.random() * 10 + '0'));
 		}
@@ -1805,25 +1775,25 @@ public final class StringUtils {
 	public static String escape(String str) {
 		int length;
 		char ch;
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder StringBuilder = new StringBuilder();
 		
-		stringBuffer.ensureCapacity(str.length() * 6);
+		StringBuilder.ensureCapacity(str.length() * 6);
 		
 		for (length = 0; length < str.length(); length++) {
 			ch = str.charAt(length);
 
 			if (Character.isDigit(ch) || Character.isLowerCase(ch) || Character.isUpperCase(ch)) {
-				stringBuffer.append(ch);
+				StringBuilder.append(ch);
 			} else if (length < 256) {
-				stringBuffer.append("%");
-				stringBuffer.append(Integer.toString(ch, 16));
+				StringBuilder.append("%");
+				StringBuilder.append(Integer.toString(ch, 16));
 			} else {
-				stringBuffer.append("%u");
-				stringBuffer.append(Integer.toString(ch, 16));
+				StringBuilder.append("%u");
+				StringBuilder.append(Integer.toString(ch, 16));
 			}
 		}
 		
-		return stringBuffer.toString();
+		return StringBuilder.toString();
 	}
 	
 	/**
@@ -1833,36 +1803,36 @@ public final class StringUtils {
 	 */
 	public static String unescape(String str) {
 		if (str == null) {
-			str = "";
+			str = Globals.DEFAULT_VALUE_STRING;
 		}
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.ensureCapacity(str.length());
+		StringBuilder StringBuilder = new StringBuilder();
+		StringBuilder.ensureCapacity(str.length());
 		int lastIndex = 0;
-		int index = 0;
+		int index;
 		char ch;
 		while (lastIndex < str.length()) {
 			index = str.indexOf("%", lastIndex);
 			if (index == lastIndex)	{
 				if (str.charAt(index + 1)=='u')	{
 					ch = (char)Integer.parseInt(str.substring(index + 2, index + 6), 16);
-					stringBuffer.append(ch);
+					StringBuilder.append(ch);
 					lastIndex = index + 6;
 				} else {
 					ch = (char)Integer.parseInt(str.substring(index + 1, index + 3), 16);
-					stringBuffer.append(ch);
+					StringBuilder.append(ch);
 					lastIndex = index + 3;
 				}
 			} else {
 				if (index == -1) {
-					stringBuffer.append(str.substring(lastIndex));
+					StringBuilder.append(str.substring(lastIndex));
 					lastIndex = str.length();
 				} else {
-					stringBuffer.append(str.substring(lastIndex,index));
+					StringBuilder.append(str, lastIndex, index);
 					lastIndex = index;
 				}
 			}
 		}
-		return stringBuffer.toString();
+		return StringBuilder.toString();
 	}
 	
 	/**
@@ -1879,24 +1849,24 @@ public final class StringUtils {
 	 * @return			First spell pinyin string
 	 */
 	public static String converterToFirstSpell(String chines) {
-		String pinyinName = "";
 		char[] nameChar = chines.toCharArray();
 		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
 		defaultFormat.setCaseType(HanyuPinyinCaseType.UPPERCASE);
 		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-		for (int i = 0; i < nameChar.length; i++) {
-			if (nameChar[i] > 128) {
+		StringBuilder pinyinName = new StringBuilder();
+		for (char ch : nameChar) {
+			if (ch > 128) {
 				try {
-					pinyinName += PinyinHelper.toHanyuPinyinStringArray(
-							nameChar[i], defaultFormat)[0].charAt(0);
+					pinyinName.append(PinyinHelper.toHanyuPinyinStringArray(
+							ch, defaultFormat)[0].charAt(0));
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
 			} else {
-				pinyinName += nameChar[i];
+				pinyinName.append(ch);
 			}
 		}
-		return pinyinName;
+		return pinyinName.toString();
 	}
 
 	/**
@@ -1905,24 +1875,24 @@ public final class StringUtils {
 	 * @return Pinyin string
 	 */
 	public static String converterToSpell(String chinese) {
-		String pinyinName = "";
 		char[] nameChar = chinese.toCharArray();
 		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
 		defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
 		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-		for (int i = 0; i < nameChar.length; i++) {
-			if (nameChar[i] > 128) {
+		StringBuilder pinyinName = new StringBuilder();
+		for (char ch : nameChar) {
+			if (ch > 128) {
 				try {
-					pinyinName += PinyinHelper.toHanyuPinyinStringArray(
-							nameChar[i], defaultFormat)[0];
+					pinyinName.append(PinyinHelper.toHanyuPinyinStringArray(
+							ch, defaultFormat)[0]);
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
 			} else {
-				pinyinName += nameChar[i];
+				pinyinName.append(ch);
 			}
 		}
-		return pinyinName.trim();
+		return pinyinName.toString().trim();
 	}
 	
 	/**
@@ -1935,14 +1905,8 @@ public final class StringUtils {
 			return content;
 		}
 		
-		byte[] zippedByteArray = null;
-		
-		try {
-			zippedByteArray = ConvertUtils.zipByteArray(content.getBytes());
-		} catch (IOException e) {
-			return content;
-		}
-		
+		byte[] zippedByteArray = ConvertUtils.zipByteArray(content.getBytes());
+
 		if (zippedByteArray.length >= content.getBytes().length) {
 			return content;
 		} else {
@@ -1952,22 +1916,7 @@ public final class StringUtils {
 			}
 		}
 
-		int length = zippedByteArray.length;
-		StringBuffer stringBuffer = new StringBuffer(length * 2);
-		for(int i = 0 ; i < length ; i++) {
-			int intTmp = zippedByteArray[i];
-			
-			while (intTmp < 0) {
-				intTmp = intTmp + 256;
-			}
-			
-			if (intTmp < 16) {
-				stringBuffer.append("0");
-			}
-			
-			stringBuffer.append(Integer.toString(intTmp, 16));
-		}
-		return stringBuffer.toString();
+		return ConvertUtils.byteArrayToHexString(zippedByteArray);
 	}
 
 	/**
@@ -1998,12 +1947,8 @@ public final class StringUtils {
 	 * @return	check result
 	 */
 	public static boolean isSpace(char letter) {
-		if (letter == 8 || letter == 9 || letter == 10 || 
-				letter == 13 || letter == 32 || letter == 160) {
-			return true;
-		} else {
-			return false;
-		}
+		return (letter == 8 || letter == 9 || letter == 10 ||
+				letter == 13 || letter == 32 || letter == 160);
 	}
 	
 	/**
@@ -2012,11 +1957,7 @@ public final class StringUtils {
 	 * @return	check result
 	 */
 	public static boolean isEnglish(char letter) {
-		if ((letter > 'a' && letter < 'z') || (letter > 'A' && letter < 'Z')) {
-			return true;
-		} else {
-			return false;
-		}
+		return (letter > 'a' && letter < 'z') || (letter > 'A' && letter < 'Z');
 	}
 	
 	/**
@@ -2025,11 +1966,7 @@ public final class StringUtils {
 	 * @return	check result
 	 */
 	public static boolean isNumber(char letter) {
-		if (letter >= '0' && letter <= '9') {
-			return true;
-		} else {
-			return false;
-		}
+		return letter >= '0' && letter <= '9';
 	}
 	
 	/**
@@ -2039,8 +1976,8 @@ public final class StringUtils {
 	 */
 	public static boolean isCJK(char character) {
 		UnicodeBlock unicodeBlock = UnicodeBlock.of(character);
-		
-		if (unicodeBlock == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+
+		return (unicodeBlock == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
 				|| unicodeBlock == UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
 				|| unicodeBlock == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
 				|| unicodeBlock == UnicodeBlock.GENERAL_PUNCTUATION
@@ -2048,17 +1985,13 @@ public final class StringUtils {
 				//全角数字字符和日韩字符
 				|| unicodeBlock == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
 				//韩文字符集
-				|| unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES 
+				|| unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES
 				|| unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO
 				|| unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO
 				//日文字符集
 				|| unicodeBlock == Character.UnicodeBlock.HIRAGANA //平假名
 				|| unicodeBlock == Character.UnicodeBlock.KATAKANA //片假名
-				|| unicodeBlock == Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS) {
-			return true;
-		} else {
-			return false;
-		}
+				|| unicodeBlock == Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS);
 	}
 	
 	/**
@@ -2107,7 +2040,7 @@ public final class StringUtils {
 	public static Object parseSimpleData(String dataValue, Class<?> typeClass) throws ParseException {
 		Object paramObj = null;
 		if (dataValue == null || typeClass == null || Globals.DEFAULT_VALUE_STRING.equals(dataValue)) {
-			return paramObj;
+			return null;
 		}
 		
 		if (BaseElement.class.isAssignableFrom(typeClass)) {
@@ -2120,7 +2053,7 @@ public final class StringUtils {
 				paramObj = StringUtils.formatForText(dataValue);
 				break;
 			case BOOLEAN:
-				paramObj = new Boolean(dataValue);
+				paramObj = Boolean.valueOf(dataValue);
 				break;
 			case DATE:
 				paramObj = DateTimeUtils.parseSitemapDate(dataValue);
@@ -2152,7 +2085,7 @@ public final class StringUtils {
 				paramObj = StringUtils.formatForText(dataValue).toCharArray();
 				break;
 			case BINARY:
-				dataValue = StringUtils.replace(dataValue, " ", "");
+				dataValue = StringUtils.replace(dataValue, " ", Globals.DEFAULT_VALUE_STRING);
 				paramObj = StringUtils.base64Decode(dataValue);
 				break;
 				default:
@@ -2266,7 +2199,7 @@ public final class StringUtils {
 		if (str == null || str.length() == 0) {
 			return str;
 		}
-		StringBuffer buf = new StringBuffer(str.length());
+		StringBuilder buf = new StringBuilder(str.length());
 		if (capitalize) {
 			buf.append(Character.toUpperCase(str.charAt(0)));
 		}

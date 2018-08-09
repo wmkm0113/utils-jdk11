@@ -28,16 +28,17 @@ import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**
+ * Deflater output stream
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Dec 1, 2017 12:19:07 PM $
  */
 public class DeflaterOutputStream extends CipherOutputStream {
 
-	private Deflater deflater = null;
-	private byte[] buffer = new byte[ZipConstants.BUFFER_SIZE];
+	private final Deflater deflater;
+	private final byte[] buffer = new byte[ZipConstants.BUFFER_SIZE];
 	private boolean firstBytesRead = Globals.DEFAULT_VALUE_BOOLEAN;
 	
-	public DeflaterOutputStream(OutputStream outputStream, ZipFile zipFile) {
+	DeflaterOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		super(outputStream, zipFile);
 		this.deflater = new Deflater();
 	}

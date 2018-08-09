@@ -18,7 +18,7 @@ package com.nervousync.commons.http.proxy;
 
 import java.net.Proxy.Type;
 
-import com.nervousync.commons.core.Globals;;
+import com.nervousync.commons.core.Globals;
 
 /**
  * Proxy server setting
@@ -31,23 +31,23 @@ public final class ProxyInfo {
 	 * Proxy type
 	 * @see java.net.Proxy.Type
 	 */
-	private Type proxyType = null;
+	private final Type proxyType;
 	/**
 	 * Proxy server address
 	 */
-	private String proxyAddress = null;
+	private final String proxyAddress;
 	/**
 	 * Proxy server port
 	 */
-	private int proxyPort = Globals.DEFAULT_VALUE_INT;
+	private final int proxyPort;
 	/**
 	 * Proxy server user name
 	 */
-	private String userName = null;
+	private final String userName;
 	/**
 	 * Proxy server password
 	 */
-	private String password = null;
+	private final String password;
 	
 	/**
 	 * Default constructor
@@ -73,7 +73,7 @@ public final class ProxyInfo {
 	 * @return					Proxy info instance
 	 */
 	public static ProxyInfo newInstance(Type proxyType, String proxyAddress) {
-		int proxyPort = Globals.DEFAULT_VALUE_INT;
+		int proxyPort;
 		switch (proxyType) {
 		case HTTP:
 			proxyPort = 80;

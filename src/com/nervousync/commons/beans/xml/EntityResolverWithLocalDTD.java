@@ -22,7 +22,6 @@ import java.io.InputStream;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Local DTD resolver implement org.xml.sax.EntityResolver
@@ -30,14 +29,14 @@ import org.xml.sax.SAXException;
  * @version $Revision: 1.0 $ $Date: 2009/09/28 14:32:00 $
  */
 public final class EntityResolverWithLocalDTD implements EntityResolver {
-	private String DTDFile = null;
+	private final String DTDFile;
 	
 	public EntityResolverWithLocalDTD(String dtdFile) {
 		this.DTDFile = dtdFile;
 	}
 
 	public InputSource resolveEntity(String publicId, String systemId)
-			throws SAXException, IOException {
+			throws IOException {
 		InputStream inputStream = new FileInputStream(this.DTDFile);
 		InputSource inputSource = new InputSource(inputStream);
 		inputSource.setPublicId(publicId);

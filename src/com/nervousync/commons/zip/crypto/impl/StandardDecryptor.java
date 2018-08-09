@@ -29,8 +29,6 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public class StandardDecryptor implements Decryptor {
 
-	private LocalFileHeader localFileHeader;
-	private byte[] crc = new byte[4];
 	private ZipCryptoEngine zipCryptoEngine;
 	
 	public StandardDecryptor(LocalFileHeader localFileHeader, 
@@ -38,27 +36,27 @@ public class StandardDecryptor implements Decryptor {
 		if (localFileHeader == null) {
 			throw new ZipException("General file header is null!");
 		}
-		
-		this.localFileHeader = localFileHeader;
+
 		this.zipCryptoEngine = new ZipCryptoEngine();
 		
 		byte[] crcBuffer = localFileHeader.getCrcBuffer();
+
+		byte[] crc = new byte[4];
+		crc[3] = (byte)(crcBuffer[3] & 0xFF);
+		crc[2] = (byte)((crcBuffer[3] >> 8) & 0xFF);
+		crc[1] = (byte)((crcBuffer[3] >> 16) & 0xFF);
+		crc[0] = (byte)((crcBuffer[3] >> 24) & 0xFF);
 		
-		this.crc[3] = (byte)(crcBuffer[3] & 0xFF);
-		this.crc[2] = (byte)((crcBuffer[3] >> 8) & 0xFF);
-		this.crc[1] = (byte)((crcBuffer[3] >> 16) & 0xFF);
-		this.crc[0] = (byte)((crcBuffer[3] >> 24) & 0xFF);
-		
-		if (this.crc[2] > 0 || this.crc[1] > 0 || this.crc[0] > 0) {
+		if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0) {
 			throw new IllegalStateException("Invalid CRC in file header");
 		}
 		
-		if (this.localFileHeader.getPassword() == null 
-				|| this.localFileHeader.getPassword().length == 0) {
+		if (localFileHeader.getPassword() == null
+				|| localFileHeader.getPassword().length == 0) {
 			throw new ZipException("Wrong password");
 		}
 		
-		this.zipCryptoEngine.initKeys(this.localFileHeader.getPassword());
+		this.zipCryptoEngine.initKeys(localFileHeader.getPassword());
 		
 		try {
 			int result = decryptorHeader[0];

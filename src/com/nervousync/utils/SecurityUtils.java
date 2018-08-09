@@ -19,7 +19,6 @@ package com.nervousync.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.MappedByteBuffer;
@@ -43,6 +42,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -305,9 +305,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param strIn						String will be decrypted
 	 * @param strKey					Decrypt key
 	 * @return							Decrypted result
-	 * @throws Exception				Any exception of this operate will be throw up
 	 */
-	public static String AES128Decrypt(String strIn, String strKey) throws Exception {
+	public static String AES128Decrypt(String strIn, String strKey) {
 		try {
 			byte[] decryptData = AESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey, 128);
 			return ConvertUtils.convertToString(decryptData);
@@ -324,9 +323,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param strIn						String will be decrypted
 	 * @param strKey					Decrypt key
 	 * @return							Decrypted result
-	 * @throws Exception				Any exception of this operate will be throw up
 	 */
-	public static String AES256Decrypt(String strIn, String strKey) throws Exception {
+	public static String AES256Decrypt(String strIn, String strKey) {
 		try {
 			byte[] decryptData = AESDecrypt(ConvertUtils.hexStrToByteArr(strIn), strKey, 256);
 			return ConvertUtils.convertToString(decryptData);
@@ -342,9 +340,8 @@ public final class SecurityUtils implements Serializable {
 	 * Decrypt string with default decrypt key by AES128
 	 * @param strIn						String will be decrypted
 	 * @return							Decrypted result
-	 * @throws Exception				Any exception of this operate will be throw up
 	 */
-	public static String AES128Decrypt(String strIn) throws Exception {
+	public static String AES128Decrypt(String strIn) {
 		return AES128Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 
@@ -352,9 +349,8 @@ public final class SecurityUtils implements Serializable {
 	 * Decrypt string with default decrypt key by AES128
 	 * @param strIn						String will be decrypted
 	 * @return							Decrypted result
-	 * @throws Exception				Any exception of this operate will be throw up
 	 */
-	public static String AES256Decrypt(String strIn) throws Exception {
+	public static String AES256Decrypt(String strIn) {
 		return AES256Decrypt(strIn, SecurityUtils.PRIVATE_KEY);
 	}
 	
@@ -708,6 +704,26 @@ public final class SecurityUtils implements Serializable {
 	public static byte[] SignDataWithRSA(PrivateKey privateKey, byte[] datas) {
 		return SignData(privateKey, datas, "SHA256withRSA");
 	}
+	
+	/**
+	 * Signature data with HmacSHA1
+	 * @param keyBytes		sign key bytes
+	 * @param signDatas		sign data bytes
+	 * @return				signature datas
+	 */
+	public static byte[] SignDataByHmacSHA1(byte[] keyBytes, byte[] signDatas) {
+		return Hmac(keyBytes, signDatas, "HmacSHA1");
+	}
+	
+	/**
+	 * Signature data with HmacSHA256
+	 * @param keyBytes		sign key bytes
+	 * @param signDatas		sign data bytes
+	 * @return				signature datas
+	 */
+	public static byte[] SignDataByHmacSHA256(byte[] keyBytes, byte[] signDatas) {
+		return Hmac(keyBytes, signDatas, "HmacSHA256");
+	}
 
 	/**
 	 * Verify signature info is valid
@@ -732,6 +748,16 @@ public final class SecurityUtils implements Serializable {
 		
 		//	Generate keyPair
 		return keyPairGenerator.generateKeyPair();
+	}
+	
+	private static byte[] Hmac(byte[] keyBytes, byte[] signDatas, String algorithm) {
+		try {
+			Mac hmac = Mac.getInstance(algorithm);
+			hmac.init(new SecretKeySpec(keyBytes, algorithm));
+			return hmac.doFinal(signDatas);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	private static byte[] SignData(PrivateKey privateKey, byte[] datas, String algorithm) {
@@ -762,29 +788,28 @@ public final class SecurityUtils implements Serializable {
 	
 	/**
 	 * Get digest value
-	 * @param source	Input source
-	 * @param isFile	<code>true</code> Is file <code>false</code> Is String
-	 * @return MD5 value
-	 * @throws ClassCastException
-	 * @throws IOException 
+	 * @param source		Input source
+	 * @param algorithm	Calc algorithm
+	 * @return calc value
 	 */
 	private static String digestEncode(Object source, String algorithm) {
 		if (source == null) {
-			return "";
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 		
-		MessageDigest messageDigest = null;
+		MessageDigest messageDigest;
 		
 		//	Initialize MessageDigest Instance
 		try {
 			messageDigest = MessageDigest.getInstance(algorithm);
 		} catch (NoSuchAlgorithmException ex) {
 			LOGGER.error("Initialize failed, maybe the MessageDigest does not support " + algorithm + "!", ex);
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 
 		if (source instanceof File) {
 			File file = (File)source;
-			if (file != null && file.exists() && file.isFile()) {
+			if (file.exists() && file.isFile()) {
 				FileInputStream fileInputStream = null;
 				FileChannel fileChannel = null;
 				try {
@@ -801,17 +826,8 @@ public final class SecurityUtils implements Serializable {
 					LOGGER.error("Message digest error! ", e);
 					return null;
 				} finally {
-					try {
-						if (fileChannel != null) {
-							fileChannel.close();
-						}
-						
-						if (fileInputStream != null) {
-							fileInputStream.close();
-						}
-					} catch (IOException e) {
-						
-					}
+					IOUtils.closeStream(fileChannel);
+					IOUtils.closeStream(fileInputStream);
 				}
 			} else {
 				LOGGER.error("File does not exists" + file.getAbsolutePath());
@@ -820,7 +836,9 @@ public final class SecurityUtils implements Serializable {
 			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 		} else {
 			byte[] tempBytes = ConvertUtils.convertToByteArray(source);
-			messageDigest.update(tempBytes);
+			if (tempBytes != null) {
+				messageDigest.update(tempBytes);
+			}
 			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 		}
 	}

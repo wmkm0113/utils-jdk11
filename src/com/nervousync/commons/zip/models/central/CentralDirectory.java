@@ -61,7 +61,7 @@ public final class CentralDirectory {
 	}
 	
 	public List<String> listFolderGeneralFileHeaders(String folderPath) {
-		List<String> headerList = new ArrayList<String>();
+		List<String> headerList = new ArrayList<>();
 		GeneralFileHeader folderFileHeader = this.retrieveGeneralFileHeader(folderPath);
 		if (folderFileHeader != null && folderFileHeader.isDirectory()) {
 			for (GeneralFileHeader generalFileHeader : this.fileHeaders) {

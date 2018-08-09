@@ -90,15 +90,15 @@ public final class SystemUtils {
 	static {
 		JAVA_VBERSION = System.getProperty("java.version");
 		// version String should look like "1.4.2_10"
-		if (JAVA_VBERSION.indexOf("1.9.") != -1) {
+		if (JAVA_VBERSION.contains("1.9.")) {
 			MAJOR_VERSION = JAVA_19;
-		} else if (JAVA_VBERSION.indexOf("1.8.") != -1) {
+		} else if (JAVA_VBERSION.contains("1.8.")) {
 			MAJOR_VERSION = JAVA_18;
-		} else if (JAVA_VBERSION.indexOf("1.7.") != -1) {
+		} else if (JAVA_VBERSION.contains("1.7.")) {
 			MAJOR_VERSION = JAVA_17;
-		} else if (JAVA_VBERSION.indexOf("1.6.") != -1) {
+		} else if (JAVA_VBERSION.contains("1.6.")) {
 			MAJOR_VERSION = JAVA_16;
-		} else if (JAVA_VBERSION.indexOf("1.5.") != -1) {
+		} else if (JAVA_VBERSION.contains("1.5.")) {
 			MAJOR_VERSION = JAVA_15;
 		} else {
 			// else leave 1.4 as default (it's either 1.4 or unknown)
@@ -222,7 +222,7 @@ public final class SystemUtils {
 	 * @see #JAVA_18
 	 */
 	public static boolean isAtLeastJava14() {
-		return true;
+		return getMajorVersion() >= JAVA_14;
 	}
 
 	/**
@@ -289,7 +289,7 @@ public final class SystemUtils {
 	private static String generateIdentifiedKey() {
 		try {
 			List<NetworkInfo> networkInfos = retrieveNetworkInfos();
-			List<String> macAddrList = new ArrayList<String>();
+			List<String> macAddrList = new ArrayList<>();
 			
 			for (NetworkInfo networkInfo : networkInfos) {
 				if (!networkInfo.isVirtual() && networkInfo.getMacAddress().length() > 0 
@@ -310,7 +310,7 @@ public final class SystemUtils {
 	}
 	
 	private static List<NetworkInfo> retrieveNetworkInfos() throws SocketException {
-		List<NetworkInfo> networkInfos = new ArrayList<NetworkInfo>();
+		List<NetworkInfo> networkInfos = new ArrayList<>();
 		
 		Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
 		
@@ -322,7 +322,6 @@ public final class SystemUtils {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Retrieve network info error!", e);
 				}
-				continue;
 			}
 		}
 		

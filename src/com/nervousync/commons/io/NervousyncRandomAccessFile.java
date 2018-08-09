@@ -38,7 +38,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	/**
 	 * Operate file path
 	 */
-	private String filePath = null;
+	private final String filePath;
 	/**
 	 * The object of RandomAccessFile/SmbRandomAccessFile
 	 */

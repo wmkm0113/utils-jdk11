@@ -47,7 +47,7 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public int encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (this.finished) {
-			throw new ZipException("AES Encrypter is in finished state (A non 16 byte block has already been passed to encrypter)");
+			throw new ZipException("AES Encryptor is in finished state (A non 16 byte block has already been passed to encryptor)");
 		}
 		
 		if (len % 16 != 0) {
@@ -79,9 +79,9 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 	}
 	
 	/**
-	 * @return the derviedPasswordVerifier
+	 * @return the derivedPasswordVerifier
 	 */
-	public byte[] getDerviedPasswordVerifier() {
-		return derviedPasswordVerifier;
+	public byte[] getDerivedPasswordVerifier() {
+		return derivedPasswordVerifier;
 	}
 }

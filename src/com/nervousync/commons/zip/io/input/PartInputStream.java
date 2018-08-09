@@ -33,17 +33,16 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public class PartInputStream extends InputStream {
 
-	private ZipFile zipFile = null;
-	private NervousyncRandomAccessFile input = null;
-	private long readBytes = Globals.DEFAULT_VALUE_LONG;
-	private long length = Globals.DEFAULT_VALUE_LONG;
-	private Decryptor decryptor = null;
-	private byte[] oneByteBuffer = new byte[1];
-	private byte[] aesBlockBuffer = new byte[ZipConstants.AES_BLOCK_SIZE];
+	private final ZipFile zipFile;
+	private NervousyncRandomAccessFile input;
+	private long readBytes;
+	private final long length;
+	private final Decryptor decryptor;
+	private final byte[] oneByteBuffer = new byte[1];
+	private final byte[] aesBlockBuffer = new byte[ZipConstants.AES_BLOCK_SIZE];
 	private int aesBytesReturned = 0;
-	private boolean isAESEncryptedFile = Globals.DEFAULT_VALUE_BOOLEAN;
-	private int count = Globals.DEFAULT_VALUE_INT;
-	
+	private final boolean isAESEncryptedFile;
+
 	public PartInputStream(ZipFile zipFile, NervousyncRandomAccessFile input, 
 			long length, Decryptor decryptor, boolean isAESEncryptedFile) {
 		this.zipFile = zipFile;
@@ -91,41 +90,42 @@ public class PartInputStream extends InputStream {
 				len -= (len % 16);
 			}
 		}
-		
+
+		int count;
 		synchronized (this.input) {
-			this.count = this.input.read(b, off, len);
-			if ((this.count < len) && this.zipFile.isSplitArchive()) {
+			count = this.input.read(b, off, len);
+			if ((count < len) && this.zipFile.isSplitArchive()) {
 				this.input.close();
 				this.input = this.zipFile.startNextSplitFile();
 				
-				if (this.count < 0) {
-					this.count = 0;
+				if (count < 0) {
+					count = 0;
 				}
 				
-				int readCount = this.input.read(b, this.count, len - this.count);
+				int readCount = this.input.read(b, count, len - count);
 				if (readCount > 0) {
-					this.count += readCount;
+					count += readCount;
 				}
 			}
 		}
 		
-		if (this.count > 0) {
+		if (count > 0) {
 			if (this.decryptor != null) {
 				try {
-					this.decryptor.decryptData(b, off, this.count);
+					this.decryptor.decryptData(b, off, count);
 				} catch (ZipException e) {
 					throw new IOException(e);
 				}
 			}
 			
-			this.readBytes += this.count;
+			this.readBytes += count;
 		}
 		
 		if (this.readBytes >= this.length) {
 			this.checkAndReadAESMacBytes();
 		}
 		
-		return this.count;
+		return count;
 	}
 	
 	public int available() {
@@ -162,7 +162,7 @@ public class PartInputStream extends InputStream {
 	}
 	
 	protected void checkAndReadAESMacBytes() throws IOException {
-		if (this.isAESEncryptedFile && this.decryptor != null 
+		if (this.isAESEncryptedFile
 				&& (this.decryptor instanceof AESDecryptor)) {
 			if (((AESDecryptor)this.decryptor).getStoredMac() != null) {
 				//	Store mac already set
@@ -183,6 +183,10 @@ public class PartInputStream extends InputStream {
 				} else {
 					throw new ZipException("Error occured while reading stored AES authentication bytes");
 				}
+			}
+
+			if (readLength != ZipConstants.AES_AUTH_LENGTH) {
+				throw new ZipException("Error occured while reading stored AES authentication bytes");
 			}
 			
 			((AESDecryptor)this.decryptor).setStoredMac(storedMac);

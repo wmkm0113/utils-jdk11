@@ -26,11 +26,11 @@ public final class SimpleHeader {
 	/**
 	 * Header name
 	 */
-	private String headerName = null;
+	private final String headerName;
 	/**
 	 * Header value
 	 */
-	private String headerValue = null;
+	private final String headerValue;
 	
 	/**
 	 * Default constructor

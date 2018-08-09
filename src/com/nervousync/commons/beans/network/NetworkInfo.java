@@ -27,7 +27,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.beans.network.IPAddressException;
 import com.nervousync.exceptions.beans.network.NetworkInfoException;
 import com.nervousync.utils.StringUtils;
@@ -43,9 +42,7 @@ public final class NetworkInfo implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8060054814830700945L;
-	
-	private transient final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	private static final String REGEX_IPv4 = "((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))";
 	private static final String REGEX_IPv6 = "^\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))" 
 			+ "|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))" 
@@ -59,11 +56,11 @@ public final class NetworkInfo implements Serializable {
 	/**
 	 * Is virtual adapter
 	 */
-	private boolean virtual = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean virtual;
 	/**
 	 * Interface display name in system
 	 */
-	private String displayName = null;
+	private String displayName;
 	/**
 	 * Interface adapter physical address
 	 */
@@ -71,7 +68,7 @@ public final class NetworkInfo implements Serializable {
 	/**
 	 * IP address list of interface configured
 	 */
-	private List<IPAddrInfo> ipAddrInfos = new ArrayList<IPAddrInfo>();
+	private final List<IPAddrInfo> ipAddrInfos = new ArrayList<>();
 	
 	/**
 	 * Constructor for NetworkInfo
@@ -82,21 +79,27 @@ public final class NetworkInfo implements Serializable {
 		if (networkInterface == null) {
 			throw new NetworkInfoException("NetworkInterface is null");
 		}
+		Logger logger = LoggerFactory.getLogger(this.getClass());
 		try {
 			if (networkInterface.isUp() && !networkInterface.isVirtual()) {
 				byte[] macAddr = networkInterface.getHardwareAddress();
 				if (macAddr != null && macAddr.length > 0) {
+					StringBuilder stringBuilder = new StringBuilder();
 					for (byte mac : macAddr) {
+						stringBuilder.append(":");
 						String addr = Integer.toHexString(mac & 0xFF);
 						if (addr.length() == 1) {
 							addr = "0" + addr;
 						}
-						this.macAddress += (addr.toUpperCase() + ":");
+						stringBuilder.append(addr.toUpperCase());
 					}
-					this.macAddress = this.macAddress.substring(0, this.macAddress.length() - 1);
+					this.macAddress = stringBuilder.substring(1);
 				}
 			}
 		} catch (SocketException e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Retrieve network info error! ", e);
+			}
 			throw new NetworkInfoException("Retrieve network info error! ", e);
 		}
 
@@ -110,10 +113,9 @@ public final class NetworkInfo implements Serializable {
 				IPAddrInfo ipAddrInfo = new IPAddrInfo(enumeration.nextElement());
 				this.ipAddrInfos.add(ipAddrInfo);
 			} catch (IPAddressException e) {
-				if (this.logger.isDebugEnabled()) {
-					this.logger.debug("Read IP Address Info Error! ", e);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Read IP Address Info Error! ", e);
 				}
-				continue;
 			}
 		}
 	}
@@ -150,7 +152,7 @@ public final class NetworkInfo implements Serializable {
 	 * @return the IPv4 address list
 	 */
 	public List<IPAddrInfo> getIPv4AddrInfos() {
-		List<IPAddrInfo> addrInfos = new ArrayList<IPAddrInfo>();
+		List<IPAddrInfo> addrInfos = new ArrayList<>();
 		for (IPAddrInfo ipAddrInfo : this.ipAddrInfos) {
 			if (NetworkInfo.isIPv4Address(ipAddrInfo.getIpAddress())) {
 				addrInfos.add(ipAddrInfo);
@@ -163,7 +165,7 @@ public final class NetworkInfo implements Serializable {
 	 * @return the IPv6 address list
 	 */
 	public List<IPAddrInfo> getIPv6AddrInfos() {
-		List<IPAddrInfo> addrInfos = new ArrayList<IPAddrInfo>();
+		List<IPAddrInfo> addrInfos = new ArrayList<>();
 		for (IPAddrInfo ipAddrInfo : this.ipAddrInfos) {
 			if (NetworkInfo.isIPv6Address(ipAddrInfo.getIpAddress())) {
 				addrInfos.add(ipAddrInfo);
@@ -173,9 +175,9 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionuid
+	 * @return the serialversionUID
 	 */
-	public static long getSerialversionuid() {
+	public static long getSerialversionUID() {
 		return serialVersionUID;
 	}
 
@@ -194,19 +196,19 @@ public final class NetworkInfo implements Serializable {
 		/**
 		 * IP address, supported IPv4 and IPv6
 		 */
-		private String ipAddress = null;
+		private String ipAddress;
 		/**
 		 * Is site local address
 		 */
-		private boolean local = false;
+		private boolean local;
 		/**
 		 * Is loop back address
 		 */
-		private boolean loop = false;
+		private boolean loop;
 		/**
 		 * Is link local status
 		 */
-		private boolean linkLocal = false;
+		private boolean linkLocal;
 		
 		/**
 		 * Constructor

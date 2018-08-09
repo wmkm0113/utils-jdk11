@@ -112,9 +112,9 @@ public final class FileExtensionInfo extends BaseElement {
 	}
 	
 	/**
-	 * @return the serialversionuid
+	 * @return the Serial Version UID
 	 */
-	public static long getSerialversionuid() {
+	public static long getSerialversionUID() {
 		return serialVersionUID;
 	}
 
@@ -174,12 +174,12 @@ public final class FileExtensionInfo extends BaseElement {
 	
 	public byte[] convertToByteArray() throws UnsupportedEncodingException {
 		String content = this.extensionName + "|" + this.identifiedCode + "|" + this.mimeType;
-		byte[] datas = content.getBytes(Globals.DEFAULT_ENCODING);
-		byte[] dataItem = new byte[6 + datas.length];
+		byte[] dataArray = content.getBytes(Globals.DEFAULT_ENCODING);
+		byte[] dataItem = new byte[6 + dataArray.length];
 		
 		dataItem[0] = (byte)this.fileType;
 		dataItem[1] = this.printable ? (byte)Globals.NERVOUSYNC_STATUS_TRUE : (byte)Globals.NERVOUSYNC_STATUS_FALSE;
-		RawUtils.writeIntFromLittleEndian(dataItem, 2, datas.length);
+		RawUtils.writeIntFromLittleEndian(dataItem, 2, dataArray.length);
 		RawUtils.writeStringFromLittleEndian(dataItem, 6, content);
 		
 		return dataItem;

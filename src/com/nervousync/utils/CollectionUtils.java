@@ -42,14 +42,8 @@ public final class CollectionUtils {
 	 * @return				Sorted collection
 	 */
 	public static List<Integer> sort(Collection<Integer> collection) {
-		List<Integer> returnList = new ArrayList<Integer>();
-		Iterator<Integer> iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			returnList.add(iterator.next());
-		}
-		
+		List<Integer> returnList = new ArrayList<>(collection);
 		Collections.sort(returnList);
-		
 		return returnList;
 	}
 
@@ -59,15 +53,9 @@ public final class CollectionUtils {
 	 * @return				Sorted and reverse collection
 	 */
 	public static List<Integer> sortAndReverse(Collection<Integer> collection) {
-		List<Integer> returnList = new ArrayList<Integer>();
-		Iterator<Integer> iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			returnList.add(iterator.next());
-		}
-		
+		List<Integer> returnList = new ArrayList<>(collection);
 		Collections.sort(returnList);
 		Collections.reverse(returnList);
-		
 		return returnList;
 	}
 	
@@ -124,9 +112,7 @@ public final class CollectionUtils {
 			throw new IllegalArgumentException("Collection must not be null");
 		}
 		Object[] arr = ObjectUtils.toObjectArray(array);
-		for (int i = 0; i < arr.length; i++) {
-			collection.add(arr[i]);
-		}
+		Collections.addAll(collection, arr);
 	}
 
 	/**
@@ -196,8 +182,7 @@ public final class CollectionUtils {
 	 */
 	public static boolean containsInstance(Collection<?> collection, Object element) {
 		if (collection != null) {
-			for (Iterator<?> it = collection.iterator(); it.hasNext();) {
-				Object candidate = it.next();
+			for (Object candidate : collection) {
 				if (candidate == element) {
 					return true;
 				}
@@ -217,8 +202,8 @@ public final class CollectionUtils {
 		if (isEmpty(source) || isEmpty(candidates)) {
 			return false;
 		}
-		for (Iterator<?> it = candidates.iterator(); it.hasNext();) {
-			if (source.contains(it.next())) {
+		for (Object candidate : candidates) {
+			if (source.contains(candidate)) {
 				return true;
 			}
 		}
@@ -238,8 +223,7 @@ public final class CollectionUtils {
 		if (isEmpty(source) || isEmpty(candidates)) {
 			return null;
 		}
-		for (Iterator<?> it = candidates.iterator(); it.hasNext();) {
-			Object candidate = it.next();
+		for (Object candidate : candidates) {
 			if (source.contains(candidate)) {
 				return candidate;
 			}
@@ -259,8 +243,7 @@ public final class CollectionUtils {
 			return null;
 		}
 		Object value = null;
-		for (Iterator<?> it = collection.iterator(); it.hasNext();) {
-			Object obj = it.next();
+		for (Object obj : collection) {
 			if (type == null || type.isInstance(obj)) {
 				if (value != null) {
 					// More than one value found... no clear single value.
@@ -285,8 +268,8 @@ public final class CollectionUtils {
 		if (isEmpty(collection) || ObjectUtils.isEmpty(types)) {
 			return null;
 		}
-		for (int i = 0; i < types.length; i++) {
-			Object value = findValueOfType(collection, types[i]);
+		for (Class<?> type : types) {
+			Object value = findValueOfType(collection, type);
 			if (value != null) {
 				return value;
 			}
@@ -306,13 +289,11 @@ public final class CollectionUtils {
 		}
 		boolean hasCandidate = false;
 		Object candidate = null;
-		for (Iterator<?> it = collection.iterator(); it.hasNext();) {
-			Object elem = it.next();
+		for (Object elem : collection) {
 			if (!hasCandidate) {
 				hasCandidate = true;
 				candidate = elem;
-			}
-			else if (candidate != elem) {
+			} else if (candidate != elem) {
 				return false;
 			}
 		}

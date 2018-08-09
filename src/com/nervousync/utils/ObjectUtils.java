@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
+import com.nervousync.commons.core.Globals;
 import com.nervousync.enumerations.xml.DataType;
 import com.nervousync.interceptor.beans.BaseHandlerInterceptor;
 
@@ -37,9 +38,6 @@ import net.sf.cglib.proxy.Enhancer;
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
  */
 public final class ObjectUtils {
-
-	private static final int INITIAL_HASH = 7;
-	private static final int MULTIPLIER = 31;
 
 	private static final String EMPTY_STRING = "";
 	private static final String NULL_STRING = "null";
@@ -146,7 +144,7 @@ public final class ObjectUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T createProxyInstance(Class<T> clazz, Object[] args, BaseHandlerInterceptor[] methodInterceptors) {
-		T object = null;
+		T object;
 		
 		if (methodInterceptors != null && methodInterceptors.length > 0) {
 			Enhancer enhancer = new Enhancer();
@@ -216,8 +214,8 @@ public final class ObjectUtils {
 			return true;
 		}
 		if (declaredExceptions != null) {
-			for (int i = 0; i < declaredExceptions.length; i++) {
-				if (declaredExceptions[i].isAssignableFrom(ex.getClass())) {
+			for (Class<?> declaredException : declaredExceptions) {
+				if (declaredException.isAssignableFrom(ex.getClass())) {
 					return true;
 				}
 			}
@@ -247,14 +245,10 @@ public final class ObjectUtils {
 		}
 		
 		if (object.getClass().isArray()) {
-			if (Array.getLength(object) == 0) {
-				return true;
-			}
+			return (Array.getLength(object) == 0);
 		} else {
 			if (object instanceof String) {
-				if (((String)object).length() == 0) {
-					return true;
-				}
+				return (((String)object).length() == 0);
 			}
 		}
 		
@@ -272,8 +266,8 @@ public final class ObjectUtils {
 		if (array == null) {
 			return false;
 		}
-		for (int i = 0; i < array.length; i++) {
-			if (nullSafeEquals(array[i], element)) {
+		for (Object anArray : array) {
+			if (nullSafeEquals(anArray, element)) {
 				return true;
 			}
 		}
@@ -488,10 +482,10 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
+		int hash = Globals.INITIAL_HASH;
 		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + nullSafeHashCode(array[i]);
+		for (Object anArray : array) {
+			hash = Globals.MULTIPLIER * hash + nullSafeHashCode(anArray);
 		}
 		return hash;
 	}
@@ -506,10 +500,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + hashCode(array[i]);
+		int hash = Globals.INITIAL_HASH;
+		for (boolean bool : array) {
+			hash = Globals.MULTIPLIER * hash + hashCode(bool);
 		}
 		return hash;
 	}
@@ -524,10 +517,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + array[i];
+		int hash = Globals.INITIAL_HASH;
+		for (byte b : array) {
+			hash = Globals.MULTIPLIER * hash + b;
 		}
 		return hash;
 	}
@@ -542,10 +534,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + array[i];
+		int hash = Globals.INITIAL_HASH;
+		for (char c : array) {
+			hash = Globals.MULTIPLIER * hash + c;
 		}
 		return hash;
 	}
@@ -560,10 +551,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + hashCode(array[i]);
+		int hash = Globals.INITIAL_HASH;
+		for (double d : array) {
+			hash = Globals.MULTIPLIER * hash + hashCode(d);
 		}
 		return hash;
 	}
@@ -578,10 +568,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + hashCode(array[i]);
+		int hash = Globals.INITIAL_HASH;
+		for (float f : array) {
+			hash = Globals.MULTIPLIER * hash + hashCode(f);
 		}
 		return hash;
 	}
@@ -596,10 +585,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + array[i];
+		int hash = Globals.INITIAL_HASH;
+		for (int i : array) {
+			hash = Globals.MULTIPLIER * hash + i;
 		}
 		return hash;
 	}
@@ -614,10 +602,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + hashCode(array[i]);
+		int hash = Globals.INITIAL_HASH;
+		for (long l : array) {
+			hash = Globals.MULTIPLIER * hash + hashCode(l);
 		}
 		return hash;
 	}
@@ -632,10 +619,9 @@ public final class ObjectUtils {
 		if (array == null) {
 			return 0;
 		}
-		int hash = INITIAL_HASH;
-		int arraySize = array.length;
-		for (int i = 0; i < arraySize; i++) {
-			hash = MULTIPLIER * hash + array[i];
+		int hash = Globals.INITIAL_HASH;
+		for (short s : array) {
+			hash = Globals.MULTIPLIER * hash + s;
 		}
 		return hash;
 	}
@@ -657,8 +643,7 @@ public final class ObjectUtils {
 	 * @return 	hash code result
 	 */
 	public static int hashCode(double dbl) {
-		long bits = Double.doubleToLongBits(dbl);
-		return hashCode(bits);
+		return hashCode(Double.doubleToLongBits(dbl));
 	}
 
 	/**
@@ -776,15 +761,15 @@ public final class ObjectUtils {
 			return nullSafeToString((short[]) obj);
 		}
 		if (obj instanceof List) {
-			StringBuffer stringBuffer = new StringBuffer();
+			StringBuilder StringBuilder = new StringBuilder();
 			int count = ((List<?>)obj).size();
 			String split = "";
 			for (int i = 0 ; i < count ; i++) {
 				Object object = ((List<?>)obj).get(i);
-				stringBuffer.append(split + nullSafeToString(object));
+				StringBuilder.append(split).append(nullSafeToString(object));
 				split = ",";
 			}
-			return stringBuffer.toString();
+			return StringBuilder.toString();
 		}
 		String str = obj.toString();
 		return (str != null ? str : EMPTY_STRING);
@@ -807,7 +792,7 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			if (i == 0) {
 				buffer.append(ARRAY_START);
@@ -838,19 +823,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (boolean bool : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(bool);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -870,18 +848,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (byte b : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(b);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -901,18 +873,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append("'").append(array[i]).append("'");
+		StringBuilder stringBuilder = new StringBuilder();
+		for (char ch : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(ch);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -932,19 +898,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (double d : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(d);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -964,19 +923,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (float f : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(f);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -996,18 +948,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int i : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(i);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -1027,18 +973,12 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (long l : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(l);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 
 	/**
@@ -1058,17 +998,11 @@ public final class ObjectUtils {
 		if (length == 0) {
 			return EMPTY_ARRAY;
 		}
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append(array[i]);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (short s : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(s);
 		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
 	}
 }

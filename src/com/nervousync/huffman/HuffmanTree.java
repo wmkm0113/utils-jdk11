@@ -26,7 +26,7 @@ public final class HuffmanTree {
 
 	private int nodeCount = 0;
 	private HuffmanNode rootNode = null;
-	private Hashtable<String, Object> codeMapping = new Hashtable<String, Object>();
+	private Hashtable<String, Object> codeMapping = new Hashtable<>();
 	
 	public HuffmanTree() {
 		
@@ -106,16 +106,18 @@ public final class HuffmanTree {
 	private void mergeNode() {
 		HuffmanNode leftNode = this.pollNode();
 		HuffmanNode rightNode = this.pollNode();
-		
-		HuffmanNode mergeNode = new HuffmanNode(leftNode.getFrequency() + rightNode.getFrequency());
-		mergeNode.setLeftNode(leftNode);
-		mergeNode.setRightNode(rightNode);
-		this.insertNode(mergeNode);
+
+		if (leftNode != null && rightNode != null) {
+			HuffmanNode mergeNode = new HuffmanNode(leftNode.getFrequency() + rightNode.getFrequency());
+			mergeNode.setLeftNode(leftNode);
+			mergeNode.setRightNode(rightNode);
+			this.insertNode(mergeNode);
+		}
 	}
 
 	/**
 	 * Retrieves and removes the head of this queue, or returns null if this queue is empty.
-	 * @return
+	 * @return  poll node
 	 */
 	private HuffmanNode pollNode() {
 		if (this.rootNode == null) {

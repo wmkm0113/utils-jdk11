@@ -14,12 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import com.nervousync.commons.core.Globals;
 import com.nervousync.interceptor.beans.BaseHandlerInterceptor;
-import com.nervousync.utils.ObjectUtils;
-import com.nervousync.utils.ReflectionUtils;
 import com.nervousync.utils.StringUtils;
 
 /**
@@ -37,12 +33,12 @@ public final class PartialCollection<T> implements Serializable {
 	/**
 	 * Collection of entities (part of some another collection)
 	 */
-	private List<T> resultList;
+	private final List<T> resultList;
 
 	/**
 	 * Total number of elements in collection this collection is part of
 	 */
-	private long totalCount;
+	private final long totalCount;
 
 	/**
 	 * Creates an empty instance of PartialCollection
@@ -146,46 +142,20 @@ public final class PartialCollection<T> implements Serializable {
 		}
 		
 		Map<String, Object> convertMap = StringUtils.convertJSONStringToMap(cacheData);
-		
-		long totalCount = Globals.DEFAULT_VALUE_LONG;
-		
-		try {
-			totalCount = Long.valueOf((String)convertMap.get("totalCount")).longValue();
-			List<?> objectList = StringUtils.convertJSONStringToObject((String)convertMap.get("objectList"), List.class);
-			
-			List<T> resultList = new ArrayList<T>();
-			
-			for (Object jsonData : objectList) {
-				Map<String, Object> resultMap = StringUtils.convertJSONStringToMap((String)jsonData);
-				T object = ObjectUtils.createProxyInstance(entityClass, methodInterceptor);
-				
-				Iterator<Entry<String, Object>> iterator = resultMap.entrySet().iterator();
-				
-				while (iterator.hasNext()) {
-					Entry<String, Object> entry = iterator.next();
-					ReflectionUtils.setField(entry.getKey(), object, entry.getValue());
-				}
-				
-				resultList.add(object);
-			}
-			
-			return new PartialCollection<T>(resultList, totalCount);
-		} catch (Exception e) {
-			
+
+		long totalCount = Long.parseLong((String)convertMap.get("totalCount"));
+		List<T> objectList = StringUtils.convertJSONStringToList((String)convertMap.get("objectList"), entityClass);
+
+		if (objectList != null) {
+			return new PartialCollection<>(objectList, totalCount);
 		}
 		return null;
 	}
 	
 	public String cacheData() {
-		List<String> objectList = new ArrayList<String>();
-		
-		for (T object : this.resultList) {
-			objectList.add(StringUtils.convertObjectToJSONString(object));
-		}
-		
-		Map<String, String> convertMap = new HashMap<String, String>();
+		Map<String, String> convertMap = new HashMap<>();
 		convertMap.put("totalCount", Long.valueOf(this.totalCount).toString());
-		convertMap.put("objectList", StringUtils.convertObjectToJSONString(objectList));
+		convertMap.put("objectList", StringUtils.convertObjectToJSONString(this.resultList));
 		
 		return StringUtils.convertObjectToJSONString(convertMap);
 	}

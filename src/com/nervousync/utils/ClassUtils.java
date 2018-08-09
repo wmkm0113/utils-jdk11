@@ -16,6 +16,9 @@
  */
 package com.nervousync.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.Introspector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -46,7 +49,7 @@ import java.util.Set;
 public final class ClassUtils {
 
 	/** Suffix for array class names: "[]" */
-	public static final String ARRAY_SUFFIX = "[]";
+	private static final String ARRAY_SUFFIX = "[]";
 
 	/** Prefix for internal array class names: "[L" */
 	private static final String INTERNAL_ARRAY_PREFIX = "[L";
@@ -58,7 +61,7 @@ public final class ClassUtils {
 	private static final char INNER_CLASS_SEPARATOR = '$';
 
 	/** The CGLIB class separator character "$$" */
-	public static final String CGLIB_CLASS_SEPARATOR = "$$";
+	private static final String CGLIB_CLASS_SEPARATOR = "$$";
 
 	/** The ".class" file suffix */
 	public static final String CLASS_FILE_SUFFIX = ".class";
@@ -67,13 +70,13 @@ public final class ClassUtils {
 	 * Map with primitive wrapper type as key and corresponding primitive
 	 * type as value, for example: Integer.class -> int.class.
 	 */
-	private static final Map<Object, Object> PRIMITIVE_WRAPPER_TYPE_MAP = new HashMap<Object, Object>(8);
+	private static final Map<Object, Object> PRIMITIVE_WRAPPER_TYPE_MAP = new HashMap<>(8);
 
 	/**
 	 * Map with primitive type name as key and corresponding primitive
 	 * type as value, for example: "int" -> "int.class".
 	 */
-	private static final Map<Object, Object> PRIMITIVE_TYPE_NAME_MAP = new HashMap<Object, Object>(16);
+	private static final Map<Object, Object> PRIMITIVE_TYPE_NAME_MAP = new HashMap<>(16);
 
 	private static ClassLoader DEFAULT_CLASSLOADER = null;
 
@@ -87,13 +90,13 @@ public final class ClassUtils {
 		PRIMITIVE_WRAPPER_TYPE_MAP.put(Long.class, long.class);
 		PRIMITIVE_WRAPPER_TYPE_MAP.put(Short.class, short.class);
 
-		Set<Object> primitiveTypeNames = new HashSet<Object>(16);
+		Set<Object> primitiveTypeNames = new HashSet<>(16);
 		primitiveTypeNames.addAll(PRIMITIVE_WRAPPER_TYPE_MAP.values());
-		primitiveTypeNames.addAll(Arrays.asList(new Class[] {
+		primitiveTypeNames.addAll(Arrays.asList(
 				boolean[].class, byte[].class, char[].class, double[].class,
-				float[].class, int[].class, long[].class, short[].class}));
-		for (Iterator<Object> it = primitiveTypeNames.iterator(); it.hasNext();) {
-			Class<?> primitiveClass = (Class<?>) it.next();
+				float[].class, int[].class, long[].class, short[].class));
+		for (Object primitiveTypeName : primitiveTypeNames) {
+			Class<?> primitiveClass = (Class<?>) primitiveTypeName;
 			PRIMITIVE_TYPE_NAME_MAP.put(primitiveClass.getName(), primitiveClass);
 		}
 	}
@@ -266,14 +269,10 @@ public final class ClassUtils {
 		try {
 			return forName(className, classLoader);
 		} catch (ClassNotFoundException ex) {
-			IllegalArgumentException iae = new IllegalArgumentException("Cannot find class [" + className + "]");
-			iae.initCause(ex);
-			throw iae;
+			throw new IllegalArgumentException("Cannot find class [" + className + "]", ex);
 		} catch (LinkageError ex) {
-			IllegalArgumentException iae = new IllegalArgumentException(
-					"Error loading class [" + className + "]: problem with class file or dependent class.");
-			iae.initCause(ex);
-			throw iae;
+			throw new IllegalArgumentException(
+					"Error loading class [" + className + "]: problem with class file or dependent class.", ex);
 		}
 	}
 
@@ -319,7 +318,7 @@ public final class ClassUtils {
 	 * @return the user-defined class
 	 */
 	public static Class<?> getUserClass(Class<?> clazz) {
-		return (clazz != null && clazz.getName().indexOf(CGLIB_CLASS_SEPARATOR) != -1 ?
+		return (clazz != null && clazz.getName().contains(CGLIB_CLASS_SEPARATOR) ?
 				clazz.getSuperclass() : clazz);
 	}
 
@@ -469,12 +468,12 @@ public final class ClassUtils {
 		}
 		Class<?> clazz = value.getClass();
 		if (Proxy.isProxyClass(clazz)) {
-			StringBuffer buf = new StringBuffer(clazz.getName());
+			StringBuilder buf = new StringBuilder(clazz.getName());
 			buf.append(" implementing ");
-			Class<?>[] ifcs = clazz.getInterfaces();
-			for (int i = 0; i < ifcs.length; i++) {
-				buf.append(ifcs[i].getName());
-				if (i < ifcs.length - 1) {
+			Class<?>[] interfaces = clazz.getInterfaces();
+			for (int i = 0; i < interfaces.length; i++) {
+				buf.append(interfaces[i].getName());
+				if (i < interfaces.length - 1) {
 					buf.append(',');
 				}
 			}
@@ -526,7 +525,7 @@ public final class ClassUtils {
 	 * @return					List of all fields
 	 */
 	public static List<Field> getDeclaredFields(Class<?> clazz, boolean includeParent) {
-		List<Field> fieldList = new ArrayList<Field>();
+		List<Field> fieldList = new ArrayList<>();
 		getDeclaredFields(clazz, includeParent, fieldList);
 		return fieldList;
 	}
@@ -538,7 +537,7 @@ public final class ClassUtils {
 	 * @return					Check result
 	 */
 	public static boolean hasField(Class<?> clazz, String fieldName) {
-		return (getFieldIfAvaliable(clazz, fieldName) != null);
+		return (getFieldIfAvailable(clazz, fieldName) != null);
 	}
 	
 	/**
@@ -547,7 +546,7 @@ public final class ClassUtils {
 	 * @param fieldName			Field name
 	 * @return					Field object
 	 */
-	public static Field getFieldIfAvaliable(Class<?> clazz, String fieldName) {
+	public static Field getFieldIfAvailable(Class<?> clazz, String fieldName) {
 		if (clazz == null) {
 			throw new IllegalArgumentException("Class must not be null");
 		}
@@ -556,9 +555,7 @@ public final class ClassUtils {
 		}
 		try {
 			return clazz.getField(fieldName);
-		} catch (SecurityException e) {
-			return null;
-		} catch (NoSuchFieldException e) {
+		} catch (SecurityException | NoSuchFieldException e) {
 			return null;
 		}
 	}
@@ -616,15 +613,14 @@ public final class ClassUtils {
 		}
 		int count = 0;
 		Method[] declaredMethods = clazz.getDeclaredMethods();
-		for (int i = 0; i < declaredMethods.length; i++) {
-			Method method = declaredMethods[i];
+		for (Method method : declaredMethods) {
 			if (methodName.equals(method.getName())) {
 				count++;
 			}
 		}
-		Class<?>[] ifcs = clazz.getInterfaces();
-		for (int i = 0; i < ifcs.length; i++) {
-			count += getMethodCountForName(ifcs[i], methodName);
+		Class<?>[] interfaces = clazz.getInterfaces();
+		for (Class<?> interfaceClass : interfaces) {
+			count += getMethodCountForName(interfaceClass, methodName);
 		}
 		if (clazz.getSuperclass() != null) {
 			count += getMethodCountForName(clazz.getSuperclass(), methodName);
@@ -647,15 +643,14 @@ public final class ClassUtils {
 			throw new IllegalArgumentException("Method name must not be null");
 		}
 		Method[] declaredMethods = clazz.getDeclaredMethods();
-		for (int i = 0; i < declaredMethods.length; i++) {
-			Method method = declaredMethods[i];
+		for (Method method : declaredMethods) {
 			if (method.getName().equals(methodName)) {
 				return true;
 			}
 		}
-		Class<?>[] ifcs = clazz.getInterfaces();
-		for (int i = 0; i < ifcs.length; i++) {
-			if (hasAtLeastOneMethodWithName(ifcs[i], methodName)) {
+		Class<?>[] interfaces = clazz.getInterfaces();
+		for (Class<?> interfaceClass : interfaces) {
+			if (hasAtLeastOneMethodWithName(interfaceClass, methodName)) {
 				return true;
 			}
 		}
@@ -706,8 +701,11 @@ public final class ClassUtils {
 			if ((method.getModifiers() & Modifier.STATIC) != 0) {
 				return method;
 			}
-		} catch (NoSuchMethodException ex) {
-			
+		} catch (NoSuchMethodException e) {
+			Logger logger = LoggerFactory.getLogger(ClassUtils.class);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Get static method error! ", e);
+			}
 		}
 		return null;
 	}
@@ -824,7 +822,7 @@ public final class ClassUtils {
 	 * (also suitable for use with <code>Class.getResource</code> by prepending a
 	 * slash ('/') to the return value. Built by taking the package of the specified
 	 * class file, converting all dots ('.') to slashes ('/'), adding a trailing slash
-	 * if necesssary, and concatenating the specified resource name to this.
+	 * if necessary, and concatenating the specified resource name to this.
 	 * As such, this function may be used to build a path suitable for
 	 * loading a resource file that is in the same package as a class file,
 	 * @param clazz	the Class whose package will be used as the base
@@ -896,7 +894,7 @@ public final class ClassUtils {
 		if (CollectionUtils.isEmpty(classes)) {
 			return "[]";
 		}
-		StringBuffer sb = new StringBuffer("[");
+		StringBuilder sb = new StringBuilder("[");
 		for (Iterator<?> it = classes.iterator(); it.hasNext(); ) {
 			Class<?> clazz = (Class<?>) it.next();
 			sb.append(clazz.getName());
@@ -949,7 +947,7 @@ public final class ClassUtils {
 		if (clazz.isInterface()) {
 			return new Class[] {clazz};
 		}
-		List<Object> interfaces = new ArrayList<Object>();
+		List<Object> interfaces = new ArrayList<>();
 		while (clazz != null) {
 			for (int i = 0; i < clazz.getInterfaces().length; i++) {
 				Class<?> ifc = clazz.getInterfaces()[i];
@@ -960,7 +958,7 @@ public final class ClassUtils {
 			}
 			clazz = clazz.getSuperclass();
 		}
-		return (Class[]) interfaces.toArray(new Class[interfaces.size()]);
+		return interfaces.toArray(new Class[0]);
 	}
 
 	/**
@@ -1003,7 +1001,7 @@ public final class ClassUtils {
 		if (clazz.isInterface()) {
 			return Collections.singleton(clazz);
 		}
-		Set<Object> interfaces = new LinkedHashSet<Object>();
+		Set<Object> interfaces = new LinkedHashSet<>();
 		while (clazz != null) {
 			for (int i = 0; i < clazz.getInterfaces().length; i++) {
 				Class<?> ifc = clazz.getInterfaces()[i];
@@ -1063,7 +1061,7 @@ public final class ClassUtils {
 	 * @return a qualified name for the array class
 	 */
 	private static String getQualifiedNameForArray(Class<?> clazz) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		while (clazz.isArray()) {
 			clazz = clazz.getComponentType();
 			buffer.append(ClassUtils.ARRAY_SUFFIX);
@@ -1071,18 +1069,16 @@ public final class ClassUtils {
 		buffer.insert(0, clazz.getName());
 		return buffer.toString();
 	}
-	
+
 	private static void getDeclaredFields(Class<?> clazz, boolean includeParent, List<Field> fieldList) {
 		if (fieldList == null) {
 			return;
 		}
 
 		if (includeParent && clazz.getSuperclass() != null) {
-			getDeclaredFields(clazz.getSuperclass(), includeParent, fieldList);
+			getDeclaredFields(clazz.getSuperclass(), true, fieldList);
 		}
-		
-		for (Field field : clazz.getDeclaredFields()) {
-			fieldList.add(field);
-		}
+
+		Collections.addAll(fieldList, clazz.getDeclaredFields());
 	}
 }

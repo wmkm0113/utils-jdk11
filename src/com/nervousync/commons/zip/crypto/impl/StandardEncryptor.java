@@ -80,30 +80,22 @@ public final class StandardEncryptor implements Encryptor {
 		}
 		
 		this.zipCryptoEngine.initKeys(password);
-		this.headerBytes = this.generateRandomBytes(ZipConstants.STD_DEC_HDR_SIZE);
+		this.headerBytes = this.generateRandomBytes();
 		
 		this.zipCryptoEngine.initKeys(password);
 		
 		this.headerBytes[ZipConstants.STD_DEC_HDR_SIZE - 1] = (byte)(crc >>> 24);
 		this.headerBytes[ZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)(crc >>> 16);
-		
-		if (this.headerBytes.length < ZipConstants.STD_DEC_HDR_SIZE) {
-			throw new ZipException("invalid header bytes generated, cannot perform standard encryption");
-		}
-		
+
 		this.encryptData(this.headerBytes);
 	}
 	
-	private byte[] generateRandomBytes(int size) throws ZipException {
-		if (size <= 0) {
-			throw new ZipException("size is either 0 or less than 0, cannot generate header for standard encryptor");
-		}
-		
-		byte[] buffer = new byte[size];
+	private byte[] generateRandomBytes() throws ZipException {
+		byte[] buffer = new byte[ZipConstants.STD_DEC_HDR_SIZE];
 		
 		Random rand = new Random();
 		
-		for (int i = 0 ; i < size ; i++) {
+		for (int i = 0 ; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
 			buffer[i] = this.encryptByte((byte)rand.nextInt(256));
 		}
 		

@@ -31,7 +31,7 @@ public final class MacBasedPRF {
 
 	private Mac mac;
 	private int length;
-	private String algorithm;
+	private final String algorithm;
 	
 	public MacBasedPRF(String algorithm) {
 		this.algorithm = algorithm;
@@ -48,9 +48,7 @@ public final class MacBasedPRF {
 		try {
 			this.mac = Mac.getInstance(this.algorithm, provider);
 			this.length = this.mac.getMacLength();
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchProviderException e) {
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			throw new RuntimeException(e);
 		}
 	}

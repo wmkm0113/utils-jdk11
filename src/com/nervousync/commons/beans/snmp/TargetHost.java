@@ -40,11 +40,11 @@ public class TargetHost implements Serializable {
 	/**
 	 * Host ip address
 	 */
-	private String ipAddress = null;
+	private String ipAddress;
 	/**
 	 * Community name
 	 */
-	private String community = null;
+	private String community;
 	/**
 	 * SNMP authentication type
 	 */

@@ -19,13 +19,7 @@ package com.nervousync.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -72,7 +66,7 @@ public final class MailUtils {
 	}
 	
 	public static boolean sendMessage(MailServerConfig mailServerConfig, MailObject mailObject, String userName, String passWord) 
-					throws MessagingException, UnsupportedEncodingException, FileNotFoundException {
+					throws MessagingException {
 		MimeMessage message = 
 				new MimeMessage(getSession(mailServerConfig.getSendConfigInfo(userName), 
 						userName, passWord));
@@ -85,12 +79,12 @@ public final class MailUtils {
 			for (String attachment : mailObject.getAttachFiles()) {
 				MimeBodyPart mimeBodyPart = new MimeBodyPart();
 				
-				File file = null;
+				File file;
 				
 				try {
 					file = FileUtils.getFile(attachment);
 				} catch (FileNotFoundException e) {
-					continue;
+					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
 				
 				DataSource dataSource = new FileDataSource(file);
@@ -105,8 +99,8 @@ public final class MailUtils {
 		if (mailObject.getIncludeFiles() != null) {
 			List<String> includeFiles = mailObject.getIncludeFiles();
 			for (String filePath : includeFiles) {
-				File file = null;
-				MimeBodyPart mimeBodyPart = null;
+				File file;
+				MimeBodyPart mimeBodyPart;
 				
 				try {
 					file = FileUtils.getFile(filePath);
@@ -120,7 +114,7 @@ public final class MailUtils {
 					mimeBodyPart.setFileName(fileName);
 					mimeBodyPart.setHeader("Content-ID", fileName);
 				} catch (Exception e) {
-					continue;
+					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
 				
 				mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
@@ -132,10 +126,8 @@ public final class MailUtils {
 			
 			if (mailObject.getContentMap() != null) {
 				Map<String, String> argsMap = mailObject.getContentMap();
-				Iterator<String> iterator = argsMap.keySet().iterator();
-				
-				while (iterator.hasNext()) {
-					String key = iterator.next();
+
+				for (String key : argsMap.keySet()) {
 					content = StringUtils.replace(content, "###" + key + "###", argsMap.get(key));
 				}
 			}
@@ -152,39 +144,39 @@ public final class MailUtils {
 			message.setFrom(new InternetAddress(userName));
 		}
 		
-		StringBuffer recvAddress = new StringBuffer();
+		StringBuilder recvAddress = new StringBuilder();
 		
 		for (String address : mailObject.getRecvAddress()) {
-			recvAddress.append("," + address);
+			recvAddress.append(",").append(address);
 		}
 		
 		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recvAddress.toString().substring(1)));
 
 		if (mailObject.getCcAddress() != null) {
-			StringBuffer ccAddress = new StringBuffer();
+			StringBuilder ccAddress = new StringBuilder();
 			
 			for (String address : mailObject.getCcAddress()) {
-				ccAddress.append("," + address);
+				ccAddress.append(",").append(address);
 			}
 			
 			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccAddress.toString().substring(1)));
 		}
 
 		if (mailObject.getBccAddress() != null) {
-			StringBuffer bccAddress = new StringBuffer();
+			StringBuilder bccAddress = new StringBuilder();
 			
 			for (String address : mailObject.getBccAddress()) {
-				bccAddress.append("," + address);
+				bccAddress.append(",").append(address);
 			}
 			
 			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccAddress.toString().substring(1)));
 		}
 
 		if (mailObject.getReplyAddress() != null) {
-			StringBuffer replyAddress = new StringBuffer();
+			StringBuilder replyAddress = new StringBuilder();
 			
 			for (String address : mailObject.getReplyAddress()) {
-				replyAddress.append("," + address);
+				replyAddress.append(",").append(address);
 			}
 			
 			message.setReplyTo(InternetAddress.parse(replyAddress.toString().substring(1)));
@@ -238,7 +230,7 @@ public final class MailUtils {
 					}
 				}
 			} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
-				message = ((IMAPFolder)folder).getMessageByUID(Long.valueOf(uid).longValue());
+				message = ((IMAPFolder)folder).getMessageByUID(Long.parseLong(uid));
 			}
 			
 			if (message != null) {
@@ -263,7 +255,7 @@ public final class MailUtils {
 
 	public static List<MailObject> getMailInfo(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList, String saveAttchPath) throws MessagingException {
-		List<MailObject> mailList = new ArrayList<MailObject>();
+		List<MailObject> mailList = new ArrayList<>();
 		
 		Store store = null;
 		Folder folder = null;
@@ -286,26 +278,7 @@ public final class MailUtils {
 				return mailList;
 			}
 
-			List<Message> messageList = new ArrayList<Message>();
-			if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
-				Message[] messages = folder.getMessages();
-				
-				for (Message message : messages) {
-					if (uidList.contains(((POP3Folder)folder).getUID(message))) {
-						messageList.add(message);
-					}
-				}
-			} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
-				long[] uids = new long[uidList.size()];
-				
-				for (int i = 0 ; i < uidList.size() ; i++) {
-					uids[i] = Long.valueOf(uidList.get(i)).longValue();
-				}
-				Message[] messages = ((IMAPFolder)folder).getMessagesByUID(uids);
-				for (Message message : messages) {
-					messageList.add(message);
-				}
-			}
+			List<Message> messageList = convertMailArraysToList(mailServerConfig, uidList, folder);
 			
 			for (Message message : messageList) {
 				MailObject mailObject = receiveMessage((MimeMessage)message, userName, true, saveAttchPath);
@@ -330,6 +303,29 @@ public final class MailUtils {
 		return mailList;
 	}
 
+	private static List<Message> convertMailArraysToList(MailServerConfig mailServerConfig,
+	                                                     List<String> uidList, Folder folder) throws MessagingException {
+		List<Message> messageList = new ArrayList<>();
+		if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
+			Message[] messages = folder.getMessages();
+
+			for (Message message : messages) {
+				if (uidList.contains(((POP3Folder)folder).getUID(message))) {
+					messageList.add(message);
+				}
+			}
+		} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
+			long[] uids = new long[uidList.size()];
+
+			for (int i = 0 ; i < uidList.size() ; i++) {
+				uids[i] = Long.parseLong(uidList.get(i));
+			}
+			Message[] messages = ((IMAPFolder)folder).getMessagesByUID(uids);
+			Collections.addAll(messageList, messages);
+		}
+		return messageList;
+	}
+
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String saveAttchPath) throws MessagingException {
 		return getMailList(mailServerConfig, userName, passWord, null, saveAttchPath);
@@ -337,7 +333,7 @@ public final class MailUtils {
 	
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
 			String passWord, Date date, String saveAttchPath) throws MessagingException {
-		List<MailObject> mailList = new ArrayList<MailObject>();
+		List<MailObject> mailList = new ArrayList<>();
 		
 		Store store = null;
 		Folder folder = null;
@@ -389,7 +385,7 @@ public final class MailUtils {
 
 	public static void removeMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
 	}
@@ -401,7 +397,7 @@ public final class MailUtils {
 
 	public static void recoverMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
 	}
@@ -413,7 +409,7 @@ public final class MailUtils {
 
 	public static void readMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
 	}
@@ -425,7 +421,7 @@ public final class MailUtils {
 
 	public static void unreadMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
 	}
@@ -437,7 +433,7 @@ public final class MailUtils {
 
 	public static void answerMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
 	}
@@ -449,7 +445,7 @@ public final class MailUtils {
 
 	public static void flagMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
@@ -461,7 +457,7 @@ public final class MailUtils {
 
 	public static void unflagMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) throws MessagingException {
-		List<String> uidList = new ArrayList<String>();
+		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
@@ -475,15 +471,15 @@ public final class MailUtils {
 			boolean detail, String saveAttchPath) throws MessagingException, IOException {
 		MailObject mailObject = new MailObject();
 
-		InternetAddress[] receiveAddress = null;
+		InternetAddress[] receiveAddress;
 		
 		if (mimeMessage instanceof IMAPMessage) {
-			receiveAddress = (InternetAddress[]) ((IMAPMessage)mimeMessage).getRecipients(IMAPMessage.RecipientType.TO);
+			receiveAddress = (InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
 		} else {
 			receiveAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.TO);
 		}
 
-		List<String> receiveList = new ArrayList<String>();
+		List<String> receiveList = new ArrayList<>();
 
 		for (InternetAddress address : receiveAddress) {
 			receiveList.add(address.getAddress());
@@ -517,7 +513,7 @@ public final class MailUtils {
 			InternetAddress[] ccAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.CC);
 			
 			if (ccAddress != null) {
-				List<String> ccList = new ArrayList<String>();
+				List<String> ccList = new ArrayList<>();
 		
 				for (InternetAddress address : ccAddress) {
 					ccList.add(address.getAddress());
@@ -530,7 +526,7 @@ public final class MailUtils {
 			InternetAddress[] bccAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.BCC);
 	
 			if (bccAddress != null) {
-				List<String> bccList = new ArrayList<String>();
+				List<String> bccList = new ArrayList<>();
 				
 				for (InternetAddress address : bccAddress) {
 					bccList.add(address.getAddress());
@@ -540,11 +536,11 @@ public final class MailUtils {
 			}
 
 			//	Read mail content message
-			StringBuffer contentBuffer = new StringBuffer();
+			StringBuilder contentBuffer = new StringBuilder();
 			getMailContent(mimeMessage, contentBuffer);
 			mailObject.setContent(contentBuffer.toString());
 			
-			List<String> attachFiles = new ArrayList<String>();
+			List<String> attachFiles = new ArrayList<>();
 			getMailAttachment(mimeMessage, saveAttchPath, attachFiles);
 			mailObject.setAttachFiles(attachFiles);
 		}
@@ -584,32 +580,15 @@ public final class MailUtils {
 				return;
 			}
 			
-			List<Message> messageList = new ArrayList<Message>();
-			if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
-				Message[] messages = folder.getMessages();
-				
-				for (Message message : messages) {
-					if (uidList.contains(((POP3Folder)folder).getUID(message))) {
-						messageList.add(message);
-					}
-				}
-			} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
-				long[] uids = new long[uidList.size()];
-				
-				for (int i = 0 ; i < uidList.size() ; i++) {
-					uids[i] = Long.valueOf(uidList.get(i)).longValue();
-				}
-				Message[] messages = ((IMAPFolder)folder).getMessagesByUID(uids);
-				for (Message message : messages) {
-					messageList.add(message);
-				}
-			}
+			List<Message> messageList = convertMailArraysToList(mailServerConfig, uidList, folder);
 			
 			for (Message message : messageList) {
 				message.setFlag(flag, status);
 			}
 		} catch (Exception e) {
-			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Set message status error! ", e);
+			}
 		} finally {
 			if (folder != null) {
 				folder.close(true);
@@ -621,7 +600,7 @@ public final class MailUtils {
 		}
 	}
 	
-	private static void getMailContent(Part part, StringBuffer contentBuffer) throws MessagingException, IOException {
+	private static void getMailContent(Part part, StringBuilder contentBuffer) throws MessagingException, IOException {
 		String contentType = part.getContentType();
 		int nameIndex = contentType.indexOf("name");
 
@@ -657,7 +636,7 @@ public final class MailUtils {
 	
 	private static void getMailAttachment(Part part, String saveAttchPath, List<String> saveFiles) throws MessagingException, IOException {
 		if (saveFiles == null) {
-			saveFiles = new ArrayList<String>();
+			saveFiles = new ArrayList<>();
 		}
 		if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
 			Multipart multipart = (Multipart) part.getContent();
@@ -685,13 +664,12 @@ public final class MailUtils {
 	}
 	
 	private static Folder openReadOnlyFolder(Store store) 
-			throws NoSuchProviderException, MessagingException {
+			throws MessagingException {
 		return openFolder(store, true);
 	}
 	
 	private static Folder openFolder(Store store, boolean readOnly) 
-			throws NoSuchProviderException,
-			MessagingException {
+			throws MessagingException {
 		Folder folder = store.getFolder(Globals.DEFAULT_EMAIL_FOLDER_INBOX);
 		
 		if (readOnly) {

@@ -26,12 +26,12 @@ import javax.mail.PasswordAuthentication;
  */
 public final class DefaultAuthenticator extends Authenticator {
 
-	private PasswordAuthentication passwordAuthentication;
+	private final PasswordAuthentication passwordAuthentication;
 	
 	/**
 	 * Initialize authenticator
 	 * @param username		Authenticate user name
-	 * @param password		Authenticate passsword
+	 * @param password		Authenticate password
 	 */
 	public DefaultAuthenticator(String username, String password){
 		this.passwordAuthentication = new PasswordAuthentication(username, password);

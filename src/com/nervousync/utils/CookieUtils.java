@@ -58,9 +58,9 @@ public final class CookieUtils {
 				if (domainName != null) {
 					cookie.setDomain("." + domainName);
 				}
-				if (lifeCycle != null && lifeCycle.intValue() >= 0) {
+				if (lifeCycle != null && lifeCycle >= 0) {
 					//	Default Cookie Life Cycle
-					cookie.setMaxAge(60 * 60 * lifeCycle.intValue());
+					cookie.setMaxAge(60 * 60 * lifeCycle);
 				}
 			} else {
 				cookie.setValue(cookieValue);
@@ -77,56 +77,41 @@ public final class CookieUtils {
 	public static Cookie getCookie(String cookieName, HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		
-		if (cookies == null || cookies.length == 0) {
-			return null;
-		}
-		
-		int cookieLength = cookies.length;
-		
-		for (int i = 0 ; i < cookieLength ; i++) {
-			Cookie cookie = cookies[i];
-			if (cookie.getName().equals(cookieName)) {
-				return cookie;
+		if (cookies != null && cookies.length > 0) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(cookieName)) {
+					return cookie;
+				}
 			}
 		}
-		
+
 		return null;
 	}
 
 	public static String getCookieValue(String cookieName, HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		
-		if (cookies == null || cookies.length == 0) {
-			return null;
-		}
-		
-		int cookieLength = cookies.length;
-		
-		for (int i = 0 ; i < cookieLength ; i++) {
-			Cookie cookie = cookies[i];
-			if (cookie.getName().equals(cookieName)) {
-				return cookie.getValue();
+		if (cookies != null && cookies.length > 0) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(cookieName)) {
+					return cookie.getValue();
+				}
 			}
 		}
-		
+
 		return null;
 	}
 
-	public static boolean delCookie(String cookieName, HttpServletRequest request, HttpServletResponse response) {
-		return delCookie(getCookie(cookieName, request), response);
+	public static void delCookie(String cookieName, HttpServletRequest request, HttpServletResponse response) {
+		delCookie(getCookie(cookieName, request), response);
 	}
 
-	public static boolean delCookie(Cookie cookie, HttpServletResponse response) {
+	public static void delCookie(Cookie cookie, HttpServletResponse response) {
 		addP3PHeader(response);
-		if (cookie == null) {
-			return true;
+		if (cookie != null) {
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
 		}
-		
-		cookie.setMaxAge(0);
-		
-		response.addCookie(cookie);
-		
-		return true;
 	}
 
 	private static void addP3PHeader(HttpServletResponse response) {

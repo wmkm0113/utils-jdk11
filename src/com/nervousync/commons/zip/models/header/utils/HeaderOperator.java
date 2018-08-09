@@ -32,13 +32,31 @@ import com.nervousync.utils.RawUtils;
  */
 public final class HeaderOperator {
 
+	public static int retrieveSaltLength(int aesStrength) throws ZipException {
+		int saltLength;
+		switch (aesStrength) {
+			case ZipConstants.AES_STRENGTH_128:
+				saltLength = 8;
+				break;
+			case ZipConstants.AES_STRENGTH_192:
+				saltLength = 12;
+				break;
+			case ZipConstants.AES_STRENGTH_256:
+				saltLength = 16;
+				break;
+			default:
+				throw new ZipException("unable to determine salt length: invalid aes key strength");
+		}
+		return saltLength;
+	}
+
 	public static int writeExtendedLocalHeader(LocalFileHeader localFileHeader, OutputStream outputStream)
 			throws ZipException, IOException {
 		if (localFileHeader == null || outputStream == null) {
 			throw new ZipException("input parameters is null, cannot write extended local header");
 		}
 
-		List<String> byteArrayList = new ArrayList<String>();
+		List<String> byteArrayList = new ArrayList<>();
 		byte[] intBuffer = new byte[4];
 
 		// Extended local file header signature
@@ -72,7 +90,7 @@ public final class HeaderOperator {
 
 	public static byte[] convertByteArrayListToByteArray(List<String> arrayList) throws ZipException {
 		if (arrayList == null) {
-			throw new ZipException("input byte array list is null, cannot conver to byte array");
+			throw new ZipException("input byte array list is null, cannot convert to byte array");
 		}
 
 		if (arrayList.size() > 0) {

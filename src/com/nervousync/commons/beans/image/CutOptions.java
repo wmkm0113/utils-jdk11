@@ -16,8 +16,6 @@
  */
 package com.nervousync.commons.beans.image;
 
-import com.nervousync.commons.core.Globals;
-
 /**
  * Images options of cut operate
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -28,19 +26,19 @@ public final class CutOptions {
 	/**
 	 * Begin position X, default value is 0
 	 */
-	private int positionX = Globals.DEFAULT_VALUE_INT;
+	private final int positionX;
 	/**
 	 * Begin position Y, default value is 0
 	 */
-	private int positionY = Globals.DEFAULT_VALUE_INT;
+	private final int positionY;
 	/**
 	 * Cut width
 	 */
-	private int cutWidth = Globals.DEFAULT_VALUE_INT;
+	private final int cutWidth;
 	/**
 	 * Cut height
 	 */
-	private int cutHeight = Globals.DEFAULT_VALUE_INT;
+	private final int cutHeight;
 	
 	/**
 	 * Initialize cut options using default position X and Y

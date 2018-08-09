@@ -45,11 +45,11 @@ public final class DateTimeUtils {
 	/**
 	 * Formats given date according to string with ISO8601 format
 	 * @param date		date instance
-	 * @return			formated result by ISO8601
+	 * @return			formatted result by ISO8601
 	 */
 	public static String formatDateForSitemap(Date date) {
 		if (date == null) {
-			return null;
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 		return formatDate(date, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	}
@@ -67,7 +67,7 @@ public final class DateTimeUtils {
 	/**
 	 * Formats given date according to string with vCard format
 	 * @param date		date instance
-	 * @return			formated result by ISO8601
+	 * @return			formatted result by ISO8601
 	 */
 	public static String formatDateForVCard(Date date) {
 		if (date == null) {
@@ -101,15 +101,13 @@ public final class DateTimeUtils {
 		if (format == null) {
 			format = DEFAULT_DATE_PATTERN;
 		}
-		Date date = new SimpleDateFormat(format).parse(string);
-		
-		return date;
+		return new SimpleDateFormat(format).parse(string);
 	}
 
 	/**
 	 * Formats given date according to system style
 	 * @param date		date instance
-	 * @return			formated result by given format
+	 * @return			formatted result by given format
 	 */
 	public static String formatDate(Date date) {
 		return formatDate(date, "");
@@ -121,7 +119,7 @@ public final class DateTimeUtils {
 	 */
 	public static int currentDay() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.valueOf(simpleDateFormat.format(new Date())).intValue();
+		return Integer.parseInt(simpleDateFormat.format(new Date()));
 	}
 
 	/**
@@ -131,7 +129,7 @@ public final class DateTimeUtils {
 	public static int currentGMTDay() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return Integer.valueOf(simpleDateFormat.format(new Date())).intValue();
+		return Integer.parseInt(simpleDateFormat.format(new Date()));
 	}
 	
 	/**
@@ -142,7 +140,7 @@ public final class DateTimeUtils {
 	public static int expireDay(long expireTime) {
 		long expireDate = System.currentTimeMillis() + expireTime;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.valueOf(simpleDateFormat.format(new Date(expireDate))).intValue();
+		return Integer.parseInt(simpleDateFormat.format(new Date(expireDate)));
 	}
 
 	/**
@@ -153,7 +151,7 @@ public final class DateTimeUtils {
 	public static int expireGMTDay(long expireTime) {
 		long expireDate = DateTimeUtils.currentGMTTimeMillis() + expireTime;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.valueOf(simpleDateFormat.format(new Date(expireDate))).intValue();
+		return Integer.parseInt(simpleDateFormat.format(new Date(expireDate)));
 	}
 	
 	/**
@@ -184,11 +182,50 @@ public final class DateTimeUtils {
 	    int min = (dosTime >> 5) & 0x3f;
 	    int hrs = (dosTime >> 11) & 0x1f;
 	    int day = (dosTime >> 16) & 0x1f;
-	    int mon = ((dosTime >> 21) & 0xf) - 1;
+	    int mon = ((dosTime >> 21) & 0xf);
 	    int year = ((dosTime >> 25) & 0x7f) + 1980;
 	    
 	    Calendar cal = Calendar.getInstance();
-		cal.set(year, mon, day, hrs, min, sec);
+	    switch (mon) {
+		    case 1:
+			    cal.set(year, Calendar.JANUARY, day, hrs, min, sec);
+		    	break;
+		    case 2:
+			    cal.set(year, Calendar.FEBRUARY, day, hrs, min, sec);
+			    break;
+		    case 3:
+			    cal.set(year, Calendar.MARCH, day, hrs, min, sec);
+			    break;
+		    case 4:
+			    cal.set(year, Calendar.APRIL, day, hrs, min, sec);
+			    break;
+		    case 5:
+			    cal.set(year, Calendar.MAY, day, hrs, min, sec);
+			    break;
+		    case 6:
+			    cal.set(year, Calendar.JUNE, day, hrs, min, sec);
+			    break;
+		    case 7:
+			    cal.set(year, Calendar.JULY, day, hrs, min, sec);
+			    break;
+		    case 8:
+			    cal.set(year, Calendar.AUGUST, day, hrs, min, sec);
+			    break;
+		    case 9:
+			    cal.set(year, Calendar.SEPTEMBER, day, hrs, min, sec);
+			    break;
+		    case 10:
+			    cal.set(year, Calendar.OCTOBER, day, hrs, min, sec);
+			    break;
+		    case 11:
+			    cal.set(year, Calendar.NOVEMBER, day, hrs, min, sec);
+			    break;
+		    case 12:
+			    cal.set(year, Calendar.DECEMBER, day, hrs, min, sec);
+			    break;
+		    default:
+		    	return Globals.DEFAULT_VALUE_LONG;
+	    }
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime().getTime();
 	}
@@ -199,7 +236,7 @@ public final class DateTimeUtils {
 	 */
 	public static long currentTime() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-		return Long.valueOf(simpleDateFormat.format(new Date())).longValue();
+		return Long.parseLong(simpleDateFormat.format(new Date()));
 	}
 
 	/**
@@ -217,7 +254,7 @@ public final class DateTimeUtils {
 	public static long currentGMTTime() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return Long.valueOf(simpleDateFormat.format(new Date())).longValue();
+		return Long.parseLong(simpleDateFormat.format(new Date()));
 	}
 	
 	/**
@@ -250,7 +287,7 @@ public final class DateTimeUtils {
 		if (date == null) {
 			date = new Date();
 		}
-		SimpleDateFormat simpleDateFormat = null;
+		SimpleDateFormat simpleDateFormat;
 		if (format == null || format.length() == 0) {
 			simpleDateFormat = new SimpleDateFormat();
 		} else {
@@ -527,7 +564,7 @@ public final class DateTimeUtils {
 
 	private static String getTimeZone() {
 		String timeZone = "";
-		Integer zone = TimeZone.getDefault().getRawOffset() / (1000 * 60 * 60);
+		int zone = TimeZone.getDefault().getRawOffset() / (1000 * 60 * 60);
 		if (zone > 0) {
 			timeZone = "+";
 		}

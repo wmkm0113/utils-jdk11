@@ -32,11 +32,11 @@ import com.nervousync.commons.zip.crypto.Decryptor;
  */
 public class InflaterInputStream extends PartInputStream {
 
-	private Inflater inflater = null;
-	private byte[] buffer = null;
-	private byte[] oneByteBuffer = new byte[1];
-	private long writeBytes = Globals.DEFAULT_VALUE_LONG;
-	private long originalSize = Globals.DEFAULT_VALUE_LONG;
+	private final Inflater inflater;
+	private final byte[] buffer;
+	private final byte[] oneByteBuffer = new byte[1];
+	private long writeBytes;
+	private final long originalSize;
 	
 	public InflaterInputStream(ZipFile zipFile, NervousyncRandomAccessFile input, 
 			long length, long originalSize, Decryptor decryptor, boolean isAESEncryptedFile) {
@@ -76,7 +76,7 @@ public class InflaterInputStream extends PartInputStream {
 				return Globals.DEFAULT_VALUE_INT;
 			}
 			
-			int readLength = 0;
+			int readLength;
 			while ((readLength = this.inflater.inflate(b, off, len)) == 0) {
 				if (this.inflater.finished() || this.inflater.needsDictionary()) {
 					this.finishInflating();

@@ -29,5 +29,5 @@ public interface SNMPDataOperator {
 	 * Parse and analyze datas
 	 * @param snmpData	SNMP data
 	 */
-	public void operateData(SNMPData snmpData);
+	void operateData(SNMPData snmpData);
 }

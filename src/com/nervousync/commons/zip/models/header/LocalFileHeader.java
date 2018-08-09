@@ -23,6 +23,7 @@ import java.io.RandomAccessFile;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.impl.AESCrypto;
+import com.nervousync.commons.zip.models.header.utils.HeaderOperator;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**
@@ -86,22 +87,7 @@ public class LocalFileHeader extends FileHeader {
 			if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
 				byte[] salt = null;
 				if (this.getAesExtraDataRecord() != null) {
-					int saltLength = Globals.DEFAULT_VALUE_INT;
-					
-					switch (this.getAesExtraDataRecord().getAesStrength()) {
-					case ZipConstants.AES_STRENGTH_128:
-						saltLength = 8;
-						break;
-					case ZipConstants.AES_STRENGTH_192:
-						saltLength = 12;
-						break;
-					case ZipConstants.AES_STRENGTH_256:
-						saltLength = 16;
-						break;
-						default:
-							throw new ZipException("unable to determine salt length: invalid aes key strength");
-					}
-					salt = new byte[saltLength];
+					salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
 					if (input instanceof RandomAccessFile) {
 						((RandomAccessFile)input).seek(this.getOffsetStartOfData());
 						((RandomAccessFile)input).read(salt);
@@ -117,7 +103,10 @@ public class LocalFileHeader extends FileHeader {
 				} else if (input instanceof InputStream) {
 					((InputStream)input).read(passwordBytes);
 				}
-				
+
+				if (this.getAesExtraDataRecord() == null) {
+					return Globals.DEFAULT_VALUE_BOOLEAN;
+				}
 				return AESCrypto.verifyPassword(this.getAesExtraDataRecord().getAesStrength(), 
 						salt, this.getPassword(), passwordBytes);
 			} else if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {

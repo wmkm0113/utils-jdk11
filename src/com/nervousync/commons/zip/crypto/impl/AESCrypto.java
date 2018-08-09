@@ -35,7 +35,7 @@ import com.nervousync.exceptions.zip.ZipException;
 public class AESCrypto {
 
 	/**
-	 * Salt datas
+	 * Salt data array
 	 */
 	private byte[] saltBytes;
 	
@@ -63,7 +63,7 @@ public class AESCrypto {
 	/**
 	 * current password bytes
 	 */
-	protected byte[] derviedPasswordVerifier = null;
+	protected byte[] derivedPasswordVerifier = null;
 
 	/**
 	 * nonce
@@ -126,7 +126,7 @@ public class AESCrypto {
 		if (aesStrength != ZipConstants.AES_STRENGTH_128
 				&& aesStrength != ZipConstants.AES_STRENGTH_192
 				&& aesStrength != ZipConstants.AES_STRENGTH_256) {
-			throw new ZipException("Invalid key strength in AES encrypter constructor");
+			throw new ZipException("Invalid key strength in AES encryptor constructor");
 		}
 		
 		this.iv = new byte[ZipConstants.AES_BLOCK_SIZE];
@@ -197,11 +197,11 @@ public class AESCrypto {
 	 * @return	verify result
 	 */
 	protected boolean verifyPassword(byte[] password) {
-		if (this.derviedPasswordVerifier == null) {
-			throw new ZipException("Invalid dervied password verifier!");
+		if (this.derivedPasswordVerifier == null) {
+			throw new ZipException("Invalid derived password verifier!");
 		}
 
-		return Arrays.equals(password, this.derviedPasswordVerifier);
+		return Arrays.equals(password, this.derivedPasswordVerifier);
 	}
 	
 	/**
@@ -219,12 +219,12 @@ public class AESCrypto {
 
 		this.aesKey = new byte[this.keyLength];
 		this.macKey = new byte[this.macLength];
-		this.derviedPasswordVerifier = new byte[ZipConstants.PASSWORD_VERIFIER_LENGTH];
+		this.derivedPasswordVerifier = new byte[ZipConstants.PASSWORD_VERIFIER_LENGTH];
 		
 		System.arraycopy(keyBytes, 0, this.aesKey, 0, this.keyLength);
 		System.arraycopy(keyBytes, this.keyLength, this.macKey, 0, this.macLength);
 		System.arraycopy(keyBytes, (this.keyLength + this.macLength), 
-				this.derviedPasswordVerifier, 0, ZipConstants.PASSWORD_VERIFIER_LENGTH);
+				this.derivedPasswordVerifier, 0, ZipConstants.PASSWORD_VERIFIER_LENGTH);
 		
 		this.aesEngine = new AESEngine(this.aesKey);
 		this.macBasedPRF = new MacBasedPRF("HmacSHA1");
@@ -233,10 +233,10 @@ public class AESCrypto {
 	
 	/**
 	 * Generate salt data
-	 * @throws ZipException
+	 * @throws ZipException if salt length was invalid
 	 */
 	private void generateSalt() throws ZipException {
-		int rounds = 0;
+		int rounds;
 		
 		if (this.saltLength == 8) {
 			rounds = 2;
@@ -252,7 +252,7 @@ public class AESCrypto {
 		for (int i = 0 ; i < rounds ; i++) {
 			Random random = new Random();
 			int temp = random.nextInt();
-			this.saltBytes[0 + i * 4] = (byte)(temp >> 24);
+			this.saltBytes[i * 4] = (byte)(temp >> 24);
 			this.saltBytes[1 + i * 4] = (byte)(temp >> 16);
 			this.saltBytes[2 + i * 4] = (byte)(temp >> 8);
 			this.saltBytes[3 + i * 4] = (byte)temp;

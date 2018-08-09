@@ -16,6 +16,9 @@
  */
 package com.nervousync.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nervousync.commons.core.Globals;
 import com.nervousync.utils.DateTimeUtils;
 import com.nervousync.utils.SystemUtils;
@@ -39,27 +42,34 @@ public final class SnowflakeUtils {
 	/**
 	 * Sequence mask code, sequence id bits: 12
 	 */
-	private static final long SEQUENCE_MASK = -1L ^ (-1L << 12L);
+	private static final long SEQUENCE_MASK = ~(-1L << 12L);
 	/**
 	 * Node identified id (between 0 and 63)
 	 */
-	private static final long DEVICE_ID = SystemUtils.identifiedKey().hashCode() % 64L;
+	private static long DEVICE_ID;
 	/**
 	 * Node instance id (between 0 and 63), default: 1L
 	 */
-	private long instanceId = 1L;
+	private long instanceId;
 	/**
 	 * Begin timestamp value
 	 */
-	private long referenceTime = Globals.DEFAULT_VALUE_LONG;
+	private long referenceTime;
 	/**
 	 * Sequence index in millisecond
 	 */
-	private long sequenceIndex = Globals.DEFAULT_VALUE_LONG;
+	private long sequenceIndex;
 	/**
 	 * Previous generate time
 	 */
 	private long lastTime = Globals.DEFAULT_VALUE_LONG;
+	
+	static {
+		DEVICE_ID = SystemUtils.identifiedKey().hashCode() % 64L;
+		if (DEVICE_ID < 0L) {
+			DEVICE_ID *= -1L;
+		}
+	}
 	
 	/**
 	 * Constructor
@@ -67,6 +77,10 @@ public final class SnowflakeUtils {
 	 * @param instanceId		Instance id
 	 */
 	private SnowflakeUtils(long referenceTime, long instanceId) {
+		Logger logger = LoggerFactory.getLogger(this.getClass());
+		if (logger.isDebugEnabled()) {
+			logger.debug("DEVICE ID: {}", DEVICE_ID);
+		}
 		if (referenceTime < 0L) {
 			this.referenceTime = REFERENCE_TIME;
 		} else {
@@ -148,7 +162,7 @@ public final class SnowflakeUtils {
 		} else {
 			stringBuilder.append(DateTimeUtils.currentDay());
 		}
-		stringBuilder.append(this.generateValue(false));
+		stringBuilder.append(this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
 		return Long.parseLong(stringBuilder.toString());
 	}
 	
@@ -159,7 +173,7 @@ public final class SnowflakeUtils {
 		} else {
 			stringBuilder.append(DateTimeUtils.currentTime());
 		}
-		stringBuilder.append(this.generateValue(false));
+		stringBuilder.append(this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
 		return Long.parseLong(stringBuilder.toString());
 	}
 	

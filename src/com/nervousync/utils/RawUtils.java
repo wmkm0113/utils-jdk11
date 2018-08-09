@@ -166,7 +166,7 @@ public final class RawUtils {
 			return;
 		}
 		
-		byte[] valueBytes = null;
+		byte[] valueBytes;
 		try {
 			valueBytes = value.getBytes(encoding);
 		} catch (UnsupportedEncodingException e) {
@@ -176,9 +176,7 @@ public final class RawUtils {
 			return;
 		}
 		if ((position + valueBytes.length) <= bytes.length) {
-			for (int i = 0 ; i < valueBytes.length ; i++) {
-				bytes[position + i] = valueBytes[i];
-			}
+			System.arraycopy(valueBytes, 0, bytes, position, valueBytes.length);
 		}
 	}
 	
@@ -211,15 +209,10 @@ public final class RawUtils {
 	 * @param value			int value 
 	 */
 	public static void writeIntFromLittleEndian(byte[] bytes, int position, int value) {
-		int i = 4;
-		while (i > 0) {
-			i--;
-			if (i == 0) {
-				bytes[position + i] = (byte)(value & 0xFF);
-			} else {
-				bytes[position + i] = (byte)(value >>> (i * 8));
-			}
-		}
+		bytes[position + 3] = (byte)(value >>> 24);
+		bytes[position + 2] = (byte)(value >>> 16);
+		bytes[position + 1] = (byte)(value >>> 8);
+		bytes[position] = (byte)(value & 0xFF);
 	}
 	
 	/**
@@ -248,15 +241,14 @@ public final class RawUtils {
 	 * @param value			long value 
 	 */
 	public static void writeLongFromLittleEndian(byte[] bytes, int position, long value) {
-		int i = 8;
-		while (i > 0) {
-			i--;
-			if (i == 0) {
-				bytes[position + i] = (byte)(value & 0xFF);
-			} else {
-				bytes[position + i] = (byte)(value >>> (i * 8));
-			}
-		}
+		bytes[position + 7] = (byte)(value >>> 56);
+		bytes[position + 6] = (byte)(value >>> 48);
+		bytes[position + 5] = (byte)(value >>> 40);
+		bytes[position + 4] = (byte)(value >>> 32);
+		bytes[position + 3] = (byte)(value >>> 24);
+		bytes[position + 2] = (byte)(value >>> 16);
+		bytes[position + 1] = (byte)(value >>> 8);
+		bytes[position] = (byte)(value & 0xFF);
 	}
 	
 	/**
@@ -371,7 +363,7 @@ public final class RawUtils {
 	 * @param value				int value
 	 * @param arraySize			array size
 	 * @param appendZero		append zero if array is empty
-	 * @return
+	 * @return  converted byte array
 	 */
 	private static byte[] convertIntToByteArray(int value, int arraySize, boolean appendZero) {
 		if (arraySize < 4) {

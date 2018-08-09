@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +104,7 @@ public final class ReflectionUtils {
 	 * @return	enum data map
 	 */
 	public static Map<String, Object> parseEnum(Class<?> enumClass) {
-		Map<String, Object> enumMap = new HashMap<String, Object>();
+		Map<String, Object> enumMap = new HashMap<>();
 		
 		if (enumClass != null && enumClass.isEnum()) {
 			Object[] constants = enumClass.getEnumConstants();
@@ -125,10 +124,10 @@ public final class ReflectionUtils {
 	 */
 	public static List<String> getAllDeclaredFieldNames(Class<?> clazz) {
 		if (clazz == null) {
-			return new ArrayList<String>(0);
+			return new ArrayList<>(0);
 		}
 		
-		List<String> fieldList = new ArrayList<String>();
+		List<String> fieldList = new ArrayList<>();
 		
 		for (Field field : clazz.getDeclaredFields()) {
 			if ((field.getModifiers() & Modifier.STATIC) == 0) {
@@ -179,8 +178,7 @@ public final class ReflectionUtils {
 		Class<?> searchType = clazz;
 		while (!Object.class.equals(searchType) && searchType != null) {
 			Field[] fields = searchType.getDeclaredFields();
-			for (int i = 0; i < fields.length; i++) {
-				Field field = fields[i];
+			for (Field field : fields) {
 				if ((name == null || name.equals(field.getName()))
 						&& (type == null || type.equals(field.getType()))) {
 					return field;
@@ -232,7 +230,7 @@ public final class ReflectionUtils {
 		try {
 			Method getMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.GetMethod);
 			if (getMethod != null) {
-				return getMethod.invoke(target, new Object[]{});
+				return getMethod.invoke(target);
 			} else {
 				Field field = getFieldIfAvailable(target.getClass(), fieldName);
 				return ReflectionUtils.getFieldValue(field, target);
@@ -273,7 +271,7 @@ public final class ReflectionUtils {
 
 	public static Object executeMethod(String methodName, Object target) 
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		return executeMethod(methodName, target, new Class[]{}, new Object[]{});
+		return executeMethod(methodName, target, new Class[]{});
 	}
 	
 	public static Object executeMethod(String methodName, Object target, Class<?>[] paramClasses, Object... args) 
@@ -295,7 +293,7 @@ public final class ReflectionUtils {
 	
 	public static <T> Constructor<T> findConstructor(Class<T> clazz) 
 			throws SecurityException, NoSuchMethodException {
-		return clazz.getDeclaredConstructor(new Class[0]);
+		return clazz.getDeclaredConstructor();
 	}
 
 	public static <T> Constructor<T> findConstructor(Class<T> clazz, Class<?>[] paramTypes) 
@@ -335,8 +333,7 @@ public final class ReflectionUtils {
 		Class<?> searchType = clazz;
 		while (!Object.class.equals(searchType) && searchType != null) {
 			Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());
-			for (int i = 0; i < methods.length; i++) {
-				Method method = methods[i];
+			for (Method method : methods) {
 				if (name.equals(method.getName()) &&
 						(paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
 					return method;
@@ -511,8 +508,7 @@ public final class ReflectionUtils {
 			throw new IllegalArgumentException("Method must not be null");
 		}
 		Class<?>[] declaredExceptions = method.getExceptionTypes();
-		for (int i = 0; i < declaredExceptions.length; i++) {
-			Class<?> declaredException = declaredExceptions[i];
+		for (Class<?> declaredException : declaredExceptions) {
 			if (declaredException.isAssignableFrom(exceptionType)) {
 				return true;
 			}
@@ -628,16 +624,15 @@ public final class ReflectionUtils {
 		// Keep backing up the inheritance hierarchy.
 		do {
 			Method[] methods = targetClass.getDeclaredMethods();
-			for (int i = 0; i < methods.length; i++) {
-				if (mf != null && !mf.matches(methods[i])) {
+			for (Method method : methods) {
+				if (mf != null && !mf.matches(method)) {
 					continue;
 				}
 				try {
-					mc.doWith(methods[i]);
-				}
-				catch (IllegalAccessException ex) {
+					mc.doWith(method);
+				} catch (IllegalArgumentException ex) {
 					throw new IllegalStateException(
-							"Shouldn't be illegal to access method '" + methods[i].getName() + "': " + ex);
+							"Shouldn't be illegal argument method '" + method.getName() + "': " + ex);
 				}
 			}
 			targetClass = targetClass.getSuperclass();
@@ -652,13 +647,13 @@ public final class ReflectionUtils {
 	 * @return All declared method arrays
 	 */
 	public static Method[] getAllDeclaredMethods(Class<?> leafClass) throws IllegalArgumentException {
-		final List<Method> list = new ArrayList<Method>(32);
+		final List<Method> list = new ArrayList<>(32);
 		doWithMethods(leafClass, new MethodCallback() {
 			public void doWith(Method method) {
 				list.add(method);
 			}
 		});
-		return (Method[]) list.toArray(new Method[list.size()]);
+		return list.toArray(new Method[0]);
 	}
 
 
@@ -686,17 +681,16 @@ public final class ReflectionUtils {
 		do {
 			// Copy each field declared on this class unless it's static or file.
 			Field[] fields = targetClass.getDeclaredFields();
-			for (int i = 0; i < fields.length; i++) {
+			for (Field field : fields) {
 				// Skip static and final fields.
-				if (ff != null && !ff.matches(fields[i])) {
+				if (ff != null && !ff.matches(field)) {
 					continue;
 				}
 				try {
-					fc.doWith(fields[i]);
-				}
-				catch (IllegalAccessException ex) {
+					fc.doWith(field);
+				} catch (IllegalAccessException ex) {
 					throw new IllegalStateException(
-							"Shouldn't be illegal to access field '" + fields[i].getName() + "': " + ex);
+							"Shouldn't be illegal to access field '" + field.getName() + "': " + ex);
 				}
 			}
 			targetClass = targetClass.getSuperclass();
@@ -759,23 +753,20 @@ public final class ReflectionUtils {
 		if (target == null || parameterMap == null) {
 			return;
 		}
-		
-		Iterator<String> iterator = parameterMap.keySet().iterator();
-		
-		while (iterator.hasNext()) {
-			String fieldName = iterator.next();
+
+		for (String fieldName : parameterMap.keySet()) {
 			Object value = parameterMap.get(fieldName);
-			Object fieldValue = null;
+			Object fieldValue;
 			if (value.getClass().isArray()) {
-				if (((Object[])value).length == 1) {
-					fieldValue = ((Object[])value)[0];
+				if (((Object[]) value).length == 1) {
+					fieldValue = ((Object[]) value)[0];
 				} else {
 					fieldValue = value;
 				}
 			} else {
 				fieldValue = value;
 			}
-			
+
 			setField(fieldName, target, fieldValue);
 		}
 	}
@@ -791,7 +782,7 @@ public final class ReflectionUtils {
 		try {
 			Method setMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.SetMethod);
 			if (setMethod != null) {
-				setMethod.invoke(target, new Object[]{value});
+				setMethod.invoke(target, value);
 				return true;
 			} else {
 				Field field = getFieldIfAvailable(target.getClass(), fieldName);
@@ -804,7 +795,7 @@ public final class ReflectionUtils {
 				if (value != null) {
 					Class<?> clazz = field.getType();
 					if (!value.getClass().equals(clazz)) {
-						int length = 0;
+						int length;
 						if (value.getClass().isArray()) {
 							length = ((String[])value).length;
 						} else {
@@ -818,50 +809,50 @@ public final class ReflectionUtils {
 							if (arrayClass.isPrimitive()) {
 								if (arrayClass.equals(int.class)) {
 									if (length == 1) {
-										Array.set(object, 0, Integer.valueOf(value.toString()).intValue());
+										Array.set(object, 0, Integer.parseInt(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Integer.valueOf(((String[])value)[i]).intValue());
+											Array.set(object, i, Integer.parseInt(((String[])value)[i]));
 										}
 									}
 								} else if (arrayClass.equals(double.class)) {
 									if (length == 1) {
-										Array.set(object, 0, Double.valueOf(value.toString()).doubleValue());
+										Array.set(object, 0, Double.parseDouble(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Double.valueOf(((String[])value)[i]).doubleValue());
+											Array.set(object, i, Double.parseDouble(((String[])value)[i]));
 										}
 									}
 								} else if (arrayClass.equals(float.class)) {
 									if (length == 1) {
-										Array.set(object, 0, Float.valueOf(value.toString()).floatValue());
+										Array.set(object, 0, Float.parseFloat(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Float.valueOf(((String[])value)[i]).floatValue());
+											Array.set(object, i, Float.parseFloat(((String[])value)[i]));
 										}
 									}
 								} else if (arrayClass.equals(long.class)) {
 									if (length == 1) {
-										Array.set(object, 0, Long.valueOf(value.toString()).longValue());
+										Array.set(object, 0, Long.parseLong(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Long.valueOf(((String[])value)[i]).longValue());
+											Array.set(object, i, Long.parseLong(((String[])value)[i]));
 										}
 									}
 								} else if (arrayClass.equals(short.class)) {
 									if (length == 1) {
-										Array.set(object, 0, Short.valueOf(value.toString()).shortValue());
+										Array.set(object, 0, Short.parseShort(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Short.valueOf(((String[])value)[i]).shortValue());
+											Array.set(object, i, Short.parseShort(((String[])value)[i]));
 										}
 									}
 								} else if (arrayClass.equals(boolean.class)) {
 									if (length == 1) {
-										Array.set(object, 0, new Boolean(value.toString()).booleanValue());
+										Array.set(object, 0, Boolean.parseBoolean(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, new Boolean(((String[])value)[i]).booleanValue());
+											Array.set(object, i, Boolean.parseBoolean(((String[])value)[i]));
 										}
 									}
 								}
@@ -870,7 +861,7 @@ public final class ReflectionUtils {
 									if (length == 1) {
 										Array.set(object, 0, value.toString());
 									} else {
-										object = (String[])value;
+										object = value;
 									}
 								} else if (arrayClass.equals(Integer.class)) {
 									if (length == 1) {
@@ -906,10 +897,10 @@ public final class ReflectionUtils {
 									}
 								} else if (arrayClass.equals(Boolean.class)) {
 									if (length == 1) {
-										Array.set(object, 0, new Boolean(value.toString()));
+										Array.set(object, 0, Boolean.valueOf(value.toString()));
 									} else {
 										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, new Boolean(((String[])value)[i]));
+											Array.set(object, i, Boolean.valueOf(((String[])value)[i]));
 										}
 									}
 								} else {
@@ -925,17 +916,17 @@ public final class ReflectionUtils {
 						} else if (clazz.isPrimitive()) {
 							//	Basic data type	int, double, float, long, short
 							if (clazz.equals(int.class)) {
-								object = Integer.valueOf(value.toString()).intValue();
+								object = Integer.parseInt(value.toString());
 							} else if (clazz.equals(double.class)) {
-								object = Double.valueOf(value.toString()).doubleValue();
+								object = Double.parseDouble(value.toString());
 							} else if (clazz.equals(float.class)) {
-								object = Float.valueOf(value.toString()).floatValue();
+								object = Float.parseFloat(value.toString());
 							} else if (clazz.equals(long.class)) {
-								object = Long.valueOf(value.toString()).longValue();
+								object = Long.parseLong(value.toString());
 							} else if (clazz.equals(short.class)) {
-								object = Short.valueOf(value.toString()).shortValue();
+								object = Short.parseShort(value.toString());
 							} else if (clazz.equals(boolean.class)) {
-								object = new Boolean(value.toString()).booleanValue();
+								object = Boolean.parseBoolean(value.toString());
 							}
 						} else {
 							if (clazz.equals(Integer.class)) {
@@ -949,7 +940,7 @@ public final class ReflectionUtils {
 							} else if (clazz.equals(Short.class)) {
 								object = Short.valueOf(value.toString());
 							} else if (clazz.equals(Boolean.class)) {
-								object = new Boolean(value.toString());
+								object = Boolean.valueOf(value.toString());
 							} else {
 								object = value;
 							}
@@ -980,9 +971,7 @@ public final class ReflectionUtils {
 	 */
 	private static void handleUnexpectedException(Throwable ex) {
 		// Needs to avoid the chained constructor for JDK 1.4 compatibility.
-		IllegalStateException isex = new IllegalStateException("Unexpected exception thrown");
-		isex.initCause(ex);
-		throw isex;
+		throw new IllegalStateException("Unexpected exception thrown", ex);
 	}
 
 	private static Method retrieveMethod(String fieldName, Class<?> targetClass, MethodType methodType) {
@@ -990,52 +979,40 @@ public final class ReflectionUtils {
 		if (field == null) {
 			return null;
 		}
-		
-		String methodName = null;
-		
+
+		Method method = null;
 		switch(methodType) {
 		case GetMethod:
 			if (boolean.class.equals(field.getType())) {
-				methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+				return ReflectionUtils.findMethod(targetClass, "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
 			} else {
-				methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+				return ReflectionUtils.findMethod(targetClass, "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
 			}
-			break;
 		case SetMethod:
-			methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-			break;
+			return ReflectionUtils.findMethod(targetClass, "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1), new Class<?>[]{field.getType()});
 		}
-		
-		Method method = null;
-		if (methodName != null) {
-			if (MethodType.GetMethod.equals(methodType)) {
-				method = ReflectionUtils.findMethod(targetClass, methodName);
-			} else if (MethodType.SetMethod.equals(methodType)) {
-				method = ReflectionUtils.findMethod(targetClass, methodName, new Class<?>[]{field.getType()});
-			}
-		}
-		return method;
+
+		return null;
 	}
 
 	/**
 	 * Action to take on each method.
 	 */
-	public static interface MethodCallback {
+	public interface MethodCallback {
 
 		/**
 		 * Perform an operation using the given method.
 		 * @param method the method to operate on
 		 * @throws IllegalArgumentException	 @see java.lang.IllegalArgumentException
-		 * @throws IllegalAccessException  @see java.lang.IllegalAccessException
 		 */
-		void doWith(Method method) throws IllegalArgumentException, IllegalAccessException;
+		void doWith(Method method) throws IllegalArgumentException;
 	}
 
 
 	/**
 	 * Callback optionally used to method fields to be operated on by a method callback.
 	 */
-	public static interface MethodFilter {
+	public interface MethodFilter {
 
 		/**
 		 * Determine whether the given method matches.
@@ -1049,7 +1026,7 @@ public final class ReflectionUtils {
 	/**
 	 * Callback interface invoked on each field in the hierarchy.
 	 */
-	public static interface FieldCallback {
+	public interface FieldCallback {
 
 		/**
 		 * Perform an operation using the given field.
@@ -1064,7 +1041,7 @@ public final class ReflectionUtils {
 	/**
 	 * Callback optionally used to filter fields to be operated on by a field callback.
 	 */
-	public static interface FieldFilter {
+	public interface FieldFilter {
 
 		/**
 		 * Determine whether the given field matches.
@@ -1078,7 +1055,7 @@ public final class ReflectionUtils {
 	/**
 	 * Pre-built FieldFilter that matches all non-static, non-final fields.
 	 */
-	public static FieldFilter COPYABLE_FIELDS = new FieldFilter() {
+	public static final FieldFilter COPYABLE_FIELDS = new FieldFilter() {
 		public boolean matches(Field field) {
 			return !(Modifier.isStatic(field.getModifiers()) ||
 					Modifier.isFinal(field.getModifiers()));

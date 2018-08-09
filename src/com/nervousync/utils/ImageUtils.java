@@ -115,7 +115,7 @@ public final class ImageUtils {
 					}
 				}
 				
-				ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
+				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Read picture error! ", e);
@@ -196,19 +196,18 @@ public final class ImageUtils {
 				&& (targetWidth > 0 || targetHeight > 0)) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(origPath));
-				
-				if (targetWidth == Globals.DEFAULT_VALUE_INT
-						|| targetHeight == Globals.DEFAULT_VALUE_INT) {
-					int origWidth = srcImage.getWidth(null);
-					int origHeight = srcImage.getHeight(null);
-					
-					if (targetWidth == Globals.DEFAULT_VALUE_INT) {
-						double ratio = targetHeight * 1.0 / origHeight;
-						targetWidth = Double.valueOf(ratio * origWidth).intValue();
-					} else if (targetHeight == Globals.DEFAULT_VALUE_INT) {
-						double ratio = targetWidth * 1.0 / origWidth;
-						targetHeight = Double.valueOf(ratio * origHeight).intValue();
-					}
+
+				int origWidth = srcImage.getWidth(null);
+				int origHeight = srcImage.getHeight(null);
+
+				if (targetWidth == Globals.DEFAULT_VALUE_INT) {
+					double ratio = targetHeight * 1.0 / origHeight;
+					targetWidth = Double.valueOf(ratio * origWidth).intValue();
+				}
+
+				if (targetHeight == Globals.DEFAULT_VALUE_INT) {
+					double ratio = targetWidth * 1.0 / origWidth;
+					targetHeight = Double.valueOf(ratio * origHeight).intValue();
 				}
 				
 				return resizeImage(srcImage, destPath, targetWidth, targetHeight, markOptions);

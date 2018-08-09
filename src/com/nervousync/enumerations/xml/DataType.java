@@ -29,5 +29,5 @@ public enum DataType {
 	NUMBER, 
 	STRING, 
 	OBJECT,
-	CDATA;
+	CDATA
 }

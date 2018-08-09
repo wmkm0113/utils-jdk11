@@ -14,7 +14,7 @@ Add IP Address convert support, IP/Long value convert
 Add location utils, support GPS/GCJ/BD location point convert
 
 [12/05/2017]
-Add FileZip class, support zip file oprtate utils
+Add FileZip class, support zip file operate utils
 Add SNMP utils, support monitor system by SNMP service
 
 [04/24/2017]

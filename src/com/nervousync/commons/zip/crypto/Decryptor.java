@@ -26,20 +26,20 @@ import com.nervousync.exceptions.zip.ZipException;
 public interface Decryptor {
 
 	/**
-	 * Decrypt given datas
-	 * @param buff	datas
+	 * Decrypt given data array
+	 * @param buff	data array
 	 * @return processed data length
 	 * @throws ZipException if decrypt engine was not initialized or data index out of size
 	 */
-	public int decryptData(byte[] buff) throws ZipException;
+	int decryptData(byte[] buff) throws ZipException;
 
 	/**
-	 * Decrypt given datas which index from start and process data length was given
+	 * Decrypt given data array which index from start and process data length was given
 	 * @param buff		data buffer
 	 * @param start		start index
 	 * @param len		process length
 	 * @return processed data length
 	 * @throws ZipException if decrypt engine was not initialized or data index out of size
 	 */
-	public int decryptData(byte[] buff, int start, int len) throws ZipException;
+	int decryptData(byte[] buff, int start, int len) throws ZipException;
 }

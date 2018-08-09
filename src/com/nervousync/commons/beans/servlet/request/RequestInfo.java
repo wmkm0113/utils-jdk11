@@ -53,7 +53,7 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * Request URL
 	 */
-	private String requestUrl = null;
+	private final String requestUrl;
 	/**
 	 * Charset encoding
 	 */
@@ -73,15 +73,15 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * Send header values of request
 	 */
-	private List<SimpleHeader> headers = null;
+	private final List<SimpleHeader> headers;
 	/**
 	 * Send form fields of request
 	 */
-	private Map<String, String[]> parameters = null;
+	private final Map<String, String[]> parameters;
 	/**
 	 * Send multipart fields of request
 	 */
-	private Map<String, File> uploadParam = null;
+	private final Map<String, File> uploadParam;
 	
 	/**
 	 * General constructor
@@ -89,9 +89,9 @@ public final class RequestInfo implements Serializable {
 	 */
 	public RequestInfo(String requestUrl) {
 		this.requestUrl = requestUrl;
-		this.headers = new ArrayList<SimpleHeader>();
-		this.parameters = new HashMap<String, String[]>();
-		this.uploadParam = new HashMap<String, File>();
+		this.headers = new ArrayList<>();
+		this.parameters = new HashMap<>();
+		this.uploadParam = new HashMap<>();
 	}
 	
 	/**
@@ -120,8 +120,8 @@ public final class RequestInfo implements Serializable {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
 		this.parameters = RequestUtils.getRequestParametersFromString(data);
-		this.headers = new ArrayList<SimpleHeader>();
-		this.uploadParam = new HashMap<String, File>();
+		this.headers = new ArrayList<>();
+		this.uploadParam = new HashMap<>();
 	}
 
 	/**
@@ -134,8 +134,8 @@ public final class RequestInfo implements Serializable {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
 		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
-		this.headers = new ArrayList<SimpleHeader>();
-		this.uploadParam = new HashMap<String, File>();
+		this.headers = new ArrayList<>();
+		this.uploadParam = new HashMap<>();
 	}
 	
 	/**
@@ -159,7 +159,7 @@ public final class RequestInfo implements Serializable {
 		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
 		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
 		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
-		if (requestUrl.indexOf("?") != Globals.DEFAULT_VALUE_INT) {
+		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
 		}
@@ -189,7 +189,7 @@ public final class RequestInfo implements Serializable {
 		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
 		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
 		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
-		if (requestUrl.indexOf("?") != Globals.DEFAULT_VALUE_INT) {
+		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
 		}

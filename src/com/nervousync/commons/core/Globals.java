@@ -26,9 +26,9 @@ import java.util.Locale;
  */
 public final class Globals {
 
-	public static final String READ_MODE = "r";
-	public static final String WRITE_MODE = "rw";
-	
+	public static final int INITIAL_HASH = 0;
+	public static final int MULTIPLIER = 31;
+
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
 	
 	public static final int DEFAULT_TIME_OUT = 0;
@@ -53,7 +53,10 @@ public final class Globals {
 	public static final float DEFAULT_VALUE_FLOAT = -1;
 	public static final boolean DEFAULT_VALUE_BOOLEAN = false;
 	public static final String DEFAULT_VALUE_STRING = "";
-	
+
+	public static final String READ_MODE = "r";
+	public static final String WRITE_MODE = "rw";
+
 	public static final String DEFAULT_EMAIL_FOLDER_INBOX = "INBOX";
 	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final Locale DEFAULT_LOCALE = Locale.getDefault();

@@ -219,9 +219,9 @@ public class BaseProtocol implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionuid
+	 * @return the serialversionUID
 	 */
-	public static long getSerialversionuid() {
+	public static long getSerialversionUID() {
 		return serialVersionUID;
 	}
 

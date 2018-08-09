@@ -27,8 +27,8 @@ import com.nervousync.utils.RawUtils;
  */
 public final class PBKDF2Engine {
 
-	private PBKDF2Options options = null;
-	private MacBasedPRF macBasedPRF = null;
+	private final PBKDF2Options options;
+	private MacBasedPRF macBasedPRF;
 	
 	public PBKDF2Engine() {
 		this.options = null;
@@ -134,7 +134,7 @@ public final class PBKDF2Engine {
 	}
 	
 	private void INT(byte[] dest, int offset, int value) {
-		dest[offset + 0] = (byte)(value / (Math.pow(256, 3)));
+		dest[offset] = (byte)(value / (Math.pow(256, 3)));
 		dest[offset + 1] = (byte)(value / (Math.pow(256, 2)));
 		dest[offset + 2] = (byte)(value / (Math.pow(256, 1)));
 		dest[offset + 3] = (byte)value;

@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -66,7 +65,7 @@ public final class PropertiesUtils {
 	public static Hashtable<String, String> convertPropertiesToHashtable(Properties properties, 
 			Hashtable<String, String> messageMap) {
 		if (messageMap == null) {
-			messageMap = new Hashtable<String, String>();
+			messageMap = new Hashtable<>();
 		}
 
 		if (properties != null) {
@@ -86,7 +85,7 @@ public final class PropertiesUtils {
 	
 	public static Properties convertStringToProperties(String propertiesContent) {
 		Properties properties = new Properties();
-		InputStream inputStream = null;
+		InputStream inputStream;
 		if (propertiesContent != null) {
 			inputStream = new ByteArrayInputStream(propertiesContent.getBytes());
 			
@@ -102,16 +101,7 @@ public final class PropertiesUtils {
 			} catch (IOException e) {
 				properties = new Properties();
 			} finally {
-				if (inputStream != null) {
-					try {
-						inputStream.close();
-						inputStream = null;
-					} catch (IOException e) {
-						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("Close input stream error! ");
-						}
-					}
-				}
+				IOUtils.closeStream(inputStream);
 			}
 		}
 		return properties;
@@ -176,57 +166,31 @@ public final class PropertiesUtils {
 	}
 	
 	public static boolean modifyProperties(String propertiesFilePath, Map<String, String> modifyMap, String comment) {
-		FileOutputStream fileOutputStream = null;
 		try {
-			String fileExtName = StringUtils.getFilenameExtension(propertiesFilePath);
-			
 			Properties modifyProperties = loadProperties(propertiesFilePath);
-			
-			Iterator<String> keySet = modifyMap.keySet().iterator();
-			
-			while(keySet.hasNext()) {
-				String key = keySet.next();
+
+			for (String key : modifyMap.keySet()) {
 				String value = modifyMap.get(key);
 				if (value != null) {
 					modifyProperties.setProperty(key, value);
 				}
 			}
-			
-			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
-			
-			if (fileExtName.equalsIgnoreCase("xml")) {
-				modifyProperties.storeToXML(fileOutputStream, comment, "UTF-8");
-			} else if (fileExtName.equalsIgnoreCase("properties")) {
-				modifyProperties.store(fileOutputStream, comment);
-			} else {
-				throw new Exception("Properties file error");
-			}
-			
-			return true;
+
+			return storeProperties(modifyProperties, propertiesFilePath, comment);
 		} catch (Exception e) {
 			if (PropertiesUtils.LOGGER.isDebugEnabled()) {
 				PropertiesUtils.LOGGER.debug("Modify properties error! ", e);
 			}
 			return false;
-		} finally {
-			if (fileOutputStream != null) {
-				try {
-					fileOutputStream.flush();
-					fileOutputStream.close();
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-			}
 		}
 	}
 
 	public static Properties modifyProperties(Properties properties, Map<String, String> modifyMap) {
-		Iterator<Object> keySet = properties.keySet().iterator();
-		
-		while(keySet.hasNext()) {
-			String key = (String)keySet.next();
+
+		for (Object o : properties.keySet()) {
+			String key = (String) o;
 			String value = modifyMap.get(key);
-			
+
 			if (value != null) {
 				properties.setProperty(key, value);
 			}
@@ -234,25 +198,24 @@ public final class PropertiesUtils {
 		
 		return properties;
 	}
-	
-	public static boolean saveProperties(Properties properties, String propertiesFilePath, String comment) {
+
+	private static boolean storeProperties(Properties properties, String propertiesFilePath, String comment) {
 		FileOutputStream fileOutputStream = null;
 		try {
-			String filePath = 
-					propertiesFilePath.substring(0, propertiesFilePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
+			String filePath = propertiesFilePath.substring(0,
+					propertiesFilePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
 			FileUtils.makeHome(filePath);
 			String fileExtName = StringUtils.getFilenameExtension(propertiesFilePath);
 
 			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
-			
-			if (fileExtName.equalsIgnoreCase("xml")) {
+
+			if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "xml")) {
 				properties.storeToXML(fileOutputStream, comment, "UTF-8");
-			} else if (fileExtName.equalsIgnoreCase("properties")) {
+			} else if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "properties")) {
 				properties.store(fileOutputStream, comment);
 			} else {
 				throw new Exception("Properties file error");
 			}
-			
 			return true;
 		} catch (Exception e) {
 			if (PropertiesUtils.LOGGER.isDebugEnabled()) {
@@ -260,15 +223,12 @@ public final class PropertiesUtils {
 			}
 			return false;
 		} finally {
-			if (fileOutputStream != null) {
-				try {
-					fileOutputStream.flush();
-					fileOutputStream.close();
-				} catch (IOException ex) {
-					
-				}
-			}
+			IOUtils.closeStream(fileOutputStream);
 		}
+	}
+	
+	public static boolean saveProperties(Properties properties, String propertiesFilePath, String comment) {
+		return storeProperties(properties, propertiesFilePath, comment);
 	}
 	
 	public static String getPropertiesValue(String propertiesFilePath, String keyName) {

@@ -75,15 +75,15 @@ public final class SNMPUtils {
 	private static final OctetString AUTH_NOPRIV = new OctetString("authUser");
 	private static final OctetString AUTH_PRIV = new OctetString("privUser");
 	
-	private IPProtocol protocol = null;
+	private final IPProtocol protocol;
 	private int period = 5;
-	private List<TargetHost> existsHosts = null;
-	private ScheduledExecutorService scheduledExecutorService = null;
+	private final List<TargetHost> existsHosts;
+	private final ScheduledExecutorService scheduledExecutorService;
 	private Snmp snmp = null;
 	
 	private SNMPUtils(IPProtocol protocol, int serverCount) throws IOException {
 		this.protocol = protocol;
-		this.existsHosts = new ArrayList<TargetHost>(serverCount);
+		this.existsHosts = new ArrayList<>(serverCount);
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(serverCount);
 		switch (this.protocol) {
 		case TCP:
@@ -124,6 +124,7 @@ public final class SNMPUtils {
 		}
 		
 		try {
+			this.existsHosts.add(targetHost);
 			this.scheduledExecutorService.scheduleAtFixedRate(
 					new SNMPProcessor(identifiedKey, targetHost, pduList, snmpDataOperator), 
 					0L, this.period, TimeUnit.SECONDS);
@@ -178,9 +179,9 @@ public final class SNMPUtils {
 	private static final class SNMPProcessor implements Runnable {
 
 		private String identifiedKey;
-		private Target target = null;
-		private List<PDU> pduList = null;
-		private SNMPDataOperator snmpDataOperator = null;
+		private Target target;
+		private List<PDU> pduList;
+		private SNMPDataOperator snmpDataOperator;
 		
 		public SNMPProcessor(String identifiedKey, TargetHost targetHost, List<PDU> pduList, 
 				SNMPDataOperator snmpDataOperator) throws ProcessorConfigException {
@@ -229,7 +230,7 @@ public final class SNMPUtils {
 			address = PROTOCOL_UDP + targetHost.getIpAddress() + "/" + targetHost.getPort();
 			break;
 		}
-		Target target = null;
+		Target target;
 		
 		if (SNMPVersion.VERSION3.equals(targetHost.getVersion())) {
 			USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
@@ -280,11 +281,13 @@ public final class SNMPUtils {
 				}
 				privPassword = new OctetString(targetHost.getPrivPassword());
 			}
-			
-			target.setSecurityName(securityName);
-			
-			UsmUser usmUser = new UsmUser(securityName, authProtocol, authPassword, privProtocol, privPassword);
-			this.snmp.getUSM().addUser(securityName, usmUser);
+
+			if (securityName != null) {
+				target.setSecurityName(securityName);
+
+				UsmUser usmUser = new UsmUser(securityName, authProtocol, authPassword, privProtocol, privPassword);
+				this.snmp.getUSM().addUser(securityName, usmUser);
+			}
 		} else {
 			target = new CommunityTarget();
 			((CommunityTarget)target).setCommunity(new OctetString(targetHost.getCommunity()));

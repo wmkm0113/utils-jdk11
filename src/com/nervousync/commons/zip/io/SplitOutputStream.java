@@ -50,13 +50,13 @@ public class SplitOutputStream extends OutputStream {
 		HEADER_SIGNATURES[10] = ZipConstants.AESSIG;
 	}
 	
-	private NervousyncRandomAccessFile dataOutput = null;
-	private String fileName = null;
-	private String filePath = null;
-	private String currentFullPath = null;
-	private long splitLength = Globals.DEFAULT_VALUE_LONG;
-	private int currentSplitFileIndex = Globals.DEFAULT_VALUE_INT;
-	private long bytesWrittenForThisPart = Globals.DEFAULT_VALUE_LONG;
+	private NervousyncRandomAccessFile dataOutput;
+	private String fileName;
+	private String filePath;
+	private String currentFullPath;
+	private long splitLength;
+	private int currentSplitFileIndex;
+	private long bytesWrittenForThisPart;
 	
 	public SplitOutputStream(String filePath) throws FileNotFoundException, ZipException {
 		this(filePath, Globals.DEFAULT_VALUE_LONG);
@@ -146,7 +146,7 @@ public class SplitOutputStream extends OutputStream {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 	
-	public boolean isBufferSizeFitForCurrentSplitFile(int bufferSize) throws ZipException {
+	private boolean isBufferSizeFitForCurrentSplitFile(int bufferSize) throws ZipException {
 		if (bufferSize < 0) {
 			throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
 		}
@@ -169,7 +169,7 @@ public class SplitOutputStream extends OutputStream {
 	public void flush() {
 		
 	}
-	
+
 	public boolean isSplitZipFile() {
 		return this.splitLength != Globals.DEFAULT_VALUE_LONG;
 	}
@@ -190,15 +190,15 @@ public class SplitOutputStream extends OutputStream {
 	
 	private void startNextSplitFile() throws IOException {
 		try {
-			String currentSplitFile = null;
-			String folderPath = null;
+			String folderPath;
 			
 			if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
 				folderPath = this.filePath + "/";
 			} else {
 				folderPath = this.filePath + Globals.DEFAULT_PAGE_SEPARATOR;
 			}
-			
+
+			String currentSplitFile;
 			if (this.currentSplitFileIndex < 9) {
 				currentSplitFile = folderPath + fileName + ".zip.0" + (this.currentSplitFileIndex + 1);
 			} else {

@@ -27,10 +27,6 @@ import com.nervousync.commons.zip.ZipFile;
  */
 public class ZipOutputStream extends DeflaterOutputStream {
 
-	public ZipOutputStream(OutputStream outputStream) {
-		this(outputStream, null);
-	}
-	
 	public ZipOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		super(outputStream, zipFile);
 	}

@@ -64,7 +64,7 @@ import com.nervousync.exceptions.xml.XmlException;
  */
 public final class XmlUtils {
 	
-	public static final String DEFAULT_NAME = "##default";
+	private static final String DEFAULT_NAME = "##default";
 
 	//	Log Object
 	private final static Logger LOGGER = LoggerFactory.getLogger(XmlUtils.class);
@@ -81,7 +81,7 @@ public final class XmlUtils {
 		InputStream inputStream = null;
 		
 		try {
-			byte[] xmlBytes = null;
+			byte[] xmlBytes;
 			if (encoding == null) {
 				xmlBytes = xml.getBytes();
 			} else {
@@ -91,7 +91,7 @@ public final class XmlUtils {
 			SAXReader reader = new SAXReader();
 			
 			if (xmlNs != null) {
-				Map<String, String> namespaceURIs = new HashMap<String, String>();
+				Map<String, String> namespaceURIs = new HashMap<>();
 				namespaceURIs.put(xmlNs.prefix(), xmlNs.namespaceURI());
 				
 				reader.getDocumentFactory().setXPathNamespaceURIs(namespaceURIs);
@@ -101,13 +101,7 @@ public final class XmlUtils {
 		} catch (Exception e) {
 			throw new XmlException("Load xml file error! ", e);
 		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (Exception e) {
-					throw new XmlException("Close input stream error! ", e);
-				}
-			}
+			IOUtils.closeStream(inputStream);
 		}
 	}
 
@@ -154,7 +148,7 @@ public final class XmlUtils {
 			annoCheck = classType.isAnnotationPresent(XmlType.class);
 			element = (Element)xmlObj;
 		} else if (xmlObj instanceof InputStream) {
-			return XmlUtils.convertToObject(FileUtils.readFile((InputStream)xmlObj), classType);
+			return XmlUtils.convertToObject(IOUtils.readContent((InputStream)xmlObj), classType);
 		} else if (xmlObj instanceof String) {
 			if (((String)xmlObj).startsWith("<")) {
 				return XmlUtils.convertToObject(XmlUtils.loadXml((String)xmlObj, xmlNs), classType);
@@ -162,12 +156,16 @@ public final class XmlUtils {
 				return XmlUtils.convertToObject(XmlUtils.loadXml(FileUtils.readFile((String)xmlObj), xmlNs), classType);
 			}
 		}
+
+		if (element == null) {
+			return null;
+		}
 		
 		if (annoCheck) {
 			try {
-				Constructor<T> constructor = null;
+				Constructor<T> constructor;
 				if (classType.getName().indexOf('$') == -1) {
-					constructor = classType.getDeclaredConstructor(new Class[] {});
+					constructor = classType.getDeclaredConstructor();
 					constructor.setAccessible(true);
 					object = constructor.newInstance();
 				} else {
@@ -175,17 +173,17 @@ public final class XmlUtils {
 						String parameterTypeName = classType.getName();
 						parameterTypeName = parameterTypeName.substring(0, parameterTypeName.indexOf('$'));
 						Class<?> parameterType = ClassUtils.forName(parameterTypeName);
-						constructor = classType.getDeclaredConstructor(new Class[] {parameterType});
+						constructor = classType.getDeclaredConstructor(parameterType);
 						constructor.setAccessible(true);
 						
-						Constructor<?> paramConstructor = parameterType.getDeclaredConstructor(new Class[] {});
+						Constructor<?> paramConstructor = parameterType.getDeclaredConstructor();
 						paramConstructor.setAccessible(true);
 						
 						Object paramObj = paramConstructor.newInstance();
 						
-						object = constructor.newInstance(new Object[]{paramObj});
+						object = constructor.newInstance(paramObj);
 					} else {
-						constructor = classType.getDeclaredConstructor(new Class[] {});
+						constructor = classType.getDeclaredConstructor();
 						constructor.setAccessible(true);
 						object = constructor.newInstance();
 					}
@@ -200,29 +198,22 @@ public final class XmlUtils {
 					
 					if (field.isAnnotationPresent(XmlAttribute.class)) {
 						// 标注为Attribute
-						String attributeName = "";
-						String attributeValue = "";
-						
 						XmlAttribute xmlAttribute = field.getAnnotation(XmlAttribute.class);
+
+						String attributeName = xmlAttribute.name();
 						
-						attributeName = xmlAttribute.name();
-						
-						if (attributeName == null || DEFAULT_NAME.equals(attributeName) 
+						if (DEFAULT_NAME.equals(attributeName)
 								|| attributeName.trim().length() == 0) {
 							attributeName = fieldName;
 						}
 	
-						attributeValue = element.attributeValue(attributeName);
-
-						paramObj = StringUtils.parseSimpleData(attributeValue, field.getType());
+						paramObj = StringUtils.parseSimpleData(element.attributeValue(attributeName), field.getType());
 					} else if (field.isAnnotationPresent(XmlElement.class)) {
-						String elementName = "";
-						
 						XmlElement xmlElement = field.getAnnotation(XmlElement.class);
+
+						String elementName = xmlElement.name();
 						
-						elementName = xmlElement.name();
-						
-						if (elementName == null || DEFAULT_NAME.equals(elementName)
+						if (DEFAULT_NAME.equals(elementName)
 								|| elementName.trim().length() == 0) {
 							elementName = fieldName;
 						}
@@ -241,13 +232,12 @@ public final class XmlUtils {
 						XmlElementWrapper xmlElementWrapper = field.getAnnotation(XmlElementWrapper.class);
 						String elemName = xmlElementWrapper.name();
 						
-						if (elemName == null || elemName.trim().length() == 0
+						if (elemName.trim().length() == 0
 								|| DEFAULT_NAME.equals(elemName)) {
 							elemName = fieldName;
 						}
-						
-						String childElemName = null;
-						Class<?> paramClass = null;
+
+						Class<?> paramClass;
 
 						boolean isArray = field.getType().isArray();
 						
@@ -258,18 +248,17 @@ public final class XmlUtils {
 						}
 						
 						DataType elemType = ObjectUtils.retrieveSimpleDataType(paramClass);
-						
+
+						String childElemName;
 						if (DataType.OBJECT.equals(elemType)) {
-							XmlType childElement = paramClass.getAnnotation(XmlType.class);
-							childElemName = childElement.name();
-							
-							if (childElemName == null || childElemName.trim().length() == 0 
-									|| DEFAULT_NAME.equals(childElemName)) {
-								childElemName = paramClass.getSimpleName();
-							}
+							childElemName = readChildElemName(paramClass);
 						} else {
 							childElemName = elemName;
 							elemName = fieldName;
+						}
+
+						if (childElemName == null) {
+							continue;
 						}
 						
 						List<?> elemChildren = null;
@@ -283,10 +272,10 @@ public final class XmlUtils {
 							}
 						}
 						
-						List<Object> objList = null;
+						List<Object> objList;
 						
 						if (elemChildren != null) {
-							objList = new ArrayList<Object>(elemChildren.size());
+							objList = new ArrayList<>(elemChildren.size());
 							
 							for (Object childObj : elemChildren) {
 								if (DataType.OBJECT.equals(elemType)) {
@@ -297,7 +286,7 @@ public final class XmlUtils {
 								}
 							}
 						} else {
-							objList = new ArrayList<Object>(0);
+							objList = new ArrayList<>(0);
 						}
 						
 						if (isArray) {
@@ -321,7 +310,7 @@ public final class XmlUtils {
 		return object;
 	}
 	
-	public static boolean simpleDataType(Class<?> targetClass) {
+	private static boolean simpleDataType(Class<?> targetClass) {
 		if (String.class.equals(targetClass) || int.class.equals(targetClass) || Integer.class.equals(targetClass) 
 				|| double.class.equals(targetClass) || Double.class.equals(targetClass) || float.class.equals(targetClass) || Float.class.equals(targetClass)
 				|| boolean.class.equals(targetClass) || Boolean.class.equals(targetClass) || short.class.equals(targetClass) || Short.class.equals(targetClass)
@@ -333,22 +322,9 @@ public final class XmlUtils {
 	}
 
 	private static List<Field> getFields(Class<?> clazz) {
-		List<Field> fieldList = new ArrayList<Field>();
-		List<String> existsFieldName = new ArrayList<String>();
-		if (clazz != null) {
-			Field[] fields = clazz.getDeclaredFields();
-			for (Field field : fields) {
-				if (!existsFieldName.contains(field.getName())) {
-					fieldList.add(field);
-					existsFieldName.add(field.getName());
-				}
-			}
-
-			if (!clazz.equals(BaseElement.class)) {
-				XmlUtils.getFields(fieldList, existsFieldName,
-						clazz.getSuperclass());
-			}
-		}
+		List<Field> fieldList = new ArrayList<>();
+		List<String> existsFieldName = new ArrayList<>();
+		getFields(fieldList, existsFieldName, clazz);
 
 		return fieldList;
 	}
@@ -356,11 +332,11 @@ public final class XmlUtils {
 	private static void getFields(List<Field> fieldList,
 			List<String> existsFieldName, Class<?> clazz) {
 		if (fieldList == null) {
-			fieldList = new ArrayList<Field>();
+			fieldList = new ArrayList<>();
 		}
 
 		if (existsFieldName == null) {
-			existsFieldName = new ArrayList<String>();
+			existsFieldName = new ArrayList<>();
 		}
 
 		if (clazz != null) {
@@ -388,7 +364,6 @@ public final class XmlUtils {
 		// 获取对象的Class
 		Class<?> classType = object.getClass();
 		Class<?> paramClass = null;
-		String rootElemName = null;
 		Object[] arrayObjects = null;
 		
 		if (classType.isArray()) {
@@ -400,7 +375,8 @@ public final class XmlUtils {
 				paramClass = arrayObjects[0].getClass();
 			}
 		}
-		
+
+		String rootElemName;
 		if (paramClass != null) {
 			if (XmlUtils.simpleDataType(paramClass)) {
 				rootElemName = paramClass.getSimpleName();
@@ -420,7 +396,7 @@ public final class XmlUtils {
 			} else {
 				XmlRootElement documentAnno = paramClass.getAnnotation(XmlRootElement.class);
 				rootElemName = documentAnno.name();
-				if (rootElemName == null || DEFAULT_NAME.equals(rootElemName)
+				if (DEFAULT_NAME.equals(rootElemName)
 						|| rootElemName.trim().length() == 0) {
 					rootElemName = paramClass.getSimpleName();
 				}
@@ -441,7 +417,7 @@ public final class XmlUtils {
 		} else {
 			XmlRootElement documentAnno = classType.getAnnotation(XmlRootElement.class);
 			rootElemName = documentAnno.name();
-			if (rootElemName == null || DEFAULT_NAME.equals(rootElemName)
+			if (DEFAULT_NAME.equals(rootElemName)
 					|| rootElemName.trim().length() == 0) {
 				rootElemName = classType.getSimpleName();
 			}
@@ -456,7 +432,7 @@ public final class XmlUtils {
 		if (element == null && ignoreNullElement) {
 			return;
 		}
-		
+
 		DataType dataType = ObjectUtils.retrieveSimpleDataType(objectClass);
 		
 		if (DataType.OBJECT.equals(dataType)) {
@@ -504,15 +480,11 @@ public final class XmlUtils {
 								element.setText("");
 							}
 						}
-						continue;
 					} else if (field.isAnnotationPresent(XmlAttribute.class)) {
 						// 标注为Attribute
-						String attributeName = "";
-						String attributeValue = "";
-						
 						XmlAttribute xmlAttrAnno = field.getAnnotation(XmlAttribute.class);
-						
-						attributeName = xmlAttrAnno.name();
+
+						String attributeName = xmlAttrAnno.name();
 						
 						if (DEFAULT_NAME.equals(attributeName)
 								|| attributeName.trim().length() == 0) {
@@ -523,13 +495,14 @@ public final class XmlUtils {
 							if (DataType.NUMBER.equals(fieldType) || DataType.STRING.equals(fieldType)
 									|| DataType.BOOLEAN.equals(fieldType) || DataType.DATE.equals(fieldType)
 									|| DataType.ENUM.equals(fieldType)) {
+								String attributeValue;
 								if (DataType.DATE.equals(fieldType)) {
 									attributeValue = DateTimeUtils.formatDateForSitemap((Date) fieldValue);
 								} else {
 									attributeValue = fieldValue.toString();
 								}
 								
-								element.addAttribute(attributeName, attributeValue);
+								element.addAttribute(attributeName, attributeValue == null ? "" : attributeValue);
 							} else {
 								throw new XmlException("Attribute type does not support!");
 							}
@@ -539,13 +512,11 @@ public final class XmlUtils {
 							}
 						}
 					} else if (field.isAnnotationPresent(XmlElement.class)) {
-						String elemName = null;
-						
 						XmlElement xmlElemAnno = field.getAnnotation(XmlElement.class);
+
+						String elemName = xmlElemAnno.name();
 						
-						elemName = xmlElemAnno.name();
-						
-						if (elemName == null || DEFAULT_NAME.equals(elemName)
+						if (DEFAULT_NAME.equals(elemName)
 								|| elemName.trim().length() == 0) {
 							elemName = field.getName();
 						}
@@ -560,45 +531,8 @@ public final class XmlUtils {
 							}
 							convertToXmlElement(fieldClass, childObject, childElement, ignoreNullElement);
 						} else {
-							String nodeValue = null;
-							
-							if (fieldValue != null) {
-								if (DataType.DATE.equals(fieldType)) {
-									nodeValue = DateTimeUtils.formatDateForSitemap((Date) fieldValue);
-								} else if (DataType.BINARY.equals(fieldType)) {
-									byte[] binary = null;
-									if (fieldValue instanceof byte[]) {
-										binary = (byte[])fieldValue;
-									} else {
-										ByteArrayOutputStream byteArrayOutputStream = null;
-										ObjectOutputStream objectOutputStream = null;
-										try {
-											byteArrayOutputStream = new ByteArrayOutputStream();
-											objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-											objectOutputStream.writeObject(fieldValue);
-											binary = byteArrayOutputStream.toByteArray();
-										} catch (IOException e) {
-											if (LOGGER.isDebugEnabled()) {
-												LOGGER.debug("Encode binary data error! ", e);
-											}
-										} finally {
-											if (objectOutputStream != null) {
-												objectOutputStream.close();
-											}
-											
-											if (byteArrayOutputStream != null) {
-												byteArrayOutputStream.close();
-											}
-										}
-									}
-									nodeValue = StringUtils.base64Encode(binary);
-								} else {
-									if (fieldValue != null) {
-										nodeValue = StringUtils.formatTextForXML(fieldValue.toString());
-									}
-								}
-							}
-							
+							String nodeValue = convertDataToString(fieldType, fieldValue);
+
 							if (nodeValue != null) {
 								element.addElement(elemName).setText(nodeValue);
 							} else {
@@ -608,18 +542,15 @@ public final class XmlUtils {
 							}
 						}
 					} else if (field.isAnnotationPresent(XmlElementWrapper.class)) {
-						String elemName = null;
-						
 						XmlElementWrapper xmlElementWrapper = field.getAnnotation(XmlElementWrapper.class);
 
-						elemName = xmlElementWrapper.name();
-						if (elemName == null || elemName.trim().length() == 0
+						String elemName = xmlElementWrapper.name();
+						if (elemName.trim().length() == 0
 								|| DEFAULT_NAME.equals(elemName)) {
 							elemName = fieldName;
 						}
-						
-						String childElemName = null;
-						Class<?> paramClass = null;
+
+						Class<?> paramClass;
 						
 						if (field.getType().isArray()) {
 							paramClass = field.getType().getComponentType();
@@ -628,15 +559,10 @@ public final class XmlUtils {
 						}
 						
 						DataType elemType = ObjectUtils.retrieveSimpleDataType(paramClass);
-						
+
+						String childElemName;
 						if (DataType.OBJECT.equals(elemType)) {
-							XmlType childElement = paramClass.getAnnotation(XmlType.class);
-							childElemName = childElement.name();
-							
-							if (childElemName == null || childElemName.trim().length() == 0 
-									|| DEFAULT_NAME.equals(childElemName)) {
-								childElemName = paramClass.getSimpleName();
-							}
+							childElemName = readChildElemName(paramClass);
 						} else {
 							childElemName = elemName;
 							elemName = fieldName;
@@ -654,7 +580,7 @@ public final class XmlUtils {
 						}
 						
 						Element parentElement = element;
-						List<?> arrayList = null;
+						List<?> arrayList;
 						
 						if (field.getType().isArray()) {
 							arrayList = Arrays.asList((Object[]) fieldValue);
@@ -670,45 +596,12 @@ public final class XmlUtils {
 							continue;
 						}
 						
-						for (int j = 0; j < arrayCount; j++) {
-							Object childObj = arrayList.get(j);
+						for (Object childObj : arrayList) {
 							if (DataType.OBJECT.equals(elemType)) {
 								Element childElem = parentElement.addElement(childElemName);
 								convertToXmlElement(paramClass, childObj, childElem, ignoreNullElement);
 							} else {
-								String nodeValue = null;
-								if (DataType.DATE.equals(fieldType)) {
-									nodeValue = DateTimeUtils.formatDateForSitemap((Date) childObj);
-								} else if (DataType.BINARY.equals(fieldType)) {
-									byte[] binary = null;
-									if (fieldValue instanceof byte[]) {
-										binary = (byte[])childObj;
-									} else {
-										ByteArrayOutputStream byteArrayOutputStream = null;
-										ObjectOutputStream objectOutputStream = null;
-										try {
-											byteArrayOutputStream = new ByteArrayOutputStream();
-											objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-											objectOutputStream.writeObject(childObj);
-											binary = byteArrayOutputStream.toByteArray();
-										} catch (IOException e) {
-											if (LOGGER.isDebugEnabled()) {
-												LOGGER.debug("Encode binary data error! ", e);
-											}
-										} finally {
-											if (objectOutputStream != null) {
-												objectOutputStream.close();
-											}
-											
-											if (byteArrayOutputStream != null) {
-												byteArrayOutputStream.close();
-											}
-										}
-									}
-									nodeValue = StringUtils.base64Encode(binary);
-								} else {
-									nodeValue = StringUtils.formatTextForXML(childObj.toString());
-								}
+								String nodeValue = convertDataToString(fieldType, childObj);
 								
 								if (nodeValue != null) {
 									parentElement.addElement(childElemName).setText(nodeValue);
@@ -724,9 +617,7 @@ public final class XmlUtils {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("Convert Object To XML Error! ", e);
 					}
-					continue;
 				}
-			
 			}
 		} else {
 			String text = null;
@@ -737,11 +628,66 @@ public final class XmlUtils {
 				} else {
 					text = object.toString();
 				}
-			} else {
-				text = "";
 			}
-			element.setText(text);
+			if (text == null) {
+				element.setText(Globals.DEFAULT_VALUE_STRING);
+			} else {
+				element.setText(text);
+			}
 		}
+	}
+
+	private static String convertDataToString(DataType fieldType, Object object) {
+		if (object == null) {
+			return null;
+		}
+
+		String nodeValue;
+		if (DataType.DATE.equals(fieldType)) {
+			nodeValue = DateTimeUtils.formatDateForSitemap((Date) object);
+		} else if (DataType.BINARY.equals(fieldType)) {
+			nodeValue = StringUtils.base64Encode(processBinaryDatas(object));
+		} else {
+			nodeValue = StringUtils.formatTextForXML(object.toString());
+		}
+		return nodeValue;
+	}
+
+	private static String readChildElemName(Class<?> paramClass) {
+		String childElemName;
+		XmlType childElement = paramClass.getAnnotation(XmlType.class);
+		childElemName = childElement.name();
+
+		if (childElemName.trim().length() == 0
+				|| DEFAULT_NAME.equals(childElemName)) {
+			childElemName = paramClass.getSimpleName();
+		}
+		return childElemName;
+	}
+
+	private static byte[] processBinaryDatas(Object object) {
+		byte[] binary;
+		if (object instanceof byte[]) {
+			binary = (byte[])object;
+		} else {
+			ByteArrayOutputStream byteArrayOutputStream = null;
+			ObjectOutputStream objectOutputStream = null;
+			try {
+				byteArrayOutputStream = new ByteArrayOutputStream();
+				objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+				objectOutputStream.writeObject(object);
+				binary = byteArrayOutputStream.toByteArray();
+			} catch (IOException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Encode binary data error! ", e);
+				}
+				binary = new byte[]{};
+			} finally {
+				IOUtils.closeStream(objectOutputStream);
+				IOUtils.closeStream(byteArrayOutputStream);
+			}
+		}
+		return binary;
 	}
 	
 	private static String convertToXmlString(Document document, String indent, String encoding, boolean expandEmptyElements) throws XmlException {
@@ -780,19 +726,20 @@ public final class XmlUtils {
 			
 			return stringWriter.toString();
 		} catch (IOException e) {
-			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Catch error! ", e);
+			}
 		} finally {
 			try {
 				if (xmlWriter != null) {
 					xmlWriter.close();
 				}
-				
-				if (stringWriter != null) {
-					stringWriter.close();
-				}
 			} catch (IOException e) {
-				
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Catch error! ", e);
+				}
 			}
+			IOUtils.closeStream(stringWriter);
 		}
 		
 		return null;

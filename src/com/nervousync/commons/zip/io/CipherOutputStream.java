@@ -19,7 +19,6 @@ package com.nervousync.commons.zip.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.CRC32;
@@ -52,7 +51,7 @@ public class CipherOutputStream extends OutputStream {
 	/**
 	 * Target output stream
 	 */
-	private OutputStream outputStream;
+	private final OutputStream outputStream;
 	/**
 	 * Source file
 	 */
@@ -60,22 +59,22 @@ public class CipherOutputStream extends OutputStream {
 	private GeneralFileHeader generalFileHeader;
 	private LocalFileHeader localFileHeader;
 	private Encryptor encryptor;
-	protected ZipOptions zipOptions;
+	ZipOptions zipOptions;
 	/**
 	 * Target zip file object
 	 */
-	private ZipFile zipFile;
+	private final ZipFile zipFile;
 	/**
 	 * CRC
 	 */
-	protected CRC32 crc;
+	final CRC32 crc;
 	private long totalWriteBytes;
 	private long totalReadBytes;
-	protected long bytesWrittenForThisFile;
-	private byte[] pendingBuffer;
+	long bytesWrittenForThisFile;
+	private final byte[] pendingBuffer;
 	private int pendingBufferLength;
 
-	public CipherOutputStream(OutputStream outputStream, ZipFile zipFile) {
+	CipherOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		this.outputStream = outputStream;
 		this.zipFile = zipFile;
 		this.initZipFile();
@@ -154,7 +153,7 @@ public class CipherOutputStream extends OutputStream {
 						this.bytesWrittenForThisFile += headerBytes.length;
 					} else if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
 						byte[] saltBytes = ((AESEncryptor) this.encryptor).getSaltBytes();
-						byte[] passwordVerifier = ((AESEncryptor) this.encryptor).getDerviedPasswordVerifier();
+						byte[] passwordVerifier = ((AESEncryptor) this.encryptor).getDerivedPasswordVerifier();
 						this.outputStream.write(saltBytes);
 						this.outputStream.write(passwordVerifier);
 						this.totalWriteBytes += saltBytes.length + passwordVerifier.length;
@@ -239,7 +238,7 @@ public class CipherOutputStream extends OutputStream {
 				this.bytesWrittenForThisFile += 10;
 				this.totalWriteBytes += 10;
 			} else {
-				throw new ZipException("invalid encrypter for AES encrypted file");
+				throw new ZipException("invalid encryptor for AES encrypted file");
 			}
 		}
 
@@ -281,7 +280,7 @@ public class CipherOutputStream extends OutputStream {
 		this.totalReadBytes = 0L;
 	}
 
-	public void finish() throws IOException, ZipException {
+	public void finish() throws ZipException {
 		this.zipFile.getEndCentralDirectoryRecord().setOffsetOfStartOfCentralDirectory(this.totalWriteBytes);
 		this.zipFile.finalizeZipFile(this.outputStream);
 	}
@@ -292,7 +291,7 @@ public class CipherOutputStream extends OutputStream {
 		}
 	}
 
-	protected void updateTotalBytesRead(int readCount) {
+	void updateTotalBytesRead(int readCount) {
 		if (readCount > 0) {
 			this.totalReadBytes += readCount;
 		}
@@ -358,7 +357,7 @@ public class CipherOutputStream extends OutputStream {
 			this.generalFileHeader.setEncryptionMethod(this.zipOptions.getEncryptionMethod());
 		}
 
-		String entryPath = null;
+		String entryPath;
 		if (this.zipOptions.isSourceExternalStream()) {
 			this.generalFileHeader.setLastModFileTime((int) DateTimeUtils.toDosTime(System.currentTimeMillis()));
 			if (this.zipOptions.getFileNameInZip() == null || this.zipOptions.getFileNameInZip().length() == 0) {
@@ -401,7 +400,7 @@ public class CipherOutputStream extends OutputStream {
 		byte[] externalFileAttrs = { (byte) fileAttrs, 0, 0, 0 };
 		this.generalFileHeader.setExternalFileAttr(externalFileAttrs);
 		
-		boolean isDirectory = Globals.DEFAULT_VALUE_BOOLEAN;
+		boolean isDirectory;
 		if (this.zipOptions.isSourceExternalStream()) {
 			isDirectory = entryPath.endsWith(ZipConstants.ZIP_FILE_SEPARATOR) 
 					|| entryPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR);
@@ -420,7 +419,7 @@ public class CipherOutputStream extends OutputStream {
 					if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
 						this.generalFileHeader.setCompressedSize(fileSize + ZipConstants.STD_DEC_HDR_SIZE);
 					} else if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
-						int saltLength = 0;
+						int saltLength;
 						switch (this.zipOptions.getAesKeyStrength()) {
 						case ZipConstants.AES_STRENGTH_128:
 							saltLength = 8;
@@ -459,8 +458,6 @@ public class CipherOutputStream extends OutputStream {
 				|| (!isFileNameCharset && StringUtils.detectCharSet(this.generalFileHeader.getEntryPath())
 						.equalsIgnoreCase(Globals.DEFAULT_ENCODING))) {
 			generalPurposeFlag[1] = 8;
-		} else {
-			generalPurposeFlag[1] = 0;
 		}
 
 		this.generalFileHeader.setGeneralPurposeFlag(generalPurposeFlag);
@@ -520,9 +517,7 @@ public class CipherOutputStream extends OutputStream {
 			generalPurposeFlag[0] = 0;
 		}
 
-		if (compressionMethod == ZipConstants.COMP_DEFLATE) {
-			// Set flag for deflate
-		} else {
+		if (compressionMethod != ZipConstants.COMP_DEFLATE) {
 			generalPurposeFlag[1] = 0;
 			generalPurposeFlag[2] = 0;
 		}
@@ -551,7 +546,7 @@ public class CipherOutputStream extends OutputStream {
 		this.localFileHeader.setAesExtraDataRecord(this.generalFileHeader.getAesExtraDataRecord());
 		this.localFileHeader.setCrc32(this.generalFileHeader.getCrc32());
 		this.localFileHeader.setCompressedSize(this.generalFileHeader.getCompressedSize());
-		this.localFileHeader.setGeneralPurposeFlag((byte[]) this.generalFileHeader.getGeneralPurposeFlag().clone());
+		this.localFileHeader.setGeneralPurposeFlag(this.generalFileHeader.getGeneralPurposeFlag().clone());
 	}
 
 	private void initEncryptor() throws ZipException {
@@ -565,7 +560,7 @@ public class CipherOutputStream extends OutputStream {
 				this.encryptor = new AESEncryptor(this.zipOptions.getPassword(), this.zipOptions.getAesKeyStrength());
 				break;
 			default:
-				throw new ZipException("invalid encprytion method");
+				throw new ZipException("invalid encryption method");
 			}
 		} else {
 			this.encryptor = null;
@@ -578,7 +573,7 @@ public class CipherOutputStream extends OutputStream {
 			throw new ZipException("Local file header is null, cannot write!");
 		}
 		try {
-			List<String> byteArrayList = new ArrayList<String>();
+			List<String> byteArrayList = new ArrayList<>();
 
 			byte[] shortBuffer = new byte[2];
 			byte[] intBuffer = new byte[4];
@@ -686,9 +681,7 @@ public class CipherOutputStream extends OutputStream {
 			outputStream.write(bytes);
 
 			return bytes.length;
-		} catch (UnsupportedCharsetException e) {
-			throw new ZipException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new ZipException(e);
 		}
 	}

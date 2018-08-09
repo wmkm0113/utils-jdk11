@@ -18,7 +18,6 @@ package com.nervousync.commons.beans.xml;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +41,9 @@ public class BaseElement implements Serializable {
 	private static final long serialVersionUID = 239544550914272242L;
 	
 	protected transient final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	public BaseElement() {
-		
-	}
-	
+
 	/**
-	 * Parse xml string and setting datas to this object
+	 * Parse xml string and setting fields data to this object
 	 * @param xmlObj	XML string will be parsed
 	 */
 	public void parseXml(Object xmlObj) {
@@ -66,7 +61,7 @@ public class BaseElement implements Serializable {
 
 	/**
 	 * Convert Object to XML String By Nervousync XML Util 
-	 * Expain all empty element
+	 * Explain all empty element
 	 * 
 	 * @param indent 				Indent string
 	 * @return XML String
@@ -77,7 +72,7 @@ public class BaseElement implements Serializable {
 	
 	/**
 	 * Convert Object to XML String By Nervousync XML Util 
-	 * Expain all empty element
+	 * Explain all empty element
 	 * 
 	 * @param indent 				Indent string
 	 * @param encoding				Charset encoding
@@ -89,11 +84,11 @@ public class BaseElement implements Serializable {
 	
 	/**
 	 * Convert Object to XML String By Nervousync XML Util 
-	 * Expain all empty element
+	 * Explain all empty element
 	 * 
 	 * @param indent 				Indent string
 	 * @param encoding				Charset encoding
-	 * @param expandEmptyElements 	Expain empty element status
+	 * @param expandEmptyElements 	Explain empty element status
 	 * @return XML String
 	 */
 	public String toString(String indent, String encoding, boolean expandEmptyElements) throws XmlException {
@@ -118,23 +113,8 @@ public class BaseElement implements Serializable {
 		
 		try {
 			for (Field field : fields) {
-				String fieldName = field.getName();
-				String methodName = null;
-				
-				if (field.getType().equals(boolean.class)) {
-					methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-				} else {
-					methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-				}
-				
-				if ("serialVersionUID".equals(fieldName)) {
-					methodName = "getSerialversionuid";
-				}
-				
-				Method getMethod = ReflectionUtils.findMethod(this.getClass(), methodName, new Class[]{});
-				
-				Object origValue = getMethod.invoke(this, new Object[]{});
-				Object destValue = getMethod.invoke(o, new Object[]{});
+				Object origValue = ReflectionUtils.getFieldValue(field, this);
+				Object destValue = ReflectionUtils.getFieldValue(field, o);
 				
 				if (origValue != null ? !origValue.equals(destValue) : destValue != null) {
 					return false;
@@ -150,31 +130,15 @@ public class BaseElement implements Serializable {
 	public int hashCode() {
 		Field[] fields = this.getClass().getDeclaredFields();
 		
-		int result = 0;
+		int result = Globals.INITIAL_HASH;
 
 		try {
 			for (Field field : fields) {
-				String fieldName = field.getName();
-				String methodName = null;
-				
-				if (field.getType().equals(boolean.class)) {
-					methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-				} else {
-					methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-				}
-				
-				if ("serialVersionUID".equals(fieldName)) {
-					methodName = "getSerialversionuid";
-				}
-				
-				Method getMethod = ReflectionUtils.findMethod(this.getClass(), methodName, new Class[]{});
-				
-				Object origValue = getMethod.invoke(this, new Object[]{});
-				
-				result = 29 * result + (origValue != null ? origValue.hashCode() : 0);
+				Object origValue = ReflectionUtils.getFieldValue(field, this);
+				result = Globals.MULTIPLIER * result + (origValue != null ? origValue.hashCode() : 0);
 			}
 		} catch (Exception e) {
-			return 0;
+			result = Globals.INITIAL_HASH;
 		}
 		
 		return result;

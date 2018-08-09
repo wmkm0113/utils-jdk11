@@ -39,7 +39,7 @@ public final class SNMPData implements Serializable {
 	/**
 	 * GMT time of reading datas operate.
 	 */
-	private long currentGMTTime;
+	private final long currentGMTTime;
 	/**
 	 * Identified key
 	 */
@@ -47,11 +47,11 @@ public final class SNMPData implements Serializable {
 	/**
 	 * Reading data map
 	 */
-	private Map<String, String> dataMap = null;
+	private final Map<String, String> dataMap;
 	
 	public SNMPData() {
 		this.currentGMTTime = DateTimeUtils.currentGMTTimeMillis();
-		this.dataMap = new HashMap<String, String>();
+		this.dataMap = new HashMap<>();
 	}
 
 	/**

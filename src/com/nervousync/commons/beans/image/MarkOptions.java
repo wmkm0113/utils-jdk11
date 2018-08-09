@@ -34,36 +34,36 @@ public final class MarkOptions {
 	 * Mark type
 	 * @see com.nervousync.commons.beans.image.MarkOptions.MarkType
 	 */
-	private MarkType markType;
+	private final MarkType markType;
 	/**
 	 * Mark location define
 	 * @see com.nervousync.commons.beans.image.MarkOptions.MarkLocation
 	 */
-	private MarkLocation markLocation;
+	private final MarkLocation markLocation;
 	/**
 	 * Mark image path if mark type is MarkType.ICON
 	 */
-	private String markPath = null;
+	private final String markPath;
 	/**
 	 * Mark image transparent value, default is 1, valid value is between 0 and 1
 	 */
-	private float transparency = 1f;
+	private final float transparency;
 	/**
 	 * Mark text value if mark type is MarkType.TEXT
 	 */
-	private String markText = null;
+	private final String markText;
 	/**
 	 * Mark text color setting
 	 */
-	private Color color = Color.BLACK;
+	private final Color color;
 	/**
 	 * Mark text font name
 	 */
-	private String fontName = null;
+	private final String fontName;
 	/**
 	 * Mark text font size
 	 */
-	private int fontSize = 12;
+	private final int fontSize;
 	
 	private MarkOptions(MarkType markType, MarkLocation markLocation, 
 			String markPath, float transparency, String markText, 
@@ -269,8 +269,8 @@ public final class MarkOptions {
 		
 	public static final class MarkPosition {
 		
-		private int positionX = Globals.DEFAULT_VALUE_INT;
-		private int positionY = Globals.DEFAULT_VALUE_INT;
+		private final int positionX;
+		private final int positionY;
 		
 		public MarkPosition(int positionX, int positionY) {
 			this.positionX = positionX;

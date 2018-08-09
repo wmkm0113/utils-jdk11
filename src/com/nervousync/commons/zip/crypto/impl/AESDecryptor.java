@@ -29,7 +29,7 @@ import com.nervousync.utils.RawUtils;
  */
 public class AESDecryptor extends AESCrypto implements Decryptor {
 
-	private LocalFileHeader localFileHeader = null;
+	private LocalFileHeader localFileHeader;
 	private byte[] storedMac = null;
 
 	public AESDecryptor(LocalFileHeader localFileHeader, 

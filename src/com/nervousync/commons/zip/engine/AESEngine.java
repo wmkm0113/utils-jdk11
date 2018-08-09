@@ -16,7 +16,6 @@
  */
 package com.nervousync.commons.zip.engine;
 
-import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**
@@ -34,11 +33,11 @@ public final class AESEngine {
 		this.generateWorkingKeys(keys);
 	}
 	
-	public int processBlock(byte[] in, byte[] out) throws ZipException {
-		return this.processBlock(in, 0, out, 0);
+	public void processBlock(byte[] in, byte[] out) throws ZipException {
+		this.processBlock(in, 0, out, 0);
 	}
 	
-	public int processBlock(byte[] in, int inOffset, byte[] out, int outOffset) throws ZipException {
+	public void processBlock(byte[] in, int inOffset, byte[] out, int outOffset) throws ZipException {
 		if (this.workingKeys == null) {
 			throw new ZipException("AES engine not initialized");
 		}
@@ -54,11 +53,9 @@ public final class AESEngine {
 		this.stateIn(in, inOffset);
 		this.encryptBlock();
 		this.stateOut(out, outOffset);
-		
-		return ZipConstants.AES_BLOCK_SIZE;
 	}
 
-	private final void stateIn(byte[] bytes, int offset) {
+	private void stateIn(byte[] bytes, int offset) {
 		int index = offset;
 
 		this.C0 = (bytes[index++] & 0xFF);
@@ -82,7 +79,7 @@ public final class AESEngine {
 		this.C3 |= bytes[index++] << 24;
 	}
 
-	private final void encryptBlock() {
+	private void encryptBlock() {
 		int r, r0, r1, r2, r3;
 
 		this.C0 ^= this.workingKeys[0][0];
@@ -134,7 +131,7 @@ public final class AESEngine {
 				^ this.workingKeys[r][3];
 	}
 
-	private final void stateOut(byte[] bytes, int offset) {
+	private void stateOut(byte[] bytes, int offset) {
 		int index = offset;
 
 		bytes[index++] = (byte)this.C0;

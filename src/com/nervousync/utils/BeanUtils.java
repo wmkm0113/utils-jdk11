@@ -16,7 +16,6 @@
  */
 package com.nervousync.utils;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 import net.sf.cglib.beans.BeanCopier;
@@ -30,8 +29,8 @@ import com.nervousync.exceptions.beans.BeansException;
  */
 public final class BeanUtils {
 
-	private static Hashtable<String, BeanCopier> BEAN_COPIER_MAP = new Hashtable<String, BeanCopier>();
-	
+	private static final Hashtable<String, BeanCopier> BEAN_COPIER_MAP = new Hashtable<>();
+
 	private BeanUtils() {
 		
 	}
@@ -47,7 +46,7 @@ public final class BeanUtils {
 	 * @param dest the target bean
 	 * @throws BeansException if the copying failed
 	 */
-	public static void copyProperties(Object orig, Object dest) throws BeansException {
+	public static void copyProperties(Object orig, Object dest) {
 		BeanUtils.copyProperties(orig, dest, null);
 	}
 	
@@ -63,34 +62,30 @@ public final class BeanUtils {
 	 * @param converter converter instance
 	 * @throws BeansException if the copying failed
 	 */
-	public static void copyProperties(Object orig, Object dest, Converter converter) throws BeansException {
-		BeanCopier beanCopier = null;
-		try {
-			String cacheKey = null;
-			if (converter == null) {
-				cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), null);
-			} else {
-				cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), converter.getClass());
-			}
-			
-			if (BeanUtils.BEAN_COPIER_MAP.containsKey(cacheKey)) {
-				beanCopier = BeanUtils.BEAN_COPIER_MAP.get(cacheKey);
-			} else {
-				if (converter == null) {
-					beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), false);
-				} else {
-					beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), true);
-				}
-				BeanUtils.BEAN_COPIER_MAP.put(cacheKey, beanCopier);
-			}
-			
-			beanCopier.copy(orig, dest, converter);
-		} catch (IOException e) {
-			throw new BeansException("Copy properties error! ", e);
+	public static void copyProperties(Object orig, Object dest, Converter converter) {
+		String cacheKey;
+		if (converter == null) {
+			cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), null);
+		} else {
+			cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), converter.getClass());
 		}
+
+		BeanCopier beanCopier;
+		if (BeanUtils.BEAN_COPIER_MAP.containsKey(cacheKey)) {
+			beanCopier = BeanUtils.BEAN_COPIER_MAP.get(cacheKey);
+		} else {
+			if (converter == null) {
+				beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), false);
+			} else {
+				beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), true);
+			}
+			BeanUtils.BEAN_COPIER_MAP.put(cacheKey, beanCopier);
+		}
+
+		beanCopier.copy(orig, dest, converter);
 	}
 	
-	private static String generateKey(Class<?> origClass, Class<?> destClass, Class<?> converterClass) throws IOException {
+	private static String generateKey(Class<?> origClass, Class<?> destClass, Class<?> converterClass) {
 		if (converterClass == null) {
 			return SecurityUtils.MD5(origClass.getName() + "To" + destClass.getName());
 		} else {

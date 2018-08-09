@@ -23,7 +23,6 @@ import com.nervousync.commons.beans.mail.protocol.BaseProtocol;
 import com.nervousync.commons.beans.mail.protocol.impl.IMAPProtocol;
 import com.nervousync.commons.beans.mail.protocol.impl.POP3Protocol;
 import com.nervousync.commons.beans.mail.protocol.impl.SMTPProtocol;
-import com.nervousync.commons.core.Globals;
 import com.nervousync.enumerations.mail.ProtocolOption;
 
 /**
@@ -180,9 +179,9 @@ public final class MailServerConfig implements Serializable {
 		
 		private BaseProtocol protocol;
 		private String hostName;
-		private int hostPort = Globals.DEFAULT_VALUE_INT;
-		private boolean ssl = false;
-		private boolean authLogin = false;
+		private int hostPort;
+		private boolean ssl;
+		private boolean authLogin;
 		private ProtocolOption protocolOption;
 		
 		public ServerConfig(BaseProtocol protocol, String hostName, int hostPort, boolean ssl, boolean authLogin) {

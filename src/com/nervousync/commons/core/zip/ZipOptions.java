@@ -96,7 +96,7 @@ public final class ZipOptions implements Cloneable {
 	
 	/**
 	 * Constructor by given password
-	 * @param password
+	 * @param password  password
 	 */
 	private ZipOptions(String password) {
 		this.encryptFiles = true;

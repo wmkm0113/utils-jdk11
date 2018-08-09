@@ -128,7 +128,7 @@ public final class MIMETypes implements Serializable {
 	 */
 	public static boolean isImage(String mimeType) {
 		for (String imageType : MIME_TYPE_IMAGES) {
-			if (mimeType.indexOf(imageType) != Globals.DEFAULT_VALUE_INT) {
+			if (mimeType.contains(imageType)) {
 				return true;
 			}
 		}
@@ -142,7 +142,7 @@ public final class MIMETypes implements Serializable {
 	 */
 	public static boolean isMedia(String mimeType) {
 		for (String mediaType : MIME_TYPE_MEDIAS) {
-			if (mimeType.indexOf(mediaType) != Globals.DEFAULT_VALUE_INT) {
+			if (mimeType.contains(mediaType)) {
 				return true;
 			}
 		}
@@ -155,11 +155,8 @@ public final class MIMETypes implements Serializable {
 	 * @return				Check result
 	 */
 	public static boolean isXml(String mimeType) {
-		if (mimeType.indexOf(MIME_TYPE_TEXT_XML) != Globals.DEFAULT_VALUE_INT
-				|| mimeType.indexOf(MIME_TYPE_APPLICATION_XML) != Globals.DEFAULT_VALUE_INT) {
-			return true;
-		}
-		return false;
+		return mimeType.contains(MIME_TYPE_TEXT_XML)
+				|| mimeType.contains(MIME_TYPE_APPLICATION_XML);
 	}
 	
 	/**
@@ -168,10 +165,7 @@ public final class MIMETypes implements Serializable {
 	 * @return				Check result
 	 */
 	public static boolean isJSON(String mimeType) {
-		if (mimeType.indexOf(MIME_TYPE_JSON) != Globals.DEFAULT_VALUE_INT) {
-			return true;
-		}
-		return false;
+		return mimeType.contains(MIME_TYPE_JSON);
 	}
 	
 	/**
@@ -181,7 +175,7 @@ public final class MIMETypes implements Serializable {
 	 */
 	public static boolean isText(String mimeType) {
 		for (String textType : MIME_TYPE_TEXTS) {
-			if (mimeType.indexOf(textType) != Globals.DEFAULT_VALUE_INT) {
+			if (mimeType.contains(textType)) {
 				return true;
 			}
 		}

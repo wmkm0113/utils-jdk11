@@ -16,7 +16,6 @@
  */
 package com.nervousync.utils;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -99,7 +98,7 @@ public final class FileUtils {
 	/** Line break character */
 	public static final String NEWLINE_CHARACTER = "\n";
 
-	private static Hashtable<String, FileExtensionInfo> REGISTER_IDEN_MAP = new Hashtable<String, FileExtensionInfo>();
+	private static final Hashtable<String, FileExtensionInfo> REGISTER_IDEN_MAP = new Hashtable<>();
 	
 	/** Define file type code for picture */
 	public static final int FILE_TYPE_PIC 				= 0;
@@ -297,7 +296,7 @@ public final class FileUtils {
 	/**
 	 * Identified file type
 	 * @param extensionName	extension name
-	 * @param fileContent	File datas as byte arrays
+	 * @param fileContent	File data as byte arrays
 	 * @return				identified result
 	 */
 	public static boolean validateFileType(String extensionName, byte[] fileContent) {
@@ -309,10 +308,8 @@ public final class FileUtils {
 				return Globals.DEFAULT_VALUE_BOOLEAN;
 			}
 			byte[] fileTypeByte = new byte[idenLength];
-			
-			for (int i = 0 ; i < idenLength ; i++) {
-				fileTypeByte[i] = fileContent[i];
-			}
+
+			System.arraycopy(fileContent, 0, fileTypeByte, 0, idenLength);
 
 			String fileType = ConvertUtils.byteArrayToHexString(fileTypeByte);
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
@@ -400,7 +397,6 @@ public final class FileUtils {
 	 * Read file last modified time
 	 * @param resourceLocation	resource location
 	 * @return last modified time with long type if file exists 
-	 * @return <code>Globals.DEFAULT_VALUE_LONG</code> for others
 	 */
 	public static long lastModify(String resourceLocation) {
 		if (resourceLocation == null || resourceLocation.trim().length() == 0) {
@@ -414,7 +410,7 @@ public final class FileUtils {
 				}
 			} else {
 				File file = FileUtils.getFile(resourceLocation);
-				if (file != null && file.exists()) {
+				if (file.exists()) {
 					return file.lastModified();
 				}
 			}
@@ -429,8 +425,7 @@ public final class FileUtils {
 	/**
 	 * Read file last modified time
 	 * @param resourceLocation	resource location
-	 * @return last modified time with <code>java.util.Date</code> type if file exists 
-	 * @return null for others
+	 * @return last modified time with <code>java.util.Date</code> type if file exists or null for others
 	 */
 	public static Date getLastModify(String resourceLocation) {
 		long lastModify = FileUtils.lastModify(resourceLocation);
@@ -463,23 +458,6 @@ public final class FileUtils {
 	 */
 	public static InputStream loadFile(String resourceLocation) 
 			throws FileNotFoundException, IOException {
-		return FileUtils.loadFile(resourceLocation, null);
-	}
-	
-	/**
-	 * Load resource and convert to java.io.InputStream used encode
-	 * @param resourceLocation	resource location
-	 * @param encode 			charset encoding
-	 * @return <code>java.io.InputStream</code>
-	 * @throws FileNotFoundException	target file does not exists
-	 * @throws IOException when opening input stream error
-	 */
-	public static InputStream loadFile(String resourceLocation, String encode) 
-			throws FileNotFoundException, IOException {
-		if (encode == null || encode.length() == 0) {
-			encode = Globals.DEFAULT_ENCODING;
-		}
-
 		//	Convert resource location to input stream
 		InputStream inputStream = FileUtils.class.getResourceAsStream(resourceLocation);
 		
@@ -487,18 +465,16 @@ public final class FileUtils {
             try {
             	inputStream = new FileInputStream(resourceLocation);
             } catch (Exception e) {
+            	if (LOGGER.isDebugEnabled()) {
+            		LOGGER.debug("Open file input stream error! ", e);
+	            }
+	            throw new IOException(e);
             }
 		}
 
-		if (inputStream == null) {
-			URL url = FileUtils.getURL(resourceLocation);
-			if (url != null) {
-				inputStream = url.openStream();
-			}
-		}
-		
-		if (inputStream == null) {
-			throw new IOException("Load file error!");
+		URL url = FileUtils.getURL(resourceLocation);
+		if (url != null) {
+			inputStream = url.openStream();
 		}
 		
 		return inputStream;
@@ -612,9 +588,9 @@ public final class FileUtils {
 		return new File(resourceUri.getSchemeSpecificPart());
 	}
 	
-	public static List<String> listJarEntry(String filePath) throws IOException {
+	public static List<String> listJarEntry(String filePath) {
 
-		List<String> entryList = new ArrayList<String>();
+		List<String> entryList = new ArrayList<>();
 		JarFile jarFile = null;
 		try {
 			jarFile = new JarFile(getFile(filePath));
@@ -632,20 +608,17 @@ public final class FileUtils {
 				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
 			}
 		} finally {
-			if (jarFile != null) {
-				jarFile.close();
-			}
+			IOUtils.closeStream(jarFile);
 		}
 		
 		return entryList;
 	}
 	
-	public static String readJarEntryInfo(String filePath, String entryPath) throws IOException {
+	public static String readJarEntryInfo(String filePath, String entryPath) {
 		String entryContent = null;
 		InputStream inputStream = null;
 		InputStreamReader inputStreamReader = null;
-		BufferedReader bufferedReader = null;
-		
+
 		try {
 			JarFile jarFile = new JarFile(getFile(filePath));
 			
@@ -656,8 +629,8 @@ public final class FileUtils {
 				inputStreamReader = new InputStreamReader(inputStream, Globals.DEFAULT_ENCODING);
 
 				char [] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
-				int readLength = 0;
-				StringBuffer returnValue = new StringBuffer();
+				int readLength;
+				StringBuilder returnValue = new StringBuilder();
 				
 				while (((readLength = inputStreamReader.read(readBuffer)) > -1)) {
 					returnValue.append(readBuffer, 0, readLength);
@@ -672,21 +645,8 @@ public final class FileUtils {
 				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
 			}
 		} finally {
-			try {
-				if (inputStreamReader != null) {
-					inputStreamReader.close();
-				}
-				if (bufferedReader != null) {
-					bufferedReader.close();
-				}
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (Exception e) {
-				if (FileUtils.LOGGER.isDebugEnabled()) {
-					FileUtils.LOGGER.debug("Close stream error! ", e);
-				}
-			}
+			IOUtils.closeStream(inputStreamReader);
+			IOUtils.closeStream(inputStream);
 		}
 		
 		return entryContent;
@@ -710,7 +670,7 @@ public final class FileUtils {
 			
 			JarFile jarFile = new JarFile(getFile(filePath));
 			
-			String resourcePath = null;
+			String resourcePath;
 			
 			if (entryPath.endsWith(ClassUtils.CLASS_FILE_SUFFIX)) {
 				resourcePath = ClassUtils.convertClassNameToResourcePath(entryPath.substring(0, entryPath.length() - 6));
@@ -725,8 +685,8 @@ public final class FileUtils {
 				inputStream = jarFile.getInputStream(packageEntry);
 				byteArrayOutputStream = new ByteArrayOutputStream();
 				
-				byte [] buffer = new byte[8192];
-				int readLength = 8192;
+				byte [] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+				int readLength;
 				while (((readLength = inputStream.read(buffer)) != -1)) {
 					byteArrayOutputStream.write(buffer, 0 , readLength);
 				}
@@ -759,38 +719,6 @@ public final class FileUtils {
 		
 		return classContent;
 	}
-
-	/**
-	 * Read file to byte[] from current input stream use default charset: UTF-8
-	 * @param inputStream		File input stream
-	 * @return	File data by byte arrays
-	 * @throws IOException	if an I/O error occurs
-	 */
-	public static byte[] readFileBytes(InputStream inputStream) throws IOException {
-		ByteArrayOutputStream byteArrayOutputStream = null;
-		
-		byte[] content = null;
-		try {
-			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
-			
-			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-			int readLength = 0;
-			while ((readLength = inputStream.read(buffer)) != -1) {
-				byteArrayOutputStream.write(buffer, 0, readLength);
-			}
-			
-			content = byteArrayOutputStream.toByteArray();
-		} catch (Exception e) {
-			content = new byte[0];
-		} finally {
-			if (byteArrayOutputStream != null) {
-				byteArrayOutputStream.close();
-			}
-			
-		}
-		
-		return content;
-	}
 	
 	/**
 	 * Read resource content
@@ -806,13 +734,13 @@ public final class FileUtils {
 		FileInputStream fileInputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		
-		byte[] content = null;
+		byte[] content;
 		try {
 			fileInputStream = new FileInputStream(file);
 			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
 			
 			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-			int readLength = 0;
+			int readLength;
 			while ((readLength = fileInputStream.read(buffer)) != -1) {
 				byteArrayOutputStream.write(buffer, 0, readLength);
 			}
@@ -821,14 +749,8 @@ public final class FileUtils {
 		} catch (Exception e) {
 			content = new byte[0];
 		} finally {
-			if (fileInputStream != null) {
-				fileInputStream.close();
-			}
-			
-			if (byteArrayOutputStream != null) {
-				byteArrayOutputStream.close();
-			}
-			
+			IOUtils.closeStream(fileInputStream);
+			IOUtils.closeStream(byteArrayOutputStream);
 		}
 		
 		return content;
@@ -941,7 +863,7 @@ public final class FileUtils {
 		return (URL_PROTOCOL_JAR.equals(protocol) ||
 				URL_PROTOCOL_ZIP.equals(protocol) ||
 				URL_PROTOCOL_WSJAR.equals(protocol) ||
-				(URL_PROTOCOL_CODE_SOURCE.equals(protocol) && url.getPath().indexOf(JAR_URL_SEPARATOR) != -1));
+				(URL_PROTOCOL_CODE_SOURCE.equals(protocol) && url.getPath().contains(JAR_URL_SEPARATOR)));
 	}
 
 	/**
@@ -960,7 +882,7 @@ public final class FileUtils {
 				return new URL(jarFile);
 			}
 			catch (MalformedURLException ex) {
-				// Probably no protocol in original jar URL, like "jar:C:/mypath/myjar.jar".
+				// Probably no protocol in original jar URL, like "jar:C:/path/jarFile.jar".
 				// This usually indicates that the jar file resides in the file system.
 				if (!jarFile.startsWith("/")) {
 					jarFile = "/" + jarFile;
@@ -1001,14 +923,13 @@ public final class FileUtils {
 	 * List jar entry
 	 * @param uri		Jar file URI
 	 * @return			List of entry names
-	 * @throws IOException		read jar file error
 	 */
-	public static List<String> listJarEntry(URI uri) throws IOException {
-		List<String> returnList = new ArrayList<String>();
+	public static List<String> listJarEntry(URI uri) {
+		List<String> returnList = new ArrayList<>();
 		
 		if (uri != null) {
 			String fullPath = uri.getPath();
-			String filePath = null;
+			String filePath;
 			String entryPath = null;
 			if (fullPath.indexOf(JAR_URL_SEPARATOR) > 0) {
 				filePath = fullPath.substring(0, fullPath.indexOf(JAR_URL_SEPARATOR));
@@ -1033,18 +954,15 @@ public final class FileUtils {
 								continue;
 							}
 							String entryName = jarEntry.getName();
-							if (entryPath == null || (entryPath != null && entryName.startsWith(entryPath))) {
+							if (entryPath == null || entryName.startsWith(entryPath)) {
 								returnList.add(entryName);
 							}
 						}
 					}
 				} catch (Exception e) {
-					returnList = new ArrayList<String>();
+					returnList = new ArrayList<>();
 				} finally {
-					if (jarFile != null) {
-						jarFile.close();
-						jarFile = null;
-					}
+					IOUtils.closeStream(jarFile);
 				}
 			}
 		}
@@ -1089,9 +1007,8 @@ public final class FileUtils {
 	 * List child files
 	 * @param file			parent file object
 	 * @return				list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file) throws FileNotFoundException {
+	public static List<String> listFiles(File file) {
 		return FileUtils.listFiles(file, null);
 	}
 
@@ -1100,9 +1017,8 @@ public final class FileUtils {
 	 * @param file			parent file object
 	 * @param readHiddenFiles	List include hidden files
 	 * @return				list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, boolean readHiddenFiles) throws FileNotFoundException {
+	public static List<String> listFiles(File file, boolean readHiddenFiles) {
 		return FileUtils.listFiles(file, null, readHiddenFiles);
 	}
 
@@ -1112,10 +1028,9 @@ public final class FileUtils {
 	 * @param readHiddenFiles	List include hidden files
 	 * @param includeRootFolder	List include directories
 	 * @return				list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listFiles(File file, boolean readHiddenFiles, 
-			boolean includeRootFolder) throws FileNotFoundException {
+			boolean includeRootFolder) {
 		return FileUtils.listFiles(file, null, readHiddenFiles, includeRootFolder);
 	}
 	
@@ -1149,10 +1064,9 @@ public final class FileUtils {
 	 * @param file			parent file object
 	 * @param filter		file name filter
 	 * @return				list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(File file, FilenameFilter filter) throws FileNotFoundException {
-		List<String> returnList = new ArrayList<String>();
+	public static List<String> listFiles(File file, FilenameFilter filter) {
+		List<String> returnList = new ArrayList<>();
 		FileUtils.listFiles(file, filter, returnList, true, Globals.DEFAULT_VALUE_BOOLEAN);
 		return returnList;
 	}
@@ -1163,11 +1077,10 @@ public final class FileUtils {
 	 * @param filter			file name filter
 	 * @param readHiddenFiles	List include hidden files
 	 * @return					list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listFiles(File file, FilenameFilter filter, 
-			boolean readHiddenFiles) throws FileNotFoundException {
-		List<String> returnList = new ArrayList<String>();
+			boolean readHiddenFiles) {
+		List<String> returnList = new ArrayList<>();
 		FileUtils.listFiles(file, filter, returnList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN);
 		return returnList;
 	}
@@ -1179,11 +1092,10 @@ public final class FileUtils {
 	 * @param readHiddenFiles	List include hidden files
 	 * @param includeRootFolder	List include directories
 	 * @return					list of child file path 
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listFiles(File file, FilenameFilter filter, 
-			boolean readHiddenFiles, boolean includeRootFolder) throws FileNotFoundException {
-		List<String> returnList = new ArrayList<String>();
+			boolean readHiddenFiles, boolean includeRootFolder) {
+		List<String> returnList = new ArrayList<>();
 		FileUtils.listFiles(file, filter, returnList, readHiddenFiles, includeRootFolder);
 		return returnList;
 	}
@@ -1257,7 +1169,7 @@ public final class FileUtils {
 	public static void listFiles(File file, FilenameFilter filter, List<String> fileList, 
 			boolean readHiddenFiles, boolean includeRootFolder) {
 		if (fileList == null) {
-			fileList = new ArrayList<String>();
+			fileList = new ArrayList<>();
 		}
 		
 		if (file.isDirectory()) {
@@ -1278,7 +1190,7 @@ public final class FileUtils {
 			boolean match = Globals.DEFAULT_VALUE_BOOLEAN;
 			if (filter == null) {
 				match = true;
-			} else if (filter != null && filter.accept(file.getParentFile(), file.getName())) {
+			} else if (filter.accept(file.getParentFile(), file.getName())) {
 				match = true;
 			}
 			
@@ -1298,7 +1210,7 @@ public final class FileUtils {
 	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listDirectory(String filePath) throws FileNotFoundException {
-		List<String> directoryList = new ArrayList<String>();
+		List<String> directoryList = new ArrayList<>();
 		FileUtils.listDirectory(FileUtils.getFile(filePath), directoryList);
 		return directoryList;
 	}
@@ -1309,7 +1221,7 @@ public final class FileUtils {
 	 * @return				list of child directory path
 	 */
 	public static List<String> listDirectory(File directory) {
-		List<String> directoryList = new ArrayList<String>();
+		List<String> directoryList = new ArrayList<>();
 		FileUtils.listDirectory(directory, directoryList);
 		return directoryList;
 	}
@@ -1361,9 +1273,8 @@ public final class FileUtils {
 	 * List child files by filter extension name is .class
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listClassesFiles(File file) throws FileNotFoundException {
+	public static List<String> listClassesFiles(File file) {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter("class"));
 	}
 
@@ -1381,9 +1292,8 @@ public final class FileUtils {
 	 * List child files by filter extension name is .jar
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listJarFiles(File file) throws FileNotFoundException {
+	public static List<String> listJarFiles(File file) {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_JAR));
 	}
 
@@ -1401,9 +1311,8 @@ public final class FileUtils {
 	 * List child files by filter extension name is .zip
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listZipFiles(File file) throws FileNotFoundException {
+	public static List<String> listZipFiles(File file) {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_ZIP));
 	}
 
@@ -1421,9 +1330,8 @@ public final class FileUtils {
 	 * List child files by filter extension name is .wsjar
 	 * @param file				parent file object
 	 * @return					list of file path
-	 * @throws FileNotFoundException 	if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listWebSphereJarFiles(File file) throws FileNotFoundException {
+	public static List<String> listWebSphereJarFiles(File file) {
 		return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_WSJAR));
 	}
 	
@@ -1449,7 +1357,7 @@ public final class FileUtils {
 	 */
 	public static List<String> listFilesByRegex(String filePath, String fileNameRegex, 
 			boolean readHiddenFiles, boolean includeRootFolder) throws FileNotFoundException {
-		List<String> fileList = new ArrayList<String>();
+		List<String> fileList = new ArrayList<>();
 		FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameRegexFilter(fileNameRegex), 
 				fileList, readHiddenFiles, includeRootFolder);
 		return fileList;
@@ -1475,9 +1383,7 @@ public final class FileUtils {
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		} finally {
-			if (fileOutputStream != null) {
-				fileOutputStream.close();
-			}
+			IOUtils.closeStream(fileOutputStream);
 		}
 		
 		return true;
@@ -1497,7 +1403,7 @@ public final class FileUtils {
 			FileUtils.makeHome(file.getParent());
 			
 			outputStream = new FileOutputStream(file);
-		    int bytesRead = 0;
+		    int bytesRead;
 		    byte[] buffer = new byte[8192];
 		    while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
 		    	outputStream.write(buffer, 0, bytesRead);
@@ -1546,22 +1452,13 @@ public final class FileUtils {
 			printWriter = new PrintWriter(outputStreamWriter);
 			
 			printWriter.print(content);
+			outputStreamWriter.flush();
 			return true;
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		} finally {
-			if (printWriter != null) {
-				printWriter.close();
-			}
-			
-			if (outputStreamWriter != null) {
-				try {
-					outputStreamWriter.flush();
-					outputStreamWriter.close();
-				} catch (IOException e) {
-					
-				}
-			}
+			IOUtils.closeStream(printWriter);
+			IOUtils.closeStream(outputStreamWriter);
 		}
 	}
 	
@@ -1582,65 +1479,12 @@ public final class FileUtils {
 	 */
 	public static String readFile(String filePath, String encoding) {
 		try {
-			return FileUtils.readFile(getURL(filePath).openStream(), encoding);
+			return IOUtils.readContent(getURL(filePath).openStream(), encoding);
 		} catch (Exception e) {
 			return "";
 		}
 	}
 
-	/**
-	 * Read file to String from current input stream use default charset: UTF-8
-	 * @param inputStream		File input stream
-	 * @return File content as string
-	 */
-	public static String readFile(InputStream inputStream) {
-		return FileUtils.readFile(inputStream, null);
-	}
-	
-	/**
-	 * Read file to String from current input stream use current encoding
-	 * @param inputStream		File input stream
-	 * @param encoding			Charset encoding
-	 * @return File content as string
-	 */
-	public static String readFile(InputStream inputStream, String encoding) {
-		if (encoding == null) {
-			encoding = Globals.DEFAULT_ENCODING;
-		}
-		
-		char [] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
-		int len = 0;
-		StringBuffer returnValue = new StringBuffer();
-		
-		InputStreamReader inputStreamReader = null;
-		BufferedReader bufferedReader = null;
-		try {
-			inputStreamReader = new InputStreamReader(inputStream, encoding);
-			bufferedReader = new BufferedReader(inputStreamReader);
-			
-			while ((len = bufferedReader.read(readBuffer)) > -1) {
-				returnValue.append(readBuffer, 0, len);
-			}
-		} catch (Exception e) {
-			return returnValue.toString();
-		} finally {
-			try {
-				if (inputStreamReader != null) {
-					inputStreamReader.close();
-				}
-				if (bufferedReader != null) {
-					bufferedReader.close();
-				}
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (IOException ex) {
-				
-			}
-		}
-		return returnValue.toString();
-	}
-	
 	/**
 	 * Remove File by current file path
 	 * @param filePath		File path
@@ -1714,7 +1558,7 @@ public final class FileUtils {
 	
 	/**
 	 * Rename smb file
-	 * @param origFile		Oringial file
+	 * @param origFile		Original file
 	 * @param destFile		Rename file
 	 * @return Rename result
 	 */
@@ -1758,7 +1602,7 @@ public final class FileUtils {
 			if (override || !FileUtils.isExists(moveToPath)) {
 				try {
 					File destFile = FileUtils.getFile(moveToPath);
-					if (destFile != null && destFile.exists()) {
+					if (destFile.exists()) {
 						if (override && !FileUtils.removeFile(destFile)) {
 							return Globals.DEFAULT_VALUE_BOOLEAN;
 						}
@@ -1770,6 +1614,9 @@ public final class FileUtils {
 					
 					return Globals.DEFAULT_VALUE_BOOLEAN;
 				} catch (Exception e) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Move file error! ", e);
+					}
 				}
 			}
 		}
@@ -1865,7 +1712,7 @@ public final class FileUtils {
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
 		try {
-			String folderPath = null;
+			String folderPath;
 			if (copyToPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
 				folderPath = copyToPath.substring(0, copyToPath.lastIndexOf("/"));
 			} else {
@@ -1884,7 +1731,7 @@ public final class FileUtils {
 					outputStream = new FileOutputStream(copyToPath);
 				}
 				
-				int len = 0;
+				int len;
 				byte [] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 				
 				while ((len = inputStream.read(buffer)) > -1) {
@@ -1928,9 +1775,11 @@ public final class FileUtils {
 		if (FileUtils.makeHome(destPath)) {
 			try {
 				File destFile = FileUtils.getFile(destPath);
-				destFile.mkdirs();
-				return destFile.exists();
+				return destFile.mkdirs();
 			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Make directory error! ", e);
+				}
 			}
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -1968,8 +1817,7 @@ public final class FileUtils {
 					return true;
 				} else {
 					try {
-						homeDir.mkdirs();
-						return FileUtils.isExists(homePath);
+						return homeDir.mkdirs();
 					} catch (Exception e) {
 						return Globals.DEFAULT_VALUE_BOOLEAN;
 					}
@@ -1992,9 +1840,6 @@ public final class FileUtils {
 
 		try {
 			File directory = FileUtils.getFile(resourceLocation);
-			if (directory == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
 			return (directory.exists() && directory.isDirectory());
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2016,29 +1861,29 @@ public final class FileUtils {
 		File destFiles = new File(destDir);
 		
 		String [] fileList = baseFiles.list();
-		
-		if (!FileUtils.makeHome(destDir)) {
+
+		if (fileList == null || !FileUtils.makeHome(destDir)) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 		
 		boolean copyStatus = true;
-		
-		for (int i = 0 ; i < fileList.length ; i++) {
-			String baseFile = baseFiles + Globals.DEFAULT_PAGE_SEPARATOR + fileList[i];
-			String destFile = destFiles + Globals.DEFAULT_PAGE_SEPARATOR + fileList[i];
-			
+
+		for (String aFileList : fileList) {
+			String baseFile = baseFiles + Globals.DEFAULT_PAGE_SEPARATOR + aFileList;
+			String destFile = destFiles + Globals.DEFAULT_PAGE_SEPARATOR + aFileList;
+
 			File tempFile = new File(baseFile);
 			if (tempFile.isFile()) {
-				copyStatus = FileUtils.copyFile(baseDir + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName(), 
+				copyStatus = FileUtils.copyFile(baseDir + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName(),
 						destDir + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName());
 			} else if (tempFile.isDirectory()) {
 				copyStatus = FileUtils.copyDir(baseFile, destFile);
 			}
 			if (!copyStatus) {
-				return copyStatus;
+				break;
 			}
 		}
-		return true;
+		return copyStatus;
 	}
 	
 	/**
@@ -2053,17 +1898,17 @@ public final class FileUtils {
 		String [] fileList = directory.list();
 		
 		if (fileList != null) {
-			boolean operatStatus = true;
-			for (int i = 0 ; i < fileList.length ; i++) {
-				File tempFile = new File(directory.getAbsolutePath(), fileList[i]);
+			boolean operateStatus;
+			for (String fileName : fileList) {
+				File tempFile = new File(directory.getAbsolutePath(), fileName);
 				if (tempFile.isDirectory()) {
-					operatStatus = FileUtils.removeDir(tempFile);
+					operateStatus = FileUtils.removeDir(tempFile);
 				} else {
-					operatStatus = tempFile.delete();
+					operateStatus = tempFile.delete();
 				}
-				
-				if (!operatStatus) {
-					return operatStatus;
+
+				if (!operateStatus) {
+					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
 			}
 		}
@@ -2084,8 +1929,8 @@ public final class FileUtils {
 			String [] fileList = directory.list();
 			
 			if (fileList != null) {
-				for (int i = 0 ; i < fileList.length ; i++) {
-					SmbFile childFile = new SmbFile(fileList[i]);
+				for (String filePath : fileList) {
+					SmbFile childFile = new SmbFile(filePath);
 					if (childFile.isDirectory()) {
 						if (!FileUtils.removeSmbDir(childFile)) {
 							return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2117,7 +1962,7 @@ public final class FileUtils {
 			inputStream = FileUtils.loadFile(filePath);
 			if (inputStream != null) {
 				byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-				int readLength = Globals.DEFAULT_VALUE_INT;
+				int readLength;
 				CRC32 crc = new CRC32();
 				
 				while ((readLength = inputStream.read(readBuffer)) != Globals.DEFAULT_VALUE_INT) {
@@ -2131,12 +1976,7 @@ public final class FileUtils {
 				LOGGER.debug("Calculate file crc error! ", e);
 			}
 		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e2) {
-				}
-			}
+			IOUtils.closeStream(inputStream);
 		}
 		
 		return Globals.DEFAULT_VALUE_LONG;
@@ -2221,9 +2061,6 @@ public final class FileUtils {
 		
 		try {
 			File file = FileUtils.getFile(filePath);
-			if (file == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
 			return file.exists();
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2285,9 +2122,6 @@ public final class FileUtils {
 		
 		try {
 			File file = FileUtils.getFile(filePath);
-			if (file == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
 			return file.canRead();
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2310,9 +2144,6 @@ public final class FileUtils {
 		
 		try {
 			File file = FileUtils.getFile(filePath);
-			if (file == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
 			return file.canWrite();
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2327,9 +2158,6 @@ public final class FileUtils {
 	public static boolean canExecute(String filePath) {
 		try {
 			File file = FileUtils.getFile(filePath);
-			if (file == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
 			return file.canExecute();
 		} catch (FileNotFoundException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2339,10 +2167,10 @@ public final class FileUtils {
 	/**
 	 * Merge file to save path
 	 * @param savePath					Target save directory
-	 * @param segmentationFileInfos		Segmentation file infos
+	 * @param segmentationFileInfoList		Segmentation file info list
 	 * @return							Operate result
 	 */
-	public static boolean mergeFileInfo(String savePath, List<SegmentationFileInfo> segmentationFileInfos) {
+	public static boolean mergeFileInfo(String savePath, List<SegmentationFileInfo> segmentationFileInfoList) {
 		RandomAccessFile randomAccessFile = null;
 		
 		try {
@@ -2350,7 +2178,7 @@ public final class FileUtils {
 			long defineSize = 0;
 			randomAccessFile = new RandomAccessFile(savePath, "rw");
 			
-			for (SegmentationFileInfo segmentationFileInfo : segmentationFileInfos) {
+			for (SegmentationFileInfo segmentationFileInfo : segmentationFileInfoList) {
 				if (segmentationFileInfo == null) {
 					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
@@ -2381,22 +2209,14 @@ public final class FileUtils {
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		} finally {
-			if (randomAccessFile != null) {
-				try {
-					randomAccessFile.close();
-				} catch (IOException e) {
-					if (FileUtils.LOGGER.isDebugEnabled()) {
-						FileUtils.LOGGER.debug("Close random access file error! ", e);
-					}
-				}
-			}
+			IOUtils.closeStream(randomAccessFile);
 		}
 	}
 	
 	/**
 	 * Merge file to save path
 	 * @param savePath					Target save path
-	 * @param segmentationFilePaths		Segmentation file infos
+	 * @param segmentationFilePaths		Segmentation file paths
 	 * @return							Operate result
 	 */
 	public static boolean mergeFile(String savePath, List<String> segmentationFilePaths) {
@@ -2440,15 +2260,7 @@ public final class FileUtils {
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		} finally {
-			if (randomAccessFile != null) {
-				try {
-					randomAccessFile.close();
-				} catch (IOException e) {
-					if (FileUtils.LOGGER.isDebugEnabled()) {
-						FileUtils.LOGGER.debug("Close random access file error! ", e);
-					}
-				}
-			}
+			IOUtils.closeStream(randomAccessFile);
 		}
 	}
 	
@@ -2460,12 +2272,12 @@ public final class FileUtils {
 	 */
 	public static List<SegmentationFileInfo> segmentFile(String filePath, int blockSize) {
 		if (!FileUtils.isExists(filePath)) {
-			return new ArrayList<SegmentationFileInfo>();
+			return new ArrayList<>();
 		}
 		
-		List<SegmentationFileInfo> segmentationFileInfos = new ArrayList<SegmentationFileInfo>();
+		List<SegmentationFileInfo> segmentationFileInfoList = new ArrayList<>();
 		InputStream fileInputStream = null;
-		ByteArrayOutputStream byteArrayOutputStream = null;
+		ByteArrayOutputStream byteArrayOutputStream;
 		
 		try {
 			File file = getFile(filePath);
@@ -2475,7 +2287,7 @@ public final class FileUtils {
 			
 			byte[] readBuffer = new byte[blockSize];
 			int index = 0;
-			int readLength = 0;
+			int readLength;
 			while ((readLength = fileInputStream.read(readBuffer)) != -1) {
 				if (FileUtils.LOGGER.isDebugEnabled()) {
 					FileUtils.LOGGER.debug("Read index: " + index + ", read length: " + readLength);
@@ -2484,17 +2296,17 @@ public final class FileUtils {
 				byteArrayOutputStream.write(readBuffer, 0, readLength);
 				SegmentationFileInfo segmentationFileInfo = 
 						new SegmentationFileInfo(index * blockSize, fileSize, byteArrayOutputStream.toByteArray());
-				segmentationFileInfos.add(segmentationFileInfo);
+				segmentationFileInfoList.add(segmentationFileInfo);
 				index++;
 			}
 		} catch (FileNotFoundException e) {
-			return new ArrayList<SegmentationFileInfo>();
+			return new ArrayList<>();
 		} catch (IOException e) {
 			if (FileUtils.LOGGER.isDebugEnabled()) {
 				FileUtils.LOGGER.debug("Read file data error! ", e);
 			}
 			FileUtils.LOGGER.error("Read file data error! ");
-			return new ArrayList<SegmentationFileInfo>();
+			return new ArrayList<>();
 		} finally {
 			if (fileInputStream != null) {
 				try {
@@ -2507,7 +2319,7 @@ public final class FileUtils {
 			}
 		}
 		
-		return segmentationFileInfos;
+		return segmentationFileInfoList;
 	}
 
 	private static String replacePageSeparator(String path) {
@@ -2596,28 +2408,18 @@ public final class FileUtils {
 	}
 	
 	private static void registerFileType() {
-		byte[] bytes = null;
-		InputStream inputStream = null;
-		
-		try {
-			inputStream = FileUtils.class.getClassLoader().getResourceAsStream("com/nervousync/datas/File.dat");
-			bytes = FileUtils.readFileBytes(inputStream);
-		} catch (IOException e) {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Register file extension info error! ");
-			}
+		InputStream inputStream;
+
+		inputStream = FileUtils.class.getClassLoader().getResourceAsStream("com/nervousync/datas/File.dat");
+		byte[] bytes = IOUtils.readBytes(inputStream);
+		IOUtils.closeStream(inputStream);
+
+		if (bytes == null || bytes.length == 0) {
 			return;
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-				}
-			}
 		}
-		
-		List<FileExtensionInfo> extensionInfoList = new ArrayList<FileExtensionInfo>();
-		byte[] readBuffer = null;
+
+		List<FileExtensionInfo> extensionInfoList = new ArrayList<>();
+		byte[] readBuffer;
 		byte[] intBuffer = new byte[4];
 		System.arraycopy(bytes, 0, intBuffer, 0, 4);
 		int dataCount = RawUtils.readIntFromLittleEndian(intBuffer, 0);
@@ -2639,6 +2441,9 @@ public final class FileUtils {
 				String contentInfo = new String(readBuffer, Globals.DEFAULT_ENCODING);
 				extensionInfoList.add(new FileExtensionInfo(fileType, printing, contentInfo));
 			} catch (UnsupportedEncodingException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Charset does not supported! ", e);
+				}
 			}
 		}
 		
@@ -2651,7 +2456,7 @@ public final class FileUtils {
 	}
 	
 	private static final class FilenameRegexFilter implements FilenameFilter {
-		private String fileNameRegex = null;
+		private final String fileNameRegex;
 		
 		public FilenameRegexFilter(String fileNameRegex) {
 			this.fileNameRegex = fileNameRegex;
@@ -2668,7 +2473,7 @@ public final class FileUtils {
 	}
 	
 	private static final class FilenameExtensionFilter implements FilenameFilter {
-		private String fileExtName = null;
+		private final String fileExtName;
 		
 		public FilenameExtensionFilter(String fileExtName) {
 			this.fileExtName = fileExtName;

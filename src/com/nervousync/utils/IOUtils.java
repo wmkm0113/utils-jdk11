@@ -16,42 +16,135 @@
  */
 package com.nervousync.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import com.nervousync.commons.core.Globals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 3, 2015 11:20:20 AM $
  */
-public class IOUtils {
+public final class IOUtils {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(IOUtils.class);
 	
 	private IOUtils() {
 		
 	}
 
+	/**
+	 * Read byte[] from current input stream use default charset: UTF-8
+	 * @param inputStream		Input stream
+	 * @return	Data by byte arrays
+	 */
+	public static byte[] readBytes(InputStream inputStream) {
+		ByteArrayOutputStream byteArrayOutputStream = null;
+		
+		byte[] content;
+		try {
+			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
+			
+			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+			int readLength;
+			while ((readLength = inputStream.read(buffer)) != -1) {
+				byteArrayOutputStream.write(buffer, 0, readLength);
+			}
+			
+			content = byteArrayOutputStream.toByteArray();
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Catch error! ", e);
+			}
+			content = new byte[0];
+		} finally {
+			closeStream(byteArrayOutputStream);
+		}
+		
+		return content;
+	}
+
+	/**
+	 * Read String content from current input stream use default charset: UTF-8
+	 * @param inputStream		Input stream
+	 * @return File content as string
+	 */
+	public static String readContent(InputStream inputStream) {
+		return IOUtils.readContent(inputStream, Globals.DEFAULT_ENCODING);
+	}
+
+	/**
+	 * Read String content from current input stream use current encoding
+	 * @param inputStream		Input stream
+	 * @param encoding			Charset encoding
+	 * @return File content as string
+	 */
+	public static String readContent(InputStream inputStream, String encoding) {
+		if (encoding == null) {
+			encoding = Globals.DEFAULT_ENCODING;
+		}
+		
+		char [] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
+		int len;
+		StringBuilder returnValue = new StringBuilder();
+		
+		InputStreamReader inputStreamReader = null;
+		BufferedReader bufferedReader = null;
+		try {
+			inputStreamReader = new InputStreamReader(inputStream, encoding);
+			bufferedReader = new BufferedReader(inputStreamReader);
+			
+			while ((len = bufferedReader.read(readBuffer)) > -1) {
+				returnValue.append(readBuffer, 0, len);
+			}
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Catch error! ", e);
+			}
+			return returnValue.toString();
+		} finally {
+			closeStream(inputStreamReader);
+			closeStream(bufferedReader);
+			closeStream(inputStream);
+		}
+		return returnValue.toString();
+	}
+
+	/**
+	 * Copy data from input stream to output stream
+	 * @param inputStream				Input stream
+	 * @param outputStream				Output stream
+	 * @param closeOutputAfterCopy		close output stream after copy
+	 * @return	copy length
+	 * @throws IOException	if an I/O error occurs
+	 */
 	public static long copyStream(InputStream inputStream, 
 			OutputStream outputStream, boolean closeOutputAfterCopy) throws IOException {
 		return copyStream(inputStream, outputStream, 
 				closeOutputAfterCopy, new byte[Globals.DEFAULT_BUFFER_SIZE]);
 	}
 	
+	/**
+	 * Copy data from input stream to output stream using given buffer
+	 * @param inputStream				Input stream
+	 * @param outputStream				Output stream
+	 * @param closeOutputAfterCopy		close output stream after copy
+	 * @param buffer					Copy buffer
+	 * @return	copy length
+	 * @throws IOException	if an I/O error occurs
+	 */
 	public static long copyStream(InputStream inputStream, OutputStream outputStream, 
 			boolean closeOutputAfterCopy, byte[] buffer) throws IOException {
 		if (inputStream == null) {
 			return 0L;
 		}
 		
-		InputStream inStream = inputStream;
-		OutputStream outStream = outputStream;
-		
 		try {
 			long totalCount = 0L;
 			
 			while (true) {
-				int readCount = inStream.read(buffer);
+				int readCount = inputStream.read(buffer);
 				
 				if (readCount == -1) {
 					break;
@@ -59,40 +152,34 @@ public class IOUtils {
 				
 				if (readCount > 0) {
 					totalCount += readCount;
-					if (outStream != null) {
-						outStream.write(buffer, 0, readCount);
+					if (outputStream != null) {
+						outputStream.write(buffer, 0, readCount);
 					}
 				}
 			}
 			
-			if (outStream != null) {
-				if (closeOutputAfterCopy) {
-					outStream.close();
-				} else {
-					outStream.flush();
-				}
-				
-				outStream = null;
+			if (outputStream != null) {
+				outputStream.flush();
 			}
-			inStream.close();
-			inStream = null;
 			
 			return totalCount;
 		} finally {
-			try {
-				if (inStream != null) {
-					inStream.close();
-				}
-			} catch (IOException e) {
-			}
+			closeStream(inputStream);
             if (closeOutputAfterCopy) {
-    			try {
-    				if (outStream != null) {
-    					outStream.close();
-    				}
-    			} catch (IOException e) {
-    			}
+            	closeStream(outputStream);
             }
+		}
+	}
+
+	public static void closeStream(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (IOException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Catch error! ", e);
+				}
+			}
 		}
 	}
 }

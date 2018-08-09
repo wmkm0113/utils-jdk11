@@ -18,7 +18,6 @@ package com.nervousync.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -60,21 +59,21 @@ public final class ConvertUtils {
 	public static List<Object> convertCollectionToList(Object collection) {
 		
 		if (collection == null) {
-			return new ArrayList<Object>();
+			return new ArrayList<>();
 		}
 		
-		List<Object> list = null;
+		List<Object> list;
 		
 		if (collection instanceof Collection) {
-			list = new ArrayList<Object>((Collection<?>)collection);
+			list = new ArrayList<>((Collection<?>)collection);
 		} else if (collection instanceof Enumeration) {
-			list = new ArrayList<Object>();
+			list = new ArrayList<>();
 			Enumeration<?> enumeration = (Enumeration<?>)collection;
 			while(enumeration.hasMoreElements()) {
 				list.add(enumeration.nextElement());
 			}
 		} else if (collection instanceof Iterator) {
-			list = new ArrayList<Object>();
+			list = new ArrayList<>();
 			Iterator<?> iterator = (Iterator<?>)collection;
 			while(iterator.hasNext()) {
 				list.add(iterator.next());
@@ -89,8 +88,8 @@ public final class ConvertUtils {
 			list = Arrays.asList(convertPrimitivesToObjects(collection));
 		} else {
 			// type is not supported
-			throw new IllegalArgumentException("Class '" + collection.getClass().getName() 
-					+ "' is not convertable to java.util.List");
+			throw new IllegalArgumentException("Class '" + collection.getClass().getName()
+					+ "' is not convertible to java.util.List");
 		}
 
 		return list;
@@ -128,9 +127,8 @@ public final class ConvertUtils {
 	 * Convert hex string to byte arrays
 	 * @param strIn			Hex string
 	 * @return				Convert byte arrays
-	 * @throws Exception	Data invalid
 	 */
-	public static byte[] hexStrToByteArr(String strIn) throws Exception {
+	public static byte[] hexStrToByteArr(String strIn) {
 		byte[] arrB = strIn.getBytes();
 		int iLen = arrB.length;
 
@@ -144,26 +142,26 @@ public final class ConvertUtils {
 	
 	/**
 	 * Convert hex to String
-	 * @param source	hex byte arrays
+	 * @param sourceBytes	hex byte arrays
 	 * @return convert String
 	 */
-	public static String byteArrayToHexString(byte [] source) {
-		int length = source.length;
-		StringBuffer stringBuffer = new StringBuffer(length * 2);
-		for(int i = 0 ; i < length ; i++) {
-			int intTmp = source[i];
-			
+	public static String byteArrayToHexString(byte [] sourceBytes) {
+		int length = sourceBytes.length;
+		StringBuilder stringBuilder = new StringBuilder(length * 2);
+		for (byte source : sourceBytes) {
+			int intTmp = source;
+
 			while (intTmp < 0) {
 				intTmp = intTmp + 256;
 			}
-			
+
 			if (intTmp < 16) {
-				stringBuffer.append("0");
+				stringBuilder.append("0");
 			}
-			
-			stringBuffer.append(Integer.toString(intTmp, 16));
+
+			stringBuilder.append(Integer.toString(intTmp, 16));
 		}
-		return stringBuffer.toString();
+		return stringBuilder.toString();
 	}
 	
 	/**
@@ -191,13 +189,11 @@ public final class ConvertUtils {
 			encoding = Globals.DEFAULT_ENCODING;
 		}
 
-		String value = null;
 		try {
-			value = new String(content, encoding);
+			return new String(content, encoding);
 		} catch (UnsupportedEncodingException ex) {
 			return new String(content);
 		}
-		return value;
 	}
 
 	/**
@@ -246,36 +242,23 @@ public final class ConvertUtils {
 			return (byte[])object;
 		}
 
-		byte[] content = null;
 		ByteArrayOutputStream outputStream = null;
 		ObjectOutputStream objectOutputStream = null;
 		try {
 			outputStream = new ByteArrayOutputStream();
 			objectOutputStream = new ObjectOutputStream(outputStream);
 			objectOutputStream.writeObject(object);
-			content = outputStream.toByteArray();
+			return outputStream.toByteArray();
 		} catch (Exception e) {
 			if (ConvertUtils.LOGGER.isDebugEnabled()) {
 				ConvertUtils.LOGGER.debug("Convert object to byte[] error! ", e);
 			}
-			content = null;
 		} finally {
-			try {
-				if (objectOutputStream != null) {
-					objectOutputStream.close();
-				}
-				
-				if (outputStream != null) {
-					outputStream.close();
-				}
-			} catch (Exception e) {
-				if (ConvertUtils.LOGGER.isDebugEnabled()) {
-					ConvertUtils.LOGGER.debug("Close output stream error! ", e);
-				}
-			}
+			IOUtils.closeStream(objectOutputStream);
+			IOUtils.closeStream(outputStream);
 		}
 		
-		return content;
+		return null;
 	}
 	
 	public static Object convertToObject(byte[] content) {
@@ -283,32 +266,19 @@ public final class ConvertUtils {
 			return null;
 		}
 		
-		Object object = null;
 		ByteArrayInputStream byteInputStream = null;
 		ObjectInputStream objectInputStream = null;
 		try {
 			byteInputStream = new ByteArrayInputStream(content);
 			objectInputStream = new ObjectInputStream(byteInputStream);
 			
-			object = objectInputStream.readObject();
+			return objectInputStream.readObject();
 		} catch (Exception e) {
-			object = convertToString(content);
+			return convertToString(content);
 		} finally {
-			try {
-				if (objectInputStream != null) {
-					objectInputStream.close();
-				}
-				
-				if (byteInputStream != null) {
-					byteInputStream.close();
-				}
-			} catch (Exception e) {
-				if (ConvertUtils.LOGGER.isDebugEnabled()) {
-					ConvertUtils.LOGGER.debug("Close input stream error! ", e);
-				}
-			}
+			IOUtils.closeStream(objectInputStream);
+			IOUtils.closeStream(byteInputStream);
 		}
-		return object;
 	}
 	
 	public static <T> T convertMapToObject(Map<?, ?> dataMap, Class<T> clazz) {
@@ -322,12 +292,12 @@ public final class ConvertUtils {
 					ReflectionUtils.setField(fieldName, object, StringUtils.base64Decode((String)fieldValue));
 				} else if (fieldValue instanceof Map) {
 					ReflectionUtils.setField(fieldName, object, 
-							(Object)convertMapToObject((Map<?, ?>)fieldValue, field.getType()));
+							convertMapToObject((Map<?, ?>)fieldValue, field.getType()));
 				} else if (field.getType().isArray() 
 						|| List.class.isAssignableFrom(field.getType())) {
-					List<Object> valueList = new ArrayList<Object>();
+					List<Object> valueList = new ArrayList<>();
 
-					Class<?> paramClass = null;
+					Class<?> paramClass;
 					
 					if (field.getType().isArray()) {
 						paramClass = field.getType().getComponentType();
@@ -340,7 +310,7 @@ public final class ConvertUtils {
 						
 						for (Object value : values) {
 							if (value instanceof Map) {
-								valueList.add((Object)convertMapToObject((Map<?, ?>)value, paramClass));
+								valueList.add(convertMapToObject((Map<?, ?>)value, paramClass));
 							} else {
 								valueList.add(value);
 							}
@@ -350,7 +320,7 @@ public final class ConvertUtils {
 						
 						for (Object value : values) {
 							if (value instanceof Map) {
-								valueList.add((Object)convertMapToObject((Map<?, ?>)value, paramClass));
+								valueList.add(convertMapToObject((Map<?, ?>)value, paramClass));
 							} else {
 								valueList.add(value);
 							}
@@ -376,7 +346,7 @@ public final class ConvertUtils {
 		return null;
 	}
 
-	public static byte[] zipByteArray(byte[] str) throws IOException {
+	public static byte[] zipByteArray(byte[] str) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		GZIPOutputStream gzipOutputStream = null;
 
@@ -391,8 +361,8 @@ public final class ConvertUtils {
 		} catch (Exception ex) {
 			return str;
 		} finally {
-			gzipOutputStream = null;
-			byteArrayOutputStream = null;
+			IOUtils.closeStream(gzipOutputStream);
+			IOUtils.closeStream(byteArrayOutputStream);
 		}
 	}
 	
@@ -415,9 +385,9 @@ public final class ConvertUtils {
 		} catch (Exception ex) {
 			return str;
 		} finally {
-			gzipInputStream = null;
-			byteArrayInputStream = null;
-			byteArrayOutputStream = null;
+			IOUtils.closeStream(gzipInputStream);
+			IOUtils.closeStream(byteArrayInputStream);
+			IOUtils.closeStream(byteArrayOutputStream);
 		}
 	}
 }

@@ -112,14 +112,6 @@ public final class HttpStatus {
     public static final int SC_EXPECTATION_FAILED = 417;
 
     /**
-     * Static constant for a 418 error.
-     * {@code 418 Unprocessable Entity} (WebDAV drafts?)
-     * or {@code 418 Reauthentication Required} (HTTP/1.1 drafts?)
-     */
-    // not used
-    // public static final int SC_UNPROCESSABLE_ENTITY = 418;
-
-    /**
      * Static constant for a 419 error.
      * {@code 419 Insufficient Space on Resource}
      * (WebDAV - draft-ietf-webdav-protocol-05?)

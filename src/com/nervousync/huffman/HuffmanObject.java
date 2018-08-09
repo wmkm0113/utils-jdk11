@@ -26,8 +26,8 @@ import com.nervousync.utils.StringUtils;
  */
 public class HuffmanObject {
 
-	private Hashtable<String, Object> codeMapping = new Hashtable<String, Object>();
-	private String huffmanValue = null;
+	private final Hashtable<String, Object> codeMapping;
+	private final String huffmanValue;
 	
 	public HuffmanObject(Hashtable<String, Object> codeMapping, String huffmanValue) {
 		this.codeMapping = codeMapping;

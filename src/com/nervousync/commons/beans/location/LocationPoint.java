@@ -35,15 +35,15 @@ public final class LocationPoint implements Serializable {
 	 * Define type of location
 	 * @see com.nervousync.commons.beans.location.LocationPoint.LocationType
 	 */
-	private LocationType locationType;
+	private final LocationType locationType;
 	/**
 	 * Location longitude value
 	 */
-	private double longitude;
+	private final double longitude;
 	/**
 	 * Location latitude value
 	 */
-	private double latitude;
+	private final double latitude;
 	
 	private LocationPoint(LocationType locationType, 
 			double longitude, double latitude) {
@@ -125,7 +125,7 @@ public final class LocationPoint implements Serializable {
 		return this.latitude + "," + this.longitude;
 	}
 	
-	public static enum LocationType {
+	public enum LocationType {
 		GPS, GCJ_02, BD_09, DELTA
 	}
 }

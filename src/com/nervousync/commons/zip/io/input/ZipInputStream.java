@@ -28,8 +28,8 @@ import com.nervousync.commons.core.Globals;
  */
 public class ZipInputStream extends InputStream {
 
-	private CRC32 crc = null;
-	private InputStream inputStream = null;
+	private final CRC32 crc;
+	private final InputStream inputStream;
 	
 	public ZipInputStream(InputStream inputStream) {
 		this.inputStream = inputStream;

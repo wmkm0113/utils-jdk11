@@ -38,15 +38,15 @@ public final class RequestAttribute implements Serializable {
 	/**
 	 * Current session id
 	 */
-	private String sessionId;
+	private final String sessionId;
 	/**
 	 * Send attribute mapping for request
 	 */
-	private Map<String, Object> attributeMap;
+	private final Map<String, Object> attributeMap;
 
 	private RequestAttribute(HttpServletRequest request) {
 		this.sessionId = request.getSession().getId();
-		this.attributeMap = new HashMap<String, Object>();
+		this.attributeMap = new HashMap<>();
 
 		Enumeration<String> e = request.getAttributeNames();
 

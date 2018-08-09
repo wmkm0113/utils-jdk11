@@ -16,13 +16,11 @@
  */
 package com.nervousync.commons.beans.servlet.response;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.nervousync.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	private String charset = null;
 	/**
-	 * Value of response header whick header name is "identified"
+	 * Value of response header which header name is "identified"
 	 */
 	private String identifiedCode;
 	/**
@@ -75,7 +74,7 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	private int contentLength;
 	/**
-	 * Response content datas
+	 * Response content data array
 	 */
 	private byte[] responseContent;
 	
@@ -123,8 +122,6 @@ public final class HttpResponseContent implements Serializable {
 	
 	public HttpResponseContent(HttpURLConnection urlConnection) {
 		InputStream inputStream = null;
-		InputStreamReader inputStreamReader = null;
-		BufferedReader bufferedReader = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		
 		try {
@@ -133,13 +130,13 @@ public final class HttpResponseContent implements Serializable {
 			if (this.statusCode == HttpsURLConnection.HTTP_OK) {
 				this.contentType = urlConnection.getContentType();
 				if (this.contentType != null 
-						&& this.contentType.indexOf("charset=") != Globals.DEFAULT_VALUE_INT) {
+						&& this.contentType.contains("charset=")) {
 					this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
-					if (this.contentType.indexOf("\"") != Globals.DEFAULT_VALUE_INT) {
+					if (this.contentType.contains("\"")) {
 						this.charset = this.charset.substring(0, this.charset.indexOf("\""));
 					}
 					this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-					if (this.charset.indexOf(";") != Globals.DEFAULT_VALUE_INT) {
+					if (this.charset.contains(";")) {
 						this.charset = this.charset.substring(0, this.charset.indexOf(";"));
 					}
 				}
@@ -152,14 +149,16 @@ public final class HttpResponseContent implements Serializable {
 			} else {
 				inputStream = urlConnection.getErrorStream();
 			}
-			
+
 			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
 			
 			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-			int readLength = 0;
 			
-			while ((readLength = inputStream.read(buffer)) != -1) {
-				byteArrayOutputStream.write(buffer, 0, readLength);
+			if (inputStream != null) {
+				int readLength;
+				while ((readLength = inputStream.read(buffer)) != -1) {
+					byteArrayOutputStream.write(buffer, 0, readLength);
+				}
 			}
 
 			this.responseContent = byteArrayOutputStream.toByteArray();
@@ -170,7 +169,7 @@ public final class HttpResponseContent implements Serializable {
 					this.charset = tempContent.substring(tempContent.indexOf("charset="));
 					this.charset = this.charset.substring(0, this.charset.indexOf("\""));
 					this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-					if (this.charset.indexOf(";") != Globals.DEFAULT_VALUE_INT) {
+					if (this.charset.contains(";")) {
 						this.charset = this.charset.substring(0, this.charset.indexOf(";"));
 					}
 				} else {
@@ -184,31 +183,8 @@ public final class HttpResponseContent implements Serializable {
 				this.logger.debug("Read response data error! ", e);
 			}
 		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-					inputStream = null;
-				}
-				
-				if (inputStreamReader != null) {
-					inputStreamReader.close();
-					inputStreamReader = null;
-				}
-				
-				if (bufferedReader != null) {
-					bufferedReader.close();
-					bufferedReader = null;
-				}
-
-				if (byteArrayOutputStream != null) {
-					byteArrayOutputStream.close();
-					byteArrayOutputStream = null;
-				}
-			} catch (IOException e) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Close input stream error! ", e);
-				}
-			}
+			IOUtils.closeStream(inputStream);
+			IOUtils.closeStream(byteArrayOutputStream);
 		}
 	}
 
@@ -220,15 +196,14 @@ public final class HttpResponseContent implements Serializable {
 		return StringUtils.convertJSONStringToObject(this.parseString(), clazz);
 	}
 	
-	public Object parseObject() throws XmlException, UnsupportedEncodingException {
+	public Object parseObject() throws XmlException {
 		ByteArrayInputStream byteArrayInputStream = null;
 		ObjectInputStream objectInputStream = null;
 		
 		try {
 			byteArrayInputStream = new ByteArrayInputStream(this.responseContent);
 			objectInputStream = new ObjectInputStream(byteArrayInputStream);
-			Object object = objectInputStream.readObject();
-			return object;
+			return objectInputStream.readObject();
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Convert to object error! ", e);
@@ -236,24 +211,8 @@ public final class HttpResponseContent implements Serializable {
 			
 			return null;
 		} finally {
-			if (byteArrayInputStream != null) {
-				try {
-					byteArrayInputStream.close();
-				} catch (IOException e) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Close byte array input stream error! ", e);
-					}
-				}
-			}
-			if (objectInputStream != null) {
-				try {
-					objectInputStream.close();
-				} catch (IOException e) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Close object input stream error! ", e);
-					}
-				}
-			}
+			IOUtils.closeStream(byteArrayInputStream);
+			IOUtils.closeStream(objectInputStream);
 		}
 	}
 	
@@ -271,10 +230,7 @@ public final class HttpResponseContent implements Serializable {
 	}
 	
 	private boolean isGZipResponse(String contentEncoding) {
-		if (contentEncoding != null 
-				&& contentEncoding.indexOf("gzip") != -1) {
-			return true;
-		}
-		return false;
+		return contentEncoding != null
+				&& contentEncoding.contains("gzip");
 	}
 }
