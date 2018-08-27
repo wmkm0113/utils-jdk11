@@ -66,6 +66,17 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to string with vCard format
+	 * @return			formatted result by ISO8601
+	 */
+	public static String formatGMTDateForVCard() {
+		SimpleDateFormat simpleDateFormat =
+				new SimpleDateFormat(DEFAULT_DATETIME_PATTERN_ISO8601 + "'Z'", Locale.US);
+		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return simpleDateFormat.format(Calendar.getInstance().getTime());
+	}
+
+	/**
+	 * Formats given date according to string with vCard format
 	 * @param date		date instance
 	 * @return			formatted result by ISO8601
 	 */

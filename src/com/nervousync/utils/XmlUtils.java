@@ -299,7 +299,9 @@ public final class XmlUtils {
 					}
 					
 					if (paramObj != null) {
-						ReflectionUtils.setField(fieldName, object, paramObj);
+						if (!ReflectionUtils.setField(fieldName, object, paramObj)) {
+							LOGGER.error("Set field value failed, field name: {}", fieldName);
+						}
 					}
 				}
 			} catch (Exception e) {

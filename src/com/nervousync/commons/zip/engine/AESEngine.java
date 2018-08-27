@@ -76,7 +76,7 @@ public final class AESEngine {
 		this.C3 = (bytes[index++] & 0xFF);
 		this.C3 |= (bytes[index++] & 0xFF) << 8;
 		this.C3 |= (bytes[index++] & 0xFF) << 16;
-		this.C3 |= bytes[index++] << 24;
+		this.C3 |= bytes[index] << 24;
 	}
 
 	private void encryptBlock() {
@@ -152,7 +152,7 @@ public final class AESEngine {
 		bytes[index++] = (byte)this.C3;
 		bytes[index++] = (byte)(this.C3 >> 8);
 		bytes[index++] = (byte)(this.C3 >> 16);
-		bytes[index++] = (byte)(this.C3 >> 24);
+		bytes[index] = (byte)(this.C3 >> 24);
 	}
 
 	private void generateWorkingKeys(byte[] keys) throws ZipException {

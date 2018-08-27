@@ -947,7 +947,7 @@ public final class ClassUtils {
 		if (clazz.isInterface()) {
 			return new Class[] {clazz};
 		}
-		List<Object> interfaces = new ArrayList<>();
+		List<Class<?>> interfaces = new ArrayList<>();
 		while (clazz != null) {
 			for (int i = 0; i < clazz.getInterfaces().length; i++) {
 				Class<?> ifc = clazz.getInterfaces()[i];

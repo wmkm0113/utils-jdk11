@@ -464,6 +464,7 @@ public final class RequestUtils {
 	
 	/**
 	 * Generate SOAP client instance
+	 * @param <T>                           End point interface
 	 * @param endPointUrl					End point URL
 	 * @param serviceEndpointInterface		End point interface
 	 * @param handlerResolver				Handler resolver

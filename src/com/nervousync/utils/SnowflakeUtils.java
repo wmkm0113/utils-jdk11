@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.utils.DateTimeUtils;
-import com.nervousync.utils.SystemUtils;
 
 /**
  * Snowflake Utility
@@ -34,6 +32,8 @@ public final class SnowflakeUtils {
 	 * Instance object
 	 */
 	private static SnowflakeUtils INSTANCE = null;
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * Default timestamp value, default is 2011-04-21 00:00 CST
@@ -77,7 +77,6 @@ public final class SnowflakeUtils {
 	 * @param instanceId		Instance id
 	 */
 	private SnowflakeUtils(long referenceTime, long instanceId) {
-		Logger logger = LoggerFactory.getLogger(this.getClass());
 		if (logger.isDebugEnabled()) {
 			logger.debug("DEVICE ID: {}", DEVICE_ID);
 		}
@@ -188,14 +187,21 @@ public final class SnowflakeUtils {
 		if (currentTime == this.lastTime) {
 			this.sequenceIndex = (this.sequenceIndex + 1) & SEQUENCE_MASK;
 			if (this.sequenceIndex == 0) {
-				//	Out of sequence size, waiting to next second
-				while ((currentTime = DateTimeUtils.currentGMTTimeMillis()) <= this.lastTime) {
+				while (true) {
+					if ((currentTime = DateTimeUtils.currentGMTTimeMillis()) > this.lastTime) {
+						break;
+					}
 				}
 			}
 			this.lastTime = currentTime;
 		} else {
 			this.sequenceIndex = 0L;
 			this.lastTime = currentTime;
+		}
+
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("Last time: {}, reference time: {}, Device ID: {}, instanceId: {}, sequenceIndex: {}",
+					this.lastTime, this.referenceTime, SnowflakeUtils.DEVICE_ID, this.instanceId, this.sequenceIndex);
 		}
 		
 		if (calcTime) {

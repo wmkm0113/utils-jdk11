@@ -52,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
-
 import sun.misc.Cleaner;
 
 /**

@@ -79,41 +79,45 @@ public final class SystemUtils {
 	public static final int JAVA_18 = 5;
 
 	/**
-	 * Constant identifying the 1.9 JVM (Java 9).
+	 * Constant identifying the 9 JVM (Java 9).
 	 */
-	public static final int JAVA_19 = 6;
+	public static final int JAVA_9 = 6;
 
-	private static final String JAVA_VBERSION;
+	/**
+	 * Constant identifying the 10 JVM (Java 10).
+	 */
+	public static final int JAVA_10 = 7;
 
 	private static final int MAJOR_VERSION;
 
 	static {
-		JAVA_VBERSION = System.getProperty("java.version");
 		// version String should look like "1.4.2_10"
-		if (JAVA_VBERSION.contains("1.9.")) {
-			MAJOR_VERSION = JAVA_19;
-		} else if (JAVA_VBERSION.contains("1.8.")) {
+		if (JAVA_VERSION.startsWith("10.")) {
+			MAJOR_VERSION = JAVA_10;
+		} else if (JAVA_VERSION.startsWith("9.")) {
+			MAJOR_VERSION = JAVA_9;
+		} else if (JAVA_VERSION.startsWith("1.8.")) {
 			MAJOR_VERSION = JAVA_18;
-		} else if (JAVA_VBERSION.contains("1.7.")) {
+		} else if (JAVA_VERSION.startsWith("1.7.")) {
 			MAJOR_VERSION = JAVA_17;
-		} else if (JAVA_VBERSION.contains("1.6.")) {
+		} else if (JAVA_VERSION.startsWith("1.6.")) {
 			MAJOR_VERSION = JAVA_16;
-		} else if (JAVA_VBERSION.contains("1.5.")) {
+		} else if (JAVA_VERSION.startsWith("1.5.")) {
 			MAJOR_VERSION = JAVA_15;
 		} else {
 			// else leave 1.4 as default (it's either 1.4 or unknown)
 			MAJOR_VERSION = JAVA_14;
 		}
 	}
-	
+
 	private SystemUtils() {
-		
+
 	}
-	
+
 	public static String identifiedKey() {
 		return IDENTIFIED_KEY;
 	}
-	
+
 	public static boolean isWindows() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("windows") > 0;
 	}
@@ -129,163 +133,153 @@ public final class SystemUtils {
 	public static boolean isMacOS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mac os") > 0;
 	}
-	
+
 	public static boolean isMacOSX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mac os x") > 0;
 	}
-	
+
 	public static boolean isOS2() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("os/2") > 0;
 	}
-	
+
 	public static boolean isSolaris() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("solaris") > 0;
 	}
-	
+
 	public static boolean isSunOS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("sunos") > 0;
 	}
-	
+
 	public static boolean isMPEiX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mpe/ix") > 0;
 	}
-	
+
 	public static boolean isHPUX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("hp-ux") > 0;
 	}
-	
+
 	public static boolean isAIX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("aix") > 0;
 	}
-	
+
 	public static boolean isOS390() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("os/390") > 0;
 	}
-	
+
 	public static boolean isFreeBSD() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("freebsd") > 0;
 	}
-	
+
 	public static boolean isIrix() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("irix") > 0;
 	}
-	
+
 	public static boolean isDigitalUnix() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("digital unix") > 0;
 	}
-	
+
 	public static boolean isNetware() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("netware") > 0;
 	}
-	
+
 	public static boolean isOSF1() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("osf1") > 0;
 	}
-	
+
 	public static boolean isOpenVMS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("openvms") > 0;
 	}
 
 	/**
-	 * Return the full Java version string, as returned by
-	 * <code>System.getProperty("java.version")</code>.
-	 * @return the full Java version string
-	 * @see System#getProperty(String)
-	 */
-	public static String getJavaVbersion() {
-		return JAVA_VBERSION;
-	}
-
-	/**
-	 * Get the major version code. This means we can do things like
-	 * <code>if (getMajorJavaVersion() &lt; JAVA_14)</code>.
-	 * @return a code comparable to the JAVA_XX codes in this class
-	 * @see #JAVA_13
-	 * @see #JAVA_14
-	 * @see #JAVA_15
-	 * @see #JAVA_16
-	 * @see #JAVA_17
-	 * @see #JAVA_18
-	 */
-	public static int getMajorVersion() {
-		return MAJOR_VERSION;
-	}
-
-	/**
 	 * Convenience method to determine if the current JVM is at least Java 1.4.
 	 * @return <code>true</code> if the current JVM is at least Java 1.4
-	 * @see #getMajorVersion()
 	 * @see #JAVA_14
 	 * @see #JAVA_15
 	 * @see #JAVA_16
 	 * @see #JAVA_17
 	 * @see #JAVA_18
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
 	public static boolean isAtLeastJava14() {
-		return getMajorVersion() >= JAVA_14;
+		return MAJOR_VERSION >= JAVA_14;
 	}
 
 	/**
 	 * Convenience method to determine if the current JVM is at least
 	 * Java 1.5 (Java 5).
 	 * @return <code>true</code> if the current JVM is at least Java 1.5
-	 * @see #getMajorVersion()
 	 * @see #JAVA_15
 	 * @see #JAVA_16
 	 * @see #JAVA_17
 	 * @see #JAVA_18
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
 	public static boolean isAtLeastJava15() {
-		return getMajorVersion() >= JAVA_15;
+		return MAJOR_VERSION >= JAVA_15;
 	}
 
 	/**
 	 * Convenience method to determine if the current JVM is at least
 	 * Java 1.6 (Java 6).
 	 * @return <code>true</code> if the current JVM is at least Java 1.6
-	 * @see #getMajorVersion()
 	 * @see #JAVA_16
 	 * @see #JAVA_17
 	 * @see #JAVA_18
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
 	public static boolean isAtLeastJava16() {
-		return getMajorVersion() >= JAVA_16;
+		return MAJOR_VERSION >= JAVA_16;
 	}
 
 	/**
 	 * Convenience method to determine if the current JVM is at least
 	 * Java 1.7 (Java 7).
 	 * @return <code>true</code> if the current JVM is at least Java 1.7
-	 * @see #getMajorVersion()
 	 * @see #JAVA_17
 	 * @see #JAVA_18
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
 	public static boolean isAtLeastJava17() {
-		return getMajorVersion() >= JAVA_17;
+		return MAJOR_VERSION >= JAVA_17;
 	}
 
 	/**
 	 * Convenience method to determine if the current JVM is at least
 	 * Java 1.8 (Java 8).
 	 * @return <code>true</code> if the current JVM is at least Java 1.8
-	 * @see #getMajorVersion()
 	 * @see #JAVA_18
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
 	public static boolean isAtLeastJava18() {
-		return getMajorVersion() >= JAVA_18;
+		return MAJOR_VERSION >= JAVA_18;
 	}
 
 	/**
 	 * Convenience method to determine if the current JVM is at least
-	 * Java 1.9 (Java 9).
-	 * @return <code>true</code> if the current JVM is at least Java 1.9
-	 * @see #getMajorVersion()
-	 * @see #JAVA_19
+	 * Java 9.
+	 * @return <code>true</code> if the current JVM is at least Java 9
+	 * @see #JAVA_9
+	 * @see #JAVA_10
 	 */
-	public static boolean isAtLeastJava19() {
-		return getMajorVersion() >= JAVA_19;
+	public static boolean isAtLeastJava9() {
+		return MAJOR_VERSION >= JAVA_9;
 	}
-	
+
+	/**
+	 * Convenience method to determine if the current JVM is at least
+	 * Java 10.
+	 * @return <code>true</code> if the current JVM is at least Java 10
+	 * @see #JAVA_10
+	 */
+	public static boolean isAtLeastJava10() {
+		return MAJOR_VERSION >= JAVA_10;
+	}
+
 	private static String generateIdentifiedKey() {
 		try {
 			List<NetworkInfo> networkInfos = retrieveNetworkInfos();
@@ -299,7 +293,7 @@ public final class SystemUtils {
 			}
 			
 			Collections.sort(macAddrList);
-			return SecurityUtils.MD5(macAddrList);
+			return SecurityUtils.SHA256(macAddrList);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Generate identified key error!", e);

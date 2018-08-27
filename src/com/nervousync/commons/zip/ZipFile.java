@@ -1799,13 +1799,12 @@ public final class ZipFile implements Cloneable {
 					throw new ZipException("Compression type not supported");
 			}
 		} catch (Exception e) {
+			IOUtils.closeStream(input);
 			if (e instanceof ZipException) {
 				throw (ZipException)e;
 			} else {
 				throw new ZipException(e);
 			}
-		} finally {
-			IOUtils.closeStream(input);
 		}
 	}
 	
@@ -3123,7 +3122,6 @@ public final class ZipFile implements Cloneable {
 	private static Zip64ExtendInfo readZip64ExtendInfo(List<ExtraDataRecord> extraDataRecords, long originalSize,
 			long compressedSize, long offsetLocalHeader, int diskNumberStart) throws ZipException {
 		for (ExtraDataRecord extraDataRecord : extraDataRecords) {
-			Zip64ExtendInfo zip64ExtendInfo = new Zip64ExtendInfo();
 			if (extraDataRecord.getHeader() == 0x0001) {
 				if (extraDataRecord.getDataSize() <= 0) {
 					break;
@@ -3134,7 +3132,9 @@ public final class ZipFile implements Cloneable {
 				int count = 0;
 				boolean addValue = false;
 
-				if (((originalSize & 0xFFFF) == 0xFFFF) && count < extraDataRecord.getDataSize()) {
+				Zip64ExtendInfo zip64ExtendInfo = new Zip64ExtendInfo();
+
+				if ((originalSize & 0xFFFF) == 0xFFFF) {
 					System.arraycopy(extraDataRecord.getDataContent(), count, longBuffer, 0, 8);
 					zip64ExtendInfo.setOriginalSize(RawUtils.readLongFromLittleEndian(longBuffer, 0));
 					count += 8;

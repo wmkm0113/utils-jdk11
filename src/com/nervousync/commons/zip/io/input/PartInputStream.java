@@ -74,7 +74,7 @@ public class PartInputStream extends InputStream {
 	}
 
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
+	public synchronized int read(byte[] b, int off, int len) throws IOException {
 		if (len > (this.length - this.readBytes)) {
 			len = (int)(this.length - this.readBytes);
 			
@@ -91,21 +91,18 @@ public class PartInputStream extends InputStream {
 			}
 		}
 
-		int count;
-		synchronized (this.input) {
-			count = this.input.read(b, off, len);
-			if ((count < len) && this.zipFile.isSplitArchive()) {
-				this.input.close();
-				this.input = this.zipFile.startNextSplitFile();
-				
-				if (count < 0) {
-					count = 0;
-				}
-				
-				int readCount = this.input.read(b, count, len - count);
-				if (readCount > 0) {
-					count += readCount;
-				}
+		int count = this.input.read(b, off, len);
+		if ((count < len) && this.zipFile.isSplitArchive()) {
+			this.input.close();
+			this.input = this.zipFile.startNextSplitFile();
+
+			if (count < 0) {
+				count = 0;
+			}
+
+			int readCount = this.input.read(b, count, len - count);
+			if (readCount > 0) {
+				count += readCount;
 			}
 		}
 		

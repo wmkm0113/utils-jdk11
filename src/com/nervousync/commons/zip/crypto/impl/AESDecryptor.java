@@ -29,7 +29,6 @@ import com.nervousync.utils.RawUtils;
  */
 public class AESDecryptor extends AESCrypto implements Decryptor {
 
-	private LocalFileHeader localFileHeader;
 	private byte[] storedMac = null;
 
 	public AESDecryptor(LocalFileHeader localFileHeader, 
@@ -38,13 +37,12 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 			throw new ZipException("Local file header is null!");
 		}
 		
-		this.localFileHeader = localFileHeader;
-		if (this.localFileHeader.getAesExtraDataRecord() == null) {
+		if (localFileHeader.getAesExtraDataRecord() == null) {
 			throw new ZipException("Invalid aes extra data record!");
 		}
 
-		super.preInit(this.localFileHeader.getAesExtraDataRecord().getAesStrength());
-		this.init(salt, this.localFileHeader.getPassword());
+		super.preInit(localFileHeader.getAesExtraDataRecord().getAesStrength());
+		this.init(salt, localFileHeader.getPassword());
 		
 		if (!this.verifyPassword(passwordBytes)) {
 			throw new ZipException("Wrong password!");

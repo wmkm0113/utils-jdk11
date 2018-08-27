@@ -1362,33 +1362,35 @@ public final class FileUtils {
 				fileList, readHiddenFiles, includeRootFolder);
 		return fileList;
 	}
-	
+
 	/**
 	 * Write file content to local file path
 	 * @param fileData			file content
 	 * @param filePath			write path
-	 * @return					true for success and Globals.DEFAULT_VALUE_BOOLEAN for error 
-	 * @throws IOException		close output stream error
+	 * @return					true for success and Globals.DEFAULT_VALUE_BOOLEAN for error
 	 */
-	public static boolean saveFile(byte[] fileData, String filePath) throws IOException {
+	public static boolean saveFile(byte[] fileData, String filePath) {
 		FileOutputStream fileOutputStream = null;
-		
+
 		try {
 			File destFile = FileUtils.getFile(filePath);
 			FileUtils.makeHome(destFile.getParent());
-			
+
 			fileOutputStream = new FileOutputStream(destFile);
 			fileOutputStream.write(fileData);
 			fileOutputStream.flush();
-		} catch (FileNotFoundException e) {
+			return true;
+		} catch (IOException e) {
+			LOGGER.error("Save file to storage error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack trace message: ", e);
+			}
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		} finally {
 			IOUtils.closeStream(fileOutputStream);
 		}
-		
-		return true;
 	}
-	
+
 	/**
 	 * Write input stream content to file path
 	 * @param inputStream		file content by input stream
@@ -1775,7 +1777,7 @@ public final class FileUtils {
 		if (FileUtils.makeHome(destPath)) {
 			try {
 				File destFile = FileUtils.getFile(destPath);
-				return destFile.mkdirs();
+				return destFile.exists() || destFile.mkdirs();
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Make directory error! ", e);
