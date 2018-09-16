@@ -606,7 +606,7 @@ public class CipherOutputStream extends OutputStream {
 
 				HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
 				writingZip64Record = true;
-				localFileHeader.setWriteComprSizeInZip64ExtraRecord(true);
+				localFileHeader.setWriteCompressSizeInZip64ExtraRecord(true);
 			} else {
 				RawUtils.writeLongFromLittleEndian(longBuffer, 0, localFileHeader.getCompressedSize());
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
@@ -616,7 +616,7 @@ public class CipherOutputStream extends OutputStream {
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
 				HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
 
-				localFileHeader.setWriteComprSizeInZip64ExtraRecord(Globals.DEFAULT_VALUE_BOOLEAN);
+				localFileHeader.setWriteCompressSizeInZip64ExtraRecord(Globals.DEFAULT_VALUE_BOOLEAN);
 			}
 
 			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) localFileHeader.getFileNameLength());

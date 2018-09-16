@@ -74,7 +74,7 @@ public final class MailObject implements Serializable {
 	/**
 	 * Receiver e-mail address list
 	 */
-	private List<String> recvAddress;
+	private List<String> receiveAddress;
 	/**
 	 * CC e-mail address list
 	 */
@@ -223,17 +223,17 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
-	 * @return the recvAddress
+	 * @return the receiveAddress
 	 */
-	public List<String> getRecvAddress() {
-		return recvAddress;
+	public List<String> getReceiveAddress() {
+		return receiveAddress;
 	}
 
 	/**
-	 * @param recvAddress the recvAddress to set
+	 * @param receiveAddress the receiveAddress to set
 	 */
-	public void setRecvAddress(List<String> recvAddress) {
-		this.recvAddress = recvAddress;
+	public void setReceiveAddress(List<String> receiveAddress) {
+		this.receiveAddress = receiveAddress;
 	}
 
 	/**
@@ -304,12 +304,5 @@ public final class MailObject implements Serializable {
 	 */
 	public void setContentMap(Map<String, String> contentMap) {
 		this.contentMap = contentMap;
-	}
-
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 }

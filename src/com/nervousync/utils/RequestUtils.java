@@ -21,7 +21,7 @@ import com.nervousync.commons.beans.servlet.request.RequestInfo;
 import com.nervousync.commons.beans.servlet.response.HttpResponseContent;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.RegexGlobals;
-import com.nervousync.commons.http.cookie.CookieInfo;
+import com.nervousync.commons.http.cookie.CookieEntity;
 import com.nervousync.commons.http.entity.HttpEntity;
 import com.nervousync.commons.http.header.SimpleHeader;
 import com.nervousync.commons.http.proxy.ProxyInfo;
@@ -209,13 +209,13 @@ public final class RequestUtils {
 	 * @return				Begin IP address
 	 */
 	public static String beginIP(String ipAddress, String netmask) {
-		String[] addrItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
+		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
 		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
 		
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		for (int i = 0 ; i < 4 ; i++) {
-			int beginItem = Integer.parseInt(addrItems[i]) & Integer.parseInt(maskItems[i]);
+			int beginItem = Integer.parseInt(addressItems[i]) & Integer.parseInt(maskItems[i]);
 			if (i == 3) {
 				beginItem++;
 			}
@@ -232,13 +232,13 @@ public final class RequestUtils {
 	 * @return				End IP address
 	 */
 	public static String endIP(String beginIP, String netmask) {
-		String[] addrItems = StringUtils.tokenizeToStringArray(beginIP, ".");
+		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, ".");
 		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
 		
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		for (int i = 0 ; i < 4 ; i++) {
-			int endItem = 255 - Integer.parseInt(addrItems[i]) ^ Integer.parseInt(maskItems[i]);
+			int endItem = 255 - Integer.parseInt(addressItems[i]) ^ Integer.parseInt(maskItems[i]);
 			stringBuilder.append(".").append(endItem);
 		}
 		
@@ -322,7 +322,7 @@ public final class RequestUtils {
 	 */
 	public static String convertIPv4ToIPv6(String ipAddress, boolean collapse) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			StringBuilder stringBuilder;
 			if (collapse) {
 				stringBuilder = new StringBuilder(":");
@@ -330,11 +330,11 @@ public final class RequestUtils {
 				stringBuilder = new StringBuilder("0000:0000:0000:0000:0000:0000");
 			}
 			int index = 0;
-			for (String addrItem : splitAddr) {
+			for (String addressItem : splitAddress) {
 				if (index % 2 == 0) {
 					stringBuilder.append(":");
 				}
-				stringBuilder.append(Integer.toHexString(Integer.parseInt(addrItem)));
+				stringBuilder.append(Integer.toHexString(Integer.parseInt(addressItem)));
 				index++;
 			}
 			
@@ -350,15 +350,15 @@ public final class RequestUtils {
 	 */
 	public static byte[] convertIPv4ToBytes(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
-			byte[] addrBytes = new byte[4];
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			byte[] addressBytes = new byte[4];
+
+			addressBytes[0] = (byte)Integer.parseInt(splitAddress[0]);
+			addressBytes[1] = (byte)Integer.parseInt(splitAddress[1]);
+			addressBytes[2] = (byte)Integer.parseInt(splitAddress[2]);
+			addressBytes[3] = (byte)Integer.parseInt(splitAddress[3]);
 			
-			addrBytes[0] = (byte)Integer.parseInt(splitAddr[0]);
-			addrBytes[1] = (byte)Integer.parseInt(splitAddr[1]);
-			addrBytes[2] = (byte)Integer.parseInt(splitAddr[2]);
-			addrBytes[3] = (byte)Integer.parseInt(splitAddr[3]);
-			
-			return addrBytes;
+			return addressBytes;
 		}
 		return null;
 	}
@@ -383,12 +383,12 @@ public final class RequestUtils {
 	 */
 	public static BigInteger convertIPv4ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ".");
-			if (splitAddr.length == 4) {
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			if (splitAddress.length == 4) {
 				BigInteger bigInteger = BigInteger.ZERO;
 				
-				for (int i = 0 ; i < splitAddr.length ; i++) {
-					BigInteger currentInteger = BigInteger.valueOf(Long.parseLong(splitAddr[3 - i])).shiftLeft(i * 8);
+				for (int i = 0 ; i < splitAddress.length ; i++) {
+					BigInteger currentInteger = BigInteger.valueOf(Long.parseLong(splitAddress[3 - i])).shiftLeft(i * 8);
 					bigInteger = bigInteger.add(currentInteger);
 				}
 				return bigInteger;
@@ -405,11 +405,11 @@ public final class RequestUtils {
 	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)) {
 			ipAddress = appendIgnore(ipAddress);
-			String[] splitAddr = StringUtils.tokenizeToStringArray(ipAddress, ":");
-			if (splitAddr.length == 8) {
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ":");
+			if (splitAddress.length == 8) {
 				BigInteger bigInteger = BigInteger.ZERO;
 				int index = 0;
-				for (String split : splitAddr) {
+				for (String split : splitAddress) {
 					BigInteger currentInteger;
 					if (StringUtils.matches(split, RegexGlobals.IPV4_REGEX)) {
 						currentInteger = convertIPv4ToBigInteger(split);
@@ -419,7 +419,7 @@ public final class RequestUtils {
 					if (currentInteger == null) {
 						return null;
 					}
-					bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddr.length - index - 1)));
+					bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddress.length - index - 1)));
 					index++;
 				}
 				return bigInteger;
@@ -434,15 +434,15 @@ public final class RequestUtils {
 	 * @return					IPv4 address
 	 */
 	public static String convertBigIntegerToIPv4(BigInteger bigInteger) {
-		StringBuilder ipv4Addr = new StringBuilder();
+		StringBuilder ipv4Address = new StringBuilder();
 		BigInteger ff = BigInteger.valueOf(0xFFL);
 		
 		for (int i = 0 ; i < 4 ; i++) {
-			ipv4Addr.insert(0, "." + bigInteger.and(ff).toString());
+			ipv4Address.insert(0, "." + bigInteger.and(ff).toString());
 			bigInteger = bigInteger.shiftRight(8);
 		}
 		
-		return ipv4Addr.substring(1);
+		return ipv4Address.substring(1);
 	}
 
 	/**
@@ -450,16 +450,16 @@ public final class RequestUtils {
 	 * @param bigInteger		BigInteger value
 	 * @return					IPv6 address
 	 */
-	public static String convertBigIntegerToIPv6Addr(BigInteger bigInteger) {
-		StringBuilder ipv6Addr = new StringBuilder();
+	public static String convertBigIntegerToIPv6Address(BigInteger bigInteger) {
+		StringBuilder ipv6Address = new StringBuilder();
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
 		
 		for (int i = 0 ; i < 8 ; i++) {
-			ipv6Addr.insert(0, ":" + bigInteger.and(ff).toString(16));
+			ipv6Address.insert(0, ":" + bigInteger.and(ff).toString(16));
 			bigInteger = bigInteger.shiftRight(16);
 		}
 		
-		return ipv6Addr.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
+		return ipv6Address.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
 	}
 	
 	/**
@@ -1093,15 +1093,15 @@ public final class RequestUtils {
 	/**
 	 * Send request and receive response
 	 * @param requestInfo		Request info
-	 * @param cookieInfos		Cookie infos
+	 * @param cookieList		Cookie  list
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(RequestInfo requestInfo, List<CookieInfo> cookieInfos) {
+	public static HttpResponseContent sendRequest(RequestInfo requestInfo, List<CookieEntity> cookieList) {
 		HttpURLConnection urlConnection = null;
 		OutputStream outputStream = null;
 		
 		try {
-			urlConnection = openConnection(requestInfo, cookieInfos);
+			urlConnection = openConnection(requestInfo, cookieList);
 			int timeout = requestInfo.getTimeOut() == Globals.DEFAULT_VALUE_INT ? DEFAULT_TIME_OUT : requestInfo.getTimeOut();
 			urlConnection.setConnectTimeout(timeout * 1000);
 			urlConnection.setReadTimeout(timeout * 1000);
@@ -1125,19 +1125,19 @@ public final class RequestUtils {
 			
 			String redirectUrl = urlConnection.getHeaderField("Location");
 			if (redirectUrl != null) {
-				if (cookieInfos == null) {
-					cookieInfos = new ArrayList<>();
+				if (cookieList == null) {
+					cookieList = new ArrayList<>();
 				}
 
 				for (Entry<String, List<String>> entry : urlConnection.getHeaderFields().entrySet()) {
 					if ("Set-Cookie".equals(entry.getKey())) {
 						for (String cookieValue : entry.getValue()) {
-							cookieInfos.add(new CookieInfo(cookieValue));
+							cookieList.add(new CookieEntity(cookieValue));
 						}
 					}
 				}
 				
-				return RequestUtils.sendRequest(new RequestInfo(redirectUrl, requestInfo), cookieInfos);
+				return RequestUtils.sendRequest(new RequestInfo(redirectUrl, requestInfo), cookieList);
 			}
 			return new HttpResponseContent(urlConnection);
 		} catch (Exception e) {
@@ -1337,8 +1337,8 @@ public final class RequestUtils {
      * @return resulting URI
      */
     public static String appendParams(String uri, Map<String, String[]> params) {
-        String delim = (uri.indexOf('?') == -1) ? "?" : "&";
-        return uri + delim + RequestUtils.createQueryStringFromMap(params, "&").toString();
+        String delimiter = (uri.indexOf('?') == -1) ? "?" : "&";
+        return uri + delimiter + RequestUtils.createQueryStringFromMap(params, "&").toString();
     }
 
 	/**
@@ -1557,13 +1557,13 @@ public final class RequestUtils {
 		}
 	}
 	
-	private static String generateCookie(String requestUrl, List<CookieInfo> cookieInfos) {
-		if (cookieInfos == null || cookieInfos.size() == 0) {
+	private static String generateCookie(String requestUrl, List<CookieEntity> cookieList) {
+		if (cookieList == null || cookieList.size() == 0) {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		for (CookieInfo cookieInfo : cookieInfos) {
+		for (CookieEntity cookieInfo : cookieList) {
 			if ((!requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)
 					&& cookieInfo.isSecure()) || (cookieInfo.getExpires() > DateTimeUtils.currentGMTTimeMillis())
 					|| cookieInfo.getMaxAge() == Globals.DEFAULT_VALUE_LONG || cookieInfo.getMaxAge() == 0L) {
@@ -1602,7 +1602,7 @@ public final class RequestUtils {
 		return stringBuilder.substring(2);
 	}
 
-	private static HttpURLConnection openConnection(RequestInfo requestInfo, List<CookieInfo> cookieInfos, 
+	private static HttpURLConnection openConnection(RequestInfo requestInfo, List<CookieEntity> cookieList,
 			TrustedCert... trustedCerts) throws UnsupportedEncodingException {
 		String method;
 		switch (requestInfo.getHttpMethodOption()) {
@@ -1668,7 +1668,7 @@ public final class RequestUtils {
 			connection.setRequestProperty("Accept", "text/html,text/javascript,text/xml");
 			connection.addRequestProperty("Accept-Encoding", "gzip, deflate");
 			connection.setRequestProperty("User-Agent", "NervousyncBot");
-			String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), cookieInfos);
+			String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), cookieList);
 			if (cookie != null) {
 				connection.setRequestProperty("Cookie", cookie);
 			}

@@ -34,7 +34,7 @@ public class LocalFileHeader extends FileHeader {
 
 	private byte[] extraField;
 	private long offsetStartOfData;
-	private boolean writeComprSizeInZip64ExtraRecord;
+	private boolean writeCompressSizeInZip64ExtraRecord;
 	
 	/**
 	 * @return the extraField
@@ -65,17 +65,17 @@ public class LocalFileHeader extends FileHeader {
 	}
 
 	/**
-	 * @return the writeComprSizeInZip64ExtraRecord
+	 * @return the writeCompressSizeInZip64ExtraRecord
 	 */
-	public boolean isWriteComprSizeInZip64ExtraRecord() {
-		return writeComprSizeInZip64ExtraRecord;
+	public boolean isWriteCompressSizeInZip64ExtraRecord() {
+		return writeCompressSizeInZip64ExtraRecord;
 	}
 
 	/**
-	 * @param writeComprSizeInZip64ExtraRecord the writeComprSizeInZip64ExtraRecord to set
+	 * @param writeCompressSizeInZip64ExtraRecord the writeCompressSizeInZip64ExtraRecord to set
 	 */
-	public void setWriteComprSizeInZip64ExtraRecord(boolean writeComprSizeInZip64ExtraRecord) {
-		this.writeComprSizeInZip64ExtraRecord = writeComprSizeInZip64ExtraRecord;
+	public void setWriteCompressSizeInZip64ExtraRecord(boolean writeCompressSizeInZip64ExtraRecord) {
+		this.writeCompressSizeInZip64ExtraRecord = writeCompressSizeInZip64ExtraRecord;
 	}
 	
 	public boolean verifyPassword(DataInput input) throws ZipException {

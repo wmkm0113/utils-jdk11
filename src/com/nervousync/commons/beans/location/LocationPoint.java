@@ -113,13 +113,6 @@ public final class LocationPoint implements Serializable {
 		return latitude;
 	}
 
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	
 	@Override
 	public String toString() {
 		return this.latitude + "," + this.longitude;

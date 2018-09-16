@@ -358,7 +358,7 @@ public final class ClassUtils {
 	 * @throws IllegalArgumentException if the className is empty
 	 */
 	public static String getShortName(String className) {
-		if (!StringUtils.hasLength(className)) {
+		if (StringUtils.hasLength(className)) {
 			throw new IllegalArgumentException("Class name must not be empty");
 		}
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);

@@ -727,7 +727,7 @@ public final class ReflectionUtils {
 	}
 	
 	/**
-	 * Retrieve field object if avaliable
+	 * Retrieve field object if available
 	 * @param clazz			Define class
 	 * @param fieldName		field name
 	 * @return				Retrieve field object or null if not exists

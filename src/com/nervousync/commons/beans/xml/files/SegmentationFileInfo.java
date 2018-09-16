@@ -87,13 +87,6 @@ public class SegmentationFileInfo extends BaseElement {
 	}
 
 	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	/**
 	 * @return the position
 	 */
 	public long getPosition() {

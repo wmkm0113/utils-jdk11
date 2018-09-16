@@ -237,10 +237,10 @@ public final class ConvertUtils {
 		if (object instanceof String) {
 			return convertToByteArray((String)object);
 		}
-		
-		if (object instanceof byte[] || object instanceof Byte[]) {
-			return (byte[])object;
-		}
+
+//		if (object instanceof byte[] || object instanceof Byte[]) {
+//			return (byte[])object;
+//		}
 
 		ByteArrayOutputStream outputStream = null;
 		ObjectOutputStream objectOutputStream = null;

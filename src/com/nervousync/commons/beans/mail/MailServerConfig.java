@@ -44,15 +44,15 @@ public final class MailServerConfig implements Serializable {
 	/**
 	 * Receive server configuration, supported POP3 and IMAP
 	 */
-	private ServerConfig recvServerConfig;
+	private ServerConfig receiveServerConfig;
 	
 	/**
 	 * Initialize MailServerConfig
-	 * @param recvProtocolName		Receive protocol name, "IMAP" or "POP3"
-	 * @param recvHostName			Receive server domain name or address
-	 * @param recvHostPort			Receive server port
-	 * @param recvSsl				Using SSL to connect receive server
-	 * @param recvAuthLogin			Receive server authentication login status
+	 * @param receiveProtocolName		Receive protocol name, "IMAP" or "POP3"
+	 * @param receiveHostName			Receive server domain name or address
+	 * @param receiveHostPort			Receive server port
+	 * @param receiveSsl				Using SSL to connect receive server
+	 * @param receiveAuthLogin			Receive server authentication login status
 	 * @param sendProtocolName		Send protocol name, "SMTP" only at this time
 	 * @param sendHostName			Send server domain name or address
 	 * @param sendHostPort			Send server port
@@ -60,22 +60,22 @@ public final class MailServerConfig implements Serializable {
 	 * @param sendAuthLogin			Send server authentication login status
 	 * @throws Exception			Parameter is null or protocol name is invalid
 	 */
-	public MailServerConfig(String recvProtocolName, String recvHostName, int recvHostPort, boolean recvSsl, boolean recvAuthLogin, 
+	public MailServerConfig(String receiveProtocolName, String receiveHostName, int receiveHostPort, boolean receiveSsl, boolean receiveAuthLogin, 
 			String sendProtocolName, String sendHostName, int sendHostPort, boolean sendSsl, boolean sendAuthLogin) throws Exception {
-		if (recvProtocolName == null || recvHostName == null || sendProtocolName == null || sendHostName == null) {
+		if (receiveProtocolName == null || receiveHostName == null || sendProtocolName == null || sendHostName == null) {
 			throw new Exception("Mail Server Info Error");
 		}
 		
-		BaseProtocol recvProtocol;
-		if (recvProtocolName.equalsIgnoreCase("IMAP")) {
-			recvProtocol = new IMAPProtocol();
-		} else if (recvProtocolName.equalsIgnoreCase("POP3")) {
-			recvProtocol = new POP3Protocol();
+		BaseProtocol receiveProtocol;
+		if (receiveProtocolName.equalsIgnoreCase("IMAP")) {
+			receiveProtocol = new IMAPProtocol();
+		} else if (receiveProtocolName.equalsIgnoreCase("POP3")) {
+			receiveProtocol = new POP3Protocol();
 		} else {
 			throw new Exception("Receive Mail Protocol Unknown");
 		}
 		
-		this.recvServerConfig = new ServerConfig(recvProtocol, recvHostName, recvHostPort, recvSsl, recvAuthLogin);
+		this.receiveServerConfig = new ServerConfig(receiveProtocol, receiveHostName, receiveHostPort, receiveSsl, receiveAuthLogin);
 		this.sendServerConfig = new ServerConfig(new SMTPProtocol(), sendHostName, sendHostPort, sendSsl, sendAuthLogin);
 	}
 	
@@ -111,8 +111,8 @@ public final class MailServerConfig implements Serializable {
 	 * Read receive config info
 	 * @return	java.util.Properties for JavaMail using
 	 */
-	public Properties getRecvConfigInfo() {
-		return this.recvServerConfig.getConfigInfo();
+	public Properties getReceiveConfigInfo() {
+		return this.receiveServerConfig.getConfigInfo();
 	}
 
 	/**
@@ -120,8 +120,8 @@ public final class MailServerConfig implements Serializable {
 	 * @param userName				User name
 	 * @return	java.util.Properties for JavaMail using
 	 */
-	public Properties getRecvConfigInfo(String userName) {
-		return this.recvServerConfig.getConfigInfo(userName);
+	public Properties getReceiveConfigInfo(String userName) {
+		return this.receiveServerConfig.getConfigInfo(userName);
 	}
 
 	/**
@@ -131,8 +131,8 @@ public final class MailServerConfig implements Serializable {
 	 * @param timeout				Operate timeout
 	 * @return	java.util.Properties for JavaMail using
 	 */
-	public Properties getRecvConfigInfo(String userName, int connectionTimeout, int timeout) {
-		return this.recvServerConfig.getConfigInfo(userName, connectionTimeout, timeout);
+	public Properties getReceiveConfigInfo(String userName, int connectionTimeout, int timeout) {
+		return this.receiveServerConfig.getConfigInfo(userName, connectionTimeout, timeout);
 	}
 	
 	/**
@@ -150,24 +150,17 @@ public final class MailServerConfig implements Serializable {
 	}
 
 	/**
-	 * @return the recvServerConfig
+	 * @return the receiveServerConfig
 	 */
-	public ServerConfig getRecvServerConfig() {
-		return recvServerConfig;
+	public ServerConfig getReceiveServerConfig() {
+		return receiveServerConfig;
 	}
 
 	/**
-	 * @param recvServerConfig the recvServerConfig to set
+	 * @param receiveServerConfig the receiveServerConfig to set
 	 */
-	public void setRecvServerConfig(ServerConfig recvServerConfig) {
-		this.recvServerConfig = recvServerConfig;
-	}
-
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public void setReceiveServerConfig(ServerConfig receiveServerConfig) {
+		this.receiveServerConfig = receiveServerConfig;
 	}
 
 	public final static class ServerConfig implements Serializable {
@@ -297,13 +290,6 @@ public final class MailServerConfig implements Serializable {
 		 */
 		public void setProtocolOption(ProtocolOption protocolOption) {
 			this.protocolOption = protocolOption;
-		}
-
-		/**
-		 * @return the serialversionuid
-		 */
-		public static long getSerialversionuid() {
-			return serialVersionUID;
 		}
 	}
 }

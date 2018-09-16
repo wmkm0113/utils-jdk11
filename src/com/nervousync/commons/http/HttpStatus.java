@@ -57,7 +57,7 @@ public final class HttpStatus {
 
     // --- 3xx Redirection ---
 
-    /** {@code 300 Mutliple Choices} (HTTP/1.1 - RFC 2616) */
+    /** {@code 300 Multiple Choices} (HTTP/1.1 - RFC 2616) */
     public static final int SC_MULTIPLE_CHOICES = 300;
     /** {@code 301 Moved Permanently} (HTTP/1.0 - RFC 1945) */
     public static final int SC_MOVED_PERMANENTLY = 301;

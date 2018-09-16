@@ -139,13 +139,13 @@ public final class XmlUtils {
 			xmlNs = classType.getAnnotation(XmlNs.class);
 		}
 		
-		boolean annoCheck = Globals.DEFAULT_VALUE_BOOLEAN;
+		boolean annotationCheck = Globals.DEFAULT_VALUE_BOOLEAN;
 		Element element = null;
 		if (xmlObj instanceof Document) {
-			annoCheck = classType.isAnnotationPresent(XmlRootElement.class);
+			annotationCheck = classType.isAnnotationPresent(XmlRootElement.class);
 			element = ((Document)xmlObj).getRootElement();
 		} else if (xmlObj instanceof Element) {
-			annoCheck = classType.isAnnotationPresent(XmlType.class);
+			annotationCheck = classType.isAnnotationPresent(XmlType.class);
 			element = (Element)xmlObj;
 		} else if (xmlObj instanceof InputStream) {
 			return XmlUtils.convertToObject(IOUtils.readContent((InputStream)xmlObj), classType);
@@ -161,7 +161,7 @@ public final class XmlUtils {
 			return null;
 		}
 		
-		if (annoCheck) {
+		if (annotationCheck) {
 			try {
 				Constructor<T> constructor;
 				if (classType.getName().indexOf('$') == -1) {
@@ -188,9 +188,9 @@ public final class XmlUtils {
 						object = constructor.newInstance();
 					}
 				}
-				
-				Field[] fields = classType.getDeclaredFields();
-				
+
+				List<Field> fields = XmlUtils.getFields(classType);
+
 				for (Field field : fields) {
 					// 遍历所有属性
 					String fieldName = field.getName();
@@ -396,8 +396,8 @@ public final class XmlUtils {
 					}
 				}
 			} else {
-				XmlRootElement documentAnno = paramClass.getAnnotation(XmlRootElement.class);
-				rootElemName = documentAnno.name();
+				XmlRootElement documentAnnotation = paramClass.getAnnotation(XmlRootElement.class);
+				rootElemName = documentAnnotation.name();
 				if (DEFAULT_NAME.equals(rootElemName)
 						|| rootElemName.trim().length() == 0) {
 					rootElemName = paramClass.getSimpleName();
@@ -417,8 +417,8 @@ public final class XmlUtils {
 				}
 			}
 		} else {
-			XmlRootElement documentAnno = classType.getAnnotation(XmlRootElement.class);
-			rootElemName = documentAnno.name();
+			XmlRootElement documentAnnotation = classType.getAnnotation(XmlRootElement.class);
+			rootElemName = documentAnnotation.name();
 			if (DEFAULT_NAME.equals(rootElemName)
 					|| rootElemName.trim().length() == 0) {
 				rootElemName = classType.getSimpleName();
@@ -431,6 +431,7 @@ public final class XmlUtils {
 	}
 
 	private static void convertToXmlElement(Class<?> objectClass, Object object, Element element, boolean ignoreNullElement) {
+
 		if (element == null && ignoreNullElement) {
 			return;
 		}
@@ -484,9 +485,9 @@ public final class XmlUtils {
 						}
 					} else if (field.isAnnotationPresent(XmlAttribute.class)) {
 						// 标注为Attribute
-						XmlAttribute xmlAttrAnno = field.getAnnotation(XmlAttribute.class);
+						XmlAttribute xmlAttrAnnotation = field.getAnnotation(XmlAttribute.class);
 
-						String attributeName = xmlAttrAnno.name();
+						String attributeName = xmlAttrAnnotation.name();
 						
 						if (DEFAULT_NAME.equals(attributeName)
 								|| attributeName.trim().length() == 0) {
@@ -499,7 +500,7 @@ public final class XmlUtils {
 									|| DataType.ENUM.equals(fieldType)) {
 								String attributeValue;
 								if (DataType.DATE.equals(fieldType)) {
-									attributeValue = DateTimeUtils.formatDateForSitemap((Date) fieldValue);
+									attributeValue = DateTimeUtils.formatDateForSiteMap((Date) fieldValue);
 								} else {
 									attributeValue = fieldValue.toString();
 								}
@@ -514,9 +515,9 @@ public final class XmlUtils {
 							}
 						}
 					} else if (field.isAnnotationPresent(XmlElement.class)) {
-						XmlElement xmlElemAnno = field.getAnnotation(XmlElement.class);
+						XmlElement xmlElemAnnotation = field.getAnnotation(XmlElement.class);
 
-						String elemName = xmlElemAnno.name();
+						String elemName = xmlElemAnnotation.name();
 						
 						if (DEFAULT_NAME.equals(elemName)
 								|| elemName.trim().length() == 0) {
@@ -626,7 +627,7 @@ public final class XmlUtils {
 			
 			if (object != null) {
 				if (DataType.DATE.equals(dataType)) {
-					text = DateTimeUtils.formatDateForSitemap((Date) object);
+					text = DateTimeUtils.formatDateForSiteMap((Date) object);
 				} else {
 					text = object.toString();
 				}
@@ -646,7 +647,7 @@ public final class XmlUtils {
 
 		String nodeValue;
 		if (DataType.DATE.equals(fieldType)) {
-			nodeValue = DateTimeUtils.formatDateForSitemap((Date) object);
+			nodeValue = DateTimeUtils.formatDateForSiteMap((Date) object);
 		} else if (DataType.BINARY.equals(fieldType)) {
 			nodeValue = StringUtils.base64Encode(processBinaryDatas(object));
 		} else {

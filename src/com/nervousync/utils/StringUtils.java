@@ -85,18 +85,18 @@ public final class StringUtils {
 	private static final char EXTENSION_SEPARATOR = '.';
 	
 	private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	private static final String AUTHCODEITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
+	private static final String AUTH_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
 	
-	private static final String CHN_IDEN_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
-	private static final String CHN_IDEN_AUTHCODE = "10X98765432";
-	private static final int[] CHN_IDEN_WEIGHT = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
+	private static final String CHN_IDENTIFIED_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
+	private static final String CHN_IDENTIFIED_AUTH_CODE = "10X98765432";
+	private static final int[] CHN_IDENTIFIED_WEIGHT = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
 
 	private static final String CHN_ORG_CODE_REGEX = "^[1-9A-Z]([0-9A-Z]{7})-{0,1}([0-9]|X)$";
 	private static final String CHN_ORG_CODE_MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final int[] CHN_ORG_CODE_WEIGHT = {3, 7, 9, 10, 5, 8, 4, 2};
 	
 	private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1|5|9|Y][0-9A-Z]{17}$";
-	private static final String CHN_SOCIAL_CREDIT_AUTHCODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
+	private static final String CHN_SOCIAL_CREDIT_AUTH_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
 	private static final int[] CHN_SOCIAL_CREDIT_WEIGHT = {1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28};
 
 	private StringUtils() {
@@ -353,7 +353,7 @@ public final class StringUtils {
 	 * @see #hasText(String)
 	 */
 	public static boolean hasLength(CharSequence str) {
-		return (str != null && str.length() > 0);
+		return (str == null || str.length() <= 0);
 	}
 
 	/**
@@ -373,7 +373,7 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return false;
 		}
 		int strLen = str.length();
@@ -406,7 +406,7 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return false;
 		}
 		int strLen = str.length();
@@ -436,7 +436,7 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -451,13 +451,13 @@ public final class StringUtils {
 
 	/**
 	 * Trim <i>all</i> whitespace from the given String:
-	 * leading, trailing, and inbetween characters.
+	 * leading, trailing, and in between characters.
 	 * @param str the String to check
 	 * @return the trimmed String
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -480,7 +480,7 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -497,7 +497,7 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -508,13 +508,13 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim all occurences of the supplied leading character from the given String.
+	 * Trim all occurrences of the supplied leading character from the given String.
 	 * @param str the String to check
 	 * @param leadingCharacter the leading character to be trimmed
 	 * @return the trimmed String
 	 */
 	public static String trimLeadingCharacter(String str, char leadingCharacter) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -525,13 +525,13 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim all occurences of the supplied trailing character from the given String.
+	 * Trim all occurrences of the supplied trailing character from the given String.
 	 * @param str the String to check
 	 * @param trailingCharacter the trailing character to be trimmed
 	 * @return the trimmed String
 	 */
 	public static String trimTrailingCharacter(String str, char trailingCharacter) {
-		if (!hasLength(str)) {
+		if (hasLength(str)) {
 			return str;
 		}
 		StringBuilder buf = new StringBuilder(str);
@@ -626,7 +626,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Replace all occurences of a substring within a string with
+	 * Replace all occurrences of a substring within a string with
 	 * another string.
 	 * @param inString String to examine
 	 * @param oldPattern String to replace
@@ -641,22 +641,22 @@ public final class StringUtils {
 			return inString;
 		}
 
-		StringBuilder sbuf = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		// output StringBuilder we'll build up
 		int pos = 0; // our position in the old string
 		int index = inString.indexOf(oldPattern);
 		// the index of an occurrence we've found, or -1
 		int patLen = oldPattern.length();
 		while (index >= 0) {
-			sbuf.append(inString, pos, index);
-			sbuf.append(newPattern);
+			stringBuilder.append(inString, pos, index);
+			stringBuilder.append(newPattern);
 			pos = index + patLen;
 			index = inString.indexOf(oldPattern, pos);
 		}
-		sbuf.append(inString.substring(pos));
+		stringBuilder.append(inString.substring(pos));
 
 		// remember to append any characters to the right of a match
-		return sbuf.toString();
+		return stringBuilder.toString();
 	}
 
 	/**
@@ -677,7 +677,7 @@ public final class StringUtils {
 	 * @return the resulting String
 	 */
 	public static String deleteAny(String inString, String charsToDelete) {
-		if (!hasLength(inString) || !hasLength(charsToDelete)) {
+		if (hasLength(inString) || hasLength(charsToDelete)) {
 			return inString;
 		}
 		StringBuilder out = new StringBuilder();
@@ -717,23 +717,23 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Unqualify a string qualified by a '.' dot character. For example,
+	 * Unqualified a string qualified by a '.' dot character. For example,
 	 * "this.name.is.qualified", returns "qualified".
 	 * @param qualifiedName the qualified name
 	 * @return qualified string
 	 */
-	public static String unqualify(String qualifiedName) {
-		return unqualify(qualifiedName, '.');
+	public static String unqualified(String qualifiedName) {
+		return unqualified(qualifiedName, '.');
 	}
 
 	/**
-	 * Unqualify a string qualified by a separator character. For example,
+	 * Unqualified a string qualified by a separator character. For example,
 	 * "this:name:is:qualified" returns "qualified" if using a ':' separator.
 	 * @param qualifiedName the qualified name
 	 * @param separator the separator
 	 * @return qualified string
 	 */
-	public static String unqualify(String qualifiedName, char separator) {
+	public static String unqualified(String qualifiedName, char separator) {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
 	}
 
@@ -749,13 +749,13 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Uncapitalize a <code>String</code>, changing the first letter to
+	 * Uncapitalized a <code>String</code>, changing the first letter to
 	 * lower case as per {@link Character#toLowerCase(char)}.
 	 * No other letters are changed.
-	 * @param str the String to uncapitalize, may be <code>null</code>
+	 * @param str the String to uncapitalized, may be <code>null</code>
 	 * @return the uncapitalized String, <code>null</code> if null
 	 */
-	public static String uncapitalize(String str) {
+	public static String uncapitalized(String str) {
 		return changeFirstCharacterCase(str, false);
 	}
 
@@ -967,7 +967,7 @@ public final class StringUtils {
 	 * array elements only included once.
 	 * <p>The order of elements in the original arrays is preserved
 	 * (with the exception of overlapping elements, which are only
-	 * included on their first occurence).
+	 * included on their first occurrence).
 	 * @param array1 the first array (can be <code>null</code>)
 	 * @param array2 the second array (can be <code>null</code>)
 	 * @return the new array (<code>null</code> if both given arrays were <code>null</code>)
@@ -1073,7 +1073,7 @@ public final class StringUtils {
 	 * or <code>null</code> if the delimiter wasn't found in the given input String
 	 */
 	public static String[] split(String toSplit, String delimiter) {
-		if (!hasLength(toSplit) || !hasLength(delimiter)) {
+		if (hasLength(toSplit) || hasLength(delimiter)) {
 			return null;
 		}
 		int offset = toSplit.indexOf(delimiter);
@@ -1126,11 +1126,11 @@ public final class StringUtils {
 			if (charsToDelete != null) {
 				element = deleteAny(string, charsToDelete);
 			}
-			String[] splittedElement = split(element, delimiter);
-			if (splittedElement == null) {
+			String[] splitterElement = split(element, delimiter);
+			if (splitterElement == null) {
 				continue;
 			}
-			result.setProperty(splittedElement[0].trim(), splittedElement[1].trim());
+			result.setProperty(splitterElement[0].trim(), splitterElement[1].trim());
 		}
 		return result;
 	}
@@ -1275,13 +1275,13 @@ public final class StringUtils {
 	 * Convenience method to return a Collection as a delimited (e.g. CSV)
 	 * String. E.g. useful for <code>toString()</code> implementations.
 	 * @param coll the Collection to display
-	 * @param delim the delimiter to use (probably a ",")
+	 * @param delimiter the delimiter to use (probably a ",")
 	 * @param prefix the String to start each element with
 	 * @param suffix the String to end each element with
 	 * @return the delimited String
 	 */
 	public static String collectionToDelimitedString(Collection<String> coll, 
-			String delim, String prefix, String suffix) {
+			String delimiter, String prefix, String suffix) {
 		if (CollectionUtils.isEmpty(coll)) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -1290,7 +1290,7 @@ public final class StringUtils {
 		while (it.hasNext()) {
 			sb.append(prefix).append(it.next()).append(suffix);
 			if (it.hasNext()) {
-				sb.append(delim);
+				sb.append(delimiter);
 			}
 		}
 		return sb.toString();
@@ -1300,11 +1300,11 @@ public final class StringUtils {
 	 * Convenience method to return a Collection as a delimited (e.g. CSV)
 	 * String. E.g. useful for <code>toString()</code> implementations.
 	 * @param coll the Collection to display
-	 * @param delim the delimiter to use (probably a ",")
+	 * @param delimiter the delimiter to use (probably a ",")
 	 * @return the delimited String
 	 */
-	public static String collectionToDelimitedString(Collection<String> coll, String delim) {
-		return collectionToDelimitedString(coll, delim, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
+	public static String collectionToDelimitedString(Collection<String> coll, String delimiter) {
+		return collectionToDelimitedString(coll, delimiter, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
@@ -1337,17 +1337,17 @@ public final class StringUtils {
 	 * Convenience method to return a String array as a delimited (e.g. CSV)
 	 * String. E.g. useful for <code>toString()</code> implementations.
 	 * @param arr the array to display
-	 * @param delim the delimiter to use (probably a ",")
+	 * @param delimiter the delimiter to use (probably a ",")
 	 * @return the delimited String
 	 */
-	public static String arrayToDelimitedString(Object[] arr, String delim) {
+	public static String arrayToDelimitedString(Object[] arr, String delimiter) {
 		if (ObjectUtils.isEmpty(arr)) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < arr.length; i++) {
 			if (i > 0) {
-				sb.append(delim);
+				sb.append(delimiter);
 			}
 			sb.append(arr[i]);
 		}
@@ -1495,9 +1495,9 @@ public final class StringUtils {
 		} else if (testString.length == 1) {
 			return testString[0];
 		} else if (testString.length == 3) {
-			int hightByte = 256 + testString[0];
+			int heightByte = 256 + testString[0];
 			int lowByte = 256 + testString[1];
-			return (256 * hightByte + lowByte) - 256 * 256;
+			return (256 * heightByte + lowByte) - 256 * 256;
 		}
 		return 0;
 	}
@@ -1741,7 +1741,7 @@ public final class StringUtils {
 		StringBuilder generateKey = new StringBuilder();
 		Random random = new Random();
 		for (int i = 0 ; i < length ; i++) {
-			generateKey.append(AUTHCODEITEMS.charAt(random.nextInt(AUTHCODEITEMS.length())));
+			generateKey.append(AUTH_CODE_ITEMS.charAt(random.nextInt(AUTH_CODE_ITEMS.length())));
 		}
 		return generateKey.toString();
 	}
@@ -1799,7 +1799,7 @@ public final class StringUtils {
 	/**
 	 * Unescape url address
 	 * @param str	escaped url address string
-	 * @return		unecsape url address
+	 * @return		unescape url address
 	 */
 	public static String unescape(String str) {
 		if (str == null) {
@@ -2056,7 +2056,7 @@ public final class StringUtils {
 				paramObj = Boolean.valueOf(dataValue);
 				break;
 			case DATE:
-				paramObj = DateTimeUtils.parseSitemapDate(dataValue);
+				paramObj = DateTimeUtils.parseSiteMapDate(dataValue);
 				break;
 			case ENUM:
 				paramObj = ReflectionUtils.parseEnum(typeClass).get(dataValue);
@@ -2115,21 +2115,23 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN ID
-	 * @param idenCode	CHN identified code
+	 * @param identifiedCode	CHN identified code
 	 * @return	Check result
 	 */
-	public static boolean validateCHNIdenCode(String idenCode) {
-		idenCode = idenCode.toUpperCase();
-		if (StringUtils.matches(idenCode, CHN_IDEN_REGEX)) {
-			int result = 0;
-			for (int i = 0 ; i < 17 ; i++) {
-				int code = Character.digit(idenCode.charAt(i), 10);
-				if (code != 0) {
-					result += code * CHN_IDEN_WEIGHT[i];
+	public static boolean validateCHNIdentifiedCode(String identifiedCode) {
+		if (identifiedCode != null) {
+			identifiedCode = identifiedCode.toUpperCase();
+			if (StringUtils.matches(identifiedCode, CHN_IDENTIFIED_REGEX)) {
+				int result = 0;
+				for (int i = 0 ; i < 17 ; i++) {
+					int code = Character.digit(identifiedCode.charAt(i), 10);
+					if (code != 0) {
+						result += code * CHN_IDENTIFIED_WEIGHT[i];
+					}
 				}
+
+				return identifiedCode.endsWith(Character.toString(CHN_IDENTIFIED_AUTH_CODE.charAt(result % 11)));
 			}
-			
-			return idenCode.endsWith(Character.toString(CHN_IDEN_AUTHCODE.charAt(result % 11)));
 		}
 		
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2137,30 +2139,32 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN organization code
-	 * @param orgCode	CHN organization code
+	 * @param organizationCode	CHN organization code
 	 * @return	Check result
 	 */
-	public static boolean validateCHNOrgCode(String orgCode) {
-		orgCode = orgCode.toUpperCase();
-		if (StringUtils.matches(orgCode, CHN_ORG_CODE_REGEX)) {
-			int result = 0;
-			for (int i = 0 ; i < 8 ; i++) {
-				char codeChar = orgCode.charAt(i);
-				int code = CHN_ORG_CODE_MAP.indexOf(Character.toString(codeChar));
-				if (code != 0) {
-					result += code * CHN_ORG_CODE_WEIGHT[i];
+	public static boolean validateCHNOrganizationCode(String organizationCode) {
+		if (organizationCode != null) {
+			organizationCode = organizationCode.toUpperCase();
+			if (StringUtils.matches(organizationCode, CHN_ORG_CODE_REGEX)) {
+				int result = 0;
+				for (int i = 0 ; i < 8 ; i++) {
+					char codeChar = organizationCode.charAt(i);
+					int code = CHN_ORG_CODE_MAP.indexOf(Character.toString(codeChar));
+					if (code != 0) {
+						result += code * CHN_ORG_CODE_WEIGHT[i];
+					}
 				}
-			}
-			
-			int authCode = 11 - (result % 11);
-			if (authCode == 11) {
-				authCode = 0;
-			}
-			
-			if (authCode == 10) {
-				return orgCode.endsWith("X");
-			} else {
-				return orgCode.endsWith(Integer.valueOf(authCode).toString());
+
+				int authCode = 11 - (result % 11);
+				if (authCode == 11) {
+					authCode = 0;
+				}
+
+				if (authCode == 10) {
+					return organizationCode.endsWith("X");
+				} else {
+					return organizationCode.endsWith(Integer.valueOf(authCode).toString());
+				}
 			}
 		}
 		
@@ -2178,7 +2182,7 @@ public final class StringUtils {
 			int result = 0;
 			for (int i = 0 ; i < 17 ; i++) {
 				char codeChar = socialCreditCode.charAt(i);
-				int code = CHN_SOCIAL_CREDIT_AUTHCODE.indexOf(Character.toString(codeChar));
+				int code = CHN_SOCIAL_CREDIT_AUTH_CODE.indexOf(Character.toString(codeChar));
 				if (code != 0) {
 					result += code * CHN_SOCIAL_CREDIT_WEIGHT[i];
 				}
@@ -2189,7 +2193,7 @@ public final class StringUtils {
 				authIndex = 0;
 			}
 			
-			return socialCreditCode.endsWith(Character.toString(CHN_SOCIAL_CREDIT_AUTHCODE.charAt(authIndex)));
+			return socialCreditCode.endsWith(Character.toString(CHN_SOCIAL_CREDIT_AUTH_CODE.charAt(authIndex)));
 		}
 		
 		return Globals.DEFAULT_VALUE_BOOLEAN;

@@ -238,13 +238,6 @@ public class TargetHost implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	
-	/**
 	 * Setting for authentication with SNMPAuthType.AUTH_NOPRIV
 	 * @param authProtocol		Authentication protocol 
 	 * @see com.nervousync.enumerations.snmp.auth.SNMPAuthProtocol

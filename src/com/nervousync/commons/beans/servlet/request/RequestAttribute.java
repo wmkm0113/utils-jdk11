@@ -64,13 +64,6 @@ public final class RequestAttribute implements Serializable {
 	public static RequestAttribute newInstance(HttpServletRequest request) {
 		return new RequestAttribute(request);
 	}
-	
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 
 	/**
 	 * @return the sessionId

@@ -138,17 +138,17 @@ public final class LocationUtils {
 	}
 	
 	private static LocationPoint deltaPoint(double longitude, double latitude) {
-		double radiLati = latitude / 180.0 * Math.PI;
-		double magic = 1 - EARTH_EE * Math.pow(Math.sin(radiLati), 2);
+		double transformLatitude = latitude / 180.0 * Math.PI;
+		double magic = 1 - EARTH_EE * Math.pow(Math.sin(transformLatitude), 2);
 		double magicSqrt = Math.sqrt(magic);
-		double fixedLatitude = ((transformLatidute(longitude - 105.0, latitude - 35.0) * 180.0) 
+		double fixedLatitude = ((transformLatitude(longitude - 105.0, latitude - 35.0) * 180.0)
 				/ ((EARTH_R * (1 - EARTH_EE)) / (magic * magicSqrt) * Math.PI));
-		double fixedLongitude = ((transformLongidute(longitude - 105.0, latitude - 35.0) * 180.0) 
-				/ (EARTH_R / magicSqrt * Math.cos(radiLati) * Math.PI));
+		double fixedLongitude = ((transformLongitude(longitude - 105.0, latitude - 35.0) * 180.0)
+				/ (EARTH_R / magicSqrt * Math.cos(transformLatitude) * Math.PI));
 		return LocationPoint.deltaPoint(fixedLongitude, fixedLatitude);
 	}
 	
-	private static double transformLatidute(double longitude, double latitude) {
+	private static double transformLatitude(double longitude, double latitude) {
 		double transformLatitude = -100.0 + 2.0 * longitude + 3.0 * latitude + 0.2 * Math.pow(latitude, 2);
 		transformLatitude += 0.1 * longitude * latitude + 0.2 * Math.sqrt(Math.abs(longitude));
 		transformLatitude += (20.0 * Math.sin(6.0 * longitude * Math.PI) + 20.0 * Math.sin(2.0 * longitude * Math.PI)) * 2.0 / 3.0;
@@ -157,7 +157,7 @@ public final class LocationUtils {
 		return transformLatitude;
 	}
 	
-	private static double transformLongidute(double longitude, double latitude) {
+	private static double transformLongitude(double longitude, double latitude) {
 		double transformLongitude = 300.0 + longitude + 2.0 * latitude + 0.1 * Math.pow(longitude, 2);
 		transformLongitude += 0.1 * longitude * latitude + 0.1 * Math.sqrt(Math.abs(longitude));
 		transformLongitude += (20.0 * Math.sin(6.0 * longitude * Math.PI) + 20.0 * Math.sin(2.0 * longitude * Math.PI)) * 2.0 / 3.0;

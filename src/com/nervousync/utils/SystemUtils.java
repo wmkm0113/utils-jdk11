@@ -282,18 +282,18 @@ public final class SystemUtils {
 
 	private static String generateIdentifiedKey() {
 		try {
-			List<NetworkInfo> networkInfos = retrieveNetworkInfos();
-			List<String> macAddrList = new ArrayList<>();
+			List<NetworkInfo> networkList = retrieveNetworkList();
+			List<String> macAddressList = new ArrayList<>();
 			
-			for (NetworkInfo networkInfo : networkInfos) {
+			for (NetworkInfo networkInfo : networkList) {
 				if (!networkInfo.isVirtual() && networkInfo.getMacAddress().length() > 0 
-						&& !macAddrList.contains(networkInfo.getMacAddress())) {
-					macAddrList.add(networkInfo.getMacAddress());
+						&& !macAddressList.contains(networkInfo.getMacAddress())) {
+					macAddressList.add(networkInfo.getMacAddress());
 				}
 			}
 			
-			Collections.sort(macAddrList);
-			return SecurityUtils.SHA256(macAddrList);
+			Collections.sort(macAddressList);
+			return SecurityUtils.SHA256(macAddressList);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Generate identified key error!", e);
@@ -303,15 +303,15 @@ public final class SystemUtils {
 		return null;
 	}
 	
-	private static List<NetworkInfo> retrieveNetworkInfos() throws SocketException {
-		List<NetworkInfo> networkInfos = new ArrayList<>();
+	private static List<NetworkInfo> retrieveNetworkList() throws SocketException {
+		List<NetworkInfo> networkList = new ArrayList<>();
 		
 		Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
 		
 		while (enumeration.hasMoreElements()) {
 			try {
 				NetworkInfo networkInfo = new NetworkInfo(enumeration.nextElement());
-				networkInfos.add(networkInfo);
+				networkList.add(networkInfo);
 			} catch (NetworkInfoException e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Retrieve network info error!", e);
@@ -319,6 +319,6 @@ public final class SystemUtils {
 			}
 		}
 		
-		return networkInfos;
+		return networkList;
 	}
 }

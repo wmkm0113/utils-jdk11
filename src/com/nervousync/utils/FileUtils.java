@@ -98,7 +98,7 @@ public final class FileUtils {
 	/** Line break character */
 	public static final String NEWLINE_CHARACTER = "\n";
 
-	private static final Hashtable<String, FileExtensionInfo> REGISTER_IDEN_MAP = new Hashtable<>();
+	private static final Hashtable<String, FileExtensionInfo> REGISTER_IDENTIFIED_MAP = new Hashtable<>();
 	
 	/** Define file type code for picture */
 	public static final int FILE_TYPE_PIC 				= 0;
@@ -155,11 +155,15 @@ public final class FileUtils {
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, 
 			int fileType, boolean printing) {
-		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
+		if (extensionName == null) {
+			return;
+		}
+		extensionName = extensionName.toLowerCase();
+		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName)) {
 			FileUtils.LOGGER.warn("Override file type define! Ext name: " + extensionName);
 		}
 		
-		FileUtils.REGISTER_IDEN_MAP.put(extensionName, 
+		FileUtils.REGISTER_IDENTIFIED_MAP.put(extensionName, 
 				new FileExtensionInfo(extensionName, identifiedCode, null, fileType, printing));
 	}
 	
@@ -173,7 +177,11 @@ public final class FileUtils {
 	 */
 	public static void registerFileType(String extensionName, String identifiedCode, String mimeType, 
 			int fileType, boolean printing) {
-		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
+		if (extensionName == null) {
+			return;
+		}
+		extensionName = extensionName.toLowerCase();
+		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName)) {
 			FileUtils.LOGGER.warn("Override file type define! Ext name: " + extensionName);
 		}
 		
@@ -181,7 +189,7 @@ public final class FileUtils {
 			mimeType = MIMETypes.MIME_TYPE_BINARY;
 		}
 		
-		FileUtils.REGISTER_IDEN_MAP.put(extensionName, 
+		FileUtils.REGISTER_IDENTIFIED_MAP.put(extensionName, 
 				new FileExtensionInfo(extensionName, identifiedCode, mimeType, fileType, printing));
 	}
 	
@@ -246,7 +254,8 @@ public final class FileUtils {
 	 */
 	public static int retrieveFileType(String extensionName) {
 		if (extensionName != null) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			if (fileExtensionInfo != null) {
 				return fileExtensionInfo.getFileType();
 			}
@@ -262,7 +271,8 @@ public final class FileUtils {
 	 */
 	public static String retrieveMimeType(String extensionName) {
 		if (extensionName != null) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			if (fileExtensionInfo != null) {
 				return fileExtensionInfo.getMimeType();
 			}
@@ -282,8 +292,9 @@ public final class FileUtils {
 		}
 
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
-		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+		extensionName = extensionName.toLowerCase();
+		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName)) {
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			
 			byte[] fileTypeByte = FileUtils.readFileBytes(resourceLocation, 0, 
 					fileExtensionInfo.getIdentifiedCode().length() / 2);
@@ -300,16 +311,17 @@ public final class FileUtils {
 	 * @return				identified result
 	 */
 	public static boolean validateFileType(String extensionName, byte[] fileContent) {
-		if (FileUtils.REGISTER_IDEN_MAP.containsKey(extensionName)) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName)) {
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			
-			int idenLength = fileExtensionInfo.getIdentifiedCode().length() / 2;
-			if (fileContent.length < idenLength) {
+			int identifiedLength = fileExtensionInfo.getIdentifiedCode().length() / 2;
+			if (fileContent.length < identifiedLength) {
 				return Globals.DEFAULT_VALUE_BOOLEAN;
 			}
-			byte[] fileTypeByte = new byte[idenLength];
+			byte[] fileTypeByte = new byte[identifiedLength];
 
-			System.arraycopy(fileContent, 0, fileTypeByte, 0, idenLength);
+			System.arraycopy(fileContent, 0, fileTypeByte, 0, identifiedLength);
 
 			String fileType = ConvertUtils.byteArrayToHexString(fileTypeByte);
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
@@ -325,7 +337,7 @@ public final class FileUtils {
 	 */
 	public static String identifiedFileType(byte[] identifiedByteCode) {
 		String identifiedCode = ConvertUtils.byteArrayToHexString(identifiedByteCode);
-		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDEN_MAP.values()) {
+		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDENTIFIED_MAP.values()) {
 			if (identifiedCode.startsWith(fileExtensionInfo.getIdentifiedCode())) {
 				return fileExtensionInfo.getExtensionName();
 			}
@@ -1996,7 +2008,8 @@ public final class FileUtils {
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
 		
 		if (extensionName != null) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			if (fileExtensionInfo != null) {
 				return fileExtensionInfo.isCompressFile();
 			}
@@ -2017,7 +2030,8 @@ public final class FileUtils {
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
 		
 		if (extensionName != null) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			if (fileExtensionInfo != null) {
 				return fileExtensionInfo.isPrintable();
 			}
@@ -2038,7 +2052,8 @@ public final class FileUtils {
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
 		
 		if (extensionName != null) {
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDEN_MAP.get(extensionName);
+			extensionName = extensionName.toLowerCase();
+			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
 			if (fileExtensionInfo != null) {
 				return fileExtensionInfo.isPicture();
 			}
@@ -2450,10 +2465,10 @@ public final class FileUtils {
 		}
 		
 		for (FileExtensionInfo fileExtensionInfo : extensionInfoList) {
-			if (REGISTER_IDEN_MAP.containsKey(fileExtensionInfo.getExtensionName())) {
+			if (REGISTER_IDENTIFIED_MAP.containsKey(fileExtensionInfo.getExtensionName())) {
 				FileUtils.LOGGER.warn("Override file extension info, extension name: " + fileExtensionInfo.getExtensionName());
 			}
-			REGISTER_IDEN_MAP.put(fileExtensionInfo.getExtensionName(), fileExtensionInfo);
+			REGISTER_IDENTIFIED_MAP.put(fileExtensionInfo.getExtensionName(), fileExtensionInfo);
 		}
 	}
 	

@@ -466,7 +466,7 @@ public final class SecurityUtils implements Serializable {
 	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] RSAEncrypt(byte[] arrB, Key key) throws Exception {
-		Cipher encryptCipher = SecurityUtils.initRSAEncryptClipher(key);
+		Cipher encryptCipher = SecurityUtils.initRSAEncryptCipher(key);
 		if (encryptCipher != null) {
 			int blockSize = encryptCipher.getBlockSize();
 			int outputSize = encryptCipher.getOutputSize(arrB.length);
@@ -512,7 +512,7 @@ public final class SecurityUtils implements Serializable {
 	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] RSADecrypt(byte[] arrB, Key key) throws Exception {
-		Cipher decryptCipher = initRSADecryptClipher(key);
+		Cipher decryptCipher = initRSADecryptCipher(key);
 		if (decryptCipher != null) {
 			int blockSize = decryptCipher.getBlockSize();
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(64);
@@ -738,7 +738,7 @@ public final class SecurityUtils implements Serializable {
 	
 	private static KeyPair KeyPair(String algorithm, int keySize) throws Exception {
 		if (keySize % 128 != 0) {
-			throw new Exception("Keysize is invalid");
+			throw new Exception("Key size is invalid");
 		}
 		//	Initialize keyPair instance
 		KeyPairGenerator keyPairGenerator = 
@@ -842,7 +842,7 @@ public final class SecurityUtils implements Serializable {
 		}
 	}
 
-	private static Cipher initRSAEncryptClipher(Key key) {
+	private static Cipher initRSAEncryptCipher(Key key) {
 		try {
 			//	Initialize encrypt Cipher
 			Cipher encryptCipher = Cipher.getInstance("RSA", new BouncyCastleProvider());
@@ -855,7 +855,7 @@ public final class SecurityUtils implements Serializable {
 		}
 	}
 	
-	private static Cipher initRSADecryptClipher(Key key) {
+	private static Cipher initRSADecryptCipher(Key key) {
 		try {
 			//	Initialize decrypt Cipher
 			Cipher decryptCipher = Cipher.getInstance("RSA", new BouncyCastleProvider());

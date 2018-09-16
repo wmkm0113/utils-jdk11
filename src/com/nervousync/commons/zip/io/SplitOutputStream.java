@@ -131,7 +131,7 @@ public class SplitOutputStream extends OutputStream {
 	
 	public boolean checkBufferSizeAndStartNextSplitFile(int bufferSize) throws ZipException {
 		if (bufferSize < 0) {
-			throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
+			throw new ZipException("negative buffer size for checkBuffSizeAndStartNextSplitFile");
 		}
 		
 		if (!this.isBufferSizeFitForCurrentSplitFile(bufferSize)) {
@@ -148,7 +148,7 @@ public class SplitOutputStream extends OutputStream {
 	
 	private boolean isBufferSizeFitForCurrentSplitFile(int bufferSize) throws ZipException {
 		if (bufferSize < 0) {
-			throw new ZipException("negative buffersize for checkBuffSizeAndStartNextSplitFile");
+			throw new ZipException("negative buffer size for checkBuffSizeAndStartNextSplitFile");
 		}
 		
 		if (this.splitLength >= ZipConstants.MIN_SPLIT_LENGTH) {

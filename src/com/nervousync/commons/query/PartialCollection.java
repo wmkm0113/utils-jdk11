@@ -95,28 +95,8 @@ public final class PartialCollection<T> implements Serializable {
 		return this.resultList.add(o);
 	}
 
-	public boolean contains(Map<String, Object> o) {
-		return this.resultList.contains(o);
-	}
-
-	public boolean remove(Map<String, Object> o) {
-		return this.resultList.remove(o);
-	}
-
 	public boolean addAll(Collection<T> c) {
 		return this.resultList.addAll(c);
-	}
-
-	public boolean containsAll(Collection<Map<String, Object>> c) {
-		return this.resultList.containsAll(c);
-	}
-
-	public boolean removeAll(Collection<Map<String, Object>> c) {
-		return this.resultList.removeAll(c);
-	}
-
-	public boolean retainAll(Collection<Map<String, Object>> c) {
-		return this.resultList.retainAll(c);
 	}
 
 	public Iterator<T> iterator() {

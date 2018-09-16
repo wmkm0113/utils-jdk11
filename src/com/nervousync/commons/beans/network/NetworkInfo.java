@@ -68,7 +68,7 @@ public final class NetworkInfo implements Serializable {
 	/**
 	 * IP address list of interface configured
 	 */
-	private final List<IPAddrInfo> ipAddrInfos = new ArrayList<>();
+	private final List<IPAddressInfo> ipAddressList = new ArrayList<>();
 	
 	/**
 	 * Constructor for NetworkInfo
@@ -82,16 +82,16 @@ public final class NetworkInfo implements Serializable {
 		Logger logger = LoggerFactory.getLogger(this.getClass());
 		try {
 			if (networkInterface.isUp() && !networkInterface.isVirtual()) {
-				byte[] macAddr = networkInterface.getHardwareAddress();
-				if (macAddr != null && macAddr.length > 0) {
+				byte[] macAddress = networkInterface.getHardwareAddress();
+				if (macAddress != null && macAddress.length > 0) {
 					StringBuilder stringBuilder = new StringBuilder();
-					for (byte mac : macAddr) {
+					for (byte mac : macAddress) {
 						stringBuilder.append(":");
-						String addr = Integer.toHexString(mac & 0xFF);
-						if (addr.length() == 1) {
-							addr = "0" + addr;
+						String address = Integer.toHexString(mac & 0xFF);
+						if (address.length() == 1) {
+							address = "0" + address;
 						}
-						stringBuilder.append(addr.toUpperCase());
+						stringBuilder.append(address.toUpperCase());
 					}
 					this.macAddress = stringBuilder.substring(1);
 				}
@@ -110,8 +110,8 @@ public final class NetworkInfo implements Serializable {
 		
 		while (enumeration.hasMoreElements()) {
 			try {
-				IPAddrInfo ipAddrInfo = new IPAddrInfo(enumeration.nextElement());
-				this.ipAddrInfos.add(ipAddrInfo);
+				IPAddressInfo ipAddressInfo = new IPAddressInfo(enumeration.nextElement());
+				this.ipAddressList.add(ipAddressInfo);
 			} catch (IPAddressException e) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Read IP Address Info Error! ", e);
@@ -142,36 +142,36 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
-	 * @return the ipAddrInfos
+	 * @return the getIpAddressList
 	 */
-	public List<IPAddrInfo> getIpAddrInfos() {
-		return ipAddrInfos;
+	public List<IPAddressInfo> getIpAddressList() {
+		return ipAddressList;
 	}
 
 	/**
 	 * @return the IPv4 address list
 	 */
-	public List<IPAddrInfo> getIPv4AddrInfos() {
-		List<IPAddrInfo> addrInfos = new ArrayList<>();
-		for (IPAddrInfo ipAddrInfo : this.ipAddrInfos) {
-			if (NetworkInfo.isIPv4Address(ipAddrInfo.getIpAddress())) {
-				addrInfos.add(ipAddrInfo);
+	public List<IPAddressInfo> getIPv4AddressList() {
+		List<IPAddressInfo> addressList = new ArrayList<>();
+		for (IPAddressInfo ipAddressInfo : this.ipAddressList) {
+			if (NetworkInfo.isIPv4Address(ipAddressInfo.getIpAddress())) {
+				addressList.add(ipAddressInfo);
 			}
 		}
-		return addrInfos;
+		return addressList;
 	}
 
 	/**
 	 * @return the IPv6 address list
 	 */
-	public List<IPAddrInfo> getIPv6AddrInfos() {
-		List<IPAddrInfo> addrInfos = new ArrayList<>();
-		for (IPAddrInfo ipAddrInfo : this.ipAddrInfos) {
-			if (NetworkInfo.isIPv6Address(ipAddrInfo.getIpAddress())) {
-				addrInfos.add(ipAddrInfo);
+	public List<IPAddressInfo> getIPv6AddressList() {
+		List<IPAddressInfo> addressList = new ArrayList<>();
+		for (IPAddressInfo ipAddressInfo : this.ipAddressList) {
+			if (NetworkInfo.isIPv6Address(ipAddressInfo.getIpAddress())) {
+				addressList.add(ipAddressInfo);
 			}
 		}
-		return addrInfos;
+		return addressList;
 	}
 
 	/**
@@ -186,7 +186,7 @@ public final class NetworkInfo implements Serializable {
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
 	 * @version $Revision: 1.0 $ $Date: Jul 2, 2018 $
 	 */
-	public static final class IPAddrInfo implements Serializable {
+	public static final class IPAddressInfo implements Serializable {
 
 		/**
 		 * 
@@ -215,7 +215,7 @@ public final class NetworkInfo implements Serializable {
 		 * @param inetAddress				InetAddress object read from interface
 		 * @throws IPAddressException		Given inetAddress is null
 		 */
-		public IPAddrInfo(InetAddress inetAddress) throws IPAddressException {
+		public IPAddressInfo(InetAddress inetAddress) throws IPAddressException {
 			if (inetAddress == null) {
 				throw new IPAddressException("InetAddress is null");
 			}
@@ -223,13 +223,6 @@ public final class NetworkInfo implements Serializable {
 			this.local = inetAddress.isSiteLocalAddress();
 			this.loop = inetAddress.isLoopbackAddress();
 			this.linkLocal = inetAddress.isLinkLocalAddress();
-		}
-
-		/**
-		 * @return the serialversionuid
-		 */
-		public static long getSerialversionuid() {
-			return serialVersionUID;
 		}
 
 		/**

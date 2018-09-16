@@ -69,7 +69,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	}
 
 	/**
-	 * Return current file pointer prsition
+	 * Return current file pointer position
 	 * @return		file pointer position
 	 * @throws IOException		Retrieve position failed
 	 */
@@ -292,7 +292,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	/**
 	 * Read data
 	 * @param b		read buffer
-	 * @return		readed length
+	 * @return		read length
 	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b) throws IOException {
@@ -308,7 +308,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @param b		read buffer
 	 * @param off	buffer offset
 	 * @param len	read length
-	 * @return		readed length
+	 * @return		read length
 	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b, int off, int len) throws IOException {

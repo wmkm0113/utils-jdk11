@@ -117,17 +117,17 @@ public final class AESEngine {
 		r3 = T0[this.C3 & 255] ^ shift(T0[(this.C0 >> 8) & 255], 24) ^ shift(T0[(this.C1 >> 16) & 255], 16)
 				^ shift(T0[(this.C2 >> 24) & 255], 8) ^ this.workingKeys[r++][3];
 
-		this.C0 = (SUBWORD_TABLE[r0 & 255] & 255) ^ ((SUBWORD_TABLE[(r1 >> 8) & 255] & 255) << 8)
-				^ ((SUBWORD_TABLE[(r2 >> 16) & 255] & 255) << 16) ^ (SUBWORD_TABLE[(r3 >> 24) & 255] << 24)
+		this.C0 = (SUB_WORD_TABLE[r0 & 255] & 255) ^ ((SUB_WORD_TABLE[(r1 >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(r2 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r3 >> 24) & 255] << 24)
 				^ this.workingKeys[r][0];
-		this.C1 = (SUBWORD_TABLE[r1 & 255] & 255) ^ ((SUBWORD_TABLE[(r2 >> 8) & 255] & 255) << 8)
-				^ ((SUBWORD_TABLE[(r3 >> 16) & 255] & 255) << 16) ^ (SUBWORD_TABLE[(r0 >> 24) & 255] << 24)
+		this.C1 = (SUB_WORD_TABLE[r1 & 255] & 255) ^ ((SUB_WORD_TABLE[(r2 >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(r3 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r0 >> 24) & 255] << 24)
 				^ this.workingKeys[r][1];
-		this.C2 = (SUBWORD_TABLE[r2 & 255] & 255) ^ ((SUBWORD_TABLE[(r3 >> 8) & 255] & 255) << 8)
-				^ ((SUBWORD_TABLE[(r0 >> 16) & 255] & 255) << 16) ^ (SUBWORD_TABLE[(r1 >> 24) & 255] << 24)
+		this.C2 = (SUB_WORD_TABLE[r2 & 255] & 255) ^ ((SUB_WORD_TABLE[(r3 >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(r0 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r1 >> 24) & 255] << 24)
 				^ this.workingKeys[r][2];
-		this.C3 = (SUBWORD_TABLE[r3 & 255] & 255) ^ ((SUBWORD_TABLE[(r0 >> 8) & 255] & 255) << 8)
-				^ ((SUBWORD_TABLE[(r1 >> 16) & 255] & 255) << 16) ^ (SUBWORD_TABLE[(r2 >> 24) & 255] << 24)
+		this.C3 = (SUB_WORD_TABLE[r3 & 255] & 255) ^ ((SUB_WORD_TABLE[(r0 >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(r1 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r2 >> 24) & 255] << 24)
 				^ this.workingKeys[r][3];
 	}
 
@@ -176,7 +176,7 @@ public final class AESEngine {
 		for (i = kc ; i < k ; i++) {
 			int temp = this.workingKeys[(i - 1) >> 2][(i - 1) & 3];
 			if ((i % kc) == 0) {
-				temp = this.subWord(this.shift(temp, 8)) ^ RCON[(i / kc) - 1];
+				temp = this.subWord(this.shift(temp, 8)) ^ R_CON[(i / kc) - 1];
 			} else if ((kc > 6) && ((i % kc) == 4)) {
 				temp = this.subWord(temp);
 			}
@@ -190,11 +190,11 @@ public final class AESEngine {
 	}
 	
 	private int subWord(int value) {
-		return (SUBWORD_TABLE[value & 255] & 255 | ((SUBWORD_TABLE[(value >> 8) & 255] & 255) << 8) 
-				| ((SUBWORD_TABLE[(value >> 16) & 255] & 255) << 16) | SUBWORD_TABLE[(value >> 24) & 255] << 24);
+		return (SUB_WORD_TABLE[value & 255] & 255 | ((SUB_WORD_TABLE[(value >> 8) & 255] & 255) << 8)
+				| ((SUB_WORD_TABLE[(value >> 16) & 255] & 255) << 16) | SUB_WORD_TABLE[(value >> 24) & 255] << 24);
 	}
 	
-	private static final byte[] SUBWORD_TABLE = {
+	private static final byte[] SUB_WORD_TABLE = {
 			(byte)99,	(byte)124,	(byte)119,	(byte)123,	(byte)242,	(byte)107,	(byte)111,	(byte)197,
 			(byte)48,	(byte)1,	(byte)103,	(byte)43,	(byte)254,	(byte)215,	(byte)171,	(byte)118,
 			(byte)202,	(byte)130,	(byte)201,	(byte)125,	(byte)250,	(byte)89,	(byte)71,	(byte)240,
@@ -229,7 +229,7 @@ public final class AESEngine {
 			(byte)65,	(byte)153,	(byte)45,	(byte)15,	(byte)176,	(byte)84,	(byte)187,	(byte)22,
 	};
 	
-	private static final int[] RCON = {
+	private static final int[] R_CON = {
 			0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
 			0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91
 	};

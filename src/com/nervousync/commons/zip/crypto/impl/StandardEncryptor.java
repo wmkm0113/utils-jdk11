@@ -35,7 +35,7 @@ public final class StandardEncryptor implements Encryptor {
 	
 	public StandardEncryptor(char[] password, int crc) throws ZipException {
 		if (password == null || password.length <= 0) {
-			throw new ZipException("input password is null or empty in standard encrpyter constructor");
+			throw new ZipException("input password is null or empty in standard encipher constructor");
 		}
 		
 		this.zipCryptoEngine = new ZipCryptoEngine();
@@ -54,7 +54,7 @@ public final class StandardEncryptor implements Encryptor {
 	@Override
 	public int encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (len < 0) {
-			throw new ZipException("invalid length specified to decrpyt data");
+			throw new ZipException("invalid length specified to decrypt data");
 		}
 		
 		try {
@@ -76,7 +76,7 @@ public final class StandardEncryptor implements Encryptor {
 
 	private void init(char[] password, int crc) throws ZipException {
 		if (password == null || password.length <= 0) {
-			throw new ZipException("input password is null or empty in standard encrpyter constructor");
+			throw new ZipException("input password is null or empty in standard encipher constructor");
 		}
 		
 		this.zipCryptoEngine.initKeys(password);

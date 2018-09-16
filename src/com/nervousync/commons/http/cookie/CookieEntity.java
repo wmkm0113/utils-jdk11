@@ -27,7 +27,7 @@ import com.nervousync.utils.StringUtils;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jan 4, 2018 1:01:35 PM $
  */
-public final class CookieInfo {
+public final class CookieEntity {
 
 	/**
 	 * Cookie name
@@ -66,7 +66,7 @@ public final class CookieInfo {
 	 * Constructor
 	 * @param responseCookieValue cookie value from response header information
 	 */
-	public CookieInfo(String responseCookieValue) {
+	public CookieEntity(String responseCookieValue) {
 		if (responseCookieValue != null && responseCookieValue.length() > 0) {
 			String[] cookieItems = StringUtils.delimitedListToStringArray(responseCookieValue, ";");
 			for (String cookieItem : cookieItems) {

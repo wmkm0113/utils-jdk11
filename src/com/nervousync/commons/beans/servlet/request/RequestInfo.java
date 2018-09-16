@@ -145,8 +145,8 @@ public final class RequestInfo implements Serializable {
 	 * @param timeOut				Request timeout setting
 	 * @param beginPosition			Reading position of begin
 	 * @param endPosition			Reading position of end
-	 * @param headers				Send header informations of request
-	 * @param parameters			Send parameter informations of request
+	 * @param headers				Send header information of request
+	 * @param parameters			Send parameter information of request
 	 * @param uploadParam			Send multipart files of request
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, 
@@ -174,8 +174,8 @@ public final class RequestInfo implements Serializable {
 	 * @param timeOut				Request timeout setting
 	 * @param beginPosition			Reading position of begin
 	 * @param endPosition			Reading position of end
-	 * @param headers				Send header informations of request
-	 * @param parameters			Send parameter informations of request
+	 * @param headers				Send header information of request
+	 * @param parameters			Send parameter information of request
 	 * @param uploadParam			Send multipart files of request
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset, 
@@ -194,13 +194,6 @@ public final class RequestInfo implements Serializable {
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
 		}
 		this.requestUrl = requestUrl;
-	}
-
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 	/**

@@ -144,13 +144,13 @@ public final class MailUtils {
 			message.setFrom(new InternetAddress(userName));
 		}
 		
-		StringBuilder recvAddress = new StringBuilder();
+		StringBuilder receiveAddress = new StringBuilder();
 		
-		for (String address : mailObject.getRecvAddress()) {
-			recvAddress.append(",").append(address);
+		for (String address : mailObject.getReceiveAddress()) {
+			receiveAddress.append(",").append(address);
 		}
 		
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recvAddress.toString().substring(1)));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveAddress.toString().substring(1)));
 
 		if (mailObject.getCcAddress() != null) {
 			StringBuilder ccAddress = new StringBuilder();
@@ -196,21 +196,21 @@ public final class MailUtils {
 	}
 	
 	public static MailObject getMailInfo(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid, String saveAttchPath) throws MessagingException {
+			String passWord, String uid, String saveAttachPath) throws MessagingException {
 		Store store = null;
 		Folder folder = null;
 
 		try {
-			Properties properties = mailServerConfig.getRecvConfigInfo(userName);
+			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
 			Session session = getSession(properties, userName, passWord);
 			
 			store = session.getStore(properties.getProperty("mail.store.protocol"));
 			
-			if (mailServerConfig.getRecvServerConfig().getHostPort() == Globals.DEFAULT_VALUE_INT) {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), userName, passWord);
+			if (mailServerConfig.getReceiveServerConfig().getHostPort() == Globals.DEFAULT_VALUE_INT) {
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
 			} else {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), 
-						mailServerConfig.getRecvServerConfig().getHostPort(), userName, passWord);
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
+						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
 			}
 			
 			folder = openReadOnlyFolder(store);
@@ -220,7 +220,7 @@ public final class MailUtils {
 			}
 			
 			Message message = null;
-			if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
+			if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
 				Message[] messages = folder.getMessages();
 				
 				for (Message msg : messages) {
@@ -229,12 +229,12 @@ public final class MailUtils {
 						break;
 					}
 				}
-			} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
+			} else if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
 				message = ((IMAPFolder)folder).getMessageByUID(Long.parseLong(uid));
 			}
 			
 			if (message != null) {
-				return receiveMessage((MimeMessage)message, userName, true, saveAttchPath);
+				return receiveMessage((MimeMessage)message, userName, true, saveAttachPath);
 			}
 		} catch (Exception e) {
 			if (MailUtils.LOGGER.isDebugEnabled()) {
@@ -254,22 +254,22 @@ public final class MailUtils {
 	}
 
 	public static List<MailObject> getMailInfo(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList, String saveAttchPath) throws MessagingException {
+			String passWord, List<String> uidList, String saveAttachPath) throws MessagingException {
 		List<MailObject> mailList = new ArrayList<>();
 		
 		Store store = null;
 		Folder folder = null;
 		try {
-			Properties properties = mailServerConfig.getRecvConfigInfo(userName);
+			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
 			Session session = getSession(properties, userName, passWord);
 			
 			store = session.getStore(properties.getProperty("mail.store.protocol"));
 
-			if (mailServerConfig.getRecvServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), userName, passWord);
+			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
 			} else {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), 
-						mailServerConfig.getRecvServerConfig().getHostPort(), userName, passWord);
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
+						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
 			}
 			
 			folder = openReadOnlyFolder(store);
@@ -281,7 +281,7 @@ public final class MailUtils {
 			List<Message> messageList = convertMailArraysToList(mailServerConfig, uidList, folder);
 			
 			for (Message message : messageList) {
-				MailObject mailObject = receiveMessage((MimeMessage)message, userName, true, saveAttchPath);
+				MailObject mailObject = receiveMessage((MimeMessage)message, userName, true, saveAttachPath);
 				if (mailObject != null) {
 					mailList.add(mailObject);
 				}
@@ -306,7 +306,7 @@ public final class MailUtils {
 	private static List<Message> convertMailArraysToList(MailServerConfig mailServerConfig,
 	                                                     List<String> uidList, Folder folder) throws MessagingException {
 		List<Message> messageList = new ArrayList<>();
-		if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
+		if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
 			Message[] messages = folder.getMessages();
 
 			for (Message message : messages) {
@@ -314,40 +314,40 @@ public final class MailUtils {
 					messageList.add(message);
 				}
 			}
-		} else if (mailServerConfig.getRecvServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
-			long[] uids = new long[uidList.size()];
+		} else if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
+			long[] uidArrays = new long[uidList.size()];
 
 			for (int i = 0 ; i < uidList.size() ; i++) {
-				uids[i] = Long.parseLong(uidList.get(i));
+				uidArrays[i] = Long.parseLong(uidList.get(i));
 			}
-			Message[] messages = ((IMAPFolder)folder).getMessagesByUID(uids);
+			Message[] messages = ((IMAPFolder)folder).getMessagesByUID(uidArrays);
 			Collections.addAll(messageList, messages);
 		}
 		return messageList;
 	}
 
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String saveAttchPath) throws MessagingException {
-		return getMailList(mailServerConfig, userName, passWord, null, saveAttchPath);
+			String passWord, String saveAttachPath) throws MessagingException {
+		return getMailList(mailServerConfig, userName, passWord, null, saveAttachPath);
 	}
 	
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
-			String passWord, Date date, String saveAttchPath) throws MessagingException {
+			String passWord, Date date, String saveAttachPath) throws MessagingException {
 		List<MailObject> mailList = new ArrayList<>();
 		
 		Store store = null;
 		Folder folder = null;
 		try {
-			Properties properties = mailServerConfig.getRecvConfigInfo(userName);
+			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
 			Session session = getSession(properties, userName, passWord);
 			
 			store = session.getStore(properties.getProperty("mail.store.protocol"));
 
-			if (mailServerConfig.getRecvServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), userName, passWord);
+			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
 			} else {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), 
-						mailServerConfig.getRecvServerConfig().getHostPort(), userName, passWord);
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
+						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
 			}
 			
 			folder = openReadOnlyFolder(store);
@@ -360,7 +360,7 @@ public final class MailUtils {
 			
 			for (Message message : messages) {
 				if (date == null || message.getReceivedDate().after(date)) {
-					MailObject mailObject = receiveMessage((MimeMessage)message, userName, false, saveAttchPath);
+					MailObject mailObject = receiveMessage((MimeMessage)message, userName, false, saveAttachPath);
 					if (mailObject != null) {
 						mailList.add(mailObject);
 					}
@@ -455,7 +455,7 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
 
-	public static void unflagMail(MailServerConfig mailServerConfig, String userName, 
+	public static void unflagMail(MailServerConfig mailServerConfig, String userName,
 			String passWord, String uid) throws MessagingException {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
@@ -467,29 +467,29 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
 	
-	private static MailObject receiveMessage(MimeMessage mimeMessage, String recvAddress, 
-			boolean detail, String saveAttchPath) throws MessagingException, IOException {
+	private static MailObject receiveMessage(MimeMessage mimeMessage, String receiveAddress, 
+			boolean detail, String saveAttachPath) throws MessagingException, IOException {
 		MailObject mailObject = new MailObject();
 
-		InternetAddress[] receiveAddress;
+		InternetAddress[] internetAddresses;
 		
 		if (mimeMessage instanceof IMAPMessage) {
-			receiveAddress = (InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
+			internetAddresses = (InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
 		} else {
-			receiveAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.TO);
+			internetAddresses = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.TO);
 		}
 
 		List<String> receiveList = new ArrayList<>();
 
-		for (InternetAddress address : receiveAddress) {
+		for (InternetAddress address : internetAddresses) {
 			receiveList.add(address.getAddress());
 		}
 		
-		if (!receiveList.contains(recvAddress)) {
+		if (!receiveList.contains(receiveAddress)) {
 			return null;
 		}
 		
-		mailObject.setRecvAddress(receiveList);
+		mailObject.setReceiveAddress(receiveList);
 		
 		Folder folder = mimeMessage.getFolder();
 		
@@ -541,7 +541,7 @@ public final class MailUtils {
 			mailObject.setContent(contentBuffer.toString());
 			
 			List<String> attachFiles = new ArrayList<>();
-			getMailAttachment(mimeMessage, saveAttchPath, attachFiles);
+			getMailAttachment(mimeMessage, saveAttachPath, attachFiles);
 			mailObject.setAttachFiles(attachFiles);
 		}
 		
@@ -554,9 +554,9 @@ public final class MailUtils {
 		Store store = null;
 		Folder folder = null;
 		try {
-			Session session = getSession(mailServerConfig.getRecvConfigInfo(userName), userName, passWord);
+			Session session = getSession(mailServerConfig.getReceiveConfigInfo(userName), userName, passWord);
 			
-			switch (mailServerConfig.getRecvServerConfig().getProtocolOption()) {
+			switch (mailServerConfig.getReceiveServerConfig().getProtocolOption()) {
 			case IMAP:
 				store = session.getStore("imap");
 				break;
@@ -567,11 +567,11 @@ public final class MailUtils {
 				throw new NoSuchProviderException("Protocol Error");
 			}
 
-			if (mailServerConfig.getRecvServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), userName, passWord);
+			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
 			} else {
-				store.connect(mailServerConfig.getRecvServerConfig().getHostName(), 
-						mailServerConfig.getRecvServerConfig().getHostPort(), userName, passWord);
+				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
+						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
 			}
 			
 			folder = openFolder(store, false);
@@ -604,19 +604,14 @@ public final class MailUtils {
 		String contentType = part.getContentType();
 		int nameIndex = contentType.indexOf("name");
 
-		boolean conname = false;
-		if (nameIndex != -1) {
-			conname = true;
-		}
-		
 		if (contentBuffer == null) {
 			throw new IOException();
 		}
 
-		if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT) && !conname) {
+		if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT) && (nameIndex == -1)) {
 			contentBuffer.append(part.getContent().toString());
 		} else {
-			if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_HTML) && !conname) {
+			if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_HTML) && (nameIndex == -1)) {
 				contentBuffer.append(part.getContent().toString());
 			} else {
 				if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
@@ -634,7 +629,7 @@ public final class MailUtils {
 		}
 	}
 	
-	private static void getMailAttachment(Part part, String saveAttchPath, List<String> saveFiles) throws MessagingException, IOException {
+	private static void getMailAttachment(Part part, String saveAttachPath, List<String> saveFiles) throws MessagingException, IOException {
 		if (saveFiles == null) {
 			saveFiles = new ArrayList<>();
 		}
@@ -644,15 +639,15 @@ public final class MailUtils {
 			for (int i = 0; i < count; i++) {
 				Part bodyPart = multipart.getBodyPart(i);
 				if (bodyPart.getFileName() != null) {
-					String dispostion = bodyPart.getDisposition();
-					if (dispostion != null && (dispostion.equals(Part.ATTACHMENT) || dispostion.equals(Part.INLINE))) {
+					String disposition = bodyPart.getDisposition();
+					if (disposition != null && (disposition.equals(Part.ATTACHMENT) || disposition.equals(Part.INLINE))) {
 						boolean saveFile = FileUtils.saveFile(bodyPart.getInputStream(), 
-								saveAttchPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
+								saveAttachPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
 						if (saveFile) {
-							saveFiles.add(saveAttchPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
+							saveFiles.add(saveAttachPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
 						}
 					} else if (bodyPart.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
-						getMailAttachment(bodyPart, saveAttchPath, saveFiles);
+						getMailAttachment(bodyPart, saveAttachPath, saveFiles);
 					}
 				}
 			}

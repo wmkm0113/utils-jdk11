@@ -434,7 +434,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	/**
-	 * Check the given entry path is extsis
+	 * Check the given entry path is exists
 	 * @param entryPath		entry path
 	 * @return				check result
 	 */
@@ -566,7 +566,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	/**
-	 * Entract all entries in zip file to target extract file path
+	 * Extract all entries in zip file to target extract file path
 	 * @param destPath			Target extract file path
 	 * @throws ZipException		Target path is null or file exists
 	 */
@@ -575,7 +575,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	/**
-	 * Entract all entries in zip file to target extract file path
+	 * Extract all entries in zip file to target extract file path
 	 * @param destPath			Target extract file path
 	 * @param ignoreFileAttr	Status of process file attribute
 	 * @throws ZipException		Target path is null or zip file invalid
@@ -763,7 +763,7 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Read comment
-	 * @return		Readed comment content
+	 * @return		Read comment content
 	 * @throws ZipException		zip file was not exists
 	 */
 	public String getComment() throws ZipException {
@@ -773,7 +773,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Read comment by given charset encoding
 	 * @param charset			charset encoding
-	 * @return					Readed comment content
+	 * @return					Read comment content
 	 * @throws ZipException		zip file was not exists, zip file does not include comment content or charset encoding was not supported
 	 */
 	public String getComment(String charset) throws ZipException {
@@ -877,7 +877,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Finallize zip file
+	 * Finalize zip file
 	 * @param outputStream			Output stream
 	 * @throws ZipException			Write datas to output stream error
 	 */
@@ -1837,7 +1837,7 @@ public final class ZipFile implements Cloneable {
 	
 	private OutputStream openMergeOutputStream(String outputPath) throws ZipException {
 		if (outputPath == null) {
-			throw new ZipException("Output path is null, cannot create outputstream");
+			throw new ZipException("Output path is null, cannot create output stream");
 		}
 		
 		try {
@@ -1853,7 +1853,7 @@ public final class ZipFile implements Cloneable {
 
 	private NervousyncRandomAccessFile openSplitFile(int index) throws ZipException {
 		if (index < 0) {
-			throw new ZipException("invlaid index, cannot create split file handler");
+			throw new ZipException("invalid index, cannot create split file handler");
 		}
 		
 		try {
@@ -2774,7 +2774,7 @@ public final class ZipFile implements Cloneable {
 			// 4 -> number of the disk with the start of the zip64 end of
 			// central directory
 			// 4 -> zip64 end of central dir locator signature
-			// Refer to Appnote for more information
+			// Refer to Appose for more information
 			input.seek(position - 4 - 8 - 4 - 4);
 
 			byte[] readBuffer = new byte[20];
@@ -3093,7 +3093,7 @@ public final class ZipFile implements Cloneable {
 				if (extraDataRecord != null) {
 					if (extraDataRecord.getHeader() == ZipConstants.AESSIG) {
 						if (extraDataRecord.getDataContent() == null) {
-							throw new ZipException("Corrput AES extra data records");
+							throw new ZipException("Corrupt AES extra data records");
 						}
 
 						AESExtraDataRecord aesExtraDataRecord = new AESExtraDataRecord();

@@ -71,7 +71,7 @@ public final class SNMPUtils {
 	private static final String PROTOCOL_UDP = "udp:";
 	private static final String PROTOCOL_TCP = "tcp:";
 	
-	private static final OctetString NOAUTH_NOPRIV = new OctetString("noAuthUser");
+	private static final OctetString NO_AUTH_NOPRIV = new OctetString("noAuthUser");
 	private static final OctetString AUTH_NOPRIV = new OctetString("authUser");
 	private static final OctetString AUTH_PRIV = new OctetString("privUser");
 	
@@ -246,7 +246,7 @@ public final class SNMPUtils {
 			
 			if (SNMPAuthType.NOAUTH_NOPRIV.equals(targetHost.getAuth())) {
 				target.setSecurityLevel(SecurityLevel.NOAUTH_NOPRIV);
-				securityName = NOAUTH_NOPRIV;
+				securityName = NO_AUTH_NOPRIV;
 			} else if (SNMPAuthType.AUTH_NOPRIV.equals(targetHost.getAuth())) {
 				target.setSecurityLevel(SecurityLevel.AUTH_NOPRIV);
 				securityName = AUTH_NOPRIV;

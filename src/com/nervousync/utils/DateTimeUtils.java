@@ -47,7 +47,7 @@ public final class DateTimeUtils {
 	 * @param date		date instance
 	 * @return			formatted result by ISO8601
 	 */
-	public static String formatDateForSitemap(Date date) {
+	public static String formatDateForSiteMap(Date date) {
 		if (date == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -60,7 +60,7 @@ public final class DateTimeUtils {
 	 * @return					Date object
 	 * @throws ParseException	given string is null
 	 */
-	public static Date parseSitemapDate(String string) throws ParseException {
+	public static Date parseSiteMapDate(String string) throws ParseException {
 		return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	}
 
