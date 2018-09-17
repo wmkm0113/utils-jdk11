@@ -310,8 +310,7 @@ public final class SystemUtils {
 		
 		while (enumeration.hasMoreElements()) {
 			try {
-				NetworkInfo networkInfo = new NetworkInfo(enumeration.nextElement());
-				networkList.add(networkInfo);
+				networkList.add(new NetworkInfo(enumeration.nextElement()));
 			} catch (NetworkInfoException e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Retrieve network info error!", e);

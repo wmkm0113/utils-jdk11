@@ -219,7 +219,13 @@ public final class NetworkInfo implements Serializable {
 			if (inetAddress == null) {
 				throw new IPAddressException("InetAddress is null");
 			}
-			this.ipAddress = inetAddress.getHostAddress();
+
+			String ipAddress = inetAddress.getHostAddress();
+			if (ipAddress.indexOf("%") > 0) {
+				this.ipAddress = ipAddress.substring(0, ipAddress.indexOf("%"));
+			} else {
+				this.ipAddress = ipAddress;
+			}
 			this.local = inetAddress.isSiteLocalAddress();
 			this.loop = inetAddress.isLoopbackAddress();
 			this.linkLocal = inetAddress.isLinkLocalAddress();
@@ -254,11 +260,11 @@ public final class NetworkInfo implements Serializable {
 		}
 	}
 	
-	private static boolean isIPv4Address(String ipAddress) {
+	public static boolean isIPv4Address(String ipAddress) {
 		return StringUtils.matches(ipAddress, REGEX_IPv4);
 	}
-	
-	private static boolean isIPv6Address(String ipAddress) {
+
+	public static boolean isIPv6Address(String ipAddress) {
 		return StringUtils.matches(ipAddress, REGEX_IPv6);
 	}
 }
