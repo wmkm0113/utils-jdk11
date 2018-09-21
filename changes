@@ -1,4 +1,8 @@
 Nervousync Utils Package
+[09/21/2018]
+Add support for IPv6 address
+Add method to calc IPv6 address range by CIDR
+
 [07/02/2018]
 Add image utils, implements operation of resize, cut and mark to given images
 Update to Apache License 2.0

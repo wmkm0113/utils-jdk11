@@ -16,6 +16,7 @@
  */
 package com.nervousync.utils;
 
+import com.nervousync.commons.beans.ip.IPRange;
 import com.nervousync.commons.beans.servlet.request.RequestAttribute;
 import com.nervousync.commons.beans.servlet.request.RequestInfo;
 import com.nervousync.commons.beans.servlet.response.HttpResponseContent;
@@ -25,6 +26,7 @@ import com.nervousync.commons.http.cookie.CookieEntity;
 import com.nervousync.commons.http.entity.HttpEntity;
 import com.nervousync.commons.http.header.SimpleHeader;
 import com.nervousync.commons.http.proxy.ProxyInfo;
+import com.nervousync.enumerations.ip.IPType;
 import com.nervousync.enumerations.web.HttpMethodOption;
 
 import javax.jws.WebService;
@@ -181,70 +183,33 @@ public final class RequestUtils {
 		}
 		return null;
 	}
-	
-	/**
-	 * Calculate IP range begin address
-	 * @param ipAddress		IP address in range
-	 * @param cidr			CIDR
-	 * @return				Begin IP address
-	 */
-	public static String beginIP(String ipAddress, int cidr) {
-		return RequestUtils.beginIP(ipAddress, convertCIDRToNetmask(cidr));
-	}
 
 	/**
-	 * Calculate IP range end address
-	 * @param beginIP		Begin address of range
-	 * @param cidr			CIDR
-	 * @return				End IP address
-	 */
-	public static String endIP(String beginIP, int cidr) {
-		return RequestUtils.endIP(beginIP, convertCIDRToNetmask(cidr));
-	}
-	
-	/**
-	 * Calculate IP range begin address
+	 * Calculate IP range address
 	 * @param ipAddress		IP address in range
-	 * @param netmask		Net mask address
-	 * @return				Begin IP address
+	 * @param cidr			CIDR
+	 * @return				IPRange object
 	 */
-	public static String beginIP(String ipAddress, String netmask) {
-		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
-		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
-		
-		StringBuilder stringBuilder = new StringBuilder();
-		
-		for (int i = 0 ; i < 4 ; i++) {
-			int beginItem = Integer.parseInt(addressItems[i]) & Integer.parseInt(maskItems[i]);
-			if (i == 3) {
-				beginItem++;
-			}
-			stringBuilder.append(".").append(beginItem);
+	public static IPRange calcRange(String ipAddress, int cidr) {
+		IPRange ipRange = new IPRange();
+		String beginAddress;
+		String endAddress;
+		if (ipAddress.contains(":")) {
+			ipRange.setIpType(IPType.IPv6);
+			beginAddress = RequestUtils.beginIPv6(ipAddress, cidr);
+			endAddress = RequestUtils.endIPv6(beginAddress, cidr);
+		} else {
+			ipRange.setIpType(IPType.IPv4);
+			beginAddress = RequestUtils.beginIPv4(ipAddress, convertCIDRToNetmask(cidr));
+			endAddress = RequestUtils.endIPv4(beginAddress, convertCIDRToNetmask(cidr));
 		}
-		
-		return stringBuilder.toString().substring(1);
+
+		ipRange.setBeginAddress(beginAddress);
+		ipRange.setEndAddress(endAddress);
+
+		return ipRange;
 	}
 
-	/**
-	 * Calculate IP range end address
-	 * @param beginIP		Begin address of range
-	 * @param netmask		Net mask address
-	 * @return				End IP address
-	 */
-	public static String endIP(String beginIP, String netmask) {
-		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, ".");
-		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
-		
-		StringBuilder stringBuilder = new StringBuilder();
-		
-		for (int i = 0 ; i < 4 ; i++) {
-			int endItem = 255 - Integer.parseInt(addressItems[i]) ^ Integer.parseInt(maskItems[i]);
-			stringBuilder.append(".").append(endItem);
-		}
-		
-		return stringBuilder.toString().substring(1);
-	}
-	
 	/**
 	 * Convert net mask to CIDR
 	 * @param netmask	Net mask address
@@ -404,7 +369,7 @@ public final class RequestUtils {
 	 */
 	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)) {
-			ipAddress = appendIgnore(ipAddress);
+			ipAddress = expandIgnore(ipAddress);
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ":");
 			if (splitAddress.length == 8) {
 				BigInteger bigInteger = BigInteger.ZERO;
@@ -1549,6 +1514,162 @@ public final class RequestUtils {
 		return null;
 	}
 
+	/**
+	 * Expand IPv6 address ignore data
+	 * @param ipv6Address      IPv6 address
+	 * @return                 Expand IPv6 address
+	 */
+	public static String expandIgnore(String ipv6Address) {
+		if (ipv6Address.contains("::")) {
+			int count = StringUtils.countOccurrencesOf(ipv6Address, ":");
+			StringBuilder stringBuilder = new StringBuilder();
+			for (int i = count ; i < 8 ; i++) {
+				stringBuilder.append(":0000");
+			}
+			ipv6Address = StringUtils.replace(ipv6Address, "::", stringBuilder.toString() + ":");
+			if (ipv6Address.startsWith(":")) {
+				ipv6Address = "0000" + ipv6Address;
+			}
+			if (ipv6Address.endsWith(":")) {
+				ipv6Address += "0000";
+			}
+		}
+
+		String[] addressItems = StringUtils.delimitedListToStringArray(ipv6Address, ":");
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String addressItem : addressItems) {
+			StringBuilder addressItemBuilder = new StringBuilder(addressItem);
+			while (addressItemBuilder.length() < 4) {
+				addressItemBuilder.insert(0, "0");
+			}
+			addressItem = addressItemBuilder.toString();
+			stringBuilder.append(":").append(addressItem);
+		}
+		return stringBuilder.substring(1);
+	}
+
+	/**
+	 * Calculate IP range begin address
+	 * @param ipAddress		IP address in range
+	 * @param netmask		Net mask address
+	 * @return				Begin IP address
+	 */
+	private static String beginIPv4(String ipAddress, String netmask) {
+		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (int i = 0 ; i < 4 ; i++) {
+			int beginItem = Integer.parseInt(addressItems[i]) & Integer.parseInt(maskItems[i]);
+			if (i == 3) {
+				beginItem++;
+			}
+			stringBuilder.append(".").append(beginItem);
+		}
+
+		return stringBuilder.toString().substring(1);
+	}
+
+	/**
+	 * Calculate IP range end address
+	 * @param beginIP		Begin address of range
+	 * @param netmask		Net mask address
+	 * @return				End IP address
+	 */
+	private static String endIPv4(String beginIP, String netmask) {
+		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, ".");
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (int i = 0 ; i < 4 ; i++) {
+			int endItem = 255 - Integer.parseInt(addressItems[i]) ^ Integer.parseInt(maskItems[i]);
+			stringBuilder.append(".").append(endItem);
+		}
+
+		return stringBuilder.toString().substring(1);
+	}
+
+	/**
+	 * Calculate IPv6 range begin address
+	 * @param ipAddress     IPv6 address
+	 * @param cidr          CIDR
+	 * @return              Begin address
+	 */
+	private static String beginIPv6(String ipAddress, int cidr) {
+		if (cidr >= 0 && cidr <= 128) {
+			String hexAddress = StringUtils.replace(RequestUtils.expandIgnore(ipAddress), ":", "");
+			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
+
+			while (baseIP.length() < 128) {
+				baseIP.append("0");
+			}
+
+			return binToHex(baseIP.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * Calculate IPv6 range end address
+	 * @param ipAddress     IPv6 address
+	 * @param cidr          CIDR
+	 * @return              End address
+	 */
+	private static String endIPv6(String ipAddress, int cidr) {
+		if (cidr >= 0 && cidr <= 128) {
+			String hexAddress = StringUtils.replace(RequestUtils.expandIgnore(ipAddress), ":", "");
+			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
+
+			while (baseIP.length() < 128) {
+				baseIP.append("1");
+			}
+
+			return binToHex(baseIP.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * Convert IPv6 address from hex data to binary data
+	 * @param hexAddress    hex data address
+	 * @return              binary data address
+	 */
+	private static String hexToBin(String hexAddress) {
+		StringBuilder binBuilder = new StringBuilder();
+		int index = 0;
+		while (index < hexAddress.length()) {
+			int hexInt = Integer.parseInt(hexAddress.substring(index, index + 1), 16);
+			StringBuilder binItem = new StringBuilder(Integer.toString(hexInt, 2));
+			while (binItem.length() < 4) {
+				binItem.insert(0, "0");
+			}
+			binBuilder.append(binItem.toString());
+			index++;
+		}
+		return binBuilder.toString();
+	}
+
+	/**
+	 * Convert IPv6 address from binary data to hex data
+	 * @param binAddress    binary data address
+	 * @return              hex data address
+	 */
+	private static String binToHex(String binAddress) {
+		StringBuilder binBuilder = new StringBuilder();
+		int index = 0;
+		while (index < binAddress.length()) {
+			if (index % 16 == 0) {
+				binBuilder.append(":");
+			}
+			int binInt = Integer.parseInt(binAddress.substring(index, index + 4), 2);
+			binBuilder.append(Integer.toString(binInt, 16).toUpperCase());
+			index += 4;
+		}
+		return binBuilder.substring(1);
+	}
+
 	private static int fillBitsFromLeft(int value) {
 		if (value >= 8) {
 			return 255;
@@ -1784,25 +1905,6 @@ public final class RequestUtils {
 		}
 	}
 
-	private static String appendIgnore(String ipv6Address) {
-		if (ipv6Address.contains("::")) {
-			int count = StringUtils.countOccurrencesOf(ipv6Address, ":");
-			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = count ; i < 8 ; i++) {
-				stringBuilder.append(":0");
-			}
-			ipv6Address = StringUtils.replace(ipv6Address, "::", stringBuilder.toString() + ":");
-			if (ipv6Address.startsWith(":")) {
-				ipv6Address = "0" + ipv6Address;
-			}
-			if (ipv6Address.endsWith(":")) {
-				ipv6Address += "0";
-			}
-		}
-		
-		return ipv6Address;
-	}
-	
 	private static final class TrustedCert {
 		
 		private final String certPath;

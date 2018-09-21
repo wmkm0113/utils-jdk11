@@ -64,7 +64,7 @@ import com.nervousync.exceptions.xml.XmlException;
  */
 public final class XmlUtils {
 	
-	private static final String DEFAULT_NAME = "##default";
+	public static final String DEFAULT_NAME = "##default";
 
 	//	Log Object
 	private final static Logger LOGGER = LoggerFactory.getLogger(XmlUtils.class);
@@ -312,7 +312,7 @@ public final class XmlUtils {
 		return object;
 	}
 	
-	private static boolean simpleDataType(Class<?> targetClass) {
+	public static boolean simpleDataType(Class<?> targetClass) {
 		if (String.class.equals(targetClass) || int.class.equals(targetClass) || Integer.class.equals(targetClass) 
 				|| double.class.equals(targetClass) || Double.class.equals(targetClass) || float.class.equals(targetClass) || Float.class.equals(targetClass)
 				|| boolean.class.equals(targetClass) || Boolean.class.equals(targetClass) || short.class.equals(targetClass) || Short.class.equals(targetClass)

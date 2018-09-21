@@ -50,7 +50,7 @@ public class BaseElement implements Serializable {
 		BaseElement parseObj = XmlUtils.convertToObject(xmlObj, this.getClass());
 		BeanUtils.copyProperties(parseObj, this);
 	}
-	
+
 	/**
 	 * Convert Object to XML String By Nervousync XML Util
 	 * @return XML String
