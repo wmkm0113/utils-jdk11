@@ -18,9 +18,9 @@ package com.nervousync.commons.beans.files;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import com.nervousync.commons.beans.xml.BaseElement;
 import com.nervousync.commons.core.Globals;
@@ -33,8 +33,8 @@ import com.nervousync.utils.StringUtils;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Aug 11, 2015 11:03:43 AM $
  */
-@XmlType
-@XmlRootElement
+@XmlRootElement(name = "FileExtensionInfo")
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class FileExtensionInfo extends BaseElement {
 
 	/**
@@ -45,27 +45,22 @@ public final class FileExtensionInfo extends BaseElement {
 	/**
 	 * File extension name
 	 */
-	@XmlElement
 	private String extensionName = null;
 	/**
 	 * Header identified code, convert hex to String
 	 */
-	@XmlElement
 	private String identifiedCode = null;
 	/**
 	 * Mime type define
 	 */
-	@XmlElement
 	private String mimeType = null;
 	/**
 	 * File type code
 	 */
-	@XmlElement
 	private int fileType;
 	/**
 	 * Is printable file
 	 */
-	@XmlElement
 	private boolean printable = false;
 	
 	/**

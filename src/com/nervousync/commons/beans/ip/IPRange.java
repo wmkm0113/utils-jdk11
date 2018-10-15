@@ -17,7 +17,9 @@ import java.io.Serializable;
  * @version $Revision: 1.0 $Date: 2018-09-21 18:25
  */
 public final class IPRange implements Serializable {
-
+	
+	private static final long serialVersionUID = 7569297312912043791L;
+	
 	private IPType ipType;
 	private String beginAddress = Globals.DEFAULT_VALUE_STRING;
 	private String endAddress = Globals.DEFAULT_VALUE_STRING;

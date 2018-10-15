@@ -16,13 +16,8 @@
  */
 package com.nervousync.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigInteger;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -52,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nervousync.commons.core.Globals;
-import sun.misc.Cleaner;
 
 /**
  * Security Utils
@@ -809,24 +803,19 @@ public final class SecurityUtils implements Serializable {
 		if (source instanceof File) {
 			File file = (File)source;
 			if (file.exists() && file.isFile()) {
-				FileInputStream fileInputStream = null;
-				FileChannel fileChannel = null;
+				RandomAccessFile randomAccessFile = null;
 				try {
-					fileInputStream = new FileInputStream(file);
-					fileChannel = fileInputStream.getChannel();
-					MappedByteBuffer byteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
-					messageDigest.update(byteBuffer);
-					
-					Cleaner cleaner = (Cleaner)ReflectionUtils.executeMethod("cleaner", byteBuffer);
-					if (cleaner != null) {
-						cleaner.clean();
+					randomAccessFile = new RandomAccessFile(file, Globals.READ_MODE);
+					byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
+					int readLength;
+					while ((readLength = randomAccessFile.read(readBuffer)) > 0) {
+						messageDigest.update(readBuffer, 0, readLength);
 					}
 				} catch (Exception e) {
 					LOGGER.error("Message digest error! ", e);
 					return null;
 				} finally {
-					IOUtils.closeStream(fileChannel);
-					IOUtils.closeStream(fileInputStream);
+					IOUtils.closeStream(randomAccessFile);
 				}
 			} else {
 				LOGGER.error("File does not exists" + file.getAbsolutePath());

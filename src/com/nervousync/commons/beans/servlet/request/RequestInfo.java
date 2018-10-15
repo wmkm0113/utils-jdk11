@@ -35,12 +35,12 @@ import com.nervousync.utils.RequestUtils;
  * @version $Revision: 1.0 $ $Date: Aug 25, 2017 11:04:17 AM $
  */
 public final class RequestInfo implements Serializable {
-
+	
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7350946565537957232L;
-
+	
 	/**
 	 * Http method define
 	 * @see com.nervousync.enumerations.web.HttpMethodOption
@@ -59,17 +59,17 @@ public final class RequestInfo implements Serializable {
 	 */
 	private String charset = Globals.DEFAULT_ENCODING;
 	/**
+	 * Content type
+	 */
+	private String contentType = null;
+	/**
 	 * Request timeout
 	 */
 	private int timeOut = Globals.DEFAULT_VALUE_INT;
 	/**
-	 * Reading position of begin
+	 * Post ata arrays
 	 */
-	private int beginPosition = Globals.DEFAULT_VALUE_INT;
-	/**
-	 * Reading position of end
-	 */
-	private int endPosition = Globals.DEFAULT_VALUE_INT;
+	private byte[] postDatas;
 	/**
 	 * Send header values of request
 	 */
@@ -103,17 +103,14 @@ public final class RequestInfo implements Serializable {
 		this.requestUrl = requestUrl;
 		this.httpMethodOption = originalInfo.getHttpMethodOption();
 		this.timeOut = originalInfo.getTimeOut();
-		this.beginPosition = originalInfo.getBeginPosition();
-		this.endPosition = originalInfo.getEndPosition();
+		this.postDatas = originalInfo.getPostDatas();
 		this.headers = originalInfo.getHeaders();
 		this.parameters = originalInfo.getParameters();
 		this.uploadParam = originalInfo.getUploadParam();
 	}
-
+	
 	/**
 	 * Constructor for given http method, request URL and send data
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
 	 * @param data					Send data
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String data) {
@@ -123,7 +120,27 @@ public final class RequestInfo implements Serializable {
 		this.headers = new ArrayList<>();
 		this.uploadParam = new HashMap<>();
 	}
-
+	
+	/**
+	 * Constructor for given http method, request URL and send data
+	 * @param httpMethodOption		Request http method
+	 * @param requestUrl			Target request url
+	 * @param timeOut			    value of time out
+	 * @param postDatas             Send data arrays
+	 * @param contentType           Content type
+	 */
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, byte[] postDatas, String contentType, String charset) {
+		this.httpMethodOption = httpMethodOption;
+		this.requestUrl = requestUrl;
+		this.timeOut = timeOut > 0 ? timeOut : Globals.DEFAULT_VALUE_INT;
+		this.contentType = contentType;
+		this.charset = charset != null ? charset : Globals.DEFAULT_ENCODING;
+		this.postDatas = postDatas;
+		this.parameters = new HashMap<>();
+		this.headers = new ArrayList<>();
+		this.uploadParam = new HashMap<>();
+	}
+	
 	/**
 	 * Constructor for given http method, request URL and send parameters data
 	 * @param httpMethodOption		Request http method
@@ -143,19 +160,15 @@ public final class RequestInfo implements Serializable {
 	 * @param httpMethodOption		Request http method
 	 * @param requestUrl			Target request url
 	 * @param timeOut				Request timeout setting
-	 * @param beginPosition			Reading position of begin
-	 * @param endPosition			Reading position of end
 	 * @param headers				Send header information of request
 	 * @param parameters			Send parameter information of request
 	 * @param uploadParam			Send multipart files of request
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, 
-			int timeOut, int beginPosition, int endPosition, List<SimpleHeader> headers, 
-			Map<String, String[]> parameters, Map<String, File> uploadParam) {
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl,
+	                   int timeOut, List<SimpleHeader> headers,
+	                   Map<String, String[]> parameters, Map<String, File> uploadParam) {
 		this.httpMethodOption = httpMethodOption;
 		this.timeOut = timeOut;
-		this.beginPosition = beginPosition;
-		this.endPosition = endPosition;
 		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
 		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
 		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
@@ -172,20 +185,16 @@ public final class RequestInfo implements Serializable {
 	 * @param requestUrl			Target request url
 	 * @param charset				Charset encoding
 	 * @param timeOut				Request timeout setting
-	 * @param beginPosition			Reading position of begin
-	 * @param endPosition			Reading position of end
 	 * @param headers				Send header information of request
 	 * @param parameters			Send parameter information of request
 	 * @param uploadParam			Send multipart files of request
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset, 
-			int timeOut, int beginPosition, int endPosition, List<SimpleHeader> headers, 
-			Map<String, String[]> parameters, Map<String, File> uploadParam) {
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
+	                   int timeOut, List<SimpleHeader> headers,
+	                   Map<String, String[]> parameters, Map<String, File> uploadParam) {
 		this.httpMethodOption = httpMethodOption;
 		this.charset = charset;
 		this.timeOut = timeOut;
-		this.beginPosition = beginPosition;
-		this.endPosition = endPosition;
 		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
 		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
 		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
@@ -195,7 +204,31 @@ public final class RequestInfo implements Serializable {
 		}
 		this.requestUrl = requestUrl;
 	}
-
+	
+	/**
+	 * Constructor for given http method, request URL, and many options
+	 * @param httpMethodOption		Request http method
+	 * @param requestUrl			Target request url
+	 * @param charset				Charset encoding
+	 * @param timeOut				Request timeout setting
+	 * @param headers				Send header information of request
+	 * @param postDatas             Send data arrays
+	 */
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
+	                   int timeOut, List<SimpleHeader> headers, byte[] postDatas) {
+		this.httpMethodOption = httpMethodOption;
+		this.charset = charset;
+		this.timeOut = timeOut;
+		this.postDatas = postDatas;
+		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
+		this.parameters = new HashMap<>();
+		this.uploadParam = new HashMap<>();
+		if (requestUrl.contains("?")) {
+			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
+		}
+		this.requestUrl = requestUrl;
+	}
+	
 	/**
 	 * @return the httpMethodOption
 	 */
@@ -213,70 +246,70 @@ public final class RequestInfo implements Serializable {
 		}
 		return httpMethodOption;
 	}
-
+	
 	/**
 	 * @return the proxyInfo
 	 */
 	public ProxyInfo getProxyInfo() {
 		return proxyInfo;
 	}
-
+	
 	/**
 	 * @param proxyInfo the proxyInfo to set
 	 */
 	public void setProxyInfo(ProxyInfo proxyInfo) {
 		this.proxyInfo = proxyInfo;
 	}
-
+	
 	/**
 	 * @return the requestUrl
 	 */
 	public String getRequestUrl() {
 		return requestUrl;
 	}
-
+	
 	/**
 	 * @return the charset
 	 */
 	public String getCharset() {
 		return charset;
 	}
-
+	
+	/**
+	 * @return the contentType
+	 */
+	public String getContentType() {
+		return contentType;
+	}
+	
 	/**
 	 * @return the timeOut
 	 */
 	public int getTimeOut() {
 		return timeOut;
 	}
-
+	
 	/**
-	 * @return the beginPosition
+	 * @return the postDatas
 	 */
-	public int getBeginPosition() {
-		return beginPosition;
+	public byte[] getPostDatas() {
+		return postDatas;
 	}
-
-	/**
-	 * @return the endPosition
-	 */
-	public int getEndPosition() {
-		return endPosition;
-	}
-
+	
 	/**
 	 * @return the headers
 	 */
 	public List<SimpleHeader> getHeaders() {
 		return headers;
 	}
-
+	
 	/**
 	 * @return the parameters
 	 */
 	public Map<String, String[]> getParameters() {
 		return parameters;
 	}
-
+	
 	/**
 	 * @return the uploadParam
 	 */

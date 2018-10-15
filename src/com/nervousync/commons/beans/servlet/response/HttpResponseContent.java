@@ -29,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.nervousync.commons.beans.xml.BaseElement;
 import com.nervousync.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,6 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.xml.XmlException;
 import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.StringUtils;
-import com.nervousync.utils.XmlUtils;
 
 /**
  * Response content of request
@@ -189,7 +189,7 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return XmlUtils.convertToObject(this.parseString(), clazz);
+		return BaseElement.parseXml(this.parseString(), this.charset, clazz);
 	}
 
 	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {

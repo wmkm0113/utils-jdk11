@@ -30,6 +30,8 @@ public final class Globals {
 	public static final int MULTIPLIER = 31;
 
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
+	//  32K
+	public static final int READ_FILE_BUFFER_SIZE = 32768;
 	
 	public static final int DEFAULT_TIME_OUT = 0;
 	public static final int DEFAULT_DOWNLOAD_SINGLE_THREAD = 1;

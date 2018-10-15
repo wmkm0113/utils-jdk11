@@ -499,8 +499,8 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
+				(List<SimpleHeader>)null, null, null));
 	}
 
 	/**
@@ -510,33 +510,8 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, null, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, int beginPosition, int endPosition, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				beginPosition, endPosition, null, null, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut,
+				(List<SimpleHeader>)null, null, null));
 	}
 
 	/**
@@ -546,19 +521,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data) {
-		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, int beginPosition, int endPosition) {
-		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, beginPosition, endPosition);
+		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT);
 	}
 
 	/**
@@ -569,7 +532,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers) {
 		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
+				headers, null, null));
 	}
 
 	/**
@@ -580,35 +543,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param headers			Request header values
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, headers, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param headers			Request header values
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int beginPosition, int endPosition, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				beginPosition, endPosition, headers, null, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, null, null));
 	}
 
 	/**
@@ -620,8 +555,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
 
 	/**
@@ -634,41 +568,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, int timeOut) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param headers			Request header values
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			int beginPosition, int endPosition) {
-		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, headers, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param headers			Request header values
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			int beginPosition, int endPosition, int timeOut) {
-		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				beginPosition, endPosition, headers, parameters, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, parameters, null));
 	}
 
 	/**
@@ -678,8 +578,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
 	/**
@@ -690,37 +589,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param parameters		Request parameters
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, null, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param parameters		Request parameters
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			int beginPosition, int endPosition, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, 
-				beginPosition, endPosition, null, parameters, null));
+		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, null, parameters, null));
 	}
 
 	/**
@@ -730,8 +599,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, (List<SimpleHeader>)null, null, null));
 	}
 
 	/**
@@ -742,37 +610,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, 
-			int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, null, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, 
-			int beginPosition, int endPosition, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				beginPosition, endPosition, null, null, null));
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, (List<SimpleHeader>)null, null, null));
 	}
 
 	/**
@@ -784,22 +622,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, HttpMethodOption httpMethodOption) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) {
-		return sendRequest(requestUrl, data, null, httpMethodOption, beginPosition, endPosition);
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
 
 	/**
@@ -811,8 +634,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
 
 	/**
@@ -825,40 +647,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param headers			Request header values
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, headers, null, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param headers			Request header values
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) {
-		
-		return sendRequest(new RequestInfo(HttpMethodOption.GET, requestUrl, timeOut, 
-				beginPosition, endPosition, headers, null, null));
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, null, null));
 	}
 
 	/**
@@ -873,7 +662,7 @@ public final class RequestUtils {
 			HttpMethodOption httpMethodOption) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
+				headers, parameters, null));
 	}
 
 	/**
@@ -889,42 +678,7 @@ public final class RequestUtils {
 			HttpMethodOption httpMethodOption, int timeOut) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param headers			Request header values
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) {
-		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, headers, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param data				Request datas
-	 * @param headers			Request header values
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) {
-		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				beginPosition, endPosition, headers, parameters, null));
+				headers, parameters, null));
 	}
 
 	/**
@@ -937,7 +691,7 @@ public final class RequestUtils {
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption) {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
+				null, parameters, null));
 	}
 
 	/**
@@ -951,7 +705,7 @@ public final class RequestUtils {
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			HttpMethodOption httpMethodOption, int timeOut) {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, null, parameters, null));
+				null, parameters, null));
 	}
 	
 	/**
@@ -965,7 +719,7 @@ public final class RequestUtils {
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
+				headers, parameters, null));
 	}
 
 	/**
@@ -979,41 +733,9 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			List<SimpleHeader> headers, HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
+		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, parameters, null));
 	}
 
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param parameters		Request parameters
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, null, parameters, null));
-	}
-
-	/**
-	 * Send request and receive response
-	 * @param requestUrl		URL address
-	 * @param parameters		Request parameters
-	 * @param httpMethodOption	HTTP method
-	 * @param beginPosition		Response content begin position
-	 * @param endPosition		Response content end position
-	 * @param timeOut			value of time out
-	 * @return					HttpResponseContent
-	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			HttpMethodOption httpMethodOption, int beginPosition, int endPosition, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				beginPosition, endPosition, null, parameters, null));
-	}
-	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -1026,7 +748,7 @@ public final class RequestUtils {
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
 			Map<String, File> uploadParam, List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
+				headers, parameters, uploadParam));
 	}
 
 	/**
@@ -1043,7 +765,63 @@ public final class RequestUtils {
 			Map<String, File> uploadParam, List<SimpleHeader> headers, 
 			HttpMethodOption httpMethodOption, int timeOut) {
 		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
-				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, headers, parameters, uploadParam));
+				headers, parameters, uploadParam));
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendRequest(String requestUrl, byte[] sendDatas, String contentType) {
+		return sendRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, Globals.DEFAULT_ENCODING));
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param httpMethodOption	HTTP method
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendRequest(HttpMethodOption httpMethodOption, String requestUrl, byte[] sendDatas, String contentType) {
+		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
+			return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, Globals.DEFAULT_ENCODING));
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param charset           Character encoding
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendRequest(String requestUrl, byte[] sendDatas, String contentType, String charset) {
+		return sendRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, charset));
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param httpMethodOption	HTTP method
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param charset           Character encoding
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendRequest(HttpMethodOption httpMethodOption, String requestUrl, byte[] sendDatas, String contentType, String charset) {
+		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
+			return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, charset));
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -1071,22 +849,34 @@ public final class RequestUtils {
 			urlConnection.setConnectTimeout(timeout * 1000);
 			urlConnection.setReadTimeout(timeout * 1000);
 			
-			HttpEntity httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
-			
-			urlConnection.setRequestProperty("Content-Type", 
-					httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getHttpMethodOption()));
-			
 			if (requestInfo.getHeaders() != null) {
 				for (SimpleHeader simpleHeader : requestInfo.getHeaders()) {
 					urlConnection.setRequestProperty(simpleHeader.getHeaderName(), simpleHeader.getHeaderValue());
 				}
 			}
 			
-			if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption()) 
-					|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+			if ((HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption()) || HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption()))
+					&& requestInfo.getPostDatas() != null && requestInfo.getPostDatas().length > 0) {
+				
+				urlConnection.setRequestProperty("Content-Type", requestInfo.getContentType() + ";charset=" + requestInfo.getCharset());
+				urlConnection.setRequestProperty("Content-Length", String.valueOf(requestInfo.getPostDatas().length));
 				outputStream = urlConnection.getOutputStream();
-				httpEntity.writeData(requestInfo.getCharset(), outputStream);
+				outputStream.write(requestInfo.getPostDatas());
+			} else {
+				HttpEntity httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
+				
+				urlConnection.setRequestProperty("Content-Type",
+						httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getHttpMethodOption()));
+				
+				if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
+						|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+					outputStream = urlConnection.getOutputStream();
+					httpEntity.writeData(requestInfo.getCharset(), outputStream);
+				}
 			}
+			
+			outputStream.flush();
+			outputStream.close();
 			
 			String redirectUrl = urlConnection.getHeaderField("Location");
 			if (redirectUrl != null) {

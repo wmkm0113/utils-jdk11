@@ -2044,7 +2044,7 @@ public final class StringUtils {
 		}
 		
 		if (BaseElement.class.isAssignableFrom(typeClass)) {
-			paramObj = XmlUtils.convertToObject(dataValue, typeClass);
+			paramObj = BaseElement.parseXml(dataValue, Globals.DEFAULT_ENCODING, typeClass);
 		} else {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 			

@@ -29,6 +29,8 @@ public final class RegexGlobals {
 	public static final String UUID = "^([0-9a-f]{8}((-[0-9a-f]{4}){3})-[0-9a-f]{12})|([0-9a-f]{32})\\b";
 	public static final String MD5_VALUE = "^[0-9a-f]{32}\\b";
 	
+	public static final String XML = "<[a-zA-Z0-9]+[^>]*>(?:.|[\\r\\n])*?<\\/[a-zA-Z0-9]+>";
+	
 	public static final String IPV4_REGEX = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
 	public static final String IPV6_REGEX = "^([\\da-fA-F]{1,4}(:[\\da-fA-F]{1,4}){7}|([\\da-fA-F]{1,4}){0,1}:(:[\\da-fA-F]{1,4}){1,7}|[\\da-fA-F]{1,4}::|::)$";
 	public static final String IPV6_COMPRESS_REGEX = "(^|:)(0+(:|$)){2,8}";

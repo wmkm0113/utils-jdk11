@@ -48,7 +48,6 @@
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<bcprov.version>1.60</bcprov.version>
 		<cglib.version>3.2.7</cglib.version>
-		<dom4j.version>2.1.1</dom4j.version>
 		<jaxb.version>2.3.0</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
 		<log4j.version>2.11.0</log4j.version>
@@ -268,17 +267,6 @@
 			<groupId>jaxen</groupId>
 			<artifactId>jaxen</artifactId>
 			<version>1.1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>${dom4j.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>jaxen</groupId>
-					<artifactId>jaxen</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>

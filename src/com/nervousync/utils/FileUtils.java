@@ -52,7 +52,8 @@ import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
 import com.nervousync.commons.beans.files.FileExtensionInfo;
-import com.nervousync.commons.beans.xml.files.SegmentationFileInfo;
+import com.nervousync.commons.beans.xml.files.SegmentationFile;
+import com.nervousync.commons.beans.xml.files.SegmentationItem;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.MIMETypes;
 import com.nervousync.commons.zip.ZipFile;
@@ -2183,92 +2184,33 @@ public final class FileUtils {
 	
 	/**
 	 * Merge file to save path
-	 * @param savePath					Target save directory
-	 * @param segmentationFileInfoList		Segmentation file info list
-	 * @return							Operate result
-	 */
-	public static boolean mergeFileInfo(String savePath, List<SegmentationFileInfo> segmentationFileInfoList) {
-		RandomAccessFile randomAccessFile = null;
-		
-		try {
-			long totalSize = 0;
-			long defineSize = 0;
-			randomAccessFile = new RandomAccessFile(savePath, "rw");
-			
-			for (SegmentationFileInfo segmentationFileInfo : segmentationFileInfoList) {
-				if (segmentationFileInfo == null) {
-					return Globals.DEFAULT_VALUE_BOOLEAN;
-				}
-
-				if (defineSize == 0) {
-					randomAccessFile.setLength(segmentationFileInfo.getTotalSize());
-					defineSize = segmentationFileInfo.getTotalSize();
-				}
-				
-				if (FileUtils.mergeFile(randomAccessFile, segmentationFileInfo)) {
-					totalSize += segmentationFileInfo.getDataContent().length;
-				}
-			}
-
-			randomAccessFile.close();
-			randomAccessFile = null;
-			
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Write file size: " + totalSize);
-			}
-			
-			if (totalSize != defineSize) {
-				FileUtils.removeFile(savePath);
-				return Globals.DEFAULT_VALUE_BOOLEAN;
-			}
-			
-			return true;
-		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		} finally {
-			IOUtils.closeStream(randomAccessFile);
-		}
-	}
-	
-	/**
-	 * Merge file to save path
 	 * @param savePath					Target save path
-	 * @param segmentationFilePaths		Segmentation file paths
+	 * @param segmentationFile		    Segmentation file object
 	 * @return							Operate result
 	 */
-	public static boolean mergeFile(String savePath, List<String> segmentationFilePaths) {
+	public static boolean mergeFile(String savePath, SegmentationFile segmentationFile) {
 		RandomAccessFile randomAccessFile = null;
 		
 		try {
 			long totalSize = 0;
-			long defineSize = 0;
 			randomAccessFile = new RandomAccessFile(savePath, "rw");
+			randomAccessFile.setLength(segmentationFile.getTotalSize());
 			
-			for (String segmentationFilePath : segmentationFilePaths) {
-				SegmentationFileInfo segmentationFileInfo = 
-						XmlUtils.convertToObject(segmentationFilePath, SegmentationFileInfo.class);
-				if (segmentationFileInfo == null) {
+			for (SegmentationItem segmentationItem : segmentationFile.getSegmentationItemList()) {
+				if (segmentationItem == null) {
 					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
-
-				if (defineSize == 0) {
-					randomAccessFile.setLength(segmentationFileInfo.getTotalSize());
-					defineSize = segmentationFileInfo.getTotalSize();
-				}
 				
-				if (FileUtils.mergeFile(randomAccessFile, segmentationFileInfo)) {
-					totalSize += segmentationFileInfo.getDataContent().length;
+				if (FileUtils.mergeFile(randomAccessFile, segmentationItem)) {
+					totalSize += segmentationItem.getBlockSize();
 				}
 			}
 
-			randomAccessFile.close();
-			randomAccessFile = null;
-			
 			if (FileUtils.LOGGER.isDebugEnabled()) {
 				FileUtils.LOGGER.debug("Write file size: " + totalSize);
 			}
 			
-			if (totalSize != defineSize) {
+			if (totalSize != segmentationFile.getTotalSize()) {
 				FileUtils.removeFile(savePath);
 				return Globals.DEFAULT_VALUE_BOOLEAN;
 			}
@@ -2287,12 +2229,12 @@ public final class FileUtils {
 	 * @param blockSize			Block size
 	 * @return					List of split file
 	 */
-	public static List<SegmentationFileInfo> segmentFile(String filePath, int blockSize) {
+	public static SegmentationFile segmentFile(String filePath, int blockSize) {
 		if (!FileUtils.isExists(filePath)) {
-			return new ArrayList<>();
+			return null;
 		}
 		
-		List<SegmentationFileInfo> segmentationFileInfoList = new ArrayList<>();
+		List<SegmentationItem> segmentationItemList = new ArrayList<>();
 		InputStream fileInputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream;
 		
@@ -2311,32 +2253,29 @@ public final class FileUtils {
 				}
 				byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
 				byteArrayOutputStream.write(readBuffer, 0, readLength);
-				SegmentationFileInfo segmentationFileInfo = 
-						new SegmentationFileInfo(index * blockSize, fileSize, byteArrayOutputStream.toByteArray());
-				segmentationFileInfoList.add(segmentationFileInfo);
+				SegmentationItem segmentationItem =
+						new SegmentationItem(index * blockSize, byteArrayOutputStream.toByteArray());
+				segmentationItemList.add(segmentationItem);
 				index++;
 			}
+			
+			return new SegmentationFile(fileSize, blockSize,
+					SecurityUtils.MD5(file), SecurityUtils.SHA256(file), segmentationItemList);
 		} catch (FileNotFoundException e) {
-			return new ArrayList<>();
-		} catch (IOException e) {
+			FileUtils.LOGGER.error("Target file not exists! ");
 			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Read file data error! ", e);
+				FileUtils.LOGGER.debug("Stack message: ", e);
 			}
+		} catch (IOException e) {
 			FileUtils.LOGGER.error("Read file data error! ");
-			return new ArrayList<>();
-		} finally {
-			if (fileInputStream != null) {
-				try {
-					fileInputStream.close();
-				} catch (IOException e) {
-					if (FileUtils.LOGGER.isDebugEnabled()) {
-						FileUtils.LOGGER.debug("Close file input stream error! ", e);
-					}
-				}
+			if (FileUtils.LOGGER.isDebugEnabled()) {
+				FileUtils.LOGGER.debug("Stack message: ", e);
 			}
+		} finally {
+			IOUtils.closeStream(fileInputStream);
 		}
 		
-		return segmentationFileInfoList;
+		return null;
 	}
 
 	private static String replacePageSeparator(String path) {
@@ -2351,19 +2290,14 @@ public final class FileUtils {
 	}
 	
 	private static boolean mergeFile(RandomAccessFile randomAccessFile, 
-			SegmentationFileInfo segmentationFileInfo) throws IOException {
-		if (segmentationFileInfo == null) {
+			SegmentationItem segmentationItem) throws IOException {
+		if (segmentationItem == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 
-		byte[] dataContent = segmentationFileInfo.getDataContent();
-		
-		if (dataContent.length > 0) {
-			randomAccessFile.setLength(segmentationFileInfo.getTotalSize());
-			
-			randomAccessFile.seek(segmentationFileInfo.getPosition());
-			randomAccessFile.write(dataContent);
-			
+		if (segmentationItem.securityCheck()) {
+			randomAccessFile.seek(segmentationItem.getPosition());
+			randomAccessFile.write(StringUtils.base64Decode(segmentationItem.getDataInfo()));
 			return true;
 		} else {
 			if (FileUtils.LOGGER.isDebugEnabled()) {
