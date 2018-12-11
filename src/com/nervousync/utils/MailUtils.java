@@ -29,7 +29,6 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -65,11 +64,11 @@ public final class MailUtils {
 		
 	}
 	
-	public static boolean sendMessage(MailServerConfig mailServerConfig, MailObject mailObject, String userName, String passWord) 
-					throws MessagingException {
+	public static boolean sendMessage(MailServerConfig mailServerConfig,
+	                                  MailObject mailObject, String userName, String passWord) throws MessagingException {
 		MimeMessage message = 
-				new MimeMessage(getSession(mailServerConfig.getSendConfigInfo(userName), 
-						userName, passWord));
+				new MimeMessage(Session.getDefaultInstance(mailServerConfig.getSendConfigInfo(userName),
+						new DefaultAuthenticator(userName, passWord)));
 		
 		message.setSubject(mailObject.getSubject(), mailObject.getCharset());
 		
@@ -196,107 +195,76 @@ public final class MailUtils {
 	}
 	
 	public static MailObject getMailInfo(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid, String saveAttachPath) throws MessagingException {
-		Store store = null;
-		Folder folder = null;
+			String passWord, String uid, String saveAttachPath) {
 
-		try {
-			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
-			Session session = getSession(properties, userName, passWord);
-			
-			store = session.getStore(properties.getProperty("mail.store.protocol"));
-			
-			if (mailServerConfig.getReceiveServerConfig().getHostPort() == Globals.DEFAULT_VALUE_INT) {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
-			} else {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
-						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
-			}
-			
-			folder = openReadOnlyFolder(store);
-			
+		try (Store store = connect(mailServerConfig, userName, passWord); Folder folder = openReadOnlyFolder(store)) {
+
 			if (!folder.exists() || !folder.isOpen()) {
 				return null;
 			}
-			
+
 			Message message = null;
 			if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.POP3)) {
 				Message[] messages = folder.getMessages();
-				
+
 				for (Message msg : messages) {
-					if (((POP3Folder)folder).getUID(msg).equals(uid)) {
+					if (((POP3Folder) folder).getUID(msg).equals(uid)) {
 						message = msg;
 						break;
 					}
 				}
 			} else if (mailServerConfig.getReceiveServerConfig().getProtocolOption().equals(ProtocolOption.IMAP)) {
-				message = ((IMAPFolder)folder).getMessageByUID(Long.parseLong(uid));
+				message = ((IMAPFolder) folder).getMessageByUID(Long.parseLong(uid));
 			}
-			
+
 			if (message != null) {
-				return receiveMessage((MimeMessage)message, userName, true, saveAttachPath);
+				return receiveMessage((MimeMessage) message, userName, true, saveAttachPath);
 			}
 		} catch (Exception e) {
 			if (MailUtils.LOGGER.isDebugEnabled()) {
 				MailUtils.LOGGER.debug("Receive Message Error! ", e);
-			}
-		} finally {
-			if (folder != null) {
-				folder.close(true);
-			}
-			
-			if (store != null) {
-				store.close();
 			}
 		}
 		
 		return null;
 	}
 
-	public static List<MailObject> getMailInfo(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList, String saveAttachPath) throws MessagingException {
-		List<MailObject> mailList = new ArrayList<>();
-		
-		Store store = null;
-		Folder folder = null;
-		try {
-			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
-			Session session = getSession(properties, userName, passWord);
-			
-			store = session.getStore(properties.getProperty("mail.store.protocol"));
+	private static Store connect(MailServerConfig mailServerConfig, String userName, String passWord) throws MessagingException {
+		Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
+		Session session = Session.getDefaultInstance(properties, new DefaultAuthenticator(userName, passWord));
 
-			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
-			} else {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
-						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
-			}
-			
-			folder = openReadOnlyFolder(store);
-			
+		Store store = session.getStore(properties.getProperty("mail.store.protocol"));
+
+		if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
+			store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
+		} else {
+			store.connect(mailServerConfig.getReceiveServerConfig().getHostName(),
+					mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
+		}
+		return store;
+	}
+
+	public static List<MailObject> getMailInfo(MailServerConfig mailServerConfig, String userName, 
+			String passWord, List<String> uidList, String saveAttachPath) {
+		List<MailObject> mailList = new ArrayList<>();
+
+		try (Store store = connect(mailServerConfig, userName, passWord); Folder folder = openReadOnlyFolder(store)) {
 			if (!folder.exists() || !folder.isOpen()) {
 				return mailList;
 			}
 
 			List<Message> messageList = convertMailArraysToList(mailServerConfig, uidList, folder);
-			
+
 			for (Message message : messageList) {
-				MailObject mailObject = receiveMessage((MimeMessage)message, userName, true, saveAttachPath);
+				MailObject mailObject = receiveMessage((MimeMessage) message, userName, true, saveAttachPath);
 				if (mailObject != null) {
 					mailList.add(mailObject);
 				}
 			}
 		} catch (Exception e) {
+			LOGGER.error("Receive Message Error! ");
 			if (MailUtils.LOGGER.isDebugEnabled()) {
-				MailUtils.LOGGER.debug("Receive Message Error! ", e);
-			}
-		} finally {
-			if (folder != null) {
-				folder.close(true);
-			}
-			
-			if (store != null) {
-				store.close();
+				MailUtils.LOGGER.debug("Stack message: ", e);
 			}
 		}
 		
@@ -327,56 +295,34 @@ public final class MailUtils {
 	}
 
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String saveAttachPath) throws MessagingException {
+			String passWord, String saveAttachPath) {
 		return getMailList(mailServerConfig, userName, passWord, null, saveAttachPath);
 	}
 	
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
-			String passWord, Date date, String saveAttachPath) throws MessagingException {
+			String passWord, Date date, String saveAttachPath) {
 		List<MailObject> mailList = new ArrayList<>();
-		
-		Store store = null;
-		Folder folder = null;
-		try {
-			Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
-			Session session = getSession(properties, userName, passWord);
-			
-			store = session.getStore(properties.getProperty("mail.store.protocol"));
 
-			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
-			} else {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
-						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
-			}
-			
-			folder = openReadOnlyFolder(store);
-			
+		try (Store store = connect(mailServerConfig, userName, passWord); Folder folder = openReadOnlyFolder(store)) {
+
 			if (!folder.exists() || !folder.isOpen()) {
 				return mailList;
 			}
-			
+
 			Message[] messages = folder.getMessages();
-			
+
 			for (Message message : messages) {
 				if (date == null || message.getReceivedDate().after(date)) {
-					MailObject mailObject = receiveMessage((MimeMessage)message, userName, false, saveAttachPath);
+					MailObject mailObject = receiveMessage((MimeMessage) message, userName, false, saveAttachPath);
 					if (mailObject != null) {
 						mailList.add(mailObject);
 					}
 				}
 			}
 		} catch (Exception e) {
-			if (MailUtils.LOGGER.isDebugEnabled()) {
-				MailUtils.LOGGER.debug("Receive Message Error! ", e);
-			}
-		} finally {
-			if (folder != null) {
-				folder.close(true);
-			}
-			
-			if (store != null) {
-				store.close();
+			LOGGER.error("Receive Message Error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
 			}
 		}
 		
@@ -384,86 +330,86 @@ public final class MailUtils {
 	}
 
 	public static void removeMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
 	}
 	
 	public static void removeMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
 	}
 
 	public static void recoverMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
 	}
 	
 	public static void recoverMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
 	}
 
 	public static void readMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
 	}
 
 	public static void readMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
 	}
 
 	public static void unreadMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
 	}
 
 	public static void unreadMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
 	}
 
 	public static void answerMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
 	}
 
 	public static void answerMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
 	}
 
 	public static void flagMail(MailServerConfig mailServerConfig, String userName, 
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
 
 	public static void flagMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
 
 	public static void unflagMail(MailServerConfig mailServerConfig, String userName,
-			String passWord, String uid) throws MessagingException {
+			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
 	
 	public static void unflagMails(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList) throws MessagingException {
+			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
 	
@@ -549,53 +495,21 @@ public final class MailUtils {
 	}
 	
 	private static void setMessageStatus(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList, Flag flag, boolean status) 
-					throws MessagingException {
-		Store store = null;
-		Folder folder = null;
-		try {
-			Session session = getSession(mailServerConfig.getReceiveConfigInfo(userName), userName, passWord);
-			
-			switch (mailServerConfig.getReceiveServerConfig().getProtocolOption()) {
-			case IMAP:
-				store = session.getStore("imap");
-				break;
-			case POP3:
-				store = session.getStore("pop3");
-				break;
-			default:
-				throw new NoSuchProviderException("Protocol Error");
-			}
+			String passWord, List<String> uidList, Flag flag, boolean status) {
+		try (Store store = connect(mailServerConfig, userName, passWord); Folder folder = openFolder(store, false)) {
 
-			if (mailServerConfig.getReceiveServerConfig().getHostPort() == 0) {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), userName, passWord);
-			} else {
-				store.connect(mailServerConfig.getReceiveServerConfig().getHostName(), 
-						mailServerConfig.getReceiveServerConfig().getHostPort(), userName, passWord);
-			}
-			
-			folder = openFolder(store, false);
-			
 			if (!folder.exists() || !folder.isOpen()) {
 				return;
 			}
-			
+
 			List<Message> messageList = convertMailArraysToList(mailServerConfig, uidList, folder);
-			
+
 			for (Message message : messageList) {
 				message.setFlag(flag, status);
 			}
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Set message status error! ", e);
-			}
-		} finally {
-			if (folder != null) {
-				folder.close(true);
-			}
-			
-			if (store != null) {
-				store.close();
 			}
 		}
 	}
@@ -653,11 +567,7 @@ public final class MailUtils {
 			}
 		}
 	}
-	
-	private static Session getSession(Properties properties, String userName, String passWord) {
-		return Session.getDefaultInstance(properties, new DefaultAuthenticator(userName, passWord));
-	}
-	
+
 	private static Folder openReadOnlyFolder(Store store) 
 			throws MessagingException {
 		return openFolder(store, true);

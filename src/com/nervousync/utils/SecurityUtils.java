@@ -160,15 +160,9 @@ public final class SecurityUtils implements Serializable {
 	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AESEncrypt(byte[] arrB, String strKey, int keySize) throws Exception {
-		if (strKey == null || strKey.length() % 16 != 0) {
-			throw new Exception("Data length error");
-		}
-		Cipher encryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), keySize);
-		encryptCipher.init(Cipher.ENCRYPT_MODE, key);
-		return encryptCipher.doFinal(arrB);
+		return initAESCipher(strKey, keySize, Cipher.ENCRYPT_MODE).doFinal(arrB);
 	}
-	
+
 	/**
 	 * Encrypt byte arrays with default encrypt key by AES128
 	 * @param arrB						Byte arrays will be encrypted
@@ -264,13 +258,7 @@ public final class SecurityUtils implements Serializable {
 	 * @throws Exception				Any exception of this operate will be throw up
 	 */
 	public static byte[] AESDecrypt(byte[] arrB, String strKey, int keySize) throws Exception {
-		if (strKey == null || strKey.length() % 16 != 0) {
-			throw new Exception("Data length error");
-		}
-		Cipher decryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), keySize);
-		decryptCipher.init(Cipher.DECRYPT_MODE, key);
-		return decryptCipher.doFinal(arrB);
+		return initAESCipher(strKey, keySize, Cipher.DECRYPT_MODE).doFinal(arrB);
 	}
 
 	/**
@@ -729,7 +717,25 @@ public final class SecurityUtils implements Serializable {
 			byte[] datas, byte[] signature) {
 		return VerifySign(publicKey, datas, signature, "SHA256withRSA");
 	}
-	
+
+	/**
+	 * Initialize AES Cipher
+	 * @param strKey        AES key
+	 * @param keySize       key size
+	 * @param mode          Cipher mode
+	 * @return              Cipher instance
+	 * @throws Exception    AES key is null or invalid
+	 */
+	private static Cipher initAESCipher(String strKey, int keySize, int mode) throws Exception {
+		if (strKey == null || strKey.length() % 16 != 0) {
+			throw new Exception("Data length error");
+		}
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		Key key = SecurityUtils.generateAESKey(strKey.getBytes(), keySize);
+		cipher.init(mode, key);
+		return cipher;
+	}
+
 	private static KeyPair KeyPair(String algorithm, int keySize) throws Exception {
 		if (keySize % 128 != 0) {
 			throw new Exception("Key size is invalid");

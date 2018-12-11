@@ -157,7 +157,7 @@ public final class ImageUtils {
 				int targetWidth = Double.valueOf(origWidth * ratio).intValue();
 				int targetHeight = Double.valueOf(origHeight * ratio).intValue();
 				
-				return resizeImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
+				return processImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
@@ -210,7 +210,7 @@ public final class ImageUtils {
 					targetHeight = Double.valueOf(ratio * origHeight).intValue();
 				}
 				
-				return resizeImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
+				return processImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
@@ -225,19 +225,9 @@ public final class ImageUtils {
 		int imageHeight = ImageUtils.imageHeight(filePath);
 		try {
 			BufferedImage srcImage = ImageIO.read(FileUtils.getFile(filePath));
-			
-			BufferedImage bufferedImage = 
+			BufferedImage bufferedImage =
 					new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-			Graphics2D graphics = bufferedImage.createGraphics();
-			graphics.drawImage(srcImage, 0, 0, imageWidth, imageHeight, null);
-			
-			if (markOptions != null) {
-				markImage(graphics, imageWidth, imageHeight, markOptions);
-			}
-			graphics.dispose();
-			
-			return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(targetPath), 
-					FileUtils.getFile(targetPath));
+			return processImage(bufferedImage, targetPath, imageWidth, imageHeight, markOptions);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Mark picture error! ", e);
@@ -289,7 +279,7 @@ public final class ImageUtils {
 	}
 	
 	/**
-	 * Process image resize operate
+	 * Process image operate
 	 * @param srcImage				original image object
 	 * @param destPath				target output path
 	 * @param targetWidth			target width
@@ -297,7 +287,7 @@ public final class ImageUtils {
 	 * @param markOptions			image mark options
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	private static boolean resizeImage(BufferedImage srcImage, String destPath, 
+	private static boolean processImage(BufferedImage srcImage, String destPath,
 			int targetWidth, int targetHeight, MarkOptions markOptions) {
 		if (srcImage != null && destPath != null && targetWidth > 0 && targetHeight > 0) {
 			try {

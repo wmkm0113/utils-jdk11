@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.nervousync.enumerations.snmp.auth.SNMPAuthProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.CommunityTarget;
@@ -55,7 +56,6 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.snmp.SNMPDataOperator;
 import com.nervousync.enumerations.net.IPProtocol;
 import com.nervousync.enumerations.snmp.SNMPVersion;
-import com.nervousync.enumerations.snmp.auth.SNMPAuthType;
 import com.nervousync.exceptions.snmp.ProcessorConfigException;
 
 /**
@@ -214,6 +214,16 @@ public final class SNMPUtils {
 			this.snmpDataOperator.operateData(snmpData);
 		}
 	}
+
+	private OID retrieveAuthProtocol(SNMPAuthProtocol snmpAuthProtocol) {
+		switch (snmpAuthProtocol) {
+			case MD5:
+				return AuthMD5.ID;
+			case SHA:
+				return AuthSHA.ID;
+		}
+		return null;
+	}
 	
 	private Target generateTarget(TargetHost targetHost) {
 		if (targetHost == null) {
@@ -243,43 +253,33 @@ public final class SNMPUtils {
 			OctetString authPassword = null;
 			OID privProtocol = null;
 			OctetString privPassword = null;
-			
-			if (SNMPAuthType.NOAUTH_NOPRIV.equals(targetHost.getAuth())) {
-				target.setSecurityLevel(SecurityLevel.NOAUTH_NOPRIV);
-				securityName = NO_AUTH_NOPRIV;
-			} else if (SNMPAuthType.AUTH_NOPRIV.equals(targetHost.getAuth())) {
-				target.setSecurityLevel(SecurityLevel.AUTH_NOPRIV);
-				securityName = AUTH_NOPRIV;
-				switch (targetHost.getAuthProtocol()) {
-				case MD5:
-					authProtocol = AuthMD5.ID;
+
+			switch (targetHost.getAuth()) {
+				case NOAUTH_NOPRIV:
+					target.setSecurityLevel(SecurityLevel.NOAUTH_NOPRIV);
+					securityName = NO_AUTH_NOPRIV;
 					break;
-				case SHA:
-					authProtocol = AuthSHA.ID;
+				case AUTH_NOPRIV:
+					target.setSecurityLevel(SecurityLevel.AUTH_NOPRIV);
+					securityName = AUTH_NOPRIV;
+					authProtocol = retrieveAuthProtocol(targetHost.getAuthProtocol());
+					authPassword = new OctetString(targetHost.getAuthPassword());
 					break;
-				}
-				authPassword = new OctetString(targetHost.getAuthPassword());
-			} else if (SNMPAuthType.AUTH_PRIV.equals(targetHost.getAuth())) {
-				target.setSecurityLevel(SecurityLevel.AUTH_PRIV);
-				securityName = AUTH_PRIV;
-				switch (targetHost.getAuthProtocol()) {
-				case MD5:
-					authProtocol = AuthMD5.ID;
+				case AUTH_PRIV:
+					target.setSecurityLevel(SecurityLevel.AUTH_PRIV);
+					securityName = AUTH_PRIV;
+					authProtocol = retrieveAuthProtocol(targetHost.getAuthProtocol());
+					authPassword = new OctetString(targetHost.getAuthPassword());
+					switch (targetHost.getPrivProtocol()) {
+						case PrivDES:
+							privProtocol = PrivDES.ID;
+							break;
+						case Priv3DES:
+							privProtocol = Priv3DES.ID;
+							break;
+					}
+					privPassword = new OctetString(targetHost.getPrivPassword());
 					break;
-				case SHA:
-					authProtocol = AuthSHA.ID;
-					break;
-				}
-				authPassword = new OctetString(targetHost.getAuthPassword());
-				switch (targetHost.getPrivProtocol()) {
-				case PrivDES:
-					privProtocol = PrivDES.ID;
-					break;
-				case Priv3DES:
-					privProtocol = Priv3DES.ID;
-					break;
-				}
-				privPassword = new OctetString(targetHost.getPrivPassword());
 			}
 
 			if (securityName != null) {

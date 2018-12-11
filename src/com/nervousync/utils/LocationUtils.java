@@ -26,8 +26,26 @@ import com.nervousync.exceptions.location.LocationConvertException;
 public final class LocationUtils {
 	
 	private static final double X_PI = Math.PI * 3000.0 / 180.0;
-	private static final double EARTH_R = 6378245.0;
+	private static final double EARTH_R = 6378137.0;
 	private static final double EARTH_EE = 0.00669342162296594323;
+
+	/**
+	 * Calc distance of begin point and end point(Unit: Kilometers)
+	 * @param beginPoint    Begin point
+	 * @param endPoint      End point
+	 * @return              distance
+	 * @throws LocationConvertException     convert point to GPS failed
+	 */
+	public static double calcDistance(LocationPoint beginPoint, LocationPoint endPoint) throws LocationConvertException {
+		LocationPoint beginGPSPoint = convertToGPS(beginPoint);
+		LocationPoint endGPSPoint = convertToGPS(endPoint);
+
+		double tmpX = (endGPSPoint.getLongitude() - beginGPSPoint.getLongitude())
+				* Math.PI * EARTH_R * Math.cos(((beginGPSPoint.getLatitude() + endGPSPoint.getLatitude()) / 2) * Math.PI / 180) / 180;
+		double tmpY = (endGPSPoint.getLatitude() - beginGPSPoint.getLatitude()) * Math.PI * EARTH_R / 180;
+		return Math.hypot(tmpX, tmpY);
+
+	}
 	
 	/**
 	 * Convert to GPS point
@@ -151,8 +169,8 @@ public final class LocationUtils {
 	private static double transformLatitude(double longitude, double latitude) {
 		double transformLatitude = -100.0 + 2.0 * longitude + 3.0 * latitude + 0.2 * Math.pow(latitude, 2);
 		transformLatitude += 0.1 * longitude * latitude + 0.2 * Math.sqrt(Math.abs(longitude));
-		transformLatitude += (20.0 * Math.sin(6.0 * longitude * Math.PI) + 20.0 * Math.sin(2.0 * longitude * Math.PI)) * 2.0 / 3.0;
-		transformLatitude += (20.0 * Math.sin(latitude * Math.PI) + 40.0 * Math.sin(latitude / 3.0 * Math.PI)) * 2.0 / 3.0;
+		transformLatitude += calcFirst(longitude);
+		transformLatitude += calcLast(latitude);
 		transformLatitude += (160.0 * Math.sin(latitude / 12.0 * Math.PI) + 320.0 * Math.sin(latitude * Math.PI / 30.0)) * 2.0 / 3.0;
 		return transformLatitude;
 	}
@@ -160,9 +178,17 @@ public final class LocationUtils {
 	private static double transformLongitude(double longitude, double latitude) {
 		double transformLongitude = 300.0 + longitude + 2.0 * latitude + 0.1 * Math.pow(longitude, 2);
 		transformLongitude += 0.1 * longitude * latitude + 0.1 * Math.sqrt(Math.abs(longitude));
-		transformLongitude += (20.0 * Math.sin(6.0 * longitude * Math.PI) + 20.0 * Math.sin(2.0 * longitude * Math.PI)) * 2.0 / 3.0;
-		transformLongitude += (20.0 * Math.sin(longitude * Math.PI) + 40.0 * Math.sin(longitude / 3.0 * Math.PI)) * 2.0 / 3.0;
+		transformLongitude += calcFirst(longitude);
+		transformLongitude += calcLast(longitude);
 		transformLongitude += (150.0 * Math.sin(longitude / 12.0 * Math.PI) + 300.0 * Math.sin(longitude * Math.PI / 30.0)) * 2.0 / 3.0;
 		return transformLongitude;
+	}
+
+	private static double calcFirst(double value) {
+		return (20.0 * Math.sin(6.0 * value * Math.PI) + 20.0 * Math.sin(2.0 * value * Math.PI)) * 2.0 / 3.0;
+	}
+
+	private static double calcLast(double value) {
+		return (20.0 * Math.sin(value * Math.PI) + 40.0 * Math.sin(value / 3.0 * Math.PI)) * 2.0 / 3.0;
 	}
 }
