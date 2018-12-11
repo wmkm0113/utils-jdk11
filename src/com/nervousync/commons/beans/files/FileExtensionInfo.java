@@ -109,7 +109,7 @@ public final class FileExtensionInfo extends BaseElement {
 	/**
 	 * @return the Serial Version UID
 	 */
-	public static long getSerialversionUID() {
+	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
 

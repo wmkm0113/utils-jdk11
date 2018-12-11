@@ -44,7 +44,7 @@ public final class PartialCollection<T> implements Serializable {
 	 * Creates an empty instance of PartialCollection
 	 */
 	public PartialCollection() {
-		this(new ArrayList<T>(), 0);
+		this(new ArrayList<>(), 0);
 	}
 
 	/**
@@ -85,10 +85,6 @@ public final class PartialCollection<T> implements Serializable {
      */
 	public boolean isEmpty() {
 		return this.resultList.isEmpty();
-	}
-
-	public Object[] toArray() {
-		return this.resultList.toArray();
 	}
 
 	public boolean add(T o) {

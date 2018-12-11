@@ -159,25 +159,14 @@ public final class ObjectUtils {
 			if (args == null || args.length == 0) {
 				object = (T) enhancer.create();
 			} else {
-				Class<?>[] classes = new Class[args.length];
-				
-				for (int i = 0 ; i < args.length ; i++) {
-					classes[i] = args[i].getClass();
-				}
-				object = (T) enhancer.create(classes, args);
+				object = (T) enhancer.create(ObjectUtils.paramClasses(args), args);
 			}
 		} else {
 			try {
 				if (args == null || args.length == 0) {
 					object = clazz.newInstance();
 				} else {
-					Class<?>[] classes = new Class[args.length];
-					
-					for (int i = 0 ; i < args.length ; i++) {
-						classes[i] = args[i].getClass();
-					}
-					
-					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, classes);
+					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, ObjectUtils.paramClasses(args));
 					
 					object = constructor.newInstance(args);
 				}
@@ -187,6 +176,16 @@ public final class ObjectUtils {
 		}
 		
 		return object;
+	}
+
+	private static Class<?>[] paramClasses(Object[] args) {
+		Class<?>[] classes = new Class[args.length];
+
+		for (int i = 0 ; i < args.length ; i++) {
+			classes[i] = args[i].getClass();
+		}
+
+		return classes;
 	}
 
 	/**
@@ -788,22 +787,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Object object : array) {
+			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
+			stringBuilder.append(object);
 		}
-		StringBuilder buffer = new StringBuilder();
-		for (int i = 0; i < length; i++) {
-			if (i == 0) {
-				buffer.append(ARRAY_START);
-			}
-			else {
-				buffer.append(ARRAY_ELEMENT_SEPARATOR);
-			}
-			buffer.append(String.valueOf(array[i]));
-		}
-		buffer.append(ARRAY_END);
-		return buffer.toString();
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -819,16 +808,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (boolean bool : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(bool);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -844,16 +829,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (byte b : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(b);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -869,16 +850,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (char ch : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(ch);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -894,16 +871,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (double d : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(d);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -919,16 +892,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (float f : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(f);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -944,16 +913,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(i);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -969,16 +934,12 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (long l : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(l);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 
 	/**
@@ -994,15 +955,11 @@ public final class ObjectUtils {
 		if (array == null) {
 			return NULL_STRING;
 		}
-		int length = array.length;
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
 		StringBuilder stringBuilder = new StringBuilder();
 		for (short s : array) {
 			stringBuilder.append(ARRAY_ELEMENT_SEPARATOR);
 			stringBuilder.append(s);
 		}
-		return ARRAY_START + stringBuilder.substring(1) + ARRAY_END;
+		return ARRAY_START + (stringBuilder.length() > 0 ? stringBuilder.substring(1) : stringBuilder.toString()) + ARRAY_END;
 	}
 }

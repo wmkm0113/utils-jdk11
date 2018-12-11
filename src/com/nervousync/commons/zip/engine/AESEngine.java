@@ -16,7 +16,11 @@
  */
 package com.nervousync.commons.zip.engine;
 
+import com.nervousync.commons.zip.models.AESExtraDataRecord;
+import com.nervousync.commons.zip.models.header.utils.HeaderOperator;
 import com.nervousync.exceptions.zip.ZipException;
+
+import java.util.List;
 
 /**
  * AES Engine
@@ -34,29 +38,38 @@ public final class AESEngine {
 	}
 	
 	public void processBlock(byte[] in, byte[] out) throws ZipException {
-		this.processBlock(in, 0, out, 0);
-	}
-	
-	public void processBlock(byte[] in, int inOffset, byte[] out, int outOffset) throws ZipException {
 		if (this.workingKeys == null) {
 			throw new ZipException("AES engine not initialized");
 		}
-		
-		if ((inOffset + 16) > in.length) {
+
+		if (in.length < 16) {
 			throw new ZipException("Input buffer too short!");
 		}
-		
-		if ((outOffset + 16) > out.length) {
+
+		if (out.length < 16) {
 			throw new ZipException("Output buffer too short!");
 		}
-		
-		this.stateIn(in, inOffset);
+
+		this.stateIn(in);
 		this.encryptBlock();
-		this.stateOut(out, outOffset);
+		this.stateOut(out);
 	}
 
-	private void stateIn(byte[] bytes, int offset) {
-		int index = offset;
+	public static void processHeader(AESExtraDataRecord aesExtraDataRecord, List<String> headerBytesList) {
+		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getSignature(), headerBytesList);
+		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getDataSize(), headerBytesList);
+		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getVersionNumber(), headerBytesList);
+		HeaderOperator.copyByteArrayToArrayList(aesExtraDataRecord.getVendorID().getBytes(), headerBytesList);
+
+		byte[] aesStrengthBytes = new byte[1];
+		aesStrengthBytes[0] = (byte) aesExtraDataRecord.getAesStrength();
+		HeaderOperator.copyByteArrayToArrayList(aesStrengthBytes, headerBytesList);
+
+		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getCompressionMethod(), headerBytesList);
+	}
+
+	private void stateIn(byte[] bytes) {
+		int index = 0;
 
 		this.C0 = (bytes[index++] & 0xFF);
 		this.C0 |= (bytes[index++] & 0xFF) << 8;
@@ -80,59 +93,67 @@ public final class AESEngine {
 	}
 
 	private void encryptBlock() {
-		int r, r0, r1, r2, r3;
+		int r = 1;
 
 		this.C0 ^= this.workingKeys[0][0];
 		this.C1 ^= this.workingKeys[0][1];
 		this.C2 ^= this.workingKeys[0][2];
 		this.C3 ^= this.workingKeys[0][3];
 
-		r = 1;
-
+		int[] calcBlock;
 		while (r < this.rounds - 1) {
-			r0 = T0[this.C0 & 255] ^ shift(T0[(this.C1 >> 8) & 255], 24) ^ shift(T0[(this.C2 >> 16) & 255], 16)
-					^ shift(T0[(this.C3 >> 24) & 255], 8) ^ this.workingKeys[r][0];
-			r1 = T0[this.C1 & 255] ^ shift(T0[(this.C2 >> 8) & 255], 24) ^ shift(T0[(this.C3 >> 16) & 255], 16)
-					^ shift(T0[(this.C0 >> 24) & 255], 8) ^ this.workingKeys[r][1];
-			r2 = T0[this.C2 & 255] ^ shift(T0[(this.C3 >> 8) & 255], 24) ^ shift(T0[(this.C0 >> 16) & 255], 16)
-					^ shift(T0[(this.C1 >> 24) & 255], 8) ^ this.workingKeys[r][2];
-			r3 = T0[this.C3 & 255] ^ shift(T0[(this.C0 >> 8) & 255], 24) ^ shift(T0[(this.C1 >> 16) & 255], 16)
-					^ shift(T0[(this.C2 >> 24) & 255], 8) ^ this.workingKeys[r++][3];
-			this.C0 = T0[r0 & 255] ^ shift(T0[(r1 >> 8) & 255], 24) ^ shift(T0[(r2 >> 16) & 255], 16)
-					^ shift(T0[(r3 >> 24) & 255], 8) ^ this.workingKeys[r][0];
-			this.C1 = T0[r1 & 255] ^ shift(T0[(r2 >> 8) & 255], 24) ^ shift(T0[(r3 >> 16) & 255], 16)
-					^ shift(T0[(r0 >> 24) & 255], 8) ^ this.workingKeys[r][1];
-			this.C2 = T0[r2 & 255] ^ shift(T0[(r3 >> 8) & 255], 24) ^ shift(T0[(r0 >> 16) & 255], 16)
-					^ shift(T0[(r1 >> 24) & 255], 8) ^ this.workingKeys[r][2];
-			this.C3 = T0[r3 & 255] ^ shift(T0[(r0 >> 8) & 255], 24) ^ shift(T0[(r1 >> 16) & 255], 16)
-					^ shift(T0[(r2 >> 24) & 255], 8) ^ this.workingKeys[r++][3];
+			calcBlock = this.calcBlock(r);
+			r++;
+			this.calcByT0(calcBlock, r);
+			r++;
 		}
 
-		r0 = T0[this.C0 & 255] ^ shift(T0[(this.C1 >> 8) & 255], 24) ^ shift(T0[(this.C2 >> 16) & 255], 16)
-				^ shift(T0[(this.C3 >> 24) & 255], 8) ^ this.workingKeys[r][0];
-		r1 = T0[this.C1 & 255] ^ shift(T0[(this.C2 >> 8) & 255], 24) ^ shift(T0[(this.C3 >> 16) & 255], 16)
-				^ shift(T0[(this.C0 >> 24) & 255], 8) ^ this.workingKeys[r][1];
-		r2 = T0[this.C2 & 255] ^ shift(T0[(this.C3 >> 8) & 255], 24) ^ shift(T0[(this.C0 >> 16) & 255], 16)
-				^ shift(T0[(this.C1 >> 24) & 255], 8) ^ this.workingKeys[r][2];
-		r3 = T0[this.C3 & 255] ^ shift(T0[(this.C0 >> 8) & 255], 24) ^ shift(T0[(this.C1 >> 16) & 255], 16)
-				^ shift(T0[(this.C2 >> 24) & 255], 8) ^ this.workingKeys[r++][3];
+		calcBlock = this.calcBlock(r);
+		r++;
 
-		this.C0 = (SUB_WORD_TABLE[r0 & 255] & 255) ^ ((SUB_WORD_TABLE[(r1 >> 8) & 255] & 255) << 8)
-				^ ((SUB_WORD_TABLE[(r2 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r3 >> 24) & 255] << 24)
-				^ this.workingKeys[r][0];
-		this.C1 = (SUB_WORD_TABLE[r1 & 255] & 255) ^ ((SUB_WORD_TABLE[(r2 >> 8) & 255] & 255) << 8)
-				^ ((SUB_WORD_TABLE[(r3 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r0 >> 24) & 255] << 24)
-				^ this.workingKeys[r][1];
-		this.C2 = (SUB_WORD_TABLE[r2 & 255] & 255) ^ ((SUB_WORD_TABLE[(r3 >> 8) & 255] & 255) << 8)
-				^ ((SUB_WORD_TABLE[(r0 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r1 >> 24) & 255] << 24)
-				^ this.workingKeys[r][2];
-		this.C3 = (SUB_WORD_TABLE[r3 & 255] & 255) ^ ((SUB_WORD_TABLE[(r0 >> 8) & 255] & 255) << 8)
-				^ ((SUB_WORD_TABLE[(r1 >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(r2 >> 24) & 255] << 24)
-				^ this.workingKeys[r][3];
+		this.calcBySubWord(calcBlock, r);
 	}
 
-	private void stateOut(byte[] bytes, int offset) {
-		int index = offset;
+	private void calcBySubWord(int[] calcBlock, int indexKey) {
+		this.C0 = (SUB_WORD_TABLE[calcBlock[0] & 255] & 255) ^ ((SUB_WORD_TABLE[(calcBlock[1] >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(calcBlock[2] >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(calcBlock[3] >> 24) & 255] << 24)
+				^ this.workingKeys[indexKey][0];
+		this.C1 = (SUB_WORD_TABLE[calcBlock[1] & 255] & 255) ^ ((SUB_WORD_TABLE[(calcBlock[2] >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(calcBlock[3] >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(calcBlock[0] >> 24) & 255] << 24)
+				^ this.workingKeys[indexKey][1];
+		this.C2 = (SUB_WORD_TABLE[calcBlock[2] & 255] & 255) ^ ((SUB_WORD_TABLE[(calcBlock[3] >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(calcBlock[0] >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(calcBlock[1] >> 24) & 255] << 24)
+				^ this.workingKeys[indexKey][2];
+		this.C3 = (SUB_WORD_TABLE[calcBlock[3] & 255] & 255) ^ ((SUB_WORD_TABLE[(calcBlock[0] >> 8) & 255] & 255) << 8)
+				^ ((SUB_WORD_TABLE[(calcBlock[1] >> 16) & 255] & 255) << 16) ^ (SUB_WORD_TABLE[(calcBlock[2] >> 24) & 255] << 24)
+				^ this.workingKeys[indexKey][3];
+	}
+
+	private int[] calcBlock(int r) {
+		return new int[]{
+				T0[this.C0 & 255] ^ shift(T0[(this.C1 >> 8) & 255], 24) ^ shift(T0[(this.C2 >> 16) & 255], 16)
+						^ shift(T0[(this.C3 >> 24) & 255], 8) ^ this.workingKeys[r][0],
+				T0[this.C1 & 255] ^ shift(T0[(this.C2 >> 8) & 255], 24) ^ shift(T0[(this.C3 >> 16) & 255], 16)
+						^ shift(T0[(this.C0 >> 24) & 255], 8) ^ this.workingKeys[r][1],
+				T0[this.C2 & 255] ^ shift(T0[(this.C3 >> 8) & 255], 24) ^ shift(T0[(this.C0 >> 16) & 255], 16)
+						^ shift(T0[(this.C1 >> 24) & 255], 8) ^ this.workingKeys[r][2],
+				T0[this.C3 & 255] ^ shift(T0[(this.C0 >> 8) & 255], 24) ^ shift(T0[(this.C1 >> 16) & 255], 16)
+						^ shift(T0[(this.C2 >> 24) & 255], 8) ^ this.workingKeys[r][3]};
+	}
+
+	private void calcByT0(int[] calcBlock, int indexKey) {
+		this.C0 = T0[calcBlock[0] & 255] ^ shift(T0[(calcBlock[1] >> 8) & 255], 24) ^ shift(T0[(calcBlock[2] >> 16) & 255], 16)
+				^ shift(T0[(calcBlock[3] >> 24) & 255], 8) ^ this.workingKeys[indexKey][0];
+		this.C1 = T0[calcBlock[1] & 255] ^ shift(T0[(calcBlock[2] >> 8) & 255], 24) ^ shift(T0[(calcBlock[3] >> 16) & 255], 16)
+				^ shift(T0[(calcBlock[0] >> 24) & 255], 8) ^ this.workingKeys[indexKey][1];
+		this.C2 = T0[calcBlock[2] & 255] ^ shift(T0[(calcBlock[3] >> 8) & 255], 24) ^ shift(T0[(calcBlock[0] >> 16) & 255], 16)
+				^ shift(T0[(calcBlock[1] >> 24) & 255], 8) ^ this.workingKeys[indexKey][2];
+		this.C3 = T0[calcBlock[3] & 255] ^ shift(T0[(calcBlock[0] >> 8) & 255], 24) ^ shift(T0[(calcBlock[1] >> 16) & 255], 16)
+				^ shift(T0[(calcBlock[2] >> 24) & 255], 8) ^ this.workingKeys[indexKey][3];
+	}
+
+	private void stateOut(byte[] bytes) {
+		int index = 0;
 
 		bytes[index++] = (byte)this.C0;
 		bytes[index++] = (byte)(this.C0 >> 8);

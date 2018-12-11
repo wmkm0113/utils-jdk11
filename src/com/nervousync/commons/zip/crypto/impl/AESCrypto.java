@@ -26,6 +26,7 @@ import com.nervousync.commons.zip.crypto.PBKDF2.PBKDF2Options;
 import com.nervousync.commons.zip.engine.AESEngine;
 import com.nervousync.commons.zip.engine.PBKDF2.PBKDF2Engine;
 import com.nervousync.exceptions.zip.ZipException;
+import com.nervousync.utils.RawUtils;
 
 /**
  * AES Crypto
@@ -42,55 +43,47 @@ public class AESCrypto {
 	/**
 	 * key length
 	 */
-	protected int keyLength;
+	private int keyLength;
 	/**
 	 * mac length
 	 */
-	protected int macLength;
+	private int macLength;
 	/**
 	 * salt length
 	 */
-	protected int saltLength;
-	
-	/**
-	 * AES key bytes
-	 */
-	protected byte[] aesKey = null;
-	/**
-	 * Mac key bytes
-	 */
-	protected byte[] macKey = null;
+	int saltLength;
+
 	/**
 	 * current password bytes
 	 */
-	protected byte[] derivedPasswordVerifier = null;
+	byte[] derivedPasswordVerifier = null;
 
 	/**
 	 * nonce
 	 */
-	protected int nonce = 1;
+	int nonce = 1;
 	/**
 	 * loop count
 	 */
-	protected int loopCount = 0;
+	int loopCount = 0;
 	
 	/**
 	 * iv bytes
 	 */
-	protected byte[] iv = null;
+	byte[] iv = null;
 	/**
 	 * count block bytes
 	 */
-	protected byte[] countBlock = null;
+	byte[] countBlock = null;
 
 	/**
 	 * AES engine
 	 */
-	protected AESEngine aesEngine = null;
+	AESEngine aesEngine = null;
 	/**
 	 * MacBasedPRF instance
 	 */
-	protected MacBasedPRF macBasedPRF = null;
+	MacBasedPRF macBasedPRF = null;
 
 	/**
 	 * Verify given password
@@ -122,7 +115,7 @@ public class AESCrypto {
 	 * Prepare initialize
 	 * @param aesStrength	AES key strength
 	 */
-	protected void preInit(int aesStrength) {
+	void preInit(int aesStrength) {
 		if (aesStrength != ZipConstants.AES_STRENGTH_128
 				&& aesStrength != ZipConstants.AES_STRENGTH_192
 				&& aesStrength != ZipConstants.AES_STRENGTH_256) {
@@ -157,7 +150,7 @@ public class AESCrypto {
 	 * Initialize by given password
 	 * @param password	password
 	 */
-	protected void init(char[] password) {
+	void init(char[] password) {
 		if (password == null || password.length == 0) {
 			throw new ZipException("Password is null or empty");
 		}
@@ -170,12 +163,22 @@ public class AESCrypto {
 	 * @param salt			salt bytes
 	 * @param password		password char arrays
 	 */
-	protected void init(byte[] salt, char[] password) {
+	void init(byte[] salt, char[] password) {
 		if (password == null || password.length == 0) {
 			throw new ZipException("Password is null or empty");
 		}
 		this.saltBytes = salt;
 		this.initCrypto(password);
+	}
+
+	void processData(byte[] buff, int index) {
+		this.iv = RawUtils.prepareAESBuffer(this.nonce);
+		this.aesEngine.processBlock(this.iv, this.countBlock);
+
+		for (int j = 0 ; j < this.loopCount ; j++) {
+			buff[index + j] = (byte)(buff[index + j] ^ this.countBlock[j]);
+		}
+		this.nonce++;
 	}
 	
 	/**
@@ -185,7 +188,7 @@ public class AESCrypto {
 	 * @param dkLen			length
 	 * @return				processed data bytes
 	 */
-	protected byte[] deriveKey(byte[] salt, char[] password, int dkLen) {
+	private byte[] deriveKey(byte[] salt, char[] password, int dkLen) {
 		PBKDF2Options options = new PBKDF2Options("HmacSHA1", "ISO-8859-1", salt, 1000);
 		PBKDF2Engine engine = new PBKDF2Engine(options);
 		return engine.deriveKey(password, dkLen);
@@ -196,7 +199,7 @@ public class AESCrypto {
 	 * @param password	password
 	 * @return	verify result
 	 */
-	protected boolean verifyPassword(byte[] password) {
+	boolean verifyPassword(byte[] password) {
 		if (this.derivedPasswordVerifier == null) {
 			throw new ZipException("Invalid derived password verifier!");
 		}
@@ -217,18 +220,18 @@ public class AESCrypto {
 			throw new ZipException("Invalid derived key!");
 		}
 
-		this.aesKey = new byte[this.keyLength];
-		this.macKey = new byte[this.macLength];
+		byte[] aesKey = new byte[this.keyLength];
+		byte[] macKey = new byte[this.macLength];
 		this.derivedPasswordVerifier = new byte[ZipConstants.PASSWORD_VERIFIER_LENGTH];
 		
-		System.arraycopy(keyBytes, 0, this.aesKey, 0, this.keyLength);
-		System.arraycopy(keyBytes, this.keyLength, this.macKey, 0, this.macLength);
+		System.arraycopy(keyBytes, 0, aesKey, 0, this.keyLength);
+		System.arraycopy(keyBytes, this.keyLength, macKey, 0, this.macLength);
 		System.arraycopy(keyBytes, (this.keyLength + this.macLength), 
 				this.derivedPasswordVerifier, 0, ZipConstants.PASSWORD_VERIFIER_LENGTH);
 		
-		this.aesEngine = new AESEngine(this.aesKey);
+		this.aesEngine = new AESEngine(aesKey);
 		this.macBasedPRF = new MacBasedPRF("HmacSHA1");
-		this.macBasedPRF.init(this.macKey);
+		this.macBasedPRF.init(macKey);
 	}
 	
 	/**

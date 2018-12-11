@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import com.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,9 @@ import com.nervousync.exceptions.beans.network.NetworkInfoException;
 public final class SystemUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemUtils.class);
+	
+	private static final String JAVA_CERT_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "lib"
+			+ Globals.DEFAULT_PAGE_SEPARATOR + "security" + Globals.DEFAULT_PAGE_SEPARATOR + "cacerts";
 	
 	public static final String OPERATE_SYSTEM_NAME = System.getProperty("os.name");
 	public static final String OPERATE_SYSTEM_VERSION = System.getProperty("os.version");
@@ -278,6 +282,14 @@ public final class SystemUtils {
 	 */
 	public static boolean isAtLeastJava10() {
 		return MAJOR_VERSION >= JAVA_10;
+	}
+	
+	/**
+	 * System certificate file path
+	 * @return      System certificate file path
+	 */
+	public static String systemCertPath() {
+		return JAVA_HOME + JAVA_CERT_PATH;
 	}
 
 	private static String generateIdentifiedKey() {

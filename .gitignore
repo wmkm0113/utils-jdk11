@@ -47,6 +47,4 @@ Temporary Items
 .apdisk
 /target/
 /bin/
-/.classpath
-/.project
-/.settings
+/.idea/

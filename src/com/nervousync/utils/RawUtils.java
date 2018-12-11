@@ -76,7 +76,7 @@ public final class RawUtils {
 	 * @return				Read long value
 	 */
 	public static int readShortFromLittleEndian(byte[] bytes, int position) {
-		return (bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8;
+		return ((bytes[position] & 0xFF) | (bytes[position + 1] & 0xFF) << 8);
 	}
 	
 	/**
@@ -209,10 +209,15 @@ public final class RawUtils {
 	 * @param value			int value 
 	 */
 	public static void writeIntFromLittleEndian(byte[] bytes, int position, int value) {
-		bytes[position + 3] = (byte)(value >>> 24);
-		bytes[position + 2] = (byte)(value >>> 16);
-		bytes[position + 1] = (byte)(value >>> 8);
-		bytes[position] = (byte)(value & 0xFF);
+		int index = 0;
+		while (index < 4) {
+			if (index == 3) {
+				bytes[position + (3 - index)] = (byte)(value & 0xFF);
+			} else {
+				bytes[position + (3 - index)] = (byte)(value >>> ((3 - index) * 8));
+			}
+			index++;
+		}
 	}
 	
 	/**
@@ -222,15 +227,15 @@ public final class RawUtils {
 	 * @param value			int value 
 	 */
 	public static void writeIntFromBigEndian(byte[] bytes, int position, int value) {
-		int i = 0;
+		int index = 0;
 		while (true) {
-			if (i == 3) {
-				bytes[position + i] = (byte)(value & 0xFF);
+			if (index == 3) {
+				bytes[position + index] = (byte)(value & 0xFF);
 				break;
 			} else {
-				bytes[position + i] = (byte)(value >>> ((3 - i) * 8));
+				bytes[position + index] = (byte)(value >>> ((3 - index) * 8));
 			}
-			i++;
+			index++;
 		}
 	}
 	
@@ -241,14 +246,15 @@ public final class RawUtils {
 	 * @param value			long value 
 	 */
 	public static void writeLongFromLittleEndian(byte[] bytes, int position, long value) {
-		bytes[position + 7] = (byte)(value >>> 56);
-		bytes[position + 6] = (byte)(value >>> 48);
-		bytes[position + 5] = (byte)(value >>> 40);
-		bytes[position + 4] = (byte)(value >>> 32);
-		bytes[position + 3] = (byte)(value >>> 24);
-		bytes[position + 2] = (byte)(value >>> 16);
-		bytes[position + 1] = (byte)(value >>> 8);
-		bytes[position] = (byte)(value & 0xFF);
+		int index = 0;
+		while (index < 8) {
+			if (index == 7) {
+				bytes[position + (7 - index)] = (byte)(value & 0xFF);
+			} else {
+				bytes[position + (7 - index)] = (byte)(value >>> ((7 - index) * 8));
+			}
+			index++;
+		}
 	}
 	
 	/**
@@ -258,15 +264,15 @@ public final class RawUtils {
 	 * @param value			long value 
 	 */
 	public static void writeLongFromBigEndian(byte[] bytes, int position, long value) {
-		int i = 0;
+		int index = 0;
 		while (true) {
-			if (i == 7) {
-				bytes[position + i] = (byte)(value & 0xFF);
+			if (index == 7) {
+				bytes[position + index] = (byte)(value & 0xFF);
 				break;
 			} else {
-				bytes[position + i] = (byte)(value >>> ((7 - i) * 8));
+				bytes[position + index] = (byte)(value >>> ((7 - index) * 8));
 			}
-			i++;
+			index++;
 		}
 	}
 	

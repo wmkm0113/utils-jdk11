@@ -79,7 +79,7 @@ public final class ConvertUtils {
 				list.add(iterator.next());
 			}
 		} else if (collection instanceof Map) {
-			list = new ArrayList<Object>(((Map<?, ?>)collection).entrySet());
+			list = new ArrayList<>(((Map<?, ?>) collection).entrySet());
 		} else if (collection instanceof String) {
 			list = Arrays.asList(convertPrimitivesToObjects(((String) collection).toCharArray()));
 		} else if (collection instanceof Object[]) {

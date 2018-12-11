@@ -20,7 +20,6 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.crypto.Encryptor;
 import com.nervousync.exceptions.zip.ZipException;
-import com.nervousync.utils.RawUtils;
 
 /**
  * Encryptor implement of AES
@@ -39,7 +38,7 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public int encryptData(byte[] buff) throws ZipException {
 		if (buff == null) {
-			throw new ZipException("input bytes are null, cannot perform AES encrpytion");
+			throw new ZipException("input bytes are null, cannot perform AES encryption");
 		}
 		return this.encryptData(buff, 0, buff.length);
 	}
@@ -57,15 +56,8 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 		for (int i = start ; i < (start + len) ; i += ZipConstants.AES_BLOCK_SIZE) {
 			this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ? 
 					ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
-			this.iv = RawUtils.prepareAESBuffer(this.nonce);
-			this.aesEngine.processBlock(this.iv, this.countBlock);
-			
-			for (int j = 0 ; j < this.loopCount ; j++) {
-				buff[i + j] = (byte)(buff[i + j] ^ this.countBlock[j]);
-			}
-			
+			super.processData(buff, i);
 			this.macBasedPRF.update(buff, i, this.loopCount);
-			this.nonce++;
 		}
 		
 		return len;

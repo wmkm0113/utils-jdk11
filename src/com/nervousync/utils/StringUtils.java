@@ -195,17 +195,19 @@ public final class StringUtils {
 		
 		int index = 0;
 		for (int i = 0 ; i < string.length() ; i += 4) {
-			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (BASE64.indexOf(string.charAt(i + 1)) >> 4)) & 0xFF);
+			int index1 = BASE64.indexOf(string.charAt(i + 1));
+			int index2 = BASE64.indexOf(string.charAt(i + 2));
+			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (index1 >> 4)) & 0xFF);
 			if (index * 3 + 1 >= bytes.length) {
 				break;
 			}
 			
-			bytes[index * 3 + 1] = (byte)(((BASE64.indexOf(string.charAt(i + 1)) << 4) | (BASE64.indexOf(string.charAt(i + 2)) >> 2)) & 0xFF);
+			bytes[index * 3 + 1] = (byte)(((index1 << 4) | (index2 >> 2)) & 0xFF);
 			if (index * 3 + 2 >= bytes.length) {
 				break;
 			}
 
-			bytes[index * 3 + 2] = (byte)(((BASE64.indexOf(string.charAt(i + 2)) << 6) | BASE64.indexOf(string.charAt(i + 3))) & 0xFF);
+			bytes[index * 3 + 2] = (byte)(((index2 << 6) | BASE64.indexOf(string.charAt(i + 3))) & 0xFF);
 			index++;
 		}
 		
@@ -436,17 +438,9 @@ public final class StringUtils {
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
-		if (hasLength(str)) {
-			return str;
-		}
-		StringBuilder buf = new StringBuilder(str);
-		while (buf.length() > 0 && Character.isWhitespace(buf.charAt(0))) {
-			buf.deleteCharAt(0);
-		}
-		while (buf.length() > 0 && Character.isWhitespace(buf.charAt(buf.length() - 1))) {
-			buf.deleteCharAt(buf.length() - 1);
-		}
-		return buf.toString();
+		String string = StringUtils.trimLeadingWhitespace(str);
+		string = StringUtils.trimTrailingWhitespace(string);
+		return string;
 	}
 
 	/**
@@ -852,18 +846,18 @@ public final class StringUtils {
 		int tops = 0;
 
 		for (int i = pathArray.length - 1; i >= 0; i--) {
-			if (CURRENT_PATH.equals(pathArray[i])) {
-				// Points to current directory - drop it.
-			} else if (TOP_PATH.equals(pathArray[i])) {
-				// Registering top path found.
-				tops++;
-			} else {
-				if (tops > 0) {
-					// Merging path element with corresponding to top path.
-					tops--;
+			if (!CURRENT_PATH.equals(pathArray[i])) {
+				if (TOP_PATH.equals(pathArray[i])) {
+					// Registering top path found.
+					tops++;
 				} else {
-					// Normal path element found.
-					pathElements.add(0, pathArray[i]);
+					if (tops > 0) {
+						// Merging path element with corresponding to top path.
+						tops--;
+					} else {
+						// Normal path element found.
+						pathElements.add(0, pathArray[i]);
+					}
 				}
 			}
 		}
@@ -1383,11 +1377,10 @@ public final class StringUtils {
 	 */
 	public static String convertObjectToJSONString(Object object) {
 		TreeMap<String, Object> valueMap = new TreeMap<>();
-		if (object instanceof Map || object.getClass().isArray() 
+		if (object instanceof Map || object.getClass().isArray()
 				|| Collection.class.isAssignableFrom(object.getClass())) {
-			ObjectMapper objectMapper = new ObjectMapper();
 			try {
-				return objectMapper.writeValueAsString(object);
+				return new ObjectMapper().writeValueAsString(object);
 			} catch (JsonProcessingException e) {
 				if (StringUtils.LOGGER.isDebugEnabled()) {
 					StringUtils.LOGGER.debug("Convert object to string error! ", e);
@@ -1409,9 +1402,8 @@ public final class StringUtils {
 				valueMap.put(field.getName(), mapValue);
 			}
 			
-			ObjectMapper objectMapper = new ObjectMapper();
 			try {
-				return objectMapper.writeValueAsString(valueMap);
+				return new ObjectMapper().writeValueAsString(valueMap);
 			} catch (JsonProcessingException e) {
 				if (StringUtils.LOGGER.isDebugEnabled()) {
 					StringUtils.LOGGER.debug("Convert object to string error! ", e);
@@ -2005,20 +1997,6 @@ public final class StringUtils {
 
 			switch (dataType) {
 			case NUMBER:
-				if (typeClass.equals(Integer.class)
-						|| typeClass.equals(int.class)
-						|| typeClass.equals(Float.class)
-						|| typeClass.equals(float.class)
-						|| typeClass.equals(Double.class)
-						|| typeClass.equals(double.class)
-						|| typeClass.equals(Short.class)
-						|| typeClass.equals(short.class)
-						|| typeClass.equals(Long.class)
-						|| typeClass.equals(long.class)
-						|| typeClass.equals(BigInteger.class)) {
-					return true;
-				}
-				break;
 			case STRING:
 			case BOOLEAN:
 			case DATE:

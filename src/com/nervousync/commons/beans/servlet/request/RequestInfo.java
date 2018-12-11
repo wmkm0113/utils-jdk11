@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.nervousync.commons.core.Globals;
+import com.nervousync.commons.http.cert.CertInfo;
 import com.nervousync.commons.http.header.SimpleHeader;
 import com.nervousync.commons.http.proxy.ProxyInfo;
 import com.nervousync.enumerations.web.HttpMethodOption;
@@ -31,8 +32,9 @@ import com.nervousync.utils.RequestUtils;
 
 /**
  * Request information for sending by com.nervousync.utils.RequestUtils
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Aug 25, 2017 11:04:17 AM $
+ * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:04:17 AM $
  */
 public final class RequestInfo implements Serializable {
 	
@@ -50,6 +52,14 @@ public final class RequestInfo implements Serializable {
 	 * Proxy server configuration
 	 */
 	private ProxyInfo proxyInfo = null;
+	/**
+	 * Custom certificate info
+	 */
+	private CertInfo certInfo = null;
+	/**
+	 * Default pass phrase
+	 */
+	private String passPhrase = null;
 	/**
 	 * Request URL
 	 */
@@ -85,7 +95,8 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * General constructor
-	 * @param requestUrl	Target request URL
+	 *
+	 * @param requestUrl Target request URL
 	 */
 	public RequestInfo(String requestUrl) {
 		this.requestUrl = requestUrl;
@@ -96,8 +107,9 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * Redirect request constructor, maybe using when receive response code of 301/302
-	 * @param requestUrl		Redirect URL
-	 * @param originalInfo		Original request information
+	 *
+	 * @param requestUrl   Redirect URL
+	 * @param originalInfo Original request information
 	 */
 	public RequestInfo(String requestUrl, RequestInfo originalInfo) {
 		this.requestUrl = requestUrl;
@@ -111,7 +123,10 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * Constructor for given http method, request URL and send data
-	 * @param data					Send data
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param data             Send data
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String data) {
 		this.httpMethodOption = httpMethodOption;
@@ -123,55 +138,79 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * Constructor for given http method, request URL and send data
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
-	 * @param timeOut			    value of time out
-	 * @param postDatas             Send data arrays
-	 * @param contentType           Content type
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param timeOut          value of time out
+	 * @param postDatas        Send data arrays
+	 * @param contentType      Content type
+	 * @param charset          Character encoding
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, byte[] postDatas, String contentType, String charset) {
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, List<SimpleHeader> headers, byte[] postDatas, String contentType, String charset) {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
 		this.timeOut = timeOut > 0 ? timeOut : Globals.DEFAULT_VALUE_INT;
 		this.contentType = contentType;
 		this.charset = charset != null ? charset : Globals.DEFAULT_ENCODING;
+		if (headers != null) {
+			this.headers = headers;
+		} else {
+			this.headers = new ArrayList<>();
+		}
 		this.postDatas = postDatas;
 		this.parameters = new HashMap<>();
-		this.headers = new ArrayList<>();
 		this.uploadParam = new HashMap<>();
 	}
 	
 	/**
 	 * Constructor for given http method, request URL and send parameters data
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
-	 * @param parameters			Send parameters data
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param parameters       Send parameters data
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, Map<String, String[]> parameters) {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
-		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
+		if (parameters != null) {
+			this.parameters = parameters;
+		} else {
+			this.parameters = new HashMap<>();
+		}
 		this.headers = new ArrayList<>();
 		this.uploadParam = new HashMap<>();
 	}
 	
 	/**
 	 * Constructor for given http method, request URL, and many options
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
-	 * @param timeOut				Request timeout setting
-	 * @param headers				Send header information of request
-	 * @param parameters			Send parameter information of request
-	 * @param uploadParam			Send multipart files of request
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param timeOut          Request timeout setting
+	 * @param headers          Send header information of request
+	 * @param parameters       Send parameter information of request
+	 * @param uploadParam      Send multipart files of request
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl,
 	                   int timeOut, List<SimpleHeader> headers,
 	                   Map<String, String[]> parameters, Map<String, File> uploadParam) {
 		this.httpMethodOption = httpMethodOption;
 		this.timeOut = timeOut;
-		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
-		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
-		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
+		if (headers != null) {
+			this.headers = headers;
+		} else {
+			this.headers = new ArrayList<>();
+		}
+		if (parameters != null) {
+			this.parameters = parameters;
+		} else {
+			this.parameters = new HashMap<>();
+		}
+		if (uploadParam != null) {
+			this.uploadParam = uploadParam;
+		} else {
+			this.uploadParam = new HashMap<>();
+		}
 		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
@@ -181,13 +220,14 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * Constructor for given http method, request URL, and many options
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
-	 * @param charset				Charset encoding
-	 * @param timeOut				Request timeout setting
-	 * @param headers				Send header information of request
-	 * @param parameters			Send parameter information of request
-	 * @param uploadParam			Send multipart files of request
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param charset          Charset encoding
+	 * @param timeOut          Request timeout setting
+	 * @param headers          Send header information of request
+	 * @param parameters       Send parameter information of request
+	 * @param uploadParam      Send multipart files of request
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
 	                   int timeOut, List<SimpleHeader> headers,
@@ -195,9 +235,21 @@ public final class RequestInfo implements Serializable {
 		this.httpMethodOption = httpMethodOption;
 		this.charset = charset;
 		this.timeOut = timeOut;
-		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
-		this.parameters = parameters != null ? parameters : new HashMap<String, String[]>();
-		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<String, File>();
+		if (headers != null) {
+			this.headers = headers;
+		} else {
+			this.headers = new ArrayList<>();
+		}
+		if (parameters != null) {
+			this.parameters = parameters;
+		} else {
+			this.parameters = new HashMap<>();
+		}
+		if (uploadParam != null) {
+			this.uploadParam = uploadParam;
+		} else {
+			this.uploadParam = new HashMap<>();
+		}
 		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
@@ -207,12 +259,13 @@ public final class RequestInfo implements Serializable {
 	
 	/**
 	 * Constructor for given http method, request URL, and many options
-	 * @param httpMethodOption		Request http method
-	 * @param requestUrl			Target request url
-	 * @param charset				Charset encoding
-	 * @param timeOut				Request timeout setting
-	 * @param headers				Send header information of request
-	 * @param postDatas             Send data arrays
+	 *
+	 * @param httpMethodOption Request http method
+	 * @param requestUrl       Target request url
+	 * @param charset          Charset encoding
+	 * @param timeOut          Request timeout setting
+	 * @param headers          Send header information of request
+	 * @param postDatas        Send data arrays
 	 */
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
 	                   int timeOut, List<SimpleHeader> headers, byte[] postDatas) {
@@ -220,7 +273,11 @@ public final class RequestInfo implements Serializable {
 		this.charset = charset;
 		this.timeOut = timeOut;
 		this.postDatas = postDatas;
-		this.headers = headers != null ? headers : new ArrayList<SimpleHeader>();
+		if (headers != null) {
+			this.headers = headers;
+		} else {
+			this.headers = new ArrayList<>();
+		}
 		this.parameters = new HashMap<>();
 		this.uploadParam = new HashMap<>();
 		if (requestUrl.contains("?")) {
@@ -230,6 +287,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets http method option.
+	 *
 	 * @return the httpMethodOption
 	 */
 	public HttpMethodOption getHttpMethodOption() {
@@ -248,6 +307,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets proxy info.
+	 *
 	 * @return the proxyInfo
 	 */
 	public ProxyInfo getProxyInfo() {
@@ -255,6 +316,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Sets proxy info.
+	 *
 	 * @param proxyInfo the proxyInfo to set
 	 */
 	public void setProxyInfo(ProxyInfo proxyInfo) {
@@ -262,6 +325,44 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets cert info.
+	 *
+	 * @return the cert info
+	 */
+	public CertInfo getCertInfo() {
+		return certInfo;
+	}
+	
+	/**
+	 * Sets cert info.
+	 *
+	 * @param certInfo the cert info
+	 */
+	public void setCertInfo(CertInfo certInfo) {
+		this.certInfo = certInfo;
+	}
+	
+	/**
+	 * Gets pass phrase.
+	 *
+	 * @return the pass phrase
+	 */
+	public String getPassPhrase() {
+		return passPhrase;
+	}
+	
+	/**
+	 * Sets pass phrase.
+	 *
+	 * @param passPhrase the pass phrase
+	 */
+	public void setPassPhrase(String passPhrase) {
+		this.passPhrase = passPhrase;
+	}
+	
+	/**
+	 * Gets request url.
+	 *
 	 * @return the requestUrl
 	 */
 	public String getRequestUrl() {
@@ -269,6 +370,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets charset.
+	 *
 	 * @return the charset
 	 */
 	public String getCharset() {
@@ -276,6 +379,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets content type.
+	 *
 	 * @return the contentType
 	 */
 	public String getContentType() {
@@ -283,6 +388,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets time out.
+	 *
 	 * @return the timeOut
 	 */
 	public int getTimeOut() {
@@ -290,6 +397,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Get post datas byte [ ].
+	 *
 	 * @return the postDatas
 	 */
 	public byte[] getPostDatas() {
@@ -297,6 +406,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets headers.
+	 *
 	 * @return the headers
 	 */
 	public List<SimpleHeader> getHeaders() {
@@ -304,6 +415,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets parameters.
+	 *
 	 * @return the parameters
 	 */
 	public Map<String, String[]> getParameters() {
@@ -311,6 +424,8 @@ public final class RequestInfo implements Serializable {
 	}
 	
 	/**
+	 * Gets upload param.
+	 *
 	 * @return the uploadParam
 	 */
 	public Map<String, File> getUploadParam() {

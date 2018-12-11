@@ -207,10 +207,28 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets the encryptFiles.
+	 *
+	 * @param encryptFiles encryptFiles
+	 */
+	public void setEncryptFiles(boolean encryptFiles) {
+		this.encryptFiles = encryptFiles;
+	}
+
+	/**
 	 * @return the encryptionMethod
 	 */
 	public int getEncryptionMethod() {
 		return encryptionMethod;
+	}
+
+	/**
+	 * Sets the encryptionMethod.
+	 *
+	 * @param encryptionMethod encryptionMethod
+	 */
+	public void setEncryptionMethod(int encryptionMethod) {
+		this.encryptionMethod = encryptionMethod;
 	}
 
 	/**

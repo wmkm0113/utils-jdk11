@@ -18,6 +18,7 @@ package com.nervousync.commons.zip.models.header;
 
 import java.util.List;
 
+import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.zip.models.AESExtraDataRecord;
 import com.nervousync.commons.zip.models.ExtraDataRecord;
 import com.nervousync.commons.zip.models.Zip64ExtendInfo;
@@ -47,7 +48,7 @@ public class FileHeader {
 	private boolean fileNameUTF8Encoded;
 	private boolean isEncrypted;
 	private boolean dataDescriptorExists;
-	private int encryptionMethod;
+	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
 
 	/**
 	 * @return the signature
@@ -89,6 +90,7 @@ public class FileHeader {
 	 */
 	public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
 		this.generalPurposeFlag = generalPurposeFlag;
+		this.setEncrypted((generalPurposeFlag[0] & 1) != 0);
 	}
 
 	/**

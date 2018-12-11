@@ -381,7 +381,7 @@ public final class ClassUtils {
 	}
 
 	/**
-	 * Return the short string name of a Java class in decapitalized JavaBeans
+	 * Return the short string name of a Java class in decapitated JavaBeans
 	 * property format. Strips the outer class name in case of an inner class.
 	 * @param clazz the class
 	 * @return the short name rendered in a standard JavaBeans property format

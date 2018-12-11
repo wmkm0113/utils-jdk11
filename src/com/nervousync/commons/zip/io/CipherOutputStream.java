@@ -30,6 +30,7 @@ import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.crypto.Encryptor;
 import com.nervousync.commons.zip.crypto.impl.AESEncryptor;
 import com.nervousync.commons.zip.crypto.impl.StandardEncryptor;
+import com.nervousync.commons.zip.engine.AESEngine;
 import com.nervousync.commons.zip.models.AESExtraDataRecord;
 import com.nervousync.commons.zip.models.central.CentralDirectory;
 import com.nervousync.commons.zip.models.central.EndCentralDirectoryRecord;
@@ -103,11 +104,15 @@ public class CipherOutputStream extends OutputStream {
 				if (this.zipOptions.getFileNameInZip() != null) {
 					if (this.zipOptions.getFileNameInZip().endsWith("/")
 							|| this.zipOptions.getFileNameInZip().endsWith("\\")) {
+						this.zipOptions.setEncryptFiles(Globals.DEFAULT_VALUE_BOOLEAN);
+						this.zipOptions.setEncryptionMethod(ZipConstants.ENC_NO_ENCRYPTION);
 						this.zipOptions.setCompressionMethod(ZipConstants.COMP_STORE);
 					}
 				}
 			} else {
 				if (this.sourceFile.isDirectory()) {
+					this.zipOptions.setEncryptFiles(Globals.DEFAULT_VALUE_BOOLEAN);
+					this.zipOptions.setEncryptionMethod(ZipConstants.ENC_NO_ENCRYPTION);
 					this.zipOptions.setCompressionMethod(ZipConstants.COMP_STORE);
 				}
 			}
@@ -163,8 +168,6 @@ public class CipherOutputStream extends OutputStream {
 			}
 
 			this.crc.reset();
-		} catch (CloneNotSupportedException e) {
-			throw new ZipException(e);
 		} catch (ZipException e) {
 			throw e;
 		} catch (Exception e) {
@@ -321,11 +324,11 @@ public class CipherOutputStream extends OutputStream {
 		}
 
 		if (this.zipFile.getCentralDirectory().getFileHeaders() == null) {
-			this.zipFile.getCentralDirectory().setFileHeaders(new ArrayList<GeneralFileHeader>());
+			this.zipFile.getCentralDirectory().setFileHeaders(new ArrayList<>());
 		}
 
 		if (this.zipFile.getLocalFileHeaderList() == null) {
-			this.zipFile.setLocalFileHeaderList(new ArrayList<LocalFileHeader>());
+			this.zipFile.setLocalFileHeaderList(new ArrayList<>());
 		}
 
 		if (this.outputStream instanceof SplitOutputStream) {
@@ -573,7 +576,7 @@ public class CipherOutputStream extends OutputStream {
 			throw new ZipException("Local file header is null, cannot write!");
 		}
 		try {
-			List<String> byteArrayList = new ArrayList<>();
+			List<String> headerBytesList = new ArrayList<>();
 
 			byte[] shortBuffer = new byte[2];
 			byte[] intBuffer = new byte[4];
@@ -581,21 +584,21 @@ public class CipherOutputStream extends OutputStream {
 			byte[] emptyLongBuffer = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 			RawUtils.writeIntFromLittleEndian(intBuffer, 0, localFileHeader.getSignature());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) localFileHeader.getExtractNeeded());
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
-			HeaderOperator.copyByteArrayToArrayList(localFileHeader.getGeneralPurposeFlag(), byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(localFileHeader.getGeneralPurposeFlag(), headerBytesList);
 
 			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) localFileHeader.getCompressionMethod());
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
 			RawUtils.writeIntFromLittleEndian(intBuffer, 0, localFileHeader.getLastModFileTime());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 			RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) localFileHeader.getCrc32());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 			boolean writingZip64Record = Globals.DEFAULT_VALUE_BOOLEAN;
 
@@ -604,23 +607,24 @@ public class CipherOutputStream extends OutputStream {
 				RawUtils.writeLongFromLittleEndian(longBuffer, 0, ZipConstants.ZIP_64_LIMIT);
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
 
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 				writingZip64Record = true;
 				localFileHeader.setWriteCompressSizeInZip64ExtraRecord(true);
 			} else {
 				RawUtils.writeLongFromLittleEndian(longBuffer, 0, localFileHeader.getCompressedSize());
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 				RawUtils.writeLongFromLittleEndian(longBuffer, 0, localFileHeader.getOriginalSize());
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 				localFileHeader.setWriteCompressSizeInZip64ExtraRecord(Globals.DEFAULT_VALUE_BOOLEAN);
 			}
 
 			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) localFileHeader.getFileNameLength());
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
 			int extraFieldLength = 0;
 			if (writingZip64Record) {
@@ -632,53 +636,35 @@ public class CipherOutputStream extends OutputStream {
 			}
 
 			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) extraFieldLength);
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
 			if (StringUtils.isNotNullAndNotEmpty(this.zipFile.getFileNameCharset())) {
 				byte[] fileNameBytes = localFileHeader.getEntryPath().getBytes(this.zipFile.getFileNameCharset());
-				HeaderOperator.copyByteArrayToArrayList(fileNameBytes, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(fileNameBytes, headerBytesList);
 			} else {
-				HeaderOperator.copyByteArrayToArrayList(StringUtils.convertCharset(localFileHeader.getEntryPath()), byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(StringUtils.convertCharset(localFileHeader.getEntryPath()), headerBytesList);
 			}
 
 			if (writingZip64Record) {
 				RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) ZipConstants.EXTRAFIELDZIP64LENGTH);
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
 				RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) 16);
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
 
 				RawUtils.writeLongFromLittleEndian(longBuffer, 0, localFileHeader.getOriginalSize());
-				HeaderOperator.copyByteArrayToArrayList(longBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(longBuffer, headerBytesList);
 
-				HeaderOperator.copyByteArrayToArrayList(emptyLongBuffer, byteArrayList);
+				HeaderOperator.copyByteArrayToArrayList(emptyLongBuffer, headerBytesList);
 			}
 
 			if (localFileHeader.getAesExtraDataRecord() != null) {
-				AESExtraDataRecord aesExtraDataRecord = localFileHeader.getAesExtraDataRecord();
-
-				RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) aesExtraDataRecord.getSignature());
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
-
-				RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) aesExtraDataRecord.getDataSize());
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
-
-				RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) aesExtraDataRecord.getVersionNumber());
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
-
-				HeaderOperator.copyByteArrayToArrayList(aesExtraDataRecord.getVendorID().getBytes(), byteArrayList);
-
-				byte[] aesStrengthBytes = new byte[1];
-				aesStrengthBytes[0] = (byte) aesExtraDataRecord.getAesStrength();
-				HeaderOperator.copyByteArrayToArrayList(aesStrengthBytes, byteArrayList);
-
-				RawUtils.writeShortFromLittleEndian(shortBuffer, 0,
-						(short) aesExtraDataRecord.getCompressionMethod());
-				HeaderOperator.copyByteArrayToArrayList(shortBuffer, byteArrayList);
+				AESEngine.processHeader(localFileHeader.getAesExtraDataRecord(), headerBytesList);
 			}
 
-			byte[] bytes = HeaderOperator.convertByteArrayListToByteArray(byteArrayList);
+			byte[] bytes = HeaderOperator.convertByteArrayListToByteArray(headerBytesList);
 			outputStream.write(bytes);
+			outputStream.flush();
 
 			return bytes.length;
 		} catch (Exception e) {

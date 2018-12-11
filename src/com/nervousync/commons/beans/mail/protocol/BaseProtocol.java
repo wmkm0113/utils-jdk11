@@ -57,15 +57,8 @@ public class BaseProtocol implements Serializable {
 	 * Protocol type
 	 * @see com.nervousync.enumerations.mail.ProtocolOption
 	 */
-	private ProtocolOption protocolOption;
-	
-	/**
-	 * Default constructor 
-	 */
-	public BaseProtocol() {
-		
-	}
-	
+	private final ProtocolOption protocolOption;
+
 	/**
 	 * Constructor for define protocol type
 	 * @param protocolOption		Protocol type
@@ -219,9 +212,9 @@ public class BaseProtocol implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionUID
+	 * @return the serialVersionUID
 	 */
-	public static long getSerialversionUID() {
+	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
 

@@ -33,7 +33,7 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
 	/**
 	 * Convert a bound type to a value type.
 	 *
-	 * @param v The value to be convereted. Can be null.
+	 * @param v The value to be converted. Can be null.
 	 */
 	@Override
 	public String marshal(Date v) {

@@ -648,11 +648,7 @@ public final class ReflectionUtils {
 	 */
 	public static Method[] getAllDeclaredMethods(Class<?> leafClass) throws IllegalArgumentException {
 		final List<Method> list = new ArrayList<>(32);
-		doWithMethods(leafClass, new MethodCallback() {
-			public void doWith(Method method) {
-				list.add(method);
-			}
-		});
+		doWithMethods(leafClass, list::add);
 		return list.toArray(new Method[0]);
 	}
 
@@ -683,14 +679,13 @@ public final class ReflectionUtils {
 			Field[] fields = targetClass.getDeclaredFields();
 			for (Field field : fields) {
 				// Skip static and final fields.
-				if (ff != null && !ff.matches(field)) {
-					continue;
-				}
-				try {
-					fc.doWith(field);
-				} catch (IllegalAccessException ex) {
-					throw new IllegalStateException(
-							"Shouldn't be illegal to access field '" + field.getName() + "': " + ex);
+				if (ff != null && ff.matches(field)) {
+					try {
+						fc.doWith(field);
+					} catch (IllegalAccessException ex) {
+						throw new IllegalStateException(
+								"Shouldn't be illegal to access field '" + field.getName() + "': " + ex);
+					}
 				}
 			}
 			targetClass = targetClass.getSuperclass();
@@ -717,12 +712,10 @@ public final class ReflectionUtils {
 			throw new IllegalArgumentException("Destination class [" + dest.getClass().getName() +
 					"] must be same or subclass as source class [" + src.getClass().getName() + "]");
 		}
-		doWithFields(src.getClass(), new FieldCallback() {
-			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-				makeAccessible(field);
-				Object srcValue = field.get(src);
-				field.set(dest, srcValue);
-			}
+		doWithFields(src.getClass(), field -> {
+			makeAccessible(field);
+			Object srcValue = field.get(src);
+			field.set(dest, srcValue);
 		}, COPYABLE_FIELDS);
 	}
 	
@@ -1037,7 +1030,6 @@ public final class ReflectionUtils {
 		void doWith(Field field) throws IllegalArgumentException, IllegalAccessException;
 	}
 
-
 	/**
 	 * Callback optionally used to filter fields to be operated on by a field callback.
 	 */
@@ -1055,13 +1047,9 @@ public final class ReflectionUtils {
 	/**
 	 * Pre-built FieldFilter that matches all non-static, non-final fields.
 	 */
-	public static final FieldFilter COPYABLE_FIELDS = new FieldFilter() {
-		public boolean matches(Field field) {
-			return !(Modifier.isStatic(field.getModifiers()) ||
-					Modifier.isFinal(field.getModifiers()));
-		}
-	};
-	
+	public static final FieldFilter COPYABLE_FIELDS = field -> !(Modifier.isStatic(field.getModifiers()) ||
+			Modifier.isFinal(field.getModifiers()));
+
 	public enum MethodType {
 		GetMethod, SetMethod
 	}

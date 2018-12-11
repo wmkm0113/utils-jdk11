@@ -106,6 +106,24 @@ public final class HeaderOperator {
 		return new byte[0];
 	}
 
+	public static void appendShortToArrayList(short value, List<String> arrayList) throws ZipException {
+		byte[] shortBuffer = new byte[2];
+		RawUtils.writeShortFromLittleEndian(shortBuffer, 0, value);
+		HeaderOperator.copyByteArrayToArrayList(shortBuffer, arrayList);
+	}
+
+	public static void appendIntToArrayList(int value, List<String> arrayList) throws ZipException {
+		byte[] intBuffer = new byte[4];
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, value);
+		HeaderOperator.copyByteArrayToArrayList(intBuffer, arrayList);
+	}
+
+	public static void appendLongToArrayList(long value, List<String> arrayList) throws ZipException {
+		byte[] longBuffer = new byte[8];
+		RawUtils.writeLongFromLittleEndian(longBuffer, 0, value);
+		HeaderOperator.copyByteArrayToArrayList(longBuffer, arrayList);
+	}
+
 	public static void copyByteArrayToArrayList(byte[] byteArray, List<String> arrayList) throws ZipException {
 		if (arrayList == null || byteArray == null) {
 			throw new ZipException("one of the input parameters is null, cannot copy byte array to array list");

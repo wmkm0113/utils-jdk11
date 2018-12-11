@@ -25,11 +25,16 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import com.nervousync.commons.beans.xml.BaseElement;
+import com.nervousync.commons.http.header.SimpleHeader;
 import com.nervousync.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +63,10 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	private int statusCode;
 	/**
+	 * Header Maps
+	 */
+	private final Map<String, String> headerMaps = new HashMap<>();
+	/**
 	 * Response content type
 	 */
 	private String contentType;
@@ -83,6 +92,15 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	public int getStatusCode() {
 		return statusCode;
+	}
+
+	/**
+	 * Gets the value of headerMaps.
+	 *
+	 * @return the value of headerMaps
+	 */
+	public Map<String, String> getHeaderMaps() {
+		return headerMaps;
 	}
 
 	/**
@@ -149,6 +167,20 @@ public final class HttpResponseContent implements Serializable {
 			} else {
 				inputStream = urlConnection.getErrorStream();
 			}
+			
+			Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+			if (headerFields != null && !headerFields.isEmpty()) {
+				for (Map.Entry<String, List<String>> entry : headerFields.entrySet()) {
+					List<String> headerValues = entry.getValue();
+					if (entry.getKey() != null && headerValues != null && !headerValues.isEmpty()) {
+						StringBuilder stringBuilder = new StringBuilder();
+						for (String headerValue : headerValues) {
+							stringBuilder.append(" ").append(headerValue);
+						}
+						this.headerMaps.put(entry.getKey().toUpperCase(), stringBuilder.substring(1));
+					}
+				}
+			}
 
 			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
 			
@@ -205,8 +237,8 @@ public final class HttpResponseContent implements Serializable {
 			objectInputStream = new ObjectInputStream(byteArrayInputStream);
 			return objectInputStream.readObject();
 		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Convert to object error! ", e);
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("Convert to object error! ", e);
 			}
 			
 			return null;
@@ -227,6 +259,20 @@ public final class HttpResponseContent implements Serializable {
 	public File parseFile(String savePath) throws IOException {
 		FileUtils.saveFile(this.responseContent, savePath);
 		return FileUtils.getFile(savePath);
+	}
+	
+	public String getHeader(String headerName) {
+		return this.headerMaps.get(headerName.toUpperCase());
+	}
+	
+	public List<SimpleHeader> headerList() {
+		List<SimpleHeader> headerList = new ArrayList<>();
+		
+		for (Map.Entry<String, String> entry : this.headerMaps.entrySet()) {
+			headerList.add(new SimpleHeader(entry.getKey(), entry.getValue()));
+		}
+		
+		return headerList;
 	}
 	
 	private boolean isGZipResponse(String contentEncoding) {

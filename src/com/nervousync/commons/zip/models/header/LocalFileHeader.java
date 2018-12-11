@@ -85,30 +85,39 @@ public class LocalFileHeader extends FileHeader {
 
 		try {
 			if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
-				byte[] salt = null;
-				if (this.getAesExtraDataRecord() != null) {
-					salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
-					if (input instanceof RandomAccessFile) {
-						((RandomAccessFile)input).seek(this.getOffsetStartOfData());
-						((RandomAccessFile)input).read(salt);
-					} else if (input instanceof InputStream) {
-						((InputStream)input).skip(this.getOffsetStartOfData());
-						((InputStream)input).read(salt);
-					}
-				}
-				
-				byte[] passwordBytes = new byte[2];
-				if (input instanceof RandomAccessFile) {
-					((RandomAccessFile)input).read(passwordBytes);
-				} else if (input instanceof InputStream) {
-					((InputStream)input).read(passwordBytes);
-				}
-
 				if (this.getAesExtraDataRecord() == null) {
 					return Globals.DEFAULT_VALUE_BOOLEAN;
+				} else {
+					byte[] salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
+					int readLength = Globals.DEFAULT_VALUE_INT;
+					if (input instanceof RandomAccessFile) {
+						((RandomAccessFile)input).seek(this.getOffsetStartOfData());
+						readLength = ((RandomAccessFile)input).read(salt);
+					} else if (input instanceof InputStream) {
+						long skipLength = ((InputStream)input).skip(this.getOffsetStartOfData());
+						if (skipLength == this.getOffsetStartOfData()) {
+							readLength = ((InputStream)input).read(salt);
+						}
+					}
+
+					if (readLength != salt.length) {
+						return Globals.DEFAULT_VALUE_BOOLEAN;
+					}
+
+					readLength = Globals.DEFAULT_VALUE_INT;
+					byte[] passwordBytes = new byte[2];
+					if (input instanceof RandomAccessFile) {
+						readLength = ((RandomAccessFile)input).read(passwordBytes);
+					} else if (input instanceof InputStream) {
+						readLength = ((InputStream)input).read(passwordBytes);
+					}
+
+					if (readLength == 2) {
+						return AESCrypto.verifyPassword(this.getAesExtraDataRecord().getAesStrength(),
+								salt, this.getPassword(), passwordBytes);
+					}
+					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
-				return AESCrypto.verifyPassword(this.getAesExtraDataRecord().getAesStrength(), 
-						salt, this.getPassword(), passwordBytes);
 			} else if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
 				//	Not supported verify password of standard encrypt
 				return true;

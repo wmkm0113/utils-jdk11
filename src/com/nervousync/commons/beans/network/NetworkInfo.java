@@ -175,9 +175,9 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionUID
+	 * @return the serialVersionUID
 	 */
-	public static long getSerialversionUID() {
+	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
 

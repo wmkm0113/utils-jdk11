@@ -35,7 +35,7 @@ public class CDataAdapter extends XmlAdapter<String, String> {
 		}
 		
 		if (dataValue.endsWith(CDATA_END)) {
-			dataValue.substring(0, dataValue.length() - CDATA_END.length());
+			dataValue = dataValue.substring(0, dataValue.length() - CDATA_END.length());
 		}
 		return dataValue;
 	}
@@ -43,7 +43,7 @@ public class CDataAdapter extends XmlAdapter<String, String> {
 	/**
 	 * Convert a bound type to a value type.
 	 *
-	 * @param v The value to be convereted. Can be null.
+	 * @param v The value to be converted. Can be null.
 	 */
 	@Override
 	public String marshal(String v) {

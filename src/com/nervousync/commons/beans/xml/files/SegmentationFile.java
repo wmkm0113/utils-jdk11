@@ -45,6 +45,10 @@ public class SegmentationFile extends BaseElement {
 	 */
 	private int blockSize;
 	/**
+	 * File extension name
+	 */
+	private String extName;
+	/**
 	 * Item identified value of MD5
 	 */
 	private String md5;
@@ -68,14 +72,16 @@ public class SegmentationFile extends BaseElement {
 	
 	/**
 	 * Constructor for define segmentation item
+	 * @param extName					File extension name
 	 * @param totalSize					File total size
 	 * @param blockSize					Item block size
 	 * @param md5   				    File MD5
 	 * @param sha   				    File SHA256
 	 * @param segmentationItemList   	Block item list
 	 */
-	public SegmentationFile(long totalSize, int blockSize, String md5, String sha,
+	public SegmentationFile(String extName, long totalSize, int blockSize, String md5, String sha,
 	                        List<SegmentationItem> segmentationItemList) {
+		this.extName = extName;
 		this.totalSize = totalSize;
 		this.blockSize = blockSize;
 		this.md5 = md5;
@@ -87,39 +93,23 @@ public class SegmentationFile extends BaseElement {
 		return totalSize;
 	}
 	
-	public void setTotalSize(long totalSize) {
-		this.totalSize = totalSize;
-	}
-	
 	public int getBlockSize() {
 		return blockSize;
 	}
 	
-	public void setBlockSize(int blockSize) {
-		this.blockSize = blockSize;
+	public String getExtName() {
+		return extName;
 	}
 	
 	public String getMd5() {
 		return md5;
 	}
 	
-	public void setMd5(String md5) {
-		this.md5 = md5;
-	}
-	
 	public String getSha() {
 		return sha;
 	}
 	
-	public void setSha(String sha) {
-		this.sha = sha;
-	}
-	
 	public List<SegmentationItem> getSegmentationItemList() {
 		return segmentationItemList;
-	}
-	
-	public void setSegmentationItemList(List<SegmentationItem> segmentationItemList) {
-		this.segmentationItemList = segmentationItemList;
 	}
 }

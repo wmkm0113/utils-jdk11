@@ -22,6 +22,7 @@ import com.nervousync.commons.beans.servlet.request.RequestInfo;
 import com.nervousync.commons.beans.servlet.response.HttpResponseContent;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.RegexGlobals;
+import com.nervousync.commons.http.cert.CertInfo;
 import com.nervousync.commons.http.cookie.CookieEntity;
 import com.nervousync.commons.http.entity.HttpEntity;
 import com.nervousync.commons.http.header.SimpleHeader;
@@ -30,21 +31,13 @@ import com.nervousync.enumerations.ip.IPType;
 import com.nervousync.enumerations.web.HttpMethodOption;
 
 import javax.jws.WebService;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import javax.servlet.ServletException;
+import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.HandlerResolver;
 
+import com.nervousync.exceptions.servlet.RequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +82,8 @@ public final class RequestUtils {
 	
 	private static final String STOWED_REQUEST_ATTRIBS = "ssl.redirect.attrib.stowed";
 	private static final int DEFAULT_TIME_OUT = 5;
+
+	private static final String DEFAULT_PASSPHRASE = "changeit";
 	
 	private static final String HTTP_METHOD_GET = "GET";
 	private static final String HTTP_METHOD_POST = "POST";
@@ -242,7 +237,7 @@ public final class RequestUtils {
 		if (cidr >= 0 && cidr <= 32) {
 			int[] arrays = new int[]{0, 0, 0, 0};
 			int index = 0;
-			while (cidr >= 0) {
+			while (index < 4 && cidr >= 0) {
 				arrays[index] = RequestUtils.fillBitsFromLeft(cidr);
 				cidr -= 8;
 				index++;
@@ -368,27 +363,25 @@ public final class RequestUtils {
 	 * @return				BigInteger
 	 */
 	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
-		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)) {
-			ipAddress = expandIgnore(ipAddress);
-			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ":");
-			if (splitAddress.length == 8) {
-				BigInteger bigInteger = BigInteger.ZERO;
-				int index = 0;
-				for (String split : splitAddress) {
-					BigInteger currentInteger;
-					if (StringUtils.matches(split, RegexGlobals.IPV4_REGEX)) {
-						currentInteger = convertIPv4ToBigInteger(split);
-					} else {
-						currentInteger = BigInteger.valueOf(Long.valueOf(split, 16));
-					}
-					if (currentInteger == null) {
-						return null;
-					}
-					bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddress.length - index - 1)));
-					index++;
+		String fullAddress = expandIgnore(ipAddress);
+		if (StringUtils.matches(fullAddress, RegexGlobals.IPV6_REGEX)) {
+			String[] splitAddress = StringUtils.tokenizeToStringArray(fullAddress, ":");
+			BigInteger bigInteger = BigInteger.ZERO;
+			int index = 0;
+			for (String split : splitAddress) {
+				BigInteger currentInteger;
+				if (StringUtils.matches(split, RegexGlobals.IPV4_REGEX)) {
+					currentInteger = convertIPv4ToBigInteger(split);
+				} else {
+					currentInteger = BigInteger.valueOf(Long.valueOf(split, 16));
 				}
-				return bigInteger;
+				if (currentInteger == null) {
+					return null;
+				}
+				bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddress.length - index - 1)));
+				index++;
 			}
+			return bigInteger;
 		}
 		return null;
 	}
@@ -492,17 +485,17 @@ public final class RequestUtils {
 		}
 		return contentLength;
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
-				(List<SimpleHeader>)null, null, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
+				null, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -510,10 +503,10 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut,
-				(List<SimpleHeader>)null, null, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut,
+				null, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -523,7 +516,7 @@ public final class RequestUtils {
 	public static HttpResponseContent sendRequest(String requestUrl, String data) {
 		return sendRequest(requestUrl, data, null, HttpMethodOption.DEFAULT);
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -531,10 +524,10 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, 
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
 				headers, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -543,9 +536,9 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, null, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -555,9 +548,9 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -568,9 +561,9 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, int timeOut) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, parameters, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -578,9 +571,9 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -589,9 +582,9 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, int timeOut) {
-		return sendRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, null, parameters, null));
+		return processRequest(new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, null, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -599,9 +592,9 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, (List<SimpleHeader>)null, null, null));
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -610,9 +603,9 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, (List<SimpleHeader>)null, null, null));
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, null, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -622,9 +615,9 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, String data, HttpMethodOption httpMethodOption) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -632,11 +625,11 @@ public final class RequestUtils {
 	 * @param httpMethodOption	HTTP method
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, headers, null, null));
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, headers, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -645,11 +638,11 @@ public final class RequestUtils {
 	 * @param timeOut			value of time out
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, null, null));
+	public static HttpResponseContent sendRequest(String requestUrl, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, int timeOut) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, null, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -658,13 +651,13 @@ public final class RequestUtils {
 	 * @param httpMethodOption	HTTP method
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption) {
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
 				headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -674,13 +667,13 @@ public final class RequestUtils {
 	 * @param timeOut			value of time out
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int timeOut) {
+	public static HttpResponseContent sendRequest(String requestUrl, String data, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, int timeOut) {
 		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut,
 				headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -688,12 +681,12 @@ public final class RequestUtils {
 	 * @param httpMethodOption	HTTP method
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              HttpMethodOption httpMethodOption) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
 				null, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -702,9 +695,9 @@ public final class RequestUtils {
 	 * @param timeOut			value of time out
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              HttpMethodOption httpMethodOption, int timeOut) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut,
 				null, parameters, null));
 	}
 	
@@ -716,12 +709,12 @@ public final class RequestUtils {
 	 * @param httpMethodOption	HTTP method
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
 				headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -731,11 +724,11 @@ public final class RequestUtils {
 	 * @param timeOut			value of time out
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			List<SimpleHeader> headers, HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, parameters, null));
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              List<SimpleHeader> headers, HttpMethodOption httpMethodOption, int timeOut) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, parameters, null));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -745,12 +738,12 @@ public final class RequestUtils {
 	 * @param httpMethodOption	HTTP method
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			Map<String, File> uploadParam, List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, 
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              Map<String, File> uploadParam, List<SimpleHeader> headers, HttpMethodOption httpMethodOption) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
 				headers, parameters, uploadParam));
 	}
-
+	
 	/**
 	 * Send request and receive response
 	 * @param requestUrl		URL address
@@ -761,10 +754,10 @@ public final class RequestUtils {
 	 * @param timeOut			value of time out
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters, 
-			Map<String, File> uploadParam, List<SimpleHeader> headers, 
-			HttpMethodOption httpMethodOption, int timeOut) {
-		return sendRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut, 
+	public static HttpResponseContent sendRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              Map<String, File> uploadParam, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, int timeOut) {
+		return processRequest(new RequestInfo(httpMethodOption, requestUrl, timeOut,
 				headers, parameters, uploadParam));
 	}
 	
@@ -776,7 +769,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, byte[] sendDatas, String contentType) {
-		return sendRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, Globals.DEFAULT_ENCODING));
+		return processRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, Globals.DEFAULT_ENCODING));
 	}
 	
 	/**
@@ -789,7 +782,7 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(HttpMethodOption httpMethodOption, String requestUrl, byte[] sendDatas, String contentType) {
 		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
-			return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, Globals.DEFAULT_ENCODING));
+			return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, Globals.DEFAULT_ENCODING));
 		} else {
 			return null;
 		}
@@ -804,7 +797,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendRequest(String requestUrl, byte[] sendDatas, String contentType, String charset) {
-		return sendRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, charset));
+		return processRequest(new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, charset));
 	}
 	
 	/**
@@ -818,7 +811,464 @@ public final class RequestUtils {
 	 */
 	public static HttpResponseContent sendRequest(HttpMethodOption httpMethodOption, String requestUrl, byte[] sendDatas, String contentType, String charset) {
 		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
-			return sendRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, sendDatas, contentType, charset));
+			return processRequest(new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, charset));
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
+				null, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut,
+				null, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, String passPhrase, CertInfo certInfo) {
+		return sendSecureRequest(requestUrl, data, null, HttpMethodOption.DEFAULT, passPhrase, certInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, List<SimpleHeader> headers, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT,
+				headers, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, List<SimpleHeader> headers, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, List<SimpleHeader> headers, String passPhrase, CertInfo certInfo) {
+		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, headers, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, List<SimpleHeader> headers, int timeOut, String passPhrase, CertInfo certInfo) {
+		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, headers, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, null, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, timeOut, null, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, null, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, HttpMethodOption httpMethodOption, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, timeOut, null, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		return sendSecureRequest(requestUrl, (data == null ? null : getRequestParametersFromString(data)), null, null, httpMethodOption, passPhrase, certInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT, headers, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, null, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		return sendSecureRequest(requestUrl, (data == null ? null : getRequestParametersFromString(data)), null, headers, httpMethodOption, passPhrase, certInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param data				Request datas
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, List<SimpleHeader> headers,
+	                                              HttpMethodOption httpMethodOption, int timeOut, String passPhrase, CertInfo certInfo) {
+		return sendSecureRequest(requestUrl, (data == null ? null : getRequestParametersFromString(data)), null, headers, httpMethodOption, timeOut, passPhrase, certInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                              HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
+				null, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                                    HttpMethodOption httpMethodOption, int timeOut,
+	                                                    String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, timeOut,
+				null, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                                    List<SimpleHeader> headers, HttpMethodOption httpMethodOption,
+	                                                    String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
+				headers, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                                    List<SimpleHeader> headers, HttpMethodOption httpMethodOption,
+	                                                    int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, timeOut, headers, parameters, null);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param uploadParam		Upload resource parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                                    Map<String, File> uploadParam, List<SimpleHeader> headers,
+	                                                    HttpMethodOption httpMethodOption, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, Globals.DEFAULT_VALUE_INT,
+				headers, parameters, uploadParam);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param parameters		Request parameters
+	 * @param uploadParam		Upload resource parameters
+	 * @param headers			Request header values
+	 * @param httpMethodOption	HTTP method
+	 * @param timeOut			value of time out
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, Map<String, String[]> parameters,
+	                                                    Map<String, File> uploadParam, List<SimpleHeader> headers,
+	                                                    HttpMethodOption httpMethodOption, int timeOut, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl, timeOut,
+				headers, parameters, uploadParam);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, byte[] sendDatas, String contentType,
+	                                                    String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT,
+				null, sendDatas, contentType, Globals.DEFAULT_ENCODING);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param httpMethodOption	HTTP method
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(HttpMethodOption httpMethodOption, String requestUrl,
+	                                                    byte[] sendDatas, String contentType, String passPhrase, CertInfo certInfo) {
+		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
+			RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl,
+					Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, Globals.DEFAULT_ENCODING);
+			requestInfo.setCertInfo(certInfo);
+			requestInfo.setPassPhrase(passPhrase);
+			return processRequest(requestInfo);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param charset           Character encoding
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(String requestUrl, byte[] sendDatas, String contentType,
+	                                                    String charset, String passPhrase, CertInfo certInfo) {
+		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.POST, requestUrl, Globals.DEFAULT_VALUE_INT,
+				null, sendDatas, contentType, charset);
+		requestInfo.setCertInfo(certInfo);
+		requestInfo.setPassPhrase(passPhrase);
+		return processRequest(requestInfo);
+	}
+	
+	/**
+	 * Send request and receive response
+	 * @param httpMethodOption	HTTP method
+	 * @param requestUrl		URL address
+	 * @param sendDatas         Send data arrays
+	 * @param contentType       Content type
+	 * @param charset           Character encoding
+	 * @param passPhrase        Default pass phrase
+	 * @param certInfo          Certificate information
+	 * @return					HttpResponseContent
+	 */
+	public static HttpResponseContent sendSecureRequest(HttpMethodOption httpMethodOption, String requestUrl,
+	                                                    byte[] sendDatas, String contentType, String charset,
+	                                                    String passPhrase, CertInfo certInfo) {
+		if (HttpMethodOption.POST.equals(httpMethodOption) || HttpMethodOption.PUT.equals(httpMethodOption)) {
+			RequestInfo requestInfo = new RequestInfo(httpMethodOption, requestUrl,
+					Globals.DEFAULT_VALUE_INT, null, sendDatas, contentType, charset);
+			requestInfo.setCertInfo(certInfo);
+			requestInfo.setPassPhrase(passPhrase);
+			return processRequest(requestInfo);
 		} else {
 			return null;
 		}
@@ -829,8 +1279,8 @@ public final class RequestUtils {
 	 * @param requestInfo		Request info
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(RequestInfo requestInfo) {
-		return RequestUtils.sendRequest(requestInfo, null);
+	private static HttpResponseContent processRequest(RequestInfo requestInfo) {
+		return RequestUtils.processRequest(requestInfo, null);
 	}
 	
 	/**
@@ -839,7 +1289,7 @@ public final class RequestUtils {
 	 * @param cookieList		Cookie  list
 	 * @return					HttpResponseContent
 	 */
-	public static HttpResponseContent sendRequest(RequestInfo requestInfo, List<CookieEntity> cookieList) {
+	public static HttpResponseContent processRequest(RequestInfo requestInfo, List<CookieEntity> cookieList) {
 		HttpURLConnection urlConnection = null;
 		OutputStream outputStream = null;
 		
@@ -875,8 +1325,10 @@ public final class RequestUtils {
 				}
 			}
 			
-			outputStream.flush();
-			outputStream.close();
+			if (outputStream != null) {
+				outputStream.flush();
+				outputStream.close();
+			}
 			
 			String redirectUrl = urlConnection.getHeaderField("Location");
 			if (redirectUrl != null) {
@@ -892,7 +1344,7 @@ public final class RequestUtils {
 					}
 				}
 				
-				return RequestUtils.sendRequest(new RequestInfo(redirectUrl, requestInfo), cookieList);
+				return RequestUtils.processRequest(new RequestInfo(redirectUrl, requestInfo), cookieList);
 			}
 			return new HttpResponseContent(urlConnection);
 		} catch (Exception e) {
@@ -1230,24 +1682,18 @@ public final class RequestUtils {
 		}
 	}
 
-	public static String getRequestURI(HttpServletRequest request) throws ServletException {
-		if (request == null) {
-			throw new ServletException("Request object must not be null");
-		}
-		String requestUrl = request.getRequestURI();
-		
-		if (request.getContextPath().length() > 0) {
-			requestUrl = requestUrl.substring(request.getContextPath().length());
-		}
+	public static String getRequestURI(HttpServletRequest request) throws RequestException {
+		String requestUrl = RequestUtils.getRequestPath(request);
+
 		if (requestUrl.lastIndexOf('.') != -1) {
 			return requestUrl.substring(0, requestUrl.lastIndexOf("."));
 		}
 		return requestUrl;
 	}
 
-	public static String getRequestPath(HttpServletRequest request) throws ServletException {
+	public static String getRequestPath(HttpServletRequest request) throws RequestException {
 		if (request == null) {
-			throw new ServletException("Request object must not be null");
+			throw new RequestException("Request object must not be null");
 		}
 		String requestUrl = request.getRequestURI();
 		
@@ -1351,8 +1797,10 @@ public final class RequestUtils {
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (int i = 0 ; i < 4 ; i++) {
-			int beginItem = Integer.parseInt(addressItems[i]) & Integer.parseInt(maskItems[i]);
-			if (i == 3) {
+			int itemValue = i < addressItems.length ? Integer.parseInt(addressItems[i])
+					: Globals.INITIALIZE_INT_VALUE;
+			int beginItem = itemValue & Integer.parseInt(maskItems[i]);
+			if (itemValue == 0 && i == 3) {
 				beginItem++;
 			}
 			stringBuilder.append(".").append(beginItem);
@@ -1586,6 +2034,12 @@ public final class RequestUtils {
 			
 			if (urlAddress.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)) {
 				((HttpsURLConnection)connection).setHostnameVerifier(new NervousyncHostnameVerifier());
+				if (requestInfo.getCertInfo() != null) {
+					SSLContext sslContext = SSLContext.getInstance("TLS");
+					sslContext.init(requestInfo.getCertInfo().generateKeyManagers(),
+							retrieveDefaultTrustManagers(requestInfo.getPassPhrase()), new SecureRandom());
+					((HttpsURLConnection)connection).setSSLSocketFactory(sslContext.getSocketFactory());
+				}
 			}
 		} catch (Exception e) {
 			connection = null;
@@ -1617,15 +2071,11 @@ public final class RequestUtils {
 		if (v2 == null) {
 			values2 = new String[0];
 		} else {
-			values2 = new String[]{String.valueOf(v2)};
+			values2 = new String[]{v2};
 		}
 
 		// merge arrays
-		String[] result = new String[values1.length + values2.length];
-		System.arraycopy(values1, 0, result, 0, values1.length);
-		System.arraycopy(values2, 0, result, values1.length, values2.length);
-
-		return result;
+		return StringUtils.concatenateStringArrays(values1, values2);
 	}
 
 	/**
@@ -1694,6 +2144,22 @@ public final class RequestUtils {
 			// do nothing
 		}
 	}
+	
+	private static TrustManager[] retrieveDefaultTrustManagers(String passPhrase) throws CertificateException {
+		try {
+			if (passPhrase == null || passPhrase.length() == 0) {
+				passPhrase = DEFAULT_PASSPHRASE;
+			}
+			
+			KeyStore trustStore = KeyStore.getInstance("JKS");
+			trustStore.load(FileUtils.loadFile(SystemUtils.systemCertPath()), passPhrase.toCharArray());
+			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			trustManagerFactory.init(trustStore);
+			return trustManagerFactory.getTrustManagers();
+		} catch (Exception e) {
+			throw new CertificateException("Read default trust manager error! ", e);
+		}
+	}
 
 	private static final class TrustedCert {
 		
@@ -1722,9 +2188,6 @@ public final class RequestUtils {
 	
 	private static final class NervousyncX509TrustManager implements X509TrustManager {
 
-		private static final String JAVA_CERT_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "lib" 
-					+ Globals.DEFAULT_PAGE_SEPARATOR + "security" + Globals.DEFAULT_PAGE_SEPARATOR + "cacerts";
-		
 		private static NervousyncX509TrustManager INSTANCE = null;
 		
 		private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -1735,7 +2198,7 @@ public final class RequestUtils {
 		
 		private NervousyncX509TrustManager(String passPhrase) throws Exception {
 			if (passPhrase == null) {
-				this.passPhrase = "changeit";
+				this.passPhrase = DEFAULT_PASSPHRASE;
 			} else {
 				this.passPhrase = passPhrase;
 			}
@@ -1797,12 +2260,11 @@ public final class RequestUtils {
 		
 		private void initManager() throws Exception {
 			KeyStore keyStore = KeyStore.getInstance("JKS");
-			String sysCertPath = SystemUtils.JAVA_HOME + JAVA_CERT_PATH;
-			if (!FileUtils.isExists(sysCertPath)) {
+			if (!FileUtils.isExists(SystemUtils.systemCertPath())) {
 				this.logger.warn("System cert file not found!");
 			} else {
 				try {
-					keyStore.load(FileUtils.loadFile(sysCertPath), this.passPhrase.toCharArray());
+					keyStore.load(FileUtils.loadFile(SystemUtils.systemCertPath()), this.passPhrase.toCharArray());
 				} catch (Exception e) {
 					this.logger.warn("Load system cert file using default passphrase error! ");
 				}

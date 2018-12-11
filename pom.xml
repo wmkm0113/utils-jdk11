@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
 	<url>https://development.nervousync.com/project/NervousyncUtils</url>
@@ -40,22 +40,22 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.version>3.7.0</maven.compiler.version>
+		<maven.compiler.version>3.8.0</maven.compiler.version>
 		<maven.jar.version>3.1.0</maven.jar.version>
 		<maven.resource.version>3.1.0</maven.resource.version>
 		<maven.source.version>3.0.1</maven.source.version>
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<bcprov.version>1.60</bcprov.version>
-		<cglib.version>3.2.7</cglib.version>
+		<cglib.version>3.2.9</cglib.version>
 		<jaxb.version>2.3.0</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
-		<log4j.version>2.11.0</log4j.version>
+		<log4j.version>2.11.1</log4j.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<jackson.version>2.9.6</jackson.version>
+		<jackson.version>2.9.7</jackson.version>
 		<snmp4j.version>2.6.2</snmp4j.version>
 		<java.mail.version>1.6.1</java.mail.version>
-		<aspectj.version>1.9.1</aspectj.version>
+		<aspectj.version>1.9.2</aspectj.version>
 		<jcifs.version>1.3.18.3</jcifs.version>
 	</properties>
 	<dependencies>
@@ -404,8 +404,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.version}</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>8</source>
+					<target>8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -428,53 +428,31 @@
 					</excludes>
 				</configuration>
 			</plugin>
-		</plugins>
+        </plugins>
 	</build>
 	<profiles>
 		<profile>
 			<id>release</id>
 			<distributionManagement>
-				<repository>
-					<id>sonatype-nexus-staging</id>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
+				<!-- Repository for SNAPSHOT -->
 				<snapshotRepository>
-					<id>sonatype-nexus-snapshots</id>
+					<id>OSS</id>
 					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 				</snapshotRepository>
+				<!-- Repository for RELEASE -->
+				<repository>
+					<id>OSS</id>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
 			</distributionManagement>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.eclipse.m2e</groupId>
-						<artifactId>lifecycle-mapping</artifactId>
-						<version>1.0.0</version>
-						<configuration>
-							<lifecycleMappingMetadata>
-								<pluginExecutions>
-									<pluginExecution>
-										<pluginExecutionFilter>
-											<groupId>org.apache.maven.plugins</groupId>
-											<artifactId>maven-enforcer-plugin</artifactId>
-											<versionRange>[1.0.0,)</versionRange>
-											<goals>
-												<goal>enforce</goal>
-											</goals>
-										</pluginExecutionFilter>
-										<action>
-											<ignore />
-										</action>
-									</pluginExecution>
-								</pluginExecutions>
-							</lifecycleMappingMetadata>
-						</configuration>
-					</plugin>
-					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<version>${maven.compiler.version}</version>
 						<configuration>
-							<source>1.7</source>
-							<target>1.7</target>
+							<source>8</source>
+							<target>8</target>
 							<encoding>UTF-8</encoding>
 						</configuration>
 					</plugin>
@@ -551,7 +529,7 @@
 								<configuration>
 									<executable>gpg</executable>
 									<keyname>${gpg.keyname}</keyname>
-									<passphraseServerId>${gpg.keyname}</passphraseServerId>
+									<passphrase>${gpg.passphrase}</passphrase>
 								</configuration>
 							</execution>
 						</executions>

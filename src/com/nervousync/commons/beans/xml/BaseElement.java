@@ -18,6 +18,7 @@ package com.nervousync.commons.beans.xml;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 import com.nervousync.commons.adapter.xml.CDataAdapter;
 import com.nervousync.utils.*;
@@ -33,6 +34,11 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Base element define, all xml object define must extends this class
@@ -44,7 +50,9 @@ public class BaseElement implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 239544550914272242L;
+	private static final long serialVersionUID = 6377799204139380357L;
+	
+	private static transient final String FRAGMENT = "<?xml version=\"1.0\" encoding=\"{}\"?>";
 	
 	protected transient final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -134,12 +142,29 @@ public class BaseElement implements Serializable {
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, encoding);
-			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Globals.DEFAULT_VALUE_BOOLEAN);
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 			
 			marshaller.marshal(this, streamWriter);
 			streamWriter.flush();
 			streamWriter.close();
-			return stringWriter.toString();
+			
+			if (formattedOutput) {
+				Transformer transformer = TransformerFactory.newInstance().newTransformer();
+				transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+				transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+				
+				String xml = stringWriter.toString();
+				stringWriter = new StringWriter();
+				
+				transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(stringWriter));
+			}
+			if (formattedOutput) {
+				return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter.toString();
+			} else {
+				return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter.toString();
+			}
 		} catch (Exception e) {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Error stack message: ", e);
@@ -170,8 +195,8 @@ public class BaseElement implements Serializable {
 			for (Field field : fields) {
 				Object origValue = ReflectionUtils.getFieldValue(field, this);
 				Object destValue = ReflectionUtils.getFieldValue(field, o);
-				
-				if (origValue != null ? !origValue.equals(destValue) : destValue != null) {
+
+				if (!Objects.equals(origValue, destValue)) {
 					return false;
 				}
 			}
@@ -201,7 +226,7 @@ public class BaseElement implements Serializable {
 	
 	private static final class CDataStreamWriter extends DelegatingXMLStreamWriter {
 		
-		public CDataStreamWriter(XMLStreamWriter xmlStreamWriter) {
+		CDataStreamWriter(XMLStreamWriter xmlStreamWriter) {
 			super(xmlStreamWriter);
 		}
 		
@@ -219,7 +244,7 @@ public class BaseElement implements Serializable {
 	
 		private final XMLStreamWriter xmlStreamWriter;
 		
-		public DelegatingXMLStreamWriter(XMLStreamWriter xmlStreamWriter) {
+		DelegatingXMLStreamWriter(XMLStreamWriter xmlStreamWriter) {
 			this.xmlStreamWriter = xmlStreamWriter;
 		}
 		
