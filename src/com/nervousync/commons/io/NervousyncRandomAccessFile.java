@@ -25,7 +25,6 @@ import java.io.RandomAccessFile;
 
 import com.nervousync.utils.FileUtils;
 
-import jcifs.smb.SmbFile;
 import jcifs.smb.SmbRandomAccessFile;
 
 /**
@@ -53,6 +52,21 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	public NervousyncRandomAccessFile(String filePath, String mode) throws FileNotFoundException {
 		this.filePath = filePath;
 		this.openFile(mode);
+	}
+
+	/**
+	 * Constructor for open SMB file
+	 * @param smbPath       SMB path
+	 * @param mode          Open type
+	 * @param domain        SMB Authentication Domain
+	 * @param userName      SMB Authentication Username
+	 * @param passWord      SMB Authentication Password
+	 * @throws FileNotFoundException    if connect to SMB file error
+	 */
+	public NervousyncRandomAccessFile(String smbPath, String mode,
+	                                  String domain, String userName, String passWord) throws FileNotFoundException {
+		this.filePath = smbPath;
+		this.openSMBFile(mode, domain, userName, passWord);
 	}
 
 	/**
@@ -520,14 +534,15 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @throws FileNotFoundException	if target file was not found
 	 */
 	private void openFile(String mode) throws FileNotFoundException {
-		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			try {
-				this.originObject = new SmbRandomAccessFile(new SmbFile(filePath), mode);
-			} catch (Exception e) {
-				throw new FileNotFoundException("Open file error! File location: " + filePath);
-			}
-		} else {
-			this.originObject = new RandomAccessFile(filePath, mode);
+		this.originObject = new RandomAccessFile(this.filePath, mode);
+	}
+
+	private void openSMBFile(String mode, String domain, String userName, String passWord) throws FileNotFoundException {
+		try {
+			this.originObject = new SmbRandomAccessFile(
+					FileUtils.openSMBFile(this.filePath, domain, userName, passWord), mode);
+		} catch (Exception e) {
+			throw new FileNotFoundException("Open file error! File location: " + this.filePath);
 		}
 	}
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
 	<url>https://development.nervousync.com/project/NervousyncUtils</url>
@@ -47,16 +47,15 @@
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<bcprov.version>1.60</bcprov.version>
-		<cglib.version>3.2.9</cglib.version>
-		<jaxb.version>2.3.0</jaxb.version>
+		<cglib.version>3.2.10</cglib.version>
+		<jaxb.version>2.3.1</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
 		<log4j.version>2.11.1</log4j.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<jackson.version>2.9.7</jackson.version>
+		<jackson.version>2.9.8</jackson.version>
 		<snmp4j.version>2.7.0</snmp4j.version>
-		<java.mail.version>1.6.1</java.mail.version>
-		<aspectj.version>1.9.2</aspectj.version>
-		<jcifs.version>1.3.18.3</jcifs.version>
+		<java.mail.version>1.6.2</java.mail.version>
+		<jcifs.version>2.1.1</jcifs.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -67,8 +66,8 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
+			<artifactId>javax.activation-api</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.virtuald</groupId>
@@ -262,6 +261,12 @@
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<version>${jaxb.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.activation</groupId>
+					<artifactId>javax.activation-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>jaxen</groupId>
@@ -342,17 +347,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- AOP Support -->
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
 		<!-- SNMP Support -->
 		<dependency>
 			<groupId>org.snmp4j</groupId>
@@ -367,13 +361,21 @@
 		</dependency>
 		<!-- SMB Support -->
 		<dependency>
-			<groupId>org.codelibs</groupId>
-			<artifactId>jcifs</artifactId>
+			<groupId>eu.agno3.jcifs</groupId>
+			<artifactId>jcifs-ng</artifactId>
 			<version>${jcifs.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -471,7 +473,6 @@
 								</manifestEntries>
 							</archive>
 							<excludes>
-								<exclude>log4j2.xml</exclude>
 								<exclude>*.dat</exclude>
 							</excludes>
 						</configuration>

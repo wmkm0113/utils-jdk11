@@ -149,11 +149,11 @@ public final class ObjectUtils {
 		if (methodInterceptors != null && methodInterceptors.length > 0) {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(clazz);
-			
-			for (BaseHandlerInterceptor methodInterceptor : methodInterceptors) {
-				if (methodInterceptor != null) {
-					enhancer.setCallback(methodInterceptor);
-				}
+
+			if (methodInterceptors.length == 1) {
+				enhancer.setCallback(methodInterceptors[0]);
+			} else {
+				enhancer.setCallbacks(methodInterceptors);
 			}
 			
 			if (args == null || args.length == 0) {
@@ -167,7 +167,6 @@ public final class ObjectUtils {
 					object = clazz.newInstance();
 				} else {
 					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, ObjectUtils.paramClasses(args));
-					
 					object = constructor.newInstance(args);
 				}
 			} catch (Exception e) {

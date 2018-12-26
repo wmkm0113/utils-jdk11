@@ -34,4 +34,6 @@ public final class RegexGlobals {
 	public static final String IPV4_REGEX = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
 	public static final String IPV6_REGEX = "^([\\da-fA-F]{1,4}:){7}([\\da-fA-F]{1,4})$";
 	public static final String IPV6_COMPRESS_REGEX = "(^|:)(0+(:|$)){2,8}";
+
+	public static final String LOCAL_FILE_PATH_REGEX = "^(\\/.*)|(([a-zA-Z]{1}\\:\\\\).*)$";
 }

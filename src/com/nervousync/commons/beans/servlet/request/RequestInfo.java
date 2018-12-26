@@ -142,6 +142,7 @@ public final class RequestInfo implements Serializable {
 	 * @param httpMethodOption Request http method
 	 * @param requestUrl       Target request url
 	 * @param timeOut          value of time out
+	 * @param headers          http headers list
 	 * @param postDatas        Send data arrays
 	 * @param contentType      Content type
 	 * @param charset          Character encoding
