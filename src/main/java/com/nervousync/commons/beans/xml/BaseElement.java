@@ -116,18 +116,31 @@ public class BaseElement implements Serializable {
 	 * @return XML String
 	 */
 	public String toString(boolean formattedOutput) throws XmlException {
-		return this.toString(formattedOutput, Globals.DEFAULT_ENCODING);
+		return this.toString(true, formattedOutput, Globals.DEFAULT_ENCODING);
 	}
-	
+
 	/**
 	 * Convert Object to XML String
 	 * Explain all empty element
-	 * 
+	 *
+	 * @param outputFragment        Output fragment
+	 * @param formattedOutput 		Formatted output
+	 * @return XML String
+	 */
+	public String toString(boolean outputFragment, boolean formattedOutput) throws XmlException {
+		return this.toString(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
+	}
+
+	/**
+	 * Convert Object to XML String
+	 * Explain all empty element
+	 *
+	 * @param outputFragment        Output fragment
 	 * @param formattedOutput 		Formatted output
 	 * @param encoding				Charset encoding
 	 * @return XML String
 	 */
-	public String toString(boolean formattedOutput, String encoding) throws XmlException {
+	public String toString(boolean outputFragment, boolean formattedOutput, String encoding) throws XmlException {
 		StringWriter stringWriter = null;
 		
 		try{
@@ -160,10 +173,14 @@ public class BaseElement implements Serializable {
 				
 				transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(stringWriter));
 			}
-			if (formattedOutput) {
-				return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter.toString();
+			if (outputFragment) {
+				if (formattedOutput) {
+					return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter.toString();
+				} else {
+					return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter.toString();
+				}
 			} else {
-				return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter.toString();
+				return stringWriter.toString();
 			}
 		} catch (Exception e) {
 			if (this.logger.isDebugEnabled()) {

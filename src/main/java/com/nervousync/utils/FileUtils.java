@@ -407,7 +407,6 @@ public final class FileUtils {
 	 *
 	 * @param resourceLocation the location String to check
 	 * @return true when location qualifies as a URL, Globals.DEFAULT_VALUE_BOOLEAN for others
-	 * @see #CLASSPATH_URL_PREFIX #CLASSPATH_URL_PREFIX#CLASSPATH_URL_PREFIX
 	 * @see java.net.URL
 	 */
 	public static boolean isUrl(String resourceLocation) {
@@ -1365,7 +1364,7 @@ public final class FileUtils {
 			if (childFiles != null) {
 				for (File childFile : childFiles) {
 					if (childFile.isDirectory()) {
-						FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles, iterateChildFolder, iterateChildFolder);
+						FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles, includeRootFolder, iterateChildFolder);
 					} else {
 						if (!readHiddenFiles && file.isHidden()) {
 							continue;

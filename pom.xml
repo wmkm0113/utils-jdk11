@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.2.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
 	<url>https://development.nervousync.com/project/NervousyncUtils</url>
@@ -388,19 +388,23 @@
 	</dependencies>
 	<build>
 		<defaultGoal>compile</defaultGoal>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>src</directory>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
 				<excludes>
-					<exclude>**/*.java</exclude>
+					<exclude>*.dat</exclude>
 				</excludes>
 			</resource>
-			<resource>
-				<directory>src/com/nervousync/datas</directory>
-				<filtering>true</filtering>
-			</resource>
 		</resources>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -426,7 +430,7 @@
 						</manifestEntries>
 					</archive>
 					<excludes>
-						<exclude>*.dat</exclude>
+						<exclude>com/nervousync/datas/*.dat</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

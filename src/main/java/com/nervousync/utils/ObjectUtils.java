@@ -59,38 +59,40 @@ public final class ObjectUtils {
 	 */
 	public static Object newInstance(String className) 
 			throws ClassNotFoundException, LinkageError {
-		return newInstance(className, new Object[]{}, null);
+		return newInstance(className, null, null, null);
 	}
 
 	/**
 	 * Create a proxy object instance
 	 * @param className		class name
+	 * @param paramClasses  parameter class array
 	 * @param args			Constructor parameters
 	 * @return				object instance
 	 * @throws ClassNotFoundException	if class was not found
 	 * @throws LinkageError				if class link error
 	 */
-	public static Object newInstance(String className, Object[] args) 
+	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args)
 			throws ClassNotFoundException, LinkageError {
-		return newInstance(className, args, null);
+		return newInstance(className, paramClasses, args, null);
 	}
 	
 	/**
 	 * Create a proxy object instance
 	 * @param className		class name
+	 * @param paramClasses  parameter class array
 	 * @param args			Constructor parameters
 	 * @param methodInterceptor method interceptor instance
 	 * @return				object instance
 	 * @throws ClassNotFoundException	if class was not found
 	 * @throws LinkageError				if class link error
 	 */
-	public static Object newInstance(String className, Object[] args, BaseHandlerInterceptor methodInterceptor) 
+	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor methodInterceptor)
 			throws ClassNotFoundException, LinkageError {
 		BaseHandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
 			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
 		}
-		return createProxyInstance(ClassUtils.forName(className), args, methodInterceptors);
+		return createProxyInstance(ClassUtils.forName(className), paramClasses, args, methodInterceptors);
 	}
 
 	/**
@@ -100,7 +102,7 @@ public final class ObjectUtils {
 	 * @return			object instance
 	 */
 	public static <T> T newInstance(Class<T> clazz) {
-		return createProxyInstance(clazz, null, new BaseHandlerInterceptor[]{});
+		return createProxyInstance(clazz, null, null, new BaseHandlerInterceptor[]{});
 	}
 	
 	/**
@@ -115,35 +117,37 @@ public final class ObjectUtils {
 		if (methodInterceptor != null) {
 			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
 		}
-		return createProxyInstance(clazz, null, methodInterceptors);
+		return createProxyInstance(clazz, null, null, methodInterceptors);
 	}
 	
 	/**
 	 * Create a proxy object instance
 	 * @param clazz		define class
+	 * @param paramClasses  parameter class array
 	 * @param args		Constructor parameters
 	 * @param methodInterceptor method interceptor instance
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, Object[] args, BaseHandlerInterceptor methodInterceptor) {
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor methodInterceptor) {
 		BaseHandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
 			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
 		}
-		return createProxyInstance(clazz, args, methodInterceptors);
+		return createProxyInstance(clazz, paramClasses, args, methodInterceptors);
 	}
 
 	/**
 	 * Create a proxy object instance
 	 * @param clazz		define class
+	 * @param paramClasses  parameter class array
 	 * @param args		Constructor parameters
 	 * @param methodInterceptors  method interceptor instance arrays
 	 * @param <T>		T
 	 * @return			object instance
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T createProxyInstance(Class<T> clazz, Object[] args, BaseHandlerInterceptor[] methodInterceptors) {
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor[] methodInterceptors) {
 		T object;
 		
 		if (methodInterceptors != null && methodInterceptors.length > 0) {
@@ -159,14 +163,14 @@ public final class ObjectUtils {
 			if (args == null || args.length == 0) {
 				object = (T) enhancer.create();
 			} else {
-				object = (T) enhancer.create(ObjectUtils.paramClasses(args), args);
+				object = (T) enhancer.create(paramClasses, args);
 			}
 		} else {
 			try {
 				if (args == null || args.length == 0) {
 					object = clazz.newInstance();
 				} else {
-					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, ObjectUtils.paramClasses(args));
+					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, paramClasses);
 					object = constructor.newInstance(args);
 				}
 			} catch (Exception e) {
@@ -175,16 +179,6 @@ public final class ObjectUtils {
 		}
 		
 		return object;
-	}
-
-	private static Class<?>[] paramClasses(Object[] args) {
-		Class<?>[] classes = new Class[args.length];
-
-		for (int i = 0 ; i < args.length ; i++) {
-			classes[i] = args[i].getClass();
-		}
-
-		return classes;
 	}
 
 	/**
