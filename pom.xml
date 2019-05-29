@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nervousync</groupId>
 	<artifactId>nervousync-utils</artifactId>
-	<version>1.0.2.2-SNAPSHOT</version>
+	<version>1.0.2.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
-	<url>https://development.nervousync.com/project/NervousyncUtils</url>
+	<url>https://nervousync.com/development/project/NervousyncUtils</url>
 	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
 		<url>https://github.com/wmkm0113/NervousyncUtils/issues</url>
@@ -23,7 +23,7 @@
 		<tag>master</tag>
 		<url>https://github.com/wmkm0113/NervousyncUtils</url>
 		<connection>scm:git:https://github.com/wmkm0113/NervousyncUtils.git</connection>
-		<developerConnection>https://development.nervousync.com/member/wmkm0113</developerConnection>
+		<developerConnection>https://nervousync.com/development/member/wmkm0113</developerConnection>
 	</scm>
 	<organization>
 		<url>https://development.nervousync.com/</url>
@@ -33,9 +33,9 @@
 		<developer>
 			<name>Steven Wee</name>
 			<email>wmkm0113@gmail.com</email>
-			<url>https://development.nervousync.com/wmkm0113</url>
+			<url>https://nervousync.com/development/member/wmkm0113</url>
 			<organization>Nervousync Studio</organization>
-			<organizationUrl>https://development.nervousync.com/</organizationUrl>
+			<organizationUrl>https://nervousync.com/development/index.shtml</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
@@ -46,16 +46,16 @@
 		<maven.source.version>3.0.1</maven.source.version>
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
-		<bcprov.version>1.60</bcprov.version>
-		<cglib.version>3.2.10</cglib.version>
+		<bcprov.version>1.61</bcprov.version>
+		<cglib.version>3.2.12</cglib.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
-		<log4j.version>2.11.1</log4j.version>
-		<slf4j.version>1.7.25</slf4j.version>
-		<jackson.version>2.9.8</jackson.version>
+		<log4j.version>2.11.2</log4j.version>
+		<slf4j.version>1.7.26</slf4j.version>
+		<jackson.version>2.9.9</jackson.version>
 		<snmp4j.version>2.7.0</snmp4j.version>
 		<java.mail.version>1.6.2</java.mail.version>
-		<jcifs.version>2.1.1</jcifs.version>
+		<jcifs.version>2.1.2</jcifs.version>
 	</properties>
 	<dependencies>
 		<dependency>

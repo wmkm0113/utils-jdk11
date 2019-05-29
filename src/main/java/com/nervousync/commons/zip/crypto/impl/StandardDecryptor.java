@@ -46,31 +46,23 @@ public class StandardDecryptor implements Decryptor {
 		crc[2] = (byte)((crcBuffer[3] >> 8) & 0xFF);
 		crc[1] = (byte)((crcBuffer[3] >> 16) & 0xFF);
 		crc[0] = (byte)((crcBuffer[3] >> 24) & 0xFF);
-		
+
 		if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0) {
 			throw new IllegalStateException("Invalid CRC in file header");
 		}
-		
+
 		if (localFileHeader.getPassword() == null
 				|| localFileHeader.getPassword().length == 0) {
 			throw new ZipException("Wrong password");
 		}
 		
 		this.zipCryptoEngine.initKeys(localFileHeader.getPassword());
-		
-		try {
-			int result = decryptorHeader[0];
-			for (int i = 0 ; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
-				this.zipCryptoEngine.updateKeys((byte)(result ^ this.zipCryptoEngine.decryptByte()));
-				if ((i + 1) != ZipConstants.STD_DEC_HDR_SIZE) {
-					result = decryptorHeader[i + 1];
-				}
-			}
-		} catch (Exception e) {
-			if (e instanceof ZipException) {
-				throw (ZipException)e;
-			} else {
-				throw new ZipException(e);
+
+		int result = decryptorHeader[0];
+		for (int i = 0 ; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
+			this.zipCryptoEngine.updateKeys((byte)(result ^ this.zipCryptoEngine.decryptByte()));
+			if ((i + 1) != ZipConstants.STD_DEC_HDR_SIZE) {
+				result = decryptorHeader[i + 1];
 			}
 		}
 	}

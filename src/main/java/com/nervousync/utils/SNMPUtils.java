@@ -107,7 +107,7 @@ public final class SNMPUtils {
 			return true;
 		} catch (IOException e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Initialize instance error! {}", e);
+				LOGGER.debug("Initialize instance error! ", e);
 			}
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
@@ -131,7 +131,7 @@ public final class SNMPUtils {
 			return true;
 		} catch (ProcessorConfigException e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Add monitor target host error! {}", e);
+				LOGGER.debug("Add monitor target host error! ", e);
 			}
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
@@ -169,11 +169,11 @@ public final class SNMPUtils {
 				}
 			} catch (IOException e) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieve snmp data error! {}", e);
+					LOGGER.debug("Retrieve snmp data error! ", e);
 				}
 			}
 		}
-		return null;
+		return new ArrayList<>();
 	}
 	
 	private static final class SNMPProcessor implements Runnable {
@@ -201,13 +201,11 @@ public final class SNMPUtils {
 			
 			snmpData.setIdentifiedKey(this.identifiedKey);
 			for (PDU pdu : this.pduList) {
-				List<VariableBinding> returnList = 
+				List<VariableBinding> returnList =
 						SNMPUtils.getInstance().retrieveData(this.target, pdu);
-				if (returnList != null) {
-					for (VariableBinding variableBinding : returnList) {
-						snmpData.addData(variableBinding.getOid().toString(), 
-								variableBinding.getVariable().toString());
-					}
+				for (VariableBinding variableBinding : returnList) {
+					snmpData.addData(variableBinding.getOid().toString(),
+							variableBinding.getVariable().toString());
 				}
 			}
 			
@@ -229,9 +227,9 @@ public final class SNMPUtils {
 		if (targetHost == null) {
 			return null;
 		}
-		
+
 		String address = null;
-		
+
 		switch (this.protocol) {
 		case TCP:
 			address = PROTOCOL_TCP + targetHost.getIpAddress() + "/" + targetHost.getPort();
@@ -245,9 +243,9 @@ public final class SNMPUtils {
 		if (SNMPVersion.VERSION3.equals(targetHost.getVersion())) {
 			USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
 			SecurityModels.getInstance().addSecurityModel(usm);
-			
+
 			target = new UserTarget();
-			
+
 			OctetString securityName = null;
 			OID authProtocol = null;
 			OctetString authPassword = null;

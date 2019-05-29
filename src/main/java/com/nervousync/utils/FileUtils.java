@@ -2263,14 +2263,11 @@ public final class FileUtils {
 		if (!FileUtils.validateFileType(resourceLocation)) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
+		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
-		if (extensionName != null) {
-			extensionName = extensionName.toLowerCase();
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-			if (fileExtensionInfo != null) {
-				return fileExtensionInfo.isCompressFile();
-			}
+		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
+		if (fileExtensionInfo != null) {
+			return fileExtensionInfo.isCompressFile();
 		}
 
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2286,14 +2283,11 @@ public final class FileUtils {
 		if (!FileUtils.validateFileType(resourceLocation)) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
+		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
-		if (extensionName != null) {
-			extensionName = extensionName.toLowerCase();
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-			if (fileExtensionInfo != null) {
-				return fileExtensionInfo.isPrintable();
-			}
+		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
+		if (fileExtensionInfo != null) {
+			return fileExtensionInfo.isPrintable();
 		}
 
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2309,14 +2303,11 @@ public final class FileUtils {
 		if (!FileUtils.validateFileType(resourceLocation)) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
+		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
-		if (extensionName != null) {
-			extensionName = extensionName.toLowerCase();
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-			if (fileExtensionInfo != null) {
-				return fileExtensionInfo.isPicture();
-			}
+		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
+		if (fileExtensionInfo != null) {
+			return fileExtensionInfo.isPicture();
 		}
 
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2497,7 +2488,7 @@ public final class FileUtils {
 
 		try {
 			String extName = StringUtils.getFilenameExtension(savePath);
-			if (extName == null) {
+			if (extName.length() == 0) {
 				extName = Globals.DEFAULT_VALUE_STRING;
 			}
 			if (!segmentationFile.getExtName().equalsIgnoreCase(extName)) {
@@ -2571,7 +2562,7 @@ public final class FileUtils {
 
 		try {
 			String extName = StringUtils.getFilenameExtension(filePath);
-			if (extName == null) {
+			if (extName.length() == 0) {
 				extName = Globals.DEFAULT_VALUE_STRING;
 			} else {
 				extName = extName.toLowerCase();
@@ -2829,7 +2820,7 @@ public final class FileUtils {
 			if (this.fileExtName != null && dir != null && dir.isDirectory()
 					&& dir.exists() && name != null) {
 				String fileExtName = StringUtils.getFilenameExtension(name);
-				return (fileExtName != null && fileExtName.equalsIgnoreCase(this.fileExtName));
+				return fileExtName.equalsIgnoreCase(this.fileExtName);
 			}
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}

@@ -902,11 +902,7 @@ public final class RequestUtils {
 	 * @return					HttpResponseContent
 	 */
 	public static HttpResponseContent sendSecureRequest(String requestUrl, String data, List<SimpleHeader> headers, String passPhrase, CertInfo certInfo) {
-		Map<String, String[]> parameters = (data == null ? null : getRequestParametersFromString(data));
-		RequestInfo requestInfo = new RequestInfo(HttpMethodOption.DEFAULT, requestUrl, Globals.DEFAULT_VALUE_INT, headers, parameters, null);
-		requestInfo.setCertInfo(certInfo);
-		requestInfo.setPassPhrase(passPhrase);
-		return processRequest(requestInfo);
+		return sendSecureRequest(requestUrl, data, headers, Globals.DEFAULT_VALUE_INT, passPhrase, certInfo);
 	}
 	
 	/**

@@ -217,7 +217,7 @@ public class CipherOutputStream extends OutputStream {
 				}
 			}
 
-			if (len != 0 && len % 16 != 0) {
+			if (len % 16 != 0) {
 				System.arraycopy(b, (len + off) - (len % 16), this.pendingBuffer, 0, len % 16);
 				this.pendingBufferLength = len % 16;
 				len -= this.pendingBufferLength;

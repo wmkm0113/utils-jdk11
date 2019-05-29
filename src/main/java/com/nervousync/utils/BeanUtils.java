@@ -17,6 +17,7 @@
 package com.nervousync.utils;
 
 import java.util.Hashtable;
+import java.util.Optional;
 
 import net.sf.cglib.beans.BeanCopier;
 import net.sf.cglib.core.Converter;
@@ -63,22 +64,19 @@ public final class BeanUtils {
 	 * @throws BeansException if the copying failed
 	 */
 	public static void copyProperties(Object orig, Object dest, Converter converter) {
-		String cacheKey;
-		if (converter == null) {
-			cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), null);
-		} else {
-			cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(), converter.getClass());
+		if (orig == null || dest == null) {
+			return;
 		}
+
+		Optional<Converter> optional = Optional.ofNullable(converter);
+		String cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(),
+				optional.map(Converter::getClass).orElse(null));
 
 		BeanCopier beanCopier;
 		if (BeanUtils.BEAN_COPIER_MAP.containsKey(cacheKey)) {
 			beanCopier = BeanUtils.BEAN_COPIER_MAP.get(cacheKey);
 		} else {
-			if (converter == null) {
-				beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), false);
-			} else {
-				beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), true);
-			}
+			beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), optional.isPresent());
 			BeanUtils.BEAN_COPIER_MAP.put(cacheKey, beanCopier);
 		}
 

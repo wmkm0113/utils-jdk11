@@ -175,6 +175,8 @@ public final class ZipFile implements Cloneable {
 			}
 			
 			this.readHeaders();
+		} else {
+			throw new ZipException("Current file doesn't exists!");
 		}
 	}
 
@@ -188,13 +190,13 @@ public final class ZipFile implements Cloneable {
 	private ZipFile(String filePath, String fileNameCharset,
 	                boolean splitArchive, long splitLength) {
 		this.filePath = filePath;
-		this.fileNameCharset = fileNameCharset;
+		this.fileNameCharset = fileNameCharset == null ? Globals.DEFAULT_ENCODING : fileNameCharset;
 		this.splitArchive = splitArchive;
 		this.splitLength = splitLength;
 	}
 
 	/**
-	 * Create zip file
+	 * Create zip file using default character encoding
 	 * @param filePath			Zip file path
 	 * @param zipOptions		Zip options
 	 * @see com.nervousync.commons.core.zip.ZipOptions
@@ -204,7 +206,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			String... addFiles) throws ZipException {
-		return ZipFile.createZipFile(filePath, null, zipOptions, 
+		return ZipFile.createZipFile(filePath, Globals.DEFAULT_ENCODING, zipOptions,
 				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, addFiles);
 	}
 	
@@ -237,7 +239,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
-		return ZipFile.createZipFile(filePath, null, zipOptions, splitArchive, splitLength, addFiles);
+		return ZipFile.createZipFile(filePath, Globals.DEFAULT_ENCODING, zipOptions, splitArchive, splitLength, addFiles);
 	}
 
 	private static void checkFilePath(String filePath) throws ZipException {
@@ -292,7 +294,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
 			String folderPath) throws ZipException {
-		return ZipFile.createZipFileFromFolder(filePath, null, zipOptions, 
+		return ZipFile.createZipFileFromFolder(filePath, Globals.DEFAULT_ENCODING, zipOptions,
 				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, folderPath);
 	}
 	
@@ -325,7 +327,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String folderPath) throws ZipException {
-		return ZipFile.createZipFileFromFolder(filePath, null, zipOptions, splitArchive, splitLength, folderPath);
+		return ZipFile.createZipFileFromFolder(filePath, Globals.DEFAULT_ENCODING, zipOptions, splitArchive, splitLength, folderPath);
 	}
 	
 	/**

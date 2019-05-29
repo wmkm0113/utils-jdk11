@@ -1,4 +1,22 @@
 Nervousync Utils Package
+[05/29/2019]
+Update bcprov to 1.61
+Update xalan to 2.7.2
+Update log4j to 2.11.2
+Update slf4j to 1.7.26
+Update jackson to 2.9.9
+Update jcifs to 2.1.2
+
+[03/21/2019]
+Add method to check String include emoji code
+
+[03/05/2019]
+Update jackson to 2.9.7
+Update cglib to 3.2.10
+Remove aspectj
+Add Support SMB v2 and v3
+Fix cglib set multi interceptors
+
 [09/21/2018]
 Add support for IPv6 address
 Add method to calc IPv6 address range by CIDR

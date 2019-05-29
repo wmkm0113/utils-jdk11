@@ -584,6 +584,45 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Check given string contains emoji info
+	 * @param string    Given string
+	 * @return          Check result
+	 */
+	public static boolean containsEmoji(String string) {
+		if (string != null && string.length() > 0) {
+			int length = string.length();
+			for (int i = 0 ; i < length ; i++) {
+				char c = string.charAt(i);
+				if (0xd800 <= c && c <= 0xdbff) {
+					if (length > 1) {
+						char next = string.charAt(i + 1);
+						int result = ((c - 0xd800) * 0x400) + (next - 0xdc00) + 0x10000;
+						if (0x1d000 <= result && result <= 0x1f77f) {
+							return true;
+						}
+					}
+				} else {
+					if ((0x2100 <= c && c <= 0x27ff && c != 0x263b)
+							|| (0x2805 <= c && c <= 0x2b07)
+							|| (0x3297 <= c && c <= 0x3299)
+							|| c == 0xa9 || c == 0xae || c == 0x303d
+							|| c == 0x3030 || c == 0x2b55 || c == 0x2b1c
+							|| c == 0x2b1b || c == 0x2b50) {
+						return true;
+					}
+
+					if (length > 1 && i < (length - 1)) {
+						char next = string.charAt(i + 1);
+						if (next == 0x20e3) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+	/**
 	 * Test whether the given string matches the given substring
 	 * at the given index.
 	 * @param str the original string (or StringBuilder)
@@ -628,11 +667,8 @@ public final class StringUtils {
 	 * @return a String with the replacements
 	 */
 	public static String replace(String inString, String oldPattern, String newPattern) {
-		if (inString == null) {
-			return null;
-		}
-		if (oldPattern == null || newPattern == null) {
-			return inString;
+		if (inString == null || oldPattern == null || newPattern == null) {
+			return "";
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
@@ -776,10 +812,10 @@ public final class StringUtils {
 	 */
 	public static String getFilenameExtension(String path) {
 		if (path == null) {
-			return null;
+			return "";
 		}
 		int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
-		return (sepIndex != -1 ? path.substring(sepIndex + 1) : null);
+		return (sepIndex != -1 ? path.substring(sepIndex + 1) : "");
 	}
 
 	/**
@@ -2027,9 +2063,6 @@ public final class StringUtils {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 			
 			switch (dataType) {
-			case STRING:
-				paramObj = StringUtils.formatForText(dataValue);
-				break;
 			case BOOLEAN:
 				paramObj = Boolean.valueOf(dataValue);
 				break;
