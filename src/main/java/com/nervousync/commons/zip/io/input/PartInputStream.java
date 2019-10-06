@@ -24,7 +24,7 @@ import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.crypto.Decryptor;
-import com.nervousync.commons.zip.crypto.impl.AESDecryptor;
+import com.nervousync.commons.zip.crypto.impl.aes.AESDecryptor;
 import com.nervousync.exceptions.zip.ZipException;
 
 /**

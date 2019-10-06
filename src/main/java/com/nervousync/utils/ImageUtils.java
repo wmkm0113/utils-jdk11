@@ -83,6 +83,22 @@ public final class ImageUtils {
 		}
 		return Globals.DEFAULT_VALUE_INT;
 	}
+
+	/**
+	 * Read image ratio
+	 * @param imagePath		image file path
+	 * @return  image ratio
+	 */
+	public static double imageRatio(String imagePath) {
+		double imageHeight = ImageUtils.imageHeight(imagePath);
+		double imageWidth = ImageUtils.imageHeight(imagePath);
+
+		if (imageHeight == Globals.DEFAULT_VALUE_DOUBLE || imageWidth == Globals.DEFAULT_VALUE_DOUBLE) {
+			return Globals.DEFAULT_VALUE_DOUBLE;
+		}
+
+		return imageWidth / imageHeight;
+	}
 	
 	/**
 	 * Cut image 

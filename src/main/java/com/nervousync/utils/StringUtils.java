@@ -74,16 +74,11 @@ public final class StringUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(StringUtils.class);
 
-	private static final String FOLDER_SEPARATOR = "/";
-
-	private static final String WINDOWS_FOLDER_SEPARATOR = "\\";
-
 	private static final String TOP_PATH = "..";
 
 	private static final String CURRENT_PATH = ".";
 
-	private static final char EXTENSION_SEPARATOR = '.';
-	
+	private static final String BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 	private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	private static final String AUTH_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
 	
@@ -138,13 +133,101 @@ public final class StringUtils {
 	public static boolean isNotNullAndNotEmpty(String str) {
 		return str != null && str.trim().length() > 0;
 	}
-	
+
+	/**
+	 * Base32 encoder
+	 * @param bytes		byte arrays
+	 * @return			Encoded base32 result
+	 */
+	public static String base32Encode(final byte[] bytes) {
+		if (bytes == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+
+		int i = 0, index = 0;
+		int currentByte, nextByte, digit;
+
+		while (i < bytes.length) {
+			currentByte = bytes[i] >= 0 ? bytes[i] : bytes[i] + 256;
+
+			if (index > 3) {
+				if ((i + 1) < bytes.length) {
+					nextByte = bytes[i + 1] >= 0 ? bytes[i + 1] : bytes[i + 1] + 256;
+				} else {
+					nextByte = 0;
+				}
+
+				digit = currentByte & (0xFF >> index);
+				index = (index + 5) % 8;
+				digit = (digit << index) | nextByte >> (8 - index);
+				i++;
+			} else {
+				digit = (currentByte >> (8 - (index + 5))) & 0x1F;
+				index = (index + 5) % 8;
+				if (index == 0) {
+					i++;
+				}
+			}
+			stringBuilder.append(BASE32.charAt(digit));
+		}
+
+		while (stringBuilder.length() % 5 > 0) {
+			stringBuilder.append("=");
+		}
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Base32 decoder
+	 * @param string	Encoded base32 string
+	 * @return			Decode byte arrays
+	 */
+	public static byte[] base32Decode(String string) {
+		if (string == null) {
+			return null;
+		}
+		while (string.endsWith("=")) {
+			string = string.substring(0, string.length() - 1);
+		}
+
+		byte[] bytes = new byte[string.length() * 5 / 8];
+		int index = 0;
+		StringBuilder stringBuilder = new StringBuilder(8);
+		StringBuilder temp;
+		for (String c : string.split("")) {
+			if (BASE32.contains(c)) {
+				int current = BASE32.indexOf(c);
+				temp = new StringBuilder(5);
+				for (int i = 0 ; i < 5 ; i++) {
+					temp.append(current & 1);
+					current >>>= 1;
+				}
+				temp.reverse();
+				if (stringBuilder.length() >= 3) {
+					int currentLength = 8 - stringBuilder.length();
+					stringBuilder.append(temp.substring(0, currentLength));
+					bytes[index] = (byte)Integer.valueOf(stringBuilder.toString(), 2).intValue();
+					index++;
+					stringBuilder = new StringBuilder(8);
+					stringBuilder.append(temp.substring(currentLength));
+				} else {
+					stringBuilder.append(temp.toString());
+				}
+			}
+		}
+		return bytes;
+	}
+
 	/**
 	 * Base64 encoder
 	 * @param bytes		byte arrays
 	 * @return			Encoded base64 result
 	 */
-	public static String base64Encode(byte[] bytes) {
+	public static String base64Encode(final byte[] bytes) {
+		if (bytes == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
 		int length = bytes.length;
 		byte[] tempBytes;
 		if (length % 3 == 0) {
@@ -180,13 +263,16 @@ public final class StringUtils {
 		
 		return new String(charArray);
 	}
-	
+
 	/**
 	 * Base64 decoder
 	 * @param string	Encoded base64 string
 	 * @return			Decode byte arrays
 	 */
 	public static byte[] base64Decode(String string) {
+		if (string == null) {
+			return null;
+		}
 		while (string.endsWith("=")) {
 			string = string.substring(0, string.length() - 1);
 		}
@@ -196,12 +282,12 @@ public final class StringUtils {
 		int index = 0;
 		for (int i = 0 ; i < string.length() ; i += 4) {
 			int index1 = BASE64.indexOf(string.charAt(i + 1));
-			int index2 = BASE64.indexOf(string.charAt(i + 2));
 			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (index1 >> 4)) & 0xFF);
 			if (index * 3 + 1 >= bytes.length) {
 				break;
 			}
-			
+
+			int index2 = BASE64.indexOf(string.charAt(i + 2));
 			bytes[index * 3 + 1] = (byte)(((index1 << 4) | (index2 >> 2)) & 0xFF);
 			if (index * 3 + 2 >= bytes.length) {
 				break;
@@ -800,7 +886,7 @@ public final class StringUtils {
 			return null;
 		}
 		path = cleanPath(path);
-		int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+		int separatorIndex = path.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
 		return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
 	}
 
@@ -814,7 +900,7 @@ public final class StringUtils {
 		if (path == null) {
 			return "";
 		}
-		int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
+		int sepIndex = path.lastIndexOf(Globals.EXTENSION_SEPARATOR);
 		return (sepIndex != -1 ? path.substring(sepIndex + 1) : "");
 	}
 
@@ -829,7 +915,7 @@ public final class StringUtils {
 		if (path == null) {
 			return null;
 		}
-		int sepIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
+		int sepIndex = path.lastIndexOf(Globals.EXTENSION_SEPARATOR);
 		return (sepIndex != -1 ? path.substring(0, sepIndex) : path);
 	}
 
@@ -842,11 +928,11 @@ public final class StringUtils {
 	 * @return the full file path that results from applying the relative path
 	 */
 	public static String applyRelativePath(String path, String relativePath) {
-		int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+		int separatorIndex = path.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
 		if (separatorIndex != -1) {
 			String newPath = path.substring(0, separatorIndex);
-			if (!relativePath.startsWith(FOLDER_SEPARATOR)) {
-				newPath += FOLDER_SEPARATOR;
+			if (!relativePath.startsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
+				newPath += Globals.DEFAULT_PAGE_SEPARATOR;
 			}
 			return newPath + relativePath;
 		}
@@ -864,7 +950,7 @@ public final class StringUtils {
 	 * @return the normalized path
 	 */
 	public static String cleanPath(String path) {
-		String pathToUse = replace(path, WINDOWS_FOLDER_SEPARATOR, FOLDER_SEPARATOR);
+		String pathToUse = path;
 
 		// Strip prefix from path to analyze, to not treat it as part of the
 		// first path element. This is necessary to correctly parse paths like
@@ -877,7 +963,7 @@ public final class StringUtils {
 			pathToUse = pathToUse.substring(prefixIndex + 1);
 		}
 
-		String[] pathArray = delimitedListToStringArray(pathToUse, FOLDER_SEPARATOR);
+		String[] pathArray = delimitedListToStringArray(pathToUse, Globals.DEFAULT_PAGE_SEPARATOR);
 		List<String> pathElements = new LinkedList<>();
 		int tops = 0;
 
@@ -903,7 +989,7 @@ public final class StringUtils {
 			pathElements.add(0, TOP_PATH);
 		}
 
-		return prefix + collectionToDelimitedString(pathElements, FOLDER_SEPARATOR);
+		return prefix + collectionToDelimitedString(pathElements, Globals.DEFAULT_PAGE_SEPARATOR);
 	}
 
 	/**

@@ -39,8 +39,8 @@ import com.nervousync.commons.core.zip.ZipConstants;
 import com.nervousync.commons.core.zip.ZipOptions;
 import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.crypto.Decryptor;
-import com.nervousync.commons.zip.crypto.impl.AESDecryptor;
-import com.nervousync.commons.zip.crypto.impl.StandardDecryptor;
+import com.nervousync.commons.zip.crypto.impl.aes.AESDecryptor;
+import com.nervousync.commons.zip.crypto.impl.standard.StandardDecryptor;
 import com.nervousync.commons.zip.io.SplitOutputStream;
 import com.nervousync.commons.zip.io.ZipOutputStream;
 import com.nervousync.commons.zip.io.input.InflaterInputStream;
@@ -429,9 +429,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public List<String> entryList() {
 		List<String> entryList = new ArrayList<>();
-		for (GeneralFileHeader generalFileHeader : this.centralDirectory.getFileHeaders()) {
-			entryList.add(generalFileHeader.getEntryPath());
-		}
+		this.centralDirectory.getFileHeaders().forEach(generalFileHeader -> entryList.add(generalFileHeader.getEntryPath()));
 		return entryList;
 	}
 	
@@ -586,10 +584,8 @@ public final class ZipFile implements Cloneable {
 		if (this.centralDirectory == null || this.centralDirectory.getFileHeaders() == null) {
 			throw new ZipException("Invalid central directory in zip entity");
 		}
-		
-		for (GeneralFileHeader generalFileHeader : this.centralDirectory.getFileHeaders()) {
-			this.extractFile(generalFileHeader, destPath, ignoreFileAttr);
-		}
+
+		this.centralDirectory.getFileHeaders().forEach(generalFileHeader -> this.extractFile(generalFileHeader, destPath, ignoreFileAttr));
 	}
 	
 	/**
@@ -1116,16 +1112,13 @@ public final class ZipFile implements Cloneable {
 		if (inputStream == null) {
 			throw new ZipException("No data to added");
 		}
-		
-		ZipOutputStream outputStream = null;
-		
-		try {
+
+		try (ZipOutputStream outputStream = this.openOutputStream()) {
 			this.checkOptions(zipOptions);
 
 			byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 			int readLength;
 
-			outputStream = this.openOutputStream();
 			outputStream.putNextEntry(null, zipOptions);
 			
 			if (!zipOptions.getFileNameInZip().endsWith(ZipConstants.ZIP_FILE_SEPARATOR) 
@@ -1139,8 +1132,6 @@ public final class ZipFile implements Cloneable {
 			outputStream.finish();
 		} catch (Exception e) {
 			throw new ZipException(e);
-		} finally {
-			IOUtils.closeStream(outputStream);
 		}
 	}
 	
@@ -1408,15 +1399,8 @@ public final class ZipFile implements Cloneable {
 			}
 			
 			input = this.createFileHandler();
-			
-			LocalFileHeader localFileHeader = 
-					this.readLocalFileHeader(input, generalFileHeader);
-			
-			if (localFileHeader == null) {
-				throw new ZipException("invalid local file header, cannot remove file from archive");
-			}
-			
-			if (!localFileHeader.verifyPassword(input)) {
+
+			if (!this.readLocalFileHeader(input, generalFileHeader).verifyPassword(input)) {
 				throw new ZipException("Wrong password or Unsupported encryption method!");
 			}
 			
@@ -1686,11 +1670,7 @@ public final class ZipFile implements Cloneable {
 			
 			LocalFileHeader localFileHeader = 
 					this.readLocalFileHeader(input, generalFileHeader);
-			
-			if (localFileHeader == null) {
-				throw new ZipException("Error reading local header!");
-			}
-			
+
 			if (localFileHeader.getCompressionMethod() != generalFileHeader.getCompressionMethod()) {
 				throw new ZipException("local header does not matched with general header");
 			}
@@ -1939,10 +1919,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	private void readHeaders() throws ZipException {
-		NervousyncRandomAccessFile input = null;
-		
-		try {
-			input = new NervousyncRandomAccessFile(this.filePath, Globals.READ_MODE);
+		try (NervousyncRandomAccessFile input = new NervousyncRandomAccessFile(this.filePath, Globals.READ_MODE)) {
 			this.readEndOfCentralDirectoryRecord(input);
 
 			// Check and set zip64 format
@@ -1958,16 +1935,6 @@ public final class ZipFile implements Cloneable {
 				throw (ZipException)e;
 			} else {
 				throw new ZipException(e);
-			}
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					if (this.logger.isDebugEnabled()) {
-						this.logger.debug("Close random access file error! ", e);
-					}
-				}
 			}
 		}
 	}
@@ -2376,7 +2343,7 @@ public final class ZipFile implements Cloneable {
 			HeaderOperator.appendIntToArrayList((int) ZipConstants.ZIP64ENDCENDIRREC, headerBytesList);
 
 			// size of zip64 end of central directory record
-			HeaderOperator.appendLongToArrayList((long) 44, headerBytesList);
+			HeaderOperator.appendLongToArrayList(44L, headerBytesList);
 
 			// version made by
 			// version needed to extract

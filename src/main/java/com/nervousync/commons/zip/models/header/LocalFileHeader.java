@@ -22,7 +22,7 @@ import java.io.RandomAccessFile;
 
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
-import com.nervousync.commons.zip.crypto.impl.AESCrypto;
+import com.nervousync.commons.zip.crypto.impl.aes.AESCrypto;
 import com.nervousync.commons.zip.models.header.utils.HeaderOperator;
 import com.nervousync.exceptions.zip.ZipException;
 

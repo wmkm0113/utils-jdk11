@@ -430,7 +430,7 @@
 						</manifestEntries>
 					</archive>
 					<excludes>
-						<exclude>com/nervousync/datas/*.dat</exclude>
+						<exclude>log4j2.xml</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -477,7 +477,7 @@
 								</manifestEntries>
 							</archive>
 							<excludes>
-								<exclude>*.dat</exclude>
+								<exclude>log4j2.xml</exclude>
 							</excludes>
 						</configuration>
 					</plugin>

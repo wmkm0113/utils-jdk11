@@ -150,7 +150,7 @@ public class BaseElement implements Serializable {
 			stringWriter = new StringWriter();
 			XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(stringWriter);
 			CDataStreamWriter streamWriter = new CDataStreamWriter(xmlWriter);
-			
+
 			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass());
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);

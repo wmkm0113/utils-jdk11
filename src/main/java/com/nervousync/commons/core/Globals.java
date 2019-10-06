@@ -59,6 +59,15 @@ public final class Globals {
 	public static final String READ_MODE = "r";
 	public static final String WRITE_MODE = "rw";
 
+	public static final String FTP_PROTOCOL = "ftp://";
+	public static final String SECURE_FTP_PROTOCOL = "sftp://";
+	public static final String WEBDAV_PROTOCOL = "webdav://";
+	public static final String FILE_PROTOCOL = "file:///";
+	public static final String HTTP_PROTOCOL = "http://";
+	public static final String SECURE_HTTP_PROTOCOL = "https://";
+
+	public static final char EXTENSION_SEPARATOR = '.';
+
 	public static final String DEFAULT_EMAIL_FOLDER_INBOX = "INBOX";
 	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final Locale DEFAULT_LOCALE = Locale.getDefault();
@@ -69,6 +78,8 @@ public final class Globals {
 	public static final String DEFAULT_URL_SEPARATOR = "/";
 	public static final String DEFAULT_JAR_PAGE_SEPARATOR = "\\";
 	public static final String DEFAULT_ZIP_PAGE_SEPARATOR = "/";
+
+	public static final String WEB_INF_FOLDER = Globals.DEFAULT_PAGE_SEPARATOR + "WEB-INF";
 
 	public static final String DEFAULT_DOWNLOAD_CONFIGURE = "nervousync_download.conf";
 	

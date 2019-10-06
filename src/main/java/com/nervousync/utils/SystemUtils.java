@@ -123,7 +123,7 @@ public final class SystemUtils {
 	}
 
 	public static boolean isWindows() {
-		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("windows") > 0;
+		return OPERATE_SYSTEM_NAME.toLowerCase().contains("windows");
 	}
 
 	public static boolean isUnix() {

@@ -67,7 +67,7 @@ public final class PBKDF2Engine {
 		
 		byte[] passwordBytes = this.deriveKey(password, referenceKey.length);
 		
-		if (passwordBytes == null || passwordBytes.length != referenceKey.length) {
+		if (passwordBytes.length != referenceKey.length) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 		

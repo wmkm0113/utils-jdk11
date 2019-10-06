@@ -235,13 +235,6 @@ public final class PropertiesUtils {
 		if (keyName == null) {
 			return null;
 		}
-		
-		Properties properties = loadProperties(propertiesFilePath);
-		
-		if (properties == null) {
-			return null;
-		}
-		
-		return properties.getProperty(keyName);
+		return loadProperties(propertiesFilePath).getProperty(keyName);
 	}
 }

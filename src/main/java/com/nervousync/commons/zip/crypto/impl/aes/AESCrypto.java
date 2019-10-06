@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nervousync.commons.zip.crypto.impl;
+package com.nervousync.commons.zip.crypto.impl.aes;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -215,8 +215,7 @@ public class AESCrypto {
 		byte[] keyBytes = this.deriveKey(this.saltBytes, password, 
 				this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH);
 		
-		if (keyBytes == null || keyBytes.length != 
-				(this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH)) {
+		if (keyBytes.length != (this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH)) {
 			throw new ZipException("Invalid derived key!");
 		}
 
