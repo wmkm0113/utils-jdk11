@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nervousync.commons.zip.engine.PBKDF2;
+package com.nervousync.commons.zip.engine;
 
 import com.nervousync.commons.core.Globals;
-import com.nervousync.commons.zip.crypto.PBKDF2.MacBasedPRF;
-import com.nervousync.commons.zip.crypto.PBKDF2.PBKDF2Options;
+import com.nervousync.commons.zip.crypto.engine.MacBasedPRF;
+import com.nervousync.commons.zip.crypto.engine.PBKDF2Options;
 import com.nervousync.utils.RawUtils;
 
 /**

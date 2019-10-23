@@ -56,7 +56,7 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	private static final long serialVersionUID = -1427305383899073910L;
 	
-	private transient final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Response status code
@@ -135,7 +135,7 @@ public final class HttpResponseContent implements Serializable {
 	 * @return the responseContent
 	 */
 	public byte[] getResponseContent() {
-		return responseContent;
+		return responseContent == null ? new byte[0] : responseContent.clone();
 	}
 	
 	public HttpResponseContent(HttpURLConnection urlConnection) {

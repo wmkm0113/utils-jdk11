@@ -71,7 +71,7 @@ public final class StandardEncryptor implements Encryptor {
 	 * @return the headerBytes
 	 */
 	public byte[] getHeaderBytes() {
-		return headerBytes;
+		return headerBytes == null ? new byte[0] : headerBytes.clone();
 	}
 
 	private void init(char[] password, int crc) throws ZipException {

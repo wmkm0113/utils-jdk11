@@ -21,10 +21,10 @@ import java.util.Random;
 
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.core.zip.ZipConstants;
-import com.nervousync.commons.zip.crypto.PBKDF2.MacBasedPRF;
-import com.nervousync.commons.zip.crypto.PBKDF2.PBKDF2Options;
+import com.nervousync.commons.zip.crypto.engine.MacBasedPRF;
+import com.nervousync.commons.zip.crypto.engine.PBKDF2Options;
 import com.nervousync.commons.zip.engine.AESEngine;
-import com.nervousync.commons.zip.engine.PBKDF2.PBKDF2Engine;
+import com.nervousync.commons.zip.engine.PBKDF2Engine;
 import com.nervousync.exceptions.zip.ZipException;
 import com.nervousync.utils.RawUtils;
 
@@ -108,7 +108,7 @@ public class AESCrypto {
 	 * @return the saltBytes
 	 */
 	public byte[] getSaltBytes() {
-		return saltBytes;
+		return saltBytes == null ? new byte[0] : saltBytes.clone();
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class AESCrypto {
 		if (password == null || password.length == 0) {
 			throw new ZipException("Password is null or empty");
 		}
-		this.saltBytes = salt;
+		this.saltBytes = salt == null ? new byte[0] : salt.clone();
 		this.initCrypto(password);
 	}
 

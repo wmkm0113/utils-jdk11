@@ -107,12 +107,18 @@ public final class HttpEntity {
 	 * Add binary parameter
 	 * @param name		Parameter name
 	 * @param value		Upload file path
-	 * @throws FileNotFoundException	Upload file is not exists
 	 */
-	public void addBinaryEntity(String name, String value) throws FileNotFoundException {
-		this.entityList.add(EntityInfo.generateBinaryEntity(name, value));
-		if (this.boundary == null) {
-			this.boundary = this.generateBoundary();
+	public void addBinaryEntity(String name, String value) {
+		try {
+			this.entityList.add(EntityInfo.generateBinaryEntity(name, value));
+			if (this.boundary == null) {
+				this.boundary = this.generateBoundary();
+			}
+		} catch (FileNotFoundException e) {
+			this.logger.error("Upload file not found! ");
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("Stack message: ", e);
+			}
 		}
 	}
 	
@@ -187,7 +193,7 @@ public final class HttpEntity {
 				stringBuilder.append(CRLF);
 				stringBuilder.append(CRLF);
 				
-				outputStream.write(stringBuilder.toString().getBytes());
+				outputStream.write(stringBuilder.toString().getBytes(Globals.DEFAULT_ENCODING));
 				if (entityInfo.isBinary()) {
 					outputStream.write(FileUtils.readFileBytes(value));
 				} else {

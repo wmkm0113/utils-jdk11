@@ -107,8 +107,12 @@ public final class SnowflakeUtils {
 	 */
 	public static void initialize(long referenceTime, long instanceId) {
 		if (INSTANCE == null) {
-			INSTANCE = new SnowflakeUtils(referenceTime, instanceId);
+			setINSTANCE(new SnowflakeUtils(referenceTime, instanceId));
 		}
+	}
+
+	private static void setINSTANCE(SnowflakeUtils snowflakeUtils) {
+		INSTANCE = snowflakeUtils;
 	}
 	
 	/**

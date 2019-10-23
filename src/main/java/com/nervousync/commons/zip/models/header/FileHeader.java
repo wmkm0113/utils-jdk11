@@ -82,15 +82,17 @@ public class FileHeader {
 	 * @return the generalPurposeFlag
 	 */
 	public byte[] getGeneralPurposeFlag() {
-		return generalPurposeFlag;
+		return generalPurposeFlag == null ? new byte[0] : generalPurposeFlag.clone();
 	}
 
 	/**
 	 * @param generalPurposeFlag the generalPurposeFlag to set
 	 */
 	public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
-		this.generalPurposeFlag = generalPurposeFlag;
-		this.setEncrypted((generalPurposeFlag[0] & 1) != 0);
+		this.generalPurposeFlag = generalPurposeFlag == null ? new byte[0] : generalPurposeFlag.clone();
+		if (generalPurposeFlag != null) {
+			this.setEncrypted((generalPurposeFlag[0] & 1) != 0);
+		}
 	}
 
 	/**
@@ -139,14 +141,14 @@ public class FileHeader {
 	 * @return the crcBuffer
 	 */
 	public byte[] getCrcBuffer() {
-		return crcBuffer;
+		return crcBuffer == null ? new byte[0] : crcBuffer.clone();
 	}
 
 	/**
 	 * @param crcBuffer the crcBuffer to set
 	 */
 	public void setCrcBuffer(byte[] crcBuffer) {
-		this.crcBuffer = crcBuffer;
+		this.crcBuffer = crcBuffer == null ? new byte[0] : crcBuffer.clone();
 	}
 
 	/**
@@ -237,14 +239,14 @@ public class FileHeader {
 	 * @return the password
 	 */
 	public char[] getPassword() {
-		return password;
+		return password == null ? new char[0] : password.clone();
 	}
 
 	/**
 	 * @param password the password to set
 	 */
 	public void setPassword(char[] password) {
-		this.password = password;
+		this.password = password == null ? new char[0] : password.clone();
 	}
 
 	/**

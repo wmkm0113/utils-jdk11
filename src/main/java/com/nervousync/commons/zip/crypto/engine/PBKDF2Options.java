@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nervousync.commons.zip.crypto.PBKDF2;
+package com.nervousync.commons.zip.crypto.engine;
 
 import com.nervousync.commons.core.Globals;
 
@@ -42,7 +42,7 @@ public final class PBKDF2Options {
 			byte[] salt, int iterationCount) {
         this.hashAlgorithm = hashAlgorithm;
         this.hashCharset = hashCharset;
-        this.salt = salt;
+        this.salt = salt == null ? new byte[0] : salt.clone();
         this.iterationCount = iterationCount;
         this.derivedKey = null;
 	}
@@ -51,23 +51,23 @@ public final class PBKDF2Options {
 			byte[] salt, int iterationCount, byte[] derivedKey) {
         this.hashAlgorithm = hashAlgorithm;
         this.hashCharset = hashCharset;
-        this.salt = salt;
+        this.salt = salt == null ? new byte[0] : salt.clone();
         this.iterationCount = iterationCount;
-        this.derivedKey = derivedKey;
+        this.derivedKey = derivedKey == null ? new byte[0] : derivedKey.clone();
 	}
 
 	/**
 	 * @return the salt
 	 */
 	public byte[] getSalt() {
-		return salt;
+		return salt == null ? new byte[0] : salt.clone();
 	}
 
 	/**
 	 * @param salt the salt to set
 	 */
 	public void setSalt(byte[] salt) {
-		this.salt = salt;
+		this.salt = salt == null ? new byte[0] : salt.clone();
 	}
 
 	/**
@@ -116,13 +116,13 @@ public final class PBKDF2Options {
 	 * @return the derivedKey
 	 */
 	public byte[] getDerivedKey() {
-		return derivedKey;
+		return derivedKey == null ? new byte[0] : derivedKey.clone();
 	}
 
 	/**
 	 * @param derivedKey the derivedKey to set
 	 */
 	public void setDerivedKey(byte[] derivedKey) {
-		this.derivedKey = derivedKey;
+		this.derivedKey = derivedKey == null ? new byte[0] : derivedKey.clone();
 	}
 }

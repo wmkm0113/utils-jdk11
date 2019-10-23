@@ -112,4 +112,14 @@ public class SegmentationFile extends BaseElement {
 	public List<SegmentationItem> getSegmentationItemList() {
 		return segmentationItemList;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		return super.equals(o);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

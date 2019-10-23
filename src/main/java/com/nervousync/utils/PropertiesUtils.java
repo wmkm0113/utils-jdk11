@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
@@ -87,7 +88,7 @@ public final class PropertiesUtils {
 		Properties properties = new Properties();
 		InputStream inputStream;
 		if (propertiesContent != null) {
-			inputStream = new ByteArrayInputStream(propertiesContent.getBytes());
+			inputStream = new ByteArrayInputStream(propertiesContent.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)));
 			
 			try {
 				if (propertiesContent.startsWith("<")) {
@@ -169,12 +170,11 @@ public final class PropertiesUtils {
 		try {
 			Properties modifyProperties = loadProperties(propertiesFilePath);
 
-			for (String key : modifyMap.keySet()) {
-				String value = modifyMap.get(key);
+			modifyMap.forEach((key, value) -> {
 				if (value != null) {
 					modifyProperties.setProperty(key, value);
 				}
-			}
+			});
 
 			return storeProperties(modifyProperties, propertiesFilePath, comment);
 		} catch (Exception e) {

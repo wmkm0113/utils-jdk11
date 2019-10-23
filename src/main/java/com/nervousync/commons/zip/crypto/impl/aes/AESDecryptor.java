@@ -93,13 +93,13 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 	 * @return the storedMac
 	 */
 	public byte[] getStoredMac() {
-		return storedMac;
+		return storedMac == null ? new byte[0] : storedMac.clone();
 	}
 
 	/**
 	 * @param storedMac the storedMac to set
 	 */
 	public void setStoredMac(byte[] storedMac) {
-		this.storedMac = storedMac;
+		this.storedMac = storedMac == null ? new byte[0] : storedMac.clone();
 	}
 }

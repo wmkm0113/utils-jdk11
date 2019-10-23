@@ -77,28 +77,28 @@ public final class GeneralFileHeader extends FileHeader {
 	 * @return the internalFileAttr
 	 */
 	public byte[] getInternalFileAttr() {
-		return internalFileAttr;
+		return internalFileAttr == null ? new byte[0] : internalFileAttr.clone();
 	}
 
 	/**
 	 * @param internalFileAttr the internalFileAttr to set
 	 */
 	public void setInternalFileAttr(byte[] internalFileAttr) {
-		this.internalFileAttr = internalFileAttr;
+		this.internalFileAttr = internalFileAttr == null ? new byte[0] : internalFileAttr.clone();
 	}
 
 	/**
 	 * @return the externalFileAttr
 	 */
 	public byte[] getExternalFileAttr() {
-		return externalFileAttr;
+		return externalFileAttr == null ? new byte[0] : externalFileAttr.clone();
 	}
 
 	/**
 	 * @param externalFileAttr the externalFileAttr to set
 	 */
 	public void setExternalFileAttr(byte[] externalFileAttr) {
-		this.externalFileAttr = externalFileAttr;
+		this.externalFileAttr = externalFileAttr == null ? new byte[0] : externalFileAttr.clone();
 	}
 
 	/**

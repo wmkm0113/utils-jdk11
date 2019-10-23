@@ -40,14 +40,14 @@ public class LocalFileHeader extends FileHeader {
 	 * @return the extraField
 	 */
 	public byte[] getExtraField() {
-		return extraField;
+		return extraField == null ? new byte[0] : extraField.clone();
 	}
 
 	/**
 	 * @param extraField the extraField to set
 	 */
 	public void setExtraField(byte[] extraField) {
-		this.extraField = extraField;
+		this.extraField = extraField == null ? new byte[0] : extraField.clone();
 	}
 
 	/**

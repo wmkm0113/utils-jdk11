@@ -1,4 +1,16 @@
 Nervousync Utils Package
+[10/23/2019]
+Add HuffmanTree support
+Update bcprov to 1.64
+Update cglib to 3.3.0
+Update log4j to 2.12.1
+Update slf4j to 1.7.28
+Update jackson to 2.10.0
+Update snmp4j to 2.8.0
+Update javamail to 1.6.4
+Update jcifs to 2.1.3
+Fix bug for pass FindBug analyze
+
 [05/29/2019]
 Update bcprov to 1.61
 Update xalan to 2.7.2

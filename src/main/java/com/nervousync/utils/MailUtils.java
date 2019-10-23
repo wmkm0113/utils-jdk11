@@ -126,8 +126,8 @@ public final class MailUtils {
 			if (mailObject.getContentMap() != null) {
 				Map<String, String> argsMap = mailObject.getContentMap();
 
-				for (String key : argsMap.keySet()) {
-					content = StringUtils.replace(content, "###" + key + "###", argsMap.get(key));
+				for (Map.Entry<String, String> entry : argsMap.entrySet()) {
+					content = StringUtils.replace(content, "###" + entry.getKey() + "###", entry.getValue());
 				}
 			}
 			

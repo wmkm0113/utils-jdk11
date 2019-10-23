@@ -137,13 +137,13 @@ public final class AuthenticatorUtils {
 		byte[] hash;
 		switch (calcType) {
 			case HmacSHA1:
-				hash = SecurityUtils.SignDataByHmacSHA1(secret, signData);
+				hash = SecurityUtils.signDataByHmacSHA1(secret, signData);
 				break;
 			case HmacSHA256:
-				hash = SecurityUtils.SignDataByHmacSHA256(secret, signData);
+				hash = SecurityUtils.signDataByHmacSHA256(secret, signData);
 				break;
 			case HmacSHA512:
-				hash = SecurityUtils.SignDataByHmacSHA512(secret, signData);
+				hash = SecurityUtils.signDataByHmacSHA512(secret, signData);
 				break;
 				default:
 					return Globals.DEFAULT_VALUE_INT;

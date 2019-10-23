@@ -1,4 +1,16 @@
 Nervous 工具包
+[10/23/2019]
+增加HuffmanTree操作
+更新bcprov版本为1.64
+更新cglib版本为3.3.0
+更新log4j版本为2.12.1
+更新slf4j版本为1.7.28
+更新jackson版本为2.10.0
+更新snmp4j版本为2.8.0
+更新javamail版本为1.6.4
+更新jcifs版本为2.1.3
+修改FindBug分析中的性能警告及異常警告
+
 [05/29/2019]
 更新bcprov版本為1.61
 更新xalan版本為2.7.2

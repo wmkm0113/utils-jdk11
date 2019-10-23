@@ -74,6 +74,6 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 	 * @return the derivedPasswordVerifier
 	 */
 	public byte[] getDerivedPasswordVerifier() {
-		return derivedPasswordVerifier;
+		return derivedPasswordVerifier == null ? new byte[0] : derivedPasswordVerifier.clone();
 	}
 }

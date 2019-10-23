@@ -31,7 +31,6 @@ import java.util.Date;
 
 /**
  * The type Segmentation item.
- *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $Date: 2018-10-15 12:41
  */
@@ -125,7 +124,7 @@ public class SegmentationItem extends BaseElement {
 	 * @return the current time
 	 */
 	public Date getCurrentTime() {
-		return currentTime;
+		return currentTime == null ? null : (Date)currentTime.clone();
 	}
 	
 	/**
@@ -141,5 +140,15 @@ public class SegmentationItem extends BaseElement {
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return super.equals(o);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

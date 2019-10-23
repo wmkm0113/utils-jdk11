@@ -18,6 +18,7 @@ package com.nervousync.utils;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -939,8 +940,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param message		Signature datas
 	 * @return				Signature info
 	 */
-	public static byte[] SignDataWithDSA(PrivateKey privateKey, String message) {
-		return SignData(privateKey, message.getBytes(), "SHA256withDSA");
+	public static byte[] signDataWithDSA(PrivateKey privateKey, String message) {
+		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withDSA");
 	}
 
 	/**
@@ -949,8 +950,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param datas			Signature datas
 	 * @return				Signature info
 	 */
-	public static byte[] SignDataWithDSA(PrivateKey privateKey, byte[] datas) {
-		return SignData(privateKey, datas, "SHA256withDSA");
+	public static byte[] signDataWithDSA(PrivateKey privateKey, byte[] datas) {
+		return signData(privateKey, datas, "SHA256withDSA");
 	}
 	
 	/**
@@ -960,9 +961,9 @@ public final class SecurityUtils implements Serializable {
 	 * @param signature		Signature info
 	 * @return				Verify result
 	 */
-	public static boolean VerifyDSASign(PublicKey publicKey, 
+	public static boolean verifyDSASign(PublicKey publicKey,
 			byte[] datas, byte[] signature) {
-		return VerifySign(publicKey, datas, signature, "SHA256withDSA");
+		return verifySign(publicKey, datas, signature, "SHA256withDSA");
 	}
 
 	/**
@@ -971,8 +972,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param message		Signature datas
 	 * @return				Signature info
 	 */
-	public static byte[] SignDataWithRSA(PrivateKey privateKey, String message) {
-		return SignData(privateKey, message.getBytes(), "SHA256withRSA");
+	public static byte[] signDataWithRSA(PrivateKey privateKey, String message) {
+		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withRSA");
 	}
 
 	/**
@@ -981,8 +982,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param datas			Signature datas
 	 * @return				Signature info
 	 */
-	public static byte[] SignDataWithRSA(PrivateKey privateKey, byte[] datas) {
-		return SignData(privateKey, datas, "SHA256withRSA");
+	public static byte[] signDataWithRSA(PrivateKey privateKey, byte[] datas) {
+		return signData(privateKey, datas, "SHA256withRSA");
 	}
 
 	/**
@@ -991,7 +992,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param signDatas		sign data bytes
 	 * @return				signature datas
 	 */
-	public static byte[] SignDataByHmacMD5(byte[] keyBytes, byte[] signDatas) {
+	public static byte[] signDataByHmacMD5(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacMD5");
 	}
 
@@ -1001,7 +1002,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param signDatas		sign data bytes
 	 * @return				signature datas
 	 */
-	public static byte[] SignDataByHmacSHA1(byte[] keyBytes, byte[] signDatas) {
+	public static byte[] signDataByHmacSHA1(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA1");
 	}
 
@@ -1011,7 +1012,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param signDatas		sign data bytes
 	 * @return				signature datas
 	 */
-	public static byte[] SignDataByHmacSHA256(byte[] keyBytes, byte[] signDatas) {
+	public static byte[] signDataByHmacSHA256(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA256");
 	}
 
@@ -1021,7 +1022,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param signDatas		sign data bytes
 	 * @return				signature datas
 	 */
-	public static byte[] SignDataByHmacSHA512(byte[] keyBytes, byte[] signDatas) {
+	public static byte[] signDataByHmacSHA512(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA512");
 	}
 
@@ -1032,9 +1033,9 @@ public final class SecurityUtils implements Serializable {
 	 * @param signature		Signature info
 	 * @return				Verify result
 	 */
-	public static boolean VerifyRSASign(PublicKey publicKey, 
+	public static boolean verifyRSASign(PublicKey publicKey,
 			byte[] datas, byte[] signature) {
-		return VerifySign(publicKey, datas, signature, "SHA256withRSA");
+		return verifySign(publicKey, datas, signature, "SHA256withRSA");
 	}
 
 	/**
@@ -1218,7 +1219,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param algorithm         Algorithm
 	 * @return                  Signature value bytes
 	 */
-	private static byte[] SignData(PrivateKey privateKey, byte[] datas, String algorithm) {
+	private static byte[] signData(PrivateKey privateKey, byte[] datas, String algorithm) {
 		try {
 			Signature signature = Signature.getInstance(algorithm);
 			signature.initSign(privateKey);
@@ -1238,7 +1239,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param algorithm     Algorithm
 	 * @return              Verify result
 	 */
-	private static boolean VerifySign(PublicKey publicKey, 
+	private static boolean verifySign(PublicKey publicKey,
 			byte[] datas, byte[] signature, String algorithm) {
 		try {
 			Signature signInstance = Signature.getInstance(algorithm);
@@ -1404,7 +1405,8 @@ public final class SecurityUtils implements Serializable {
 		}
 
 		if (ivContent.length > 0) {
-			System.arraycopy(SecurityUtils.MD5(keyContent).getBytes(), 0, ivContent, 0, ivContent.length);
+			System.arraycopy(SecurityUtils.MD5(keyContent).getBytes(Charset.defaultCharset()),
+					0, ivContent, 0, ivContent.length);
 			ivParameterSpec = new IvParameterSpec(ivContent);
 		}
 

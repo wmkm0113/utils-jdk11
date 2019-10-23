@@ -143,10 +143,10 @@ public class BaseProtocol implements Serializable {
 		
 		properties.setProperty(hostParam, host);
 		if (port != Globals.DEFAULT_VALUE_INT) {
-			properties.setProperty(portParam, Integer.valueOf(port).toString());
+			properties.setProperty(portParam, Integer.toString(port));
 		}
-		properties.setProperty(connectionTimeoutParam, Integer.valueOf(connectionTimeout).toString());
-		properties.setProperty(timeoutParam, Integer.valueOf(timeout).toString());
+		properties.setProperty(connectionTimeoutParam, Integer.toString(connectionTimeout));
+		properties.setProperty(timeoutParam, Integer.toString(timeout));
 		
 		if (ssl) {
 			Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
@@ -165,7 +165,7 @@ public class BaseProtocol implements Serializable {
 				properties.setProperty("mail.store.protocol", "imaps");
 				properties.setProperty("mail.imap.socketFactory.class", SSL_FACTORY_CLASS);
 				if (port != 0) {
-					properties.setProperty("mail.imap.socketFactory.port", Integer.valueOf(port).toString());
+					properties.setProperty("mail.imap.socketFactory.port", Integer.toString(port));
 				}
 			}
 			break;
@@ -183,7 +183,7 @@ public class BaseProtocol implements Serializable {
 				properties.setProperty("mail.store.protocol", "smtps");
 				properties.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY_CLASS);
 				if (port != 0) {
-					properties.setProperty("mail.smtp.socketFactory.port", Integer.valueOf(port).toString());
+					properties.setProperty("mail.smtp.socketFactory.port", Integer.toString(port));
 				}
 			} else {
 				properties.setProperty("mail.smtp.starttls.enable", "true");
@@ -196,7 +196,7 @@ public class BaseProtocol implements Serializable {
 				properties.setProperty("mail.store.protocol", "pop3s");
 				properties.setProperty("mail.pop3.socketFactory.class", SSL_FACTORY_CLASS);
 				if (port != 0) {
-					properties.setProperty("mail.pop3.socketFactory.port", Integer.valueOf(port).toString());
+					properties.setProperty("mail.pop3.socketFactory.port", Integer.toString(port));
 				}
 				properties.setProperty("mail.pop3.disabletop", "true");
 				properties.setProperty("mail.pop3.ssl.enable", "true");

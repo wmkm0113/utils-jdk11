@@ -26,11 +26,13 @@ import com.nervousync.utils.StringUtils;
  */
 public class HuffmanObject {
 
-	private final Hashtable<String, Object> codeMapping;
+	private final Hashtable<String, Object> codeMapping = new Hashtable<>();
 	private final String huffmanValue;
 	
 	public HuffmanObject(Hashtable<String, Object> codeMapping, String huffmanValue) {
-		this.codeMapping = codeMapping;
+		if (codeMapping != null) {
+			codeMapping.forEach(this.codeMapping::put);
+		}
 		this.huffmanValue = huffmanValue;
 	}
 
@@ -42,7 +44,9 @@ public class HuffmanObject {
 	 * @return the codeMapping
 	 */
 	public Hashtable<String, Object> getCodeMapping() {
-		return codeMapping;
+		Hashtable<String, Object> returnMap = new Hashtable<>();
+		codeMapping.forEach(returnMap::put);
+		return returnMap;
 	}
 
 	/**

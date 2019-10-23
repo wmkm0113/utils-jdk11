@@ -31,8 +31,8 @@ public class StandardDecryptor implements Decryptor {
 
 	private ZipCryptoEngine zipCryptoEngine;
 	
-	public StandardDecryptor(LocalFileHeader localFileHeader, 
-			byte[] decryptorHeader) throws ZipException {
+	public StandardDecryptor(LocalFileHeader localFileHeader, byte[] decryptorHeader)
+			throws ZipException {
 		if (localFileHeader == null) {
 			throw new ZipException("General file header is null!");
 		}

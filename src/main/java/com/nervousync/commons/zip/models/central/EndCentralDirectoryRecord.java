@@ -148,13 +148,13 @@ public final class EndCentralDirectoryRecord {
 	 * @return the commentBytes
 	 */
 	public byte[] getCommentBytes() {
-		return commentBytes;
+		return commentBytes == null ? new byte[0] : commentBytes.clone();
 	}
 
 	/**
 	 * @param commentBytes the commentBytes to set
 	 */
 	public void setCommentBytes(byte[] commentBytes) {
-		this.commentBytes = commentBytes;
+		this.commentBytes = commentBytes == null ? new byte[0] : commentBytes.clone();
 	}
 }

@@ -58,13 +58,13 @@ public final class ExtraDataRecord {
 	 * @return the dataContent
 	 */
 	public byte[] getDataContent() {
-		return dataContent;
+		return dataContent == null ? new byte[0] : dataContent.clone();
 	}
 
 	/**
 	 * @param dataContent the dataContent to set
 	 */
 	public void setDataContent(byte[] dataContent) {
-		this.dataContent = dataContent;
+		this.dataContent = dataContent == null ? new byte[0] : dataContent.clone();
 	}
 }

@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -129,12 +130,12 @@ public final class ConvertUtils {
 	 * @return				Convert byte arrays
 	 */
 	public static byte[] hexStrToByteArr(String strIn) {
-		byte[] arrB = strIn.getBytes();
+		byte[] arrB = strIn.getBytes(Charset.defaultCharset());
 		int iLen = arrB.length;
 
 		byte[] arrOut = new byte[iLen / 2];
 		for (int i = 0; i < iLen; i = i + 2) {
-			String strTmp = new String(arrB, i, 2);
+			String strTmp = new String(arrB, i, 2, Charset.defaultCharset());
 			arrOut[i / 2] = (byte) Integer.parseInt(strTmp, 16);
 		}
 		return unzipByteArray(arrOut);
@@ -192,7 +193,7 @@ public final class ConvertUtils {
 		try {
 			return new String(content, encoding);
 		} catch (UnsupportedEncodingException ex) {
-			return new String(content);
+			return new String(content, Charset.defaultCharset());
 		}
 	}
 
@@ -224,7 +225,7 @@ public final class ConvertUtils {
 		try {
 			return content.getBytes(encoding);
 		} catch (UnsupportedEncodingException ex) {
-			return content.getBytes();
+			return content.getBytes(Charset.defaultCharset());
 		}
 	}
 	

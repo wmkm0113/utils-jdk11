@@ -198,14 +198,14 @@ public final class MailObject implements Serializable {
 	 * @return the sendDate
 	 */
 	public Date getSendDate() {
-		return sendDate;
+		return sendDate == null ? null : (Date)sendDate.clone();
 	}
 
 	/**
 	 * @param sendDate the sendDate to set
 	 */
 	public void setSendDate(Date sendDate) {
-		this.sendDate = sendDate;
+		this.sendDate = sendDate == null ? null : (Date)sendDate.clone();
 	}
 
 	/**

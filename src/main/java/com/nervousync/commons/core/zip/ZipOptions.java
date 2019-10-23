@@ -249,7 +249,7 @@ public final class ZipOptions implements Cloneable {
 	 * @return the password
 	 */
 	public char[] getPassword() {
-		return password;
+		return password == null ? new char[0] : password.clone();
 	}
 
 	/**

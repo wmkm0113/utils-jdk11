@@ -147,7 +147,8 @@ public final class RequestInfo implements Serializable {
 	 * @param contentType      Content type
 	 * @param charset          Character encoding
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, List<SimpleHeader> headers, byte[] postDatas, String contentType, String charset) {
+	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, List<SimpleHeader> headers,
+	                   byte[] postDatas, String contentType, String charset) {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
 		this.timeOut = timeOut > 0 ? timeOut : Globals.DEFAULT_VALUE_INT;
@@ -158,7 +159,7 @@ public final class RequestInfo implements Serializable {
 		} else {
 			this.headers = new ArrayList<>();
 		}
-		this.postDatas = postDatas;
+		this.postDatas = postDatas == null ? new byte[0] : postDatas.clone();
 		this.parameters = new HashMap<>();
 		this.uploadParam = new HashMap<>();
 	}
@@ -273,7 +274,7 @@ public final class RequestInfo implements Serializable {
 		this.httpMethodOption = httpMethodOption;
 		this.charset = charset;
 		this.timeOut = timeOut;
-		this.postDatas = postDatas;
+		this.postDatas = postDatas == null ? new byte[0] : postDatas.clone();
 		if (headers != null) {
 			this.headers = headers;
 		} else {
@@ -403,7 +404,7 @@ public final class RequestInfo implements Serializable {
 	 * @return the postDatas
 	 */
 	public byte[] getPostDatas() {
-		return postDatas;
+		return postDatas == null ? new byte[0] : postDatas.clone();
 	}
 	
 	/**

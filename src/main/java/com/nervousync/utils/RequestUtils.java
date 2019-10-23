@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -56,7 +56,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -1343,7 +1346,7 @@ public final class RequestUtils {
 				return RequestUtils.processRequest(new RequestInfo(redirectUrl, requestInfo), cookieList);
 			}
 			return new HttpResponseContent(urlConnection);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			if (RequestUtils.LOGGER.isDebugEnabled()) {
 				RequestUtils.LOGGER.debug("Send Request ERROR: ", e);
 			}
@@ -1572,10 +1575,7 @@ public final class RequestUtils {
 		}
 		
 		Map<String, Object> attributeMap = requestAttribute.getAttributeMap();
-
-		for (String name : attributeMap.keySet()) {
-			request.setAttribute(name, attributeMap.get(name));
-		}
+		attributeMap.forEach(request::setAttribute);
 
 		request.getSession().removeAttribute(STOWED_REQUEST_ATTRIBS);
 	}
@@ -2009,7 +2009,7 @@ public final class RequestUtils {
 					}
 					
 					connection.setRequestProperty("Proxy-Authorization", 
-							StringUtils.base64Encode(authentication.getBytes()));
+							StringUtils.base64Encode(authentication.getBytes(Charset.forName(Globals.DEFAULT_ENCODING))));
 				}
 			} else {
 				connection = (HttpURLConnection)url.openConnection();
@@ -2037,7 +2037,17 @@ public final class RequestUtils {
 					((HttpsURLConnection)connection).setSSLSocketFactory(sslContext.getSocketFactory());
 				}
 			}
-		} catch (Exception e) {
+		} catch (IOException | NoSuchAlgorithmException e) {
+			LOGGER.error("Build connection error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+			connection = null;
+		} catch (com.nervousync.exceptions.http.CertificateException | CertificateException | KeyManagementException e) {
+			LOGGER.error("Process security certificate error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
 			connection = null;
 		}
 		return connection;
@@ -2080,33 +2090,27 @@ public final class RequestUtils {
 	 * @param parameters The parameter map
 	 * @param uploadFileMap The upload file map
 	 * @return URL for this grid tag
-	 * @throws FileNotFoundException if upload file was not found
 	 */
 
 	private static HttpEntity generateEntity(Map<String, String[]> parameters, 
-			Map<String, File> uploadFileMap) throws FileNotFoundException {
+			Map<String, File> uploadFileMap) {
 		if (parameters == null) {
 			parameters = new HashMap<>();
 		}
 		
 		HttpEntity httpEntity = HttpEntity.newInstance();
-
-		for (String key : parameters.keySet()) {
-			String[] values = parameters.get(key);
-
+		parameters.forEach((key, values) -> {
 			for (String value : values) {
 				httpEntity.addTextEntity(key, value);
 			}
-		}
+		});
 		
 		if (uploadFileMap != null && !uploadFileMap.isEmpty()) {
-			for (String key : uploadFileMap.keySet()) {
-				File uploadFile = uploadFileMap.get(key);
-
+			uploadFileMap.forEach((key, uploadFile) -> {
 				if (uploadFile != null) {
 					httpEntity.addBinaryEntity(key, uploadFile.getAbsolutePath());
 				}
-			}
+			});
 		}
 		
 		return httpEntity;

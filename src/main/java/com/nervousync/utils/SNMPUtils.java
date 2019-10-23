@@ -92,6 +92,8 @@ public final class SNMPUtils {
 		case UDP:
 			this.snmp = new Snmp(new DefaultUdpTransportMapping());
 			break;
+			default:
+				return;
 		}
 		
 		this.snmp.listen();

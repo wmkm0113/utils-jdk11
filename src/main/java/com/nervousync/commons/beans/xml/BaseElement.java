@@ -29,6 +29,7 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.xml.XmlException;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
@@ -52,9 +53,9 @@ public class BaseElement implements Serializable {
 	 */
 	private static final long serialVersionUID = 6377799204139380357L;
 	
-	private static transient final String FRAGMENT = "<?xml version=\"1.0\" encoding=\"{}\"?>";
+	private static final String FRAGMENT = "<?xml version=\"1.0\" encoding=\"{}\"?>";
 	
-	protected transient final Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Parse xml string and setting fields data to this object
@@ -93,7 +94,7 @@ public class BaseElement implements Serializable {
 			
 			JAXBContext jaxbContext = JAXBContext.newInstance(entityClass);
 			return (T)jaxbContext.createUnmarshaller().unmarshal(inputStream);
-		} catch (Exception e) {
+		} catch (JAXBException|IOException e) {
 			return null;
 		} finally {
 			IOUtils.closeStream(inputStream);
@@ -235,7 +236,7 @@ public class BaseElement implements Serializable {
 				result = Globals.MULTIPLIER * result + (origValue != null ? origValue.hashCode() : 0);
 			}
 		} catch (Exception e) {
-			result = Globals.INITIAL_HASH;
+			result = Globals.DEFAULT_VALUE_INT;
 		}
 		
 		return result;

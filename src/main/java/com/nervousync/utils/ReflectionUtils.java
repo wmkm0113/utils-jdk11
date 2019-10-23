@@ -745,8 +745,7 @@ public final class ReflectionUtils {
 			return;
 		}
 
-		for (String fieldName : parameterMap.keySet()) {
-			Object value = parameterMap.get(fieldName);
+		parameterMap.forEach((key, value) -> {
 			Object fieldValue;
 			if (value.getClass().isArray()) {
 				if (((Object[]) value).length == 1) {
@@ -758,8 +757,8 @@ public final class ReflectionUtils {
 				fieldValue = value;
 			}
 
-			setField(fieldName, target, fieldValue);
-		}
+			setField(key, target, fieldValue);
+		});
 	}
 	
 	/**

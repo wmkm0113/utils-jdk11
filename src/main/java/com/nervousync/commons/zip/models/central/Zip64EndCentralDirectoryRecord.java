@@ -178,13 +178,13 @@ public final class Zip64EndCentralDirectoryRecord {
 	 * @return the extensibleDataSector
 	 */
 	public byte[] getExtensibleDataSector() {
-		return extensibleDataSector;
+		return extensibleDataSector == null ? new byte[0] : extensibleDataSector.clone();
 	}
 
 	/**
 	 * @param extensibleDataSector the extensibleDataSector to set
 	 */
 	public void setExtensibleDataSector(byte[] extensibleDataSector) {
-		this.extensibleDataSector = extensibleDataSector;
+		this.extensibleDataSector = extensibleDataSector == null ? new byte[0] : extensibleDataSector.clone();
 	}
 }

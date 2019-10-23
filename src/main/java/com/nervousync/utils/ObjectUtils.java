@@ -18,6 +18,7 @@ package com.nervousync.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
@@ -173,7 +174,7 @@ public final class ObjectUtils {
 					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, paramClasses);
 					object = constructor.newInstance(args);
 				}
-			} catch (Exception e) {
+			} catch (SecurityException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				object = null;
 			}
 		}
@@ -475,7 +476,7 @@ public final class ObjectUtils {
 			return 0;
 		}
 		int hash = Globals.INITIAL_HASH;
-		int arraySize = array.length;
+//		int arraySize = array.length;
 		for (Object anArray : array) {
 			hash = Globals.MULTIPLIER * hash + nullSafeHashCode(anArray);
 		}
@@ -763,8 +764,7 @@ public final class ObjectUtils {
 			}
 			return StringBuilder.toString();
 		}
-		String str = obj.toString();
-		return (str != null ? str : EMPTY_STRING);
+		return obj.toString();
 	}
 
 	/**

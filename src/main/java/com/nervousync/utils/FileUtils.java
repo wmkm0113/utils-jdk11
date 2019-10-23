@@ -2541,7 +2541,7 @@ public final class FileUtils {
 				byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
 				byteArrayOutputStream.write(readBuffer, 0, readLength);
 				SegmentationItem segmentationItem =
-						new SegmentationItem(index * blockSize, byteArrayOutputStream.toByteArray());
+						new SegmentationItem((long) index * blockSize, byteArrayOutputStream.toByteArray());
 				segmentationItemList.add(segmentationItem);
 				index++;
 			}

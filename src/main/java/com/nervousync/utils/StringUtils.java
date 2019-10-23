@@ -21,6 +21,7 @@ import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,7 +101,7 @@ public final class StringUtils {
 	
 	public static boolean supportedCharset(String charset) {
 		try {
-			new String("a".getBytes(), charset);
+			new String("a".getBytes(Charset.defaultCharset()), charset);
 			return true;
 		} catch (UnsupportedEncodingException e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -119,12 +120,12 @@ public final class StringUtils {
 					converted = str.getBytes(Globals.DEFAULT_ENCODING);
 					break;
 				default:
-					converted = str.getBytes();
+					converted = str.getBytes(Charset.forName(Globals.DEFAULT_ENCODING));
 					break;
 			}
 			return converted;
 		} catch (UnsupportedEncodingException err) {
-			return str.getBytes();
+			return str.getBytes(Charset.defaultCharset());
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}
@@ -348,7 +349,7 @@ public final class StringUtils {
 					break;
 			}
 		} catch (UnsupportedEncodingException e) {
-			byteBuffer = ByteBuffer.wrap(str.getBytes());
+			byteBuffer = ByteBuffer.wrap(str.getBytes(Charset.defaultCharset()));
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}
@@ -1489,7 +1490,7 @@ public final class StringUtils {
 		if (content == null) {
 			return null;
 		}
-		return TextToHtml(ConvertUtils.convertToString(content));
+		return textToHtml(ConvertUtils.convertToString(content));
 	}
 	
 	/**
@@ -1685,7 +1686,7 @@ public final class StringUtils {
 	 * @param sourceString	input string
 	 * @return	replaced string
 	 */
-	public static String TextToJSON (String sourceString) {
+	public static String textToJSON (String sourceString) {
 		int strLen;
 		StringBuilder reString = new StringBuilder();
 		strLen = sourceString.length();
@@ -1729,7 +1730,7 @@ public final class StringUtils {
 	 * @param sourceString	input string
 	 * @return	replaced string
 	 */
-	public static String TextToHtml (String sourceString) {
+	public static String textToHtml (String sourceString) {
 		int strLen;
 		StringBuilder reString = new StringBuilder();
 		strLen = sourceString.length();
@@ -2019,14 +2020,14 @@ public final class StringUtils {
 			return content;
 		}
 		
-		byte[] zippedByteArray = ConvertUtils.zipByteArray(content.getBytes());
+		byte[] zippedByteArray = ConvertUtils.zipByteArray(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)));
 
-		if (zippedByteArray.length >= content.getBytes().length) {
+		if (zippedByteArray.length >= content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)).length) {
 			return content;
 		} else {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
-				StringUtils.LOGGER.debug("Compress size : " 
-						+ (content.getBytes().length - zippedByteArray.length));
+				StringUtils.LOGGER.debug("Compress size : {}" ,
+						(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)).length - zippedByteArray.length));
 			}
 		}
 
@@ -2039,12 +2040,12 @@ public final class StringUtils {
 	 * @return			Decompressed string
 	 */
 	public static String deCompress(String strIn) {
-		byte[] arrB = strIn.getBytes();
+		byte[] arrB = ConvertUtils.hexStrToByteArr(strIn);
 		int iLen = arrB.length;
 
 		byte[] arrOut = new byte[iLen / 2];
 		for (int i = 0; i < iLen; i = i + 2) {
-			String strTmp = new String(arrB, i, 2);
+			String strTmp = new String(arrB, i, 2, Charset.defaultCharset());
 			try {
 				arrOut[i / 2] = (byte) Integer.parseInt(strTmp, 16);
 			} catch (NumberFormatException e) {
@@ -2052,7 +2053,7 @@ public final class StringUtils {
 			}
 		}
 		
-		return new String(ConvertUtils.unzipByteArray(arrOut));
+		return new String(ConvertUtils.unzipByteArray(arrOut), Charset.forName(Globals.DEFAULT_ENCODING));
 	}
 
 	/**
@@ -2260,7 +2261,7 @@ public final class StringUtils {
 				if (authCode == 10) {
 					return organizationCode.endsWith("X");
 				} else {
-					return organizationCode.endsWith(Integer.valueOf(authCode).toString());
+					return organizationCode.endsWith(Integer.toString(authCode));
 				}
 			}
 		}
