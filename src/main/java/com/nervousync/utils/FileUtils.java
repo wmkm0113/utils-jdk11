@@ -40,6 +40,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 
+import com.nervousync.commons.beans.xml.BaseElement;
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
 import org.slf4j.Logger;
@@ -295,7 +296,8 @@ public final class FileUtils {
 			throw new FileNotFoundException("The resource location is null!");
 		}
 
-		if (FileUtils.retrieveFileType(resourceLocation) == FileUtils.FILE_TYPE_JAVA_PACKAGE) {
+		if (FileUtils.retrieveFileType(StringUtils.getFilenameExtension(resourceLocation))
+				== FileUtils.FILE_TYPE_JAVA_PACKAGE) {
 			return FileUtils.validateFileType(resourceLocation);
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2059,6 +2061,45 @@ public final class FileUtils {
 	}
 
 	/**
+	 * Makes a directory, including any necessary but nonexistent parent
+	 * directories. If a file already exists with specified name but it is
+	 * not a directory then an IOException is thrown.
+	 * If the directory cannot be created (or the file already exists but is not a directory)
+	 * then an IOException is thrown.
+	 *
+	 * @param directory directory to create, must not be {@code null}
+	 * @throws IOException          if the directory cannot be created or the file already exists but is not a directory
+	 */
+	public static void forceMakeDir(final File directory) throws IOException {
+		if (directory == null) {
+			return;
+		}
+		if (directory.exists()) {
+			if (!directory.isDirectory()) {
+				throw new IOException("File " + directory + " was exists and not a directory.");
+			}
+		} else {
+			if (!directory.mkdirs() && !directory.isDirectory()) {
+				throw new IOException("Unable to create directory" + directory);
+			}
+		}
+	}
+
+	/**
+	 * Makes any necessary but nonexistent parent directories for a given File. If the parent directory cannot be
+	 * created then an IOException is thrown.
+	 *
+	 * @param file              file with parent to create
+	 * @throws IOException      if the parent directory cannot be created
+	 */
+	public static void forceMakeParent(final File file) throws IOException {
+		if (file == null) {
+			return;
+		}
+		FileUtils.forceMakeDir(file.getParentFile());
+	}
+
+	/**
 	 * Check filePath is exists
 	 *
 	 * @param resourceLocation Resource location
@@ -2691,6 +2732,25 @@ public final class FileUtils {
 		} catch (Exception e) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
+	}
+
+	private static void generateFileData(String folderPath, String targetPath) throws IOException {
+		List<String> fileList = FileUtils.listFiles(folderPath);
+		byte[] intBuffer = new byte[4];
+		RawUtils.writeIntFromLittleEndian(intBuffer, 0, fileList.size());
+		RandomAccessFile randomAccessFile = new RandomAccessFile(targetPath, Globals.WRITE_MODE);
+		randomAccessFile.write(intBuffer);
+		fileList.forEach(filePath -> {
+			FileExtensionInfo fileExtensionInfo =
+					BaseElement.parseXml(FileUtils.readFile(filePath), FileExtensionInfo.class);
+			if (fileExtensionInfo != null) {
+				try {
+					randomAccessFile.write(fileExtensionInfo.convertToByteArray());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	private static void registerFileType() {

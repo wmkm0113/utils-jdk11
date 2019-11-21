@@ -16,6 +16,9 @@
  */
 package com.nervousync.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
@@ -79,9 +82,26 @@ public final class StringUtils {
 
 	private static final String CURRENT_PATH = ".";
 
+	/**
+	 * The shift value required to create the upper nibble
+	 * from the first of 2 byte values converted from ascii hex.
+	 */
+	private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
+
+	private static final byte TRANSLATED_SPACE_CHARACTER = '_';
+
+	private static final int INVALID_BYTE = -1;
+	private static final int PAD_BYTE = -2;
+	private static final int MASK_BYTE_UNSIGNED = 0xFF;
+
+	private static final int INPUT_BYTES_PER_CHUNK = 4;
+	private static final int PADDING = '=';
+
 	private static final String BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 	private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	private static final String AUTH_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
+	private static final String AUTHORIZATION_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
+
+	private static final byte[] BASE64_DECODE_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
 	
 	private static final String CHN_IDENTIFIED_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
 	private static final String CHN_IDENTIFIED_AUTH_CODE = "10X98765432";
@@ -95,8 +115,15 @@ public final class StringUtils {
 	private static final String CHN_SOCIAL_CREDIT_AUTH_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
 	private static final int[] CHN_SOCIAL_CREDIT_WEIGHT = {1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28};
 
+	static {
+		Arrays.fill(BASE64_DECODE_TABLE, (byte)INVALID_BYTE);
+		for (int i = 0 ; i < BASE64.length() ; i++) {
+			BASE64_DECODE_TABLE[BASE64.charAt(i)] = (byte)i;
+		}
+		BASE64_DECODE_TABLE[PADDING] = PAD_BYTE;
+	}
+
 	private StringUtils() {
-		
 	}
 	
 	public static boolean supportedCharset(String charset) {
@@ -159,7 +186,7 @@ public final class StringUtils {
 					nextByte = 0;
 				}
 
-				digit = currentByte & (0xFF >> index);
+				digit = currentByte & (MASK_BYTE_UNSIGNED >> index);
 				index = (index + 5) % 8;
 				digit = (digit << index) | nextByte >> (8 - index);
 				i++;
@@ -174,7 +201,7 @@ public final class StringUtils {
 		}
 
 		while (stringBuilder.length() % 5 > 0) {
-			stringBuilder.append("=");
+			stringBuilder.append(PADDING);
 		}
 		return stringBuilder.toString();
 	}
@@ -188,7 +215,7 @@ public final class StringUtils {
 		if (string == null) {
 			return null;
 		}
-		while (string.endsWith("=")) {
+		while (string.charAt(string.length() - 1) == PADDING) {
 			string = string.substring(0, string.length() - 1);
 		}
 
@@ -244,25 +271,25 @@ public final class StringUtils {
 			}
 		}
 		char[] charArray = new char[((length + 2) / 3) * 4];
-		
+
+		StringBuilder stringBuilder = new StringBuilder();
 		int index = 0;
 		while ((index * 3) < length) {
-			charArray[index * 4] = BASE64.charAt((tempBytes[index * 3] >> 2) & 0x3F);
-			charArray[index * 4 + 1] = BASE64.charAt(((tempBytes[index * 3] << 4) | ((tempBytes[index * 3 + 1] & 0xFF) >> 4)) & 0x3F);
-			if (index * 3 + 1 >= bytes.length) {
-				charArray[index * 4 + 2] = '=';
-			} else {
-				charArray[index * 4 + 2] = BASE64.charAt(((tempBytes[index * 3 + 1] << 2) | ((tempBytes[index * 3 + 2] & 0xFF) >> 6)) & 0x3F);
+			stringBuilder.append(BASE64.charAt((tempBytes[index * 3] >> 2) & 0x3F));
+			stringBuilder.append(BASE64.charAt(((tempBytes[index * 3] << 4) | ((tempBytes[index * 3 + 1] & MASK_BYTE_UNSIGNED) >> 4)) & 0x3F));
+			if (index * 3 + 1 < bytes.length) {
+				stringBuilder.append(BASE64.charAt(((tempBytes[index * 3 + 1] << 2) | ((tempBytes[index * 3 + 2] & MASK_BYTE_UNSIGNED) >> 6)) & 0x3F));
 			}
-			if (index * 3 + 2 >= bytes.length) {
-				charArray[index * 4 + 3] = '=';
-			} else {
-				charArray[index * 4 + 3] = BASE64.charAt(tempBytes[index * 3 + 2] & 0x3F);
+			if (index * 3 + 2 < bytes.length) {
+				stringBuilder.append(BASE64.charAt(tempBytes[index * 3 + 2] & 0x3F));
 			}
 			index++;
 		}
-		
-		return new String(charArray);
+
+		while (stringBuilder.length() % 3 > 0) {
+			stringBuilder.append((char)PADDING);
+		}
+		return stringBuilder.toString();
 	}
 
 	/**
@@ -274,31 +301,120 @@ public final class StringUtils {
 		if (string == null) {
 			return null;
 		}
-		while (string.endsWith("=")) {
+		while (string.charAt(string.length() - 1) == PADDING) {
 			string = string.substring(0, string.length() - 1);
 		}
 		
 		byte[] bytes = new byte[string.length() * 3 / 4];
-		
+
 		int index = 0;
 		for (int i = 0 ; i < string.length() ; i += 4) {
 			int index1 = BASE64.indexOf(string.charAt(i + 1));
-			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (index1 >> 4)) & 0xFF);
+			bytes[index * 3] = (byte)(((BASE64.indexOf(string.charAt(i)) << 2) | (index1 >> 4)) & MASK_BYTE_UNSIGNED);
 			if (index * 3 + 1 >= bytes.length) {
 				break;
 			}
 
 			int index2 = BASE64.indexOf(string.charAt(i + 2));
-			bytes[index * 3 + 1] = (byte)(((index1 << 4) | (index2 >> 2)) & 0xFF);
+			bytes[index * 3 + 1] = (byte)(((index1 << 4) | (index2 >> 2)) & MASK_BYTE_UNSIGNED);
 			if (index * 3 + 2 >= bytes.length) {
 				break;
 			}
 
-			bytes[index * 3 + 2] = (byte)(((index2 << 6) | BASE64.indexOf(string.charAt(i + 3))) & 0xFF);
+			bytes[index * 3 + 2] = (byte)(((index2 << 6) | BASE64.indexOf(string.charAt(i + 3))) & MASK_BYTE_UNSIGNED);
 			index++;
 		}
 		
 		return bytes;
+	}
+
+	/**
+	 * Base64 decoder
+	 * @param dataBytes     Encoded base64 byte array
+	 * @return			    Decode byte arrays
+	 * @throws IOException  Data bytes invalid
+	 */
+	public static byte[] mimeBase64Decode(final byte[] dataBytes) throws IOException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		byte[] tmpBuffer = new byte[INPUT_BYTES_PER_CHUNK];
+		int index = Globals.INITIALIZE_INT_VALUE;
+		for (byte b : dataBytes) {
+			final byte tmp = BASE64_DECODE_TABLE[MASK_BYTE_UNSIGNED & b];
+			if (tmp == INVALID_BYTE) {
+				//  Ignore invalid bytes
+				continue;
+			}
+
+			tmpBuffer[index++] = tmp;
+			if (index == INPUT_BYTES_PER_CHUNK) {
+				if (tmpBuffer[0] == PAD_BYTE || tmpBuffer[1] == PAD_BYTE) {
+					throw new IOException("Invalid Base64 input: incorrect padding, first two bytes cannot be padding");
+				}
+				byteArrayOutputStream.write((tmpBuffer[0] << 2) | (tmpBuffer[1] >> 4));
+				if (tmpBuffer[2] != PAD_BYTE) {
+					byteArrayOutputStream.write((tmpBuffer[1] << 4) | (tmpBuffer[2] >> 2));
+					if (tmpBuffer[3] != PAD_BYTE) {
+						byteArrayOutputStream.write((tmpBuffer[2] << 6) | tmpBuffer[3]);
+					}
+				} else if (tmpBuffer[3] != PAD_BYTE) {
+					throw new IOException("Invalid Base64 input: incorrect padding, 4th byte must be padding if 3rd byte is");
+				}
+				index = Globals.INITIALIZE_INT_VALUE;
+			}
+		}
+
+		if (index != Globals.INITIALIZE_INT_VALUE) {
+			throw new IOException("Invalid Base64 input: truncated");
+		}
+		return byteArrayOutputStream.toByteArray();
+	}
+
+	/**
+	 * Quoted Printable Decoder
+	 * @param dataBytes         Encoded data bytes
+	 * @return			        Decode byte arrays
+	 * @throws IOException      Data bytes invalid
+	 */
+	public static byte[] quotedPrintableDecode(byte[] dataBytes) throws IOException {
+		int offset = Globals.INITIALIZE_INT_VALUE;
+		int length = dataBytes.length;
+		int endOffset = offset + length;
+		int bytesWritten = Globals.INITIALIZE_INT_VALUE;
+
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		while (offset < endOffset) {
+			byte b = dataBytes[offset++];
+			switch (b) {
+				case TRANSLATED_SPACE_CHARACTER:
+					byteArrayOutputStream.write(' ');
+					break;
+				case PADDING:
+					if (offset + 1 >= endOffset) {
+						throw new IOException("Invalid quoted printable encoding; truncated escape sequence");
+					}
+
+					byte b1 = dataBytes[offset++];
+					byte b2 = dataBytes[offset++];
+
+					if (b1 == '\r') {
+						if (b2 != '\n') {
+							throw new IOException("Invalid quoted printable encoding; CR must be followed by LF");
+						}
+					} else {
+						int char1 = hexToBinary(b1);
+						int char2 = hexToBinary(b2);
+						byteArrayOutputStream.write((char1 << UPPER_NIBBLE_SHIFT) | char2);
+						bytesWritten++;
+					}
+					break;
+				default:
+					byteArrayOutputStream.write(b);
+					bytesWritten++;
+					break;
+			}
+		}
+
+		return byteArrayOutputStream.toByteArray();
 	}
 	
 	/**
@@ -1856,7 +1972,7 @@ public final class StringUtils {
 		StringBuilder generateKey = new StringBuilder();
 		Random random = new Random();
 		for (int i = 0 ; i < length ; i++) {
-			generateKey.append(AUTH_CODE_ITEMS.charAt(random.nextInt(AUTH_CODE_ITEMS.length())));
+			generateKey.append(AUTHORIZATION_CODE_ITEMS.charAt(random.nextInt(AUTHORIZATION_CODE_ITEMS.length())));
 		}
 		return generateKey.toString();
 	}
@@ -2295,6 +2411,14 @@ public final class StringUtils {
 		}
 		
 		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
+	private static int hexToBinary(final byte b) throws IOException {
+		final int i = Character.digit((char)b, 16);
+		if (i == Globals.DEFAULT_VALUE_INT) {
+			throw new IOException("Invalid quoted printable encoding: not a valid hex digit: " + b);
+		}
+		return i;
 	}
 	
 	private static String changeFirstCharacterCase(String str, boolean capitalize) {
