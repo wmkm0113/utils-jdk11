@@ -6,10 +6,10 @@
 	<version>1.0.2.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>NervousyncUtils</name>
-	<url>https://nervousync.com/development/project/NervousyncUtils</url>
+	<url>https://development.nervousync.com/project/utils</url>
 	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
-		<url>https://github.com/wmkm0113/NervousyncUtils/issues</url>
+		<url>https://github.com/Nervousync/NervousyncUtils/issues</url>
 		<system>Github Issues</system>
 	</issueManagement>
 	<licenses>
@@ -21,9 +21,9 @@
 	</licenses>
 	<scm>
 		<tag>master</tag>
-		<url>https://github.com/wmkm0113/NervousyncUtils</url>
-		<connection>scm:git:https://github.com/wmkm0113/NervousyncUtils.git</connection>
-		<developerConnection>https://nervousync.com/development/member/wmkm0113</developerConnection>
+		<url>https://github.com/Nervousync/NervousyncUtils</url>
+		<connection>scm:git:https://github.com/Nervousync/NervousyncUtils.git</connection>
+		<developerConnection>https://development.nervousync.com/member/wmkm0113</developerConnection>
 	</scm>
 	<organization>
 		<url>https://development.nervousync.com/</url>
@@ -33,9 +33,9 @@
 		<developer>
 			<name>Steven Wee</name>
 			<email>wmkm0113@gmail.com</email>
-			<url>https://nervousync.com/development/member/wmkm0113</url>
+			<url>https://development.nervousync.com/member/wmkm0113</url>
 			<organization>Nervousync Studio</organization>
-			<organizationUrl>https://nervousync.com/development/index.shtml</organizationUrl>
+			<organizationUrl>https://development.nervousync.com/index.shtml</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
