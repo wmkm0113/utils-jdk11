@@ -141,14 +141,4 @@ public class SegmentationItem extends BaseElement {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		return super.equals(o);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
 }

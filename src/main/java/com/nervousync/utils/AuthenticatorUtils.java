@@ -125,7 +125,7 @@ public final class AuthenticatorUtils {
 
 	private static int generateAuthenticatorCode(CalcType calcType, String randomKey,
 	                                             long fixedTime, int syncCount, int fixWindow) {
-		long currentGMTTime = DateTimeUtils.currentGMTTimeMillis();
+		long currentGMTTime = DateTimeUtils.currentUTCTimeMillis();
 		long calcTime = (currentGMTTime + fixedTime) / 1000L
 				/ (syncCount == Globals.DEFAULT_VALUE_INT ? DEFAULT_SYNC_COUNT : syncCount);
 		calcTime += fixWindow;

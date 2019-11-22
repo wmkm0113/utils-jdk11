@@ -50,7 +50,7 @@ public final class SNMPData implements Serializable {
 	private final Map<String, String> dataMap;
 	
 	public SNMPData() {
-		this.currentGMTTime = DateTimeUtils.currentGMTTimeMillis();
+		this.currentGMTTime = DateTimeUtils.currentUTCTimeMillis();
 		this.dataMap = new HashMap<>();
 	}
 

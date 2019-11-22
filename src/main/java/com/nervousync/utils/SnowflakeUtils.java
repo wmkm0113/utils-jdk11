@@ -136,52 +136,40 @@ public final class SnowflakeUtils {
 
 	/**
 	 * Generate id start with current date format as "yyyyMMdd"
-	 * @param isGMT		Current day is GMT
+	 * @param isUTC		Current day is UTC
 	 * @return generated ID
 	 */
-	public long generateDateId(boolean isGMT) {
+	public long generateDateId(boolean isUTC) {
 		if (INSTANCE == null) {
 			SnowflakeUtils.initialize();
 		}
-		return INSTANCE.generateDateValue(isGMT);
+		return INSTANCE.generateDateValue(isUTC);
 	}
 
 	/**
 	 * Generate id start with current time format as "yyyyMMddHHmm"
-	 * @param isGMT		Current time is GMT
+	 * @param isUTC		Current time is UTC
 	 * @return generated ID
 	 */
-	public long generateTimeId(boolean isGMT) {
+	public long generateTimeId(boolean isUTC) {
 		if (INSTANCE == null) {
 			SnowflakeUtils.initialize();
 		}
-		return INSTANCE.generateTimeValue(isGMT);
+		return INSTANCE.generateTimeValue(isUTC);
 	}
 	
-	private synchronized long generateDateValue(boolean isGMT) {
-		StringBuilder stringBuilder = new StringBuilder();
-		if (isGMT) {
-			stringBuilder.append(DateTimeUtils.currentGMTDay());
-		} else {
-			stringBuilder.append(DateTimeUtils.currentDay());
-		}
-		stringBuilder.append(this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
-		return Long.parseLong(stringBuilder.toString());
+	private synchronized long generateDateValue(boolean isUTC) {
+		return Long.parseLong(Integer.toString(isUTC ? DateTimeUtils.currentUTCDay() : DateTimeUtils.currentDay())
+				+ this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
 	}
 	
-	private synchronized long generateTimeValue(boolean isGMT) {
-		StringBuilder stringBuilder = new StringBuilder();
-		if (isGMT) {
-			stringBuilder.append(DateTimeUtils.currentGMTTime());
-		} else {
-			stringBuilder.append(DateTimeUtils.currentTime());
-		}
-		stringBuilder.append(this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
-		return Long.parseLong(stringBuilder.toString());
+	private synchronized long generateTimeValue(boolean isUTC) {
+		return Long.parseLong(Long.toString(isUTC ? DateTimeUtils.currentUTCTime() : DateTimeUtils.currentTime())
+				+ this.generateValue(Globals.DEFAULT_VALUE_BOOLEAN));
 	}
 	
 	private synchronized long generateValue(boolean calcTime) {
-		long currentTime = DateTimeUtils.currentGMTTimeMillis();
+		long currentTime = DateTimeUtils.currentUTCTimeMillis();
 		if (currentTime < this.lastTime) {
 			throw new RuntimeException(
 					String.format("System clock moved backwards. Refusing to generate id for %d milliseconds", 
@@ -192,7 +180,7 @@ public final class SnowflakeUtils {
 			this.sequenceIndex = (this.sequenceIndex + 1) & SEQUENCE_MASK;
 			if (this.sequenceIndex == 0) {
 				while (true) {
-					if ((currentTime = DateTimeUtils.currentGMTTimeMillis()) > this.lastTime) {
+					if ((currentTime = DateTimeUtils.currentUTCTimeMillis()) > this.lastTime) {
 						break;
 					}
 				}

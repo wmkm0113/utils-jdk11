@@ -18,7 +18,6 @@ package com.nervousync.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;

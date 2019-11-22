@@ -1920,7 +1920,7 @@ public final class RequestUtils {
 		
 		for (CookieEntity cookieInfo : cookieList) {
 			if ((!requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)
-					&& cookieInfo.isSecure()) || (cookieInfo.getExpires() > DateTimeUtils.currentGMTTimeMillis())
+					&& cookieInfo.isSecure()) || (cookieInfo.getExpires() > DateTimeUtils.currentUTCTimeMillis())
 					|| cookieInfo.getMaxAge() == Globals.DEFAULT_VALUE_LONG || cookieInfo.getMaxAge() == 0L) {
 				continue;
 			}

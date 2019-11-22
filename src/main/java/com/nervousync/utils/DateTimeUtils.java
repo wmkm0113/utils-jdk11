@@ -18,7 +18,10 @@ package com.nervousync.utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -37,9 +40,16 @@ public final class DateTimeUtils {
 	public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
 	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String COOKIE_DATETIME_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss 'GMT'";
-	
+
+	public static final DateTimeFormatter DEFAULT_ISO8601_PATTERN =
+			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601);
+	public static final DateTimeFormatter DEFAULT_SITE_MAP_PATTERN =
+			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
+	public static final DateTimeFormatter DEFAULT_INT_PATTERN = DateTimeFormatter.ofPattern("yyyyMMdd");
+	public static final DateTimeFormatter DEFAULT_TIME_PATTERN = DateTimeFormatter.ofPattern("HHmmssSSS");
+	public static final DateTimeFormatter DEFAULT_LONG_PATTERN = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
 	private DateTimeUtils() {
-		
 	}
 	
 	/**
@@ -51,7 +61,7 @@ public final class DateTimeUtils {
 		if (date == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
-		return formatDate(date, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
+		return formatDate(date, DEFAULT_SITE_MAP_PATTERN);
 	}
 	
 	/**
@@ -69,10 +79,8 @@ public final class DateTimeUtils {
 	 * @return			formatted result by ISO8601
 	 */
 	public static String formatGMTDateForVCard() {
-		SimpleDateFormat simpleDateFormat =
-				new SimpleDateFormat(DEFAULT_DATETIME_PATTERN_ISO8601 + "'Z'", Locale.US);
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return simpleDateFormat.format(Calendar.getInstance().getTime());
+		return ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("+00:00"))
+				.format(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + "'Z'"));
 	}
 
 	/**
@@ -84,7 +92,7 @@ public final class DateTimeUtils {
 		if (date == null) {
 			return null;
 		}
-		return formatDate(date, DEFAULT_DATETIME_PATTERN_ISO8601) + "Z";
+		return formatDate(date, DEFAULT_ISO8601_PATTERN) + "Z";
 	}
 	
 	/**
@@ -112,16 +120,18 @@ public final class DateTimeUtils {
 		if (format == null) {
 			format = DEFAULT_DATE_PATTERN;
 		}
-		return new SimpleDateFormat(format).parse(string);
+
+		return Date.from(LocalDate.parse(string, DateTimeFormatter.ofPattern(format))
+				.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 	/**
 	 * Formats given date according to system style
 	 * @param date		date instance
-	 * @return			formatted result by given format
+	 * @return			formatted result by system default format
 	 */
 	public static String formatDate(Date date) {
-		return formatDate(date, "");
+		return formatDate(date, DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL));
 	}
 	
 	/**
@@ -129,18 +139,15 @@ public final class DateTimeUtils {
 	 * @return		current day
 	 */
 	public static int currentDay() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.parseInt(simpleDateFormat.format(new Date()));
+		return Integer.parseInt(LocalDate.now().format(DEFAULT_INT_PATTERN));
 	}
 
 	/**
 	 * Return current GMT day value with format "yyyyMMdd"
 	 * @return		current GMT day
 	 */
-	public static int currentGMTDay() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return Integer.parseInt(simpleDateFormat.format(new Date()));
+	public static int currentUTCDay() {
+		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis()), DEFAULT_INT_PATTERN));
 	}
 	
 	/**
@@ -149,9 +156,7 @@ public final class DateTimeUtils {
 	 * @return		expire day
 	 */
 	public static int expireDay(long expireTime) {
-		long expireDate = System.currentTimeMillis() + expireTime;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.parseInt(simpleDateFormat.format(new Date(expireDate)));
+		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentTimeMillis()), DEFAULT_INT_PATTERN));
 	}
 
 	/**
@@ -159,10 +164,9 @@ public final class DateTimeUtils {
 	 * @param expireTime expire time
 	 * @return		expire GMT day
 	 */
-	public static int expireGMTDay(long expireTime) {
-		long expireDate = DateTimeUtils.currentGMTTimeMillis() + expireTime;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		return Integer.parseInt(simpleDateFormat.format(new Date(expireDate)));
+	public static int expireUTCDay(long expireTime) {
+		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis() + expireTime),
+				DEFAULT_INT_PATTERN));
 	}
 	
 	/**
@@ -178,9 +182,12 @@ public final class DateTimeUtils {
 		if (year < 1980) {
 		    return (1 << 21) | (1 << 16);
 		}
-		return (year - 1980) << 25 | (cal.get(Calendar.MONTH) + 1) << 21 |
-	               cal.get(Calendar.DATE) << 16 | cal.get(Calendar.HOUR_OF_DAY) << 11 | cal.get(Calendar.MINUTE) << 5 |
-	               cal.get(Calendar.SECOND) >> 1;
+		return (year - 1980) << 25
+				| (cal.get(Calendar.MONTH) + 1) << 21
+				| cal.get(Calendar.DATE) << 16
+				| cal.get(Calendar.HOUR_OF_DAY) << 11
+				| cal.get(Calendar.MINUTE) << 5
+				| cal.get(Calendar.SECOND) >> 1;
 	}
 	
 	/**
@@ -188,66 +195,66 @@ public final class DateTimeUtils {
 	 * @param dosTime		dos time
 	 * @return time in java format
 	 */
-	public static long dosToJavaTme(int dosTime) {
-		int sec = 2 * (dosTime & 0x1f);
-	    int min = (dosTime >> 5) & 0x3f;
-	    int hrs = (dosTime >> 11) & 0x1f;
-	    int day = (dosTime >> 16) & 0x1f;
-	    int mon = ((dosTime >> 21) & 0xf);
-	    int year = ((dosTime >> 25) & 0x7f) + 1980;
-	    
-	    Calendar cal = Calendar.getInstance();
-	    switch (mon) {
-		    case 1:
-			    cal.set(year, Calendar.JANUARY, day, hrs, min, sec);
-		    	break;
-		    case 2:
-			    cal.set(year, Calendar.FEBRUARY, day, hrs, min, sec);
-			    break;
-		    case 3:
-			    cal.set(year, Calendar.MARCH, day, hrs, min, sec);
-			    break;
-		    case 4:
-			    cal.set(year, Calendar.APRIL, day, hrs, min, sec);
-			    break;
-		    case 5:
-			    cal.set(year, Calendar.MAY, day, hrs, min, sec);
-			    break;
-		    case 6:
-			    cal.set(year, Calendar.JUNE, day, hrs, min, sec);
-			    break;
-		    case 7:
-			    cal.set(year, Calendar.JULY, day, hrs, min, sec);
-			    break;
-		    case 8:
-			    cal.set(year, Calendar.AUGUST, day, hrs, min, sec);
-			    break;
-		    case 9:
-			    cal.set(year, Calendar.SEPTEMBER, day, hrs, min, sec);
-			    break;
-		    case 10:
-			    cal.set(year, Calendar.OCTOBER, day, hrs, min, sec);
-			    break;
-		    case 11:
-			    cal.set(year, Calendar.NOVEMBER, day, hrs, min, sec);
-			    break;
-		    case 12:
-			    cal.set(year, Calendar.DECEMBER, day, hrs, min, sec);
-			    break;
-		    default:
-		    	return Globals.DEFAULT_VALUE_LONG;
-	    }
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime().getTime();
+	public static long dosToJavaTme(long dosTime) {
+		int month;
+		switch ((int)((dosTime >> 21) & 0x0F)) {
+			case 1:
+				month = Calendar.JANUARY;
+				break;
+			case 2:
+				month = Calendar.FEBRUARY;
+				break;
+			case 3:
+				month = Calendar.MARCH;
+				break;
+			case 4:
+				month = Calendar.APRIL;
+				break;
+			case 5:
+				month = Calendar.MAY;
+				break;
+			case 6:
+				month = Calendar.JUNE;
+				break;
+			case 7:
+				month = Calendar.JULY;
+				break;
+			case 8:
+				month = Calendar.AUGUST;
+				break;
+			case 9:
+				month = Calendar.SEPTEMBER;
+				break;
+			case 10:
+				month = Calendar.OCTOBER;
+				break;
+			case 11:
+				month = Calendar.NOVEMBER;
+				break;
+			case 12:
+				month = Calendar.DECEMBER;
+				break;
+			default:
+				month = Globals.DEFAULT_VALUE_INT;
+				break;
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set((int)(((dosTime >> 25) & 0x7F) + 1980), month,
+				(int)((dosTime >> 16) & 0x1F),
+				(int)((dosTime >> 11) & 0x1F),
+				(int)((dosTime >> 5) & 0x3F),
+				(int)((dosTime << 1) & 0x3E));
+		calendar.clear(Calendar.MILLISECOND);
+	    return calendar.getTimeInMillis();
 	}
-	
+
 	/**
-	 * Return current time value with format "yyyyMMddHHmm"
-	 * @return		current time with format "yyyyMMddHHmm"
+	 * Return current time in milliseconds.
+	 * @return		current time in milliseconds.
 	 */
 	public static long currentTime() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-		return Long.parseLong(simpleDateFormat.format(new Date()));
+		return Long.parseLong(formatDate(new Date(currentTimeMillis()), DEFAULT_LONG_PATTERN));
 	}
 
 	/**
@@ -257,59 +264,47 @@ public final class DateTimeUtils {
 	public static long currentTimeMillis() {
 		return System.currentTimeMillis();
 	}
-	
-	/**
-	 * Return current GMT time value with format "yyyyMMddHHmm"
-	 * @return		current GMT time value with format "yyyyMMddHHmm"
-	 */
-	public static long currentGMTTime() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		return Long.parseLong(simpleDateFormat.format(new Date()));
-	}
-	
+
 	/**
 	 * Returns the GMT time in milliseconds.
 	 * @return		current GMT time in milliseconds.
 	 */
-	public static long currentGMTTimeMillis() {
-		long currentTime = System.currentTimeMillis();
-		return currentTime - TimeZone.getDefault().getRawOffset();
+	public static long currentUTCTime() {
+		return Long.parseLong(formatDate(new Date(currentUTCTimeMillis()), DEFAULT_LONG_PATTERN));
+	}
+
+	/**
+	 * Returns the GMT time in milliseconds.
+	 * @return		current GMT time in milliseconds.
+	 */
+	public static long currentUTCTimeMillis() {
+		return System.currentTimeMillis() - TimeZone.getDefault().getRawOffset();
 	}
 
 	/**
 	 * Formats given date according to format style
-	 * @param date			Date instance
-	 * @param format		String format
-	 * @return				Format date value as string
+	 * @param date			        Date instance
+	 * @param dateTimeFormatter		Datetime formatter
+	 * @return				        Format date value as string
 	 */
-	public static String formatDate(Date date, String format) {
-		return DateTimeUtils.formatDate(date, format, TimeZone.getDefault());
+	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter) {
+		return DateTimeUtils.formatDate(date, dateTimeFormatter, TimeZone.getDefault());
 	}
 	
 	/**
 	 * Formats given date according to format style
-	 * @param date			Date instance
-	 * @param format		String format
-	 * @param timeZone		Time zone
-	 * @return				Time value of String
+	 * @param date			        Date instance
+	 * @param dateTimeFormatter		Datetime formatter
+	 * @param timeZone		        Time zone
+	 * @return				        Time value of String
 	 */
-	public static String formatDate(Date date, String format, TimeZone timeZone) {
+	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter, TimeZone timeZone) {
 		if (date == null) {
 			date = new Date();
 		}
-		SimpleDateFormat simpleDateFormat;
-		if (format == null || format.length() == 0) {
-			simpleDateFormat = new SimpleDateFormat();
-		} else {
-			simpleDateFormat = new SimpleDateFormat(format);
-		}
-		
-		if (timeZone != null) {
-			simpleDateFormat.setTimeZone(timeZone);
-		}
-		
-		return simpleDateFormat.format(date);
+
+		return date.toInstant().atZone(timeZone.toZoneId()).toLocalDateTime()
+				.format(dateTimeFormatter);
 	}
 	
 	/**
@@ -519,8 +514,13 @@ public final class DateTimeUtils {
 	 * @see java.text.SimpleDateFormat
 	 */
 	public static String format(Date date, Locale locale, String pattern) {
-		SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
-		return formatter.format(date);
+		LocalDateTime localDateTime;
+		if (date == null) {
+			localDateTime = LocalDateTime.now();
+		} else {
+			localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		}
+		return localDateTime.format(DateTimeFormatter.ofPattern(pattern, locale));
 	}
 
 	/**
@@ -531,14 +531,13 @@ public final class DateTimeUtils {
 	 * @param pattern Pattern to use
 	 * @return Date object corresponding to representation given in source
 	 * string
-	 * @throws ParseException if given string could not be properly parsed
-	 * according to given locale and pattern
 	 * @see java.text.SimpleDateFormat
 	 */
-	public static Date parse(String source, Locale locale, String pattern)
-			throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
-		return formatter.parse(source);
+	public static Date parse(String source, Locale locale, String pattern) {
+		return Date.from(LocalDateTime.parse(source, DateTimeFormatter.ofPattern(pattern, locale))
+				.atZone(ZoneId.systemDefault()).toInstant());
+//		SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
+//		return formatter.parse(source);
 	}
 	
 	/**
@@ -546,40 +545,37 @@ public final class DateTimeUtils {
 	 * @return		check result
 	 */
 	public static boolean isLeapYear() {
-		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-		
-		if ((currentYear % 4 == 0 && currentYear % 100 != 0) 
-				|| currentYear % 400 == 0) {
-			return true;
-		}
-		
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return LocalDate.now().isLeapYear();
 	}
 
+	/**
+	 * Get current month first day
+	 * @param format        Date format
+	 * @return              Formatted date string
+	 */
 	public static String getCurrentMonthFirstDay(String format) {
-		int firstDay = Calendar.getInstance().getActualMinimum(Calendar.DAY_OF_MONTH);
-		return getCurrentDateByDay(format, firstDay);
+		return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())
+				.format(DateTimeFormatter.ofPattern(format));
 	}
 
+	/**
+	 * Get current month last day
+	 * @param format        Date format
+	 * @return              Formatted date string
+	 */
 	public static String getCurrentMonthLastDay(String format) {
-		int lastDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-		return getCurrentDateByDay(format, lastDay);
-	}
-	
-	private static String getCurrentDateByDay(String format, int day) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		calendar.set(Calendar.DAY_OF_MONTH, day);
-		return new SimpleDateFormat(format).format(calendar.getTime());
+		return LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth())
+				.format(DateTimeFormatter.ofPattern(format));
 	}
 
 	private static String getTimeZone() {
-		String timeZone = "";
-		int zone = TimeZone.getDefault().getRawOffset() / (1000 * 60 * 60);
-		if (zone > 0) {
-			timeZone = "+";
+		StringBuilder stringBuilder = new StringBuilder();
+		int zoneCode = TimeZone.getDefault().getRawOffset() / (1000 * 60 * 60);
+		stringBuilder.append(zoneCode >= 0 ? "+" : "-");
+		if (zoneCode < 0) {
+			zoneCode = Math.abs(zoneCode);
 		}
-		timeZone += zone + ":00";
-		return timeZone;
+		stringBuilder.append(zoneCode < 10 ? "0" : "").append(zoneCode).append(":00");
+		return stringBuilder.toString();
 	}
 }
