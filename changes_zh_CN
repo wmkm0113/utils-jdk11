@@ -1,4 +1,9 @@
 Nervousync 工具包
+[11/22/2019]
+增加缓存支持
+更新jackson版本为2.10.1
+替换SimpleDateFormat为LocalDateTime/LocalDate
+
 [10/23/2019]
 增加霍夫曼树支持
 更新bcprov版本为1.64

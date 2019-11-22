@@ -1,4 +1,9 @@
 Nervous 工具包
+[11/22/2019]
+增加緩存支援
+更新jackson版本為2.10.1
+替換SimpleDateFormat為LocalDateTime/LocalDate
+
 [10/23/2019]
 增加HuffmanTree操作
 更新bcprov版本为1.64

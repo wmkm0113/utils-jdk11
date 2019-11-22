@@ -1,4 +1,9 @@
 Nervousync Utils Package
+[11/22/2019]
+Add Cache API
+Update jackson to 2.10.1
+Replace SimpleDateFormat using LocalDateTime/LocalDate
+
 [10/23/2019]
 Add HuffmanTree support
 Update bcprov to 1.64

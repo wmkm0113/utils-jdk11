@@ -31,7 +31,6 @@ public final class IOUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IOUtils.class);
 	
 	private IOUtils() {
-		
 	}
 
 	/**
@@ -171,11 +170,16 @@ public final class IOUtils {
 		}
 	}
 
+	/**
+	 * Close current stream
+	 * @param closeable     stream to closed
+	 */
 	public static void closeStream(Closeable closeable) {
 		if (closeable != null) {
 			try {
 				closeable.close();
 			} catch (IOException e) {
+				LOGGER.error("Close stream error! ");
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Catch error! ", e);
 				}
