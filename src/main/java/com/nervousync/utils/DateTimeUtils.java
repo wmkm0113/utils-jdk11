@@ -26,6 +26,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.nervousync.commons.core.Globals;
 
@@ -48,6 +51,8 @@ public final class DateTimeUtils {
 	public static final DateTimeFormatter DEFAULT_INT_PATTERN = DateTimeFormatter.ofPattern("yyyyMMdd");
 	public static final DateTimeFormatter DEFAULT_TIME_PATTERN = DateTimeFormatter.ofPattern("HHmmssSSS");
 	public static final DateTimeFormatter DEFAULT_LONG_PATTERN = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
+	private static final UTCClock UTC_CLOCK = new UTCClock();
 
 	private DateTimeUtils() {
 	}
@@ -168,6 +173,91 @@ public final class DateTimeUtils {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis() + expireTime),
 				DEFAULT_INT_PATTERN));
 	}
+
+	/**
+	 * Calc expire time millis by given month count
+	 * @param monthCount        month count
+	 * @return                  expire time millis
+	 */
+	public static long expireMonth(int monthCount) {
+		return currentTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
+	}
+
+	/**
+	 * Calc expire UTC time millis by given month count
+	 * @param monthCount        month count
+	 * @return                  expire UTC time millis
+	 */
+	public static long expireUTCMonth(int monthCount) {
+		return currentUTCTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
+	}
+
+	/**
+	 * Current Year
+	 * @return  Current Year
+	 */
+	public static int currentYear() {
+		return Calendar.getInstance().get(Calendar.YEAR);
+	}
+
+	/**
+	 * Current Month
+	 * @return  Current Month
+	 */
+	public static int currentMonth() {
+		return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+
+	/**
+	 * Days count of given year and month
+	 * @param year      year
+	 * @param month     month
+	 * @return  Days count
+	 */
+	public static int getDaysOfMonth(int year, int month) {
+		Calendar calendar = Calendar.getInstance();
+		switch (month) {
+			case 1:
+				calendar.set(year, Calendar.JANUARY, 1);
+				break;
+			case 2:
+				calendar.set(year, Calendar.FEBRUARY, 1);
+				break;
+			case 3:
+				calendar.set(year, Calendar.MARCH, 1);
+				break;
+			case 4:
+				calendar.set(year, Calendar.APRIL, 1);
+				break;
+			case 5:
+				calendar.set(year, Calendar.MAY, 1);
+				break;
+			case 6:
+				calendar.set(year, Calendar.JUNE, 1);
+				break;
+			case 7:
+				calendar.set(year, Calendar.JULY, 1);
+				break;
+			case 8:
+				calendar.set(year, Calendar.AUGUST, 1);
+				break;
+			case 9:
+				calendar.set(year, Calendar.SEPTEMBER, 1);
+				break;
+			case 10:
+				calendar.set(year, Calendar.OCTOBER, 1);
+				break;
+			case 11:
+				calendar.set(year, Calendar.NOVEMBER, 1);
+				break;
+			case 12:
+				calendar.set(year, Calendar.DECEMBER, 1);
+				break;
+			default:
+				return Globals.DEFAULT_VALUE_INT;
+		}
+		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+	}
 	
 	/**
 	 * Converts input time from Java to DOS format
@@ -262,7 +352,7 @@ public final class DateTimeUtils {
 	 * @return		current time in milliseconds.
 	 */
 	public static long currentTimeMillis() {
-		return System.currentTimeMillis();
+		return UTC_CLOCK.currentTimeMillis();
 	}
 
 	/**
@@ -278,7 +368,7 @@ public final class DateTimeUtils {
 	 * @return		current GMT time in milliseconds.
 	 */
 	public static long currentUTCTimeMillis() {
-		return System.currentTimeMillis() - TimeZone.getDefault().getRawOffset();
+		return UTC_CLOCK.currentUTCTimeMillis();
 	}
 
 	/**
@@ -568,6 +658,26 @@ public final class DateTimeUtils {
 				.format(DateTimeFormatter.ofPattern(format));
 	}
 
+	/**
+	 * Calc expire days count
+	 * @param monthCount    month count
+	 * @return              days count
+	 */
+	private static int expireDayCount(int monthCount) {
+		int dayCount = Globals.INITIALIZE_INT_VALUE;
+		int currentYear = currentYear();
+		int currentMonth = currentMonth();
+		for (int i = 0 ; i < monthCount ; i++) {
+			dayCount += getDaysOfMonth(currentYear, currentMonth);
+			currentMonth++;
+		}
+		return dayCount;
+	}
+
+	/**
+	 * Get default time zone string
+	 * @return      time zone string
+	 */
 	private static String getTimeZone() {
 		StringBuilder stringBuilder = new StringBuilder();
 		int zoneCode = TimeZone.getDefault().getRawOffset() / (1000 * 60 * 60);
@@ -577,5 +687,36 @@ public final class DateTimeUtils {
 		}
 		stringBuilder.append(zoneCode < 10 ? "0" : "").append(zoneCode).append(":00");
 		return stringBuilder.toString();
+	}
+
+	private static final class UTCClock {
+
+		private AtomicLong currentLocalTime = new AtomicLong(System.currentTimeMillis());
+		private AtomicLong currentUTCTime =
+				new AtomicLong(System.currentTimeMillis() - TimeZone.getDefault().getRawOffset());
+
+		public UTCClock() {
+			ScheduledThreadPoolExecutor threadPoolExecutor =
+					new ScheduledThreadPoolExecutor(1, r -> {
+						Thread thread = new Thread(r);
+						thread.setDaemon(true);
+						return thread;
+					});
+			threadPoolExecutor.scheduleAtFixedRate(this::readTime, 0L, 1L, TimeUnit.MILLISECONDS);
+		}
+
+		public long currentTimeMillis() {
+			return this.currentLocalTime.get();
+		}
+
+		public long currentUTCTimeMillis() {
+			return this.currentUTCTime.get();
+		}
+
+		private void readTime() {
+			long currentTime = System.currentTimeMillis();
+			this.currentLocalTime.set(currentTime);
+			this.currentUTCTime.set(currentTime - TimeZone.getDefault().getRawOffset());
+		}
 	}
 }

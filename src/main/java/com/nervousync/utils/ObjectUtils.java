@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.nervousync.commons.beans.xml.BaseElement;
 import com.nervousync.commons.core.Globals;
 import com.nervousync.enumerations.xml.DataType;
-import com.nervousync.interceptor.beans.BaseHandlerInterceptor;
+import com.nervousync.interceptor.beans.HandlerInterceptor;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -87,11 +87,11 @@ public final class ObjectUtils {
 	 * @throws ClassNotFoundException	if class was not found
 	 * @throws LinkageError				if class link error
 	 */
-	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor methodInterceptor)
+	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor)
 			throws ClassNotFoundException, LinkageError {
-		BaseHandlerInterceptor[] methodInterceptors = null;
+		HandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
-			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
+			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
 		}
 		return createProxyInstance(ClassUtils.forName(className), paramClasses, args, methodInterceptors);
 	}
@@ -103,7 +103,7 @@ public final class ObjectUtils {
 	 * @return			object instance
 	 */
 	public static <T> T newInstance(Class<T> clazz) {
-		return createProxyInstance(clazz, null, null, new BaseHandlerInterceptor[]{});
+		return createProxyInstance(clazz, null, null, new HandlerInterceptor[]{});
 	}
 	
 	/**
@@ -113,10 +113,10 @@ public final class ObjectUtils {
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, BaseHandlerInterceptor methodInterceptor) {
-		BaseHandlerInterceptor[] methodInterceptors = null;
+	public static <T> T createProxyInstance(Class<T> clazz, HandlerInterceptor methodInterceptor) {
+		HandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
-			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
+			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
 		}
 		return createProxyInstance(clazz, null, null, methodInterceptors);
 	}
@@ -130,10 +130,10 @@ public final class ObjectUtils {
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor methodInterceptor) {
-		BaseHandlerInterceptor[] methodInterceptors = null;
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor) {
+		HandlerInterceptor[] methodInterceptors = null;
 		if (methodInterceptor != null) {
-			methodInterceptors = new BaseHandlerInterceptor[]{methodInterceptor};
+			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
 		}
 		return createProxyInstance(clazz, paramClasses, args, methodInterceptors);
 	}
@@ -148,7 +148,7 @@ public final class ObjectUtils {
 	 * @return			object instance
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, BaseHandlerInterceptor[] methodInterceptors) {
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor[] methodInterceptors) {
 		T object;
 		
 		if (methodInterceptors != null && methodInterceptors.length > 0) {

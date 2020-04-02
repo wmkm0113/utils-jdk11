@@ -110,13 +110,12 @@ public final class SecurityUtils implements Serializable {
 	private static final String PRIVATE_KEY = StringUtils.randomString(32);
 
 	private SecurityUtils() {
-		
 	}
 	
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
-	
+
 	/* MD5 Method */
 	
 	/**
@@ -947,6 +946,16 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Signature data with DSA
 	 * @param privateKey	Signature private key
+	 * @param filePath		Signature file path
+	 * @return				Signature info
+	 */
+	public static byte[] signFileWithDSA(PrivateKey privateKey, String filePath) {
+		return signFile(privateKey, filePath, "SHA256withDSA");
+	}
+
+	/**
+	 * Signature data with DSA
+	 * @param privateKey	Signature private key
 	 * @param datas			Signature datas
 	 * @return				Signature info
 	 */
@@ -961,9 +970,19 @@ public final class SecurityUtils implements Serializable {
 	 * @param signature		Signature info
 	 * @return				Verify result
 	 */
-	public static boolean verifyDSASign(PublicKey publicKey,
-			byte[] datas, byte[] signature) {
+	public static boolean verifyDSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
 		return verifySign(publicKey, datas, signature, "SHA256withDSA");
+	}
+
+	/**
+	 * Verify signature info is valid
+	 * @param publicKey		Verify public key
+	 * @param filePath		Signature file path
+	 * @param signature		Signature info
+	 * @return				Verify result
+	 */
+	public static boolean verifyDSASign(PublicKey publicKey, String filePath, byte[] signature) {
+		return verifySign(publicKey, filePath, signature, "SHA256withDSA");
 	}
 
 	/**
@@ -987,7 +1006,17 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * Signature data with HmacSHA1
+	 * Signature data with RSA
+	 * @param privateKey	Signature private key
+	 * @param filePath		Signature file path
+	 * @return				Signature info
+	 */
+	public static byte[] signFileWithRSA(PrivateKey privateKey, String filePath) {
+		return signFile(privateKey, filePath, "SHA256withRSA");
+	}
+
+	/**
+	 * Signature data with HmacMD5
 	 * @param keyBytes		sign key bytes
 	 * @param signDatas		sign data bytes
 	 * @return				signature datas
@@ -1017,6 +1046,16 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Signature data with HmacSHA384
+	 * @param keyBytes		sign key bytes
+	 * @param signDatas		sign data bytes
+	 * @return				signature datas
+	 */
+	public static byte[] signDataByHmacSHA384(byte[] keyBytes, byte[] signDatas) {
+		return Hmac(keyBytes, signDatas, "HmacSHA384");
+	}
+
+	/**
 	 * Signature data with HmacSHA512
 	 * @param keyBytes		sign key bytes
 	 * @param signDatas		sign data bytes
@@ -1027,15 +1066,45 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Signature data with HmacSHA512-224
+	 * @param keyBytes		sign key bytes
+	 * @param signDatas		sign data bytes
+	 * @return				signature datas
+	 */
+	public static byte[] signDataByHmacSHA512_224(byte[] keyBytes, byte[] signDatas) {
+		return Hmac(keyBytes, signDatas, "HmacSHA512/224");
+	}
+
+	/**
+	 * Signature data with HmacSHA512-256
+	 * @param keyBytes		sign key bytes
+	 * @param signDatas		sign data bytes
+	 * @return				signature datas
+	 */
+	public static byte[] signDataByHmacSHA512_256(byte[] keyBytes, byte[] signDatas) {
+		return Hmac(keyBytes, signDatas, "HmacSHA512/256");
+	}
+
+	/**
 	 * Verify signature info is valid
 	 * @param publicKey		Verify public key
 	 * @param datas			Signature datas
 	 * @param signature		Signature info
 	 * @return				Verify result
 	 */
-	public static boolean verifyRSASign(PublicKey publicKey,
-			byte[] datas, byte[] signature) {
+	public static boolean verifyRSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
 		return verifySign(publicKey, datas, signature, "SHA256withRSA");
+	}
+
+	/**
+	 * Verify signature info is valid
+	 * @param publicKey		Verify public key
+	 * @param filePath		Signature file path
+	 * @param signature		Signature info
+	 * @return				Verify result
+	 */
+	public static boolean verifyRSASign(PublicKey publicKey, String filePath, byte[] signature) {
+		return verifySign(publicKey, filePath, signature, "SHA256withRSA");
 	}
 
 	/**
@@ -1050,7 +1119,9 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, String strKey, int keySize) {
 		try {
-			return EncryptData(algorithm, prngAlgorithm, arrB, key, strKey.getBytes(Globals.DEFAULT_ENCODING), keySize);
+			return EncryptData(algorithm, prngAlgorithm, arrB, key,
+					strKey == null ? null : strKey.getBytes(Globals.DEFAULT_ENCODING),
+					keySize);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Encrypt data error! ", e);
@@ -1121,7 +1192,9 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private static byte[] DecryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, String strKey, int keySize) {
 		try {
-			return DecryptData(algorithm, prngAlgorithm, arrB, key, strKey.getBytes(Globals.DEFAULT_ENCODING), keySize);
+			return DecryptData(algorithm, prngAlgorithm, arrB, key,
+					strKey == null ? null : strKey.getBytes(Globals.DEFAULT_ENCODING),
+					keySize);
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Decrypt data error! ", e);
@@ -1154,7 +1227,7 @@ public final class SecurityUtils implements Serializable {
 			} else if (algorithm.startsWith("RSA")) {
 				Cipher cipher = SecurityUtils.initCipher(algorithm, Cipher.DECRYPT_MODE, CipherKey.RSAKey(key));
 				int blockSize = cipher.getBlockSize();
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(64);
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
 				int j = 0;
 
@@ -1169,7 +1242,7 @@ public final class SecurityUtils implements Serializable {
 			}
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Encrypt data error! ", e);
+				LOGGER.debug("Decrypt data error! ", e);
 			}
 		}
 		return new byte[0];
@@ -1232,6 +1305,39 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Signature data by given private key and algorithm
+	 * @param privateKey        Signature using private key
+	 * @param filePath          Signature file path
+	 * @param algorithm         Algorithm
+	 * @return                  Signature value bytes
+	 */
+	private static byte[] signFile(PrivateKey privateKey, String filePath, String algorithm) {
+		if (FileUtils.isExists(filePath)) {
+			InputStream inputStream = null;
+			try {
+				Signature signature = Signature.getInstance(algorithm);
+				signature.initSign(privateKey);
+				inputStream = FileUtils.loadFile(filePath);
+
+				byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+				int readLength;
+				while ((readLength = inputStream.read(buffer)) != -1) {
+					signature.update(buffer, 0, readLength);
+				}
+
+				return signature.sign();
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack message: ", e);
+				}
+			} finally {
+				IOUtils.closeStream(inputStream);
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Verify signature data
 	 * @param publicKey     Verify using public key
 	 * @param datas         Signature data
@@ -1252,7 +1358,42 @@ public final class SecurityUtils implements Serializable {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
 		}
 	}
-	
+
+	/**
+	 * Verify signature data
+	 * @param publicKey     Verify using public key
+	 * @param filePath		Signature file path
+	 * @param signature     Signature value bytes
+	 * @param algorithm     Algorithm
+	 * @return              Verify result
+	 */
+	private static boolean verifySign(PublicKey publicKey,
+	                                  String filePath, byte[] signature, String algorithm) {
+		if (FileUtils.isExists(filePath)) {
+			InputStream inputStream = null;
+			try {
+				Signature signInstance = Signature.getInstance(algorithm);
+				signInstance.initVerify(publicKey);
+				inputStream = FileUtils.loadFile(filePath);
+
+				byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+				int readLength;
+				while ((readLength = inputStream.read(buffer)) != -1) {
+					signInstance.update(buffer, 0, readLength);
+				}
+
+				return signInstance.verify(signature);
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack message: ", e);
+				}
+			} finally {
+				IOUtils.closeStream(inputStream);
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
 	/**
 	 * Get digest value
 	 * @param source		Input source
@@ -1295,14 +1436,13 @@ public final class SecurityUtils implements Serializable {
 				LOGGER.error("File does not exists" + file.getAbsolutePath());
 				return "";
 			}
-			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 		} else {
 			byte[] tempBytes = ConvertUtils.convertToByteArray(source);
 			if (tempBytes != null) {
 				messageDigest.update(tempBytes);
 			}
-			return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 		}
+		return ConvertUtils.byteArrayToHexString(messageDigest.digest());
 	}
 
 	/**

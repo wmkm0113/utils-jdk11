@@ -102,17 +102,9 @@ public final class StringUtils {
 
 	private static final byte[] BASE64_DECODE_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
 	
-	private static final String CHN_IDENTIFIED_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
-	private static final String CHN_IDENTIFIED_AUTH_CODE = "10X98765432";
-	private static final int[] CHN_IDENTIFIED_WEIGHT = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
-
-	private static final String CHN_ORG_CODE_REGEX = "^[1-9A-Z]([0-9A-Z]{7})-{0,1}([0-9]|X)$";
-	private static final String CHN_ORG_CODE_MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private static final int[] CHN_ORG_CODE_WEIGHT = {3, 7, 9, 10, 5, 8, 4, 2};
-	
-	private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1|5|9|Y][0-9A-Z]{17}$";
-	private static final String CHN_SOCIAL_CREDIT_AUTH_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
-	private static final int[] CHN_SOCIAL_CREDIT_WEIGHT = {1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28};
+	private static final String CHN_ID_CARD_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
+	private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1-9|A|N|Y][0-9A-Z]{17}$";
+	private static final String CHN_SOCIAL_CREDIT_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
 
 	static {
 		Arrays.fill(BASE64_DECODE_TABLE, (byte)INVALID_BYTE);
@@ -1787,7 +1779,7 @@ public final class StringUtils {
 		sourceString = replace(sourceString, "&lt;", "<");
 		sourceString = replace(sourceString, "&gt;", ">");
 		sourceString = replace(sourceString, "&quot;", "\"");
-		sourceString = replace(sourceString, "&#39;", "\'");
+		sourceString = replace(sourceString, "&#39;", "'");
 		sourceString = replace(sourceString, "\\\\", "\\");
 		sourceString = replace(sourceString, "\\n", "\n");
 		sourceString = replace(sourceString, "\\r", "\r");
@@ -2328,87 +2320,55 @@ public final class StringUtils {
 	
 	/**
 	 * Authentication CHN ID
-	 * @param identifiedCode	CHN identified code
+	 * @param cardCode	CHN ID Card code
 	 * @return	Check result
 	 */
-	public static boolean validateCHNIdentifiedCode(String identifiedCode) {
-		if (identifiedCode != null) {
-			identifiedCode = identifiedCode.toUpperCase();
-			if (StringUtils.matches(identifiedCode, CHN_IDENTIFIED_REGEX)) {
-				int result = 0;
+	public static boolean validateCHNIDCardCode(String cardCode) {
+		if (cardCode != null && cardCode.length() == 18) {
+			cardCode = cardCode.toUpperCase();
+			if (StringUtils.matches(cardCode, CHN_ID_CARD_REGEX)) {
+				int sigma = 0;
 				for (int i = 0 ; i < 17 ; i++) {
-					int code = Character.digit(identifiedCode.charAt(i), 10);
+					int code = Character.digit(cardCode.charAt(i), 10);
 					if (code != 0) {
-						result += code * CHN_IDENTIFIED_WEIGHT[i];
+						sigma += code * (Math.pow(2, 17 - i) % 11);
 					}
 				}
-
-				return identifiedCode.endsWith(Character.toString(CHN_IDENTIFIED_AUTH_CODE.charAt(result % 11)));
-			}
-		}
-		
-		return Globals.DEFAULT_VALUE_BOOLEAN;
-	}
-	
-	/**
-	 * Authentication CHN organization code
-	 * @param organizationCode	CHN organization code
-	 * @return	Check result
-	 */
-	public static boolean validateCHNOrganizationCode(String organizationCode) {
-		if (organizationCode != null) {
-			organizationCode = organizationCode.toUpperCase();
-			if (StringUtils.matches(organizationCode, CHN_ORG_CODE_REGEX)) {
-				int result = 0;
-				for (int i = 0 ; i < 8 ; i++) {
-					char codeChar = organizationCode.charAt(i);
-					int code = CHN_ORG_CODE_MAP.indexOf(Character.toString(codeChar));
-					if (code != 0) {
-						result += code * CHN_ORG_CODE_WEIGHT[i];
-					}
-				}
-
-				int authCode = 11 - (result % 11);
-				if (authCode == 11) {
-					authCode = 0;
-				}
-
+				int authCode = (12 - (sigma % 11)) % 11;
 				if (authCode == 10) {
-					return organizationCode.endsWith("X");
+					return cardCode.endsWith("X");
 				} else {
-					return organizationCode.endsWith(Integer.toString(authCode));
+					return cardCode.endsWith(Integer.toString(authCode));
 				}
 			}
 		}
-		
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
-	
+
 	/**
 	 * Authentication CHN social credit code
 	 * @param socialCreditCode	CHN social credit code
 	 * @return	Check result
 	 */
 	public static boolean validateCHNSocialCreditCode(String socialCreditCode) {
-		socialCreditCode = socialCreditCode.toUpperCase();
-		if (StringUtils.matches(socialCreditCode, CHN_SOCIAL_CREDIT_REGEX)) {
-			int result = 0;
-			for (int i = 0 ; i < 17 ; i++) {
-				char codeChar = socialCreditCode.charAt(i);
-				int code = CHN_SOCIAL_CREDIT_AUTH_CODE.indexOf(Character.toString(codeChar));
-				if (code != 0) {
-					result += code * CHN_SOCIAL_CREDIT_WEIGHT[i];
+		if (socialCreditCode != null && socialCreditCode.length() == 18) {
+			String creditCode = socialCreditCode.toUpperCase();
+			int validateCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.substring(17));
+			if (validateCode != -1) {
+				if (StringUtils.matches(creditCode, CHN_SOCIAL_CREDIT_REGEX)) {
+					int sigma = 0;
+					for (int i = 0 ; i < 17 ; i++) {
+						int code = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(i));
+						if (code != 0) {
+							sigma += code * (Math.pow(3, i) % 31);
+						}
+					}
+
+					int authCode = 31 - (sigma % 31);
+					return (authCode == 31) ? (validateCode == 0) : (authCode == validateCode);
 				}
 			}
-			
-			int authIndex = 31 - (result % 31);
-			if (authIndex == 31) {
-				authIndex = 0;
-			}
-			
-			return socialCreditCode.endsWith(Character.toString(CHN_SOCIAL_CREDIT_AUTH_CODE.charAt(authIndex)));
 		}
-		
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 

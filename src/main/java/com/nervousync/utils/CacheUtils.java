@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -56,22 +57,52 @@ public final class CacheUtils {
 		return CacheUtils.INSTANCE;
 	}
 
+	/**
+	 * Check given cache name was initialized
+	 * @param cacheName     cache name
+	 * @return              initialize result
+	 */
 	public static boolean isInitialized(String cacheName) {
 		return CacheUtils.INSTANCE == null ? Globals.DEFAULT_VALUE_BOOLEAN
 				: CacheUtils.INSTANCE.registeredCache.containsKey(cacheName);
 	}
 
+	/**
+	 * Read registered provider name list
+	 * @return      provider name list
+	 */
 	public List<String> registeredProviderNames() {
 		return new ArrayList<>(this.registeredProviders.keySet());
 	}
 
-	public void registerProvider(Class<? extends AbstractCacheProvider> providerClass) {
+	/**
+	 * Register cache provider
+	 * @param providerClass     cache provider class
+	 * @return                  provider name
+	 */
+	public Optional<String> registerProvider(Class<? extends AbstractCacheProvider> providerClass) {
+		String providerName = null;
 		if (providerClass != null && providerClass.isAnnotationPresent(CacheProvider.class)) {
 			CacheProvider cacheProvider = providerClass.getAnnotation(CacheProvider.class);
-			this.registeredProviders.put(cacheProvider.name(), providerClass);
+			providerName = cacheProvider.name();
+			this.registeredProviders.put(providerName, providerClass);
 		}
+		return Optional.ofNullable(providerName);
 	}
 
+	/**
+	 * Remove registered cache provider
+	 * @param providerName      cache provider name
+	 */
+	public void removeProvider(String providerName) {
+		this.registeredProviders.remove(providerName);
+	}
+
+	/**
+	 * Initialize cache by given configure
+	 * @param cacheName         cache name
+	 * @param cacheConfig       cache config
+	 */
 	public void registerCache(String cacheName, CacheConfig cacheConfig) {
 		if (cacheName == null || cacheConfig == null
 				|| !this.registeredProviders.containsKey(cacheConfig.getProviderName())) {
@@ -90,6 +121,14 @@ public final class CacheUtils {
 				LOGGER.debug("Stack message: ", e);
 			}
 		}
+	}
+
+	/**
+	 * Destroy cache instance
+	 * @param cacheName     cache name
+	 */
+	public void destroyCache(String cacheName) {
+		this.registeredCache.remove(cacheName);
 	}
 
 	/**
