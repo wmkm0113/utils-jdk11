@@ -201,17 +201,10 @@ public final class CacheConfig extends BaseElement {
 	}
 
 	/**
-	 * @param maximumClient the maxiumClient to set
+	 * @param maximumClient the maximumClient to set
 	 */
 	public void setMaximumClient(int maximumClient) {
 		this.maximumClient = maximumClient;
-	}
-
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 	private boolean serverExists(String serverAddress, int serverPort) {

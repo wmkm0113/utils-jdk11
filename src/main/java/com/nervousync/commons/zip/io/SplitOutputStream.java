@@ -51,10 +51,10 @@ public class SplitOutputStream extends OutputStream {
 	}
 	
 	private NervousyncRandomAccessFile dataOutput;
-	private String fileName;
-	private String filePath;
-	private String currentFullPath;
-	private long splitLength;
+	private final String fileName;
+	private final String filePath;
+	private final String currentFullPath;
+	private final long splitLength;
 	private int currentSplitFileIndex;
 	private long bytesWrittenForThisPart;
 	

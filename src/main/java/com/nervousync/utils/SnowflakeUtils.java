@@ -50,11 +50,11 @@ public final class SnowflakeUtils {
 	/**
 	 * Node instance id (between 0 and 63), default: 1L
 	 */
-	private long instanceId;
+	private final long instanceId;
 	/**
 	 * Begin timestamp value
 	 */
-	private long referenceTime;
+	private final long referenceTime;
 	/**
 	 * Sequence index in millisecond
 	 */
@@ -185,11 +185,10 @@ public final class SnowflakeUtils {
 					}
 				}
 			}
-			this.lastTime = currentTime;
 		} else {
 			this.sequenceIndex = 0L;
-			this.lastTime = currentTime;
 		}
+		this.lastTime = currentTime;
 
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug("Last time: {}, reference time: {}, Device ID: {}, instanceId: {}, sequenceIndex: {}",

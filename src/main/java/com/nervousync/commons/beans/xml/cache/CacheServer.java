@@ -202,9 +202,11 @@ public final class CacheServer extends BaseElement {
 	}
 
 	/**
-	 * @return the serialversionuid
+	 * Gets the value of serialVersionUID
+	 *
+	 * @return the value of serialVersionUID
 	 */
-	public static long getSerialversionuid() {
+	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
 }

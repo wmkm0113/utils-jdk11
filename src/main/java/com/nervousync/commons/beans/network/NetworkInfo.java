@@ -56,11 +56,11 @@ public final class NetworkInfo implements Serializable {
 	/**
 	 * Is virtual adapter
 	 */
-	private boolean virtual;
+	private final boolean virtual;
 	/**
 	 * Interface display name in system
 	 */
-	private String displayName;
+	private final String displayName;
 	/**
 	 * Interface adapter physical address
 	 */
@@ -196,19 +196,19 @@ public final class NetworkInfo implements Serializable {
 		/**
 		 * IP address, supported IPv4 and IPv6
 		 */
-		private String ipAddress;
+		private final String ipAddress;
 		/**
 		 * Is site local address
 		 */
-		private boolean local;
+		private final boolean local;
 		/**
 		 * Is loop back address
 		 */
-		private boolean loop;
+		private final boolean loop;
 		/**
 		 * Is link local status
 		 */
-		private boolean linkLocal;
+		private final boolean linkLocal;
 		
 		/**
 		 * Constructor

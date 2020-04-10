@@ -773,7 +773,6 @@ public final class ReflectionUtils {
 			Method setMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.SetMethod);
 			if (setMethod != null) {
 				setMethod.invoke(target, value);
-				return true;
 			} else {
 				Field field = getFieldIfAvailable(target.getClass(), fieldName);
 				if (field == null) {
@@ -942,8 +941,8 @@ public final class ReflectionUtils {
 				
 				makeAccessible(field);
 				setField(field, target, object);
-				return true;
 			}
+			return true;
 		} catch (Exception e) {
 			if (ReflectionUtils.LOGGER.isDebugEnabled()) {
 				ReflectionUtils.LOGGER.debug("Convert to Object set field value error! ", e);

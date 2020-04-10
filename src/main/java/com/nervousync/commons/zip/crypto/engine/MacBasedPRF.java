@@ -29,8 +29,8 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public final class MacBasedPRF {
 
-	private Mac mac;
-	private int length;
+	private final Mac mac;
+	private final int length;
 	private final String algorithm;
 	
 	public MacBasedPRF(String algorithm) {

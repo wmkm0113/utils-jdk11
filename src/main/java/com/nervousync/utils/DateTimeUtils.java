@@ -691,8 +691,8 @@ public final class DateTimeUtils {
 
 	private static final class UTCClock {
 
-		private AtomicLong currentLocalTime = new AtomicLong(System.currentTimeMillis());
-		private AtomicLong currentUTCTime =
+		private final AtomicLong currentLocalTime = new AtomicLong(System.currentTimeMillis());
+		private final AtomicLong currentUTCTime =
 				new AtomicLong(System.currentTimeMillis() - TimeZone.getDefault().getRawOffset());
 
 		public UTCClock() {

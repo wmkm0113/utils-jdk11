@@ -85,18 +85,16 @@ public class LocalFileHeader extends FileHeader {
 
 		try {
 			if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
-				if (this.getAesExtraDataRecord() == null) {
-					return Globals.DEFAULT_VALUE_BOOLEAN;
-				} else {
+				if (this.getAesExtraDataRecord() != null) {
 					byte[] salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
 					int readLength = Globals.DEFAULT_VALUE_INT;
 					if (input instanceof RandomAccessFile) {
-						((RandomAccessFile)input).seek(this.getOffsetStartOfData());
-						readLength = ((RandomAccessFile)input).read(salt);
+						((RandomAccessFile) input).seek(this.getOffsetStartOfData());
+						readLength = ((RandomAccessFile) input).read(salt);
 					} else if (input instanceof InputStream) {
-						long skipLength = ((InputStream)input).skip(this.getOffsetStartOfData());
+						long skipLength = ((InputStream) input).skip(this.getOffsetStartOfData());
 						if (skipLength == this.getOffsetStartOfData()) {
-							readLength = ((InputStream)input).read(salt);
+							readLength = ((InputStream) input).read(salt);
 						}
 					}
 
@@ -107,17 +105,17 @@ public class LocalFileHeader extends FileHeader {
 					readLength = Globals.DEFAULT_VALUE_INT;
 					byte[] passwordBytes = new byte[2];
 					if (input instanceof RandomAccessFile) {
-						readLength = ((RandomAccessFile)input).read(passwordBytes);
+						readLength = ((RandomAccessFile) input).read(passwordBytes);
 					} else if (input instanceof InputStream) {
-						readLength = ((InputStream)input).read(passwordBytes);
+						readLength = ((InputStream) input).read(passwordBytes);
 					}
 
 					if (readLength == 2) {
 						return AESCrypto.verifyPassword(this.getAesExtraDataRecord().getAesStrength(),
 								salt, this.getPassword(), passwordBytes);
 					}
-					return Globals.DEFAULT_VALUE_BOOLEAN;
 				}
+				return Globals.DEFAULT_VALUE_BOOLEAN;
 			} else if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
 				//	Not supported verify password of standard encrypt
 				return true;

@@ -39,7 +39,7 @@ public abstract class AbstractCacheProvider {
 	/**
 	 * Default port number
 	 */
-	private int defaultPort;
+	private final int defaultPort;
 	
 	/**
 	 * Connect timeout
@@ -124,9 +124,9 @@ public abstract class AbstractCacheProvider {
 	}
 
 	/**
-	 * Gets the value of maxiumClient.
+	 * Gets the value of maximumClient.
 	 *
-	 * @return the value of maxiumClient
+	 * @return the value of maximumClient
 	 */
 	public int getMaximumClient() {
 		return maximumClient;

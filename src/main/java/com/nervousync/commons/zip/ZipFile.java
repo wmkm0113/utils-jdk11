@@ -273,13 +273,8 @@ public final class ZipFile implements Cloneable {
 			throw new ZipException("Zip file entity is null");
 		}
 
-		List<String> fileList = Arrays.asList(addFiles);
-		if (fileList.size() == 0) {
-			throw new ZipException("Zip file entity is null");
-		}
-
 		ZipFile zipFile = ZipFile.createZipFile(filePath, charsetName, splitArchive, splitLength);
-		zipFile.addFiles(fileList, zipOptions);
+		zipFile.addFiles(Arrays.asList(addFiles), zipOptions);
 
 		return zipFile;
 	}
@@ -2504,15 +2499,9 @@ public final class ZipFile implements Cloneable {
 			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 			
 			// Offset central directory
-			if (offsetCentralDirectory > ZipConstants.ZIP_64_LIMIT) {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, ZipConstants.ZIP_64_LIMIT);
-				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
-			} else {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, offsetCentralDirectory);
-				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
-			}
+			RawUtils.writeLongFromLittleEndian(longBuffer, 0, Math.min(offsetCentralDirectory, ZipConstants.ZIP_64_LIMIT));
+			System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
+			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
 
 			// Zip File comment length
 			int commentLength = 0;

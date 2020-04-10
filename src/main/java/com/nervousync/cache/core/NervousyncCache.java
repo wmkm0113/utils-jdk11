@@ -35,7 +35,7 @@ public final class NervousyncCache {
 	/**
 	 * Current cache provider implement object
 	 */
-	private AbstractCacheProvider cacheProvider;
+	private final AbstractCacheProvider cacheProvider;
 	
 	/**
 	 * Constructor

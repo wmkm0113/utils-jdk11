@@ -29,7 +29,7 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public class StandardDecryptor implements Decryptor {
 
-	private ZipCryptoEngine zipCryptoEngine;
+	private final ZipCryptoEngine zipCryptoEngine;
 	
 	public StandardDecryptor(LocalFileHeader localFileHeader, byte[] decryptorHeader)
 			throws ZipException {
@@ -38,18 +38,6 @@ public class StandardDecryptor implements Decryptor {
 		}
 
 		this.zipCryptoEngine = new ZipCryptoEngine();
-		
-		byte[] crcBuffer = localFileHeader.getCrcBuffer();
-
-		byte[] crc = new byte[4];
-		crc[3] = (byte)(crcBuffer[3] & 0xFF);
-		crc[2] = (byte)((crcBuffer[3] >> 8) & 0xFF);
-		crc[1] = (byte)((crcBuffer[3] >> 16) & 0xFF);
-		crc[0] = (byte)((crcBuffer[3] >> 24) & 0xFF);
-
-		if (crc[2] > 0 || crc[1] > 0 || crc[0] > 0) {
-			throw new IllegalStateException("Invalid CRC in file header");
-		}
 
 		if (localFileHeader.getPassword() == null
 				|| localFileHeader.getPassword().length == 0) {

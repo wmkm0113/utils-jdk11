@@ -180,10 +180,10 @@ public final class SNMPUtils {
 	
 	private static final class SNMPProcessor implements Runnable {
 
-		private String identifiedKey;
-		private Target target;
-		private List<PDU> pduList;
-		private SNMPDataOperator snmpDataOperator;
+		private final String identifiedKey;
+		private final Target target;
+		private final List<PDU> pduList;
+		private final SNMPDataOperator snmpDataOperator;
 		
 		public SNMPProcessor(String identifiedKey, TargetHost targetHost, List<PDU> pduList, 
 				SNMPDataOperator snmpDataOperator) throws ProcessorConfigException {

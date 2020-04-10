@@ -41,7 +41,7 @@ public final class CacheUtils {
 
 	private static CacheUtils INSTANCE = null;
 
-	private Hashtable<String, Class<? extends AbstractCacheProvider>> registeredProviders;
+	private final Hashtable<String, Class<? extends AbstractCacheProvider>> registeredProviders;
 
 	private Hashtable<String, NervousyncCache> registeredCache;
 

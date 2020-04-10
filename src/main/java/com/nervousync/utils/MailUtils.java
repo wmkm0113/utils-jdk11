@@ -417,19 +417,14 @@ public final class MailUtils {
 			boolean detail, String saveAttachPath) throws MessagingException, IOException {
 		MailObject mailObject = new MailObject();
 
-		InternetAddress[] internetAddresses;
-		
-		if (mimeMessage instanceof IMAPMessage) {
-			internetAddresses = (InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
-		} else {
-			internetAddresses = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.TO);
-		}
+		InternetAddress[] internetAddresses = (InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
 
 		List<String> receiveList = new ArrayList<>();
-
-		for (InternetAddress address : internetAddresses) {
-			receiveList.add(address.getAddress());
-		}
+		Arrays.asList(mimeMessage.getRecipients(IMAPMessage.RecipientType.TO)).forEach(address -> {
+			if (address instanceof InternetAddress) {
+				receiveList.add(((InternetAddress)address).getAddress());
+			}
+		});
 		
 		if (!receiveList.contains(receiveAddress)) {
 			return null;

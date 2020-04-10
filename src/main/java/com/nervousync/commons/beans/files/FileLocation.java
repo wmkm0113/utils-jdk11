@@ -35,11 +35,11 @@ public final class FileLocation implements Serializable {
 	 */
 	private static final long serialVersionUID = -4777811442178508666L;
 
-	private String locationPath;
-	private LocationType locationType;
-	private String domainName;
-	private String userName;
-	private String passWord;
+	private final String locationPath;
+	private final LocationType locationType;
+	private final String domainName;
+	private final String userName;
+	private final String passWord;
 
 	public FileLocation(String locationPath) throws FileProtocolNotSupportException {
 		this(locationPath, null, null, null);

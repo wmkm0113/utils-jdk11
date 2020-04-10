@@ -30,7 +30,7 @@ import com.nervousync.exceptions.zip.ZipException;
  */
 public final class StandardEncryptor implements Encryptor {
 
-	private ZipCryptoEngine zipCryptoEngine;
+	private final ZipCryptoEngine zipCryptoEngine;
 	private byte[] headerBytes;
 	
 	public StandardEncryptor(char[] password, int crc) throws ZipException {
