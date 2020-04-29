@@ -152,7 +152,7 @@ public abstract class AbstractCacheProvider {
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public final void set(String key, Object value) {
+	public final void set(String key, String value) {
 		this.set(key, value, this.expireTime);
 	}
 	
@@ -162,14 +162,14 @@ public abstract class AbstractCacheProvider {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public abstract void set(String key, Object value, int expire);
+	public abstract void set(String key, String value, int expire);
 
 	/**
 	 * Add a new key-value to cache server by default expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public final void add(String key, Object value) {
+	public final void add(String key, String value) {
 		this.add(key, value, this.expireTime);
 	}
 	
@@ -179,14 +179,14 @@ public abstract class AbstractCacheProvider {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public abstract void add(String key, Object value, int expire);
+	public abstract void add(String key, String value, int expire);
 
 	/**
 	 * Replace exists value of given key by given value by default expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public final void replace(String key, Object value) {
+	public final void replace(String key, String value) {
 		this.replace(key, value, this.expireTime);
 	}
 	
@@ -196,7 +196,7 @@ public abstract class AbstractCacheProvider {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public abstract void replace(String key, Object value, int expire);
+	public abstract void replace(String key, String value, int expire);
 	
 	/**
 	 * Set expire time to new given expire value which cache key was given
@@ -216,8 +216,24 @@ public abstract class AbstractCacheProvider {
 	 * @param key		Cache key
 	 * @return			Cache value or null if cache key was not exists or it was expired
 	 */
-	public abstract Object get(String key);
-	
+	public abstract String get(String key);
+
+	/**
+	 * Incr operate
+	 * @param key		Cache key
+	 * @param step      Step value
+	 * @return          Result value
+	 */
+	public abstract long incr(String key, long step);
+
+	/**
+	 * Decr operate
+	 * @param key		Cache key
+	 * @param step      Step value
+	 * @return          Result value
+	 */
+	public abstract long decr(String key, long step);
+
 	/**
 	 * Destroy provider
 	 */

@@ -20,6 +20,9 @@ import java.awt.AlphaComposite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -172,8 +175,10 @@ public final class ImageUtils {
 				
 				int targetWidth = Double.valueOf(origWidth * ratio).intValue();
 				int targetHeight = Double.valueOf(origHeight * ratio).intValue();
-				
-				return processImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
+
+				return ImageIO.write(processImage(srcImage, targetWidth, targetHeight, markOptions),
+						StringUtils.getFilenameExtension(destPath),
+						FileUtils.getFile(destPath));
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
@@ -225,8 +230,10 @@ public final class ImageUtils {
 					double ratio = targetWidth * 1.0 / origWidth;
 					targetHeight = Double.valueOf(ratio * origHeight).intValue();
 				}
-				
-				return processImage(srcImage, destPath, targetWidth, targetHeight, markOptions);
+
+				return ImageIO.write(processImage(srcImage, targetWidth, targetHeight, markOptions),
+						StringUtils.getFilenameExtension(destPath),
+						FileUtils.getFile(destPath));
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
@@ -243,13 +250,127 @@ public final class ImageUtils {
 			BufferedImage srcImage = ImageIO.read(FileUtils.getFile(filePath));
 			BufferedImage bufferedImage =
 					new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-			return processImage(bufferedImage, targetPath, imageWidth, imageHeight, markOptions);
+			return ImageIO.write(processImage(bufferedImage, imageWidth, imageHeight, markOptions),
+					StringUtils.getFilenameExtension(targetPath),
+					FileUtils.getFile(targetPath));
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Mark picture error! ", e);
 			}
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
+	public static int dHashHamming(String origPath, String destPath) {
+		String origHash = ImageUtils.dHash(origPath);
+		String destHash = ImageUtils.dHash(destPath);
+		int diff = 0;
+		for (int j = 0 ; j < origHash.length() ; j++) {
+			diff += (origHash.charAt(j) ^ destHash.charAt(j));
+		}
+		return diff;
+	}
+
+	public static int pHashHamming(String origPath, String destPath) {
+		String origHash = ImageUtils.pHash(origPath);
+		String destHash = ImageUtils.pHash(destPath);
+		int diff = 0;
+		for (int j = 0 ; j < origHash.length() ; j++) {
+			diff += (origHash.charAt(j) ^ destHash.charAt(j));
+		}
+		return diff;
+	}
+
+	public static String dHash(String filePath) {
+		try {
+			return ImageUtils.dHash(FileUtils.getFile(filePath));
+		} catch (FileNotFoundException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate picture pHash error! ", e);
+			}
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+	}
+
+	public static String dHash(File file) {
+		try {
+			return ImageUtils.dHash(ImageIO.read(file));
+		} catch (IOException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate picture pHash error! ", e);
+			}
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+	}
+
+	public static String dHash(BufferedImage bufferedImage) {
+		int width = bufferedImage.getWidth();
+		int height = bufferedImage.getHeight();
+		BufferedImage prepareImage;
+		if (bufferedImage.getWidth() != 9 || bufferedImage.getHeight() != 8) {
+			prepareImage = ImageUtils.processImage(bufferedImage, 9, 8, null);
+		} else {
+			prepareImage = bufferedImage;
+		}
+
+		double[][] grayMatrix = ImageUtils.grayMatrix(prepareImage);
+		StringBuilder pHash = new StringBuilder();
+		for (int x = 0 ; x < 8 ; x++) {
+			for (int y = 0 ; y < 8 ; y++) {
+				pHash.append((grayMatrix[x][y] > grayMatrix[x][y + 1]) ? "1" : "0");
+			}
+		}
+		return pHash.toString();
+	}
+
+	public static String pHash(String filePath) {
+		try {
+			return ImageUtils.pHash(FileUtils.getFile(filePath));
+		} catch (FileNotFoundException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate picture pHash error! ", e);
+			}
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+	}
+
+	public static String pHash(File file) {
+		try {
+			return ImageUtils.pHash(ImageIO.read(file));
+		} catch (IOException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate picture pHash error! ", e);
+			}
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+	}
+
+	public static String pHash(BufferedImage bufferedImage) {
+		int width = bufferedImage.getWidth();
+		int height = bufferedImage.getHeight();
+		BufferedImage prepareImage;
+		if (bufferedImage.getWidth() != 8 || bufferedImage.getHeight() != 8) {
+			prepareImage = ImageUtils.processImage(bufferedImage, 8, 8, null);
+		} else {
+			prepareImage = bufferedImage;
+		}
+
+		double[][] DCT = ImageUtils.applyDCT(prepareImage);
+		double total = 0.0;
+		for (int x = 0 ; x < 8 ; x++) {
+			for (int y = 0 ; y < 8 ; y++) {
+				total += DCT[x][y];
+			}
+		}
+		total -= DCT[0][0];
+		double average = total / 63;
+		StringBuilder pHash = new StringBuilder();
+		for (int x = 0 ; x < 8 ; x++) {
+			for (int y = 0 ; y < 8 ; y++) {
+				pHash.append((DCT[x][y] > average) ? "1" : "0");
+			}
+		}
+		return pHash.toString();
 	}
 	
 	/**
@@ -297,15 +418,14 @@ public final class ImageUtils {
 	/**
 	 * Process image operate
 	 * @param srcImage				original image object
-	 * @param destPath				target output path
 	 * @param targetWidth			target width
 	 * @param targetHeight			target height
 	 * @param markOptions			image mark options
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	private static boolean processImage(BufferedImage srcImage, String destPath,
+	private static BufferedImage processImage(BufferedImage srcImage,
 			int targetWidth, int targetHeight, MarkOptions markOptions) {
-		if (srcImage != null && destPath != null && targetWidth > 0 && targetHeight > 0) {
+		if (srcImage != null && targetWidth > 0 && targetHeight > 0) {
 			try {
 				BufferedImage bufferedImage = 
 						new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
@@ -317,14 +437,69 @@ public final class ImageUtils {
 				}
 				graphics.dispose();
 				
-				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), 
-						FileUtils.getFile(destPath));
+				return bufferedImage;
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return srcImage;
+	}
+
+	private static double[][] grayMatrix(BufferedImage bufferedImage) {
+		if (bufferedImage == null) {
+			return new double[0][0];
+		}
+		int width = bufferedImage.getWidth();
+		int height = bufferedImage.getHeight();
+		double[][] grayMatrix = new double[height][width];
+		for (int y = 0 ; y < height ; y++) {
+			for (int x = 0 ; x < width ; x++) {
+				int pixel = bufferedImage.getRGB(x, y);
+				grayMatrix[y][x] = ((pixel & 0xFF0000) >> 16) * 0.3
+						+ ((pixel & 0xFF00) >> 8) * 0.59
+						+ ((pixel & 0xFF) * 0.11);
+			}
+		}
+		return grayMatrix;
+	}
+
+	/**
+	 * Convert RGB to Gray matrix
+	 * @param bufferedImage     BufferedImage instance
+	 * @return                  Gray matrix
+	 */
+	private static double[][] applyDCT(BufferedImage bufferedImage) {
+		if (bufferedImage == null) {
+			return new double[0][0];
+		}
+		int width = bufferedImage.getWidth();
+		int height = bufferedImage.getHeight();
+		int length = Math.max(width, height);
+		double[] uv = new double[length];
+		for (int i = 1 ; i < length ; i++) {
+			uv[i] = 1;
+		}
+		uv[0] = 1 / Math.sqrt(2.0);
+		double[][] DCT = new double[width][height];
+		for (int x = 0 ; x < width ; x++) {
+			for (int y = 0 ; y < height ; y++) {
+				double sum = 0.0;
+				int pixel = bufferedImage.getRGB(x, y);
+				double gray = ((pixel & 0xFF0000) >> 16) * 0.3
+						+ ((pixel & 0xFF00) >> 8) * 0.59
+						+ ((pixel & 0xFF) * 0.11);
+				for (int i = 0 ; i < width ; i++) {
+					for (int j = 0 ; j < height ; j++) {
+						sum += Math.cos(((2 * i + 1) / (width * height * 1.0)) * x * Math.PI)
+								* Math.cos(((2 * j + 1) / (width * height * 1.0)) * y * Math.PI)
+								* gray;
+					}
+				}
+				DCT[x][y] = sum * ((uv[x] * uv[y]) / 4.0);
+			}
+		}
+		return DCT;
 	}
 }

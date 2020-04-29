@@ -285,7 +285,7 @@ public final class ConvertUtils {
 	public static <T> T convertMapToObject(Map<?, ?> dataMap, Class<T> clazz) {
 		try {
 			List<String> fieldNameList = ReflectionUtils.getAllDeclaredFieldNames(clazz);
-			T object = clazz.newInstance();
+			T object = clazz.getDeclaredConstructor().newInstance();
 			for (String fieldName : fieldNameList) {
 				Object fieldValue = dataMap.get(fieldName);
 				Field field = ReflectionUtils.findField(clazz, fieldName);

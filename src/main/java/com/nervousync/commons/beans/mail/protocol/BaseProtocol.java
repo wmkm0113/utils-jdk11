@@ -149,7 +149,7 @@ public class BaseProtocol implements Serializable {
 		properties.setProperty(timeoutParam, Integer.toString(timeout));
 		
 		if (ssl) {
-			Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+			Security.addProvider(Security.getProvider("SunJSSE"));
 		}
 		
 		switch (protocolOption) {

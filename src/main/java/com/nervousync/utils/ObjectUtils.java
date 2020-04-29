@@ -17,7 +17,6 @@
 package com.nervousync.utils;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -76,7 +75,7 @@ public final class ObjectUtils {
 			throws ClassNotFoundException, LinkageError {
 		return newInstance(className, paramClasses, args, null);
 	}
-	
+
 	/**
 	 * Create a proxy object instance
 	 * @param className		class name
@@ -105,7 +104,7 @@ public final class ObjectUtils {
 	public static <T> T newInstance(Class<T> clazz) {
 		return createProxyInstance(clazz, null, null, new HandlerInterceptor[]{});
 	}
-	
+
 	/**
 	 * Create a proxy object instance
 	 * @param clazz		define class
@@ -120,7 +119,7 @@ public final class ObjectUtils {
 		}
 		return createProxyInstance(clazz, null, null, methodInterceptors);
 	}
-	
+
 	/**
 	 * Create a proxy object instance
 	 * @param clazz		define class
@@ -150,7 +149,7 @@ public final class ObjectUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor[] methodInterceptors) {
 		T object;
-		
+
 		if (methodInterceptors != null && methodInterceptors.length > 0) {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(clazz);
@@ -160,7 +159,7 @@ public final class ObjectUtils {
 			} else {
 				enhancer.setCallbacks(methodInterceptors);
 			}
-			
+
 			if (args == null || args.length == 0) {
 				object = (T) enhancer.create();
 			} else {
@@ -169,16 +168,15 @@ public final class ObjectUtils {
 		} else {
 			try {
 				if (args == null || args.length == 0) {
-					object = clazz.newInstance();
+					object = clazz.getDeclaredConstructor().newInstance();
 				} else {
-					Constructor<T> constructor = ReflectionUtils.findConstructor(clazz, paramClasses);
-					object = constructor.newInstance(args);
+					object = clazz.getDeclaredConstructor(paramClasses).newInstance(args);
 				}
 			} catch (SecurityException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				object = null;
 			}
 		}
-		
+
 		return object;
 	}
 

@@ -82,7 +82,14 @@ public final class BeanUtils {
 
 		beanCopier.copy(orig, dest, converter);
 	}
-	
+
+	/**
+	 * Generate key of cached bean copier
+	 * @param origClass         Original class
+	 * @param destClass         Dest class
+	 * @param converterClass    Convert class
+	 * @return                  cache key
+	 */
 	private static String generateKey(Class<?> origClass, Class<?> destClass, Class<?> converterClass) {
 		if (converterClass == null) {
 			return SecurityUtils.MD5(origClass.getName() + "To" + destClass.getName());

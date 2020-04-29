@@ -137,7 +137,7 @@ public final class CacheUtils {
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public void set(String cacheName, String key, Object value) {
+	public void set(String cacheName, String key, String value) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).set(key, value);
 		}
@@ -150,7 +150,7 @@ public final class CacheUtils {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public void set(String cacheName, String key, Object value, int expire) {
+	public void set(String cacheName, String key, String value, int expire) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).set(key, value, expire);
 		}
@@ -162,7 +162,7 @@ public final class CacheUtils {
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public void add(String cacheName, String key, Object value) {
+	public void add(String cacheName, String key, String value) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).add(key, value);
 		}
@@ -175,7 +175,7 @@ public final class CacheUtils {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public void add(String cacheName, String key, Object value, int expire) {
+	public void add(String cacheName, String key, String value, int expire) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).add(key, value, expire);
 		}
@@ -187,7 +187,7 @@ public final class CacheUtils {
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 */
-	public void replace(String cacheName, String key, Object value) {
+	public void replace(String cacheName, String key, String value) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).replace(key, value);
 		}
@@ -200,7 +200,7 @@ public final class CacheUtils {
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public void replace(String cacheName, String key, Object value, int expire) {
+	public void replace(String cacheName, String key, String value, int expire) {
 		if (this.registeredCache.containsKey(cacheName)) {
 			this.registeredCache.get(cacheName).replace(key, value, expire);
 		}

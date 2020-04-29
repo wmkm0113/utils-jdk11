@@ -41,7 +41,6 @@ public final class PropertiesUtils {
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
 	
 	private PropertiesUtils() {
-		
 	}
 
 	public static Hashtable<String, String> convertPropertiesToHashtable(String propertiesFilePath) {
@@ -210,7 +209,7 @@ public final class PropertiesUtils {
 			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
 
 			if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "xml")) {
-				properties.storeToXML(fileOutputStream, comment, "UTF-8");
+				properties.storeToXML(fileOutputStream, comment, Globals.DEFAULT_ENCODING);
 			} else if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "properties")) {
 				properties.store(fileOutputStream, comment);
 			} else {

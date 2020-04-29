@@ -18,10 +18,7 @@ package com.nervousync.commons.beans.servlet.request;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.nervousync.commons.core.Globals;
 import com.nervousync.commons.http.cert.CertInfo;
@@ -174,11 +171,7 @@ public final class RequestInfo implements Serializable {
 	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, Map<String, String[]> parameters) {
 		this.httpMethodOption = httpMethodOption;
 		this.requestUrl = requestUrl;
-		if (parameters != null) {
-			this.parameters = parameters;
-		} else {
-			this.parameters = new HashMap<>();
-		}
+		this.parameters = parameters != null ? parameters : new HashMap<>();
 		this.headers = new ArrayList<>();
 		this.uploadParam = new HashMap<>();
 	}
@@ -203,16 +196,8 @@ public final class RequestInfo implements Serializable {
 		} else {
 			this.headers = new ArrayList<>();
 		}
-		if (parameters != null) {
-			this.parameters = parameters;
-		} else {
-			this.parameters = new HashMap<>();
-		}
-		if (uploadParam != null) {
-			this.uploadParam = uploadParam;
-		} else {
-			this.uploadParam = new HashMap<>();
-		}
+		this.parameters = parameters != null ? parameters : new HashMap<>();
+		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<>();
 		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
@@ -242,16 +227,8 @@ public final class RequestInfo implements Serializable {
 		} else {
 			this.headers = new ArrayList<>();
 		}
-		if (parameters != null) {
-			this.parameters = parameters;
-		} else {
-			this.parameters = new HashMap<>();
-		}
-		if (uploadParam != null) {
-			this.uploadParam = uploadParam;
-		} else {
-			this.uploadParam = new HashMap<>();
-		}
+		this.parameters = parameters != null ? parameters : new HashMap<>();
+		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<>();
 		if (requestUrl.contains("?")) {
 			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));

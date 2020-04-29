@@ -29,8 +29,8 @@ import com.nervousync.commons.core.Globals;
 import com.nervousync.exceptions.xml.XmlException;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.JAXB;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -78,10 +78,8 @@ public class BaseElement implements Serializable {
 	 *
 	 * @return              Convert object
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T parseXml(String xmlObj, String encoding, Class<T> entityClass) {
 		InputStream inputStream = null;
-		
 		try {
 			if (encoding == null) {
 				encoding = Globals.DEFAULT_ENCODING;
@@ -91,10 +89,8 @@ public class BaseElement implements Serializable {
 			} else {
 				inputStream = FileUtils.loadFile(xmlObj);
 			}
-			
-			JAXBContext jaxbContext = JAXBContext.newInstance(entityClass);
-			return (T)jaxbContext.createUnmarshaller().unmarshal(inputStream);
-		} catch (JAXBException|IOException e) {
+			return JAXB.unmarshal(inputStream, entityClass);
+		} catch (IOException e) {
 			return null;
 		} finally {
 			IOUtils.closeStream(inputStream);
@@ -157,7 +153,7 @@ public class BaseElement implements Serializable {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, encoding);
 			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-			
+
 			marshaller.marshal(this, streamWriter);
 			streamWriter.flush();
 			streamWriter.close();

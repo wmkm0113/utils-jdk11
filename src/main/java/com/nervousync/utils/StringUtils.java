@@ -47,6 +47,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1610,7 +1611,7 @@ public final class StringUtils {
 		if (object instanceof Map || object.getClass().isArray()
 				|| Collection.class.isAssignableFrom(object.getClass())) {
 			try {
-				return new ObjectMapper().writeValueAsString(object);
+				return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).writeValueAsString(object);
 			} catch (JsonProcessingException e) {
 				if (StringUtils.LOGGER.isDebugEnabled()) {
 					StringUtils.LOGGER.debug("Convert object to string error! ", e);
@@ -1633,7 +1634,7 @@ public final class StringUtils {
 			}
 			
 			try {
-				return new ObjectMapper().writeValueAsString(valueMap);
+				return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).writeValueAsString(valueMap);
 			} catch (JsonProcessingException e) {
 				if (StringUtils.LOGGER.isDebugEnabled()) {
 					StringUtils.LOGGER.debug("Convert object to string error! ", e);
@@ -1690,10 +1691,9 @@ public final class StringUtils {
 	 * @return				Convert map
 	 */
 	public static Map<String, Object> convertJSONStringToMap(String jsonData) {
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		try {
-			return objectMapper.readValue(jsonData, new TypeReference<Map<String, Object>>() {
-			});
+			return objectMapper.readValue(jsonData, new TypeReference<Map<String, Object>>() {});
 		} catch (Exception e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
 				StringUtils.LOGGER.debug("Convert json string to object bean error! ", e);

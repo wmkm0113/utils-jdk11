@@ -63,13 +63,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1644,7 +1639,7 @@ public final class RequestUtils {
 	 * @return client IP address
 	 */
 	public static String getClientIP(HttpServletRequest request) {
-		
+		request.getHeaderNames();
 		//	如果使用了反向代理服务器，则需要从Header中获取转发的客户端IP地址
 		String clientIP = request.getHeader("X-Forwarded-For");
 		
@@ -2197,12 +2192,7 @@ public final class RequestUtils {
 		private X509TrustManager trustManager = null;
 		
 		private NervousyncX509TrustManager(String passPhrase) throws Exception {
-			if (passPhrase == null) {
-				this.passPhrase = DEFAULT_PASSPHRASE;
-			} else {
-				this.passPhrase = passPhrase;
-			}
-			
+			this.passPhrase = passPhrase != null ? passPhrase : DEFAULT_PASSPHRASE;
 			this.customCerts = new ArrayList<>();
 			this.initManager();
 		}

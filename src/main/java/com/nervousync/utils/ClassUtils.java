@@ -1015,25 +1015,6 @@ public final class ClassUtils {
 	}
 
 	/**
-	 * Create a composite interface Class for the given interfaces,
-	 * implementing the given interfaces in one single Class.
-	 * <p>This implementation builds a JDK proxy class for the given interfaces.
-	 * @param interfaces the interfaces to merge
-	 * @param classLoader the ClassLoader to create the composite Class in
-	 * @return the merged interface as Class
-	 * @see java.lang.reflect.Proxy#getProxyClass
-	 */
-	public static Class<?> createCompositeInterface(Class<?>[] interfaces, ClassLoader classLoader) {
-		if (ObjectUtils.isEmpty(interfaces)) {
-			throw new IllegalArgumentException("Interfaces must not be empty");
-		}
-		if (classLoader == null) {
-			throw new IllegalArgumentException("ClassLoader must not be null");
-		}
-		return Proxy.getProxyClass(classLoader, interfaces);
-	}
-
-	/**
 	 * Check whether the given class is visible in the given ClassLoader.
 	 * @param clazz the class to check (typically an interface)
 	 * @param classLoader the ClassLoader to check against (may be <code>null</code>,
