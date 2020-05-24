@@ -242,7 +242,14 @@ public final class ImageUtils {
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
-	
+
+	/**
+	 * Mark image
+	 * @param filePath          original picture file path
+	 * @param targetPath        target picture file path
+	 * @param markOptions       mark options
+	 * @return                  operate result
+	 */
 	public static boolean markImage(String filePath, String targetPath, MarkOptions markOptions) {
 		int imageWidth = ImageUtils.imageWidth(filePath);
 		int imageHeight = ImageUtils.imageHeight(filePath);
@@ -261,6 +268,12 @@ public final class ImageUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
+	/**
+	 * Calculate dHash hamming between original image and target image
+	 * @param origPath			original picture file path
+	 * @param destPath			target picture file path
+	 * @return                  Hamming result
+	 */
 	public static int dHashHamming(String origPath, String destPath) {
 		String origHash = ImageUtils.dHash(origPath);
 		String destHash = ImageUtils.dHash(destPath);
@@ -271,6 +284,12 @@ public final class ImageUtils {
 		return diff;
 	}
 
+	/**
+	 * Calculate pHash hamming between original image and target image
+	 * @param origPath			original picture file path
+	 * @param destPath			target picture file path
+	 * @return                  Hamming result
+	 */
 	public static int pHashHamming(String origPath, String destPath) {
 		String origHash = ImageUtils.pHash(origPath);
 		String destHash = ImageUtils.pHash(destPath);
@@ -281,6 +300,11 @@ public final class ImageUtils {
 		return diff;
 	}
 
+	/**
+	 * dHash signature
+	 * @param filePath  picture file path
+	 * @return          signature value
+	 */
 	public static String dHash(String filePath) {
 		try {
 			return ImageUtils.dHash(FileUtils.getFile(filePath));
@@ -292,6 +316,11 @@ public final class ImageUtils {
 		}
 	}
 
+	/**
+	 * dHash signature
+	 * @param file      picture file instance
+	 * @return          signature value
+	 */
 	public static String dHash(File file) {
 		try {
 			return ImageUtils.dHash(ImageIO.read(file));
@@ -303,6 +332,11 @@ public final class ImageUtils {
 		}
 	}
 
+	/**
+	 * dHash signature
+	 * @param bufferedImage     picture file with bufferedImage instance
+	 * @return                  signature value
+	 */
 	public static String dHash(BufferedImage bufferedImage) {
 		int width = bufferedImage.getWidth();
 		int height = bufferedImage.getHeight();
@@ -323,6 +357,11 @@ public final class ImageUtils {
 		return pHash.toString();
 	}
 
+	/**
+	 * pHash signature
+	 * @param filePath  picture file path
+	 * @return          signature value
+	 */
 	public static String pHash(String filePath) {
 		try {
 			return ImageUtils.pHash(FileUtils.getFile(filePath));
@@ -334,6 +373,11 @@ public final class ImageUtils {
 		}
 	}
 
+	/**
+	 * pHash signature
+	 * @param file      picture file instance
+	 * @return          signature value
+	 */
 	public static String pHash(File file) {
 		try {
 			return ImageUtils.pHash(ImageIO.read(file));
@@ -345,6 +389,11 @@ public final class ImageUtils {
 		}
 	}
 
+	/**
+	 * pHash signature
+	 * @param bufferedImage     picture file with bufferedImage instance
+	 * @return                  signature value
+	 */
 	public static String pHash(BufferedImage bufferedImage) {
 		int width = bufferedImage.getWidth();
 		int height = bufferedImage.getHeight();
@@ -447,6 +496,11 @@ public final class ImageUtils {
 		return srcImage;
 	}
 
+	/**
+	 * Convert bufferedImage to grayMatrix
+	 * @param bufferedImage     BufferedImage instance
+	 * @return                  Gray matrix
+	 */
 	private static double[][] grayMatrix(BufferedImage bufferedImage) {
 		if (bufferedImage == null) {
 			return new double[0][0];
@@ -466,9 +520,9 @@ public final class ImageUtils {
 	}
 
 	/**
-	 * Convert RGB to Gray matrix
+	 * Convert bufferedImage to DCT matrix
 	 * @param bufferedImage     BufferedImage instance
-	 * @return                  Gray matrix
+	 * @return                  DCT matrix
 	 */
 	private static double[][] applyDCT(BufferedImage bufferedImage) {
 		if (bufferedImage == null) {

@@ -1914,7 +1914,7 @@ public final class RequestUtils {
 		StringBuilder stringBuilder = new StringBuilder();
 		
 		for (CookieEntity cookieInfo : cookieList) {
-			if ((!requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)
+			if ((!requestUrl.startsWith(Globals.SECURE_HTTP_PROTOCOL)
 					&& cookieInfo.isSecure()) || (cookieInfo.getExpires() > DateTimeUtils.currentUTCTimeMillis())
 					|| cookieInfo.getMaxAge() == Globals.DEFAULT_VALUE_LONG || cookieInfo.getMaxAge() == 0L) {
 				continue;
@@ -1923,10 +1923,10 @@ public final class RequestUtils {
 			String domain;
 			String requestPath;
 			
-			if (requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)) {
-				domain = requestUrl.substring(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS.length());
-			} else if (requestUrl.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTP)) {
-				domain = requestUrl.substring(Globals.DEFAULT_PROTOCOL_PREFIX_HTTP.length());
+			if (requestUrl.startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
+				domain = requestUrl.substring(Globals.SECURE_HTTP_PROTOCOL.length());
+			} else if (requestUrl.startsWith(Globals.HTTP_PROTOCOL)) {
+				domain = requestUrl.substring(Globals.HTTP_PROTOCOL.length());
 			} else {
 				return null;
 			}
@@ -2023,7 +2023,7 @@ public final class RequestUtils {
 				connection.setRequestProperty("Cookie", cookie);
 			}
 			
-			if (urlAddress.startsWith(Globals.DEFAULT_PROTOCOL_PREFIX_HTTPS)) {
+			if (urlAddress.startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
 				((HttpsURLConnection)connection).setHostnameVerifier(new NervousyncHostnameVerifier());
 				if (requestInfo.getCertInfo() != null) {
 					SSLContext sslContext = SSLContext.getInstance("TLS");

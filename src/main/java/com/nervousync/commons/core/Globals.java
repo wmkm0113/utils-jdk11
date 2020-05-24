@@ -90,10 +90,6 @@ public final class Globals {
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART = "multipart/*";
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
 
-	public static final String DEFAULT_PROTOCOL_PREFIX_FTP = "http://";
-	public static final String DEFAULT_PROTOCOL_PREFIX_HTTP = "http://";
-	public static final String DEFAULT_PROTOCOL_PREFIX_HTTPS = "https://";
-	
 	public static final int NERVOUSYNC_STATUS_FALSE = 0;
 	public static final int NERVOUSYNC_STATUS_TRUE = 1;
 	
