@@ -1,4 +1,4 @@
-Nervousync Utils Package
+Nervousync Java Utils Package
 [04/10/2020]
 Add CRC Support for calculate CRC3 to CRC32
 Support algorithms:

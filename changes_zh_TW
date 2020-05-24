@@ -1,4 +1,4 @@
-Nervous 工具包
+Nervousync Java 工具包
 [04/10/2020]
 增加CRC支援，計算CRC3到CRC32的值
 支援的CRC算法:
