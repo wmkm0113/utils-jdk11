@@ -1,2 +1,2 @@
-# NervousyncUtils
-Nervousync Utilities Package
+# GeneUtils
+Nervousync Java Utilities Package
