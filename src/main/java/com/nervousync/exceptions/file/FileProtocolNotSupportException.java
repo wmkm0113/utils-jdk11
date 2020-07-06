@@ -1,6 +1,5 @@
 package com.nervousync.exceptions.file;
 
-import com.nervousync.exceptions.beans.BeansException;
 import com.nervousync.utils.ObjectUtils;
 
 /**
@@ -36,10 +35,10 @@ public class FileProtocolNotSupportException extends RuntimeException {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof BeansException)) {
+		if (!(other instanceof FileProtocolNotSupportException)) {
 			return false;
 		}
-		BeansException otherBe = (BeansException) other;
+		FileProtocolNotSupportException otherBe = (FileProtocolNotSupportException) other;
 		return (getMessage().equals(otherBe.getMessage()) &&
 				ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 	}

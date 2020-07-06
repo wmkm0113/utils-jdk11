@@ -4,6 +4,7 @@ import com.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -24,18 +25,46 @@ public final class AuthenticatorUtils {
 	private static final String DEFAULT_SECRET_SEED = "TmVydm91c3luY0RlZmF1bHRTZWNyZXRTZWVk";
 	private static final String DEFAULT_RANDOM_ALGORITHM = "SHA1PRNG";
 
+	/**
+	 * Calculate fixed time
+	 * @param randomKey     Random key
+	 * @param authCode      Auth code
+	 * @return              Fixed time
+	 */
 	public static long calculateFixedTime(String randomKey, int authCode) {
 		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Calculate fixed time
+	 * @param randomKey     Random key
+	 * @param authCode      Auth code
+	 * @param syncCount     Synchronize count
+	 * @return              Fixed time
+	 */
 	public static long calculateFixedTime(String randomKey, int authCode, int syncCount) {
 		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, syncCount);
 	}
 
+	/**
+	 * Calculate fixed time
+	 * @param calcType      Calculate type
+	 * @param randomKey     Random key
+	 * @param authCode      Auth code
+	 * @return              Fixed time
+	 */
 	public static long calculateFixedTime(CalcType calcType, String randomKey, int authCode) {
 		return calculateFixedTime(calcType, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Calculate fixed time
+	 * @param calcType      Calculate type
+	 * @param randomKey     Random key
+	 * @param authCode      Auth code
+	 * @param syncCount     Synchronize count
+	 * @return              Fixed time
+	 */
 	public static long calculateFixedTime(CalcType calcType, String randomKey, int authCode, int syncCount) {
 		for (int i = -12 ; i <= 12 ; i++) {
 			long fixedTime = i * 60 * 60 * 1000L;
@@ -46,18 +75,46 @@ public final class AuthenticatorUtils {
 		return Globals.DEFAULT_VALUE_INT;
 	}
 
+	/**
+	 * Generate auth code
+	 * @param secret            Secret string
+	 * @param fixedTime         Fixed time
+	 * @return                  Auth code
+	 */
 	public static String generateAuthenticatorCode(String secret, long fixedTime) {
 		return generateAuthenticatorCode(CalcType.HmacSHA1, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Generate auth code
+	 * @param secret            Secret string
+	 * @param fixedTime         Fixed time
+	 * @param syncCount         Synchronize count
+	 * @return                  Auth code
+	 */
 	public static String generateAuthenticatorCode(String secret, long fixedTime, int syncCount) {
 		return generateAuthenticatorCode(CalcType.HmacSHA1, secret, fixedTime, syncCount);
 	}
 
+	/**
+	 * Generate auth code
+	 * @param calcType          Calculate type
+	 * @param secret            Secret string
+	 * @param fixedTime         Fixed time
+	 * @return                  Auth code
+	 */
 	public static String generateAuthenticatorCode(CalcType calcType, String secret, long fixedTime) {
 		return generateAuthenticatorCode(calcType, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Generate auth code
+	 * @param calcType          Calculate type
+	 * @param secret            Secret string
+	 * @param fixedTime         Fixed time
+	 * @param syncCount         Synchronize count
+	 * @return                  Auth code
+	 */
 	public static String generateAuthenticatorCode(CalcType calcType, String secret, long fixedTime, int syncCount) {
 		int authCode = AuthenticatorUtils.generateAuthenticatorCode(calcType, secret,
 				fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE);
@@ -72,20 +129,32 @@ public final class AuthenticatorUtils {
 		return returnCode.toString();
 	}
 
+	/**
+	 * Generate random secret key using default algorithm, seed and seed size
+	 * @return  Random secret key
+	 */
 	public static String generateRandomKey() {
-		return generateRandomKey(null, null, Globals.DEFAULT_VALUE_INT);
+		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Generate random secret key using default algorithm and seed
+	 * @param size      seed size
+	 * @return  Random secret key
+	 */
 	public static String generateRandomKey(int size) {
-		return generateRandomKey(null, null, size);
+		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, size);
 	}
 
-	public static String generateRandomKey(String algorithm, String seed, int size) {
+	/**
+	 * Generate random secret key by given algorithm, seed and seed size
+	 * @return  Random secret key
+	 */
+	public static String generateRandomKey(@Nonnull String algorithm, @Nonnull String seed, int size) {
 		String randomKey = null;
 		try {
-			SecureRandom secureRandom =
-					SecureRandom.getInstance(algorithm == null ? DEFAULT_RANDOM_ALGORITHM : algorithm);
-			secureRandom.setSeed(StringUtils.base64Decode(seed == null ? DEFAULT_SECRET_SEED : seed));
+			SecureRandom secureRandom = SecureRandom.getInstance(algorithm);
+			secureRandom.setSeed(StringUtils.base64Decode(seed));
 			byte[] randomKeyBytes =
 					secureRandom.generateSeed(size == Globals.DEFAULT_VALUE_INT ? DEFAULT_SECRET_SIZE : size);
 			randomKey = StringUtils.base32Encode(randomKeyBytes);
@@ -98,16 +167,41 @@ public final class AuthenticatorUtils {
 		return randomKey;
 	}
 
+	/**
+	 * Validate auth code by given secret key and fixed time using default calculate type: HmacSHA1
+	 * @param authCode      auth code
+	 * @param randomKey     random secret key
+	 * @param fixedTime     fixed time
+	 * @return              validate result
+	 */
 	public static boolean validateAuthenticatorCode(int authCode, String randomKey, long fixedTime) {
 		return validateAuthenticatorCode(CalcType.HmacSHA1, authCode, randomKey,
 				fixedTime, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 	}
 
+	/**
+	 * Validate auth code by given secret key, fixed time and fix window using default calculate type: HmacSHA1
+	 * @param authCode      auth code
+	 * @param randomKey     random secret key
+	 * @param fixedTime     fixed time
+	 * @param fixWindow     fix window
+	 * @return              validate result
+	 */
 	public static boolean validateAuthenticatorCode(int authCode, String randomKey, long fixedTime, int fixWindow) {
 		return validateAuthenticatorCode(CalcType.HmacSHA1, authCode, randomKey,
-				fixedTime, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
+				fixedTime, Globals.DEFAULT_VALUE_INT, fixWindow);
 	}
 
+	/**
+	 * Validate auth code by given secret key, fixed time, synchronize count and fix window
+	 * @param calcType      Calculate type
+	 * @param authCode      auth code
+	 * @param randomKey     random secret key
+	 * @param fixedTime     fixed time
+	 * @param syncCount     synchronize count
+	 * @param fixWindow     fix window
+	 * @return              validate result
+	 */
 	public static boolean validateAuthenticatorCode(CalcType calcType, int authCode,
 	                                                String randomKey, long fixedTime, int syncCount, int fixWindow) {
 		if (authCode > Globals.INITIALIZE_INT_VALUE) {
@@ -123,6 +217,15 @@ public final class AuthenticatorUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
+	/**
+	 * Generate auth code
+	 * @param calcType      Calculate type
+	 * @param randomKey     random secret key
+	 * @param fixedTime     fixed time
+	 * @param syncCount     synchronize count
+	 * @param fixWindow     fix window
+	 * @return      generated code
+	 */
 	private static int generateAuthenticatorCode(CalcType calcType, String randomKey,
 	                                             long fixedTime, int syncCount, int fixWindow) {
 		long currentGMTTime = DateTimeUtils.currentUTCTimeMillis();

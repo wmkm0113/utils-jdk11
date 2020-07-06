@@ -26,6 +26,7 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import javax.annotation.Nonnull;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -61,6 +62,9 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
 
+	/**
+	 * DES Algorithm
+	 */
 	public transient static final String DES_ECB_NO_PADDING         = "DES/ECB/NoPadding";
 	public transient static final String DES_ECB_PKCS5_PADDING      = "DES/ECB/PKCS5Padding";
 	public transient static final String DES_CBC_NO_PADDING         = "DES/CBC/NoPadding";
@@ -77,6 +81,9 @@ public final class SecurityUtils implements Serializable {
 	public transient static final String DES_EDE_CFB_PKCS5_PADDING  = "DESede/CFB/PKCS5Padding";
 	public transient static final String DES_EDE_OFB_NO_PADDING     = "DESede/OFB/NoPadding";
 	public transient static final String DES_EDE_OFB_PKCS5_PADDING  = "DESede/OFB/PKCS5Padding";
+	/**
+	 * AES Algorithm
+	 */
 	public transient static final String AES_CBC_NO_PADDING         = "AES/CBC/NoPadding";
 	public transient static final String AES_CBC_PKCS5_PADDING      = "AES/CBC/PKCS5Padding";
 	public transient static final String AES_CBC_PKCS7_PADDING      = "AES/CBC/PKCS7Padding";
@@ -93,10 +100,16 @@ public final class SecurityUtils implements Serializable {
 	public transient static final String AES_OFB_PKCS5_PADDING      = "AES/OFB/PKCS5Padding";
 	public transient static final String AES_OFB_PKCS7_PADDING      = "AES/OFB/PKCS7Padding";
 	public transient static final String AES_OFB_ISO10126_Padding   = "AES/OFB/ISO10126Padding";
+	/**
+	 * RSA Algorithm
+	 */
 	public transient static final String RSA_PKCS1_PADDING          = "RSA/ECB/PKCS1Padding";
 	public transient static final String RSA_OAEP_SHA1_PADDING      = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
 	public transient static final String RSA_OAEP_SHA256_PADDING    = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
+	/**
+	 * PRNG Algorithm
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE                  = "NativePRNG";
 	public transient static final String PRNG_ALGORITHM_NATIVE_BLOCKING         = "NativePRNGBlocking";
 	public transient static final String PRNG_ALGORITHM_NATIVE_NON_BLOCKING     = "NativePRNGNonBlocking";
@@ -1400,11 +1413,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param algorithm	Calc algorithm
 	 * @return calc value
 	 */
-	private static String digestEncode(Object source, String algorithm) {
-		if (source == null) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		
+	private static String digestEncode(@Nonnull Object source, @Nonnull String algorithm) {
 		MessageDigest messageDigest;
 		
 		//	Initialize MessageDigest Instance

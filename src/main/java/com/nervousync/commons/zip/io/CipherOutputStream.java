@@ -43,6 +43,8 @@ import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.RawUtils;
 import com.nervousync.utils.StringUtils;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:39:25 PM $
@@ -184,10 +186,6 @@ public class CipherOutputStream extends OutputStream {
 
 	@Override
 	public void write(byte[] b) throws IOException {
-		if (b == null) {
-			throw new NullPointerException();
-		}
-
 		if (b.length == 0) {
 			return;
 		}
@@ -196,7 +194,7 @@ public class CipherOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (len == 0) {
 			return;
 		}

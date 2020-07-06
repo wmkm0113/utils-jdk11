@@ -26,6 +26,8 @@ import com.nervousync.commons.io.NervousyncRandomAccessFile;
 import com.nervousync.commons.zip.ZipFile;
 import com.nervousync.commons.zip.crypto.Decryptor;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Dec 2, 2017 1:06:01 PM $
@@ -53,18 +55,13 @@ public class InflaterInputStream extends PartInputStream {
 	}
 	
 	@Override
-	public int read(byte[] b) throws IOException {
-		if (b == null) {
-			throw new NullPointerException("Input buffer is null");
-		}
+	public int read(@Nonnull byte[] b) throws IOException {
 		return this.read(b, 0, b.length);
 	}
 	
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
-		if (b == null) {
-			throw new NullPointerException("Input buffer is null");
-		} else if (off < 0 || len < 0 || off + len > b.length) {
+	public int read(@Nonnull byte[] b, int off, int len) throws IOException {
+		if (off < 0 || len < 0 || off + len > b.length) {
 			throw new IndexOutOfBoundsException();
 		} else if (b.length == 0) {
 			return 0;

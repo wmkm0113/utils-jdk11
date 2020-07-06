@@ -22,6 +22,8 @@ import com.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 3, 2015 11:20:20 AM $
@@ -79,11 +81,7 @@ public final class IOUtils {
 	 * @param encoding			Charset encoding
 	 * @return File content as string
 	 */
-	public static String readContent(InputStream inputStream, String encoding) {
-		if (encoding == null) {
-			encoding = Globals.DEFAULT_ENCODING;
-		}
-		
+	public static String readContent(InputStream inputStream, @Nonnull String encoding) {
 		char [] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
 		int len;
 		StringBuilder returnValue = new StringBuilder();
@@ -133,34 +131,20 @@ public final class IOUtils {
 	 * @return	copy length
 	 * @throws IOException	if an I/O error occurs
 	 */
-	public static long copyStream(InputStream inputStream, OutputStream outputStream, 
+	public static long copyStream(InputStream inputStream, @Nonnull OutputStream outputStream,
 			boolean closeOutputAfterCopy, byte[] buffer) throws IOException {
 		if (inputStream == null) {
 			return 0L;
 		}
-		
 		try {
 			long totalCount = 0L;
-			
-			while (true) {
-				int readCount = inputStream.read(buffer);
-				
-				if (readCount == -1) {
-					break;
-				}
-				
-				if (readCount > 0) {
-					totalCount += readCount;
-					if (outputStream != null) {
-						outputStream.write(buffer, 0, readCount);
-					}
-				}
+			int readCount = inputStream.read(buffer);
+			while (readCount != Globals.DEFAULT_VALUE_INT) {
+				totalCount += readCount;
+				outputStream.write(buffer, 0, readCount);
+				readCount = inputStream.read(buffer);
 			}
-			
-			if (outputStream != null) {
-				outputStream.flush();
-			}
-			
+			outputStream.flush();
 			return totalCount;
 		} finally {
 			closeStream(inputStream);

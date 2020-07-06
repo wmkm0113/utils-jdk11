@@ -28,6 +28,8 @@ import com.nervousync.utils.FileUtils;
 import com.nervousync.utils.RawUtils;
 import com.nervousync.utils.StringUtils;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:57:01 PM $
@@ -89,11 +91,11 @@ public class SplitOutputStream extends OutputStream {
 	}
 	
 	@Override
-	public void write(byte[] b) throws IOException {
+	public void write(@Nonnull byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
 	
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (len < 0) {
 			return;
 		}

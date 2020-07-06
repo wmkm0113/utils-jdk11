@@ -40,18 +40,45 @@ import com.nervousync.commons.core.Globals;
  */
 public final class DateTimeUtils {
 
+	/**
+	 * Static value for date format yyyy/MM/dd
+	 */
 	public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
+	/**
+	 * Static value for date format yyyy-MM-dd'T'HH:mm:ss
+	 */
 	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
+	/**
+	 * Static value for date format EEE, dd-MMM-yyyy HH:mm:ss 'GMT'
+	 */
 	public static final String COOKIE_DATETIME_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss 'GMT'";
 
+	/**
+	 * Static DateTimeFormatter instance for date format yyyy/MM/dd
+	 */
 	public static final DateTimeFormatter DEFAULT_ISO8601_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601);
+	/**
+	 * Static DateTimeFormatter instance for site map
+	 */
 	public static final DateTimeFormatter DEFAULT_SITE_MAP_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
+	/**
+	 * Static DateTimeFormatter instance for date format yyyyMMdd
+	 */
 	public static final DateTimeFormatter DEFAULT_INT_PATTERN = DateTimeFormatter.ofPattern("yyyyMMdd");
+	/**
+	 * Static DateTimeFormatter instance for date format HHmmssSSS
+	 */
 	public static final DateTimeFormatter DEFAULT_TIME_PATTERN = DateTimeFormatter.ofPattern("HHmmssSSS");
+	/**
+	 * Static DateTimeFormatter instance for date format yyyyMMddHHmm
+	 */
 	public static final DateTimeFormatter DEFAULT_LONG_PATTERN = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
+	/**
+	 * Current UTC Clock Instance
+	 */
 	private static final UTCClock UTC_CLOCK = new UTCClock();
 
 	private DateTimeUtils() {
@@ -81,7 +108,7 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to string with vCard format
-	 * @return			formatted result by ISO8601
+	 * @return			formatted result by ISO8601 and ending character is 'Z'
 	 */
 	public static String formatGMTDateForVCard() {
 		return ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("+00:00"))
@@ -91,7 +118,7 @@ public final class DateTimeUtils {
 	/**
 	 * Formats given date according to string with vCard format
 	 * @param date		date instance
-	 * @return			formatted result by ISO8601
+	 * @return			formatted result by ISO8601 and ending character is 'Z'
 	 */
 	public static String formatDateForVCard(Date date) {
 		if (date == null) {
@@ -601,7 +628,6 @@ public final class DateTimeUtils {
 	 * @param locale Locale to use for formatting
 	 * @param pattern Pattern to use
 	 * @return String representation of date and time according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.SimpleDateFormat
 	 */
 	public static String format(Date date, Locale locale, String pattern) {
 		LocalDateTime localDateTime;
@@ -621,13 +647,10 @@ public final class DateTimeUtils {
 	 * @param pattern Pattern to use
 	 * @return Date object corresponding to representation given in source
 	 * string
-	 * @see java.text.SimpleDateFormat
 	 */
 	public static Date parse(String source, Locale locale, String pattern) {
 		return Date.from(LocalDateTime.parse(source, DateTimeFormatter.ofPattern(pattern, locale))
 				.atZone(ZoneId.systemDefault()).toInstant());
-//		SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
-//		return formatter.parse(source);
 	}
 	
 	/**
@@ -689,6 +712,9 @@ public final class DateTimeUtils {
 		return stringBuilder.toString();
 	}
 
+	/**
+	 * UTC Clock
+	 */
 	private static final class UTCClock {
 
 		private final AtomicLong currentLocalTime = new AtomicLong(System.currentTimeMillis());

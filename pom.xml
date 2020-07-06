@@ -47,14 +47,14 @@
 		<maven.javadoc.version>3.0.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<jakarta.activation.version>1.2.2</jakarta.activation.version>
-		<bcprov.version>1.65</bcprov.version>
+		<bcprov.version>1.65.01</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
 		<jaxb.version>2.3.3</jaxb.version>
 		<xalan.version>2.7.2</xalan.version>
 		<log4j.version>2.13.1</log4j.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<jackson.version>2.10.3</jackson.version>
-		<snmp4j.version>2.8.3</snmp4j.version>
+		<jackson.version>2.11.1</jackson.version>
+		<snmp4j.version>2.8.4</snmp4j.version>
 		<jakarta.mail.version>1.6.5</jakarta.mail.version>
 		<jcifs.version>2.1.4</jcifs.version>
 	</properties>
@@ -69,6 +69,11 @@
 			<groupId>jakarta.activation</groupId>
 			<artifactId>jakarta.activation-api</artifactId>
 			<version>${jakarta.activation.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.activation</groupId>
@@ -316,11 +321,6 @@
 			<artifactId>jakarta.xml.rpc-api</artifactId>
 			<version>1.1.4</version>
 		</dependency>
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.2.0</version>
-		</dependency>
 		<!-- SNMP Support -->
 		<dependency>
 			<groupId>org.snmp4j</groupId>
@@ -352,12 +352,6 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<!-- Pinyin Support -->
-		<dependency>
-			<groupId>com.belerweb</groupId>
-			<artifactId>pinyin4j</artifactId>
-			<version>2.5.1</version>
 		</dependency>
 	</dependencies>
 	<build>

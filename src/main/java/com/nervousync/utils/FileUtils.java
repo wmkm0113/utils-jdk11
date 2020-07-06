@@ -2654,6 +2654,11 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * Replace page separator to "|"
+	 * @param path      file path
+	 * @return          replaced file path
+	 */
 	private static String replacePageSeparator(String path) {
 		String replacePath = StringUtils.replace(path, Globals.DEFAULT_PAGE_SEPARATOR, "|");
 		replacePath = StringUtils.replace(replacePath, "/", "|");
@@ -2683,6 +2688,14 @@ public final class FileUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
+	/**
+	 * Check SMB file exists
+	 * @param filePath      file path
+	 * @param domain        smb domain
+	 * @param userName      smb user name
+	 * @param passWord      smb password
+	 * @return              check result
+	 */
 	private static boolean isSMBFileExists(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2700,6 +2713,14 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * Check SMB file read access
+	 * @param filePath      file path
+	 * @param domain        smb domain
+	 * @param userName      smb user name
+	 * @param passWord      smb password
+	 * @return              check result
+	 */
 	private static boolean isSMBFileCanRead(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2717,6 +2738,14 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * Check SMB file write access
+	 * @param filePath      file path
+	 * @param domain        smb domain
+	 * @param userName      smb user name
+	 * @param passWord      smb password
+	 * @return              check result
+	 */
 	private static boolean isSMBFileCanWrite(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
 			return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -2753,6 +2782,9 @@ public final class FileUtils {
 		});
 	}
 
+	/**
+	 * Register default file type value
+	 */
 	private static void registerFileType() {
 		InputStream inputStream;
 
@@ -2801,6 +2833,9 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * File name filter by regex
+	 */
 	private static final class FilenameRegexFilter implements FilenameFilter {
 		private final String fileNameRegex;
 
@@ -2823,6 +2858,9 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * file extension name filter
+	 */
 	private static final class FilenameExtensionFilter implements FilenameFilter {
 		private final String fileExtName;
 

@@ -33,7 +33,6 @@ import java.util.Properties;
 public final class CollectionUtils {
 	
 	private CollectionUtils() {
-		
 	}
 
 	/**

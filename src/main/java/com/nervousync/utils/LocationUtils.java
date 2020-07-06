@@ -24,7 +24,7 @@ import com.nervousync.exceptions.location.LocationConvertException;
  * @version $Revision: 1.0 $ $Date: Dec 19, 2017 1:01:14 PM $
  */
 public final class LocationUtils {
-	
+
 	private static final double X_PI = Math.PI * 3000.0 / 180.0;
 	private static final double EARTH_R = 6378137.0;
 	private static final double EARTH_EE = 0.00669342162296594323;
@@ -118,6 +118,12 @@ public final class LocationUtils {
 		}
 	}
 
+	/**
+	 * Convert GCJ02 to BD09
+	 * @param longitude     longitude value of GCJ02
+	 * @param latitude      latitude value of GCJ02
+	 * @return              Location point
+	 */
 	private static LocationPoint convertGCJ02ToBD09(double longitude, double latitude) {
 		double fixValue = Math.sqrt(Math.pow(longitude, 2) + Math.pow(latitude, 2)) + 0.00002 * Math.sin(latitude * X_PI);
 		double fixTemp = Math.atan2(latitude, longitude) + 0.000003 * Math.cos(longitude * X_PI);
@@ -125,7 +131,13 @@ public final class LocationUtils {
 		double bdLon = fixValue * Math.cos(fixTemp) + 0.0065;
 		return LocationPoint.bd09Point(bdLon, bdLat);
 	}
-	
+
+	/**
+	 * Convert BD09 to GCJ02
+	 * @param longitude     longitude value of BD09
+	 * @param latitude      latitude value of BD09
+	 * @return              Location point
+	 */
 	private static LocationPoint convertBD09ToGCJ02(double longitude, double latitude) {
 		double fixValue = Math.sqrt(Math.pow(longitude - 0.0065, 2) + Math.pow(latitude - 0.006, 2)) 
 				- 0.00002 * Math.sin((latitude - 0.006) * X_PI);
@@ -135,7 +147,13 @@ public final class LocationUtils {
 		double gcjLon = fixValue * Math.cos(fixTemp);
 		return LocationPoint.gcj02Point(gcjLon, gcjLat);
 	}
-	
+
+	/**
+	 * Convert GCJ02 to GPS
+	 * @param longitude     longitude value of GCJ02
+	 * @param latitude      latitude value of GCJ02
+	 * @return              Location point
+	 */
 	private static LocationPoint convertGCJ02ToGPS(double longitude, double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
 			return LocationPoint.gpsPoint(longitude, latitude);
@@ -145,7 +163,13 @@ public final class LocationUtils {
 					latitude - deltaPoint.getLatitude());
 		}
 	}
-	
+
+	/**
+	 * Convert GPS to GCJ02
+	 * @param longitude     longitude value of GPS
+	 * @param latitude      latitude value of GPS
+	 * @return              Location point
+	 */
 	private static LocationPoint convertGPSToGCJ02(double longitude, double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
 			return LocationPoint.gcj02Point(longitude, latitude);

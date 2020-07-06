@@ -43,25 +43,51 @@ public final class PropertiesUtils {
 	private PropertiesUtils() {
 	}
 
+	/**
+	 * Read properties file and convert data to hash table
+	 * @param propertiesFilePath    Properties file path
+	 * @return                      Data hash table
+	 */
 	public static Hashtable<String, String> convertPropertiesToHashtable(String propertiesFilePath) {
 		return convertPropertiesToHashtable(propertiesFilePath, null);
 	}
-	
+
+	/**
+	 * Read properties file and write data to given hash table
+	 * @param propertiesFilePath    Properties file path
+	 * @param messageMap            Exists hash table to write data
+	 * @return                      Data hash table
+	 */
 	public static Hashtable<String, String> convertPropertiesToHashtable(String propertiesFilePath, 
 			Hashtable<String, String> messageMap) {
-		Properties properties = loadProperties(propertiesFilePath);
-		
-		return convertPropertiesToHashtable(properties, messageMap);
+		return convertPropertiesToHashtable(loadProperties(propertiesFilePath), messageMap);
 	}
-	
+
+	/**
+	 * Read properties file from URL and convert data to hash table
+	 * @param url    Properties file url
+	 * @return       Data hash table
+	 */
 	public static Hashtable<String, String> convertPropertiesToHashtable(URL url) {
 		return convertPropertiesToHashtable(url, null);
 	}
-	
+
+	/**
+	 * Read properties file from URL and write data to given hash table
+	 * @param url                   Properties file url
+	 * @param messageMap            Exists hash table to write data
+	 * @return                      Data hash table
+	 */
 	public static Hashtable<String, String> convertPropertiesToHashtable(URL url, Hashtable<String, String> messageMap) {
 		return convertPropertiesToHashtable(loadProperties(url), messageMap);
 	}
-	
+
+	/**
+	 * Read data from properties object and write to given hash table
+	 * @param properties        Properties object
+	 * @param messageMap        Exists hash table to write data
+	 * @return                  Data hash table
+	 */
 	public static Hashtable<String, String> convertPropertiesToHashtable(Properties properties, 
 			Hashtable<String, String> messageMap) {
 		if (messageMap == null) {
@@ -82,7 +108,12 @@ public final class PropertiesUtils {
 		
 		return messageMap;
 	}
-	
+
+	/**
+	 * Read properties from string
+	 * @param propertiesContent     string data
+	 * @return                      Properties object
+	 */
 	public static Properties convertStringToProperties(String propertiesContent) {
 		Properties properties = new Properties();
 		InputStream inputStream;
@@ -106,7 +137,12 @@ public final class PropertiesUtils {
 		}
 		return properties;
 	}
-	
+
+	/**
+	 * Read properties from string
+	 * @param propertiesFilePath    Properties file path
+	 * @return                      Properties object
+	 */
 	public static Properties loadProperties(String propertiesFilePath) {
 		try {
 			URL url = FileUtils.getURL(propertiesFilePath);
@@ -115,7 +151,12 @@ public final class PropertiesUtils {
 			return new Properties();
 		}
 	}
-	
+
+	/**
+	 * Read properties from URL
+	 * @param url    Properties file URL
+	 * @return       Properties object
+	 */
 	public static Properties loadProperties(URL url) {
 		InputStream inputStream = null;
 		try {
@@ -146,7 +187,13 @@ public final class PropertiesUtils {
 			}
 		}
 	}
-	
+
+	/**
+	 * Read properties from InputStream
+	 * @param inputStream   Properties input stream
+	 * @param isXML         Data is xml
+	 * @return              Properties object
+	 */
 	public static Properties loadProperties(InputStream inputStream, boolean isXML) {
 		Properties properties = new Properties();
 		try {
@@ -164,7 +211,14 @@ public final class PropertiesUtils {
 			return new Properties();
 		}
 	}
-	
+
+	/**
+	 * Write given data and comment to target properties file
+	 * @param propertiesFilePath    Properties file path
+	 * @param modifyMap             Data hash table
+	 * @param comment               Comment string
+	 * @return                      Operate result
+	 */
 	public static boolean modifyProperties(String propertiesFilePath, Map<String, String> modifyMap, String comment) {
 		try {
 			Properties modifyProperties = loadProperties(propertiesFilePath);
@@ -184,6 +238,12 @@ public final class PropertiesUtils {
 		}
 	}
 
+	/**
+	 * Write given data to target properties object
+	 * @param properties    Properties Object
+	 * @param modifyMap     Data hash table
+	 * @return              Operate result
+	 */
 	public static Properties modifyProperties(Properties properties, Map<String, String> modifyMap) {
 
 		for (Object o : properties.keySet()) {
@@ -198,6 +258,13 @@ public final class PropertiesUtils {
 		return properties;
 	}
 
+	/**
+	 * Write properties object to target path
+	 * @param properties            Properties Object
+	 * @param propertiesFilePath    Properties file path
+	 * @param comment               Comment string
+	 * @return                      Operate result
+	 */
 	private static boolean storeProperties(Properties properties, String propertiesFilePath, String comment) {
 		FileOutputStream fileOutputStream = null;
 		try {
@@ -225,11 +292,13 @@ public final class PropertiesUtils {
 			IOUtils.closeStream(fileOutputStream);
 		}
 	}
-	
-	public static boolean saveProperties(Properties properties, String propertiesFilePath, String comment) {
-		return storeProperties(properties, propertiesFilePath, comment);
-	}
-	
+
+	/**
+	 * Read properties file from given path and retrieve value by given key name
+	 * @param propertiesFilePath    Properties file path
+	 * @param keyName               Key name
+	 * @return                      Retrieve value or null if not found
+	 */
 	public static String getPropertiesValue(String propertiesFilePath, String keyName) {
 		if (keyName == null) {
 			return null;

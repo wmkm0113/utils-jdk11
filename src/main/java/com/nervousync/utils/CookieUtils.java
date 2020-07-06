@@ -30,21 +30,57 @@ public final class CookieUtils {
 		
 	}
 
+	/**
+	 * Set cookie
+	 * @param cookieName    cookie name
+	 * @param cookieValue   cookie value
+	 * @param request       http request
+	 * @param response      http response
+	 * @return              Set result
+	 */
 	public static boolean setCookie(String cookieName, String cookieValue, 
 			HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, null, null, request, response);
 	}
 
+	/**
+	 * Set cookie
+	 * @param cookieName    cookie name
+	 * @param cookieValue   cookie value
+	 * @param domainName    domain name
+	 * @param request       http request
+	 * @param response      http response
+	 * @return              Set result
+	 */
 	public static boolean setCookie(String cookieName, String cookieValue, String domainName, 
 			HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, domainName, null, request, response);
 	}
 
+	/**
+	 * Set cookie
+	 * @param cookieName    cookie name
+	 * @param cookieValue   cookie value
+	 * @param lifeCycle     life cycle
+	 * @param request       http request
+	 * @param response      http response
+	 * @return              Set result
+	 */
 	public static boolean setCookie(String cookieName, String cookieValue, Integer lifeCycle, 
 			HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, null, lifeCycle, request, response);
 	}
 
+	/**
+	 * Set cookie
+	 * @param cookieName    cookie name
+	 * @param cookieValue   cookie value
+	 * @param domainName    domain name
+	 * @param lifeCycle     life cycle
+	 * @param request       http request
+	 * @param response      http response
+	 * @return              Set result
+	 */
 	public static boolean setCookie(String cookieName, String cookieValue, String domainName, 
 			Integer lifeCycle, HttpServletRequest request, HttpServletResponse response) {
 		CookieUtils.addP3PHeader(response);
@@ -74,6 +110,12 @@ public final class CookieUtils {
 		}
 	}
 
+	/**
+	 * Read cookie value
+	 * @param cookieName    cookie name
+	 * @param request       http request
+	 * @return              cookie instance or null if not exists
+	 */
 	public static Cookie getCookie(String cookieName, HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		
@@ -88,6 +130,12 @@ public final class CookieUtils {
 		return null;
 	}
 
+	/**
+	 * Read cookie value
+	 * @param cookieName    cookie name
+	 * @param request       http request
+	 * @return              cookie value or null if not exists
+	 */
 	public static String getCookieValue(String cookieName, HttpServletRequest request) {
 		Cookie[] cookies = request.getCookies();
 		
@@ -102,10 +150,21 @@ public final class CookieUtils {
 		return null;
 	}
 
+	/**
+	 * Remove coolie
+	 * @param cookieName    cookie name
+	 * @param request       http request
+	 * @param response      http response
+	 */
 	public static void delCookie(String cookieName, HttpServletRequest request, HttpServletResponse response) {
 		delCookie(getCookie(cookieName, request), response);
 	}
 
+	/**
+	 * Remove cookie
+	 * @param cookie        cookie instance
+	 * @param response      http response
+	 */
 	public static void delCookie(Cookie cookie, HttpServletResponse response) {
 		addP3PHeader(response);
 		if (cookie != null) {
@@ -114,6 +173,10 @@ public final class CookieUtils {
 		}
 	}
 
+	/**
+	 * Add P3P header for cross domain
+	 * @param response  http response
+	 */
 	private static void addP3PHeader(HttpServletResponse response) {
 		if (response != null) {
 			response.addHeader("P3P:CP", "CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR");

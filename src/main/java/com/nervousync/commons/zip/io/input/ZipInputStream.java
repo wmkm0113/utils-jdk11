@@ -22,6 +22,8 @@ import java.util.zip.CRC32;
 
 import com.nervousync.commons.core.Globals;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Dec 2, 2017 10:29:09 AM $
@@ -46,12 +48,12 @@ public class ZipInputStream extends InputStream {
 	}
 	
 	@Override
-	public int read(byte[] b) throws IOException {
+	public int read(@Nonnull byte[] b) throws IOException {
 		return this.read(b, 0, b.length);
 	}
 	
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
+	public int read(@Nonnull byte[] b, int off, int len) throws IOException {
 		int readLength = this.inputStream.read(b, off, len);
 		if (readLength != Globals.DEFAULT_VALUE_INT) {
 			this.crc.update(b, off, readLength);

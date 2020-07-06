@@ -27,6 +27,8 @@ import com.nervousync.utils.FileUtils;
 
 import jcifs.smb.SmbRandomAccessFile;
 
+import javax.annotation.Nonnull;
+
 /**
  * RandomAccessFile Supported local files and NAS files
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -139,7 +141,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataOutput#write(byte[])
 	 */
 	@Override
-	public void write(byte[] b) throws IOException {
+	public void write(@Nonnull byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).write(b);
 		} else {
@@ -152,7 +154,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataOutput#write(byte[], int, int)
 	 */
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).write(b, off, len);
 		} else {
@@ -269,7 +271,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataOutput#writeBytes(java.lang.String)
 	 */
 	@Override
-	public void writeBytes(String s) throws IOException {
+	public void writeBytes(@Nonnull String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).writeBytes(s);
 		} else {
@@ -282,7 +284,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataOutput#writeChars(java.lang.String)
 	 */
 	@Override
-	public void writeChars(String s) throws IOException {
+	public void writeChars(@Nonnull String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).writeChars(s);
 		} else {
@@ -295,7 +297,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataOutput#writeUTF(java.lang.String)
 	 */
 	@Override
-	public void writeUTF(String s) throws IOException {
+	public void writeUTF(@Nonnull String s) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).writeUTF(s);
 		} else {
@@ -338,7 +340,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataInput#readFully(byte[])
 	 */
 	@Override
-	public void readFully(byte[] b) throws IOException {
+	public void readFully(@Nonnull byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).readFully(b);
 		} else {
@@ -351,7 +353,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @see java.io.DataInput#readFully(byte[], int, int)
 	 */
 	@Override
-	public void readFully(byte[] b, int off, int len) throws IOException {
+	public void readFully(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
 			((SmbRandomAccessFile)this.originObject).readFully(b, off, len);
 		} else {
@@ -519,6 +521,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readUTF()
 	 */
+	@Nonnull
 	@Override
 	public String readUTF() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {

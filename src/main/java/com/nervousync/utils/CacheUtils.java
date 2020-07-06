@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nervousync.utils;
 
 import com.nervousync.cache.annotation.CacheProvider;
@@ -39,17 +38,30 @@ public final class CacheUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CacheUtils.class);
 
+	//  Single Instance Mode
 	private static CacheUtils INSTANCE = null;
 
+	//  Registered cache provider implements
 	private final Hashtable<String, Class<? extends AbstractCacheProvider>> registeredProviders;
 
+	//  Registered cache instance
 	private Hashtable<String, NervousyncCache> registeredCache;
 
+	/**
+	 * Constructor
+	 */
 	private CacheUtils() {
 		this.registeredProviders = new Hashtable<>();
 		this.registeredCache = new Hashtable<>();
 	}
 
+	/**
+	 * Retrieve cache utils instance
+	 * <p>
+	 *     If CacheUtils not initialized, this method will initialize first
+	 * </p>
+	 * @return  initialized instance of cache utils
+	 */
 	public static CacheUtils getInstance() {
 		if (CacheUtils.INSTANCE == null) {
 			CacheUtils.INSTANCE = new CacheUtils();

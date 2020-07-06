@@ -64,12 +64,6 @@ import com.nervousync.huffman.HuffmanNode;
 import com.nervousync.huffman.HuffmanObject;
 import com.nervousync.huffman.HuffmanTree;
 
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
-
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 3:53:41 PM $
@@ -1654,7 +1648,7 @@ public final class StringUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T convertJSONStringToObject(String jsonData, Class<T> clazz) {
-		if (StringUtils.isSimpleDataType(clazz)) {
+		if (StringUtils.simpleDataType(clazz)) {
 			try {
 				return (T)StringUtils.parseSimpleData(jsonData, clazz);
 			} catch (ParseException e) {
@@ -2064,104 +2058,6 @@ public final class StringUtils {
 	public static String getUUID() {
 		return UUID.randomUUID().toString();
 	}
-	
-	/**
-	 * Convert ASCII to pinyin first spell
-	 * @param chines	Chinese ASCII string
-	 * @return			First spell pinyin string
-	 */
-	public static String converterToFirstSpell(String chines) {
-		char[] nameChar = chines.toCharArray();
-		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-		defaultFormat.setCaseType(HanyuPinyinCaseType.UPPERCASE);
-		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-		StringBuilder pinyinName = new StringBuilder();
-		for (char ch : nameChar) {
-			if (ch > 128) {
-				try {
-					pinyinName.append(PinyinHelper.toHanyuPinyinStringArray(
-							ch, defaultFormat)[0].charAt(0));
-				} catch (BadHanyuPinyinOutputFormatCombination e) {
-					e.printStackTrace();
-				}
-			} else {
-				pinyinName.append(ch);
-			}
-		}
-		return pinyinName.toString();
-	}
-
-	/**
-	 * Convert ASCII to pinyin
-	 * @param chinese	Chinese ASCII string
-	 * @return Pinyin string
-	 */
-	public static String converterToSpell(String chinese) {
-		char[] nameChar = chinese.toCharArray();
-		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-		defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-		StringBuilder pinyinName = new StringBuilder();
-		for (char ch : nameChar) {
-			if (ch > 128) {
-				try {
-					pinyinName.append(PinyinHelper.toHanyuPinyinStringArray(
-							ch, defaultFormat)[0]);
-				} catch (BadHanyuPinyinOutputFormatCombination e) {
-					e.printStackTrace();
-				}
-			} else {
-				pinyinName.append(ch);
-			}
-		}
-		return pinyinName.toString().trim();
-	}
-	
-	/**
-	 * Compress string
-	 * @param content	string
-	 * @return			Compressed string
-	 */
-	public static String compress(String content) {
-		if (content == null || content.length() == 0) {
-			return content;
-		}
-		
-		byte[] zippedByteArray = ConvertUtils.zipByteArray(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)));
-
-		if (zippedByteArray.length >= content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)).length) {
-			return content;
-		} else {
-			if (StringUtils.LOGGER.isDebugEnabled()) {
-				StringUtils.LOGGER.debug("Compress size : {}" ,
-						(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)).length - zippedByteArray.length));
-			}
-		}
-
-		return ConvertUtils.byteArrayToHexString(zippedByteArray);
-	}
-
-	/**
-	 * Decompress string
-	 * @param strIn		Compressed string
-	 * @return			Decompressed string
-	 */
-	public static String deCompress(String strIn) {
-		byte[] arrB = ConvertUtils.hexStrToByteArr(strIn);
-		int iLen = arrB.length;
-
-		byte[] arrOut = new byte[iLen / 2];
-		for (int i = 0; i < iLen; i = i + 2) {
-			String strTmp = new String(arrB, i, 2, Charset.defaultCharset());
-			try {
-				arrOut[i / 2] = (byte) Integer.parseInt(strTmp, 16);
-			} catch (NumberFormatException e) {
-				return strIn;
-			}
-		}
-		
-		return new String(ConvertUtils.unzipByteArray(arrOut), Charset.forName(Globals.DEFAULT_ENCODING));
-	}
 
 	/**
 	 * Check given character is space
@@ -2221,7 +2117,7 @@ public final class StringUtils {
 	 * @param typeClass	type class
 	 * @return	check result
 	 */
-	public static boolean isSimpleDataType(Class<?> typeClass) {
+	public static boolean simpleDataType(Class<?> typeClass) {
 		if (typeClass != null) {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 

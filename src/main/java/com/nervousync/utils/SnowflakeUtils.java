@@ -40,6 +40,10 @@ public final class SnowflakeUtils {
 	 */
 	private static final long REFERENCE_TIME = 1303286400000L;
 	/**
+	 * Default instance id
+	 */
+	private static final long INSTANCE_ID = 1L;
+	/**
 	 * Sequence mask code, sequence id bits: 12
 	 */
 	private static final long SEQUENCE_MASK = ~(-1L << 12L);
@@ -80,16 +84,9 @@ public final class SnowflakeUtils {
 		if (logger.isDebugEnabled()) {
 			logger.debug("DEVICE ID: {}", DEVICE_ID);
 		}
-		if (referenceTime < 0L) {
-			this.referenceTime = REFERENCE_TIME;
-		} else {
-			this.referenceTime = referenceTime;
-		}
-		if (instanceId >= 0L && instanceId < 64L) {
-			this.instanceId = instanceId;
-		} else {
-			this.instanceId = 1L;
-		}
+
+		this.referenceTime = (referenceTime < 0L) ? REFERENCE_TIME : referenceTime;
+		this.instanceId = (instanceId >= 0L && instanceId < 64L) ? instanceId : INSTANCE_ID;
 		this.sequenceIndex = 0L;
 	}
 	

@@ -27,6 +27,8 @@ import com.nervousync.commons.zip.crypto.Decryptor;
 import com.nervousync.commons.zip.crypto.impl.aes.AESDecryptor;
 import com.nervousync.exceptions.zip.ZipException;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Dec 2, 2017 10:30:23 AM $
@@ -74,7 +76,7 @@ public class PartInputStream extends InputStream {
 	}
 
 	@Override
-	public synchronized int read(byte[] b, int off, int len) throws IOException {
+	public synchronized int read(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (len > (this.length - this.readBytes)) {
 			len = (int)(this.length - this.readBytes);
 			

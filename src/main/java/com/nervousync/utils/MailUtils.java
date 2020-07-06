@@ -61,11 +61,19 @@ public final class MailUtils {
 	private static transient final Logger LOGGER = LoggerFactory.getLogger(MailUtils.class);
 	
 	private MailUtils() {
-		
 	}
-	
-	public static boolean sendMessage(MailServerConfig mailServerConfig,
-	                                  MailObject mailObject, String userName, String passWord) throws MessagingException {
+
+	/**
+	 * Send mail
+	 * @param mailServerConfig      mail server config
+	 * @param mailObject            mail info
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @return                      send result
+	 * @throws MessagingException   send failed
+	 */
+	public static boolean sendMessage(MailServerConfig mailServerConfig, MailObject mailObject,
+	                                  String userName, String passWord) throws MessagingException {
 		MimeMessage message = 
 				new MimeMessage(Session.getDefaultInstance(mailServerConfig.getSendConfigInfo(userName),
 						new DefaultAuthenticator(userName, passWord)));
@@ -193,7 +201,16 @@ public final class MailUtils {
 		
 		return true;
 	}
-	
+
+	/**
+	 * Read mail info
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 * @param saveAttachPath        attach file save path
+	 * @return                      read mail object instance
+	 */
 	public static MailObject getMailInfo(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid, String saveAttachPath) {
 
@@ -229,6 +246,14 @@ public final class MailUtils {
 		return null;
 	}
 
+	/**
+	 * Connect to mail server
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @return                      Store instance
+	 * @throws MessagingException   connect failed
+	 */
 	private static Store connect(MailServerConfig mailServerConfig, String userName, String passWord) throws MessagingException {
 		Properties properties = mailServerConfig.getReceiveConfigInfo(userName);
 		Session session = Session.getDefaultInstance(properties, new DefaultAuthenticator(userName, passWord));
@@ -244,6 +269,15 @@ public final class MailUtils {
 		return store;
 	}
 
+	/**
+	 * Read mail list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               mail uid list
+	 * @param saveAttachPath        attach file save path
+	 * @return                      read mail object instance list
+	 */
 	public static List<MailObject> getMailInfo(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList, String saveAttachPath) {
 		List<MailObject> mailList = new ArrayList<>();
@@ -271,6 +305,14 @@ public final class MailUtils {
 		return mailList;
 	}
 
+	/**
+	 * Convert array message to list
+	 * @param mailServerConfig      mail server config
+	 * @param uidList               mail uid list
+	 * @param folder                mail folder
+	 * @return                      mail message list
+	 * @throws MessagingException   read mail failed
+	 */
 	private static List<Message> convertMailArraysToList(MailServerConfig mailServerConfig,
 	                                                     List<String> uidList, Folder folder) throws MessagingException {
 		List<Message> messageList = new ArrayList<>();
@@ -294,11 +336,28 @@ public final class MailUtils {
 		return messageList;
 	}
 
+	/**
+	 * Read all mail list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param saveAttachPath        attach file save path
+	 * @return                      read mail object instance list
+	 */
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String saveAttachPath) {
 		return getMailList(mailServerConfig, userName, passWord, null, saveAttachPath);
 	}
-	
+
+	/**
+	 * Read mail list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param date                  receive date
+	 * @param saveAttachPath        attach file save path
+	 * @return                      read mail object instance list
+	 */
 	public static List<MailObject> getMailList(MailServerConfig mailServerConfig, String userName, 
 			String passWord, Date date, String saveAttachPath) {
 		List<MailObject> mailList = new ArrayList<>();
@@ -329,30 +388,65 @@ public final class MailUtils {
 		return mailList;
 	}
 
+	/**
+	 * Remove mail by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void removeMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
 	}
-	
+
+	/**
+	 * Remove mails by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void removeMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
 	}
 
+	/**
+	 * Recover mail by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void recoverMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
 	}
-	
+
+	/**
+	 * Recover mails by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void recoverMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
 	}
 
+	/**
+	 * Set mail status as read by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void readMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
@@ -360,11 +454,25 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
 	}
 
+	/**
+	 * Set mails status as read by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void readMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
 	}
 
+	/**
+	 * Set mail status as unread by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void unreadMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
@@ -372,11 +480,25 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
 	}
 
+	/**
+	 * Set mails status as unread by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void unreadMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
 	}
 
+	/**
+	 * Set mail status as answered by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void answerMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
@@ -384,11 +506,25 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
 	}
 
+	/**
+	 * Set mails status as answered by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void answerMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
 	}
 
+	/**
+	 * Set mail status as flagged by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void flagMail(MailServerConfig mailServerConfig, String userName, 
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
@@ -396,23 +532,54 @@ public final class MailUtils {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
 
+	/**
+	 * Set mails status as flagged by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void flagMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
 	}
 
+	/**
+	 * Set mail status as not flagged by uid
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uid                   mail uid
+	 */
 	public static void unflagMail(MailServerConfig mailServerConfig, String userName,
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
-	
+
+	/**
+	 * Set mails status as not flagged by uid list
+	 * @param mailServerConfig      mail server config
+	 * @param userName              login user name
+	 * @param passWord              login pass word
+	 * @param uidList               uid list
+	 */
 	public static void unflagMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
 		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
 	}
-	
+
+	/**
+	 * Read mail info
+	 * @param mimeMessage           MIME message instance
+	 * @param receiveAddress        receive address
+	 * @param detail                read detail
+	 * @param saveAttachPath        attach file save path
+	 * @return                      Mail object instance
+	 * @throws MessagingException   read mail info error
+	 * @throws IOException          save attach file error
+	 */
 	private static MailObject receiveMessage(MimeMessage mimeMessage, String receiveAddress, 
 			boolean detail, String saveAttachPath) throws MessagingException, IOException {
 		MailObject mailObject = new MailObject();
