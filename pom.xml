@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.nervousync</groupId>
+	<groupId>org.nervousync</groupId>
 	<artifactId>gene-utils</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Gene-Utils</name>
-	<url>https://development.nervousync.com/project/gene-utils</url>
+	<url>https://development.nervousync.org/project/gene-utils</url>
 	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
 		<url>https://github.com/Nervousync/Gene/issues</url>
@@ -23,19 +23,19 @@
 		<tag>master</tag>
 		<url>https://github.com/Nervousync/Gene</url>
 		<connection>scm:git:https://github.com/Nervousync/Gene.git</connection>
-		<developerConnection>https://development.nervousync.com/member/wmkm0113</developerConnection>
+		<developerConnection>https://development.nervousync.org/member/wmkm0113</developerConnection>
 	</scm>
 	<organization>
-		<url>https://development.nervousync.com/</url>
+		<url>https://development.nervousync.org/</url>
 		<name>Nervousync Studio</name>
 	</organization>
 	<developers>
 		<developer>
 			<name>Steven Wee</name>
 			<email>wmkm0113@gmail.com</email>
-			<url>https://development.nervousync.com/member/wmkm0113</url>
+			<url>https://development.nervousync.org/member/wmkm0113</url>
 			<organization>Nervousync Studio</organization>
-			<organizationUrl>https://development.nervousync.com/index.shtml</organizationUrl>
+			<organizationUrl>https://development.nervousync.org/index.shtml</organizationUrl>
 		</developer>
 	</developers>
 	<properties>
