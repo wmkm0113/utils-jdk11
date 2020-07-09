@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nervousync</groupId>
-	<artifactId>gene-utils</artifactId>
+	<artifactId>utils</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Gene-Utils</name>
-	<url>https://development.nervousync.org/project/gene-utils</url>
+	<name>Pure Java Utils</name>
+	<url>https://development.nervousync.org/project/gene</url>
 	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
 		<url>https://github.com/Nervousync/Gene/issues</url>
@@ -23,7 +23,7 @@
 		<tag>master</tag>
 		<url>https://github.com/Nervousync/Gene</url>
 		<connection>scm:git:https://github.com/Nervousync/Gene.git</connection>
-		<developerConnection>https://development.nervousync.org/member/wmkm0113</developerConnection>
+		<developerConnection>scm:git:https://github.com/Nervousync/Gene.git</developerConnection>
 	</scm>
 	<organization>
 		<url>https://development.nervousync.org/</url>
@@ -40,6 +40,7 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.scm.version>1.11.2</maven.scm.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.jar.version>3.1.1</maven.jar.version>
 		<maven.resource.version>3.1.0</maven.resource.version>
@@ -375,6 +376,13 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>${maven.scm.version}</version>
+				<configuration>
+					<connectionType>developerConnection</connectionType>
+				</configuration>
+			</plugin>
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.version}</version>
 				<configuration>
@@ -398,7 +406,7 @@
 						</manifestEntries>
 					</archive>
 					<excludes>
-						<exclude>com/nervousync/datas/*.dat</exclude>
+						<exclude>org/nervousync/datas/*.dat</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

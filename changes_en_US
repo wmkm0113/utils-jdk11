@@ -1,4 +1,7 @@
 Nervousync Java Utils Package
+[07/09/2020]
+Add TOTP(Time-based One-time Password Algorithm) Utility
+
 [04/10/2020]
 Add CRC Support for calculate CRC3 to CRC32
 Support algorithms:

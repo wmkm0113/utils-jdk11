@@ -23,6 +23,7 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Snowflake Utility
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 27, 2018 $
  */

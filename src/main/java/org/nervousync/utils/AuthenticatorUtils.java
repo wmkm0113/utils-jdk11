@@ -26,6 +26,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
+ * TOTP(Time-based One-time Password Algorithm) Utility
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: 2019-06-04 10:47 $
  */
@@ -165,6 +167,9 @@ public final class AuthenticatorUtils {
 
 	/**
 	 * Generate random secret key by given algorithm, seed and seed size
+	 * @param algorithm     Secure algorithm
+	 * @param seed          Secret seed
+	 * @param size          Seed size
 	 * @return  Random secret key
 	 */
 	public static String generateRandomKey(@Nonnull String algorithm, @Nonnull String seed, int size) {

@@ -22,6 +22,8 @@ import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.zip.ZipException;
 
 /**
+ * RAW data process utils
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Nov 28, 2017 5:34:55 PM $
  */
