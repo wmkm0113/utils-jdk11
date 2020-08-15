@@ -157,7 +157,7 @@ public final class MailUtils {
 			receiveAddress.append(",").append(address);
 		}
 		
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveAddress.toString().substring(1)));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveAddress.substring(1)));
 
 		if (mailObject.getCcAddress() != null) {
 			StringBuilder ccAddress = new StringBuilder();
@@ -166,7 +166,7 @@ public final class MailUtils {
 				ccAddress.append(",").append(address);
 			}
 			
-			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccAddress.toString().substring(1)));
+			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccAddress.substring(1)));
 		}
 
 		if (mailObject.getBccAddress() != null) {
@@ -176,7 +176,7 @@ public final class MailUtils {
 				bccAddress.append(",").append(address);
 			}
 			
-			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccAddress.toString().substring(1)));
+			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccAddress.substring(1)));
 		}
 
 		if (mailObject.getReplyAddress() != null) {
@@ -186,7 +186,7 @@ public final class MailUtils {
 				replyAddress.append(",").append(address);
 			}
 			
-			message.setReplyTo(InternetAddress.parse(replyAddress.toString().substring(1)));
+			message.setReplyTo(InternetAddress.parse(replyAddress.substring(1)));
 		} else {
 			if (mailObject.getSendAddress() != null) {
 				message.setReplyTo(InternetAddress.parse(mailObject.getSendAddress()));

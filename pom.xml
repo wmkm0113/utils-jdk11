@@ -405,9 +405,6 @@
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
 					</archive>
-					<excludes>
-						<exclude>org/nervousync/datas/*.dat</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
         </plugins>
@@ -452,9 +449,6 @@
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
-							<excludes>
-								<exclude>*.dat</exclude>
-							</excludes>
 						</configuration>
 					</plugin>
 					<plugin>

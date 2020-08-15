@@ -17,10 +17,13 @@
 package org.nervousync.utils;
 
 import java.util.Hashtable;
+import java.util.Map;
 
-import org.nervousync.commons.core.Globals;
-import net.sf.cglib.beans.BeanCopier;
-import net.sf.cglib.core.Converter;
+import org.nervousync.beans.config.BeanConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -28,11 +31,38 @@ import net.sf.cglib.core.Converter;
  */
 public final class BeanUtils {
 
-	private static final Hashtable<String, BeanCopier> BEAN_COPIER_MAP = new Hashtable<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(BeanUtils.class);
+
+	private static final Hashtable<String, BeanConfig> BEAN_CONFIG_MAP = new Hashtable<>();
 
 	private BeanUtils() {
 	}
-	
+
+	/**
+	 * Remove registered bean config
+	 *
+	 * @param className     Bean class name
+	 */
+	public static void removeBeanConfig(String className) {
+		BEAN_CONFIG_MAP.remove(className);
+	}
+
+	/**
+	 * Copy the map values into the target bean identify by map key.
+	 * <p>
+	 *     Note: The source and target classes do not have to match or even be derived
+	 *     from each other, as long as the properties match. Any bean properties that the
+	 *     source bean exposes but the target bean does not will silently be ignored.
+	 * </p>
+	 * @param dataMap data map
+	 * @param dest the target bean
+	 */
+	public static void copyProperties(@Nonnull Map<String, Object> dataMap, @Nonnull Object dest) {
+		BeanUtils.checkRegister(dest.getClass());
+		BeanConfig targetBean = BEAN_CONFIG_MAP.get(dest.getClass().getName());
+		dataMap.forEach((key, value) -> targetBean.copyValue(key, dest, value));
+	}
+
 	/**
 	 * Copy the property values of the given source bean into the target bean.
 	 * <p>
@@ -42,12 +72,11 @@ public final class BeanUtils {
 	 * </p>
 	 * @param orig the source bean
 	 * @param dest the target bean
-	 * @return Process result
 	 */
-	public static boolean copyProperties(Object orig, Object dest) {
-		return BeanUtils.copyProperties(orig, dest, null);
+	public static void copyProperties(@Nonnull Object orig, @Nonnull Object dest) {
+		BeanUtils.copyProperties(orig, dest, new Hashtable<>(0));
 	}
-	
+
 	/**
 	 * Copy the property values of the given source bean into the target bean.
 	 * <p>
@@ -57,42 +86,27 @@ public final class BeanUtils {
 	 * </p>
 	 * @param orig the source bean
 	 * @param dest the target bean
-	 * @param converter converter instance
-	 * @return Process result
+	 * @param convertMapping    field mapping
 	 */
-	public static boolean copyProperties(Object orig, Object dest, Converter converter) {
-		if (orig == null || dest == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
+	public static void copyProperties(@Nonnull Object orig, @Nonnull Object dest,
+	                                     @Nonnull Hashtable<String, String> convertMapping) {
+		BeanUtils.checkRegister(orig.getClass());
+		BeanUtils.checkRegister(dest.getClass());
 
-		String cacheKey = BeanUtils.generateKey(orig.getClass(), dest.getClass(),
-				converter == null ? null : converter.getClass());
-
-		BeanCopier beanCopier;
-		if (BeanUtils.BEAN_COPIER_MAP.containsKey(cacheKey)) {
-			beanCopier = BeanUtils.BEAN_COPIER_MAP.get(cacheKey);
-		} else {
-			beanCopier = BeanCopier.create(orig.getClass(), dest.getClass(), converter != null);
-			BeanUtils.BEAN_COPIER_MAP.put(cacheKey, beanCopier);
-		}
-
-		beanCopier.copy(orig, dest, converter);
-		return true;
+		BeanConfig targetBean = BEAN_CONFIG_MAP.get(dest.getClass().getName());
+		BEAN_CONFIG_MAP.get(orig.getClass().getName()).retrieveValue(orig)
+				.forEach((key, value) ->
+						targetBean.copyValue(convertMapping.getOrDefault(key, key), dest, value)
+				);
 	}
 
 	/**
-	 * Generate key of cached bean copier
-	 * @param origClass         Original class
-	 * @param destClass         Dest class
-	 * @param converterClass    Convert class
-	 * @return                  cache key
+	 * Register bean class if needed
+	 * @param beanClass Bean class
 	 */
-	private static String generateKey(Class<?> origClass, Class<?> destClass, Class<?> converterClass) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(origClass.getName()).append("To").append(destClass.getName());
-		if (converterClass != null) {
-			stringBuilder.append("Converter:").append(converterClass.getName());
+	private static void checkRegister(@Nonnull Class<?> beanClass) {
+		if (!BEAN_CONFIG_MAP.containsKey(beanClass.getName())) {
+			BEAN_CONFIG_MAP.put(beanClass.getName(), new BeanConfig(beanClass));
 		}
-		return SecurityUtils.SHA256(stringBuilder.toString());
 	}
 }

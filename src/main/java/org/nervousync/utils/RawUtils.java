@@ -214,7 +214,7 @@ public final class RawUtils {
 		int index = 0;
 		while (index < 4) {
 			if (index == 3) {
-				bytes[position + (3 - index)] = (byte)(value & 0xFF);
+				bytes[position] = (byte)(value & 0xFF);
 			} else {
 				bytes[position + (3 - index)] = (byte)(value >>> ((3 - index) * 8));
 			}
@@ -251,7 +251,7 @@ public final class RawUtils {
 		int index = 0;
 		while (index < 8) {
 			if (index == 7) {
-				bytes[position + (7 - index)] = (byte)(value & 0xFF);
+				bytes[position] = (byte)(value & 0xFF);
 			} else {
 				bytes[position + (7 - index)] = (byte)(value >>> ((7 - index) * 8));
 			}

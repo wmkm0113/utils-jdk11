@@ -83,7 +83,6 @@ public final class CookieUtils {
 	 */
 	public static boolean setCookie(String cookieName, String cookieValue, String domainName, 
 			Integer lifeCycle, HttpServletRequest request, HttpServletResponse response) {
-		CookieUtils.addP3PHeader(response);
 		try {
 			Cookie cookie = getCookie(cookieName, request);
 			
@@ -166,20 +165,9 @@ public final class CookieUtils {
 	 * @param response      http response
 	 */
 	public static void delCookie(Cookie cookie, HttpServletResponse response) {
-		addP3PHeader(response);
 		if (cookie != null) {
 			cookie.setMaxAge(0);
 			response.addCookie(cookie);
-		}
-	}
-
-	/**
-	 * Add P3P header for cross domain
-	 * @param response  http response
-	 */
-	private static void addP3PHeader(HttpServletResponse response) {
-		if (response != null) {
-			response.addHeader("P3P:CP", "CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR");
 		}
 	}
 }

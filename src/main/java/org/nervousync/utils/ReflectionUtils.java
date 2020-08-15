@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import org.nervousync.commons.core.Globals;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
@@ -266,6 +268,14 @@ public final class ReflectionUtils {
 			throw new IllegalStateException(
 					"Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
 		}
+	}
+
+	public static Method retrieveGetMethod(String fieldName, Class<?> beanClass) {
+		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.GetMethod);
+	}
+
+	public static Method retrieveSetMethod(String fieldName, Class<?> beanClass) {
+		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.SetMethod);
 	}
 
 	public static Object executeMethod(String methodName, Object target) 
@@ -969,19 +979,37 @@ public final class ReflectionUtils {
 			return null;
 		}
 
+		String methodName = ReflectionUtils.convertFieldNameToMethodName(field, methodType);
 		Method method = null;
 		switch(methodType) {
 		case GetMethod:
-			if (boolean.class.equals(field.getType())) {
-				return ReflectionUtils.findMethod(targetClass, "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-			} else {
-				return ReflectionUtils.findMethod(targetClass, "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
-			}
+			return ReflectionUtils.findMethod(targetClass, methodName);
 		case SetMethod:
-			return ReflectionUtils.findMethod(targetClass, "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1), new Class<?>[]{field.getType()});
+			return ReflectionUtils.findMethod(targetClass, methodName, new Class<?>[]{field.getType()});
 		}
 
 		return null;
+	}
+
+	private static String convertFieldNameToMethodName(@Nonnull Field field, @Nonnull MethodType methodType) {
+		StringBuilder methodName = new StringBuilder();
+		switch (methodType) {
+			case GetMethod:
+				if (boolean.class.equals(field.getType())) {
+					methodName.append("is");
+				} else {
+					methodName.append("get");
+				}
+				break;
+			case SetMethod:
+				methodName.append("set");
+				break;
+			default:
+				return Globals.DEFAULT_VALUE_STRING;
+		}
+		String fieldName = field.getName();
+		methodName.append(fieldName.substring(0, 1).toUpperCase()).append(fieldName.substring(1));
+		return methodName.toString();
 	}
 
 	/**

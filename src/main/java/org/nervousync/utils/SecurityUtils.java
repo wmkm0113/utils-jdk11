@@ -1169,9 +1169,9 @@ public final class SecurityUtils implements Serializable {
 				int blockSize = cipher.getBlockSize();
 				int outputSize = cipher.getOutputSize(arrB.length);
 
-				int leavedSize = arrB.length % blockSize;
+				int leftSize = arrB.length % blockSize;
 
-				int blocksSize = leavedSize != 0 ? arrB.length / blockSize + 1
+				int blocksSize = leftSize != 0 ? arrB.length / blockSize + 1
 						: arrB.length / blockSize;
 
 				byte[] byteArray = new byte[outputSize * blocksSize];

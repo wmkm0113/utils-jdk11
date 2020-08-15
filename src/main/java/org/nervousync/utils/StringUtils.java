@@ -284,8 +284,8 @@ public final class StringUtils {
 	 * @return			Decode byte arrays
 	 */
 	public static byte[] base64Decode(String string) {
-		if (string == null) {
-			return null;
+		if (string == null || string.length() == 0) {
+			return new byte[0];
 		}
 		while (string.charAt(string.length() - 1) == PADDING) {
 			string = string.substring(0, string.length() - 1);

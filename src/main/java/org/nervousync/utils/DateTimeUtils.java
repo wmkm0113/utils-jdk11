@@ -352,8 +352,7 @@ public final class DateTimeUtils {
 				month = Calendar.DECEMBER;
 				break;
 			default:
-				month = Globals.DEFAULT_VALUE_INT;
-				break;
+				return Globals.DEFAULT_VALUE_LONG;
 		}
 
 		Calendar calendar = Calendar.getInstance();

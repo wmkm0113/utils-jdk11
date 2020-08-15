@@ -23,7 +23,7 @@ import org.nervousync.utils.ObjectUtils;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 24, 2015 12:18:33 PM $
  */
-public class IPAddressException extends Exception {
+public final class IPAddressException extends Exception {
 
 	/**
 	 * 

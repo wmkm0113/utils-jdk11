@@ -734,24 +734,11 @@ public final class FileUtils {
 		ByteArrayOutputStream byteArrayOutputStream = null;
 
 		try {
-			if (!FileUtils.validateFileType(filePath)) {
-				throw new Exception("Validate file type error!");
-			}
-
 			JarFile jarFile = new JarFile(getFile(filePath));
 
-			String resourcePath;
+			JarEntry packageEntry = jarFile.getJarEntry(entryPath);
 
-			if (entryPath.endsWith(ClassUtils.CLASS_FILE_SUFFIX)) {
-				resourcePath = ClassUtils.convertClassNameToResourcePath(entryPath.substring(0, entryPath.length() - 6));
-			} else {
-				resourcePath = ClassUtils.convertClassNameToResourcePath(entryPath);
-			}
-
-			JarEntry packageEntry =
-					jarFile.getJarEntry(resourcePath + ClassUtils.CLASS_FILE_SUFFIX);
-
-			if(packageEntry != null){
+			if (packageEntry != null) {
 				inputStream = jarFile.getInputStream(packageEntry);
 				byteArrayOutputStream = new ByteArrayOutputStream();
 

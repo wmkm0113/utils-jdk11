@@ -247,7 +247,7 @@ public final class CacheUtils {
 	 * @param key		Cache key
 	 * @return			Cache value or null if cache key was not exists or it was expired
 	 */
-	public Object get(String cacheName, String key) {
+	public String get(String cacheName, String key) {
 		if (key != null && this.registeredCache.containsKey(cacheName)) {
 			return this.registeredCache.get(cacheName).get(key);
 		}

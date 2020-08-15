@@ -246,7 +246,7 @@ public final class RequestUtils {
 			for (int mask : arrays) {
 				stringBuilder.append(".").append(mask);
 			}
-			return stringBuilder.toString().substring(1);
+			return stringBuilder.substring(1);
 		}
 		return null;
 	}
@@ -1797,7 +1797,7 @@ public final class RequestUtils {
 			stringBuilder.append(".").append(beginItem);
 		}
 
-		return stringBuilder.toString().substring(1);
+		return stringBuilder.substring(1);
 	}
 
 	/**
@@ -1817,7 +1817,7 @@ public final class RequestUtils {
 			stringBuilder.append(".").append(endItem);
 		}
 
-		return stringBuilder.toString().substring(1);
+		return stringBuilder.substring(1);
 	}
 
 	/**
