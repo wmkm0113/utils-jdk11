@@ -16,7 +16,7 @@
  */
 package org.nervousync.cache.core;
 
-import org.nervousync.cache.provider.AbstractCacheProvider;
+import org.nervousync.cache.provider.impl.AbstractCacheProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 26, 2018 $
  */
-public final class NervousyncCache {
+public final class CacheInstance {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,7 +46,7 @@ public final class NervousyncCache {
 	 * @throws CacheException           Generate instance of provider failed
 	 *                                  or provider implement class not extends with AbstractCacheProvider
 	 */
-	public NervousyncCache(CacheConfig cacheConfig, Class<?> providerImplClass) throws CacheException {
+	public CacheInstance(CacheConfig cacheConfig, Class<?> providerImplClass) throws CacheException {
 		if (providerImplClass != null && AbstractCacheProvider.class.isAssignableFrom(providerImplClass)) {
 			try {
 				this.cacheProvider = (AbstractCacheProvider)providerImplClass.getDeclaredConstructor().newInstance();
@@ -75,11 +75,11 @@ public final class NervousyncCache {
 	 * Set key-value to cache server and set expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void set(String key, String value, int expire) {
+	public void set(String key, String value, int expiry) {
 		this.logInfo(key, value);
-		this.cacheProvider.set(key, value, expire);
+		this.cacheProvider.set(key, value, expiry);
 	}
 
 	/**
@@ -96,11 +96,11 @@ public final class NervousyncCache {
 	 * Add a new key-value to cache server and set expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void add(String key, String value, int expire) {
+	public void add(String key, String value, int expiry) {
 		this.logInfo(key, value);
-		this.cacheProvider.add(key, value, expire);
+		this.cacheProvider.add(key, value, expiry);
 	}
 
 	/**
@@ -117,20 +117,28 @@ public final class NervousyncCache {
 	 * Replace exists value of given key by given value and given expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void replace(String key, String value, int expire) {
+	public void replace(String key, String value, int expiry) {
 		this.logInfo(key, value);
-		this.cacheProvider.replace(key, value, expire);
+		this.cacheProvider.replace(key, value, expiry);
 	}
 
 	/**
 	 * Set expire time to new given expire value which cache key was given
 	 * @param key		Cache key
-	 * @param expire	New expire time
+	 * @param expiry	New expire time
 	 */
-	public void touch(String key, int expire) {
-		this.cacheProvider.touch(key, expire);
+	public void expire(String key, int expiry) {
+		this.cacheProvider.expire(key, expiry);
+	}
+
+	/**
+	 * Operate touch to given keys
+	 * @param keys      Keys
+	 */
+	public void touch(String... keys) {
+		this.cacheProvider.touch(keys);
 	}
 
 	/**

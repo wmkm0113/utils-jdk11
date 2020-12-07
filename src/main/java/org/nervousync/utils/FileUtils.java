@@ -528,8 +528,7 @@ public final class FileUtils {
 	 * @throws FileNotFoundException target file does not exists
 	 * @throws IOException           when opening input stream error
 	 */
-	public static InputStream loadFile(String resourceLocation)
-			throws FileNotFoundException, IOException {
+	public static InputStream loadFile(String resourceLocation) throws IOException {
 		//	Convert resource location to input stream
 		InputStream inputStream = FileUtils.class.getResourceAsStream(resourceLocation);
 
@@ -1033,7 +1032,8 @@ public final class FileUtils {
 	 * @return list of child file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFiles(String filePath, boolean readHiddenFiles, boolean iterateChildFolder) throws FileNotFoundException {
+	public static List<String> listFiles(String filePath, boolean readHiddenFiles,
+	                                     boolean iterateChildFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), readHiddenFiles, iterateChildFolder);
 	}
 
@@ -1150,7 +1150,8 @@ public final class FileUtils {
 	 */
 	public static List<String> listFiles(File file, FilenameFilter filter) {
 		List<String> returnList = new ArrayList<>();
-		FileUtils.listFiles(file, filter, returnList, true, Globals.DEFAULT_VALUE_BOOLEAN, true);
+		FileUtils.listFiles(file, filter, returnList, true,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 		return returnList;
 	}
 
@@ -1164,7 +1165,8 @@ public final class FileUtils {
 	 */
 	public static List<String> listFiles(File file, FilenameFilter filter, boolean readHiddenFiles) {
 		List<String> returnList = new ArrayList<>();
-		FileUtils.listFiles(file, filter, returnList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN, true);
+		FileUtils.listFiles(file, filter, returnList, readHiddenFiles,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 		return returnList;
 	}
 
@@ -1209,7 +1211,8 @@ public final class FileUtils {
 	 * @throws IOException the io exception
 	 */
 	public static void listFiles(String filePath, List<String> fileList) throws IOException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, true, Globals.DEFAULT_VALUE_BOOLEAN, true);
+		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, true,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 	}
 
 	/**
@@ -1221,7 +1224,8 @@ public final class FileUtils {
 	 * @throws IOException the io exception
 	 */
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles) throws IOException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN, true);
+		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 	}
 
 	/**
@@ -1233,8 +1237,10 @@ public final class FileUtils {
 	 * @param iterateChildFolder the iterate child folder
 	 * @throws IOException the io exception
 	 */
-	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles, boolean iterateChildFolder) throws IOException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles, Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles,
+	                             boolean iterateChildFolder) throws IOException {
+		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
+				Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
 	}
 
 	/**
@@ -1247,9 +1253,10 @@ public final class FileUtils {
 	 * @param iterateChildFolder the iterate child folder
 	 * @throws IOException the io exception
 	 */
-	public static void listFiles(String filePath, List<String> fileList,
-	                             boolean readHiddenFiles, boolean includeRootFolder, boolean iterateChildFolder) throws IOException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles, includeRootFolder, iterateChildFolder);
+	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles,
+	                             boolean includeRootFolder, boolean iterateChildFolder) throws IOException {
+		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
+				includeRootFolder, iterateChildFolder);
 	}
 
 	/**
@@ -1261,7 +1268,8 @@ public final class FileUtils {
 	 * @throws IOException the io exception
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter, List<String> fileList) throws IOException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true, Globals.DEFAULT_VALUE_BOOLEAN, true);
+		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 	}
 
 	/**
@@ -1275,7 +1283,8 @@ public final class FileUtils {
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter,
 	                             List<String> fileList, boolean includeRootFolder) throws FileNotFoundException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true, includeRootFolder, true);
+		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true,
+				includeRootFolder, true);
 	}
 
 	/**
@@ -1288,9 +1297,10 @@ public final class FileUtils {
 	 * @param iterateChildFolder the iterate child folder
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static void listFiles(String filePath, FilenameFilter filter,
-	                             List<String> fileList, boolean includeRootFolder, boolean iterateChildFolder) throws FileNotFoundException {
-		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true, includeRootFolder, iterateChildFolder);
+	public static void listFiles(String filePath, FilenameFilter filter, List<String> fileList,
+	                             boolean includeRootFolder, boolean iterateChildFolder) throws FileNotFoundException {
+		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true,
+				includeRootFolder, iterateChildFolder);
 	}
 
 	/**
@@ -1317,7 +1327,8 @@ public final class FileUtils {
 			if (childFiles != null) {
 				for (File childFile : childFiles) {
 					if (childFile.isDirectory()) {
-						FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles, includeRootFolder, iterateChildFolder);
+						FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles,
+								includeRootFolder, iterateChildFolder);
 					} else {
 						if (!readHiddenFiles && file.isHidden()) {
 							continue;
@@ -1427,8 +1438,8 @@ public final class FileUtils {
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listExtNameFiles(String filePath, String fileExtName,
-	                                            boolean readHiddenFile, boolean iterateChildFolder) throws FileNotFoundException {
+	public static List<String> listExtNameFiles(String filePath, String fileExtName, boolean readHiddenFile,
+	                                            boolean iterateChildFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName),
 				readHiddenFile, Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
 	}
@@ -1525,8 +1536,10 @@ public final class FileUtils {
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFilesByRegex(String filePath, String fileNameRegex) throws FileNotFoundException {
-		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true, Globals.DEFAULT_VALUE_BOOLEAN, true);
+	public static List<String> listFilesByRegex(String filePath, String fileNameRegex)
+			throws FileNotFoundException {
+		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true,
+				Globals.DEFAULT_VALUE_BOOLEAN, true);
 	}
 
 	/**
@@ -1538,8 +1551,10 @@ public final class FileUtils {
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static List<String> listFilesByRegex(String filePath, String fileNameRegex, boolean iterateChildFolder) throws FileNotFoundException {
-		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true, Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+	public static List<String> listFilesByRegex(String filePath, String fileNameRegex,
+	                                            boolean iterateChildFolder) throws FileNotFoundException {
+		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true,
+				Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
 	}
 
 	/**
@@ -1554,7 +1569,8 @@ public final class FileUtils {
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
 	public static List<String> listFilesByRegex(String filePath, String fileNameRegex,
-	                                            boolean readHiddenFiles, boolean includeRootFolder, boolean iterateChildFolder) throws FileNotFoundException {
+	                                            boolean readHiddenFiles, boolean includeRootFolder,
+	                                            boolean iterateChildFolder) throws FileNotFoundException {
 		List<String> fileList = new ArrayList<>();
 		FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameRegexFilter(fileNameRegex),
 				fileList, readHiddenFiles, includeRootFolder, iterateChildFolder);
@@ -1628,31 +1644,31 @@ public final class FileUtils {
 	/**
 	 * Save String to File use default charset: UTF-8
 	 *
-	 * @param fileName File name
-	 * @param filePath File path
-	 * @param content  File content
+	 * @param fileName      File name
+	 * @param folderPath    Folder path
+	 * @param content       File content
 	 * @return Save result
 	 */
-	public static boolean saveFile(String fileName, String filePath, String content) {
-		return FileUtils.saveFile(fileName, filePath, content, Globals.DEFAULT_ENCODING);
+	public static boolean saveFile(String fileName, String folderPath, String content) {
+		return FileUtils.saveFile(fileName, folderPath, content, Globals.DEFAULT_ENCODING);
 	}
 
 	/**
 	 * Save String to File
 	 *
-	 * @param fileName File name
-	 * @param filePath File path
-	 * @param content  File content
-	 * @param encoding Charset encoding
+	 * @param fileName      File name
+	 * @param folderPath    Folder path
+	 * @param content       File content
+	 * @param encoding      Charset encoding
 	 * @return Save result
 	 */
-	public static boolean saveFile(String fileName, String filePath, String content,String encoding) {
+	public static boolean saveFile(String fileName, String folderPath, String content, String encoding) {
 		PrintWriter printWriter = null;
 		OutputStreamWriter outputStreamWriter = null;
 		try {
-			FileUtils.makeHome(filePath);
+			FileUtils.makeHome(folderPath);
 			outputStreamWriter = new OutputStreamWriter(
-					new FileOutputStream(filePath + Globals.DEFAULT_PAGE_SEPARATOR + fileName), encoding);
+					new FileOutputStream(folderPath + Globals.DEFAULT_PAGE_SEPARATOR + fileName), encoding);
 			printWriter = new PrintWriter(outputStreamWriter);
 
 			printWriter.print(content);
@@ -2775,7 +2791,7 @@ public final class FileUtils {
 	private static void registerFileType() {
 		InputStream inputStream;
 
-		inputStream = FileUtils.class.getClassLoader().getResourceAsStream("com/nervousync/datas/File.dat");
+		inputStream = FileUtils.class.getClassLoader().getResourceAsStream("org/nervousync/datas/File.dat");
 		byte[] bytes = IOUtils.readBytes(inputStream);
 		IOUtils.closeStream(inputStream);
 

@@ -14,31 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.nervousync.cache.annotation;
 
-package org.nervousync.beans.provider.json.impl;
+import org.nervousync.commons.core.Globals;
 
-import org.nervousync.beans.provider.ConvertProvider;
-import org.nervousync.commons.beans.json.JsonObject;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 4:26 PM $
+ * @version $Revision: 1.0 $ $Date: 2018-12-26 17:23 $
  */
-public final class ParseJSONStringProvider implements ConvertProvider {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface CacheProviderImpl {
 
-	public ParseJSONStringProvider() {
-	}
+	String name();
 
-	@Override
-	public boolean checkType(Class<?> dataType) {
-		return String.class.equals(dataType);
-	}
-
-	@Override
-	public <T> T convert(Object origObj, Class<T> targetClass) {
-		if (origObj instanceof String) {
-			return JsonObject.parseJSON((String)origObj, targetClass);
-		}
-		return null;
-	}
+	int defaultPort() default Globals.DEFAULT_VALUE_INT;
 }

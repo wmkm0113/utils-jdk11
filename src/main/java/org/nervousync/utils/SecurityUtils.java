@@ -20,6 +20,10 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.*;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
@@ -31,6 +35,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.slf4j.Logger;
@@ -123,10 +128,6 @@ public final class SecurityUtils implements Serializable {
 	private static final String PRIVATE_KEY = StringUtils.randomString(32);
 
 	private SecurityUtils() {
-	}
-	
-	static {
-		Security.addProvider(new BouncyCastleProvider());
 	}
 
 	/* MD5 Method */
@@ -745,6 +746,72 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Decrypt byte arrays with given decrypt key by DES
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(byte[] arrB, String strKey) {
+		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
+	}
+
+	/**
+	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
+	 * @param algorithm                 Algorithm
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(String algorithm, byte[] arrB, String strKey) {
+		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
+	}
+
+	/**
+	 * Decrypt byte arrays with given algorithm and decrypt key by DES
+	 * @param algorithm                 Algorithm
+	 * @param prngAlgorithm             PRNG Algorithm
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param strKey					Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
+		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
+	}
+
+	/**
+	 * Decrypt byte arrays with given decrypt key by DES
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param keyContent			    Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(byte[] arrB, byte[] keyContent) {
+		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
+	}
+
+	/**
+	 * Decrypt byte arrays with given algorithm and decrypt key by DES
+	 * @param algorithm                 Algorithm
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param keyContent			    Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(String algorithm, byte[] arrB, byte[] keyContent) {
+		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
+	}
+
+	/**
+	 * Decrypt byte arrays with given algorithm and decrypt key by DES
+	 * @param algorithm                 Algorithm
+	 * @param prngAlgorithm             PRNG Algorithm
+	 * @param arrB						Byte arrays will be decrypted
+	 * @param keyContent			    Decrypt key
+	 * @return							Decrypted result
+	 */
+	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
+		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
+	}
+
+	/**
 	 * Decrypt string with given decrypt key by DES
 	 * @param strIn						String will be decrypted
 	 * @param strKey					Decrypt key
@@ -799,7 +866,7 @@ public final class SecurityUtils implements Serializable {
 	 * @return							Decrypt result
 	 */
 	public static String RSADecrypt(String algorithm, String strIn, Key key) {
-		return ConvertUtils.convertToString(DecryptData(algorithm, null,
+		return ConvertUtils.convertToString(SecurityUtils.DecryptData(algorithm, null,
 				ConvertUtils.hexStrToByteArr(strIn), key, (String)null, Globals.DEFAULT_VALUE_INT));
 	}
 
@@ -810,7 +877,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							Decrypt result
 	 */
 	public static byte[] RSADecrypt(byte[] arrB, Key key) {
-		return DecryptData(RSA_PKCS1_PADDING, null, arrB, key, (String)null, Globals.DEFAULT_VALUE_INT);
+		return SecurityUtils.DecryptData(RSA_PKCS1_PADDING, null, arrB,
+				key, (String)null, Globals.DEFAULT_VALUE_INT);
 	}
 
 	/**
@@ -821,7 +889,8 @@ public final class SecurityUtils implements Serializable {
 	 * @return							Decrypt result
 	 */
 	public static byte[] RSADecrypt(String algorithm, byte[] arrB, Key key) {
-		return DecryptData(algorithm, null, arrB, key, (String)null, Globals.DEFAULT_VALUE_INT);
+		return SecurityUtils.DecryptData(algorithm, null, arrB,
+				key, (String)null, Globals.DEFAULT_VALUE_INT);
 	}
 
 	/**
@@ -1121,6 +1190,52 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Read public key from X.509 certificate file
+	 *
+	 * @param dataBytes         Certificate file data bytes
+	 * @return                  Public key
+	 */
+	public static PublicKey readPublicKeyFromX509(@Nonnull byte[] dataBytes) {
+		return SecurityUtils.readPublicKeyFromX509(dataBytes, Globals.DEFAULT_VALUE_BOOLEAN);
+	}
+
+	/**
+	 * Read public key from X.509 certificate file
+	 *
+	 * @param dataBytes         Certificate file data bytes
+	 * @param checkValidity     Check certificate validity
+	 * @return                  Public key
+	 */
+	public static PublicKey readPublicKeyFromX509(@Nonnull byte[] dataBytes, boolean checkValidity) {
+		PublicKey publicKey = null;
+		try {
+			CertificateFactory certificateFactory =
+					CertificateFactory.getInstance("X.509", new BouncyCastleProvider());
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);
+			X509Certificate x509Certificate =
+					(X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Certificate SN: {}", x509Certificate.getSerialNumber().toString());
+			}
+			if (checkValidity) {
+				x509Certificate.checkValidity();
+			}
+			publicKey = x509Certificate.getPublicKey();
+		} catch (CertificateExpiredException | CertificateNotYetValidException e) {
+			LOGGER.error("Certificate is invalid! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Read public key error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return publicKey;
+	}
+
+	/**
 	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
 	 * @param algorithm             Encrypt algorithm
 	 * @param prngAlgorithm         PRNG Algorithm
@@ -1153,7 +1268,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param keySize               Key Size
 	 * @return                      Encrypted Data
 	 */
-	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, byte[] keyData, int keySize) {
+	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB,
+	                                  Key key, byte[] keyData, int keySize) {
 		try {
 			if (algorithm.startsWith("AES")) {
 				return initCipher(algorithm, Cipher.ENCRYPT_MODE,
@@ -1178,7 +1294,8 @@ public final class SecurityUtils implements Serializable {
 				int i = 0;
 
 				while (arrB.length - i * blockSize > 0) {
-					cipher.doFinal(arrB, i * blockSize, Math.min(arrB.length - i * blockSize, blockSize), byteArray, i * outputSize);
+					cipher.doFinal(arrB, i * blockSize, Math.min(arrB.length - i * blockSize, blockSize),
+							byteArray, i * outputSize);
 					i++;
 				}
 				return byteArray;
@@ -1273,12 +1390,11 @@ public final class SecurityUtils implements Serializable {
 			throw new Exception("Key size is invalid");
 		}
 		//	Initialize keyPair instance
-		KeyPairGenerator keyPairGenerator = 
-			KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
 		keyPairGenerator.initialize(keySize, new SecureRandom());
+		return keyPairGenerator.generateKeyPair();
 		
 		//	Generate keyPair
-		return keyPairGenerator.generateKeyPair();
 	}
 
 	/**
@@ -1425,26 +1541,7 @@ public final class SecurityUtils implements Serializable {
 		}
 
 		if (source instanceof File) {
-			File file = (File)source;
-			if (file.exists() && file.isFile()) {
-				RandomAccessFile randomAccessFile = null;
-				try {
-					randomAccessFile = new RandomAccessFile(file, Globals.READ_MODE);
-					byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
-					int readLength;
-					while ((readLength = randomAccessFile.read(readBuffer)) > 0) {
-						messageDigest.update(readBuffer, 0, readLength);
-					}
-				} catch (Exception e) {
-					LOGGER.error("Message digest error! ", e);
-					return null;
-				} finally {
-					IOUtils.closeStream(randomAccessFile);
-				}
-			} else {
-				LOGGER.error("File does not exists" + file.getAbsolutePath());
-				return "";
-			}
+			digestFile((File)source, messageDigest);
 		} else {
 			byte[] tempBytes = ConvertUtils.convertToByteArray(source);
 			if (tempBytes != null) {
@@ -1455,11 +1552,40 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Calculate given file digest value
+	 * @param file      File object
+	 * @param digest    Digest instance
+	 */
+	private static void digestFile(@Nonnull File file, @Nonnull Object digest) {
+		if (file.exists() && file.isFile()) {
+			RandomAccessFile randomAccessFile = null;
+			try {
+				randomAccessFile = new RandomAccessFile(file, Globals.READ_MODE);
+				byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
+				int readLength;
+				while ((readLength = randomAccessFile.read(readBuffer)) > 0) {
+					if (digest instanceof MessageDigest) {
+						((MessageDigest)digest).update(readBuffer, 0, readLength);
+					} else {
+						((SM3Digest)digest).update(readBuffer, 0, readLength);
+					}
+				}
+			} catch (Exception e) {
+				LOGGER.error("Message digest error! ", e);
+			} finally {
+				IOUtils.closeStream(randomAccessFile);
+			}
+		} else {
+			LOGGER.error("File does not exists" + file.getAbsolutePath());
+		}
+	}
+
+	/**
 	 * Generate AES Key Instance
 	 * @param prngAlgorithm     PRNG Algorithm
 	 * @param keyContent        key bytes
 	 * @param keySize           Key size
-	 * @return              Key Instance
+	 * @return                  Key Instance
 	 * @throws NoSuchAlgorithmException     Algorithm not supported
 	 */
 	private static Key generateAESKey(String prngAlgorithm,
@@ -1511,6 +1637,20 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
+	 * Generate SM4 Key Instance
+	 * @param keyContent        key bytes
+	 * @param keySize           Key size
+	 * @return                  Key Instance
+	 * @throws NoSuchAlgorithmException     Algorithm not supported
+	 */
+	private static Key generateSM4Key(byte[] keyContent, int keySize)
+			throws NoSuchAlgorithmException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance("SM4", new BouncyCastleProvider());
+		keyGenerator.init(keySize, new SecureRandom());
+		return keyGenerator.generateKey();
+	}
+
+	/**
 	 * Initialize Cipher Instance
 	 * @param algorithm         Algorithm
 	 * @param cipherMode        Cipher Mode
@@ -1548,6 +1688,9 @@ public final class SecurityUtils implements Serializable {
 			if (!algorithm.startsWith("DES/ECB")) {
 				ivContent = new byte[8];
 			}
+		} else if (algorithm.startsWith("SM4")) {
+			provider = new BouncyCastleProvider();
+			key = generateSM4Key(cipherKey.getKeyContent(), cipherKey.getKeySize());
 		} else {
 			provider = new BouncyCastleProvider();
 			key = cipherKey.getRsaKey();

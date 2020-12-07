@@ -58,23 +58,14 @@ public final class BeanUtils {
 	 * @param dest the target bean
 	 */
 	public static void copyProperties(@Nonnull Map<String, Object> dataMap, @Nonnull Object dest) {
-		BeanUtils.checkRegister(dest.getClass());
-		BeanConfig targetBean = BEAN_CONFIG_MAP.get(dest.getClass().getName());
-		dataMap.forEach((key, value) -> targetBean.copyValue(key, dest, value));
-	}
-
-	/**
-	 * Copy the property values of the given source bean into the target bean.
-	 * <p>
-	 *     Note: The source and target classes do not have to match or even be derived
-	 *     from each other, as long as the properties match. Any bean properties that the
-	 *     source bean exposes but the target bean does not will silently be ignored.
-	 * </p>
-	 * @param orig the source bean
-	 * @param dest the target bean
-	 */
-	public static void copyProperties(@Nonnull Object orig, @Nonnull Object dest) {
-		BeanUtils.copyProperties(orig, dest, new Hashtable<>(0));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Data Map: {}", StringUtils.convertObjectToJSONString(dataMap));
+		}
+		String className = retrieveClassName(dest.getClass());
+		BeanUtils.checkRegister(className);
+		BeanConfig targetBean = BEAN_CONFIG_MAP.get(className);
+		dataMap.entrySet().stream().filter(entry -> entry.getValue() != null)
+				.forEach(entry -> targetBean.copyValue(entry.getKey(), dest, entry.getValue()));
 	}
 
 	/**
@@ -90,23 +81,38 @@ public final class BeanUtils {
 	 */
 	public static void copyProperties(@Nonnull Object orig, @Nonnull Object dest,
 	                                     @Nonnull Hashtable<String, String> convertMapping) {
-		BeanUtils.checkRegister(orig.getClass());
-		BeanUtils.checkRegister(dest.getClass());
+		String origClass = retrieveClassName(orig.getClass());
+		String destClass = retrieveClassName(dest.getClass());
+		BeanUtils.checkRegister(origClass);
+		BeanUtils.checkRegister(destClass);
 
-		BeanConfig targetBean = BEAN_CONFIG_MAP.get(dest.getClass().getName());
-		BEAN_CONFIG_MAP.get(orig.getClass().getName()).retrieveValue(orig)
-				.forEach((key, value) ->
-						targetBean.copyValue(convertMapping.getOrDefault(key, key), dest, value)
-				);
+		BeanConfig targetBean = BEAN_CONFIG_MAP.get(destClass);
+		BEAN_CONFIG_MAP.get(origClass).retrieveValue(orig)
+				.entrySet().stream().filter(entry -> entry.getValue() != null)
+				.forEach(entry ->
+						targetBean.copyValue(convertMapping.getOrDefault(entry.getKey(), entry.getKey()),
+								dest, entry.getValue()));
 	}
 
 	/**
 	 * Register bean class if needed
-	 * @param beanClass Bean class
+	 * @param className Bean class name
 	 */
-	private static void checkRegister(@Nonnull Class<?> beanClass) {
-		if (!BEAN_CONFIG_MAP.containsKey(beanClass.getName())) {
-			BEAN_CONFIG_MAP.put(beanClass.getName(), new BeanConfig(beanClass));
+	private static void checkRegister(@Nonnull String className) {
+		if (!BEAN_CONFIG_MAP.containsKey(className)) {
+			try {
+				BEAN_CONFIG_MAP.put(className, new BeanConfig(ClassUtils.forName(className)));
+			} catch (ClassNotFoundException e) {
+				LOGGER.error("Class not found! Class name: {}", className);
+			}
 		}
+	}
+
+	private static String retrieveClassName(@Nonnull Class<?> clazz) {
+		String className = clazz.getName();
+		if (className.contains("$$")) {
+			className = className.substring(0, className.indexOf("$$"));
+		}
+		return className;
 	}
 }

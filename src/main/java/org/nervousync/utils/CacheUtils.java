@@ -16,19 +16,16 @@
  */
 package org.nervousync.utils;
 
-import org.nervousync.cache.annotation.CacheProvider;
+import org.nervousync.cache.annotation.CacheProviderImpl;
+import org.nervousync.cache.provider.CacheProvider;
 import org.nervousync.commons.beans.xml.cache.CacheConfig;
-import org.nervousync.cache.core.NervousyncCache;
+import org.nervousync.cache.core.CacheInstance;
 import org.nervousync.exceptions.cache.CacheException;
-import org.nervousync.cache.provider.AbstractCacheProvider;
 import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -39,19 +36,29 @@ public final class CacheUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CacheUtils.class);
 
 	//  Single Instance Mode
-	private static CacheUtils INSTANCE = null;
+	private static volatile CacheUtils INSTANCE = null;
 
 	//  Registered cache provider implements
-	private final Hashtable<String, Class<? extends AbstractCacheProvider>> registeredProviders;
+	private static final Hashtable<String, Class<?>> REGISTERED_PROVIDERS = new Hashtable<>();
 
 	//  Registered cache instance
-	private Hashtable<String, NervousyncCache> registeredCache;
+	private Hashtable<String, CacheInstance> registeredCache;
+
+	static {
+		ServiceLoader.load(CacheProvider.class).forEach(cacheProvider -> {
+			if (cacheProvider.getClass().isAnnotationPresent(CacheProviderImpl.class)) {
+				registerProvider(cacheProvider.getClass());
+			}
+		});
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Registered cache provider number: {}", REGISTERED_PROVIDERS.size());
+		}
+	}
 
 	/**
 	 * Constructor
 	 */
 	private CacheUtils() {
-		this.registeredProviders = new Hashtable<>();
 		this.registeredCache = new Hashtable<>();
 	}
 
@@ -64,7 +71,11 @@ public final class CacheUtils {
 	 */
 	public static CacheUtils getInstance() {
 		if (CacheUtils.INSTANCE == null) {
-			CacheUtils.INSTANCE = new CacheUtils();
+			synchronized (CacheUtils.class) {
+				if (CacheUtils.INSTANCE == null) {
+					CacheUtils.INSTANCE = new CacheUtils();
+				}
+			}
 		}
 		return CacheUtils.INSTANCE;
 	}
@@ -83,31 +94,27 @@ public final class CacheUtils {
 	 * Read registered provider name list
 	 * @return      provider name list
 	 */
-	public List<String> registeredProviderNames() {
-		return new ArrayList<>(this.registeredProviders.keySet());
+	public static List<String> registeredProviderNames() {
+		return new ArrayList<>(REGISTERED_PROVIDERS.keySet());
 	}
 
 	/**
 	 * Register cache provider
 	 * @param providerClass     cache provider class
-	 * @return                  provider name
 	 */
-	public Optional<String> registerProvider(Class<? extends AbstractCacheProvider> providerClass) {
-		String providerName = null;
-		if (providerClass != null && providerClass.isAnnotationPresent(CacheProvider.class)) {
-			CacheProvider cacheProvider = providerClass.getAnnotation(CacheProvider.class);
-			providerName = cacheProvider.name();
-			this.registeredProviders.put(providerName, providerClass);
+	public static void registerProvider(Class<?> providerClass) {
+		if (providerClass != null && providerClass.isAnnotationPresent(CacheProviderImpl.class)) {
+			CacheProviderImpl cacheProviderImpl = providerClass.getAnnotation(CacheProviderImpl.class);
+			REGISTERED_PROVIDERS.put(cacheProviderImpl.name(), providerClass);
 		}
-		return Optional.ofNullable(providerName);
 	}
 
 	/**
 	 * Remove registered cache provider
 	 * @param providerName      cache provider name
 	 */
-	public void removeProvider(String providerName) {
-		this.registeredProviders.remove(providerName);
+	public static void removeProvider(String providerName) {
+		REGISTERED_PROVIDERS.remove(providerName);
 	}
 
 	/**
@@ -117,7 +124,7 @@ public final class CacheUtils {
 	 */
 	public void registerCache(String cacheName, CacheConfig cacheConfig) {
 		if (cacheName == null || cacheConfig == null
-				|| !this.registeredProviders.containsKey(cacheConfig.getProviderName())) {
+				|| !REGISTERED_PROVIDERS.containsKey(cacheConfig.getProviderName())) {
 			return;
 		}
 		if (this.registeredCache.containsKey(cacheName)) {
@@ -126,7 +133,7 @@ public final class CacheUtils {
 
 		try {
 			this.registeredCache.put(cacheName,
-					new NervousyncCache(cacheConfig, this.registeredProviders.get(cacheConfig.getProviderName())));
+					new CacheInstance(cacheConfig, REGISTERED_PROVIDERS.get(cacheConfig.getProviderName())));
 		} catch (CacheException e) {
 			LOGGER.error("Generate nervousync cache instance error! ");
 			if (LOGGER.isDebugEnabled()) {
@@ -144,7 +151,7 @@ public final class CacheUtils {
 	}
 
 	/**
-	 * Set key-value to cache server by default expire time
+	 * Set key-value to cache server by default expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
@@ -156,20 +163,20 @@ public final class CacheUtils {
 	}
 
 	/**
-	 * Set key-value to cache server and set expire time
+	 * Set key-value to cache server and set expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void set(String cacheName, String key, String value, int expire) {
+	public void set(String cacheName, String key, String value, int expiry) {
 		if (this.registeredCache.containsKey(cacheName)) {
-			this.registeredCache.get(cacheName).set(key, value, expire);
+			this.registeredCache.get(cacheName).set(key, value, expiry);
 		}
 	}
 
 	/**
-	 * Add a new key-value to cache server by default expire time
+	 * Add a new key-value to cache server by default expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
@@ -181,20 +188,20 @@ public final class CacheUtils {
 	}
 
 	/**
-	 * Add a new key-value to cache server and set expire time
+	 * Add a new key-value to cache server and set expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void add(String cacheName, String key, String value, int expire) {
+	public void add(String cacheName, String key, String value, int expiry) {
 		if (this.registeredCache.containsKey(cacheName)) {
-			this.registeredCache.get(cacheName).add(key, value, expire);
+			this.registeredCache.get(cacheName).add(key, value, expiry);
 		}
 	}
 
 	/**
-	 * Replace exists value of given key by given value by default expire time
+	 * Replace exists value of given key by given value by default expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
@@ -206,27 +213,38 @@ public final class CacheUtils {
 	}
 
 	/**
-	 * Replace exists value of given key by given value and given expire time
+	 * Replace exists value of given key by given value and given expiry time
 	 * @param cacheName Cache name
 	 * @param key		Cache key
 	 * @param value		Cache value
-	 * @param expire	Expire time
+	 * @param expiry	Expire time
 	 */
-	public void replace(String cacheName, String key, String value, int expire) {
+	public void replace(String cacheName, String key, String value, int expiry) {
 		if (this.registeredCache.containsKey(cacheName)) {
-			this.registeredCache.get(cacheName).replace(key, value, expire);
+			this.registeredCache.get(cacheName).replace(key, value, expiry);
 		}
 	}
 
 	/**
-	 * Set expire time to new given expire value which cache key was given
+	 * Set expiry time to new given expiry value which cache key was given
 	 * @param cacheName Cache name
 	 * @param key		Cache key
-	 * @param expire	New expire time
+	 * @param expiry	New expiry time
 	 */
-	public void touch(String cacheName, String key, int expire) {
+	public void expire(String cacheName, String key, int expiry) {
 		if (this.registeredCache.containsKey(cacheName)) {
-			this.registeredCache.get(cacheName).touch(key, expire);
+			this.registeredCache.get(cacheName).expire(key, expiry);
+		}
+	}
+
+	/**
+	 * Operate touch to given keys
+	 * @param cacheName Cache name
+	 * @param keys      Keys
+	 */
+	public void touch(String cacheName, String... keys) {
+		if (this.registeredCache.containsKey(cacheName)) {
+			this.registeredCache.get(cacheName).touch(keys);
 		}
 	}
 
@@ -258,8 +276,12 @@ public final class CacheUtils {
 	 * Destroy all registered cache instance
 	 */
 	public void destroy() {
-		this.registeredCache.values().forEach(NervousyncCache::destroy);
+		this.registeredCache.values().forEach(CacheInstance::destroy);
 		this.registeredCache = null;
 		CacheUtils.INSTANCE = null;
+	}
+
+	private Object readResolve() {
+		return CacheUtils.INSTANCE;
 	}
 }

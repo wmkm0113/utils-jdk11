@@ -22,5 +22,5 @@ package org.nervousync.enumerations.ip;
  * @version $Revision: 1.0 $Date: 2018-09-21 18:25
  */
 public enum IPType {
-	IPv4, IPv6
+	IPv4, IPv6, Unknown
 }

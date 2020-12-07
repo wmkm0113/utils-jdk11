@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 public final class CookieUtils {
 
 	private CookieUtils() {
-		
 	}
 
 	/**

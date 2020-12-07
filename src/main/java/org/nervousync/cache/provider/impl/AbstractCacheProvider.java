@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.cache.provider;
+package org.nervousync.cache.provider.impl;
 
 import java.util.List;
 
-import org.nervousync.cache.annotation.CacheProvider;
+import org.nervousync.cache.annotation.CacheProviderImpl;
+import org.nervousync.cache.provider.CacheProvider;
 import org.nervousync.exceptions.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,9 @@ import org.nervousync.commons.core.Globals;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Apr 25, 2017 3:01:30 PM $
  */
-public abstract class AbstractCacheProvider {
+public abstract class AbstractCacheProvider implements CacheProvider {
 	
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Default port number
@@ -66,11 +67,10 @@ public abstract class AbstractCacheProvider {
 	 * Default constructor
 	 */
 	public AbstractCacheProvider() throws CacheException {
-		if (this.getClass().isAnnotationPresent(CacheProvider.class)) {
-			CacheProvider cacheProvider = this.getClass().getAnnotation(CacheProvider.class);
-			this.defaultPort = cacheProvider.defaultPort();
+		if (this.getClass().isAnnotationPresent(CacheProviderImpl.class)) {
+			this.defaultPort = this.getClass().getAnnotation(CacheProviderImpl.class).defaultPort();
 		} else {
-			throw new CacheException("Provider implement class must annotation with com.nervousync.cache.annotation.CacheProvider");
+			throw new CacheException("Provider implement class must annotation with " + CacheProviderImpl.class.getName());
 		}
 	}
 	
@@ -155,14 +155,6 @@ public abstract class AbstractCacheProvider {
 	public final void set(String key, String value) {
 		this.set(key, value, this.expireTime);
 	}
-	
-	/**
-	 * Set key-value to cache server and set expire time
-	 * @param key		Cache key
-	 * @param value		Cache value
-	 * @param expire	Expire time
-	 */
-	public abstract void set(String key, String value, int expire);
 
 	/**
 	 * Add a new key-value to cache server by default expire time
@@ -172,14 +164,6 @@ public abstract class AbstractCacheProvider {
 	public final void add(String key, String value) {
 		this.add(key, value, this.expireTime);
 	}
-	
-	/**
-	 * Add a new key-value to cache server and set expire time
-	 * @param key		Cache key
-	 * @param value		Cache value
-	 * @param expire	Expire time
-	 */
-	public abstract void add(String key, String value, int expire);
 
 	/**
 	 * Replace exists value of given key by given value by default expire time
@@ -189,21 +173,43 @@ public abstract class AbstractCacheProvider {
 	public final void replace(String key, String value) {
 		this.replace(key, value, this.expireTime);
 	}
-	
+
 	/**
-	 * Replace exists value of given key by given value and given expire time
+	 * Set expire time to new given expire value which cache key was given
+	 * @param key		Cache key
+	 * @param expiry	New expire time
+	 */
+	public abstract void expire(String key, int expiry);
+
+	/**
+	 * Set key-value to cache server and set expire time
+	 * @param key		Cache key
+	 * @param value		Cache value
+	 * @param expiry	Expire time
+	 */
+	public abstract void set(String key, String value, int expiry);
+
+	/**
+	 * Add a new key-value to cache server and set expire time
 	 * @param key		Cache key
 	 * @param value		Cache value
 	 * @param expire	Expire time
 	 */
-	public abstract void replace(String key, String value, int expire);
-	
+	public abstract void add(String key, String value, int expire);
+
 	/**
-	 * Set expire time to new given expire value which cache key was given
+	 * Replace exists value of given key by given value and given expire time
 	 * @param key		Cache key
-	 * @param expire	New expire time
+	 * @param value		Cache value
+	 * @param expiry	Expire time
 	 */
-	public abstract void touch(String key, int expire);
+	public abstract void replace(String key, String value, int expiry);
+
+	/**
+	 * Operate touch to given keys
+	 * @param keys      Keys
+	 */
+	public abstract void touch(String... keys);
 	
 	/**
 	 * Remove cache key-value from cache server

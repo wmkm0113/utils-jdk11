@@ -15,30 +15,25 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.provider.json.impl;
+package org.nervousync.beans.provider.blob.impl;
 
 import org.nervousync.beans.provider.ConvertProvider;
-import org.nervousync.commons.beans.json.JsonObject;
+import org.nervousync.utils.StringUtils;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 4:26 PM $
+ * @version $Revision: 1.0 $ $Date: 8/25/2020 2:57 PM $
  */
-public final class ParseJSONStringProvider implements ConvertProvider {
-
-	public ParseJSONStringProvider() {
-	}
+public final class Base64Provider implements ConvertProvider {
 
 	@Override
 	public boolean checkType(Class<?> dataType) {
-		return String.class.equals(dataType);
+		return byte[].class.equals(dataType);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T convert(Object origObj, Class<T> targetClass) {
-		if (origObj instanceof String) {
-			return JsonObject.parseJSON((String)origObj, targetClass);
-		}
-		return null;
+		return (T)StringUtils.base64Encode((byte[])origObj);
 	}
 }

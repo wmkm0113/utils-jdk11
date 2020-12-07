@@ -80,11 +80,11 @@
       Contribution(s) alone or by combination of their Contribution(s)
       with the Work to which such Contribution(s) was submitted. If You
       institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      cross-claim or counterclaim in a lawsuit) alleging that the Work,
       or a Contribution incorporated within the Work constitutes direct
       or contributory patent infringement, then any patent licenses
       granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+      as of the date such litigation is file.
 
    4. Redistribution. You may reproduce and distribute copies of the
       Work or Derivative Works thereof in any medium, with or without
@@ -151,15 +151,15 @@
       risks associated with Your exercise of permissions under this License.
 
    8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
+      whether in a tort (including negligence), contract, or otherwise,
       unless required by applicable law (such as deliberate and grossly
       negligent acts) or agreed to in writing, shall any Contributor be
       liable to You for damages, including any direct, indirect, special,
       incidental, or consequential damages of any character arising as a
       result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
+      Work (including but not limited to damage for loss of goodwill,
       work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
+      other commercial damages or losses), even if such a Contributor
       has been advised of the possibility of such damages.
 
    9. Accepting Warranty or Additional Liability. While redistributing

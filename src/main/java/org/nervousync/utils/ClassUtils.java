@@ -95,14 +95,11 @@ public final class ClassUtils {
 		primitiveTypeNames.addAll(Arrays.asList(
 				boolean[].class, byte[].class, char[].class, double[].class,
 				float[].class, int[].class, long[].class, short[].class));
-		for (Object primitiveTypeName : primitiveTypeNames) {
-			Class<?> primitiveClass = (Class<?>) primitiveTypeName;
-			PRIMITIVE_TYPE_NAME_MAP.put(primitiveClass.getName(), primitiveClass);
-		}
+		primitiveTypeNames.forEach(primitiveClass ->
+				PRIMITIVE_TYPE_NAME_MAP.put(((Class<?>)primitiveClass).getName(), primitiveClass));
 	}
 	
 	private ClassUtils() {
-		
 	}
 	
 	/**

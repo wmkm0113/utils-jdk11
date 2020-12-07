@@ -40,30 +40,26 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.scm.version>1.11.2</maven.scm.version>
-		<maven.compiler.version>3.8.1</maven.compiler.version>
-		<maven.jar.version>3.1.1</maven.jar.version>
-		<maven.resource.version>3.1.0</maven.resource.version>
-		<maven.source.version>3.0.1</maven.source.version>
-		<maven.javadoc.version>3.0.1</maven.javadoc.version>
-		<maven.gpg.version>1.6</maven.gpg.version>
 		<jakarta.activation.version>1.2.2</jakarta.activation.version>
-		<bcprov.version>1.65.01</bcprov.version>
+		<bcprov.version>1.66</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
 		<jaxb.version>2.3.3</jaxb.version>
-		<xalan.version>2.7.2</xalan.version>
 		<log4j.version>2.13.3</log4j.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<jackson.version>2.11.1</jackson.version>
-		<snmp4j.version>2.8.4</snmp4j.version>
+		<jackson.version>2.11.3</jackson.version>
+		<snmp4j.version>2.8.5</snmp4j.version>
 		<jakarta.mail.version>1.6.5</jakarta.mail.version>
 		<jcifs.version>2.1.4</jcifs.version>
+		<memcached.version>2.4.6</memcached.version>
+		<jedis.version>3.3.0</jedis.version>
+		<netty.version>4.1.52.Final</netty.version>
+		<lettuce.version>5.3.3.RELEASE</lettuce.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>4.0.3</version>
+			<version>4.0.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -354,6 +350,173 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Netty Support -->
+		<dependency>
+			<groupId>org.reactivestreams</groupId>
+			<artifactId>reactive-streams</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-core</artifactId>
+			<version>3.3.10.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>reactive-streams</artifactId>
+					<groupId>org.reactivestreams</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec</artifactId>
+			<version>${netty.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-buffer</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-transport</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+			<version>${netty.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+			<version>${netty.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-transport</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-buffer</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-codec</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-resolver</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-resolver</artifactId>
+			<version>${netty.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport</artifactId>
+			<version>${netty.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-buffer</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-resolver</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Cache -->
+		<!-- XMemcached Support -->
+		<dependency>
+			<groupId>com.googlecode.xmemcached</groupId>
+			<artifactId>xmemcached</artifactId>
+			<version>${memcached.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Jedis Support -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-pool2</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Lettuce Support -->
+		<dependency>
+			<groupId>io.lettuce</groupId>
+			<artifactId>lettuce-core</artifactId>
+			<version>${lettuce.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-common</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-handler</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netty-transport</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>reactor-core</artifactId>
+					<groupId>io.projectreactor</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 	<build>
 		<defaultGoal>compile</defaultGoal>
@@ -376,6 +539,7 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-scm-plugin</artifactId>
 				<version>${maven.scm.version}</version>
 				<configuration>
@@ -436,6 +600,7 @@
 						</configuration>
 					</plugin>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
 						<version>${maven.jar.version}</version>
 						<configuration>

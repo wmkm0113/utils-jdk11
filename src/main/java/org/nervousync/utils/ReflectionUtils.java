@@ -23,10 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +143,24 @@ public final class ReflectionUtils {
 			}
 		}
 		
+		return fieldList;
+	}
+
+	public static List<Field> getAllDeclaredFields(Class<?> clazz) {
+		if (clazz == null) {
+			return new ArrayList<>(0);
+		}
+
+		List<Field> fieldList = new ArrayList<>();
+		Arrays.stream(clazz.getDeclaredFields()).filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
+				.forEach(fieldList::add);
+
+		if (clazz.getSuperclass() != null) {
+			ReflectionUtils.getAllDeclaredFields(clazz.getSuperclass()).stream()
+					.filter(field -> (field.getModifiers() & Modifier.STATIC) == 0)
+					.forEach(fieldList::add);
+		}
+
 		return fieldList;
 	}
 	
@@ -544,6 +559,18 @@ public final class ReflectionUtils {
 	public static boolean isStatic(Field field) {
 		if (field != null) {
 			return Modifier.isStatic(field.getModifiers());
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
+	/**
+	 * Determine whether the given field is a "final" constant.
+	 * @param field the field to check
+	 * @return is a "final" constant.
+	 */
+	public static boolean isFinal(Field field) {
+		if (field != null) {
+			return Modifier.isFinal(field.getModifiers());
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}

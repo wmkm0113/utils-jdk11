@@ -14,24 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.cache.annotation;
 
-import org.nervousync.commons.core.Globals;
+package org.nervousync.beans.provider.blob.impl;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.nervousync.beans.provider.ConvertProvider;
+import org.nervousync.utils.StringUtils;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 2018-12-26 17:23 $
+ * @version $Revision: 1.0 $ $Date: 8/25/2020 2:56 PM $
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface CacheProvider {
+public final class ParseBase64Provider implements ConvertProvider {
 
-	String name();
+	@Override
+	public boolean checkType(Class<?> dataType) {
+		return String.class.equals(dataType);
+	}
 
-	int defaultPort() default Globals.DEFAULT_VALUE_INT;
+	@Override
+	public <T> T convert(Object origObj, Class<T> targetClass) {
+		Object object = StringUtils.base64Decode((String)origObj);
+		if (targetClass.isInstance(object)) {
+			return targetClass.cast(object);
+		}
+		return null;
+	}
 }

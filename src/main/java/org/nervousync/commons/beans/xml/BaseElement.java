@@ -21,7 +21,6 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 import org.nervousync.commons.adapter.xml.CDataAdapter;
-import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.utils.ReflectionUtils;
 import org.nervousync.utils.StringUtils;
@@ -31,9 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.xml.XmlException;
 
+import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.JAXB;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -46,8 +45,9 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * Base element define, all xml object define must extends this class
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Sep 23, 2010, 2010 1:22:51 PM $
+ * @version $Revision : 1.0 $ $Date: Sep 23, 2010, 2010 1:22:51 PM $
  */
 public class BaseElement implements Serializable {
 
@@ -57,16 +57,19 @@ public class BaseElement implements Serializable {
 	private static final long serialVersionUID = 6377799204139380357L;
 	
 	private static final String FRAGMENT = "<?xml version=\"1.0\" encoding=\"{}\"?>";
-	
-	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
+	/**
+	 * The constant LOGGER.
+	 */
+	protected transient static final Logger LOGGER = LoggerFactory.getLogger(BaseElement.class);
+
 	/**
 	 * Parse xml string and setting fields data to this object
-	 * @param <T>           Object
-	 * @param xmlObj	    XML string or XML file location will be parsed
-	 * @param entityClass   Entity class
 	 *
-	 * @return              Convert object
+	 * @param <T>         Object
+	 * @param xmlObj      XML string or XML file location will be parsed
+	 * @param entityClass Entity class
+	 * @return Convert object
 	 */
 	public static <T> T parseXml(String xmlObj, Class<T> entityClass) {
 		return BaseElement.parseXml(xmlObj, Globals.DEFAULT_ENCODING, entityClass);
@@ -74,30 +77,24 @@ public class BaseElement implements Serializable {
 
 	/**
 	 * Parse xml string and setting fields data to this object
-	 * @param <T>           Object
-	 * @param xmlObj	    XML string or XML file location will be parsed
-	 * @param encoding      Character encoding
-	 * @param entityClass   Entity class
 	 *
-	 * @return              Convert object
+	 * @param <T>       Object
+	 * @param string    the string
+	 * @param encoding  Character encoding
+	 * @param beanClass the bean class
+	 * @return Convert object
 	 */
-	public static <T> T parseXml(String xmlObj, String encoding, Class<T> entityClass) {
-		InputStream inputStream = null;
-		try {
-			if (encoding == null) {
-				encoding = Globals.DEFAULT_ENCODING;
-			}
-			if (xmlObj.startsWith("<")) {
-				inputStream = new ByteArrayInputStream(xmlObj.getBytes(encoding));
-			} else {
-				inputStream = FileUtils.loadFile(xmlObj);
-			}
-			return JAXB.unmarshal(inputStream, entityClass);
+	public static <T> T parseXml(String string, String encoding, Class<T> beanClass) {
+		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
+		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
+			return JAXB.unmarshal(inputStream, beanClass);
 		} catch (IOException e) {
-			return null;
-		} finally {
-			IOUtils.closeStream(inputStream);
+			LOGGER.error("Parse xml error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -112,8 +109,9 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String
 	 * Explain all empty element
 	 *
-	 * @param formattedOutput 		Formatted output
+	 * @param formattedOutput Formatted output
 	 * @return XML String
+	 * @throws XmlException the xml exception
 	 */
 	public String toString(boolean formattedOutput) throws XmlException {
 		return this.toString(true, formattedOutput, Globals.DEFAULT_ENCODING);
@@ -123,9 +121,10 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String
 	 * Explain all empty element
 	 *
-	 * @param outputFragment        Output fragment
-	 * @param formattedOutput 		Formatted output
+	 * @param outputFragment  Output fragment
+	 * @param formattedOutput Formatted output
 	 * @return XML String
+	 * @throws XmlException the xml exception
 	 */
 	public String toString(boolean outputFragment, boolean formattedOutput) throws XmlException {
 		return this.toString(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
@@ -135,10 +134,11 @@ public class BaseElement implements Serializable {
 	 * Convert Object to XML String
 	 * Explain all empty element
 	 *
-	 * @param outputFragment        Output fragment
-	 * @param formattedOutput 		Formatted output
-	 * @param encoding				Charset encoding
+	 * @param outputFragment  Output fragment
+	 * @param formattedOutput Formatted output
+	 * @param encoding        Charset encoding
 	 * @return XML String
+	 * @throws XmlException the xml exception
 	 */
 	public String toString(boolean outputFragment, boolean formattedOutput, String encoding) throws XmlException {
 		StringWriter stringWriter = null;
@@ -183,8 +183,8 @@ public class BaseElement implements Serializable {
 				return stringWriter.toString();
 			}
 		} catch (Exception e) {
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Error stack message: ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Error stack message: ", e);
 			}
 			return null;
 		} finally {
@@ -240,31 +240,20 @@ public class BaseElement implements Serializable {
 		
 		return result;
 	}
-	
-	private static final class CDataStreamWriter extends DelegatingXMLStreamWriter {
-		
-		CDataStreamWriter(XMLStreamWriter xmlStreamWriter) {
-			super(xmlStreamWriter);
-		}
-		
-		@Override
-		public void writeCharacters(String text) throws XMLStreamException {
-			if (text.startsWith(CDataAdapter.CDATA_BEGIN) && text.endsWith(CDataAdapter.CDATA_END)) {
-				super.writeCData(text.substring(CDataAdapter.CDATA_BEGIN.length(), text.length() - CDataAdapter.CDATA_END.length()));
-			} else {
-				super.writeCharacters(text);
-			}
-		}
-	}
-	
-	private static class DelegatingXMLStreamWriter implements XMLStreamWriter {
-	
+
+	private static final class CDataStreamWriter implements XMLStreamWriter {
+
 		private final XMLStreamWriter xmlStreamWriter;
-		
-		DelegatingXMLStreamWriter(XMLStreamWriter xmlStreamWriter) {
+
+		/**
+		 * Instantiates a new C data stream writer.
+		 *
+		 * @param xmlStreamWriter the xml stream writer
+		 */
+		CDataStreamWriter(XMLStreamWriter xmlStreamWriter) {
 			this.xmlStreamWriter = xmlStreamWriter;
 		}
-		
+
 		/**
 		 * Writes a start tag to the output.  All writeStartElement methods
 		 * open a new scope in the internal namespace context.  Writing the
@@ -277,7 +266,7 @@ public class BaseElement implements Serializable {
 		public void writeStartElement(String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(localName);
 		}
-		
+
 		/**
 		 * Writes a start tag to the output
 		 *
@@ -290,7 +279,7 @@ public class BaseElement implements Serializable {
 		public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(namespaceURI, localName);
 		}
-		
+
 		/**
 		 * Writes a start tag to the output
 		 *
@@ -303,7 +292,7 @@ public class BaseElement implements Serializable {
 		public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(prefix, localName, namespaceURI);
 		}
-		
+
 		/**
 		 * Writes an empty element tag to the output
 		 *
@@ -316,7 +305,7 @@ public class BaseElement implements Serializable {
 		public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(namespaceURI, localName);
 		}
-		
+
 		/**
 		 * Writes an empty element tag to the output
 		 *
@@ -329,7 +318,7 @@ public class BaseElement implements Serializable {
 		public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(prefix, localName, namespaceURI);
 		}
-		
+
 		/**
 		 * Writes an empty element tag to the output
 		 *
@@ -340,7 +329,7 @@ public class BaseElement implements Serializable {
 		public void writeEmptyElement(String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(localName);
 		}
-		
+
 		/**
 		 * Writes an end tag to the output relying on the internal
 		 * state of the writer to determine the prefix and local name
@@ -352,7 +341,7 @@ public class BaseElement implements Serializable {
 		public void writeEndElement() throws XMLStreamException {
 			this.xmlStreamWriter.writeEndElement();
 		}
-		
+
 		/**
 		 * Closes any start tags and writes corresponding end tags.
 		 *
@@ -362,7 +351,7 @@ public class BaseElement implements Serializable {
 		public void writeEndDocument() throws XMLStreamException {
 			this.xmlStreamWriter.writeEndDocument();
 		}
-		
+
 		/**
 		 * Close this writer and free any resources associated with the
 		 * writer.  This must not close the underlying output stream.
@@ -373,7 +362,7 @@ public class BaseElement implements Serializable {
 		public void close() throws XMLStreamException {
 			this.xmlStreamWriter.close();
 		}
-		
+
 		/**
 		 * Write any cached data to the underlying output mechanism.
 		 *
@@ -383,7 +372,7 @@ public class BaseElement implements Serializable {
 		public void flush() throws XMLStreamException {
 			this.xmlStreamWriter.flush();
 		}
-		
+
 		/**
 		 * Writes an attribute to the output stream without
 		 * a prefix.
@@ -398,7 +387,7 @@ public class BaseElement implements Serializable {
 		public void writeAttribute(String localName, String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(localName, value);
 		}
-		
+
 		/**
 		 * Writes an attribute to the output stream
 		 *
@@ -414,7 +403,7 @@ public class BaseElement implements Serializable {
 		public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(prefix, namespaceURI, localName, value);
 		}
-		
+
 		/**
 		 * Writes an attribute to the output stream
 		 *
@@ -429,7 +418,7 @@ public class BaseElement implements Serializable {
 		public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(namespaceURI, localName, value);
 		}
-		
+
 		/**
 		 * Writes a namespace to the output stream
 		 * If the prefix argument to this method is the empty string,
@@ -444,7 +433,7 @@ public class BaseElement implements Serializable {
 		public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeNamespace(prefix, namespaceURI);
 		}
-		
+
 		/**
 		 * Writes the default namespace to the stream
 		 *
@@ -456,7 +445,7 @@ public class BaseElement implements Serializable {
 		public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeDefaultNamespace(namespaceURI);
 		}
-		
+
 		/**
 		 * Writes an xml comment with the data enclosed
 		 *
@@ -467,7 +456,7 @@ public class BaseElement implements Serializable {
 		public void writeComment(String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeComment(data);
 		}
-		
+
 		/**
 		 * Writes a processing instruction
 		 *
@@ -478,7 +467,7 @@ public class BaseElement implements Serializable {
 		public void writeProcessingInstruction(String target) throws XMLStreamException {
 			this.xmlStreamWriter.writeProcessingInstruction(target);
 		}
-		
+
 		/**
 		 * Writes a processing instruction
 		 *
@@ -490,7 +479,7 @@ public class BaseElement implements Serializable {
 		public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeProcessingInstruction(target, data);
 		}
-		
+
 		/**
 		 * Writes a CData section
 		 *
@@ -501,7 +490,7 @@ public class BaseElement implements Serializable {
 		public void writeCData(String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeCData(data);
 		}
-		
+
 		/**
 		 * Write a DTD section.  This string represents the entire doctypedecl production
 		 * from the XML 1.0 specification.
@@ -513,7 +502,7 @@ public class BaseElement implements Serializable {
 		public void writeDTD(String dtd) throws XMLStreamException {
 			this.xmlStreamWriter.writeDTD(dtd);
 		}
-		
+
 		/**
 		 * Writes an entity reference
 		 *
@@ -524,7 +513,7 @@ public class BaseElement implements Serializable {
 		public void writeEntityRef(String name) throws XMLStreamException {
 			this.xmlStreamWriter.writeEntityRef(name);
 		}
-		
+
 		/**
 		 * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8
 		 *
@@ -534,7 +523,7 @@ public class BaseElement implements Serializable {
 		public void writeStartDocument() throws XMLStreamException {
 			this.xmlStreamWriter.writeStartDocument();
 		}
-		
+
 		/**
 		 * Write the XML Declaration. Defaults the XML version to 1.0
 		 *
@@ -546,7 +535,7 @@ public class BaseElement implements Serializable {
 		public void writeStartDocument(String version) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartDocument(version);
 		}
-		
+
 		/**
 		 * Write the XML Declaration.  Note that the encoding parameter does
 		 * not set the actual encoding of the underlying output.  That must
@@ -562,7 +551,7 @@ public class BaseElement implements Serializable {
 		public void writeStartDocument(String encoding, String version) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartDocument(encoding, version);
 		}
-		
+
 		/**
 		 * Write text to the output
 		 *
@@ -571,9 +560,14 @@ public class BaseElement implements Serializable {
 		 */
 		@Override
 		public void writeCharacters(String text) throws XMLStreamException {
-			this.xmlStreamWriter.writeCharacters(text);
+			if (text.startsWith(CDataAdapter.CDATA_BEGIN) && text.endsWith(CDataAdapter.CDATA_END)) {
+				this.writeCData(text.substring(CDataAdapter.CDATA_BEGIN.length(),
+						text.length() - CDataAdapter.CDATA_END.length()));
+			} else {
+				this.xmlStreamWriter.writeCharacters(text);
+			}
 		}
-		
+
 		/**
 		 * Write text to the output
 		 *
@@ -586,7 +580,7 @@ public class BaseElement implements Serializable {
 		public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
 			this.writeCharacters(new String(text, start, len));
 		}
-		
+
 		/**
 		 * Gets the prefix the uri is bound to
 		 *
@@ -598,7 +592,7 @@ public class BaseElement implements Serializable {
 		public String getPrefix(String uri) throws XMLStreamException {
 			return this.xmlStreamWriter.getPrefix(uri);
 		}
-		
+
 		/**
 		 * Sets the prefix the uri is bound to.  This prefix is bound
 		 * in the scope of the current START_ELEMENT / END_ELEMENT pair.
@@ -613,7 +607,7 @@ public class BaseElement implements Serializable {
 		public void setPrefix(String prefix, String uri) throws XMLStreamException {
 			this.xmlStreamWriter.setPrefix(prefix, uri);
 		}
-		
+
 		/**
 		 * Binds a URI to the default namespace
 		 * This URI is bound
@@ -628,7 +622,7 @@ public class BaseElement implements Serializable {
 		public void setDefaultNamespace(String uri) throws XMLStreamException {
 			this.xmlStreamWriter.setDefaultNamespace(uri);
 		}
-		
+
 		/**
 		 * Sets the current namespace context for prefix and uri bindings.
 		 * This context becomes the root namespace context for writing and
@@ -648,7 +642,7 @@ public class BaseElement implements Serializable {
 		public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
 			this.xmlStreamWriter.setNamespaceContext(context);
 		}
-		
+
 		/**
 		 * Returns the current namespace context.
 		 *
@@ -658,7 +652,7 @@ public class BaseElement implements Serializable {
 		public NamespaceContext getNamespaceContext() {
 			return this.xmlStreamWriter.getNamespaceContext();
 		}
-		
+
 		/**
 		 * Get the value of a feature/property from the underlying implementation
 		 *

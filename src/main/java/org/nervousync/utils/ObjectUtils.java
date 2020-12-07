@@ -18,6 +18,7 @@ package org.nervousync.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
@@ -108,16 +109,12 @@ public final class ObjectUtils {
 	/**
 	 * Create a proxy object instance
 	 * @param clazz		define class
-	 * @param methodInterceptor method interceptor instance
+	 * @param handlerInterceptors method interceptor instance array
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, HandlerInterceptor methodInterceptor) {
-		HandlerInterceptor[] methodInterceptors = null;
-		if (methodInterceptor != null) {
-			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
-		}
-		return createProxyInstance(clazz, null, null, methodInterceptors);
+	public static <T> T createProxyInstance(Class<T> clazz, HandlerInterceptor... handlerInterceptors) {
+		return createProxyInstance(clazz, null, null, handlerInterceptors);
 	}
 
 	/**
@@ -146,9 +143,8 @@ public final class ObjectUtils {
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor[] methodInterceptors) {
-		T object;
+		Object object;
 
 		if (methodInterceptors != null && methodInterceptors.length > 0) {
 			Enhancer enhancer = new Enhancer();
@@ -161,9 +157,9 @@ public final class ObjectUtils {
 			}
 
 			if (args == null || args.length == 0) {
-				object = (T) enhancer.create();
+				object = enhancer.create();
 			} else {
-				object = (T) enhancer.create(paramClasses, args);
+				object = enhancer.create(paramClasses, args);
 			}
 		} else {
 			try {
@@ -177,7 +173,10 @@ public final class ObjectUtils {
 			}
 		}
 
-		return object;
+		if (clazz.isInstance(object)) {
+			return clazz.cast(object);
+		}
+		return null;
 	}
 
 	/**
@@ -338,7 +337,8 @@ public final class ObjectUtils {
 				|| clazz.equals(Double.class) || clazz.equals(double.class)
 				|| clazz.equals(Short.class) || clazz.equals(short.class)
 				|| clazz.equals(Long.class) || clazz.equals(long.class)
-				|| clazz.equals(BigInteger.class) || clazz.equals(Number.class)) {
+				|| clazz.equals(byte.class) || clazz.equals(BigInteger.class)
+				|| clazz.equals(BigDecimal.class) || clazz.equals(Number.class)) {
 			return DataType.NUMBER;
 		} else if (clazz.equals(String.class)) {
 			return DataType.STRING;

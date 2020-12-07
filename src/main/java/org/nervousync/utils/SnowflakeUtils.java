@@ -32,7 +32,7 @@ public final class SnowflakeUtils {
 	/**
 	 * Instance object
 	 */
-	private static SnowflakeUtils INSTANCE = null;
+	private static volatile SnowflakeUtils INSTANCE = null;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -105,7 +105,11 @@ public final class SnowflakeUtils {
 	 */
 	public static void initialize(long referenceTime, long instanceId) {
 		if (INSTANCE == null) {
-			setINSTANCE(new SnowflakeUtils(referenceTime, instanceId));
+			synchronized (SnowflakeUtils.class) {
+				if (INSTANCE == null) {
+					setINSTANCE(new SnowflakeUtils(referenceTime, instanceId));
+				}
+			}
 		}
 	}
 
@@ -118,6 +122,9 @@ public final class SnowflakeUtils {
 	 * @return	Snowflake utils
 	 */
 	public static SnowflakeUtils getInstance() {
+		if (SnowflakeUtils.INSTANCE == null) {
+			SnowflakeUtils.initialize();
+		}
 		return SnowflakeUtils.INSTANCE;
 	}
 	
@@ -126,10 +133,7 @@ public final class SnowflakeUtils {
 	 * @return generated ID
 	 */
 	public long generateId() {
-		if (INSTANCE == null) {
-			SnowflakeUtils.initialize();
-		}
-		return INSTANCE.generateValue(true);
+		return this.generateValue(true);
 	}
 
 	/**
@@ -198,5 +202,9 @@ public final class SnowflakeUtils {
 		} else {
 			return (DEVICE_ID << 17L) | (this.instanceId << 12L) | this.sequenceIndex;
 		}
+	}
+
+	private Object readResolve() {
+		return SnowflakeUtils.INSTANCE;
 	}
 }

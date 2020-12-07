@@ -237,7 +237,7 @@ public final class ConvertUtils {
 			IOUtils.closeStream(outputStream);
 		}
 		
-		return null;
+		return new byte[0];
 	}
 
 	/**

@@ -31,14 +31,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.nervousync.commons.beans.json.JsonObject;
 import org.nervousync.commons.beans.xml.BaseElement;
 import org.nervousync.commons.http.header.SimpleHeader;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.FileUtils;
-import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +47,9 @@ import org.nervousync.exceptions.xml.XmlException;
 
 /**
  * Response content of request
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
+ * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
  */
 public final class HttpResponseContent implements Serializable {
 
@@ -86,8 +88,10 @@ public final class HttpResponseContent implements Serializable {
 	 * Response content data array
 	 */
 	private byte[] responseContent;
-	
+
 	/**
+	 * Gets status code.
+	 *
 	 * @return the statusCode
 	 */
 	public int getStatusCode() {
@@ -104,6 +108,8 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
+	 * Gets content type.
+	 *
 	 * @return the contentType
 	 */
 	public String getContentType() {
@@ -111,6 +117,8 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
+	 * Gets charset.
+	 *
 	 * @return the charset
 	 */
 	public String getCharset() {
@@ -118,6 +126,8 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
+	 * Gets identified code.
+	 *
 	 * @return the identifiedCode
 	 */
 	public String getIdentifiedCode() {
@@ -125,19 +135,28 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
+	 * Gets content length.
+	 *
 	 * @return the contentLength
 	 */
 	public int getContentLength() {
 		return contentLength;
 	}
-	
+
 	/**
+	 * Get response content byte [ ].
+	 *
 	 * @return the responseContent
 	 */
 	public byte[] getResponseContent() {
 		return responseContent == null ? new byte[0] : responseContent.clone();
 	}
-	
+
+	/**
+	 * Instantiates a new Http response content.
+	 *
+	 * @param urlConnection the url connection
+	 */
 	public HttpResponseContent(HttpURLConnection urlConnection) {
 		InputStream inputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
@@ -220,14 +239,38 @@ public final class HttpResponseContent implements Serializable {
 		}
 	}
 
-	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+	/**
+	 * Parse xml t.
+	 *
+	 * @param <T>   the type parameter
+	 * @param clazz the clazz
+	 * @return the t
+	 * @throws XmlException                 the xml exception
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
+	public <T> T parseXml(@Nonnull Class<T> clazz) throws XmlException, UnsupportedEncodingException {
 		return BaseElement.parseXml(this.parseString(), this.charset, clazz);
 	}
 
-	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.convertJSONStringToObject(this.parseString(), clazz);
+	/**
+	 * Parse json t.
+	 *
+	 * @param <T>   the type parameter
+	 * @param clazz the clazz
+	 * @return the t
+	 * @throws XmlException                 the xml exception
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
+	public <T> T parseJson(@Nonnull Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+		return JsonObject.parseJSON(this.parseString(), this.charset, clazz);
 	}
-	
+
+	/**
+	 * Parse object object.
+	 *
+	 * @return the object
+	 * @throws XmlException the xml exception
+	 */
 	public Object parseObject() throws XmlException {
 		ByteArrayInputStream byteArrayInputStream = null;
 		ObjectInputStream objectInputStream = null;
@@ -247,24 +290,55 @@ public final class HttpResponseContent implements Serializable {
 			IOUtils.closeStream(objectInputStream);
 		}
 	}
-	
+
+	/**
+	 * Parse string string.
+	 *
+	 * @return the string
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
 	public String parseString() throws UnsupportedEncodingException {
 		return new String(this.responseContent, this.charset);
 	}
-	
+
+	/**
+	 * Parse string string.
+	 *
+	 * @param charsetName the charset name
+	 * @return the string
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
 	public String parseString(String charsetName) throws UnsupportedEncodingException {
 		return new String(this.responseContent, charsetName);
 	}
-	
+
+	/**
+	 * Parse file file.
+	 *
+	 * @param savePath the save path
+	 * @return the file
+	 * @throws IOException the io exception
+	 */
 	public File parseFile(String savePath) throws IOException {
 		FileUtils.saveFile(this.responseContent, savePath);
 		return FileUtils.getFile(savePath);
 	}
-	
+
+	/**
+	 * Gets header.
+	 *
+	 * @param headerName the header name
+	 * @return the header
+	 */
 	public String getHeader(String headerName) {
 		return this.headerMaps.get(headerName.toUpperCase());
 	}
-	
+
+	/**
+	 * Header list list.
+	 *
+	 * @return the list
+	 */
 	public List<SimpleHeader> headerList() {
 		List<SimpleHeader> headerList = new ArrayList<>();
 		

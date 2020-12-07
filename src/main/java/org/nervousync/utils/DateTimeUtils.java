@@ -295,7 +295,7 @@ public final class DateTimeUtils {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		
-		int year = cal.get(Calendar.YEAR);
+		long year = cal.get(Calendar.YEAR);
 		if (year < 1980) {
 		    return (1 << 21) | (1 << 16);
 		}

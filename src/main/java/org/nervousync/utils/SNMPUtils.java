@@ -64,7 +64,7 @@ import org.nervousync.exceptions.snmp.ProcessorConfigException;
  */
 public final class SNMPUtils {
 
-	private static SNMPUtils INSTANCE = null;
+	private static volatile SNMPUtils INSTANCE = null;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SNMPUtils.class);
 	
@@ -104,8 +104,15 @@ public final class SNMPUtils {
 	}
 	
 	public static boolean initialize(IPProtocol protocol, int serverCount) {
+		if (SNMPUtils.INSTANCE != null) {
+			return true;
+		}
 		try {
-			SNMPUtils.INSTANCE = new SNMPUtils(protocol, serverCount);
+			synchronized (SNMPUtils.class) {
+				if (SNMPUtils.INSTANCE == null) {
+					SNMPUtils.INSTANCE = new SNMPUtils(protocol, serverCount);
+				}
+			}
 			return true;
 		} catch (IOException e) {
 			if (LOGGER.isDebugEnabled()) {

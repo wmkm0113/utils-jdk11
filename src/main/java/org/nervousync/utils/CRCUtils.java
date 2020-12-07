@@ -337,7 +337,7 @@ public final class CRCUtils {
 		 */
 		public void appendBinary(byte[] dataBytes) {
 			for (byte dataByte : dataBytes) {
-				int crc = (dataByte < 0) ? ((int)dataByte) + 256 : dataByte;
+				long crc = (dataByte < 0) ? ((int)dataByte) + 256 : dataByte;
 				if (this.crcConfig.getBit() <= 8) {
 					this.crc ^= crc;
 				} else {

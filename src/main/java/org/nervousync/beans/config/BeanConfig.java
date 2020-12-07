@@ -18,8 +18,15 @@ package org.nervousync.beans.config;
 
 import org.nervousync.beans.annotation.BeanConvert;
 import org.nervousync.beans.provider.ConvertProvider;
+import org.nervousync.beans.provider.blob.impl.Base64Provider;
+import org.nervousync.beans.provider.blob.impl.ParseBase64Provider;
+import org.nervousync.beans.provider.json.impl.ConvertJSONProvider;
+import org.nervousync.beans.provider.json.impl.ParseJSONStringProvider;
+import org.nervousync.beans.provider.number.impl.ConvertNumberProvider;
+import org.nervousync.beans.provider.xml.impl.ConvertXMLProvider;
+import org.nervousync.beans.provider.xml.impl.ParseXMLStringProvider;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.utils.BeanUtils;
+import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.ReflectionUtils;
 import org.slf4j.Logger;
@@ -49,8 +56,9 @@ public final class BeanConfig implements Serializable {
 	public BeanConfig(@Nonnull Class<?> beanClass) {
 		this.className = beanClass.getName();
 		List<FieldConfig> fieldConfigList = new ArrayList<>();
-		for (Field field : beanClass.getDeclaredFields()) {
-			if (!ReflectionUtils.isStatic(field)) {
+
+		for (Field field : ReflectionUtils.getAllDeclaredFields(beanClass)) {
+			if (!ReflectionUtils.isStatic(field) && !ReflectionUtils.isFinal(field)) {
 				BeanConvert beanConvert = field.getAnnotation(BeanConvert.class);
 				if (field.isAnnotationPresent(BeanConvert.class)) {
 					beanConvert = field.getAnnotation(BeanConvert.class);
@@ -109,10 +117,8 @@ public final class BeanConfig implements Serializable {
 	 */
 	public Map<String, Object> retrieveValue(@Nonnull Object object) {
 		Map<String, Object> resultMap = new HashMap<>();
-		if (object.getClass().getName().equals(this.className)) {
-			this.fieldConfigHashtable.keySet().forEach(fieldName ->
-					resultMap.put(fieldName, this.retrieveValue(fieldName, object)));
-		}
+		this.fieldConfigHashtable.keySet().forEach(fieldName ->
+				resultMap.put(fieldName, this.retrieveValue(fieldName, object)));
 		return resultMap;
 	}
 
@@ -123,10 +129,14 @@ public final class BeanConfig implements Serializable {
 	 * @return              Field value
 	 */
 	public Object retrieveValue(@Nonnull String fieldName, @Nonnull Object object) {
-		if (object.getClass().getName().equals(this.className)
-				&& this.fieldConfigHashtable.containsKey(fieldName)) {
+		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			try {
-				return this.fieldConfigHashtable.get(fieldName).getMethodGet().invoke(object);
+				FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
+				if (fieldConfig.getMethodGet() == null) {
+					return ReflectionUtils.getFieldValue(fieldName, object);
+				} else {
+					return fieldConfig.getMethodGet().invoke(object);
+				}
 			} catch (Exception e) {
 				if (this.logger.isDebugEnabled()) {
 					this.logger.debug("Stack message: ", e);
@@ -145,30 +155,30 @@ public final class BeanConfig implements Serializable {
 	 * @return              Copy result
 	 */
 	public boolean copyValue(@Nonnull String fieldName, @Nonnull Object object, @Nonnull Object value) {
-		if (object.getClass().getName().equals(this.className)
-				&& this.fieldConfigHashtable.containsKey(fieldName)) {
+		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
 			try {
-				Class<?> fieldType = value.getClass();
+				Class<?> dataType = value.getClass();
 				Object args = null;
-				if (fieldType.equals(fieldConfig.getFieldType())) {
-					if (BeanConfig.isPrimitiveClass(fieldType)) {
-						args = value;
-					} else {
-						args = fieldConfig.getMethodGet().invoke(object);
-						if (args == null) {
-							args = ObjectUtils.newInstance(fieldConfig.getFieldType());
-						}
-						BeanUtils.copyProperties(value, args);
-					}
+				if (matchFieldType(fieldConfig.getFieldType(), value.getClass())) {
+					args = value;
 				} else {
 					if (this.logger.isDebugEnabled()) {
 						this.logger.debug("Convert data start...");
 					}
-					ConvertProvider convertProvider = fieldConfig.retrieveConverterClass(value.getClass());
+					ConvertProvider convertProvider = fieldConfig.retrieveConverterClass(dataType);
 					if (convertProvider == null) {
-						this.logger.warn("Data type not matched! Convert provider not found! ");
-					} else {
+						if (DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(fieldConfig.getFieldType()))) {
+							convertProvider = new ConvertNumberProvider();
+						} else {
+							this.logger.warn("Data type not matched! Convert provider not found! ");
+							if (this.logger.isDebugEnabled()) {
+								this.logger.debug("Bean class: {}, field name: {}, field type: {}, value type: {}",
+										this.className, fieldName, fieldConfig.getFieldType().getName(), dataType.getName());
+							}
+						}
+					}
+					if (convertProvider != null) {
 						args = convertProvider.convert(value, fieldConfig.getFieldType());
 					}
 					if (this.logger.isDebugEnabled()) {
@@ -178,7 +188,11 @@ public final class BeanConfig implements Serializable {
 				if (args == null) {
 					args = value;
 				}
-				fieldConfig.getMethodSet().invoke(object, args);
+				if (fieldConfig.getMethodSet() == null) {
+					ReflectionUtils.setField(fieldName, object, args);
+				} else {
+					fieldConfig.getMethodSet().invoke(object, args);
+				}
 				return true;
 			} catch (Exception e) {
 				if (this.logger.isDebugEnabled()) {
@@ -189,12 +203,49 @@ public final class BeanConfig implements Serializable {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
-	private static boolean isPrimitiveClass(Class<?> clazz) {
+	private static boolean matchFieldType(@Nonnull Class<?> fieldType, @Nonnull Class<?> currentType) {
+		if (fieldType.equals(currentType)) {
+			return true;
+		}
+		Class<?> matchType = fieldType.isPrimitive() ? convertPrimitiveToWrapperClass(fieldType) : fieldType;
+		Class<?> targetType = currentType.isPrimitive() ? convertPrimitiveToWrapperClass(currentType) : currentType;
+		return matchType.equals(targetType);
+	}
+
+	private static boolean isPrimitiveClass(@Nonnull Class<?> clazz) {
 		return clazz.isPrimitive() || Integer.class.equals(clazz)
 				|| Double.class.equals(clazz) || Float.class.equals(clazz)
 				|| Long.class.equals(clazz) || Short.class.equals(clazz)
 				|| Boolean.class.equals(clazz) || Byte.class.equals(clazz)
-				|| String.class.equals(clazz);
+				|| Character.class.equals(clazz)|| String.class.equals(clazz);
+	}
+
+	private static Class<?> convertPrimitiveToWrapperClass(@Nonnull Class<?> primitiveClass) {
+		if (int.class.equals(primitiveClass)) {
+			return Integer.class;
+		}
+		if (double.class.equals(primitiveClass)) {
+			return Double.class;
+		}
+		if (float.class.equals(primitiveClass)) {
+			return Float.class;
+		}
+		if (long.class.equals(primitiveClass)) {
+			return Long.class;
+		}
+		if (short.class.equals(primitiveClass)) {
+			return Short.class;
+		}
+		if (boolean.class.equals(primitiveClass)) {
+			return Boolean.class;
+		}
+		if (byte.class.equals(primitiveClass)) {
+			return Byte.class;
+		}
+		if (char.class.equals(primitiveClass)) {
+			return Character.class;
+		}
+		return primitiveClass;
 	}
 
 	private static final class FieldConfig implements Serializable {
@@ -213,10 +264,36 @@ public final class BeanConfig implements Serializable {
 			this.fieldType = fieldType;
 			this.methodGet = methodGet;
 			this.methodSet = methodSet;
-			this.converters = new ArrayList<>(dataConverters.length);
-			for (Class<?> dataConverter : dataConverters) {
-				if (ConvertProvider.class.isAssignableFrom(dataConverter)) {
-					this.converters.add((ConvertProvider)ObjectUtils.newInstance(dataConverter));
+			if (dataConverters.length == 0) {
+				this.converters = new ArrayList<>();
+				DataType dataType = ObjectUtils.retrieveSimpleDataType(fieldType);
+				switch (dataType) {
+					case BINARY:
+						this.converters.add(new ParseBase64Provider());
+						break;
+					case NUMBER:
+						this.converters.add(new ConvertNumberProvider());
+						break;
+					case OBJECT:
+						this.converters.add(new ParseXMLStringProvider());
+						break;
+					case STRING:
+						this.converters.add(new Base64Provider());
+						this.converters.add(new ConvertJSONProvider());
+						this.converters.add(new ConvertXMLProvider());
+						break;
+					case UNKNOWN:
+						this.converters.add(new ParseJSONStringProvider());
+						break;
+					default:
+						break;
+				}
+			} else {
+				this.converters = new ArrayList<>(dataConverters.length);
+				for (Class<?> dataConverter : dataConverters) {
+					if (ConvertProvider.class.isAssignableFrom(dataConverter)) {
+						this.converters.add((ConvertProvider)ObjectUtils.newInstance(dataConverter));
+					}
 				}
 			}
 		}
