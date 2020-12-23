@@ -42,16 +42,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.jupiter.version>5.6.2</junit.jupiter.version>
 		<junit.platform.version>1.6.2</junit.platform.version>
-		<jakarta.activation.version>1.2.2</jakarta.activation.version>
-		<bcprov.version>1.66</bcprov.version>
+		<jakarta.activation.version>2.0.0</jakarta.activation.version>
+		<jakarta.mail.version>2.0.0</jakarta.mail.version>
+		<jakarta.xml.binding.version>3.0.0</jakarta.xml.binding.version>
+		<jakarta.xml.soap.version>2.0.0</jakarta.xml.soap.version>
+		<bcprov.version>1.67</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
-		<jaxb.version>2.3.3</jaxb.version>
-		<log4j.version>2.13.3</log4j.version>
+		<log4j.version>2.14.0</log4j.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<jackson.version>2.11.3</jackson.version>
-		<snmp4j.version>2.8.5</snmp4j.version>
-		<jakarta.mail.version>1.6.5</jakarta.mail.version>
-		<jcifs.version>2.1.4</jcifs.version>
+		<jackson.version>2.12.0</jackson.version>
+		<snmp4j.version>2.8.6</snmp4j.version>
+		<jcifs.version>2.1.5</jcifs.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,15 +88,16 @@
 			<artifactId>jakarta.activation</artifactId>
 			<version>${jakarta.activation.version}</version>
 		</dependency>
+		<!-- Java WebService -->
 		<dependency>
 			<groupId>jakarta.jws</groupId>
 			<artifactId>jakarta.jws-api</artifactId>
-			<version>2.1.0</version>
+			<version>3.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.ws</groupId>
 			<artifactId>jakarta.xml.ws-api</artifactId>
-			<version>2.3.3</version>
+			<version>3.0.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.xml.soap</groupId>
@@ -114,7 +116,7 @@
 		<dependency>
 			<groupId>jakarta.ws.rs</groupId>
 			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>2.1.6</version>
+			<version>3.0.0</version>
 		</dependency>
 		<!-- Java Mail Support -->
 		<dependency>
@@ -304,7 +306,7 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>${jaxb.version}</version>
+			<version>${jakarta.xml.binding.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.activation</groupId>
@@ -315,7 +317,7 @@
 		<dependency>
 			<groupId>jakarta.xml.soap</groupId>
 			<artifactId>jakarta.xml.soap-api</artifactId>
-			<version>1.4.2</version>
+			<version>${jakarta.xml.soap.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jakarta.activation-api</artifactId>

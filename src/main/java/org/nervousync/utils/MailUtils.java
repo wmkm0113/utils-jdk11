@@ -21,25 +21,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.Flags.Flag;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
-import javax.mail.util.ByteArrayDataSource;
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +61,7 @@ public final class MailUtils {
 	 */
 	public static boolean sendMessage(MailServerConfig mailServerConfig, MailObject mailObject,
 	                                  String userName, String passWord) throws MessagingException {
-		MimeMessage message = 
+		MimeMessage message =
 				new MimeMessage(Session.getDefaultInstance(mailServerConfig.getSendConfigInfo(userName),
 						new DefaultAuthenticator(userName, passWord)));
 		
@@ -114,7 +101,7 @@ public final class MailUtils {
 					String fileName = StringUtils.getFilename(filePath);
 					mimeBodyPart = new MimeBodyPart();
 					DataHandler dataHandler = 
-							new DataHandler(new ByteArrayDataSource(file.toURI().toURL().openStream(), 
+							new DataHandler(new ByteArrayDataSource(file.toURI().toURL().openStream(),
 									"application/octet-stream"));
 					mimeBodyPart.setDataHandler(dataHandler);
 					
@@ -399,7 +386,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.DELETED, true);
 	}
 
 	/**
@@ -411,7 +398,7 @@ public final class MailUtils {
 	 */
 	public static void removeMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.DELETED, true);
 	}
 
 	/**
@@ -425,7 +412,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.DELETED, false);
 	}
 
 	/**
@@ -437,7 +424,7 @@ public final class MailUtils {
 	 */
 	public static void recoverMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.DELETED, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.DELETED, false);
 	}
 
 	/**
@@ -451,7 +438,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.SEEN, true);
 	}
 
 	/**
@@ -463,7 +450,7 @@ public final class MailUtils {
 	 */
 	public static void readMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.SEEN, true);
 	}
 
 	/**
@@ -477,7 +464,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.SEEN, false);
 	}
 
 	/**
@@ -489,7 +476,7 @@ public final class MailUtils {
 	 */
 	public static void unreadMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.SEEN, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.SEEN, false);
 	}
 
 	/**
@@ -503,7 +490,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.ANSWERED, true);
 	}
 
 	/**
@@ -515,7 +502,7 @@ public final class MailUtils {
 	 */
 	public static void answerMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.ANSWERED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.ANSWERED, true);
 	}
 
 	/**
@@ -529,7 +516,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.FLAGGED, true);
 	}
 
 	/**
@@ -541,7 +528,7 @@ public final class MailUtils {
 	 */
 	public static void flagMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, true);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.FLAGGED, true);
 	}
 
 	/**
@@ -555,7 +542,7 @@ public final class MailUtils {
 			String passWord, String uid) {
 		List<String> uidList = new ArrayList<>();
 		uidList.add(uid);
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.FLAGGED, false);
 	}
 
 	/**
@@ -567,7 +554,7 @@ public final class MailUtils {
 	 */
 	public static void unflagMails(MailServerConfig mailServerConfig, String userName, 
 			String passWord, List<String> uidList) {
-		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flag.FLAGGED, false);
+		setMessageStatus(mailServerConfig, userName, passWord, uidList, Flags.Flag.FLAGGED, false);
 	}
 
 	/**
@@ -656,8 +643,8 @@ public final class MailUtils {
 		return mailObject;
 	}
 	
-	private static void setMessageStatus(MailServerConfig mailServerConfig, String userName, 
-			String passWord, List<String> uidList, Flag flag, boolean status) {
+	private static void setMessageStatus(MailServerConfig mailServerConfig, String userName,
+	                                     String passWord, List<String> uidList, Flags.Flag flag, boolean status) {
 		try (Store store = connect(mailServerConfig, userName, passWord); Folder folder = openFolder(store, false)) {
 
 			if (!folder.exists() || !folder.isOpen()) {

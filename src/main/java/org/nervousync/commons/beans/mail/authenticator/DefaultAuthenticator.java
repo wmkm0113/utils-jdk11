@@ -16,8 +16,8 @@
  */
 package org.nervousync.commons.beans.mail.authenticator;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
 
 /**
  * Username and password authenticator for SMTP/POP3/IMAP server
