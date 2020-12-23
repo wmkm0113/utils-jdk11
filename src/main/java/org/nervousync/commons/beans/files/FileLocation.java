@@ -16,8 +16,8 @@
  */
 package org.nervousync.commons.beans.files;
 
-import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.exceptions.file.FileProtocolNotSupportException;
+import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.StringUtils;

@@ -16,8 +16,8 @@
  */
 package org.nervousync.commons.beans.ip;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.ip.IPType;
+import org.nervousync.commons.core.Globals;
 
 import java.io.Serializable;
 

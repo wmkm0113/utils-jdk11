@@ -76,6 +76,7 @@ public final class Globals {
 	public static final String DEFAULT_LANGUAGE = 
 			System.getProperty("user.language")	+ "_" + System.getProperty("user.country");
 	public static final String DEFAULT_SYSTEM_CHARSET = System.getProperty("file.encoding");
+	public static final String DEFAULT_SPLIT_SEPARATOR = ",";
 	public static final String DEFAULT_PAGE_SEPARATOR = File.separator;
 	public static final String DEFAULT_URL_SEPARATOR = "/";
 	public static final String DEFAULT_JAR_PAGE_SEPARATOR = "\\";

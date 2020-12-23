@@ -18,8 +18,8 @@ package org.nervousync.commons.zip.crypto.impl.aes;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
-import org.nervousync.commons.zip.crypto.Encryptor;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.zip.crypto.Encryptor;
 
 /**
  * Encryptor implement of AES

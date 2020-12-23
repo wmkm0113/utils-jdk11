@@ -16,8 +16,8 @@
  */
 package org.nervousync.commons.beans.mail.protocol.impl;
 
-import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
 import org.nervousync.enumerations.mail.ProtocolOption;
+import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
 
 /**
  * Implement SMTP protocol

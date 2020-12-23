@@ -14,24 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.cache.annotation;
 
-import org.nervousync.commons.core.Globals;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.nervousync.uuid;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 2018-12-26 17:23 $
+ * @version $Revision : 1.0 $ $Date: 12/21/2020 4:24 PM $
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface CacheProviderImpl {
+public abstract class TimerSynchronizer {
 
-	String name();
+	protected TimerSynchronizer() {
+	}
 
-	int defaultPort() default Globals.DEFAULT_VALUE_INT;
+	protected abstract long initialize();
+
+	protected abstract void deactivate();
+
+	protected abstract long update(long currentTimeMillis);
 }

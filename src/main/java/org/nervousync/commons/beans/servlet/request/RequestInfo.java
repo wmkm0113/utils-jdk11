@@ -18,14 +18,16 @@ package org.nervousync.commons.beans.servlet.request;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.Proxy;
 import java.util.*;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.http.cert.CertInfo;
+import org.nervousync.enumerations.web.HttpMethodOption;
+import org.nervousync.commons.http.cert.TrustCert;
+import org.nervousync.commons.http.cookie.CookieEntity;
 import org.nervousync.commons.http.header.SimpleHeader;
 import org.nervousync.commons.http.proxy.ProxyInfo;
-import org.nervousync.enumerations.web.HttpMethodOption;
-import org.nervousync.utils.RequestUtils;
+
+import javax.annotation.Nonnull;
 
 /**
  * Request information for sending by com.nervousync.utils.RequestUtils
@@ -39,24 +41,28 @@ public final class RequestInfo implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 7350946565537957232L;
-	
+
 	/**
 	 * Http method define
 	 * @see HttpMethodOption
 	 */
-	private HttpMethodOption httpMethodOption = HttpMethodOption.DEFAULT;
+	private final HttpMethodOption httpMethodOption;
 	/**
 	 * Proxy server configuration
 	 */
-	private ProxyInfo proxyInfo = null;
+	private final ProxyInfo proxyInfo;
 	/**
 	 * Custom certificate info
 	 */
-	private CertInfo certInfo = null;
+	private final List<TrustCert> trustTrustCerts;
 	/**
 	 * Default pass phrase
 	 */
-	private String passPhrase = null;
+	private final String passPhrase;
+	/**
+	 * User agent
+	 */
+	private final String userAgent;
 	/**
 	 * Request URL
 	 */
@@ -64,19 +70,19 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * Charset encoding
 	 */
-	private String charset = Globals.DEFAULT_ENCODING;
+	private final String charset;
 	/**
 	 * Content type
 	 */
-	private String contentType = null;
+	private final String contentType;
 	/**
 	 * Request timeout
 	 */
-	private int timeOut = Globals.DEFAULT_VALUE_INT;
+	private final int timeOut;
 	/**
 	 * Post ata arrays
 	 */
-	private byte[] postDatas;
+	private final byte[] postDatas;
 	/**
 	 * Send header values of request
 	 */
@@ -88,239 +94,108 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * Send multipart fields of request
 	 */
-	private final Map<String, File> uploadParam;
-	
+	private final Map<String, File> uploadParams;
 	/**
-	 * General constructor
-	 *
-	 * @param requestUrl Target request URL
+	 * Cookie list
 	 */
-	public RequestInfo(String requestUrl) {
-		this.requestUrl = requestUrl;
-		this.headers = new ArrayList<>();
-		this.parameters = new HashMap<>();
-		this.uploadParam = new HashMap<>();
-	}
-	
+	private final List<CookieEntity> cookieList;
+
 	/**
-	 * Redirect request constructor, maybe using when receive response code of 301/302
-	 *
-	 * @param requestUrl   Redirect URL
-	 * @param originalInfo Original request information
-	 */
-	public RequestInfo(String requestUrl, RequestInfo originalInfo) {
-		this.requestUrl = requestUrl;
-		this.httpMethodOption = originalInfo.getHttpMethodOption();
-		this.timeOut = originalInfo.getTimeOut();
-		this.postDatas = originalInfo.getPostDatas();
-		this.headers = originalInfo.getHeaders();
-		this.parameters = originalInfo.getParameters();
-		this.uploadParam = originalInfo.getUploadParam();
-	}
-	
-	/**
-	 * Constructor for given http method, request URL and send data
+	 * Constructor for given http method, request URL, and many options
 	 *
 	 * @param httpMethodOption Request http method
 	 * @param requestUrl       Target request url
-	 * @param data             Send data
+	 * @param charset          Charset encoding
+	 * @param timeOut          Request timeout setting
+	 * @param headers          Send header information of request
+	 * @param parameters       Send parameter information of request
+	 * @param uploadParams      Send multipart files of request
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String data) {
+	private RequestInfo(HttpMethodOption httpMethodOption, ProxyInfo proxyInfo, @Nonnull List<TrustCert> trustTrustCerts,
+	                    String passPhrase, String userAgent, String requestUrl, String charset,
+	                    String contentType, int timeOut, byte[] postDatas, @Nonnull List<SimpleHeader> headers,
+	                    @Nonnull List<CookieEntity> cookieList, @Nonnull Map<String, String[]> parameters,
+	                    @Nonnull Map<String, File> uploadParams) {
 		this.httpMethodOption = httpMethodOption;
+		this.proxyInfo = proxyInfo;
+		this.trustTrustCerts = trustTrustCerts;
+		this.passPhrase = passPhrase;
+		this.userAgent = userAgent;
 		this.requestUrl = requestUrl;
-		this.parameters = RequestUtils.getRequestParametersFromString(data);
-		this.headers = new ArrayList<>();
-		this.uploadParam = new HashMap<>();
-	}
-	
-	/**
-	 * Constructor for given http method, request URL and send data
-	 *
-	 * @param httpMethodOption Request http method
-	 * @param requestUrl       Target request url
-	 * @param timeOut          value of time out
-	 * @param headers          http headers list
-	 * @param postDatas        Send data arrays
-	 * @param contentType      Content type
-	 * @param charset          Character encoding
-	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, int timeOut, List<SimpleHeader> headers,
-	                   byte[] postDatas, String contentType, String charset) {
-		this.httpMethodOption = httpMethodOption;
-		this.requestUrl = requestUrl;
-		this.timeOut = timeOut > 0 ? timeOut : Globals.DEFAULT_VALUE_INT;
+		this.charset = charset;
 		this.contentType = contentType;
-		this.charset = charset != null ? charset : Globals.DEFAULT_ENCODING;
-		if (headers != null) {
-			this.headers = headers;
-		} else {
-			this.headers = new ArrayList<>();
-		}
-		this.postDatas = postDatas == null ? new byte[0] : postDatas.clone();
-		this.parameters = new HashMap<>();
-		this.uploadParam = new HashMap<>();
-	}
-	
-	/**
-	 * Constructor for given http method, request URL and send parameters data
-	 *
-	 * @param httpMethodOption Request http method
-	 * @param requestUrl       Target request url
-	 * @param parameters       Send parameters data
-	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, Map<String, String[]> parameters) {
-		this.httpMethodOption = httpMethodOption;
-		this.requestUrl = requestUrl;
-		this.parameters = parameters != null ? parameters : new HashMap<>();
-		this.headers = new ArrayList<>();
-		this.uploadParam = new HashMap<>();
-	}
-	
-	/**
-	 * Constructor for given http method, request URL, and many options
-	 *
-	 * @param httpMethodOption Request http method
-	 * @param requestUrl       Target request url
-	 * @param timeOut          Request timeout setting
-	 * @param headers          Send header information of request
-	 * @param parameters       Send parameter information of request
-	 * @param uploadParam      Send multipart files of request
-	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl,
-	                   int timeOut, List<SimpleHeader> headers,
-	                   Map<String, String[]> parameters, Map<String, File> uploadParam) {
-		this.httpMethodOption = httpMethodOption;
 		this.timeOut = timeOut;
-		if (headers != null) {
-			this.headers = headers;
-		} else {
-			this.headers = new ArrayList<>();
-		}
-		this.parameters = parameters != null ? parameters : new HashMap<>();
-		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<>();
-		if (requestUrl.contains("?")) {
-			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
-			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
-		}
-		this.requestUrl = requestUrl;
+		this.postDatas = postDatas;
+		this.headers = headers;
+		this.parameters = parameters;
+		this.uploadParams = uploadParams;
+		this.cookieList = cookieList;
 	}
-	
+
 	/**
-	 * Constructor for given http method, request URL, and many options
+	 * Builder request builder.
 	 *
-	 * @param httpMethodOption Request http method
-	 * @param requestUrl       Target request url
-	 * @param charset          Charset encoding
-	 * @param timeOut          Request timeout setting
-	 * @param headers          Send header information of request
-	 * @param parameters       Send parameter information of request
-	 * @param uploadParam      Send multipart files of request
+	 * @param httpMethodOption the http method option
+	 * @return the request builder
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
-	                   int timeOut, List<SimpleHeader> headers,
-	                   Map<String, String[]> parameters, Map<String, File> uploadParam) {
-		this.httpMethodOption = httpMethodOption;
-		this.charset = charset;
-		this.timeOut = timeOut;
-		if (headers != null) {
-			this.headers = headers;
-		} else {
-			this.headers = new ArrayList<>();
-		}
-		this.parameters = parameters != null ? parameters : new HashMap<>();
-		this.uploadParam = uploadParam != null ? uploadParam : new HashMap<>();
-		if (requestUrl.contains("?")) {
-			this.parameters.putAll(RequestUtils.getRequestParametersFromString(requestUrl.substring(requestUrl.indexOf("?") + 1)));
-			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
-		}
-		this.requestUrl = requestUrl;
+	public static RequestBuilder builder(HttpMethodOption httpMethodOption) {
+		return new RequestBuilder(httpMethodOption);
 	}
-	
+
 	/**
-	 * Constructor for given http method, request URL, and many options
+	 * Gets serial version uid.
 	 *
-	 * @param httpMethodOption Request http method
-	 * @param requestUrl       Target request url
-	 * @param charset          Charset encoding
-	 * @param timeOut          Request timeout setting
-	 * @param headers          Send header information of request
-	 * @param postDatas        Send data arrays
+	 * @return the serial version uid
 	 */
-	public RequestInfo(HttpMethodOption httpMethodOption, String requestUrl, String charset,
-	                   int timeOut, List<SimpleHeader> headers, byte[] postDatas) {
-		this.httpMethodOption = httpMethodOption;
-		this.charset = charset;
-		this.timeOut = timeOut;
-		this.postDatas = postDatas == null ? new byte[0] : postDatas.clone();
-		if (headers != null) {
-			this.headers = headers;
-		} else {
-			this.headers = new ArrayList<>();
-		}
-		this.parameters = new HashMap<>();
-		this.uploadParam = new HashMap<>();
-		if (requestUrl.contains("?")) {
-			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
-		}
-		this.requestUrl = requestUrl;
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
 	}
-	
+
 	/**
 	 * Gets http method option.
 	 *
-	 * @return the httpMethodOption
+	 * @return the http method option
 	 */
 	public HttpMethodOption getHttpMethodOption() {
-		if (HttpMethodOption.DEFAULT.equals(this.httpMethodOption)) {
-			if (!this.uploadParam.isEmpty()) {
-				this.httpMethodOption = HttpMethodOption.POST;
-			} else {
-				if (RequestUtils.appendParams(this.requestUrl, this.parameters).length() > 1024) {
-					this.httpMethodOption = HttpMethodOption.POST;
-				} else {
-					this.httpMethodOption = HttpMethodOption.GET;
-				}
-			}
-		}
 		return httpMethodOption;
 	}
-	
+
+	/**
+	 * Gets upload params.
+	 *
+	 * @return the upload params
+	 */
+	public Map<String, File> getUploadParams() {
+		return uploadParams;
+	}
+
+	/**
+	 * Gets cookie list.
+	 *
+	 * @return the cookie list
+	 */
+	public List<CookieEntity> getCookieList() {
+		return cookieList;
+	}
+
 	/**
 	 * Gets proxy info.
 	 *
-	 * @return the proxyInfo
+	 * @return the proxy info
 	 */
 	public ProxyInfo getProxyInfo() {
 		return proxyInfo;
 	}
-	
+
 	/**
-	 * Sets proxy info.
+	 * Gets trust cert infos.
 	 *
-	 * @param proxyInfo the proxyInfo to set
+	 * @return the trust cert infos
 	 */
-	public void setProxyInfo(ProxyInfo proxyInfo) {
-		this.proxyInfo = proxyInfo;
+	public List<TrustCert> getTrustCertInfos() {
+		return trustTrustCerts;
 	}
-	
-	/**
-	 * Gets cert info.
-	 *
-	 * @return the cert info
-	 */
-	public CertInfo getCertInfo() {
-		return certInfo;
-	}
-	
-	/**
-	 * Sets cert info.
-	 *
-	 * @param certInfo the cert info
-	 */
-	public void setCertInfo(CertInfo certInfo) {
-		this.certInfo = certInfo;
-	}
-	
+
 	/**
 	 * Gets pass phrase.
 	 *
@@ -329,25 +204,25 @@ public final class RequestInfo implements Serializable {
 	public String getPassPhrase() {
 		return passPhrase;
 	}
-	
+
 	/**
-	 * Sets pass phrase.
+	 * Gets user agent.
 	 *
-	 * @param passPhrase the pass phrase
+	 * @return the user agent
 	 */
-	public void setPassPhrase(String passPhrase) {
-		this.passPhrase = passPhrase;
+	public String getUserAgent() {
+		return userAgent;
 	}
-	
+
 	/**
 	 * Gets request url.
 	 *
-	 * @return the requestUrl
+	 * @return the request url
 	 */
 	public String getRequestUrl() {
 		return requestUrl;
 	}
-	
+
 	/**
 	 * Gets charset.
 	 *
@@ -356,34 +231,34 @@ public final class RequestInfo implements Serializable {
 	public String getCharset() {
 		return charset;
 	}
-	
+
 	/**
 	 * Gets content type.
 	 *
-	 * @return the contentType
+	 * @return the content type
 	 */
 	public String getContentType() {
 		return contentType;
 	}
-	
+
 	/**
 	 * Gets time out.
 	 *
-	 * @return the timeOut
+	 * @return the time out
 	 */
 	public int getTimeOut() {
 		return timeOut;
 	}
-	
+
 	/**
 	 * Get post datas byte [ ].
 	 *
-	 * @return the postDatas
+	 * @return the byte [ ]
 	 */
 	public byte[] getPostDatas() {
-		return postDatas == null ? new byte[0] : postDatas.clone();
+		return postDatas;
 	}
-	
+
 	/**
 	 * Gets headers.
 	 *
@@ -392,7 +267,7 @@ public final class RequestInfo implements Serializable {
 	public List<SimpleHeader> getHeaders() {
 		return headers;
 	}
-	
+
 	/**
 	 * Gets parameters.
 	 *
@@ -401,13 +276,294 @@ public final class RequestInfo implements Serializable {
 	public Map<String, String[]> getParameters() {
 		return parameters;
 	}
-	
+
 	/**
 	 * Gets upload param.
 	 *
-	 * @return the uploadParam
+	 * @return the upload param
 	 */
 	public Map<String, File> getUploadParam() {
-		return uploadParam;
+		return uploadParams;
+	}
+
+	/**
+	 * The type Request builder.
+	 */
+	public static final class RequestBuilder implements Serializable {
+
+		private static final long serialVersionUID = -2600183788360275158L;
+
+		/**
+		 * Http method define
+		 * @see HttpMethodOption
+		 */
+		private final HttpMethodOption httpMethodOption;
+		/**
+		 * Proxy server configuration
+		 */
+		private ProxyInfo proxyInfo;
+		/**
+		 * Custom certificate info
+		 */
+		private final List<TrustCert> trustTrustCerts = new ArrayList<>();
+		/**
+		 * Default pass phrase
+		 */
+		private String passPhrase;
+		/**
+		 * User agent
+		 */
+		private String userAgent;
+		/**
+		 * Request URL
+		 */
+		private String requestUrl;
+		/**
+		 * Charset encoding
+		 */
+		private String charset;
+		/**
+		 * Content type
+		 */
+		private String contentType;
+		/**
+		 * Request timeout
+		 */
+		private int timeOut;
+		/**
+		 * Post ata arrays
+		 */
+		private byte[] postDatas;
+		/**
+		 * Send header values of request
+		 */
+		private final List<SimpleHeader> headers = new ArrayList<>();
+		/**
+		 * Send form fields of request
+		 */
+		private final Map<String, String[]> parameters = new HashMap<>();
+		/**
+		 * Send multipart fields of request
+		 */
+		private final Map<String, File> uploadParams = new HashMap<>();
+		/**
+		 * Cookie list
+		 */
+		private final List<CookieEntity> cookieList = new ArrayList<>();
+
+		private RequestBuilder(@Nonnull HttpMethodOption httpMethodOption) {
+			this.httpMethodOption = httpMethodOption;
+		}
+
+		/**
+		 * Build request info.
+		 *
+		 * @return the request info
+		 */
+		public RequestInfo build() {
+			return new RequestInfo(this.httpMethodOption, this.proxyInfo, this.trustTrustCerts, this.passPhrase,
+					this.userAgent, this.requestUrl, this.charset, this.contentType, this.timeOut,
+					this.postDatas, this.headers, this.cookieList, this.parameters, this.uploadParams);
+		}
+
+		/**
+		 * Add ProxyInfo
+		 *
+		 * @param proxyType    Proxy type
+		 * @param proxyAddress Proxy server address
+		 * @return Proxy info instance
+		 */
+		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress) {
+			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress);
+			return this;
+		}
+
+		/**
+		 * Add ProxyInfo
+		 *
+		 * @param proxyType    Proxy type
+		 * @param proxyAddress Proxy server address
+		 * @param proxyPort    Proxy server port
+		 * @return Proxy info instance
+		 */
+		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress, int proxyPort) {
+			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress, proxyPort);
+			return this;
+		}
+
+		/**
+		 * Add ProxyInfo
+		 *
+		 * @param proxyType    Proxy type
+		 * @param proxyAddress Proxy server address
+		 * @param proxyPort    Proxy server port
+		 * @param userName     Proxy server user name
+		 * @param password     Proxy server password
+		 * @return Proxy info instance
+		 */
+		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress,
+		                                      int proxyPort, String userName, String password) {
+			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress, proxyPort, userName, password);
+			return this;
+		}
+
+		/**
+		 * Add cert info.
+		 *
+		 * @param certPath     the cert path
+		 * @param certPassword the cert password
+		 * @return the cert info
+		 */
+		public RequestBuilder addTrustCertificate(String certPath, String certPassword) {
+			this.trustTrustCerts.add(TrustCert.newInstance(certPath, certPassword));
+			return this;
+		}
+
+		/**
+		 * Add cert info.
+		 *
+		 * @param certContent  the cert content
+		 * @param certPassword the cert password
+		 * @return the cert info
+		 */
+		public RequestBuilder addTrustCertificate(byte[] certContent, String certPassword) {
+			this.trustTrustCerts.add(TrustCert.newInstance(certContent, certPassword));
+			return this;
+		}
+
+		/**
+		 * Pass phrase request builder.
+		 *
+		 * @param passPhrase the pass phrase
+		 * @return the request builder
+		 */
+		public RequestBuilder passPhrase(String passPhrase) {
+			this.passPhrase = passPhrase;
+			return this;
+		}
+
+		/**
+		 * User agent request builder.
+		 *
+		 * @param userAgent the user agent
+		 * @return the request builder
+		 */
+		public RequestBuilder userAgent(String userAgent) {
+			this.userAgent = userAgent;
+			return this;
+		}
+
+		/**
+		 * Request url request builder.
+		 *
+		 * @param requestUrl the request url
+		 * @return the request builder
+		 */
+		public RequestBuilder requestUrl(String requestUrl) {
+			this.requestUrl = requestUrl;
+			return this;
+		}
+
+		/**
+		 * Charset request builder.
+		 *
+		 * @param charset the charset
+		 * @return the request builder
+		 */
+		public RequestBuilder charset(String charset) {
+			this.passPhrase = charset;
+			return this;
+		}
+
+		/**
+		 * Content type request builder.
+		 *
+		 * @param contentType the content type
+		 * @return the request builder
+		 */
+		public RequestBuilder contentType(String contentType) {
+			this.contentType = contentType;
+			return this;
+		}
+
+		/**
+		 * Time out request builder.
+		 *
+		 * @param timeOut the time out
+		 * @return the request builder
+		 */
+		public RequestBuilder timeOut(int timeOut) {
+			this.timeOut = timeOut;
+			return this;
+		}
+
+		/**
+		 * Post datas request builder.
+		 *
+		 * @param postDatas the post datas
+		 * @return the request builder
+		 */
+		public RequestBuilder postDatas(byte[] postDatas) {
+			this.postDatas = postDatas;
+			return this;
+		}
+
+		/**
+		 * Add header request builder.
+		 *
+		 * @param headerName  the header name
+		 * @param headerValue the header value
+		 * @return the request builder
+		 */
+		public RequestBuilder addHeader(String headerName, String headerValue) {
+			this.headers.add(new SimpleHeader(headerName, headerValue));
+			return this;
+		}
+
+		/**
+		 * Add parameter request builder.
+		 *
+		 * @param parameterName   the parameter name
+		 * @param parameterValues the parameter values
+		 * @return the request builder
+		 */
+		public RequestBuilder addParameter(String parameterName, String[] parameterValues) {
+			this.parameters.put(parameterName, parameterValues);
+			return this;
+		}
+
+		/**
+		 * Add upload param request builder.
+		 *
+		 * @param parameterName  the parameter name
+		 * @param parameterValue the parameter value
+		 * @return the request builder
+		 */
+		public RequestBuilder addUploadParam(String parameterName, File parameterValue) {
+			this.uploadParams.put(parameterName, parameterValue);
+			return this;
+		}
+
+		/**
+		 * Add cookies request builder.
+		 *
+		 * @param cookieEntity the cookie entity
+		 * @return the request builder
+		 */
+		public RequestBuilder addCookies(CookieEntity cookieEntity) {
+			this.cookieList.add(cookieEntity);
+			return this;
+		}
+
+		/**
+		 * Add cookies request builder.
+		 *
+		 * @param responseCookieValue the response cookie value
+		 * @return the request builder
+		 */
+		public RequestBuilder addCookies(String responseCookieValue) {
+			this.cookieList.add(new CookieEntity(responseCookieValue));
+			return this;
+		}
 	}
 }

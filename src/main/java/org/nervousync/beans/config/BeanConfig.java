@@ -16,7 +16,7 @@
  */
 package org.nervousync.beans.config;
 
-import org.nervousync.beans.annotation.BeanConvert;
+import org.nervousync.annotations.beans.BeanConvert;
 import org.nervousync.beans.provider.ConvertProvider;
 import org.nervousync.beans.provider.blob.impl.Base64Provider;
 import org.nervousync.beans.provider.blob.impl.ParseBase64Provider;
@@ -58,22 +58,23 @@ public final class BeanConfig implements Serializable {
 		List<FieldConfig> fieldConfigList = new ArrayList<>();
 
 		for (Field field : ReflectionUtils.getAllDeclaredFields(beanClass)) {
-			if (!ReflectionUtils.isStatic(field) && !ReflectionUtils.isFinal(field)) {
-				BeanConvert beanConvert = field.getAnnotation(BeanConvert.class);
-				if (field.isAnnotationPresent(BeanConvert.class)) {
-					beanConvert = field.getAnnotation(BeanConvert.class);
-				}
-				String fieldName = field.getName();
-				if (beanConvert == null) {
-					fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
-							ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
-							ReflectionUtils.retrieveSetMethod(fieldName, beanClass)));
-				} else {
-					fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
-							ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
-							ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
-							beanConvert.value()));
-				}
+			if (ReflectionUtils.isStatic(field) || ReflectionUtils.isFinal(field)) {
+				continue;
+			}
+			BeanConvert beanConvert = field.getAnnotation(BeanConvert.class);
+			if (field.isAnnotationPresent(BeanConvert.class)) {
+				beanConvert = field.getAnnotation(BeanConvert.class);
+			}
+			String fieldName = field.getName();
+			if (beanConvert == null) {
+				fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
+						ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
+						ReflectionUtils.retrieveSetMethod(fieldName, beanClass)));
+			} else {
+				fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
+						ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
+						ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
+						beanConvert.value()));
 			}
 		}
 		this.fieldConfigHashtable = new Hashtable<>(fieldConfigList.size());

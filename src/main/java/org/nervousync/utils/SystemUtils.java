@@ -16,12 +16,11 @@
  */
 package org.nervousync.utils;
 
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.net.UnknownHostException;
+import java.util.*;
 
 import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
@@ -404,6 +403,39 @@ public final class SystemUtils {
 	 */
 	public static String systemCertPath() {
 		return JAVA_HOME + JAVA_CERT_PATH;
+	}
+
+	public static byte[] localMac() {
+		byte[] macAddress = null;
+		try {
+			final InetAddress localHost = InetAddress.getLocalHost();
+			try {
+				final NetworkInterface localInterface = NetworkInterface.getByInetAddress(localHost);
+				if (localInterface != null && !localInterface.isLoopback() && localInterface.isUp()) {
+					macAddress = localInterface.getHardwareAddress();
+				}
+				if (macAddress == null) {
+					final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+					while (networkInterfaces.hasMoreElements() && macAddress == null) {
+						final NetworkInterface networkInterface = networkInterfaces.nextElement();
+						if (networkInterface != null && !networkInterface.isLoopback() && networkInterface.isUp()) {
+							macAddress = networkInterface.getHardwareAddress();
+						}
+					}
+				}
+			} catch (final SocketException e) {
+				LOGGER.error("Retrieve local MAC address error! ", e);
+			}
+			if (macAddress == null || macAddress.length == 0) {
+				// Emulate a mac address with an IP v4 or v6
+				final byte[] address = localHost.getAddress();
+				// Take only 6 bytes if the address is an IPv6 otherwise will pad with two zero bytes
+				macAddress = Arrays.copyOf(localHost.getAddress(), 6);
+			}
+		} catch (final UnknownHostException ignored) {
+			// ignored
+		}
+		return macAddress;
 	}
 
 	/**

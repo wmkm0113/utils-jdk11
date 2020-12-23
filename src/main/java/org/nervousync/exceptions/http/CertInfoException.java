@@ -23,13 +23,13 @@ import org.nervousync.utils.ObjectUtils;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $Date: 2018-10-30 15:53
  */
-public class CertificateException extends Exception {
+public class CertInfoException extends Exception {
 	
 	/**
 	 * Create a new IPAddressException with the specified message.
 	 * @param msg the detail message
 	 */
-	public CertificateException(String msg) {
+	public CertInfoException(String msg) {
 		super(msg);
 	}
 	
@@ -39,7 +39,7 @@ public class CertificateException extends Exception {
 	 * @param msg the detail message
 	 * @param cause the root cause
 	 */
-	public CertificateException(String msg, Throwable cause) {
+	public CertInfoException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 	
@@ -52,8 +52,8 @@ public class CertificateException extends Exception {
 			return true;
 		}
 		
-		if (other instanceof CertificateException) {
-			CertificateException otherBe = (CertificateException) other;
+		if (other instanceof CertInfoException) {
+			CertInfoException otherBe = (CertInfoException) other;
 			return (getMessage().equals(otherBe.getMessage()) &&
 					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 		}

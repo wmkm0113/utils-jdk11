@@ -14,28 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.commons.beans.mail.protocol.impl;
+package org.nervousync.annotations.beans;
 
-import org.nervousync.enumerations.mail.ProtocolOption;
-import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Implement IMAP protocol
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:58:05 PM $
+ * @version $Revision: 1.0 $ $Date: 8/15/2020 3:25 PM $
  */
-public final class IMAPProtocol extends BaseProtocol {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface BeanConvert {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8284024432628098776L;
-	
-	public IMAPProtocol() {
-		super(ProtocolOption.IMAP);
-		this.hostParam = "mail.imap.host";
-		this.portParam = "mail.imap.port";
-		this.connectionTimeoutParam = "mail.imap.connectiontimeout";
-		this.timeoutParam = "mail.imap.timeout";
-	}
+	Class<?>[] value() default {};
+
 }

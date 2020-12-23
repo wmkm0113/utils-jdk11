@@ -30,18 +30,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.nervousync.commons.zip.engine.AESEngine;
-import org.nervousync.commons.io.NervousyncRandomAccessFile;
-import org.nervousync.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.commons.core.zip.ZipOptions;
 import org.nervousync.commons.zip.crypto.Decryptor;
 import org.nervousync.commons.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.commons.zip.crypto.impl.standard.StandardDecryptor;
+import org.nervousync.commons.zip.engine.AESEngine;
 import org.nervousync.commons.zip.io.SplitOutputStream;
 import org.nervousync.commons.zip.io.ZipOutputStream;
 import org.nervousync.commons.zip.io.input.InflaterInputStream;
@@ -51,16 +46,21 @@ import org.nervousync.commons.zip.models.AESExtraDataRecord;
 import org.nervousync.commons.zip.models.ArchiveExtraDataRecord;
 import org.nervousync.commons.zip.models.ExtraDataRecord;
 import org.nervousync.commons.zip.models.Zip64ExtendInfo;
-import org.nervousync.commons.zip.models.central.CentralDirectory;
-import org.nervousync.commons.zip.models.central.DigitalSignature;
-import org.nervousync.commons.zip.models.central.EndCentralDirectoryRecord;
-import org.nervousync.commons.zip.models.central.Zip64EndCentralDirectoryLocator;
-import org.nervousync.commons.zip.models.central.Zip64EndCentralDirectoryRecord;
 import org.nervousync.commons.zip.models.header.FileHeader;
 import org.nervousync.commons.zip.models.header.GeneralFileHeader;
 import org.nervousync.commons.zip.models.header.LocalFileHeader;
 import org.nervousync.commons.zip.models.header.utils.HeaderOperator;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.io.NervousyncRandomAccessFile;
+import org.nervousync.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.nervousync.commons.zip.models.central.CentralDirectory;
+import org.nervousync.commons.zip.models.central.DigitalSignature;
+import org.nervousync.commons.zip.models.central.EndCentralDirectoryRecord;
+import org.nervousync.commons.zip.models.central.Zip64EndCentralDirectoryLocator;
+import org.nervousync.commons.zip.models.central.Zip64EndCentralDirectoryRecord;
 
 /**
  * Zip File
@@ -136,7 +136,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * ZipFile Constructor
 	 * @param filePath			Zip file path
-	 * @throws ZipException		Zip file cannot access and read
+	 * @throws ZipException        Zip file cannot access and read
 	 */
 	public ZipFile(String filePath) throws ZipException {
 		this(filePath, Globals.DEFAULT_ENCODING);
@@ -1731,10 +1731,10 @@ public final class ZipFile implements Cloneable {
 						&& generalFileHeader.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES;
 			switch (compressionMethod) {
 			case ZipConstants.COMP_STORE:
-				return new ZipInputStream(new PartInputStream(this, input, 
+				return new ZipInputStream(new PartInputStream(this, input,
 						compressedSize, this.decryptor, isAESEncryptedFile));
 			case ZipConstants.COMP_DEFLATE:
-				return new ZipInputStream(new InflaterInputStream(this, input, 
+				return new ZipInputStream(new InflaterInputStream(this, input,
 						compressedSize, generalFileHeader.getOriginalSize(), this.decryptor, isAESEncryptedFile));
 				default:
 					throw new ZipException("Compression type not supported");
@@ -3009,7 +3009,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	private static Zip64ExtendInfo readZip64ExtendInfo(List<ExtraDataRecord> extraDataRecords, long originalSize,
-			long compressedSize, long offsetLocalHeader, int diskNumberStart) throws ZipException {
+	                                                   long compressedSize, long offsetLocalHeader, int diskNumberStart) throws ZipException {
 		for (ExtraDataRecord extraDataRecord : extraDataRecords) {
 			if (extraDataRecord.getHeader() == 0x0001) {
 				if (extraDataRecord.getDataSize() <= 0) {

@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.nervousync.enumerations.web.HttpMethodOption;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.enumerations.web.HttpMethodOption;
 
 /**
  * Http Entity

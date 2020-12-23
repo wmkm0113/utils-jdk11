@@ -24,8 +24,8 @@ import java.util.zip.Deflater;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.commons.core.zip.ZipOptions;
-import org.nervousync.commons.zip.ZipFile;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.zip.ZipFile;
 
 import javax.annotation.Nonnull;
 

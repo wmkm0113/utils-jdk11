@@ -24,12 +24,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.nervousync.exceptions.beans.network.IPAddressException;
+import org.nervousync.exceptions.beans.network.NetworkInfoException;
 import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.nervousync.exceptions.beans.network.IPAddressException;
-import org.nervousync.exceptions.beans.network.NetworkInfoException;
 
 /**
  * System interface network information
@@ -73,7 +72,7 @@ public final class NetworkInfo implements Serializable {
 	/**
 	 * Constructor for NetworkInfo
 	 * @param networkInterface			NetworkInterface value
-	 * @throws NetworkInfoException		If value of NetworkInterface is null or catch other SocketException
+	 * @throws NetworkInfoException        If value of NetworkInterface is null or catch other SocketException
 	 */
 	public NetworkInfo(NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {

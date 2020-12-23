@@ -19,9 +19,9 @@ package org.nervousync.commons.zip.crypto.impl.standard;
 import java.util.Random;
 
 import org.nervousync.commons.core.zip.ZipConstants;
-import org.nervousync.commons.zip.crypto.Encryptor;
 import org.nervousync.commons.zip.engine.ZipCryptoEngine;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.zip.crypto.Encryptor;
 
 /**
  * Encryptor implement of standard

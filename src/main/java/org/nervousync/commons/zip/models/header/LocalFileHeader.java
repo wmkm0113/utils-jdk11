@@ -22,9 +22,9 @@ import java.io.RandomAccessFile;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.commons.zip.crypto.impl.aes.AESCrypto;
 import org.nervousync.commons.zip.models.header.utils.HeaderOperator;
-import org.nervousync.exceptions.zip.ZipException;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

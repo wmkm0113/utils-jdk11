@@ -14,21 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.nervousync.annotations.service;
+
+import java.lang.annotation.*;
 
 /**
+ * The interface Restful client.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 3:25 PM $
+ * @version $Revision : 1.0 $ $Date: 12/21/2020 11:32 AM $
  */
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface BeanConvert {
+@Documented
+public @interface RestfulClient {
 
-	Class<?>[] value() default {};
+	/**
+	 * The location of the Web service.
+	 *
+	 * @return the string
+	 */
+	String address();
 
 }

@@ -22,9 +22,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.zip.crypto.Decryptor;
 import org.nervousync.commons.io.NervousyncRandomAccessFile;
 import org.nervousync.commons.zip.ZipFile;
-import org.nervousync.commons.zip.crypto.Decryptor;
 
 import javax.annotation.Nonnull;
 

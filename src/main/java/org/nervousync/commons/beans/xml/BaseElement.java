@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 import org.nervousync.commons.adapter.xml.CDataAdapter;
+import org.nervousync.exceptions.xml.XmlException;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.utils.ReflectionUtils;
 import org.nervousync.utils.StringUtils;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.exceptions.xml.XmlException;
 
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;

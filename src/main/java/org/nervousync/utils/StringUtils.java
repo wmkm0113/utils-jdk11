@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -185,6 +184,17 @@ public final class StringUtils {
 	 * @return Encoded base32 result
 	 */
 	public static String base32Encode(final byte[] bytes) {
+		return base32Encode(bytes, Globals.DEFAULT_VALUE_BOOLEAN);
+	}
+
+	/**
+	 * Base32 encoder
+	 *
+	 * @param bytes byte arrays
+	 * @param padding append padding character
+	 * @return Encoded base32 result
+	 */
+	public static String base32Encode(final byte[] bytes, boolean padding) {
 		if (bytes == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -217,8 +227,10 @@ public final class StringUtils {
 			stringBuilder.append(BASE32.charAt(digit));
 		}
 
-		while (stringBuilder.length() % 5 > 0) {
-			stringBuilder.append(PADDING);
+		if (padding) {
+			while (stringBuilder.length() % 5 > 0) {
+				stringBuilder.append(PADDING);
+			}
 		}
 		return stringBuilder.toString();
 	}
@@ -2167,15 +2179,6 @@ public final class StringUtils {
 			}
 		}
 		return StringBuilder.toString();
-	}
-
-	/**
-	 * Generate UUID string
-	 *
-	 * @return UUID string
-	 */
-	public static String getUUID() {
-		return UUID.randomUUID().toString();
 	}
 
 	/**

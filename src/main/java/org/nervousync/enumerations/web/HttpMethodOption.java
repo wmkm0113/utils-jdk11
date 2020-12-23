@@ -21,5 +21,5 @@ package org.nervousync.enumerations.web;
  * @version $Revision: 1.0 $ $Date: May 22, 2015 12:12:30 PM $
  */
 public enum HttpMethodOption {
-	GET, HEAD, PUT, POST, TRACE, OPTIONS, DELETE, DEFAULT
+	GET, HEAD, PUT, POST, TRACE, OPTIONS, DELETE, UNKNOWN
 }

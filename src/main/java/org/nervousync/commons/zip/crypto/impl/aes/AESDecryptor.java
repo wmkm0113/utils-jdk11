@@ -17,9 +17,9 @@
 package org.nervousync.commons.zip.crypto.impl.aes;
 
 import org.nervousync.commons.core.zip.ZipConstants;
-import org.nervousync.commons.zip.crypto.Decryptor;
 import org.nervousync.commons.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.zip.crypto.Decryptor;
 
 /**
  * Decryptor implement of AES
@@ -30,8 +30,8 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 
 	private byte[] storedMac = null;
 
-	public AESDecryptor(LocalFileHeader localFileHeader, 
-			byte[] salt, byte[] passwordBytes) throws ZipException {
+	public AESDecryptor(LocalFileHeader localFileHeader,
+	                    byte[] salt, byte[] passwordBytes) throws ZipException {
 		if (localFileHeader == null) {
 			throw new ZipException("Local file header is null!");
 		}

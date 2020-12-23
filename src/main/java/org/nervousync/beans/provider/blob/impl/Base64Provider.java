@@ -34,6 +34,6 @@ public final class Base64Provider implements ConvertProvider {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T convert(Object origObj, Class<T> targetClass) {
-		return (T)StringUtils.base64Encode((byte[])origObj);
+		return (T) StringUtils.base64Encode((byte[])origObj);
 	}
 }

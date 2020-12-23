@@ -17,10 +17,10 @@
 package org.nervousync.commons.zip.crypto.impl.standard;
 
 import org.nervousync.commons.core.zip.ZipConstants;
-import org.nervousync.commons.zip.crypto.Decryptor;
 import org.nervousync.commons.zip.engine.ZipCryptoEngine;
 import org.nervousync.commons.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.zip.crypto.Decryptor;
 
 /**
  * Decryptor implement of standard
@@ -47,7 +47,7 @@ public class StandardDecryptor implements Decryptor {
 		this.zipCryptoEngine.initKeys(localFileHeader.getPassword());
 
 		int result = decryptorHeader[0];
-		for (int i = 0 ; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
+		for (int i = 0; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
 			this.zipCryptoEngine.updateKeys((byte)(result ^ this.zipCryptoEngine.decryptByte()));
 			if ((i + 1) != ZipConstants.STD_DEC_HDR_SIZE) {
 				result = decryptorHeader[i + 1];

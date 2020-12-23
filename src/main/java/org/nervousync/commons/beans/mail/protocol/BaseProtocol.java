@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.security.Security;
 import java.util.Properties;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.mail.ProtocolOption;
+import org.nervousync.commons.core.Globals;
 
 /**
  * JavaMail base protocol

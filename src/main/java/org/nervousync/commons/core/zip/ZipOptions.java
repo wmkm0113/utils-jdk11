@@ -18,8 +18,8 @@ package org.nervousync.commons.core.zip;
 
 import java.util.TimeZone;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.zip.ZipException;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**

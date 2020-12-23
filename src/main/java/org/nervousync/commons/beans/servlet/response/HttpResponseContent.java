@@ -34,16 +34,15 @@ import java.util.zip.GZIPInputStream;
 import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.nervousync.exceptions.xml.XmlException;
 import org.nervousync.commons.beans.json.JsonObject;
 import org.nervousync.commons.beans.xml.BaseElement;
 import org.nervousync.commons.http.header.SimpleHeader;
+import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.nervousync.exceptions.xml.XmlException;
 
 /**
  * Response content of request
