@@ -22,8 +22,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.nervousync.commons.core.Globals;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -58,7 +54,7 @@ public final class ConvertUtils {
 	 * @param collection	collection
 	 * @return				Convert list
 	 */
-	public static List<Object> convertCollectionToList(@Nonnull Object collection) {
+	public static List<Object> convertCollectionToList(Object collection) {
 		List<Object> list;
 		
 		if (collection instanceof Collection) {
@@ -97,7 +93,7 @@ public final class ConvertUtils {
 	 * @param primitiveArray		primitive arrays
 	 * @return		Object arrays
 	 */
-	public static Object[] convertPrimitivesToObjects(@Nonnull Object primitiveArray) {
+	public static Object[] convertPrimitivesToObjects(Object primitiveArray) {
 		if (!primitiveArray.getClass().isArray()) {
 			throw new IllegalArgumentException("Specified object is not array");
 		}
@@ -120,7 +116,7 @@ public final class ConvertUtils {
 	 * @param strIn			Hex string
 	 * @return				Convert byte arrays
 	 */
-	public static byte[] hexStrToByteArr(@Nonnull String strIn) {
+	public static byte[] hexStrToByteArr(String strIn) {
 		byte[] arrB = strIn.getBytes(Charset.defaultCharset());
 		int iLen = arrB.length;
 
@@ -137,7 +133,7 @@ public final class ConvertUtils {
 	 * @param sourceBytes	hex byte arrays
 	 * @return convert String
 	 */
-	public static String byteArrayToHexString(@Nonnull byte [] sourceBytes) {
+	public static String byteArrayToHexString(byte [] sourceBytes) {
 		int length = sourceBytes.length;
 		StringBuilder stringBuilder = new StringBuilder(length * 2);
 		for (byte source : sourceBytes) {
@@ -162,7 +158,7 @@ public final class ConvertUtils {
 	 * @param content Byte array to convert to string
 	 * @return string resulted from converting byte array using default encoding
 	 */
-	public static String convertToString(@Nonnull byte[] content) {
+	public static String convertToString(byte[] content) {
 		return convertToString(content, Globals.DEFAULT_ENCODING);
 	}
 
@@ -173,7 +169,7 @@ public final class ConvertUtils {
 	 * @param encoding Encoding string, if <code>null</code> default is used
 	 * @return string resulted from converting byte array
 	 */
-	public static String convertToString(@Nonnull byte[] content, @Nonnull String encoding) {
+	public static String convertToString(byte[] content, String encoding) {
 		try {
 			return new String(content, encoding);
 		} catch (UnsupportedEncodingException ex) {
@@ -187,7 +183,7 @@ public final class ConvertUtils {
 	 * @param content String to convert to array
 	 * @return byte array resulted from converting string using default encoding
 	 */
-	public static byte[] convertToByteArray(@Nonnull String content) {
+	public static byte[] convertToByteArray(String content) {
 		return convertToByteArray(content, Globals.DEFAULT_ENCODING);
 	}
 
@@ -198,7 +194,7 @@ public final class ConvertUtils {
 	 * @param encoding Encoding string, if <code>null</code> default is used
 	 * @return byte array
 	 */
-	public static byte[] convertToByteArray(@Nonnull String content, @Nonnull String encoding) {
+	public static byte[] convertToByteArray(String content, String encoding) {
 		try {
 			return content.getBytes(encoding);
 		} catch (UnsupportedEncodingException ex) {
@@ -211,7 +207,7 @@ public final class ConvertUtils {
 	 * @param object		if <code>null</code> convert error
 	 * @return byte array
 	 */
-	public static byte[] convertToByteArray(@Nonnull Object object) {
+	public static byte[] convertToByteArray(Object object) {
 		if (object instanceof String) {
 			return convertToByteArray((String)object);
 		}
@@ -245,7 +241,7 @@ public final class ConvertUtils {
 	 * @param content       byte array
 	 * @return              Converted object or byte array when failed
 	 */
-	public static Object convertToObject(@Nonnull byte[] content) {
+	public static Object convertToObject(byte[] content) {
 		if (content.length == 0) {
 			return null;
 		}
@@ -266,77 +262,11 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Initialize entity class and assigned field value by given data map
-	 * @param dataMap       field value map
-	 * @param clazz         entity class
-	 * @param <T>           T
-	 * @return              Converted instance object
-	 */
-	public static <T> T convertMapToObject(Map<?, ?> dataMap, Class<T> clazz) {
-		T object = ObjectUtils.newInstance(clazz);
-		if (object != null) {
-			ReflectionUtils.getAllDeclaredFieldNames(clazz).forEach(fieldName -> {
-				Object fieldValue = dataMap.get(fieldName);
-				Field field = ReflectionUtils.findField(clazz, fieldName);
-				if (byte[].class.equals(field.getType())) {
-					ReflectionUtils.setField(fieldName, object, StringUtils.base64Decode((String)fieldValue));
-				} else if (fieldValue instanceof Map) {
-					ReflectionUtils.setField(fieldName, object,
-							convertMapToObject((Map<?, ?>)fieldValue, field.getType()));
-				} else if (field.getType().isArray()
-						|| List.class.isAssignableFrom(field.getType())) {
-					List<Object> valueList = new ArrayList<>();
-
-					Class<?> paramClass;
-
-					if (field.getType().isArray()) {
-						paramClass = field.getType().getComponentType();
-					} else {
-						paramClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-					}
-
-					if (fieldValue.getClass().isArray()) {
-						Object[] values = (Object[])fieldValue;
-
-						for (Object value : values) {
-							if (value instanceof Map) {
-								valueList.add(convertMapToObject((Map<?, ?>)value, paramClass));
-							} else {
-								valueList.add(value);
-							}
-						}
-					} else if (List.class.isAssignableFrom(fieldValue.getClass())) {
-						Object[] values = ((List<?>)fieldValue).toArray();
-
-						for (Object value : values) {
-							if (value instanceof Map) {
-								valueList.add(convertMapToObject((Map<?, ?>)value, paramClass));
-							} else {
-								valueList.add(value);
-							}
-						}
-					}
-
-					if (field.getType().isArray()) {
-						ReflectionUtils.setField(fieldName, object, valueList.toArray());
-					} else {
-						ReflectionUtils.setField(fieldName, object, valueList);
-					}
-				} else {
-					ReflectionUtils.setField(fieldName, object, fieldValue);
-				}
-			});
-		}
-		
-		return object;
-	}
-
-	/**
 	 * Compress given data bytes using gzip
 	 * @param dataBytes     Data bytes
 	 * @return              Compressed byte array
 	 */
-	public static byte[] zipByteArray(@Nonnull byte[] dataBytes) {
+	public static byte[] zipByteArray(byte[] dataBytes) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		GZIPOutputStream gzipOutputStream = null;
 
@@ -361,7 +291,7 @@ public final class ConvertUtils {
 	 * @param dataBytes     Compressed data bytes
 	 * @return              Decompressed data bytes
 	 */
-	public static byte[] unzipByteArray(@Nonnull byte[] dataBytes) {
+	public static byte[] unzipByteArray(byte[] dataBytes) {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		GZIPInputStream gzipInputStream = null;

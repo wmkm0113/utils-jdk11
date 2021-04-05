@@ -112,6 +112,19 @@ public final class RawUtils {
 		return ((bytes[position + 3] & 0xFF) | (bytes[position + 2] & 0xFF) << 8) 
 				| ((bytes[position + 1] & 0xFF) | (bytes[position] & 0xFF) << 8) << 16;
 	}
+
+	/**
+	 * Read boolean value
+	 * @param bytes			Byte arrays
+	 * @param position      Data position
+	 * @return              <code>true</code> if current byte value is 1, <code>false</code> for others
+	 */
+	public static boolean readBoolean(byte[] bytes, int position) {
+		if (bytes.length <= position) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+		return bytes[position] == Globals.NERVOUSYNC_STATUS_TRUE;
+	}
 	
 	/**
 	 * Read string value from little endian of byte arrays by default charset encoding
@@ -180,6 +193,16 @@ public final class RawUtils {
 		if ((position + valueBytes.length) <= bytes.length) {
 			System.arraycopy(valueBytes, 0, bytes, position, valueBytes.length);
 		}
+	}
+
+	/**
+	 * Write boolean value
+	 * @param bytes			Byte arrays
+	 * @param position      Data position
+	 * @param bool          Boolean value
+	 */
+	public static void writeBoolean(byte[] bytes, int position, boolean bool) {
+		bytes[position] = bool ? (byte) Globals.NERVOUSYNC_STATUS_TRUE : (byte) Globals.NERVOUSYNC_STATUS_FALSE;
 	}
 	
 	/**

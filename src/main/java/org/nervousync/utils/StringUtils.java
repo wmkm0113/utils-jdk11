@@ -16,13 +16,10 @@
  */
 package org.nervousync.utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +43,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +53,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.nervousync.commons.beans.xml.BaseElement;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.enumerations.xml.DataType;
-import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.huffman.HuffmanNode;
 import org.nervousync.huffman.HuffmanObject;
 import org.nervousync.huffman.HuffmanTree;
@@ -95,104 +92,43 @@ public final class StringUtils {
 	private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	private static final String AUTHORIZATION_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
 
-	private static final byte[] BASE64_DECODE_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
-
 	private static final String CHN_ID_CARD_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
+	private static final String CHN_ID_CARD_CODE = "0123456789X";
 	private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1-9|A|N|Y][0-9A-Z]{17}$";
 	private static final String CHN_SOCIAL_CREDIT_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
-
-	static {
-		Arrays.fill(BASE64_DECODE_TABLE, (byte) INVALID_BYTE);
-		for (int i = 0; i < BASE64.length(); i++) {
-			BASE64_DECODE_TABLE[BASE64.charAt(i)] = (byte) i;
-		}
-		BASE64_DECODE_TABLE[PADDING] = PAD_BYTE;
-	}
+	private static final String LUHN_CODE_REGEX = "^[0-9]{1,}";
 
 	private StringUtils() {
 	}
 
 	/**
-	 * Supported charset boolean.
-	 *
-	 * @param charset the charset
-	 * @return the boolean
-	 */
-	public static boolean supportedCharset(String charset) {
-		try {
-			new String("a".getBytes(Charset.defaultCharset()), charset);
-			return true;
-		} catch (UnsupportedEncodingException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
-	}
-
-	/**
-	 * Convert charset byte [ ].
-	 *
-	 * @param string the string
-	 * @return the byte [ ]
-	 * @throws ZipException the zip exception
-	 */
-	public static byte[] convertCharset(String string) throws ZipException {
-		try {
-			byte[] converted;
-			String charSet = detectCharSet(string);
-			switch (charSet) {
-				case ZipConstants.CHARSET_CP850:
-					converted = string.getBytes(ZipConstants.CHARSET_CP850);
-					break;
-				case Globals.DEFAULT_ENCODING:
-					converted = string.getBytes(Globals.DEFAULT_ENCODING);
-					break;
-				default:
-					converted = string.getBytes(Charset.forName(Globals.DEFAULT_ENCODING));
-					break;
-			}
-			return converted;
-		} catch (UnsupportedEncodingException err) {
-			return string.getBytes(Charset.defaultCharset());
-		} catch (Exception e) {
-			throw new ZipException(e);
-		}
-	}
-
-	/**
-	 * Is null or empty boolean.
-	 *
-	 * @param str the str
-	 * @return the boolean
-	 */
-	public static boolean isNullOrEmpty(String str) {
-		return str == null || str.trim().length() == 0;
-	}
-
-	/**
-	 * Is not null and not empty boolean.
-	 *
-	 * @param str the str
-	 * @return the boolean
-	 */
-	public static boolean isNotNullAndNotEmpty(String str) {
-		return str != null && str.trim().length() > 0;
-	}
-
-	/**
-	 * Base32 encoder
+	 * Encode byte arrays using Base32 and not pending the padding character
+	 * Note: Will return zero length string for given byte arrays is null or arrays length is 0.
+	 * <pre>
+	 * StringUtils.base32Encode(null) = ""
+	 * StringUtils.base32Encode([]) = ""
+	 * StringUtils.base32Encode([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]) = "JBSWY3DPEBLW64TMMQ"
+	 * </pre>
 	 *
 	 * @param bytes byte arrays
-	 * @return Encoded base32 result
+	 * @return Encoded base32 string
 	 */
 	public static String base32Encode(final byte[] bytes) {
 		return base32Encode(bytes, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 
 	/**
-	 * Base32 encoder
+	 * Encode byte arrays using Base32
+	 * Note: Will return zero length string for given byte arrays is null or arrays length is 0.
+	 * <pre>
+	 * StringUtils.base32Encode(null, true) = ""
+	 * StringUtils.base32Encode([], true) = ""
+	 * StringUtils.base32Encode([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], true) = "JBSWY3DPEBLW64TMMQ=="
+	 * </pre>
 	 *
 	 * @param bytes byte arrays
-	 * @param padding append padding character
-	 * @return Encoded base32 result
+	 * @param padding   append padding character if needed
+	 * @return Encoded base32 string
 	 */
 	public static String base32Encode(final byte[] bytes, boolean padding) {
 		if (bytes == null) {
@@ -229,22 +165,29 @@ public final class StringUtils {
 
 		if (padding) {
 			while (stringBuilder.length() % 5 > 0) {
-				stringBuilder.append(PADDING);
+				stringBuilder.append((char) PADDING);
 			}
 		}
 		return stringBuilder.toString();
 	}
 
 	/**
-	 * Base32 decoder
+	 * Convert given base32 string to byte array
+	 * Note: Will return zero length array for given base64 string is null or string length is 0.
+	 * <pre>
+	 * StringUtils.base32Decode(null) = []
+	 * StringUtils.base32Decode("") = []
+	 * StringUtils.base32Decode("JBSWY3DPEBLW64TMMQ") = [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]
+	 * </pre>
 	 *
 	 * @param string Encoded base32 string
 	 * @return Decode byte arrays
 	 */
 	public static byte[] base32Decode(String string) {
-		if (string == null) {
-			return null;
+		if (string == null || string.length() == 0) {
+			return new byte[0];
 		}
+
 		while (string.charAt(string.length() - 1) == PADDING) {
 			string = string.substring(0, string.length() - 1);
 		}
@@ -278,13 +221,19 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Base64 encoder
+	 * Encode byte arrays using Base64
+	 * Note: Will return zero length string for given byte arrays is null or arrays length is 0.
+	 * <pre>
+	 * StringUtils.base64Encode(null) = ""
+	 * StringUtils.base64Encode([]) = ""
+	 * StringUtils.base64Encode([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]) = "SGVsbG8gV29ybGQ="
+	 * </pre>
 	 *
 	 * @param bytes byte arrays
-	 * @return Encoded base64 result
+	 * @return Encoded base64 string
 	 */
 	public static String base64Encode(final byte[] bytes) {
-		if (bytes == null) {
+		if (bytes == null || bytes.length == 0) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 		int length = bytes.length;
@@ -326,7 +275,13 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Base64 decoder
+	 * Convert given base64 string to byte array
+	 * Note: Will return zero length array for given base64 string is null or string length is 0.
+	 * <pre>
+	 * StringUtils.base64Decode(null) = []
+	 * StringUtils.base64Decode("") = []
+	 * StringUtils.base64Decode("SGVsbG8gV29ybGQ=") = [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]
+	 * </pre>
 	 *
 	 * @param string Encoded base64 string
 	 * @return Decode byte arrays
@@ -363,203 +318,21 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Base64 decoder
+	 * Convert the given string to HuffmanTree Object using given code mapping
 	 *
-	 * @param dataBytes Encoded base64 byte array
-	 * @return Decode byte arrays
-	 * @throws IOException Data bytes invalid
-	 */
-	public static byte[] mimeBase64Decode(final byte[] dataBytes) throws IOException {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		byte[] tmpBuffer = new byte[INPUT_BYTES_PER_CHUNK];
-		int index = Globals.INITIALIZE_INT_VALUE;
-		for (byte b : dataBytes) {
-			final byte tmp = BASE64_DECODE_TABLE[MASK_BYTE_UNSIGNED & b];
-			if (tmp == INVALID_BYTE) {
-				//  Ignore invalid bytes
-				continue;
-			}
-
-			tmpBuffer[index++] = tmp;
-			if (index == INPUT_BYTES_PER_CHUNK) {
-				if (tmpBuffer[0] == PAD_BYTE || tmpBuffer[1] == PAD_BYTE) {
-					throw new IOException("Invalid Base64 input: incorrect padding, first two bytes cannot be padding");
-				}
-				byteArrayOutputStream.write((tmpBuffer[0] << 2) | (tmpBuffer[1] >> 4));
-				if (tmpBuffer[2] != PAD_BYTE) {
-					byteArrayOutputStream.write((tmpBuffer[1] << 4) | (tmpBuffer[2] >> 2));
-					if (tmpBuffer[3] != PAD_BYTE) {
-						byteArrayOutputStream.write((tmpBuffer[2] << 6) | tmpBuffer[3]);
-					}
-				} else if (tmpBuffer[3] != PAD_BYTE) {
-					throw new IOException("Invalid Base64 input: incorrect padding, 4th byte must be padding if 3rd byte is");
-				}
-				index = Globals.INITIALIZE_INT_VALUE;
-			}
-		}
-
-		if (index != Globals.INITIALIZE_INT_VALUE) {
-			throw new IOException("Invalid Base64 input: truncated");
-		}
-		return byteArrayOutputStream.toByteArray();
-	}
-
-	/**
-	 * Quoted Printable Decoder
-	 *
-	 * @param dataBytes Encoded data bytes
-	 * @return Decode byte arrays
-	 * @throws IOException Data bytes invalid
-	 */
-	public static byte[] quotedPrintableDecode(byte[] dataBytes) throws IOException {
-		int offset = Globals.INITIALIZE_INT_VALUE;
-		int length = dataBytes.length;
-		int endOffset = offset + length;
-		int bytesWritten = Globals.INITIALIZE_INT_VALUE;
-
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		while (offset < endOffset) {
-			byte b = dataBytes[offset++];
-			switch (b) {
-				case TRANSLATED_SPACE_CHARACTER:
-					byteArrayOutputStream.write(' ');
-					break;
-				case PADDING:
-					if (offset + 1 >= endOffset) {
-						throw new IOException("Invalid quoted printable encoding; truncated escape sequence");
-					}
-
-					byte b1 = dataBytes[offset++];
-					byte b2 = dataBytes[offset++];
-
-					if (b1 == '\r') {
-						if (b2 != '\n') {
-							throw new IOException("Invalid quoted printable encoding; CR must be followed by LF");
-						}
-					} else {
-						int char1 = hexToBinary(b1);
-						int char2 = hexToBinary(b2);
-						byteArrayOutputStream.write((char1 << UPPER_NIBBLE_SHIFT) | char2);
-						bytesWritten++;
-					}
-					break;
-				default:
-					byteArrayOutputStream.write(b);
-					bytesWritten++;
-					break;
-			}
-		}
-
-		return byteArrayOutputStream.toByteArray();
-	}
-
-	/**
-	 * returns the length of the string by wrapping it in a byte buffer with
-	 * the appropriate charset of the input string and returns the limit of the
-	 * byte buffer
-	 *
-	 * @param str string
-	 * @return length of the string
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
-	 */
-	public static int getEncodedStringLength(String str) throws ZipException {
-		if (!isNotNullAndNotEmpty(str)) {
-			throw new ZipException("input string is null, cannot calculate encoded String length");
-		}
-
-		String charset = detectCharSet(str);
-		return getEncodedStringLength(str, charset);
-	}
-
-	/**
-	 * returns the length of the string in the input encoding
-	 *
-	 * @param str     string
-	 * @param charset charset encoding
-	 * @return length of the string
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
-	 */
-	public static int getEncodedStringLength(String str, String charset) throws ZipException {
-		if (!isNotNullAndNotEmpty(str)) {
-			throw new ZipException("input string is null, cannot calculate encoded String length");
-		}
-
-		if (!isNotNullAndNotEmpty(charset)) {
-			throw new ZipException("encoding is not defined, cannot calculate string length");
-		}
-
-		ByteBuffer byteBuffer;
-
-		try {
-			switch (charset) {
-				case ZipConstants.CHARSET_CP850:
-					byteBuffer = ByteBuffer.wrap(str.getBytes(ZipConstants.CHARSET_CP850));
-					break;
-				case Globals.DEFAULT_ENCODING:
-					byteBuffer = ByteBuffer.wrap(str.getBytes(Globals.DEFAULT_ENCODING));
-					break;
-				default:
-					byteBuffer = ByteBuffer.wrap(str.getBytes(charset));
-					break;
-			}
-		} catch (UnsupportedEncodingException e) {
-			byteBuffer = ByteBuffer.wrap(str.getBytes(Charset.defaultCharset()));
-		} catch (Exception e) {
-			throw new ZipException(e);
-		}
-
-		return byteBuffer.limit();
-	}
-
-	/**
-	 * Detects the encoding charset for the input string
-	 *
-	 * @param str string
-	 * @return String - charset for the String
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
-	 */
-	public static String detectCharSet(String str) throws ZipException {
-		if (str == null) {
-			throw new ZipException("input string is null, cannot detect charset");
-		}
-
-		try {
-			byte[] byteString = str.getBytes(ZipConstants.CHARSET_CP850);
-			String tempString = new String(byteString, ZipConstants.CHARSET_CP850);
-
-			if (str.equals(tempString)) {
-				return ZipConstants.CHARSET_CP850;
-			}
-
-			byteString = str.getBytes(Globals.DEFAULT_ENCODING);
-			tempString = new String(byteString, Globals.DEFAULT_ENCODING);
-
-			if (str.equals(tempString)) {
-				return Globals.DEFAULT_ENCODING;
-			}
-
-			return Globals.DEFAULT_SYSTEM_CHARSET;
-		} catch (Exception e) {
-			return Globals.DEFAULT_SYSTEM_CHARSET;
-		}
-	}
-
-	/**
-	 * Encode with Huffman Tree
-	 *
-	 * @param codeMapping code mapping
-	 * @param content     data content
-	 * @return encoded result
+	 * @param codeMapping   Geven code mapping
+	 * @param content       Given data string
+	 * @return              Converted HuffmanTree object
 	 */
 	public static String encodeWithHuffman(Hashtable<String, Object> codeMapping, String content) {
 		return HuffmanTree.encodeString(codeMapping, content);
 	}
 
 	/**
-	 * Encode a string to HuffmanTree
+	 * Convert the given string to HuffmanTree Object
 	 *
-	 * @param content string
-	 * @return HuffmanTree object
+	 * @param content       Given data string
+	 * @return              Converted HuffmanTree object
 	 */
 	public static HuffmanObject encodeWithHuffman(String content) {
 		HuffmanTree huffmanTree = new HuffmanTree();
@@ -580,10 +353,6 @@ public final class StringUtils {
 		huffmanTree.build();
 		return huffmanTree.encodeString(content);
 	}
-
-	//---------------------------------------------------------------------
-	// General convenience methods for working with Strings
-	//---------------------------------------------------------------------
 
 	/**
 	 * Check that the given CharSequence is <code>null</code> or length 0.
@@ -650,7 +419,7 @@ public final class StringUtils {
 	 * @return <code>true</code> if the CharSequence is not null and has length
 	 */
 	public static boolean hasLength(CharSequence str) {
-		return (str == null || str.length() <= 0);
+		return (str != null && str.length() > 0);
 	}
 
 	/**
@@ -667,7 +436,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
 		if (hasLength(str)) {
@@ -687,7 +456,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
 		if (hasLength(str)) {
@@ -707,7 +476,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check (may be <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
-	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)#containsWhitespace(CharSequence)#containsWhitespace(CharSequence)
+	 * @see #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
 		return containsWhitespace((CharSequence) str);
@@ -718,7 +487,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
@@ -732,7 +501,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (hasLength(str)) {
@@ -755,7 +524,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -773,7 +542,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -830,7 +599,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @return check result
-	 * @see java.lang.String#startsWith java.lang.String#startsWithjava.lang.String#startsWithjava.lang.String#startsWith
+	 * @see java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -854,7 +623,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @return check result
-	 * @see java.lang.String#endsWith java.lang.String#endsWithjava.lang.String#endsWithjava.lang.String#endsWith
+	 * @see java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -1014,11 +783,6 @@ public final class StringUtils {
 		}
 		return out.toString();
 	}
-
-
-	//---------------------------------------------------------------------
-	// Convenience methods for working with formatted Strings
-	//---------------------------------------------------------------------
 
 	/**
 	 * Quote the given String with single quotes.
@@ -1481,8 +1245,8 @@ public final class StringUtils {
 	 * @param delimiters the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(String str, String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
@@ -1501,8 +1265,8 @@ public final class StringUtils {
 	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String was <code>null</code>)
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(
 			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
@@ -1533,7 +1297,7 @@ public final class StringUtils {
 	 * @param str       the input String
 	 * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
@@ -1549,7 +1313,7 @@ public final class StringUtils {
 	 * @param delimiter     the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
 		if (str == null) {
@@ -1723,13 +1487,14 @@ public final class StringUtils {
 	/**
 	 * Convert object to JSON string
 	 *
-	 * @param object object
+	 * @param object     object
+	 * @param stringType the string type
 	 * @return JSON string
 	 */
-	public static String convertObjectToJSONString(Object object) {
+	public static String objectToString(Object object, StringType stringType) {
 		if (object instanceof Map || object.getClass().isArray()
 				|| Collection.class.isAssignableFrom(object.getClass())) {
-			return StringUtils.writeToJson(object);
+			return StringUtils.writeToString(object, stringType);
 		}
 
 		TreeMap<String, Object> valueMap = new TreeMap<>();
@@ -1746,12 +1511,38 @@ public final class StringUtils {
 					valueMap.put(field.getName(), mapValue);
 				});
 
-		return StringUtils.writeToJson(valueMap);
+		return StringUtils.writeToString(valueMap, stringType);
 	}
 
-	private static String writeToJson(Object object) {
+	/**
+	 * The enum String type.
+	 */
+	public enum StringType {
+		/**
+		 * Json string type.
+		 */
+		JSON,
+		/**
+		 * Yaml string type.
+		 */
+		YAML
+	}
+
+	private static String writeToString(Object object, StringType stringType) {
+		ObjectMapper objectMapper;
+		switch (stringType) {
+			case JSON:
+				objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+				break;
+			case YAML:
+				objectMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+						.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+				break;
+			default:
+				return Globals.DEFAULT_VALUE_STRING;
+		}
 		try {
-			return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).writeValueAsString(object);
+			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
 		} catch (JsonProcessingException e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
 				StringUtils.LOGGER.debug("Convert object to string error! ", e);
@@ -1768,7 +1559,7 @@ public final class StringUtils {
 	 * @param clazz    Bind JavaBean define class
 	 * @return List of JavaBean
 	 */
-	public static <T> List<T> convertJSONStringToList(String jsonData, Class<T> clazz) {
+	public static <T> List<T> JSONToList(String jsonData, Class<T> clazz) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
@@ -1785,13 +1576,25 @@ public final class StringUtils {
 	/**
 	 * Convert JSON string to map
 	 *
-	 * @param jsonData JSON string
+	 * @param data       the data
+	 * @param stringType the string type
 	 * @return Convert map
 	 */
-	public static Map<String, Object> convertJSONStringToMap(String jsonData) {
-		ObjectMapper objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+	public static Map<String, Object> dataToMap(String data, StringType stringType) {
+		ObjectMapper objectMapper;
+		switch (stringType) {
+			case JSON:
+				objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+				break;
+			case YAML:
+				objectMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+						.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+				break;
+			default:
+				return new HashMap<>();
+		}
 		try {
-			return objectMapper.readValue(jsonData, new TypeReference<Map<String, Object>>() {
+			return objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
 			});
 		} catch (Exception e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
@@ -2276,8 +2079,8 @@ public final class StringUtils {
 			return null;
 		}
 
-		if (BaseElement.class.isAssignableFrom(typeClass)) {
-			paramObj = BaseElement.parseXml(dataValue, Globals.DEFAULT_ENCODING, typeClass);
+		if (BeanObject.class.isAssignableFrom(typeClass)) {
+			paramObj = BeanUtils.parseXml(dataValue, Globals.DEFAULT_ENCODING, typeClass);
 		} else {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 
@@ -2292,20 +2095,15 @@ public final class StringUtils {
 					paramObj = ReflectionUtils.parseEnum(typeClass).get(dataValue);
 					break;
 				case NUMBER:
-					if (typeClass.equals(Integer.class)
-							|| typeClass.equals(int.class)) {
+					if (typeClass.equals(Integer.class) || typeClass.equals(int.class)) {
 						paramObj = Integer.valueOf(dataValue);
-					} else if (typeClass.equals(Float.class)
-							|| typeClass.equals(float.class)) {
+					} else if (typeClass.equals(Float.class) || typeClass.equals(float.class)) {
 						paramObj = Float.valueOf(dataValue);
-					} else if (typeClass.equals(Double.class)
-							|| typeClass.equals(double.class)) {
+					} else if (typeClass.equals(Double.class) || typeClass.equals(double.class)) {
 						paramObj = Double.valueOf(dataValue);
-					} else if (typeClass.equals(Short.class)
-							|| typeClass.equals(short.class)) {
+					} else if (typeClass.equals(Short.class) || typeClass.equals(short.class)) {
 						paramObj = Short.valueOf(dataValue);
-					} else if (typeClass.equals(Long.class)
-							|| typeClass.equals(long.class)) {
+					} else if (typeClass.equals(Long.class) || typeClass.equals(long.class)) {
 						paramObj = Long.valueOf(dataValue);
 					} else if (typeClass.equals(BigInteger.class)) {
 						paramObj = new BigInteger(dataValue);
@@ -2327,75 +2125,67 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Format character
+	 * Validate given code, support China ID Code, China Social Credit Code, Luhn Algorithm
 	 *
-	 * @param character character
-	 * @return formatted character
+	 * @param code          Code
+	 * @param codeType      Code type
+	 * @return              Validate result
 	 */
-	public static char format(char character) {
-		if (character == 12288) {
-			character = (char) 32;
-		} else if (character > 65280 && character < 65375) {
-			character = (char) (character - 65248);
-		} else if (character > 'A' && character < 'Z') {
-			character += 32;
-		}
-
-		return character;
-	}
-
-	/**
-	 * Authentication CHN ID
-	 *
-	 * @param cardCode CHN ID Card code
-	 * @return Check result
-	 */
-	public static boolean validateCHNIDCardCode(String cardCode) {
-		if (cardCode != null && cardCode.length() == 18) {
-			cardCode = cardCode.toUpperCase();
-			if (StringUtils.matches(cardCode, CHN_ID_CARD_REGEX)) {
-				int sigma = 0;
-				for (int i = 0; i < 17; i++) {
-					int code = Character.digit(cardCode.charAt(i), 10);
-					if (code != 0) {
-						sigma += code * (Math.pow(2, 17 - i) % 11);
-					}
-				}
-				int authCode = (12 - (sigma % 11)) % 11;
-				if (authCode == 10) {
-					return cardCode.endsWith("X");
-				} else {
-					return cardCode.endsWith(Integer.toString(authCode));
-				}
-			}
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
-	}
-
-	/**
-	 * Authentication CHN social credit code
-	 *
-	 * @param socialCreditCode CHN social credit code
-	 * @return Check result
-	 */
-	public static boolean validateCHNSocialCreditCode(String socialCreditCode) {
-		if (socialCreditCode != null && socialCreditCode.length() == 18) {
-			String creditCode = socialCreditCode.toUpperCase();
-			int validateCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.substring(17));
-			if (validateCode != -1) {
-				if (StringUtils.matches(creditCode, CHN_SOCIAL_CREDIT_REGEX)) {
-					int sigma = 0;
-					for (int i = 0; i < 17; i++) {
-						int code = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(i));
-						if (code != 0) {
-							sigma += code * (Math.pow(3, i) % 31);
+	public static boolean validateCode(String code, CodeType codeType) {
+		switch (codeType) {
+			case CHN_ID_Code:
+				String cardCode = code.toUpperCase();
+				if (StringUtils.matches(cardCode, CHN_ID_CARD_REGEX)) {
+					int validateCode = CHN_ID_CARD_CODE.indexOf(cardCode.charAt(17));
+					if (validateCode != -1) {
+						int sigma = 0;
+						for (int i = 0; i < 17; i++) {
+							int currentCode = Character.digit(cardCode.charAt(i), 10);
+							if (currentCode != 0) {
+								sigma += currentCode * (Math.pow(2, 17 - i) % 11);
+							}
 						}
+						return validateCode == ((12 - (sigma % 11)) % 11);
 					}
-
-					int authCode = 31 - (sigma % 31);
-					return (authCode == 31) ? (validateCode == 0) : (authCode == validateCode);
 				}
-			}
+				break;
+			case CHN_Social_Code:
+				String creditCode = code.toUpperCase();
+				if (StringUtils.matches(creditCode, CHN_SOCIAL_CREDIT_REGEX)) {
+					int validateCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(17));
+					if (validateCode != -1) {
+						int sigma = 0;
+						for (int i = 0; i < 17; i++) {
+							int currentCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(i));
+							if (currentCode != 0) {
+								sigma += currentCode * (Math.pow(3, i) % 31);
+							}
+						}
+
+						int authCode = 31 - (sigma % 31);
+						return (authCode == 31) ? (validateCode == 0) : (authCode == validateCode);
+					}
+				}
+				break;
+			case Luhn:
+				if (StringUtils.matches(code, LUHN_CODE_REGEX)) {
+					int result = 0;
+					boolean process = Globals.DEFAULT_VALUE_BOOLEAN;
+					while (code.length() > 0) {
+						int currentCode = Integer.parseInt(code.substring(code.length() - 1));
+						if (process) {
+							currentCode *= 2;
+							if (currentCode > 9) {
+								currentCode -= 9;
+							}
+						}
+						result += currentCode;
+						process = !process;
+						code = code.substring(0, code.length() - 1);
+					}
+					return result % 10 == 0;
+				}
+				break;
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
@@ -2420,5 +2210,9 @@ public final class StringUtils {
 		}
 		buf.append(str.substring(1));
 		return buf.toString();
+	}
+
+	public enum CodeType {
+		CHN_Social_Code, CHN_ID_Code, Luhn
 	}
 }

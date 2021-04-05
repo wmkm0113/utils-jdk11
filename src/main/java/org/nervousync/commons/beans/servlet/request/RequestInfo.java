@@ -27,8 +27,6 @@ import org.nervousync.commons.http.cookie.CookieEntity;
 import org.nervousync.commons.http.header.SimpleHeader;
 import org.nervousync.commons.http.proxy.ProxyInfo;
 
-import javax.annotation.Nonnull;
-
 /**
  * Request information for sending by com.nervousync.utils.RequestUtils
  *
@@ -111,11 +109,11 @@ public final class RequestInfo implements Serializable {
 	 * @param parameters       Send parameter information of request
 	 * @param uploadParams      Send multipart files of request
 	 */
-	private RequestInfo(HttpMethodOption httpMethodOption, ProxyInfo proxyInfo, @Nonnull List<TrustCert> trustTrustCerts,
+	private RequestInfo(HttpMethodOption httpMethodOption, ProxyInfo proxyInfo, List<TrustCert> trustTrustCerts,
 	                    String passPhrase, String userAgent, String requestUrl, String charset,
-	                    String contentType, int timeOut, byte[] postDatas, @Nonnull List<SimpleHeader> headers,
-	                    @Nonnull List<CookieEntity> cookieList, @Nonnull Map<String, String[]> parameters,
-	                    @Nonnull Map<String, File> uploadParams) {
+	                    String contentType, int timeOut, byte[] postDatas, List<SimpleHeader> headers,
+	                    List<CookieEntity> cookieList, Map<String, String[]> parameters,
+	                    Map<String, File> uploadParams) {
 		this.httpMethodOption = httpMethodOption;
 		this.proxyInfo = proxyInfo;
 		this.trustTrustCerts = trustTrustCerts;
@@ -351,7 +349,7 @@ public final class RequestInfo implements Serializable {
 		 */
 		private final List<CookieEntity> cookieList = new ArrayList<>();
 
-		private RequestBuilder(@Nonnull HttpMethodOption httpMethodOption) {
+		private RequestBuilder(HttpMethodOption httpMethodOption) {
 			this.httpMethodOption = httpMethodOption;
 		}
 

@@ -21,14 +21,22 @@ import java.util.Hashtable;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Huffman object.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 6, 2017 2:13:35 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 6, 2017 2:13:35 PM $
  */
 public class HuffmanObject {
 
 	private final Hashtable<String, Object> codeMapping = new Hashtable<>();
 	private final String huffmanValue;
-	
+
+	/**
+	 * Instantiates a new Huffman object.
+	 *
+	 * @param codeMapping  the code mapping
+	 * @param huffmanValue the huffman value
+	 */
 	public HuffmanObject(Hashtable<String, Object> codeMapping, String huffmanValue) {
 		if (codeMapping != null) {
 			codeMapping.forEach(this.codeMapping::put);
@@ -36,11 +44,18 @@ public class HuffmanObject {
 		this.huffmanValue = huffmanValue;
 	}
 
-	public String generateCodeMapping() {
-		return StringUtils.convertObjectToJSONString(this.codeMapping);
-	}
-	
 	/**
+	 * Generate code mapping string.
+	 *
+	 * @return the string
+	 */
+	public String generateCodeMapping() {
+		return StringUtils.objectToString(this.codeMapping, StringUtils.StringType.JSON);
+	}
+
+	/**
+	 * Gets code mapping.
+	 *
 	 * @return the codeMapping
 	 */
 	public Hashtable<String, Object> getCodeMapping() {
@@ -50,6 +65,8 @@ public class HuffmanObject {
 	}
 
 	/**
+	 * Gets huffman value.
+	 *
 	 * @return the huffmanValue
 	 */
 	public String getHuffmanValue() {

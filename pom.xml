@@ -44,6 +44,7 @@
 		<junit.platform.version>1.6.2</junit.platform.version>
 		<jakarta.activation.version>2.0.0</jakarta.activation.version>
 		<jakarta.mail.version>2.0.0</jakarta.mail.version>
+		<jakarta.webservice.version>3.0.0</jakarta.webservice.version>
 		<jakarta.xml.binding.version>3.0.0</jakarta.xml.binding.version>
 		<jakarta.xml.soap.version>2.0.0</jakarta.xml.soap.version>
 		<bcprov.version>1.67</bcprov.version>
@@ -79,11 +80,6 @@
 			<version>${jakarta.activation.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.2</version>
-		</dependency>
-		<dependency>
 			<groupId>com.sun.activation</groupId>
 			<artifactId>jakarta.activation</artifactId>
 			<version>${jakarta.activation.version}</version>
@@ -92,7 +88,7 @@
 		<dependency>
 			<groupId>jakarta.jws</groupId>
 			<artifactId>jakarta.jws-api</artifactId>
-			<version>3.0.0</version>
+			<version>${jakarta.webservice.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.ws</groupId>
@@ -116,7 +112,7 @@
 		<dependency>
 			<groupId>jakarta.ws.rs</groupId>
 			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>3.0.0</version>
+			<version>${jakarta.webservice.version}</version>
 		</dependency>
 		<!-- Java Mail Support -->
 		<dependency>
@@ -302,15 +298,66 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- YAML Support -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.27</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+			<version>${jackson.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<!-- XML Support -->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>${jakarta.xml.binding.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>${jakarta.xml.binding.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<version>${jakarta.xml.binding.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>jakarta.activation</groupId>
-					<artifactId>jakarta.activation-api</artifactId>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -320,8 +367,8 @@
 			<version>${jakarta.xml.soap.version}</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>jakarta.activation-api</artifactId>
-					<groupId>jakarta.activation</groupId>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

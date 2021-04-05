@@ -31,13 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.nervousync.exceptions.xml.XmlException;
-import org.nervousync.commons.beans.json.JsonObject;
-import org.nervousync.commons.beans.xml.BaseElement;
 import org.nervousync.commons.http.header.SimpleHeader;
+import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.commons.core.Globals;
@@ -247,8 +245,8 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws XmlException                 the xml exception
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public <T> T parseXml(@Nonnull Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return BaseElement.parseXml(this.parseString(), this.charset, clazz);
+	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+		return BeanUtils.parseXml(this.parseString(), this.charset, clazz);
 	}
 
 	/**
@@ -260,8 +258,8 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws XmlException                 the xml exception
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public <T> T parseJson(@Nonnull Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return JsonObject.parseJSON(this.parseString(), this.charset, clazz);
+	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+		return BeanUtils.parseJSON(this.parseString(this.charset), clazz);
 	}
 
 	/**

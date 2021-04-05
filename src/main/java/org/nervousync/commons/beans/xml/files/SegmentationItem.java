@@ -18,7 +18,7 @@ package org.nervousync.commons.beans.xml.files;
 
 import org.nervousync.commons.adapter.xml.CDataAdapter;
 import org.nervousync.commons.adapter.xml.DateTimeAdapter;
-import org.nervousync.commons.beans.xml.BaseElement;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.SecurityUtils;
 import org.nervousync.utils.StringUtils;
@@ -36,7 +36,7 @@ import java.util.Date;
  */
 @XmlRootElement(name = "segment-item")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SegmentationItem extends BaseElement {
+public class SegmentationItem extends BeanObject {
 	
 	private static final long serialVersionUID = 2993229461743423521L;
 	

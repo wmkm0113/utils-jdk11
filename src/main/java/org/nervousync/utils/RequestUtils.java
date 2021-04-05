@@ -32,7 +32,6 @@ import org.nervousync.commons.http.security.GeneX509TrustManager;
 import org.nervousync.enumerations.ip.IPType;
 import org.nervousync.enumerations.web.HttpMethodOption;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -330,16 +329,14 @@ public final class RequestUtils {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			if (splitAddress.length == 4) {
-				BigInteger bigInteger = BigInteger.ZERO;
-
+				long result = 0L;
 				for (int i = 0; i < splitAddress.length; i++) {
-					BigInteger currentInteger = BigInteger.valueOf(Long.parseLong(splitAddress[3 - i])).shiftLeft(i * 8);
-					bigInteger = bigInteger.add(currentInteger);
+					result += (Long.parseLong(splitAddress[i]) << 8 * (3 - i));
 				}
-				return bigInteger;
+				return BigInteger.valueOf(result);
 			}
 		}
-		return null;
+		return BigInteger.ZERO;
 	}
 
 	/**
@@ -362,14 +359,14 @@ public final class RequestUtils {
 					currentInteger = BigInteger.valueOf(Long.valueOf(split, 16));
 				}
 				if (currentInteger == null) {
-					return null;
+					return BigInteger.ZERO;
 				}
 				bigInteger = bigInteger.add(currentInteger.shiftLeft(16 * (splitAddress.length - index - 1)));
 				index++;
 			}
 			return bigInteger;
 		}
-		return null;
+		return BigInteger.ZERO;
 	}
 
 	/**
@@ -415,7 +412,7 @@ public final class RequestUtils {
 	 * @param <T>                   Client interface
 	 * @return                      Generated instance
 	 */
-	public static <T> T RestfulClient(@Nonnull Class<T> serviceClient, HandlerInterceptor handlerInterceptor) {
+	public static <T> T RestfulClient(Class<T> serviceClient, HandlerInterceptor handlerInterceptor) {
 		if (!serviceClient.isAnnotationPresent(RestfulClient.class)) {
 			return null;
 		}
@@ -432,7 +429,7 @@ public final class RequestUtils {
 	 * @return                          Generated instance
 	 * @throws MalformedURLException if no protocol is specified, or an unknown protocol is found, or spec is null.
 	 */
-	public static <T> T SOAPClient(@Nonnull Class<T> serviceInterface,
+	public static <T> T SOAPClient(Class<T> serviceInterface,
 	                               HandlerResolver handlerResolver)
 			throws MalformedURLException {
 		if (!serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
@@ -456,7 +453,7 @@ public final class RequestUtils {
 			namespaceURI = stringBuilder.substring(0, stringBuilder.length() - 1) + "/";
 		}
 
-		if (StringUtils.isNullOrEmpty(serviceName)) {
+		if (StringUtils.isEmpty(serviceName)) {
 			serviceName = serviceInterface.getSimpleName() + "Service";
 		}
 
@@ -830,23 +827,23 @@ public final class RequestUtils {
 		//	如果使用了反向代理服务器，则需要从Header中获取转发的客户端IP地址
 		String clientIP = request.getHeader("X-Forwarded-For");
 
-		if (StringUtils.isNullOrEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
+		if (StringUtils.isEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
 			clientIP = request.getHeader("Proxy-Client-IP");
 		}
 
-		if (StringUtils.isNullOrEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
+		if (StringUtils.isEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
 			clientIP = request.getHeader("WL-Proxy-Client-IP");
 		}
 
-		if (StringUtils.isNullOrEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
+		if (StringUtils.isEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
 			clientIP = request.getHeader("HTTP_CLIENT_IP");
 		}
 
-		if (StringUtils.isNullOrEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
+		if (StringUtils.isEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
 			clientIP = request.getHeader("HTTP_X_FORWARDED_FOR");
 		}
 
-		if (StringUtils.isNullOrEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
+		if (StringUtils.isEmpty(clientIP) || "unknown".equalsIgnoreCase(clientIP)) {
 			clientIP = request.getRemoteAddr();
 		}
 
@@ -1036,7 +1033,7 @@ public final class RequestUtils {
 			connection.setRequestMethod(method);
 			connection.setRequestProperty("Accept", "text/html,text/javascript,text/xml");
 			connection.addRequestProperty("Accept-Encoding", "gzip, deflate");
-			if (StringUtils.isNullOrEmpty(requestInfo.getUserAgent())) {
+			if (StringUtils.isEmpty(requestInfo.getUserAgent())) {
 				connection.setRequestProperty("User-Agent", "NervousyncBot");
 			} else {
 				connection.setRequestProperty("User-Agent", requestInfo.getUserAgent());

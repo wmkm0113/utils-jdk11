@@ -26,7 +26,6 @@ import org.nervousync.utils.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -50,9 +49,9 @@ public class GeneX509TrustManager implements X509TrustManager {
 	private final List<TrustCert> trustCertList;
 	private X509TrustManager trustManager = null;
 
-	private GeneX509TrustManager(@Nonnull String passPhrase,
-	                             @Nonnull List<TrustCert> trustCertList) throws CertInfoException {
-		this.passPhrase = StringUtils.isNotNullAndNotEmpty(passPhrase) ? passPhrase : DEFAULT_PASSPHRASE;
+	private GeneX509TrustManager(String passPhrase,
+	                             List<TrustCert> trustCertList) throws CertInfoException {
+		this.passPhrase = StringUtils.notBlank(passPhrase) ? passPhrase : DEFAULT_PASSPHRASE;
 		this.trustCertList = trustCertList;
 		this.initManager();
 	}

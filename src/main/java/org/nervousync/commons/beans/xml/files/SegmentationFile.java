@@ -16,9 +16,9 @@
  */
 package org.nervousync.commons.beans.xml.files;
 
-import javax.xml.bind.annotation.*;
+import org.nervousync.commons.beans.core.BeanObject;
 
-import org.nervousync.commons.beans.xml.BaseElement;
+import javax.xml.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  */
 @XmlRootElement(name = "segment-file")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SegmentationFile extends BaseElement {
+public class SegmentationFile extends BeanObject {
 
 	/**
 	 * 

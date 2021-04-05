@@ -18,31 +18,33 @@ package org.nervousync.beans.config;
 
 import org.nervousync.annotations.beans.BeanConvert;
 import org.nervousync.beans.provider.ConvertProvider;
-import org.nervousync.beans.provider.blob.impl.Base64Provider;
-import org.nervousync.beans.provider.blob.impl.ParseBase64Provider;
-import org.nervousync.beans.provider.json.impl.ConvertJSONProvider;
-import org.nervousync.beans.provider.json.impl.ParseJSONStringProvider;
-import org.nervousync.beans.provider.number.impl.ConvertNumberProvider;
-import org.nervousync.beans.provider.xml.impl.ConvertXMLProvider;
-import org.nervousync.beans.provider.xml.impl.ParseXMLStringProvider;
+import org.nervousync.beans.provider.impl.blob.EncodeBase64Provider;
+import org.nervousync.beans.provider.impl.blob.ParseBase64Provider;
+import org.nervousync.beans.provider.impl.json.EncodeJSONProvider;
+import org.nervousync.beans.provider.impl.json.ParseJSONProvider;
+import org.nervousync.beans.provider.impl.basic.ParseNumberProvider;
+import org.nervousync.beans.provider.impl.xml.EncodeXMLProvider;
+import org.nervousync.beans.provider.impl.xml.ParseXMLProvider;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
+import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
  * Java Bean Config using for BeanUtils method: copyProperties
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 11:46 AM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 11:46 AM $
  */
 public final class BeanConfig implements Serializable {
 
@@ -53,7 +55,12 @@ public final class BeanConfig implements Serializable {
 	private final String className;
 	private final Hashtable<String, FieldConfig> fieldConfigHashtable;
 
-	public BeanConfig(@Nonnull Class<?> beanClass) {
+	/**
+	 * Instantiates a new Bean config.
+	 *
+	 * @param beanClass the bean class
+	 */
+	public BeanConfig(Class<?> beanClass) {
 		this.className = beanClass.getName();
 		List<FieldConfig> fieldConfigList = new ArrayList<>();
 
@@ -61,21 +68,28 @@ public final class BeanConfig implements Serializable {
 			if (ReflectionUtils.isStatic(field) || ReflectionUtils.isFinal(field)) {
 				continue;
 			}
-			BeanConvert beanConvert = field.getAnnotation(BeanConvert.class);
+			Class<?>[] dataConverters;
 			if (field.isAnnotationPresent(BeanConvert.class)) {
-				beanConvert = field.getAnnotation(BeanConvert.class);
+				dataConverters = field.getAnnotation(BeanConvert.class).value();
+			} else {
+				dataConverters = new Class<?>[0];
 			}
 			String fieldName = field.getName();
-			if (beanConvert == null) {
-				fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
-						ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
-						ReflectionUtils.retrieveSetMethod(fieldName, beanClass)));
+			boolean isArray = field.getType().isArray() || List.class.isAssignableFrom(field.getType());
+			Class<?> paramClass;
+			if (isArray) {
+				if (field.getType().isArray()) {
+					paramClass = field.getType().getComponentType();
+				} else {
+					paramClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+				}
 			} else {
-				fieldConfigList.add(new FieldConfig(fieldName, field.getType(),
-						ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
-						ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
-						beanConvert.value()));
+				paramClass = field.getType();
 			}
+			fieldConfigList.add(new FieldConfig(fieldName, isArray, field.getType(), paramClass,
+					ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
+					ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
+					dataConverters));
 		}
 		this.fieldConfigHashtable = new Hashtable<>(fieldConfigList.size());
 		fieldConfigList.forEach(fieldConfig ->
@@ -103,20 +117,21 @@ public final class BeanConfig implements Serializable {
 	/**
 	 * Check field exists status
 	 *
-	 * @param fieldName     Field name
-	 * @return              Check result
+	 * @param fieldName Field name
+	 * @return Check result
 	 */
-	public boolean containsField(@Nonnull String fieldName) {
+	public boolean containsField(String fieldName) {
 		return this.fieldConfigHashtable.containsKey(fieldName);
 	}
 
 	/**
 	 * Retrieve all field value and convert to HashMap
 	 * which field is annotation by org.nervousync.beans.annotation.BeanData
-	 * @param object    Bean object
-	 * @return          Converted data map
+	 *
+	 * @param object Bean object
+	 * @return Converted data map
 	 */
-	public Map<String, Object> retrieveValue(@Nonnull Object object) {
+	public Map<String, Object> retrieveValue(Object object) {
 		Map<String, Object> resultMap = new HashMap<>();
 		this.fieldConfigHashtable.keySet().forEach(fieldName ->
 				resultMap.put(fieldName, this.retrieveValue(fieldName, object)));
@@ -125,11 +140,12 @@ public final class BeanConfig implements Serializable {
 
 	/**
 	 * Retrieve field value by given field name
-	 * @param fieldName     Field name
-	 * @param object        Bean object
-	 * @return              Field value
+	 *
+	 * @param fieldName Field name
+	 * @param object    Bean object
+	 * @return Field value
 	 */
-	public Object retrieveValue(@Nonnull String fieldName, @Nonnull Object object) {
+	public Object retrieveValue(String fieldName, Object object) {
 		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			try {
 				FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
@@ -147,6 +163,111 @@ public final class BeanConfig implements Serializable {
 		return null;
 	}
 
+	private Object parseBean(Map<?, ?> value, Class<?> beanClass) {
+		Object beanObject = ObjectUtils.newInstance(beanClass);
+		BeanUtils.copyProperties(value, beanObject);
+		return beanObject;
+	}
+
+	private Object parseBoolean(Object value) {
+		switch (ObjectUtils.retrieveSimpleDataType(value.getClass())) {
+			case STRING:
+				return "true".equalsIgnoreCase((String) value);
+			case NUMBER:
+				return "1".equalsIgnoreCase(value.toString());
+			default:
+				return value;
+		}
+	}
+
+	private Object parseValue(Object value, FieldConfig fieldConfig) {
+		Class<?> dataType = value.getClass();
+		ConvertProvider convertProvider = fieldConfig.retrieveConverterClass(dataType);
+		Object parsedValue = null;
+		if (convertProvider == null) {
+			DataType targetType = ObjectUtils.retrieveSimpleDataType(fieldConfig.getFieldType());
+			if (DataType.NUMBER.equals(targetType)) {
+				convertProvider = new ParseNumberProvider();
+			} else if (DataType.BOOLEAN.equals(targetType)) {
+				parsedValue = this.parseBoolean(value);
+			} else {
+				this.logger.warn("Data type not matched! Convert provider not found! ");
+				if (this.logger.isDebugEnabled()) {
+					this.logger.debug("Bean class: {}, field name: {}, field type: {}, value type: {}",
+							this.className, fieldConfig.getFieldName(), fieldConfig.getFieldType().getName(),
+							dataType.getName());
+				}
+			}
+		}
+		if (convertProvider != null) {
+			parsedValue = convertProvider.convert(value, fieldConfig.getFieldType());
+		}
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("Convert data finished");
+		}
+		return parsedValue;
+	}
+
+	/**
+	 * Copy given value to target field identify by given field name
+	 *
+	 * @param fieldName field name
+	 * @param object    Bean object
+	 * @param value     field value
+	 * @return Copy result
+	 */
+	public boolean parseValue(String fieldName, Object object, Object value) {
+		if (this.fieldConfigHashtable.containsKey(fieldName)) {
+			FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
+			try {
+				Class<?> dataType = value.getClass();
+				Object args = null;
+				if (matchFieldType(fieldConfig.getFieldType(), value.getClass())) {
+					args = value;
+				} else if (fieldConfig.isArray()) {
+					if (value.getClass().isArray()) {
+						List<Object> valueList = new ArrayList<>();
+						Arrays.stream((Map<?, ?>[]) value)
+								.forEach(itemMap ->
+										valueList.add(this.parseBean(itemMap, fieldConfig.getParamClass())));
+						args = valueList.toArray();
+					} else if (List.class.isAssignableFrom(value.getClass())) {
+						List<Object> valueList = new ArrayList<>();
+						((List<?>)value).stream()
+								.filter(item -> item instanceof Map)
+								.forEach(item ->
+										valueList.add(this.parseBean((Map<?, ?>) item, fieldConfig.getParamClass())));
+						args = valueList;
+					}
+				} else if (value instanceof Map && BeanObject.class.isAssignableFrom(fieldConfig.getFieldType())) {
+					args = this.parseBean((Map<?, ?>) value, fieldConfig.getFieldType());
+				} else {
+					if (this.logger.isDebugEnabled()) {
+						this.logger.debug("Convert data start...");
+					}
+					args = this.parseValue(value, fieldConfig);
+					if (this.logger.isDebugEnabled()) {
+						this.logger.debug("Convert data finished");
+					}
+				}
+				if (args == null) {
+					args = value;
+				}
+				if (fieldConfig.getMethodSet() == null) {
+					ReflectionUtils.setField(fieldName, object, args);
+				} else {
+					fieldConfig.getMethodSet().invoke(object, args);
+				}
+				return true;
+			} catch (Exception e) {
+				if (this.logger.isDebugEnabled()) {
+					this.logger.debug("Stack message: ", e);
+				}
+			}
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
 	/**
 	 * Copy given value to target field identify by given field name
 	 *
@@ -155,7 +276,7 @@ public final class BeanConfig implements Serializable {
 	 * @param value         field value
 	 * @return              Copy result
 	 */
-	public boolean copyValue(@Nonnull String fieldName, @Nonnull Object object, @Nonnull Object value) {
+	public boolean copyValue(String fieldName, Object object, Object value) {
 		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
 			try {
@@ -169,8 +290,11 @@ public final class BeanConfig implements Serializable {
 					}
 					ConvertProvider convertProvider = fieldConfig.retrieveConverterClass(dataType);
 					if (convertProvider == null) {
-						if (DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(fieldConfig.getFieldType()))) {
-							convertProvider = new ConvertNumberProvider();
+						DataType targetType = ObjectUtils.retrieveSimpleDataType(fieldConfig.getFieldType());
+						if (DataType.NUMBER.equals(targetType)) {
+							convertProvider = new ParseNumberProvider();
+						} else if (DataType.BOOLEAN.equals(targetType)) {
+							args = this.parseBoolean(value);
 						} else {
 							this.logger.warn("Data type not matched! Convert provider not found! ");
 							if (this.logger.isDebugEnabled()) {
@@ -204,7 +328,7 @@ public final class BeanConfig implements Serializable {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
-	private static boolean matchFieldType(@Nonnull Class<?> fieldType, @Nonnull Class<?> currentType) {
+	private static boolean matchFieldType(Class<?> fieldType, Class<?> currentType) {
 		if (fieldType.equals(currentType)) {
 			return true;
 		}
@@ -213,7 +337,7 @@ public final class BeanConfig implements Serializable {
 		return matchType.equals(targetType);
 	}
 
-	private static boolean isPrimitiveClass(@Nonnull Class<?> clazz) {
+	private static boolean isPrimitiveClass(Class<?> clazz) {
 		return clazz.isPrimitive() || Integer.class.equals(clazz)
 				|| Double.class.equals(clazz) || Float.class.equals(clazz)
 				|| Long.class.equals(clazz) || Short.class.equals(clazz)
@@ -221,7 +345,7 @@ public final class BeanConfig implements Serializable {
 				|| Character.class.equals(clazz)|| String.class.equals(clazz);
 	}
 
-	private static Class<?> convertPrimitiveToWrapperClass(@Nonnull Class<?> primitiveClass) {
+	private static Class<?> convertPrimitiveToWrapperClass(Class<?> primitiveClass) {
 		if (int.class.equals(primitiveClass)) {
 			return Integer.class;
 		}
@@ -254,15 +378,30 @@ public final class BeanConfig implements Serializable {
 		private static final long serialVersionUID = 268647537906576706L;
 
 		private final String fieldName;
+		private final boolean array;
 		private final Class<?> fieldType;
+		private final Class<?> paramClass;
 		private final Method methodGet;
 		private final Method methodSet;
 		private final List<ConvertProvider> converters;
 
-		FieldConfig(@Nonnull String fieldName, Class<?> fieldType, Method methodGet, Method methodSet,
-		            Class<?>... dataConverters) {
+		/**
+		 * Instantiates a new Field config.
+		 *
+		 * @param fieldName      the field name
+		 * @param array          the array
+		 * @param fieldType      the field type
+		 * @param paramClass     the param class
+		 * @param methodGet      the method get
+		 * @param methodSet      the method set
+		 * @param dataConverters the data converters
+		 */
+		FieldConfig(String fieldName, boolean array, Class<?> fieldType, Class<?> paramClass,
+		            Method methodGet, Method methodSet, Class<?>... dataConverters) {
 			this.fieldName = fieldName;
+			this.array = array;
 			this.fieldType = fieldType;
+			this.paramClass = paramClass;
 			this.methodGet = methodGet;
 			this.methodSet = methodSet;
 			if (dataConverters.length == 0) {
@@ -270,23 +409,30 @@ public final class BeanConfig implements Serializable {
 				DataType dataType = ObjectUtils.retrieveSimpleDataType(fieldType);
 				switch (dataType) {
 					case BINARY:
+						this.converters.add(new EncodeBase64Provider());
 						this.converters.add(new ParseBase64Provider());
 						break;
 					case NUMBER:
-						this.converters.add(new ConvertNumberProvider());
+						this.converters.add(new ParseNumberProvider());
 						break;
 					case OBJECT:
-						this.converters.add(new ParseXMLStringProvider());
+						this.converters.add(new EncodeJSONProvider());
+						this.converters.add(new ParseJSONProvider());
+						this.converters.add(new EncodeXMLProvider());
+						this.converters.add(new ParseXMLProvider());
 						break;
 					case STRING:
-						this.converters.add(new Base64Provider());
-						this.converters.add(new ConvertJSONProvider());
-						this.converters.add(new ConvertXMLProvider());
+						this.converters.add(new EncodeBase64Provider());
+						this.converters.add(new EncodeJSONProvider());
+						this.converters.add(new EncodeXMLProvider());
 						break;
 					case UNKNOWN:
-						this.converters.add(new ParseJSONStringProvider());
-						break;
-					default:
+						this.converters.add(new EncodeBase64Provider());
+						this.converters.add(new ParseBase64Provider());
+						this.converters.add(new EncodeJSONProvider());
+						this.converters.add(new ParseJSONProvider());
+						this.converters.add(new EncodeXMLProvider());
+						this.converters.add(new ParseXMLProvider());
 						break;
 				}
 			} else {
@@ -318,12 +464,30 @@ public final class BeanConfig implements Serializable {
 		}
 
 		/**
-		 * Gets the value of fieldType
+		 * Is array boolean.
 		 *
-		 * @return the value of fieldType
+		 * @return the boolean
+		 */
+		public boolean isArray() {
+			return array;
+		}
+
+		/**
+		 * Gets field type.
+		 *
+		 * @return the field type
 		 */
 		public Class<?> getFieldType() {
 			return fieldType;
+		}
+
+		/**
+		 * Gets param class.
+		 *
+		 * @return the param class
+		 */
+		public Class<?> getParamClass() {
+			return paramClass;
 		}
 
 		/**
@@ -344,6 +508,12 @@ public final class BeanConfig implements Serializable {
 			return methodSet;
 		}
 
+		/**
+		 * Retrieve converter class convert provider.
+		 *
+		 * @param dataType the data type
+		 * @return the convert provider
+		 */
 		public ConvertProvider retrieveConverterClass(Class<?> dataType) {
 			for (ConvertProvider convertProvider : this.converters) {
 				if (convertProvider.checkType(dataType)) {

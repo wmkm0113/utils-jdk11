@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import org.nervousync.commons.core.Globals;
 
-import javax.annotation.Nonnull;
-
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
@@ -1018,7 +1016,7 @@ public final class ReflectionUtils {
 		return null;
 	}
 
-	private static String convertFieldNameToMethodName(@Nonnull Field field, @Nonnull MethodType methodType) {
+	private static String convertFieldNameToMethodName(Field field, MethodType methodType) {
 		StringBuilder methodName = new StringBuilder();
 		switch (methodType) {
 			case GetMethod:

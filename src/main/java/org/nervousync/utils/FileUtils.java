@@ -40,9 +40,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 
-import org.nervousync.commons.beans.xml.BaseElement;
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ import org.nervousync.commons.beans.xml.files.SegmentationFile;
 import org.nervousync.commons.beans.xml.files.SegmentationItem;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.MIMETypes;
-import org.nervousync.commons.zip.ZipFile;
+import org.nervousync.zip.ZipFile;
 
 /**
  * File operate utils
@@ -2774,7 +2774,7 @@ public final class FileUtils {
 		randomAccessFile.write(intBuffer);
 		fileList.forEach(filePath -> {
 			FileExtensionInfo fileExtensionInfo =
-					BaseElement.parseXml(FileUtils.readFile(filePath), FileExtensionInfo.class);
+					BeanUtils.parseXml(FileUtils.readFile(filePath), FileExtensionInfo.class);
 			if (fileExtensionInfo != null) {
 				try {
 					randomAccessFile.write(fileExtensionInfo.convertToByteArray());

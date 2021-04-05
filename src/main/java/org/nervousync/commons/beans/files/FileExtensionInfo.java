@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.nervousync.commons.beans.xml.BaseElement;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.RawUtils;
@@ -35,7 +35,7 @@ import org.nervousync.utils.StringUtils;
  */
 @XmlRootElement(name = "FileExtensionInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class FileExtensionInfo extends BaseElement {
+public final class FileExtensionInfo extends BeanObject {
 
 	/**
 	 * 

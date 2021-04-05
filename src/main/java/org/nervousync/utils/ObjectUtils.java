@@ -27,7 +27,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.nervousync.commons.beans.xml.BaseElement;
+import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.interceptor.beans.HandlerInterceptor;
@@ -342,7 +342,7 @@ public final class ObjectUtils {
 			return DataType.NUMBER;
 		} else if (clazz.equals(String.class)) {
 			return DataType.STRING;
-		} else if (BaseElement.class.isAssignableFrom(clazz) 
+		} else if (BeanObject.class.isAssignableFrom(clazz)
 				&& (clazz.isAnnotationPresent(XmlType.class) || clazz.isAnnotationPresent(XmlRootElement.class))) {
 			return DataType.OBJECT;
 		} else if (clazz.isEnum()) {

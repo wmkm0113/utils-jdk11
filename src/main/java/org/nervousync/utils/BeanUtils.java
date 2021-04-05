@@ -16,18 +16,23 @@
  */
 package org.nervousync.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
 
+import jakarta.xml.bind.JAXB;
 import org.nervousync.beans.config.BeanConfig;
+import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-
 /**
+ * The type Bean utils.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jun 25, 2015 2:55:15 PM $
+ * @version $Revision : 1.0 $ $Date: Jun 25, 2015 2:55:15 PM $
  */
 public final class BeanUtils {
 
@@ -39,9 +44,109 @@ public final class BeanUtils {
 	}
 
 	/**
+	 * Parse file content to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param filePath  File path
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T parseFile(String filePath, Class<T> beanClass) {
+		if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
+			LOGGER.error("Can't found file: {}", filePath);
+			return null;
+		}
+		String textContent = FileUtils.readFile(filePath);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {}", textContent);
+		}
+		String extName = StringUtils.getFilenameExtension(filePath);
+		switch (extName.toLowerCase()) {
+			case "json":
+				return BeanUtils.parseJSON(FileUtils.readFile(filePath), beanClass);
+			case "xml":
+				return BeanUtils.parseXml(FileUtils.readFile(filePath), beanClass);
+			case "yaml":
+				return BeanUtils.parseYaml(FileUtils.readFile(filePath), beanClass);
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Parse xml string and setting fields data to this object
+	 *
+	 * @param <T>       Object
+	 * @param string    XML string or XML file location will be parsed
+	 * @param beanClass Entity class
+	 * @return Convert object
+	 */
+	public static <T> T parseXml(String string, Class<T> beanClass) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
+		}
+		return parseXml(string, Globals.DEFAULT_ENCODING, beanClass);
+	}
+
+	/**
+	 * Parse xml string and setting fields data to this object
+	 *
+	 * @param <T>       Object
+	 * @param string    the string
+	 * @param encoding  Character encoding
+	 * @param beanClass the bean class
+	 * @return Convert object
+	 */
+	public static <T> T parseXml(String string, String encoding, Class<T> beanClass) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
+		}
+		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
+		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
+			return JAXB.unmarshal(inputStream, beanClass);
+		} catch (IOException e) {
+			LOGGER.error("Parse xml error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Parse json t.
+	 *
+	 * @param <T>       the type parameter
+	 * @param string    the string
+	 * @param beanClass the bean class
+	 * @return the t
+	 */
+	public static <T> T parseJSON(String string, Class<T> beanClass) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
+		}
+		return convertMapToBean(string, StringUtils.StringType.JSON, beanClass);
+	}
+
+	/**
+	 * Parse YAML t.
+	 *
+	 * @param <T>       the type parameter
+	 * @param string    the string
+	 * @param beanClass the bean class
+	 * @return the t
+	 */
+	public static <T> T parseYaml(String string, Class<T> beanClass) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
+		}
+		return convertMapToBean(string, StringUtils.StringType.YAML, beanClass);
+	}
+
+	/**
 	 * Remove registered bean config
 	 *
-	 * @param className     Bean class name
+	 * @param className Bean class name
 	 */
 	public static void removeBeanConfig(String className) {
 		BEAN_CONFIG_MAP.remove(className);
@@ -50,37 +155,38 @@ public final class BeanUtils {
 	/**
 	 * Copy the map values into the target bean identify by map key.
 	 * <p>
-	 *     Note: The source and target classes do not have to match or even be derived
-	 *     from each other, as long as the properties match. Any bean properties that the
-	 *     source bean exposes but the target bean does not will silently be ignored.
+	 * Note: The source and target classes do not have to match or even be derived
+	 * from each other, as long as the properties match. Any bean properties that the
+	 * source bean exposes but the target bean does not will silently be ignored.
 	 * </p>
+	 *
 	 * @param dataMap data map
-	 * @param dest the target bean
+	 * @param dest    the target bean
 	 */
-	public static void copyProperties(@Nonnull Map<String, Object> dataMap, @Nonnull Object dest) {
+	public static void copyProperties(Map<?, ?> dataMap, Object dest) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Data Map: {}", StringUtils.convertObjectToJSONString(dataMap));
+			LOGGER.debug("Data Map: {}", StringUtils.objectToString(dataMap, StringUtils.StringType.JSON));
 		}
 		String className = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(className);
 		BeanConfig targetBean = BEAN_CONFIG_MAP.get(className);
 		dataMap.entrySet().stream().filter(entry -> entry.getValue() != null)
-				.forEach(entry -> targetBean.copyValue(entry.getKey(), dest, entry.getValue()));
+				.forEach(entry -> targetBean.parseValue((String)entry.getKey(), dest, entry.getValue()));
 	}
 
 	/**
 	 * Copy the property values of the given source bean into the target bean.
 	 * <p>
-	 *     Note: The source and target classes do not have to match or even be derived
-	 *     from each other, as long as the properties match. Any bean properties that the
-	 *     source bean exposes but the target bean does not will silently be ignored.
+	 * Note: The source and target classes do not have to match or even be derived
+	 * from each other, as long as the properties match. Any bean properties that the
+	 * source bean exposes but the target bean does not will silently be ignored.
 	 * </p>
-	 * @param orig the source bean
-	 * @param dest the target bean
-	 * @param convertMapping    field mapping
+	 *
+	 * @param orig           the source bean
+	 * @param dest           the target bean
+	 * @param convertMapping field mapping
 	 */
-	public static void copyProperties(@Nonnull Object orig, @Nonnull Object dest,
-	                                     @Nonnull Hashtable<String, String> convertMapping) {
+	public static void copyProperties(Object orig, Object dest, Hashtable<String, String> convertMapping) {
 		String origClass = retrieveClassName(orig.getClass());
 		String destClass = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(origClass);
@@ -96,9 +202,10 @@ public final class BeanUtils {
 
 	/**
 	 * Register bean class if needed
+	 *
 	 * @param className Bean class name
 	 */
-	private static void checkRegister(@Nonnull String className) {
+	private static void checkRegister(String className) {
 		if (!BEAN_CONFIG_MAP.containsKey(className)) {
 			try {
 				BEAN_CONFIG_MAP.put(className, new BeanConfig(ClassUtils.forName(className)));
@@ -108,11 +215,21 @@ public final class BeanUtils {
 		}
 	}
 
-	private static String retrieveClassName(@Nonnull Class<?> clazz) {
+	private static String retrieveClassName(Class<?> clazz) {
 		String className = clazz.getName();
 		if (className.contains("$$")) {
 			className = className.substring(0, className.indexOf("$$"));
 		}
 		return className;
+	}
+
+	private static <T> T convertMapToBean(String data, StringUtils.StringType stringType, Class<T> beanClass) {
+		Map<String, Object> dataMap = StringUtils.dataToMap(data, stringType);
+		if (dataMap.isEmpty()) {
+			return null;
+		}
+		T object = ObjectUtils.newInstance(beanClass);
+		BeanUtils.copyProperties(dataMap, object);
+		return object;
 	}
 }

@@ -19,7 +19,6 @@ package org.nervousync.commons.http.cert;
 import org.nervousync.exceptions.http.CertInfoException;
 import org.nervousync.utils.FileUtils;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import java.io.ByteArrayInputStream;
@@ -50,7 +49,7 @@ public final class TrustCert {
 	 * @param certContent       certificate bytes
 	 * @param certPassword      certificate password
 	 */
-	private TrustCert(@Nonnull byte[] certContent, @Nonnull String certPassword) {
+	private TrustCert(byte[] certContent, String certPassword) {
 		this.certContent = certContent;
 		this.certPassword = certPassword;
 	}
@@ -62,7 +61,7 @@ public final class TrustCert {
 	 * @param certPassword the cert password
 	 * @return the cert info
 	 */
-	public static TrustCert newInstance(@Nonnull String certPath, @Nonnull String certPassword) {
+	public static TrustCert newInstance(String certPath, String certPassword) {
 		if (FileUtils.isExists(certPath)) {
 			try {
 				return new TrustCert(FileUtils.readFileBytes(certPath), certPassword);
@@ -79,7 +78,7 @@ public final class TrustCert {
 	 * @param certPassword the cert password
 	 * @return the cert info
 	 */
-	public static TrustCert newInstance(@Nonnull byte[] certContent, @Nonnull String certPassword) {
+	public static TrustCert newInstance(byte[] certContent, String certPassword) {
 		return new TrustCert(certContent, certPassword);
 	}
 

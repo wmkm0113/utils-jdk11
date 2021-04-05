@@ -132,7 +132,7 @@ public final class ZipOptions implements Cloneable {
 	 */
 	public static ZipOptions standardEncryptOptions(String password) 
 			throws ZipException {
-		if (!StringUtils.isNotNullAndNotEmpty(password)) {
+		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
 		}
 		return new ZipOptions(password);
@@ -158,7 +158,7 @@ public final class ZipOptions implements Cloneable {
 	 */
 	public static ZipOptions aesEncryptOptions(String password, 
 			int aesKeyStrength) throws ZipException {
-		if (!StringUtils.isNotNullAndNotEmpty(password)) {
+		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
 		}
 		

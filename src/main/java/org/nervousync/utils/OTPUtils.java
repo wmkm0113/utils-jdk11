@@ -20,7 +20,6 @@ import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -182,13 +181,13 @@ public final class OTPUtils {
 	 * @param size      Seed size
 	 * @return Random secret key
 	 */
-	public static String generateRandomKey(@Nonnull String algorithm, @Nonnull String seed, int size) {
+	public static String generateRandomKey(String algorithm, String seed, int size) {
 		String randomKey = null;
 		try {
-			SecureRandom secureRandom = StringUtils.isNotNullAndNotEmpty(algorithm)
+			SecureRandom secureRandom = StringUtils.notBlank(algorithm)
 					? SecureRandom.getInstance(algorithm)
 					: new SecureRandom();
-			if (StringUtils.isNotNullAndNotEmpty(seed)) {
+			if (StringUtils.notBlank(seed)) {
 				secureRandom.setSeed(StringUtils.base64Decode(seed));
 			}
 			byte[] randomKeyBytes =

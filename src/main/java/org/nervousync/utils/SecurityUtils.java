@@ -30,7 +30,6 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.annotation.Nonnull;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -1195,7 +1194,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param dataBytes         Certificate file data bytes
 	 * @return                  Public key
 	 */
-	public static PublicKey readPublicKeyFromX509(@Nonnull byte[] dataBytes) {
+	public static PublicKey readPublicKeyFromX509(byte[] dataBytes) {
 		return SecurityUtils.readPublicKeyFromX509(dataBytes, Globals.DEFAULT_VALUE_BOOLEAN);
 	}
 
@@ -1206,7 +1205,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param checkValidity     Check certificate validity
 	 * @return                  Public key
 	 */
-	public static PublicKey readPublicKeyFromX509(@Nonnull byte[] dataBytes, boolean checkValidity) {
+	public static PublicKey readPublicKeyFromX509(byte[] dataBytes, boolean checkValidity) {
 		PublicKey publicKey = null;
 		try {
 			CertificateFactory certificateFactory =
@@ -1529,7 +1528,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param algorithm	Calc algorithm
 	 * @return calc value
 	 */
-	private static String digestEncode(@Nonnull Object source, @Nonnull String algorithm) {
+	private static String digestEncode(Object source, String algorithm) {
 		MessageDigest messageDigest;
 		
 		//	Initialize MessageDigest Instance
@@ -1556,7 +1555,7 @@ public final class SecurityUtils implements Serializable {
 	 * @param file      File object
 	 * @param digest    Digest instance
 	 */
-	private static void digestFile(@Nonnull File file, @Nonnull Object digest) {
+	private static void digestFile(File file, Object digest) {
 		if (file.exists() && file.isFile()) {
 			RandomAccessFile randomAccessFile = null;
 			try {

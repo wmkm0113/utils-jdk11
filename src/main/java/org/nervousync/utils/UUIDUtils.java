@@ -20,6 +20,7 @@ package org.nervousync.utils;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.uuid.UUIDTimer;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +46,20 @@ public final class UUIDUtils {
 	 */
 	public static final String UUID_SEQUENCE = "org.nervousync.uuid.UUIDSequence";
 	private static final String ASSIGNED_SEQUENCES = "org.nervousync.uuid.AssignedSequences";
+
+	/**
+	 * Convert uuid to big integer.
+	 *
+	 * @param uuid the uuid
+	 * @return the big integer
+	 */
+	public static BigInteger convertUUIDtoBigInteger(UUID uuid) {
+		byte[] dataBytes = ByteBuffer.allocate(16)
+				.putLong(uuid.getMostSignificantBits())
+				.putLong(uuid.getLeastSignificantBits())
+				.array();
+		return new BigInteger(dataBytes);
+	}
 
 	/**
 	 * Version 1 uuid.
@@ -208,7 +223,7 @@ public final class UUIDUtils {
 			final ByteBuffer byteBuffer = ByteBuffer.wrap(node);
 			String assigned = System.getProperty(ASSIGNED_SEQUENCES, Globals.DEFAULT_VALUE_STRING);
 			long[] sequences;
-			if (StringUtils.isNullOrEmpty(assigned)) {
+			if (StringUtils.isEmpty(assigned)) {
 				sequences = new long[0];
 			} else {
 				final String[] array =
@@ -237,7 +252,7 @@ public final class UUIDUtils {
 					rand = (rand + 1) & 0x3FFF;
 				}
 			} while (duplicate);
-			assigned = StringUtils.isNullOrEmpty(assigned) ? Long.toString(rand) : assigned + ',' + rand;
+			assigned = StringUtils.isEmpty(assigned) ? Long.toString(rand) : assigned + ',' + rand;
 			System.setProperty(ASSIGNED_SEQUENCES, assigned);
 
 			lowBits = byteBuffer.getLong() | rand << 48;

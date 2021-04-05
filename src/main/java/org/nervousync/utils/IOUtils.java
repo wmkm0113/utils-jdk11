@@ -22,8 +22,6 @@ import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 3, 2015 11:20:20 AM $
@@ -81,7 +79,7 @@ public final class IOUtils {
 	 * @param encoding			Charset encoding
 	 * @return File content as string
 	 */
-	public static String readContent(InputStream inputStream, @Nonnull String encoding) {
+	public static String readContent(InputStream inputStream, String encoding) {
 		char [] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
 		int len;
 		StringBuilder returnValue = new StringBuilder();
@@ -131,7 +129,7 @@ public final class IOUtils {
 	 * @return	copy length
 	 * @throws IOException	if an I/O error occurs
 	 */
-	public static long copyStream(InputStream inputStream, @Nonnull OutputStream outputStream,
+	public static long copyStream(InputStream inputStream, OutputStream outputStream,
 			boolean closeOutputAfterCopy, byte[] buffer) throws IOException {
 		if (inputStream == null) {
 			return 0L;
