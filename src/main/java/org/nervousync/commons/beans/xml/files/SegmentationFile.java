@@ -18,7 +18,7 @@ package org.nervousync.commons.beans.xml.files;
 
 import org.nervousync.commons.beans.core.BeanObject;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.List;
 

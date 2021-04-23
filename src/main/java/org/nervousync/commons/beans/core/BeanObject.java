@@ -62,7 +62,16 @@ public class BeanObject implements Serializable {
 	 * @return the string
 	 */
 	public String toJson() {
-		return StringUtils.objectToString(this, StringUtils.StringType.JSON);
+		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Globals.DEFAULT_VALUE_BOOLEAN);
+	}
+
+	/**
+	 * To json string string.
+	 *
+	 * @return the string
+	 */
+	public String toFormattedJson() {
+		return StringUtils.objectToString(this, StringUtils.StringType.JSON, true);
 	}
 
 	/**
@@ -71,7 +80,16 @@ public class BeanObject implements Serializable {
 	 * @return the string
 	 */
 	public String toYaml() {
-		return StringUtils.objectToString(this, StringUtils.StringType.YAML);
+		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Globals.DEFAULT_VALUE_BOOLEAN);
+	}
+
+	/**
+	 * To json string string.
+	 *
+	 * @return the string
+	 */
+	public String toFormattedYaml() {
+		return StringUtils.objectToString(this, StringUtils.StringType.YAML, true);
 	}
 
 	/**
@@ -154,9 +172,9 @@ public class BeanObject implements Serializable {
 			}
 			if (outputFragment) {
 				if (formattedOutput) {
-					return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter.toString();
+					return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter;
 				} else {
-					return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter.toString();
+					return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter;
 				}
 			} else {
 				return stringWriter.toString();

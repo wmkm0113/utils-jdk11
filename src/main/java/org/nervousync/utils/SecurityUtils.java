@@ -29,6 +29,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Optional;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -44,15 +45,15 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Security Utils
- * 
+ * <p>
  * Implements:
- * 		MD5 Encode
- * 		SHA Encode
- * 		DES Encrypt/Decrypt
- * 		RSA Encrypt/Decrypt
- * 
+ * MD5 Encode
+ * SHA Encode
+ * DES Encrypt/Decrypt
+ * RSA Encrypt/Decrypt
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 11:23:13 AM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:23:13 AM $
  */
 public final class SecurityUtils implements Serializable {
 	
@@ -70,55 +71,166 @@ public final class SecurityUtils implements Serializable {
 	 * DES Algorithm
 	 */
 	public transient static final String DES_ECB_NO_PADDING         = "DES/ECB/NoPadding";
+	/**
+	 * The constant DES_ECB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_ECB_PKCS5_PADDING      = "DES/ECB/PKCS5Padding";
+	/**
+	 * The constant DES_CBC_NO_PADDING.
+	 */
 	public transient static final String DES_CBC_NO_PADDING         = "DES/CBC/NoPadding";
+	/**
+	 * The constant DES_CBC_PKCS5_PADDING.
+	 */
 	public transient static final String DES_CBC_PKCS5_PADDING      = "DES/CBC/PKCS5Padding";
+	/**
+	 * The constant DES_CFB_NO_PADDING.
+	 */
 	public transient static final String DES_CFB_NO_PADDING         = "DES/CFB/NoPadding";
+	/**
+	 * The constant DES_CFB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_CFB_PKCS5_PADDING      = "DES/CFB/PKCS5Padding";
+	/**
+	 * The constant DES_OFB_NO_PADDING.
+	 */
 	public transient static final String DES_OFB_NO_PADDING         = "DES/OFB/NoPadding";
+	/**
+	 * The constant DES_OFB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_OFB_PKCS5_PADDING      = "DES/OFB/PKCS5Padding";
+	/**
+	 * The constant DES_EDE_ECB_NO_PADDING.
+	 */
 	public transient static final String DES_EDE_ECB_NO_PADDING     = "DESede/ECB/NoPadding";
+	/**
+	 * The constant DES_EDE_ECB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_EDE_ECB_PKCS5_PADDING  = "DESede/ECB/PKCS5Padding";
+	/**
+	 * The constant DES_EDE_CBC_NO_PADDING.
+	 */
 	public transient static final String DES_EDE_CBC_NO_PADDING     = "DESede/CBC/NoPadding";
+	/**
+	 * The constant DES_EDE_CBC_PKCS5_PADDING.
+	 */
 	public transient static final String DES_EDE_CBC_PKCS5_PADDING  = "DESede/CBC/PKCS5Padding";
+	/**
+	 * The constant DES_EDE_CFB_NO_PADDING.
+	 */
 	public transient static final String DES_EDE_CFB_NO_PADDING     = "DESede/CFB/NoPadding";
+	/**
+	 * The constant DES_EDE_CFB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_EDE_CFB_PKCS5_PADDING  = "DESede/CFB/PKCS5Padding";
+	/**
+	 * The constant DES_EDE_OFB_NO_PADDING.
+	 */
 	public transient static final String DES_EDE_OFB_NO_PADDING     = "DESede/OFB/NoPadding";
+	/**
+	 * The constant DES_EDE_OFB_PKCS5_PADDING.
+	 */
 	public transient static final String DES_EDE_OFB_PKCS5_PADDING  = "DESede/OFB/PKCS5Padding";
 	/**
 	 * AES Algorithm
 	 */
 	public transient static final String AES_CBC_NO_PADDING         = "AES/CBC/NoPadding";
+	/**
+	 * The constant AES_CBC_PKCS5_PADDING.
+	 */
 	public transient static final String AES_CBC_PKCS5_PADDING      = "AES/CBC/PKCS5Padding";
+	/**
+	 * The constant AES_CBC_PKCS7_PADDING.
+	 */
 	public transient static final String AES_CBC_PKCS7_PADDING      = "AES/CBC/PKCS7Padding";
+	/**
+	 * The constant AES_CBC_ISO10126_Padding.
+	 */
 	public transient static final String AES_CBC_ISO10126_Padding   = "AES/CBC/ISO10126Padding";
+	/**
+	 * The constant AES_CFB_NO_PADDING.
+	 */
 	public transient static final String AES_CFB_NO_PADDING         = "AES/CFB/NoPadding";
+	/**
+	 * The constant AES_CFB_PKCS5_PADDING.
+	 */
 	public transient static final String AES_CFB_PKCS5_PADDING      = "AES/CFB/PKCS5Padding";
+	/**
+	 * The constant AES_CFB_PKCS7_PADDING.
+	 */
 	public transient static final String AES_CFB_PKCS7_PADDING      = "AES/CFB/PKCS7Padding";
+	/**
+	 * The constant AES_CFB_ISO10126_Padding.
+	 */
 	public transient static final String AES_CFB_ISO10126_Padding   = "AES/CFB/ISO10126Padding";
+	/**
+	 * The constant AES_ECB_NO_PADDING.
+	 */
 	public transient static final String AES_ECB_NO_PADDING         = "AES/ECB/NoPadding";
+	/**
+	 * The constant AES_ECB_PKCS5_PADDING.
+	 */
 	public transient static final String AES_ECB_PKCS5_PADDING      = "AES/ECB/PKCS5Padding";
+	/**
+	 * The constant AES_ECB_PKCS7_PADDING.
+	 */
 	public transient static final String AES_ECB_PKCS7_PADDING      = "AES/ECB/PKCS7Padding";
+	/**
+	 * The constant AES_ECB_ISO10126_Padding.
+	 */
 	public transient static final String AES_ECB_ISO10126_Padding   = "AES/ECB/ISO10126Padding";
+	/**
+	 * The constant AES_OFB_NO_PADDING.
+	 */
 	public transient static final String AES_OFB_NO_PADDING         = "AES/OFB/NoPadding";
+	/**
+	 * The constant AES_OFB_PKCS5_PADDING.
+	 */
 	public transient static final String AES_OFB_PKCS5_PADDING      = "AES/OFB/PKCS5Padding";
+	/**
+	 * The constant AES_OFB_PKCS7_PADDING.
+	 */
 	public transient static final String AES_OFB_PKCS7_PADDING      = "AES/OFB/PKCS7Padding";
+	/**
+	 * The constant AES_OFB_ISO10126_Padding.
+	 */
 	public transient static final String AES_OFB_ISO10126_Padding   = "AES/OFB/ISO10126Padding";
 	/**
 	 * RSA Algorithm
 	 */
 	public transient static final String RSA_PKCS1_PADDING          = "RSA/ECB/PKCS1Padding";
+	/**
+	 * The constant RSA_OAEP_SHA1_PADDING.
+	 */
 	public transient static final String RSA_OAEP_SHA1_PADDING      = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
+	/**
+	 * The constant RSA_OAEP_SHA256_PADDING.
+	 */
 	public transient static final String RSA_OAEP_SHA256_PADDING    = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
 	/**
 	 * PRNG Algorithm
 	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE                  = "NativePRNG";
+	/**
+	 * The constant PRNG_ALGORITHM_NATIVE_BLOCKING.
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE_BLOCKING         = "NativePRNGBlocking";
+	/**
+	 * The constant PRNG_ALGORITHM_NATIVE_NON_BLOCKING.
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE_NON_BLOCKING     = "NativePRNGNonBlocking";
+	/**
+	 * The constant PRNG_ALGORITHM_NATIVE_PKCS11.
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE_PKCS11           = "PKCS11";
+	/**
+	 * The constant PRNG_ALGORITHM_NATIVE_SHA1PRNG.
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE_SHA1PRNG         = "SHA1PRNG";
+	/**
+	 * The constant PRNG_ALGORITHM_NATIVE_WINDOWS.
+	 */
 	public transient static final String PRNG_ALGORITHM_NATIVE_WINDOWS          = "Windows-PRNG";
 
 	/**
@@ -130,10 +242,11 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/* MD5 Method */
-	
+
 	/**
 	 * Get MD5 value. Only encode <code>String</code>
-	 * @param source		source object
+	 *
+	 * @param source source object
 	 * @return MD5 value
 	 */
 	public static String MD5(Object source) {
@@ -141,30 +254,33 @@ public final class SecurityUtils implements Serializable {
 	}
 	
 	/* SHA Method */
-	
+
 	/**
 	 * Get SHA1 value. Only encode <code>String</code>
 	 * Using SHA256 instead
-	 * @param source		source object
+	 *
+	 * @param source source object
 	 * @return SHA1 value
 	 */
 	@Deprecated
 	public static String SHA1(Object source) {
 		return digestEncode(source, "SHA1");
 	}
-	
+
 	/**
 	 * Get SHA256 value. Only encode <code>String</code>
-	 * @param source		source object
+	 *
+	 * @param source source object
 	 * @return SHA256 value
 	 */
 	public static String SHA256(Object source) {
 		return digestEncode(source, "SHA-256");
 	}
-	
+
 	/**
 	 * Get SHA512 value. Only encode <code>String</code>
-	 * @param source		source object
+	 *
+	 * @param source source object
 	 * @return SHA512 value
 	 */
 	public static String SHA512(Object source) {
@@ -175,9 +291,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by AES128
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param arrB   Byte arrays will be encrypted
+	 * @param strKey encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(byte[] arrB, String strKey) {
 		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
@@ -185,10 +302,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte arrays will be encrypted
+	 * @param strKey    encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(String algorithm, byte[] arrB, String strKey) {
 		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
@@ -196,11 +314,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param strKey        encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, 128);
@@ -208,9 +327,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by AES128
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(byte[] arrB, byte[] keyContent) {
 		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
@@ -218,10 +338,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm  Algorithm
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
@@ -229,11 +350,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param keyContent    Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES128Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 128);
@@ -241,9 +363,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by AES256
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param arrB   Byte arrays will be encrypted
+	 * @param strKey encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(byte[] arrB, String strKey) {
 		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -251,10 +374,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte arrays will be encrypted
+	 * @param strKey    encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(String algorithm, byte[] arrB, String strKey) {
 		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -262,11 +386,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param strKey        encrypt key
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
@@ -274,9 +399,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by AES256
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(byte[] arrB, byte[] keyContent) {
 		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -284,10 +410,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm  Algorithm
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -295,11 +422,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param keyContent				Binary key content
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param keyContent    Binary key content
+	 * @return Encrypted result
 	 */
 	public static byte[] AES256Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
@@ -307,8 +435,9 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with default encrypt key by AES128
-	 * @param strIn						String will be encrypted
-	 * @return							Encrypted result
+	 *
+	 * @param strIn String will be encrypted
+	 * @return Encrypted result
 	 */
 	public static String AES128Encrypt(String strIn) {
 		return AES128Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, SecurityUtils.PRIVATE_KEY);
@@ -316,9 +445,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES128
-	 * @param strIn						String will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param strIn  String will be encrypted
+	 * @param strKey encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES128Encrypt(String strIn, String strKey) {
 		return AES128Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -326,10 +456,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be encrypted
+	 * @param strKey    encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES128Encrypt(String algorithm, String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(
@@ -338,11 +469,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param strIn						String will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be encrypted
+	 * @param strKey        encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES128Encrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(
@@ -351,8 +483,9 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with default encrypt key by AES256
-	 * @param strIn						String will be encrypted
-	 * @return							Encrypted result
+	 *
+	 * @param strIn String will be encrypted
+	 * @return Encrypted result
 	 */
 	public static String AES256Encrypt(String strIn) {
 		return AES256Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, SecurityUtils.PRIVATE_KEY);
@@ -360,9 +493,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES256
-	 * @param strIn						String will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param strIn  String will be encrypted
+	 * @param strKey encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES256Encrypt(String strIn, String strKey) {
 		return AES256Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -370,10 +504,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be encrypted
-	 * @param strKey					encrypt key
-	 * @return							Encrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be encrypted
+	 * @param strKey    encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES256Encrypt(String algorithm, String strIn, String strKey) {
 		return AES256Encrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -381,11 +516,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by AES256
-	 * @param algorithm             Algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param strIn					String will be encrypted
-	 * @param strKey				encrypt key
-	 * @return						Encrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be encrypted
+	 * @param strKey        encrypt key
+	 * @return Encrypted result
 	 */
 	public static String AES256Encrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(
@@ -394,9 +530,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param arrB					Byte arrays will be encrypted
-	 * @param keyContent			Binary key content
-	 * @return						Encrypt result
+	 *
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(byte[] arrB, byte[] keyContent) {
 		return DESEncrypt(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, keyContent);
@@ -404,10 +541,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param arrB					Byte arrays will be encrypted
-	 * @param keyContent			Binary key content
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm  Encrypt algorithm
+	 * @param arrB       Byte arrays will be encrypted
+	 * @param keyContent Binary key content
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return DESEncrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, keyContent);
@@ -415,11 +553,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB					Byte arrays will be encrypted
-	 * @param keyContent			Binary key content
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm     Encrypt algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param keyContent    Binary key content
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, Globals.DEFAULT_VALUE_INT);
@@ -427,9 +566,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param strKey					Encrypt key
-	 * @return							Encrypt result
+	 *
+	 * @param arrB   Byte arrays will be encrypted
+	 * @param strKey Encrypt key
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(byte[] arrB, String strKey) {
 		return DESEncrypt(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, strKey);
@@ -437,10 +577,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param arrB					Byte arrays will be encrypted
-	 * @param strKey				Encrypt key
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm Encrypt algorithm
+	 * @param arrB      Byte arrays will be encrypted
+	 * @param strKey    Encrypt key
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(String algorithm, byte[] arrB, String strKey) {
 		return DESEncrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, strKey);
@@ -448,11 +589,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB					Byte arrays will be encrypted
-	 * @param strKey				Encrypt key
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm     Encrypt algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be encrypted
+	 * @param strKey        Encrypt key
+	 * @return Encrypt result
 	 */
 	public static byte[] DESEncrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, Globals.DEFAULT_VALUE_INT);
@@ -460,9 +602,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by DES
-	 * @param strIn					String will be encrypted
-	 * @param strKey				Encrypt key
-	 * @return						Encrypt result
+	 *
+	 * @param strIn  String will be encrypted
+	 * @param strKey Encrypt key
+	 * @return Encrypt result
 	 */
 	public static String DESEncrypt(String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(DESEncrypt(DES_CBC_PKCS5_PADDING,
@@ -471,10 +614,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param strIn					String will be encrypted
-	 * @param strKey				Encrypt key
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm Encrypt algorithm
+	 * @param strIn     String will be encrypted
+	 * @param strKey    Encrypt key
+	 * @return Encrypt result
 	 */
 	public static String DESEncrypt(String algorithm, String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(DESEncrypt(algorithm,
@@ -483,11 +627,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given encrypt key by DES
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param strIn				    String will be encrypted
-	 * @param strKey				Encrypt key
-	 * @return						Encrypt result
+	 *
+	 * @param algorithm     Encrypt algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be encrypted
+	 * @param strKey        Encrypt key
+	 * @return Encrypt result
 	 */
 	public static String DESEncrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		return ConvertUtils.byteArrayToHexString(DESEncrypt(algorithm,
@@ -496,9 +641,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given key by RSA
-	 * @param strIn						String will be encrypted
-	 * @param key						RSA key
-	 * @return							Encrypt result
+	 *
+	 * @param strIn String will be encrypted
+	 * @param key   RSA key
+	 * @return Encrypt result
 	 */
 	public static String RSAEncrypt(String strIn, Key key) {
 		return ConvertUtils.byteArrayToHexString(SecurityUtils.EncryptData(RSA_PKCS1_PADDING, null,
@@ -507,10 +653,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt string with given key by RSA
-	 * @param algorithm                 Encrypt algorithm
-	 * @param strIn						String will be encrypted
-	 * @param key						RSA key
-	 * @return							Encrypt result
+	 *
+	 * @param algorithm Encrypt algorithm
+	 * @param strIn     String will be encrypted
+	 * @param key       RSA key
+	 * @return Encrypt result
 	 */
 	public static String RSAEncrypt(String algorithm, String strIn, Key key) {
 		return ConvertUtils.byteArrayToHexString(SecurityUtils.EncryptData(algorithm, null,
@@ -519,9 +666,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Encrypt byte arrays with given key by RSA
-	 * @param arrB						Byte arrays will be encrypted
-	 * @param key						RSA key
-	 * @return							Encrypt result
+	 *
+	 * @param arrB Byte arrays will be encrypted
+	 * @param key  RSA key
+	 * @return Encrypt result
 	 */
 	public static byte[] RSAEncrypt(byte[] arrB, Key key) {
 		return SecurityUtils.EncryptData(RSA_PKCS1_PADDING, null, arrB, key, (String)null, Globals.DEFAULT_VALUE_INT);
@@ -531,9 +679,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by AES128
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param arrB   Byte arrays will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(byte[] arrB, String strKey) {
 		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
@@ -541,10 +690,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte arrays will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(String algorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
@@ -552,11 +702,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 128);
@@ -564,9 +715,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by AES128
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent				Binary key content
-	 * @return							Decrypted result
+	 *
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Binary key content
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(byte[] arrB, byte[] keyContent) {
 		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
@@ -574,10 +726,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent				Binary key content
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm  Algorithm
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Binary key content
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
@@ -585,11 +738,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent				Binary key content
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param keyContent    Binary key content
+	 * @return Decrypted result
 	 */
 	public static byte[] AES128Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 128);
@@ -597,9 +751,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given decrypt key by AES128
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param strIn  String will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES128Decrypt(String strIn, String strKey) {
 		return AES128Decrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -607,10 +762,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES128Decrypt(String algorithm, String strIn, String strKey) {
 		return AES128Decrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -618,11 +774,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given algorithm and decrypt key by AES128
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES128Decrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		try {
@@ -639,9 +796,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by AES256
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param arrB   Byte arrays will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(byte[] arrB, String strKey) {
 		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -649,10 +807,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte arrays will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(String algorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -660,11 +819,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
@@ -672,9 +832,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by AES256
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(byte[] arrB, byte[] keyContent) {
 		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -682,10 +843,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm  Algorithm
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -693,11 +855,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param keyContent    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] AES256Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
@@ -705,9 +868,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given decrypt key by AES256
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param strIn  String will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES256Decrypt(String strIn, String strKey) {
 		return AES256Decrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -715,10 +879,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES256Decrypt(String algorithm, String strIn, String strKey) {
 		return AES256Decrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
@@ -726,11 +891,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypted result
 	 */
 	public static String AES256Decrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		try {
@@ -746,9 +912,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by DES
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param arrB   Byte arrays will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(byte[] arrB, String strKey) {
 		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -756,10 +923,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte arrays will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(String algorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
@@ -767,11 +935,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
@@ -779,9 +948,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given decrypt key by DES
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(byte[] arrB, byte[] keyContent) {
 		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -789,10 +959,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm  Algorithm
+	 * @param arrB       Byte arrays will be decrypted
+	 * @param keyContent Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(String algorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
@@ -800,11 +971,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param arrB						Byte arrays will be decrypted
-	 * @param keyContent			    Decrypt key
-	 * @return							Decrypted result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param arrB          Byte arrays will be decrypted
+	 * @param keyContent    Decrypt key
+	 * @return Decrypted result
 	 */
 	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
 		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
@@ -812,9 +984,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given decrypt key by DES
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypt result
+	 *
+	 * @param strIn  String will be decrypted
+	 * @param strKey Decrypt key
+	 * @return Decrypt result
 	 */
 	public static String DESDecrypt(String strIn, String strKey) {
 		return ConvertUtils.convertToString(DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG,
@@ -823,10 +996,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given decrypt key by DES
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypt result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be decrypted
+	 * @param strKey    Decrypt key
+	 * @return Decrypt result
 	 */
 	public static String DESDecrypt(String algorithm, String strIn, String strKey) {
 		return ConvertUtils.convertToString(DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG,
@@ -835,11 +1009,12 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given decrypt key by DES
-	 * @param algorithm                 Algorithm
-	 * @param prngAlgorithm             PRNG Algorithm
-	 * @param strIn						String will be decrypted
-	 * @param strKey					Decrypt key
-	 * @return							Decrypt result
+	 *
+	 * @param algorithm     Algorithm
+	 * @param prngAlgorithm PRNG Algorithm
+	 * @param strIn         String will be decrypted
+	 * @param strKey        Decrypt key
+	 * @return Decrypt result
 	 */
 	public static String DESDecrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
 		return ConvertUtils.convertToString(DecryptData(algorithm, prngAlgorithm,
@@ -848,9 +1023,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given key by RSA
-	 * @param strIn						String will be encrypted
-	 * @param key						RSA key
-	 * @return							Decrypt result
+	 *
+	 * @param strIn String will be encrypted
+	 * @param key   RSA key
+	 * @return Decrypt result
 	 */
 	public static String RSADecrypt(String strIn, Key key) {
 		return ConvertUtils.convertToString(DecryptData(RSA_PKCS1_PADDING, null,
@@ -859,10 +1035,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt string with given key by RSA
-	 * @param algorithm                 Algorithm
-	 * @param strIn						String will be encrypted
-	 * @param key						RSA key
-	 * @return							Decrypt result
+	 *
+	 * @param algorithm Algorithm
+	 * @param strIn     String will be encrypted
+	 * @param key       RSA key
+	 * @return Decrypt result
 	 */
 	public static String RSADecrypt(String algorithm, String strIn, Key key) {
 		return ConvertUtils.convertToString(SecurityUtils.DecryptData(algorithm, null,
@@ -871,9 +1048,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte array with given key by RSA
-	 * @param arrB						Byte array will be encrypted
-	 * @param key						RSA key
-	 * @return							Decrypt result
+	 *
+	 * @param arrB Byte array will be encrypted
+	 * @param key  RSA key
+	 * @return Decrypt result
 	 */
 	public static byte[] RSADecrypt(byte[] arrB, Key key) {
 		return SecurityUtils.DecryptData(RSA_PKCS1_PADDING, null, arrB,
@@ -882,10 +1060,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Decrypt byte array with given key by RSA
-	 * @param algorithm                 Algorithm
-	 * @param arrB						Byte array will be encrypted
-	 * @param key						RSA key
-	 * @return							Decrypt result
+	 *
+	 * @param algorithm Algorithm
+	 * @param arrB      Byte array will be encrypted
+	 * @param key       RSA key
+	 * @return Decrypt result
 	 */
 	public static byte[] RSADecrypt(String algorithm, byte[] arrB, Key key) {
 		return SecurityUtils.DecryptData(algorithm, null, arrB,
@@ -894,131 +1073,110 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Generate RSA key pair with default key size: 1024
-	 * @return	Key pair
-	 * @throws Exception	Any exception of this operate will be throw up
+	 *
+	 * @return Key pair
 	 */
-	public static KeyPair RSAKeyPair() throws Exception {
+	public static Optional<KeyPair> RSAKeyPair() {
 		return SecurityUtils.KeyPair("RSA", 1024);
 	}
 
 	/**
 	 * Generate RSA key pair with given key size
-	 * @param keySize	key size
-	 * @return	Key pair
-	 * @throws Exception	Any exception of this operate will be throw up
+	 *
+	 * @param keySize key size
+	 * @return Key pair
 	 */
-	public static KeyPair RSAKeyPair(int keySize) throws Exception {
+	public static Optional<KeyPair> RSAKeyPair(int keySize) {
 		return SecurityUtils.KeyPair("RSA", keySize);
 	}
 
 	/**
 	 * Generate DSA key pair with default key size: 1024
-	 * @return	Key pair
-	 * @throws Exception	key size invalid or 
-	 * if a KeyPairGeneratorSpi implementation for the specified algorithm is not available from the specified Provider object.
-	 * if the specified provider is null.
+	 *
+	 * @return Key pair
 	 */
-	public static KeyPair DSAKeyPair() throws Exception {
+	public static Optional<KeyPair> DSAKeyPair() {
 		return SecurityUtils.KeyPair("DSA", 1024);
 	}
 
 	/**
 	 * Generate DSA key pair with given key size
-	 * @param keySize	key size
-	 * @return	Key pair
-	 * @throws Exception	key size invalid or 
-	 * if a KeyPairGeneratorSpi implementation for the specified algorithm is not available from the specified Provider object.
-	 * if the specified provider is null.
+	 *
+	 * @param keySize key size
+	 * @return Key pair
 	 */
-	public static KeyPair DSAKeyPair(int keySize) throws Exception {
+	public static Optional<KeyPair> DSAKeyPair(int keySize) {
 		return SecurityUtils.KeyPair("DSA", keySize);
 	}
 
 	/**
 	 * Generate DSA public key with given key content
-	 * @param keyContent	key content
-	 * @return	DSA public key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param keyContent key content
+	 * @return DSA public key object
 	 */
-	public static PublicKey DSAPublicKey(byte[] keyContent) 
-			throws InvalidKeySpecException, NoSuchAlgorithmException {
-		return KeyFactory.getInstance("DSA").generatePublic(new X509EncodedKeySpec(keyContent));
+	public static Optional<PublicKey> DSAPublicKey(byte[] keyContent) {
+		return generateKey(PublicKey.class, "DSA", keyContent);
 	}
-	
+
 	/**
 	 * Generate DSA private key with given key content
-	 * @param keyContent	key content
-	 * @return	DSA private key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param keyContent key content
+	 * @return DSA private key object
 	 */
-	public static PrivateKey DSAPrivateKey(byte[] keyContent) 
-			throws InvalidKeySpecException, NoSuchAlgorithmException {
-		return KeyFactory.getInstance("DSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
+	public static Optional<PrivateKey> DSAPrivateKey(byte[] keyContent) {
+		return generateKey(PrivateKey.class, "DSA", keyContent);
 	}
 
 	/**
 	 * Generate RSA public key with given key content
-	 * @param keyContent	key content
-	 * @return	RSA public key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param keyContent key content
+	 * @return RSA public key object
 	 */
-	public static PublicKey RSAPublicKey(byte[] keyContent) 
-			throws InvalidKeySpecException, NoSuchAlgorithmException {
-		return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyContent));
+	public static Optional<PublicKey> RSAPublicKey(byte[] keyContent) {
+		return generateKey(PublicKey.class, "RSA", keyContent);
 	}
 
 	/**
 	 * Generate RSA public key with given modulus and exponent
-	 * @param modulus	modulus
-	 * @param exponent	exponent
-	 * @return	RSA public key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param modulus  modulus
+	 * @param exponent exponent
+	 * @return RSA public key object
 	 */
-	public static PublicKey RSAPublicKey(BigInteger modulus, BigInteger exponent) 
-			throws NoSuchAlgorithmException, InvalidKeySpecException {
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
-		RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, exponent);
-		
-		return keyFactory.generatePublic(publicKeySpec);
+	public static Optional<PublicKey> RSAPublicKey(BigInteger modulus, BigInteger exponent) {
+		return generateRSAKey(PublicKey.class, modulus, exponent);
 	}
 
 	/**
 	 * Generate RSA private key with given key content
-	 * @param keyContent	key content
-	 * @return	RSA private key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param keyContent key content
+	 * @return RSA private key object
 	 */
-	public static PrivateKey RSAPrivateKey(byte[] keyContent) 
-			throws InvalidKeySpecException, NoSuchAlgorithmException {
-		return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyContent));
+	public static Optional<PrivateKey> RSAPrivateKey(byte[] keyContent) {
+		return generateKey(PrivateKey.class, "RSA", keyContent);
 	}
 
 	/**
 	 * Generate RSA private key with given modulus and exponent
-	 * @param modulus	modulus
-	 * @param exponent	exponent
-	 * @return	RSA private key object
-	 * @throws InvalidKeySpecException if the given key specification is inappropriate for this key factory to produce a public key.
-	 * @throws NoSuchAlgorithmException if no Provider supports a KeyFactorySpi implementation for the specified algorithm.
+	 *
+	 * @param modulus  modulus
+	 * @param exponent exponent
+	 * @return RSA private key object
 	 */
-	public static PrivateKey RSAPrivateKey(BigInteger modulus, BigInteger exponent) 
-			throws NoSuchAlgorithmException, InvalidKeySpecException {
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
-		RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
-		
-		return keyFactory.generatePrivate(privateKeySpec);
+	public static Optional<PrivateKey> RSAPrivateKey(BigInteger modulus, BigInteger exponent) {
+		return generateRSAKey(PrivateKey.class, modulus, exponent);
 	}
-	
+
 	/**
 	 * Signature data with DSA
-	 * @param privateKey	Signature private key
-	 * @param message		Signature datas
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param message    Signature datas
+	 * @return Signature info
 	 */
 	public static byte[] signDataWithDSA(PrivateKey privateKey, String message) {
 		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withDSA");
@@ -1026,9 +1184,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with DSA
-	 * @param privateKey	Signature private key
-	 * @param filePath		Signature file path
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param filePath   Signature file path
+	 * @return Signature info
 	 */
 	public static byte[] signFileWithDSA(PrivateKey privateKey, String filePath) {
 		return signFile(privateKey, filePath, "SHA256withDSA");
@@ -1036,20 +1195,22 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with DSA
-	 * @param privateKey	Signature private key
-	 * @param datas			Signature datas
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param datas      Signature datas
+	 * @return Signature info
 	 */
 	public static byte[] signDataWithDSA(PrivateKey privateKey, byte[] datas) {
 		return signData(privateKey, datas, "SHA256withDSA");
 	}
-	
+
 	/**
 	 * Verify signature info is valid
-	 * @param publicKey		Verify public key
-	 * @param datas			Signature datas
-	 * @param signature		Signature info
-	 * @return				Verify result
+	 *
+	 * @param publicKey Verify public key
+	 * @param datas     Signature datas
+	 * @param signature Signature info
+	 * @return Verify result
 	 */
 	public static boolean verifyDSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
 		return verifySign(publicKey, datas, signature, "SHA256withDSA");
@@ -1057,10 +1218,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Verify signature info is valid
-	 * @param publicKey		Verify public key
-	 * @param filePath		Signature file path
-	 * @param signature		Signature info
-	 * @return				Verify result
+	 *
+	 * @param publicKey Verify public key
+	 * @param filePath  Signature file path
+	 * @param signature Signature info
+	 * @return Verify result
 	 */
 	public static boolean verifyDSASign(PublicKey publicKey, String filePath, byte[] signature) {
 		return verifySign(publicKey, filePath, signature, "SHA256withDSA");
@@ -1068,9 +1230,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with RSA
-	 * @param privateKey	Signature private key
-	 * @param message		Signature datas
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param message    Signature datas
+	 * @return Signature info
 	 */
 	public static byte[] signDataWithRSA(PrivateKey privateKey, String message) {
 		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withRSA");
@@ -1078,9 +1241,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with RSA
-	 * @param privateKey	Signature private key
-	 * @param datas			Signature datas
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param datas      Signature datas
+	 * @return Signature info
 	 */
 	public static byte[] signDataWithRSA(PrivateKey privateKey, byte[] datas) {
 		return signData(privateKey, datas, "SHA256withRSA");
@@ -1088,9 +1252,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with RSA
-	 * @param privateKey	Signature private key
-	 * @param filePath		Signature file path
-	 * @return				Signature info
+	 *
+	 * @param privateKey Signature private key
+	 * @param filePath   Signature file path
+	 * @return Signature info
 	 */
 	public static byte[] signFileWithRSA(PrivateKey privateKey, String filePath) {
 		return signFile(privateKey, filePath, "SHA256withRSA");
@@ -1098,9 +1263,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacMD5
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacMD5(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacMD5");
@@ -1108,9 +1274,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA1
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA1(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA1");
@@ -1118,9 +1285,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA256
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA256(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA256");
@@ -1128,9 +1296,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA384
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA384(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA384");
@@ -1138,9 +1307,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA512
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA512(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA512");
@@ -1148,9 +1318,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA512-224
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA512_224(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA512/224");
@@ -1158,9 +1329,10 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Signature data with HmacSHA512-256
-	 * @param keyBytes		sign key bytes
-	 * @param signDatas		sign data bytes
-	 * @return				signature datas
+	 *
+	 * @param keyBytes  sign key bytes
+	 * @param signDatas sign data bytes
+	 * @return signature datas
 	 */
 	public static byte[] signDataByHmacSHA512_256(byte[] keyBytes, byte[] signDatas) {
 		return Hmac(keyBytes, signDatas, "HmacSHA512/256");
@@ -1168,10 +1340,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Verify signature info is valid
-	 * @param publicKey		Verify public key
-	 * @param datas			Signature datas
-	 * @param signature		Signature info
-	 * @return				Verify result
+	 *
+	 * @param publicKey Verify public key
+	 * @param datas     Signature datas
+	 * @param signature Signature info
+	 * @return Verify result
 	 */
 	public static boolean verifyRSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
 		return verifySign(publicKey, datas, signature, "SHA256withRSA");
@@ -1179,10 +1352,11 @@ public final class SecurityUtils implements Serializable {
 
 	/**
 	 * Verify signature info is valid
-	 * @param publicKey		Verify public key
-	 * @param filePath		Signature file path
-	 * @param signature		Signature info
-	 * @return				Verify result
+	 *
+	 * @param publicKey Verify public key
+	 * @param filePath  Signature file path
+	 * @param signature Signature info
+	 * @return Verify result
 	 */
 	public static boolean verifyRSASign(PublicKey publicKey, String filePath, byte[] signature) {
 		return verifySign(publicKey, filePath, signature, "SHA256withRSA");
@@ -1191,8 +1365,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Read public key from X.509 certificate file
 	 *
-	 * @param dataBytes         Certificate file data bytes
-	 * @return                  Public key
+	 * @param dataBytes Certificate file data bytes
+	 * @return Public key
 	 */
 	public static PublicKey readPublicKeyFromX509(byte[] dataBytes) {
 		return SecurityUtils.readPublicKeyFromX509(dataBytes, Globals.DEFAULT_VALUE_BOOLEAN);
@@ -1201,9 +1375,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Read public key from X.509 certificate file
 	 *
-	 * @param dataBytes         Certificate file data bytes
-	 * @param checkValidity     Check certificate validity
-	 * @return                  Public key
+	 * @param dataBytes     Certificate file data bytes
+	 * @param checkValidity Check certificate validity
+	 * @return Public key
 	 */
 	public static PublicKey readPublicKeyFromX509(byte[] dataBytes, boolean checkValidity) {
 		PublicKey publicKey = null;
@@ -1234,6 +1408,43 @@ public final class SecurityUtils implements Serializable {
 		return publicKey;
 	}
 
+	private static <T> Optional<T> generateRSAKey(Class<T> clazz, BigInteger modulus, BigInteger exponent) {
+		Object generatedKey = null;
+		try {
+			KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
+			if (PrivateKey.class.equals(clazz)) {
+				RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
+				generatedKey = keyFactory.generatePrivate(privateKeySpec);
+			} else if (PublicKey.class.equals(clazz)) {
+				RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, exponent);
+				generatedKey = keyFactory.generatePublic(publicKeySpec);
+			}
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+			LOGGER.error("Generate key from data bytes error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return generatedKey == null ? Optional.empty() : Optional.of(clazz.cast(generatedKey));
+	}
+
+	private static <T> Optional<T> generateKey(Class<T> clazz, String algorithm, byte[] keyContent) {
+		Object generatedKey = null;
+		try {
+			if (PrivateKey.class.equals(clazz)) {
+				generatedKey = KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(keyContent));
+			} else if (PublicKey.class.equals(clazz)) {
+				generatedKey = KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(keyContent));
+			}
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+			LOGGER.error("Generate key from data bytes error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return generatedKey == null ? Optional.empty() : Optional.of(clazz.cast(generatedKey));
+	}
+
 	/**
 	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
 	 * @param algorithm             Encrypt algorithm
@@ -1244,7 +1455,8 @@ public final class SecurityUtils implements Serializable {
 	 * @param keySize               Key Size
 	 * @return                      Encrypted Data
 	 */
-	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, String strKey, int keySize) {
+	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB,
+	                                  Key key, String strKey, int keySize) {
 		try {
 			return EncryptData(algorithm, prngAlgorithm, arrB, key,
 					strKey == null ? null : strKey.getBytes(Globals.DEFAULT_ENCODING),
@@ -1382,18 +1594,26 @@ public final class SecurityUtils implements Serializable {
 	 * @param algorithm     Algorithm
 	 * @param keySize       Key size
 	 * @return              Generated key pair
-	 * @throws Exception    Key size invalid or other exceptions
 	 */
-	private static KeyPair KeyPair(String algorithm, int keySize) throws Exception {
+	private static Optional<KeyPair> KeyPair(String algorithm, int keySize) {
 		if (keySize % 128 != 0) {
-			throw new Exception("Key size is invalid");
+			LOGGER.error("Key size is invalid");
+			return Optional.empty();
 		}
-		//	Initialize keyPair instance
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
-		keyPairGenerator.initialize(keySize, new SecureRandom());
-		return keyPairGenerator.generateKeyPair();
-		
-		//	Generate keyPair
+
+		KeyPair keyPair = null;
+		try {
+			//	Initialize keyPair instance
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
+			keyPairGenerator.initialize(keySize, new SecureRandom());
+			keyPair = keyPairGenerator.generateKeyPair();
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.error("Initialize key pair generator error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return Optional.ofNullable(keyPair);
 	}
 
 	/**
@@ -1737,9 +1957,10 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate DES CipherKey Instance
-		 * @param strKey    Key content
-		 * @return          CipherKey Instance
-		 * @throws UnsupportedEncodingException     Unsupported Encoding
+		 *
+		 * @param strKey Key content
+		 * @return CipherKey Instance
+		 * @throws UnsupportedEncodingException Unsupported Encoding
 		 */
 		public static CipherKey DESKey(String strKey) throws UnsupportedEncodingException {
 			return new CipherKey(null, strKey.getBytes(Globals.DEFAULT_ENCODING),
@@ -1748,9 +1969,10 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate DES CipherKey Instance
-		 * @param keyContent        Key content
-		 * @param prngAlgorithm     PRNG Algorithm
-		 * @return                  CipherKey Instance
+		 *
+		 * @param keyContent    Key content
+		 * @param prngAlgorithm PRNG Algorithm
+		 * @return CipherKey Instance
 		 */
 		public static CipherKey DESKey(byte[] keyContent, String prngAlgorithm) {
 			return new CipherKey(null, keyContent, prngAlgorithm, Globals.DEFAULT_VALUE_INT);
@@ -1758,10 +1980,11 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate DES CipherKey Instance
-		 * @param strKey            Key content
-		 * @param prngAlgorithm     PRNG Algorithm
-		 * @return                  CipherKey Instance
-		 * @throws UnsupportedEncodingException     Unsupported Encoding
+		 *
+		 * @param strKey        Key content
+		 * @param prngAlgorithm PRNG Algorithm
+		 * @return CipherKey Instance
+		 * @throws UnsupportedEncodingException Unsupported Encoding
 		 */
 		public static CipherKey DESKey(String strKey, String prngAlgorithm) throws UnsupportedEncodingException {
 			return new CipherKey(null, strKey.getBytes(Globals.DEFAULT_ENCODING),
@@ -1770,9 +1993,10 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate AES CipherKey Instance
-		 * @param keyContent        AES Key bytes
-		 * @param keySize           AES Key Size
-		 * @return                  CipherKey Instance
+		 *
+		 * @param keyContent AES Key bytes
+		 * @param keySize    AES Key Size
+		 * @return CipherKey Instance
 		 */
 		public static CipherKey AESKey(byte[] keyContent, int keySize) {
 			return new CipherKey(null, keyContent, PRNG_ALGORITHM_NATIVE_SHA1PRNG, keySize);
@@ -1780,10 +2004,11 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate AES CipherKey Instance
-		 * @param keyContent        AES Key bytes
-		 * @param prngAlgorithm     PRNG Algorithm
-		 * @param keySize           AES Key Size
-		 * @return                  CipherKey Instance
+		 *
+		 * @param keyContent    AES Key bytes
+		 * @param prngAlgorithm PRNG Algorithm
+		 * @param keySize       AES Key Size
+		 * @return CipherKey Instance
 		 */
 		public static CipherKey AESKey(byte[] keyContent, String prngAlgorithm, int keySize) {
 			return new CipherKey(null, keyContent, prngAlgorithm, keySize);
@@ -1791,8 +2016,9 @@ public final class SecurityUtils implements Serializable {
 
 		/**
 		 * Generate RSA CipherKey Instance
-		 * @param rsaKey        RSA Key Instance
-		 * @return              CipherKey Instance
+		 *
+		 * @param rsaKey RSA Key Instance
+		 * @return CipherKey Instance
 		 */
 		public static CipherKey RSAKey(Key rsaKey) {
 			return new CipherKey(rsaKey, new byte[0],

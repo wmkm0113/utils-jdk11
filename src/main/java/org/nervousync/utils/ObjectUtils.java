@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;

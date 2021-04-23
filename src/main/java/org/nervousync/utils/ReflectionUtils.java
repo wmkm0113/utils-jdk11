@@ -16,12 +16,7 @@
  */
 package org.nervousync.utils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -31,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.nervousync.commons.core.Globals;
 
 /**
+ * The type Reflection utils.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
  */
 public final class ReflectionUtils {
 
@@ -41,11 +38,12 @@ public final class ReflectionUtils {
 	private ReflectionUtils() {
 		
 	}
-	
+
 	/**
 	 * Parse field name from getter/setter method name
-	 * @param methodName		method name
-	 * @return  parsed field name
+	 *
+	 * @param methodName method name
+	 * @return parsed field name
 	 */
 	public static String parseFieldName(String methodName) {
 		String fieldName = null;
@@ -64,14 +62,15 @@ public final class ReflectionUtils {
 		
 		return fieldName;
 	}
-	
+
 	/**
 	 * Parse method name by given field name, field define class and method type
-	 * @param fieldName		field name
-	 * @param fieldClass	field define class
-	 * @param methodType	method type
+	 *
+	 * @param fieldName  field name
+	 * @param fieldClass field define class
+	 * @param methodType method type
+	 * @return parsed method name
 	 * @see ReflectionUtils.MethodType
-	 * @return	parsed method name
 	 */
 	public static String parseMethodName(String fieldName, Class<?> fieldClass, MethodType methodType) {
 		String methodName = null;
@@ -93,11 +92,12 @@ public final class ReflectionUtils {
 		
 		return methodName;
 	}
-	
+
 	/**
 	 * Retrieve child enum define in given define class
-	 * @param enumClass	Define class
-	 * @return	enum data map
+	 *
+	 * @param enumClass Define class
+	 * @return enum data map
 	 */
 	public static Map<String, Object> parseEnum(Class<?> enumClass) {
 		Map<String, Object> enumMap = new HashMap<>();
@@ -112,11 +112,12 @@ public final class ReflectionUtils {
 		
 		return enumMap;
 	}
-	
+
 	/**
 	 * Retrieve all declared field names
-	 * @param clazz		Define class
-	 * @return			List of field name
+	 *
+	 * @param clazz Define class
+	 * @return List of field name
 	 */
 	public static List<String> getAllDeclaredFieldNames(Class<?> clazz) {
 		if (clazz == null) {
@@ -144,6 +145,12 @@ public final class ReflectionUtils {
 		return fieldList;
 	}
 
+	/**
+	 * Gets all declared fields.
+	 *
+	 * @param clazz the clazz
+	 * @return the all declared fields
+	 */
 	public static List<Field> getAllDeclaredFields(Class<?> clazz) {
 		if (clazz == null) {
 			return new ArrayList<>(0);
@@ -161,12 +168,13 @@ public final class ReflectionUtils {
 
 		return fieldList;
 	}
-	
+
 	/**
 	 * Attempt to find a {@link Field field} on the supplied {@link Class} with
 	 * the supplied <code>name</code>. Searches all superclasses up to {@link Object}.
+	 *
 	 * @param clazz the class to introspect
-	 * @param name the name of the field
+	 * @param name  the name of the field
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
 	public static Field findField(Class<?> clazz, String name) {
@@ -177,9 +185,10 @@ public final class ReflectionUtils {
 	 * Attempt to find a {@link Field field} on the supplied {@link Class} with
 	 * the supplied <code>name</code> and/or {@link Class type}. Searches all
 	 * superclasses up to {@link Object}.
+	 *
 	 * @param clazz the class to introspect
-	 * @param name the name of the field
-	 * @param type the type of the field (may be <code>null</code> if name is specified)
+	 * @param name  the name of the field
+	 * @param type  the type of the field (may be <code>null</code> if name is specified)
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
 	public static Field findField(Class<?> clazz, String name, Class<?> type) {
@@ -211,9 +220,10 @@ public final class ReflectionUtils {
 	 * automatically unwrapped if the underlying field has a primitive type.
 	 * <p>Thrown exceptions are handled via a call to
 	 * {@link #handleReflectionException(Exception)}.
-	 * @param field the field to set
+	 *
+	 * @param field  the field to set
 	 * @param target the target object on which to set the field
-	 * @param value the value to set; may be <code>null</code>
+	 * @param value  the value to set; may be <code>null</code>
 	 */
 	public static void setField(Field field, Object target, Object value) {
 		try {
@@ -233,8 +243,9 @@ public final class ReflectionUtils {
 	 * automatically wrapped if the underlying field has a primitive type.
 	 * <p>Thrown exceptions are handled via a call to
 	 * {@link #handleReflectionException(Exception)}.
+	 *
 	 * @param fieldName the name of field to get
-	 * @param target the target object from which to get the field
+	 * @param target    the target object from which to get the field
 	 * @return the field's current value
 	 */
 	public static Object getFieldValue(String fieldName, Object target) {
@@ -264,7 +275,8 @@ public final class ReflectionUtils {
 	 * automatically wrapped if the underlying field has a primitive type.
 	 * <p>Thrown exceptions are handled via a call to
 	 * {@link #handleReflectionException(Exception)}.
-	 * @param field the field to get
+	 *
+	 * @param field  the field to get
 	 * @param target the target object from which to get the field
 	 * @return the field's current value
 	 */
@@ -283,20 +295,56 @@ public final class ReflectionUtils {
 		}
 	}
 
+	/**
+	 * Retrieve get method method.
+	 *
+	 * @param fieldName the field name
+	 * @param beanClass the bean class
+	 * @return the method
+	 */
 	public static Method retrieveGetMethod(String fieldName, Class<?> beanClass) {
 		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.GetMethod);
 	}
 
+	/**
+	 * Retrieve set method method.
+	 *
+	 * @param fieldName the field name
+	 * @param beanClass the bean class
+	 * @return the method
+	 */
 	public static Method retrieveSetMethod(String fieldName, Class<?> beanClass) {
 		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.SetMethod);
 	}
 
-	public static Object executeMethod(String methodName, Object target) 
+	/**
+	 * Execute method object.
+	 *
+	 * @param methodName the method name
+	 * @param target     the target
+	 * @return the object
+	 * @throws IllegalArgumentException  the illegal argument exception
+	 * @throws IllegalAccessException    the illegal access exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
+	public static Object executeMethod(String methodName, Object target)
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		return executeMethod(methodName, target, new Class[]{});
 	}
-	
-	public static Object executeMethod(String methodName, Object target, Class<?>[] paramClasses, Object... args) 
+
+	/**
+	 * Execute method object.
+	 *
+	 * @param methodName   the method name
+	 * @param target       the target
+	 * @param paramClasses the param classes
+	 * @param args         the args
+	 * @return the object
+	 * @throws IllegalArgumentException  the illegal argument exception
+	 * @throws IllegalAccessException    the illegal access exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
+	public static Object executeMethod(String methodName, Object target, Class<?>[] paramClasses, Object... args)
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		Method method = ReflectionUtils.findMethod(target.getClass(), methodName, paramClasses);
 		if (method == null) {
@@ -312,13 +360,32 @@ public final class ReflectionUtils {
 		}
 		return returnObj;
 	}
-	
-	public static <T> Constructor<T> findConstructor(Class<T> clazz) 
+
+	/**
+	 * Find constructor constructor.
+	 *
+	 * @param <T>   the type parameter
+	 * @param clazz the clazz
+	 * @return the constructor
+	 * @throws SecurityException     the security exception
+	 * @throws NoSuchMethodException the no such method exception
+	 */
+	public static <T> Constructor<T> findConstructor(Class<T> clazz)
 			throws SecurityException, NoSuchMethodException {
 		return clazz.getDeclaredConstructor();
 	}
 
-	public static <T> Constructor<T> findConstructor(Class<T> clazz, Class<?>[] paramTypes) 
+	/**
+	 * Find constructor constructor.
+	 *
+	 * @param <T>        the type parameter
+	 * @param clazz      the clazz
+	 * @param paramTypes the param types
+	 * @return the constructor
+	 * @throws SecurityException     the security exception
+	 * @throws NoSuchMethodException the no such method exception
+	 */
+	public static <T> Constructor<T> findConstructor(Class<T> clazz, Class<?>[] paramTypes)
 			throws SecurityException, NoSuchMethodException {
 		return clazz.getDeclaredConstructor(paramTypes);
 	}
@@ -327,8 +394,9 @@ public final class ReflectionUtils {
 	 * Attempt to find a {@link Method} on the supplied class with the supplied name
 	 * and no parameters. Searches all superclasses up to <code>Object</code>.
 	 * <p>Returns <code>null</code> if no {@link Method} can be found.
+	 *
 	 * @param clazz the class to introspect
-	 * @param name the name of the method
+	 * @param name  the name of the method
 	 * @return the Method object, or <code>null</code> if none found
 	 */
 	public static Method findMethod(Class<?> clazz, String name) {
@@ -339,10 +407,10 @@ public final class ReflectionUtils {
 	 * Attempt to find a {@link Method} on the supplied class with the supplied name
 	 * and parameter types. Searches all superclasses up to <code>Object</code>.
 	 * <p>Returns <code>null</code> if no {@link Method} can be found.
-	 * @param clazz the class to introspect
-	 * @param name the name of the method
-	 * @param paramTypes the parameter types of the method
-	 * (may be <code>null</code> to indicate any signature)
+	 *
+	 * @param clazz      the class to introspect
+	 * @param name       the name of the method
+	 * @param paramTypes the parameter types of the method (may be <code>null</code> to indicate any signature)
 	 * @return the Method object, or <code>null</code> if none found
 	 */
 	public static Method findMethod(Class<?> clazz, String name, Class<?>[] paramTypes) {
@@ -370,10 +438,11 @@ public final class ReflectionUtils {
 	 * with no arguments. The target object can be <code>null</code> when
 	 * invoking a static {@link Method}.
 	 * <p>Thrown exceptions are handled via a call to {@link #handleReflectionException}.
+	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
 	 * @return the invocation result, if any
-	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeMethod(Method method, Object target) {
 		return invokeMethod(method, target, null);
@@ -384,9 +453,10 @@ public final class ReflectionUtils {
 	 * with the supplied arguments. The target object can be <code>null</code>
 	 * when invoking a static {@link Method}.
 	 * <p>Thrown exceptions are handled via a call to {@link #handleReflectionException}.
+	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
-	 * @param args the invocation arguments (may be <code>null</code>)
+	 * @param args   the invocation arguments (may be <code>null</code>)
 	 * @return the invocation result, if any
 	 */
 	public static Object invokeMethod(Method method, Object target, Object[] args) {
@@ -402,11 +472,12 @@ public final class ReflectionUtils {
 	/**
 	 * Invoke the specified JDBC API {@link Method} against the supplied
 	 * target object with no arguments.
+	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
 	 * @return the invocation result, if any
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
-	 * @see #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[]) #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeJdbcMethod(Method method, Object target) throws SQLException {
 		return invokeJdbcMethod(method, target, null);
@@ -415,12 +486,13 @@ public final class ReflectionUtils {
 	/**
 	 * Invoke the specified JDBC API {@link Method} against the supplied
 	 * target object with the supplied arguments.
+	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
-	 * @param args the invocation arguments (may be <code>null</code>)
+	 * @param args   the invocation arguments (may be <code>null</code>)
 	 * @return the invocation result, if any
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
-	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeJdbcMethod(Method method, Object target, Object[] args) throws SQLException {
 		try {
@@ -444,6 +516,7 @@ public final class ReflectionUtils {
 	 * <p>Throws the underlying RuntimeException or Error in case of an
 	 * InvocationTargetException with such a root cause. Throws an
 	 * IllegalStateException with an appropriate message else.
+	 *
 	 * @param ex the reflection exception to handle
 	 */
 	public static void handleReflectionException(Exception ex) {
@@ -467,6 +540,7 @@ public final class ReflectionUtils {
 	 * no checked exception is expected to be thrown by the target method.
 	 * <p>Throws the underlying RuntimeException or Error in case of such
 	 * a root cause. Throws an IllegalStateException else.
+	 *
 	 * @param ex the invocation target exception to handle
 	 */
 	public static void handleInvocationTargetException(InvocationTargetException ex) {
@@ -481,6 +555,7 @@ public final class ReflectionUtils {
 	 * <p>Rethrows the underlying exception cast to an {@link RuntimeException}
 	 * or {@link Error} if appropriate; otherwise, throws an
 	 * {@link IllegalStateException}.
+	 *
 	 * @param ex the exception to rethrow
 	 * @throws RuntimeException the rethrown exception
 	 */
@@ -502,6 +577,7 @@ public final class ReflectionUtils {
 	 * <p>Rethrows the underlying exception cast to an {@link Exception} or
 	 * {@link Error} if appropriate; otherwise, throws an
 	 * {@link IllegalStateException}.
+	 *
 	 * @param ex the exception to rethrow
 	 * @throws Exception the rethrown exception (in case of a checked exception)
 	 */
@@ -519,10 +595,10 @@ public final class ReflectionUtils {
 	 * Determine whether the given method explicitly declares the given exception
 	 * or one of its superclasses, which means that an exception of that type
 	 * can be propagated as-is within a reflective invocation.
-	 * @param method the declaring method
+	 *
+	 * @param method        the declaring method
 	 * @param exceptionType the exception to throw
-	 * @return <code>true</code> if the exception can be thrown as-is;
-	 * <code>false</code> if it needs to be wrapped
+	 * @return <code>true</code> if the exception can be thrown as-is; <code>false</code> if it needs to be wrapped
 	 */
 	public static boolean declaresException(Method method, Class<?> exceptionType) {
 		if (method == null) {
@@ -539,12 +615,26 @@ public final class ReflectionUtils {
 
 	/**
 	 * Determine whether the given field is a "public" constant.
+	 *
 	 * @param field the field to check
 	 * @return is a "public" constant.
 	 */
 	public static boolean isPublic(Field field) {
 		if (field != null) {
 			return Modifier.isPublic(field.getModifiers());
+		}
+		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
+	/**
+	 * Is public boolean.
+	 *
+	 * @param method the method
+	 * @return the boolean
+	 */
+	public static boolean isPublic(Method method) {
+		if (method != null) {
+			return Modifier.isPublic(method.getModifiers());
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
@@ -563,6 +653,7 @@ public final class ReflectionUtils {
 
 	/**
 	 * Determine whether the given field is a "final" constant.
+	 *
 	 * @param field the field to check
 	 * @return is a "final" constant.
 	 */
@@ -572,9 +663,10 @@ public final class ReflectionUtils {
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
-	
+
 	/**
 	 * Determine whether the given field is a "public static final" constant.
+	 *
 	 * @param field the field to check
 	 * @return is a "public static final" constant.
 	 */
@@ -590,8 +682,9 @@ public final class ReflectionUtils {
 	 * Make the given field accessible, explicitly setting it accessible if necessary.
 	 * The <code>setAccessible(true)</code> method is only called when actually necessary,
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
+	 *
 	 * @param field the field to make accessible
-	 * @see java.lang.reflect.Field#setAccessible
+	 * @see java.lang.reflect.Field#setAccessible java.lang.reflect.Field#setAccessible
 	 */
 	public static void makeAccessible(Field field) {
 		if (!Modifier.isPublic(field.getModifiers()) ||
@@ -604,8 +697,9 @@ public final class ReflectionUtils {
 	 * Make the given method accessible, explicitly setting it accessible if necessary.
 	 * The <code>setAccessible(true)</code> method is only called when actually necessary,
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
+	 *
 	 * @param method the method to make accessible
-	 * @see java.lang.reflect.Method#setAccessible
+	 * @see java.lang.reflect.Method#setAccessible java.lang.reflect.Method#setAccessible
 	 */
 	public static void makeAccessible(Method method) {
 		if (!Modifier.isPublic(method.getModifiers()) ||
@@ -618,8 +712,9 @@ public final class ReflectionUtils {
 	 * Make the given constructor accessible, explicitly setting it accessible if necessary.
 	 * The <code>setAccessible(true)</code> method is only called when actually necessary,
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
+	 *
 	 * @param ctor the constructor to make accessible
-	 * @see java.lang.reflect.Constructor#setAccessible
+	 * @see java.lang.reflect.Constructor#setAccessible java.lang.reflect.Constructor#setAccessible
 	 */
 	public static void makeAccessible(Constructor<?> ctor) {
 		if (!Modifier.isPublic(ctor.getModifiers()) ||
@@ -634,9 +729,11 @@ public final class ReflectionUtils {
 	 * given class and superclasses.
 	 * <p>The same named method occurring on subclass and superclass will
 	 * appear twice, unless excluded by a {@link MethodFilter}.
+	 *
 	 * @param targetClass class to start looking at
-	 * @param mc the callback to invoke for each method
-	 * @see #doWithMethods(Class, MethodCallback, MethodFilter)
+	 * @param mc          the callback to invoke for each method
+	 * @throws IllegalArgumentException the illegal argument exception
+	 * @see #doWithMethods(Class, MethodCallback, MethodFilter) #doWithMethods(Class, MethodCallback, MethodFilter)
 	 */
 	public static void doWithMethods(Class<?> targetClass, MethodCallback mc) throws IllegalArgumentException {
 		doWithMethods(targetClass, mc, null);
@@ -647,9 +744,11 @@ public final class ReflectionUtils {
 	 * given class and superclasses.
 	 * <p>The same named method occurring on subclass and superclass will
 	 * appear twice, unless excluded by the specified {@link MethodFilter}.
+	 *
 	 * @param targetClass class to start looking at
-	 * @param mc the callback to invoke for each method
-	 * @param mf the filter that determines the methods to apply the callback to
+	 * @param mc          the callback to invoke for each method
+	 * @param mf          the filter that determines the methods to apply the callback to
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
 	public static void doWithMethods(Class<?> targetClass, MethodCallback mc, MethodFilter mf)
 			throws IllegalArgumentException {
@@ -676,8 +775,10 @@ public final class ReflectionUtils {
 	/**
 	 * Get all declared methods on the leaf class and all superclasses.
 	 * Leaf class methods are included first.
-	 * @param leafClass	leaf class
+	 *
+	 * @param leafClass leaf class
 	 * @return All declared method arrays
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
 	public static Method[] getAllDeclaredMethods(Class<?> leafClass) throws IllegalArgumentException {
 		final List<Method> list = new ArrayList<>(32);
@@ -685,12 +786,31 @@ public final class ReflectionUtils {
 		return list.toArray(new Method[0]);
 	}
 
+	/**
+	 * Parse component type class.
+	 *
+	 * @param method the method
+	 * @return the class
+	 */
+	public static Class<?> parseComponentType(Method method) {
+		Class<?> returnClass = method.getReturnType();
+		Class<?> returnItem = null;
+
+		if (returnClass.isArray()) {
+			returnItem = returnClass.getComponentType();
+		} else if (List.class.isAssignableFrom(returnClass)) {
+			returnItem = (Class<?>)((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0];
+		}
+		return returnItem;
+	}
 
 	/**
 	 * Invoke the given callback on all fields in the target class,
 	 * going up the class hierarchy to get all declared fields.
+	 *
 	 * @param targetClass the target class to analyze
-	 * @param fc the callback to invoke for each field
+	 * @param fc          the callback to invoke for each field
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
 	public static void doWithFields(Class<?> targetClass, FieldCallback fc) throws IllegalArgumentException {
 		doWithFields(targetClass, fc, null);
@@ -699,9 +819,11 @@ public final class ReflectionUtils {
 	/**
 	 * Invoke the given callback on all fields in the target class,
 	 * going up the class hierarchy to get all declared fields.
+	 *
 	 * @param targetClass the target class to analyze
-	 * @param fc the callback to invoke for each field
-	 * @param ff the filter that determines the fields to apply the callback to
+	 * @param fc          the callback to invoke for each field
+	 * @param ff          the filter that determines the fields to apply the callback to
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
 	public static void doWithFields(Class<?> targetClass, FieldCallback fc, FieldFilter ff)
 			throws IllegalArgumentException {
@@ -730,8 +852,9 @@ public final class ReflectionUtils {
 	 * Given the source object and the destination, which must be the same class
 	 * or a subclass, copy all fields, including inherited fields. Designed to
 	 * work on objects with public no-arg constructors.
-	 * @param src   	source object
-	 * @param dest		target object
+	 *
+	 * @param src  source object
+	 * @param dest target object
 	 * @throws IllegalArgumentException if the arguments are incompatible
 	 */
 	public static void shallowCopyFieldState(final Object src, final Object dest) throws IllegalArgumentException {
@@ -751,12 +874,13 @@ public final class ReflectionUtils {
 			field.set(dest, srcValue);
 		}, COPYABLE_FIELDS);
 	}
-	
+
 	/**
 	 * Retrieve field object if available
-	 * @param clazz			Define class
-	 * @param fieldName		field name
-	 * @return				Retrieve field object or null if not exists
+	 *
+	 * @param clazz     Define class
+	 * @param fieldName field name
+	 * @return Retrieve field object or null if not exists
 	 */
 	public static Field getFieldIfAvailable(Class<?> clazz, String fieldName) {
 		if (clazz == null) {
@@ -769,11 +893,12 @@ public final class ReflectionUtils {
 			return getFieldIfAvailable(clazz.getSuperclass(), fieldName);
 		}
 	}
-	
+
 	/**
 	 * Set field value values
-	 * @param target			target object
-	 * @param parameterMap		field value map
+	 *
+	 * @param target       target object
+	 * @param parameterMap field value map
 	 */
 	public static void setField(Object target, Map<String, ?> parameterMap) {
 		if (target == null || parameterMap == null) {
@@ -795,13 +920,14 @@ public final class ReflectionUtils {
 			setField(key, target, fieldValue);
 		});
 	}
-	
+
 	/**
 	 * Set field value
-	 * @param fieldName		field name
-	 * @param target		target object
-	 * @param value			field value
-	 * @return				operate result
+	 *
+	 * @param fieldName field name
+	 * @param target    target object
+	 * @param value     field value
+	 * @return operate result
 	 */
 	public static boolean setField(String fieldName, Object target, Object value) {
 		try {
@@ -1044,8 +1170,9 @@ public final class ReflectionUtils {
 
 		/**
 		 * Perform an operation using the given method.
+		 *
 		 * @param method the method to operate on
-		 * @throws IllegalArgumentException	 @see java.lang.IllegalArgumentException
+		 * @throws IllegalArgumentException @see java.lang.IllegalArgumentException
 		 */
 		void doWith(Method method) throws IllegalArgumentException;
 	}
@@ -1058,6 +1185,7 @@ public final class ReflectionUtils {
 
 		/**
 		 * Determine whether the given method matches.
+		 *
 		 * @param method the method to check
 		 * @return check result
 		 */
@@ -1072,9 +1200,10 @@ public final class ReflectionUtils {
 
 		/**
 		 * Perform an operation using the given field.
+		 *
 		 * @param field the field to operate on
-		 * @throws IllegalArgumentException	 @see java.lang.IllegalArgumentException
-		 * @throws IllegalAccessException  @see java.lang.IllegalAccessException
+		 * @throws IllegalArgumentException @see java.lang.IllegalArgumentException
+		 * @throws IllegalAccessException   @see java.lang.IllegalAccessException
 		 */
 		void doWith(Field field) throws IllegalArgumentException, IllegalAccessException;
 	}
@@ -1086,6 +1215,7 @@ public final class ReflectionUtils {
 
 		/**
 		 * Determine whether the given field matches.
+		 *
 		 * @param field the field to check
 		 * @return check result
 		 */
@@ -1099,7 +1229,17 @@ public final class ReflectionUtils {
 	public static final FieldFilter COPYABLE_FIELDS = field -> !(Modifier.isStatic(field.getModifiers()) ||
 			Modifier.isFinal(field.getModifiers()));
 
+	/**
+	 * The enum Method type.
+	 */
 	public enum MethodType {
-		GetMethod, SetMethod
+		/**
+		 * Get method method type.
+		 */
+		GetMethod,
+		/**
+		 * Set method method type.
+		 */
+		SetMethod
 	}
 }

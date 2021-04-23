@@ -18,6 +18,7 @@ package org.nervousync.beans.provider.impl.basic;
 
 import org.nervousync.beans.provider.ConvertProvider;
 import org.nervousync.enumerations.xml.DataType;
+import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.ReflectionUtils;
 
@@ -38,7 +39,8 @@ public final class ParseNumberProvider implements ConvertProvider {
 	@Override
 	public boolean checkType(Class<?> dataType) {
 		DataType currentType = ObjectUtils.retrieveSimpleDataType(dataType);
-		return DataType.NUMBER.equals(currentType) || DataType.STRING.equals(currentType);
+		return DataType.NUMBER.equals(currentType) || DataType.STRING.equals(currentType)
+				|| BigInteger.class.equals(dataType) || BigDecimal.class.equals(dataType);
 	}
 
 	@Override
@@ -62,10 +64,19 @@ public final class ParseNumberProvider implements ConvertProvider {
 			if (targetClass.equals(byte.class)) {
 				return (T)Byte.valueOf(string);
 			}
-			Method method = ReflectionUtils.findMethod(targetClass, "valueOf", new Class[]{String.class});
+
+			Method method;
+			if (targetClass.isPrimitive()) {
+				String className = targetClass.getName();
+				String methodName = "parse" + className.substring(0, 1).toUpperCase() + className.substring(1);
+				method = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
+						methodName, new Class[]{String.class});
+			} else {
+				method = ReflectionUtils.findMethod(targetClass, "valueOf", new Class[]{String.class});
+			}
 			if (method != null) {
 				try {
-					return targetClass.cast(method.invoke(null, string));
+					return (T) method.invoke(null, string);
 				} catch (IllegalAccessException | InvocationTargetException ignored) {
 				}
 			}

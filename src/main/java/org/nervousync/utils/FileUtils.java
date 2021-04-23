@@ -42,7 +42,6 @@ import java.util.zip.CRC32;
 
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
-import org.nervousync.commons.beans.core.BeanObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

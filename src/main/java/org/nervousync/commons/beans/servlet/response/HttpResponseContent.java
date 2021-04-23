@@ -16,15 +16,9 @@
  */
 package org.nervousync.commons.beans.servlet.response;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +33,7 @@ import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,6 +142,34 @@ public final class HttpResponseContent implements Serializable {
 	 */
 	public byte[] getResponseContent() {
 		return responseContent == null ? new byte[0] : responseContent.clone();
+	}
+
+	public HttpResponseContent(HttpResponse.ResponseInfo responseInfo, InputStream inputStream) {
+		this.statusCode = responseInfo.statusCode();
+		responseInfo.headers().map().forEach((key, values) -> {
+			if (key != null && values != null && !values.isEmpty()) {
+				StringBuilder stringBuilder = new StringBuilder();
+				for (String headerValue : values) {
+					stringBuilder.append(" ").append(headerValue);
+				}
+				this.headerMaps.put(key.toUpperCase(), stringBuilder.substring(1));
+			}
+		});
+		this.contentType = this.headerMaps.get("CONTENT-TYPE");
+		if (this.contentType != null
+				&& this.contentType.contains("charset=")) {
+			this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
+			if (this.contentType.contains("\"")) {
+				this.charset = this.charset.substring(0, this.charset.indexOf("\""));
+			}
+			this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
+			if (this.charset.contains(";")) {
+				this.charset = this.charset.substring(0, this.charset.indexOf(";"));
+			}
+		}
+		this.identifiedCode = this.headerMaps.get("IDENTIFIED");
+		this.responseContent = IOUtils.readBytes(inputStream);
+		this.contentLength = this.responseContent.length;
 	}
 
 	/**
@@ -295,7 +318,7 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public String parseString() throws UnsupportedEncodingException {
-		return new String(this.responseContent, this.charset);
+		return this.parseString(this.charset);
 	}
 
 	/**
@@ -306,7 +329,17 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public String parseString(String charsetName) throws UnsupportedEncodingException {
-		return new String(this.responseContent, charsetName);
+		if (StringUtils.isEmpty(charsetName)) {
+			charsetName = Globals.DEFAULT_ENCODING;
+		}
+		String string = new String(this.getResponseContent(), charsetName);
+		while (string.charAt(string.length() - 1) == '\n') {
+			string = string.substring(0, string.length() - 1);
+		}
+		while (string.charAt(string.length() - 1) == '\r') {
+			string = string.substring(0, string.length() - 1);
+		}
+		return string;
 	}
 
 	/**
@@ -317,7 +350,7 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws IOException the io exception
 	 */
 	public File parseFile(String savePath) throws IOException {
-		FileUtils.saveFile(this.responseContent, savePath);
+		FileUtils.saveFile(this.getResponseContent(), savePath);
 		return FileUtils.getFile(savePath);
 	}
 

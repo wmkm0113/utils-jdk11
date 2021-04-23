@@ -18,9 +18,9 @@ package org.nervousync.commons.beans.files;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.nervousync.commons.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;

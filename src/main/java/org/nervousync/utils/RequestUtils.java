@@ -16,6 +16,8 @@
  */
 package org.nervousync.utils;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nervousync.annotations.service.RestfulClient;
 import org.nervousync.commons.beans.ip.IPRange;
 import org.nervousync.commons.beans.servlet.request.RequestAttribute;
@@ -25,25 +27,19 @@ import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.commons.http.cookie.CookieEntity;
 import org.nervousync.commons.http.entity.HttpEntity;
-import org.nervousync.commons.http.header.SimpleHeader;
 import org.nervousync.commons.http.proxy.ProxyInfo;
-import org.nervousync.commons.http.security.GeneHostnameVerifier;
 import org.nervousync.commons.http.security.GeneX509TrustManager;
 import org.nervousync.enumerations.ip.IPType;
 import org.nervousync.enumerations.web.HttpMethodOption;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.handler.HandlerResolver;
 
-import org.nervousync.exceptions.http.CertInfoException;
-import org.nervousync.exceptions.servlet.RequestException;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceClient;
+import jakarta.xml.ws.handler.HandlerResolver;
+
 import org.nervousync.interceptor.beans.HandlerInterceptor;
 
 import org.slf4j.Logger;
@@ -52,12 +48,16 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.ParseException;
+import java.time.Duration;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -380,7 +380,7 @@ public final class RequestUtils {
 		BigInteger ff = BigInteger.valueOf(0xFFL);
 
 		for (int i = 0; i < 4; i++) {
-			ipv4Address.insert(0, "." + bigInteger.and(ff).toString());
+			ipv4Address.insert(0, "." + bigInteger.and(ff));
 			bigInteger = bigInteger.shiftRight(8);
 		}
 
@@ -407,30 +407,29 @@ public final class RequestUtils {
 
 	/**
 	 * Generate Restful service client instance
-	 * @param serviceClient         Client interface class
-	 * @param handlerInterceptor    Handler interceptor
-	 * @param <T>                   Client interface
-	 * @return                      Generated instance
+	 *
+	 * @param <T>                Client interface
+	 * @param serviceClient      Client interface class
+	 * @param handlerInterceptor Handler interceptor
+	 * @return Generated instance
 	 */
 	public static <T> T RestfulClient(Class<T> serviceClient, HandlerInterceptor handlerInterceptor) {
 		if (!serviceClient.isAnnotationPresent(RestfulClient.class)) {
 			return null;
 		}
-
 		return ObjectUtils.createProxyInstance(serviceClient, handlerInterceptor);
 	}
 
 	/**
 	 * Generate SOAP client instance
 	 *
-	 * @param <T>                       End point interface
-	 * @param serviceInterface          End point interface
-	 * @param handlerResolver           Handler resolver
-	 * @return                          Generated instance
+	 * @param <T>              End point interface
+	 * @param serviceInterface End point interface
+	 * @param handlerResolver  Handler resolver
+	 * @return Generated instance
 	 * @throws MalformedURLException if no protocol is specified, or an unknown protocol is found, or spec is null.
 	 */
-	public static <T> T SOAPClient(Class<T> serviceInterface,
-	                               HandlerResolver handlerResolver)
+	public static <T> T SOAPClient(Class<T> serviceInterface, HandlerResolver handlerResolver)
 			throws MalformedURLException {
 		if (!serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
 			return null;
@@ -479,82 +478,232 @@ public final class RequestUtils {
 	}
 
 	/**
-	 * Send request and receive response
+	 * Send request parse object optional.
 	 *
-	 * @param requestInfo Request info
-	 * @return HttpResponseContent http response content
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<T> sendRequestParseSimple(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ObjectBodyHandler<>(targetClass, StringUtils.StringType.SIMPLE));
+	}
+
+	/**
+	 * Send request parse object optional.
+	 *
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<T> sendRequestParseXML(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ObjectBodyHandler<>(targetClass, StringUtils.StringType.XML));
+	}
+
+	/**
+	 * Send request parse object optional.
+	 *
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<T> sendRequestParseJSON(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ObjectBodyHandler<>(targetClass, StringUtils.StringType.JSON));
+	}
+
+	/**
+	 * Send request parse object optional.
+	 *
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<T> sendRequestParseYAML(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ObjectBodyHandler<>(targetClass, StringUtils.StringType.YAML));
+	}
+
+	/**
+	 * Send request parse list optional.
+	 *
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<List<T>> sendRequestParseJSONList(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ArrayBodyHandler<>(targetClass, StringUtils.StringType.JSON));
+	}
+
+	/**
+	 * Send request parse list optional.
+	 *
+	 * @param <T>         the type parameter
+	 * @param requestInfo the request info
+	 * @param targetClass the target class
+	 * @return the optional
+	 */
+	public static <T> Optional<List<T>> sendRequestParseYamlList(RequestInfo requestInfo, Class<T> targetClass) {
+		return sendRequest(requestInfo, new ArrayBodyHandler<>(targetClass, StringUtils.StringType.YAML));
+	}
+
+	/**
+	 * Send request optional.
+	 *
+	 * @param requestInfo the request info
+	 * @return the optional
 	 */
 	public static Optional<HttpResponseContent> sendRequest(RequestInfo requestInfo) {
-		HttpURLConnection urlConnection = null;
-		OutputStream outputStream = null;
+		return sendRequest(requestInfo, new ResponseContentHandler());
+	}
 
-		try {
-			urlConnection = openConnection(requestInfo);
-
-			int timeout = requestInfo.getTimeOut() == Globals.DEFAULT_VALUE_INT
-					? DEFAULT_TIME_OUT
-					: requestInfo.getTimeOut();
-			urlConnection.setConnectTimeout(timeout * 1000);
-			urlConnection.setReadTimeout(timeout * 1000);
-
-			if (requestInfo.getHeaders() != null) {
-				for (SimpleHeader simpleHeader : requestInfo.getHeaders()) {
-					urlConnection.setRequestProperty(simpleHeader.getHeaderName(), simpleHeader.getHeaderValue());
-				}
-			}
-
-			if ((HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
-					|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption()))
-					&& requestInfo.getPostDatas() != null && requestInfo.getPostDatas().length > 0) {
-				urlConnection.setRequestProperty("Content-Type",
-						requestInfo.getContentType() + ";charset=" + requestInfo.getCharset());
-				urlConnection.setRequestProperty("Content-Length", Integer.toString(requestInfo.getPostDatas().length));
-				outputStream = urlConnection.getOutputStream();
-				outputStream.write(requestInfo.getPostDatas());
-			} else {
-				HttpEntity httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
-
-				urlConnection.setRequestProperty("Content-Type",
-						httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getHttpMethodOption()));
-
-				if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
-						|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
-					outputStream = urlConnection.getOutputStream();
-					httpEntity.writeData(requestInfo.getCharset(), outputStream);
-				}
-			}
-
-			if (outputStream != null) {
-				outputStream.flush();
-				outputStream.close();
-			}
-
-			String redirectUrl = urlConnection.getHeaderField("Location");
-			if (redirectUrl != null) {
-				RequestInfo.RequestBuilder requestBuilder = RequestInfo.builder(HttpMethodOption.GET);
-				requestInfo.getCookieList().forEach(requestBuilder::addCookies);
-				requestBuilder.requestUrl(redirectUrl);
-				for (Entry<String, List<String>> entry : urlConnection.getHeaderFields().entrySet()) {
-					if ("Set-Cookie".equals(entry.getKey())) {
-						for (String cookieValue : entry.getValue()) {
-							requestBuilder.addCookies(cookieValue);
+	/**
+	 * Send request and receive response
+	 *
+	 * @param <T>                 the type parameter
+	 * @param requestInfo         Request info
+	 * @param supplierBodyHandler the supplier body handler
+	 * @return HttpResponseContent http response content
+	 */
+	public static <T> Optional<T> sendRequest(RequestInfo requestInfo,
+											  HttpResponse.BodyHandler<Supplier<T>> supplierBodyHandler) {
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder();
+		HttpEntity httpEntity = null;
+		switch (requestInfo.getHttpMethodOption()) {
+			case GET:
+				requestBuilder.GET();
+				httpEntity = generateEntity(requestInfo.getParameters(), null);
+				break;
+			case POST:
+				if (requestInfo.getPostDatas() != null) {
+					requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(requestInfo.getPostDatas()));
+				} else {
+					try {
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
+						httpEntity.writeData(requestInfo.getCharset(), byteArrayOutputStream);
+						requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(byteArrayOutputStream.toByteArray()));
+					} catch (IOException ignored) {
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Process data error! ");
 						}
+						return Optional.empty();
 					}
 				}
+				break;
+			case PUT:
+				if (requestInfo.getPostDatas() != null) {
+					requestBuilder.PUT(HttpRequest.BodyPublishers.ofByteArray(requestInfo.getPostDatas()));
+				} else {
+					try {
+						ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+						httpEntity = generateEntity(requestInfo.getParameters(), requestInfo.getUploadParam());
+						httpEntity.writeData(requestInfo.getCharset(), byteArrayOutputStream);
+						requestBuilder.PUT(HttpRequest.BodyPublishers.ofByteArray(byteArrayOutputStream.toByteArray()));
+					} catch (IOException ignored) {
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Process data error! ");
+						}
+						return Optional.empty();
+					}
+				}
+				break;
+			case DELETE:
+				requestBuilder.DELETE();
+				httpEntity = generateEntity(requestInfo.getParameters(), null);
+				break;
+			default:
+				requestBuilder.method(requestInfo.getHttpMethodOption().toString(), null);
+				httpEntity = generateEntity(requestInfo.getParameters(), null);
+				break;
+		}
 
-				return sendRequest(requestBuilder.build());
+		String uri = requestInfo.getRequestUrl();
+		if (httpEntity != null) {
+			try {
+				requestBuilder.header("Content-Type",
+						httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getHttpMethodOption()));
+			} catch (UnsupportedEncodingException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Process content type error! ", e);
+				}
 			}
-			return Optional.of(new HttpResponseContent(urlConnection));
-		} catch (IOException e) {
+			if (!HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
+					&& !HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
+				uri = RequestUtils.appendParams(uri, requestInfo.getParameters());
+			}
+		} else {
+			requestBuilder.header("Content-Type",
+					requestInfo.getContentType() + ";charset=" + requestInfo.getCharset());
+		}
+
+		requestInfo.getHeaders()
+				.forEach(simpleHeader ->
+						requestBuilder.setHeader(simpleHeader.getHeaderName(), simpleHeader.getHeaderValue()));
+		requestBuilder.uri(URI.create(uri));
+
+		requestBuilder.setHeader("Accept", "text/html,text/javascript,text/xml");
+		requestBuilder.setHeader("Accept-Encoding", "gzip, deflate");
+		if (StringUtils.isEmpty(requestInfo.getUserAgent())) {
+			requestBuilder.setHeader("User-Agent", "NervousyncBot");
+		} else {
+			requestBuilder.setHeader("User-Agent", requestInfo.getUserAgent());
+		}
+		String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), requestInfo.getCookieList());
+		if (StringUtils.notBlank(cookie)) {
+			requestBuilder.setHeader("Cookie", cookie);
+		}
+
+		HttpClient.Builder clientBuilder = HttpClient.newBuilder()
+				.version(HttpClient.Version.HTTP_2)
+				.followRedirects(HttpClient.Redirect.NORMAL);
+		if (requestInfo.getTimeOut() > 0) {
+			clientBuilder.connectTimeout(Duration.ofSeconds(requestInfo.getTimeOut()));
+		}
+
+		if (requestInfo.getProxyInfo() != null) {
+			ProxyInfo proxyInfo = requestInfo.getProxyInfo();
+			clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(proxyInfo.getProxyAddress(), proxyInfo.getProxyPort())));
+			if (StringUtils.notBlank(proxyInfo.getUserName())) {
+				String authentication = proxyInfo.getUserName() + ":";
+				if (StringUtils.notBlank(proxyInfo.getPassword())) {
+					authentication += proxyInfo.getPassword();
+				}
+
+				requestBuilder.setHeader("Proxy-Authorization",
+						StringUtils.base64Encode(authentication.getBytes(Charset.forName(Globals.DEFAULT_ENCODING))));
+			}
+		}
+
+		if (requestInfo.getTrustCertInfos() != null && requestInfo.getTrustCertInfos().size() > 0) {
+			try {
+				System.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+				SSLContext sslContext = SSLContext.getInstance("TLS");
+				GeneX509TrustManager x509TrustManager =
+						GeneX509TrustManager.init(requestInfo.getPassPhrase(), requestInfo.getTrustCertInfos());
+				sslContext.init(new KeyManager[0], new TrustManager[]{x509TrustManager}, new SecureRandom());
+				clientBuilder.sslContext(sslContext);
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Process ssl certificate error! ");
+				}
+			}
+		}
+
+		try {
+			return Optional.ofNullable(clientBuilder.build()
+					.send(requestBuilder.build(), supplierBodyHandler)
+					.body()
+					.get());
+		} catch (IOException | InterruptedException e) {
 			if (RequestUtils.LOGGER.isDebugEnabled()) {
 				RequestUtils.LOGGER.debug("Send Request ERROR: ", e);
 			}
 			return Optional.empty();
 		} finally {
-			IOUtils.closeStream(outputStream);
-			if (urlConnection != null) {
-				urlConnection.disconnect();
-			}
+			System.clearProperty("jdk.internal.httpclient.disableHostnameVerification");
 		}
 	}
 
@@ -709,7 +858,7 @@ public final class RequestUtils {
 	 */
 	public static String appendParams(String uri, Map<String, String[]> params) {
 		String delimiter = (uri.indexOf('?') == -1) ? "?" : "&";
-		return uri + delimiter + RequestUtils.createQueryStringFromMap(params, "&").toString();
+		return uri + delimiter + RequestUtils.createQueryStringFromMap(params, "&");
 	}
 
 	/**
@@ -862,9 +1011,8 @@ public final class RequestUtils {
 	 *
 	 * @param request the request
 	 * @return the request uri
-	 * @throws RequestException the request exception
 	 */
-	public static String getRequestURI(HttpServletRequest request) throws RequestException {
+	public static String getRequestURI(HttpServletRequest request) {
 		String requestUrl = RequestUtils.getRequestPath(request);
 
 		if (requestUrl.lastIndexOf('.') != -1) {
@@ -878,11 +1026,10 @@ public final class RequestUtils {
 	 *
 	 * @param request the request
 	 * @return the request path
-	 * @throws RequestException the request exception
 	 */
-	public static String getRequestPath(HttpServletRequest request) throws RequestException {
+	public static String getRequestPath(HttpServletRequest request) {
 		if (request == null) {
-			throw new RequestException("Request object must not be null");
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 		String requestUrl = request.getRequestURI();
 
@@ -969,103 +1116,6 @@ public final class RequestUtils {
 		return null;
 	}
 
-	private static HttpURLConnection openConnection(RequestInfo requestInfo) {
-		String urlAddress;
-		if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
-				|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
-			urlAddress = requestInfo.getRequestUrl();
-		} else {
-			urlAddress = RequestUtils.appendParams(requestInfo.getRequestUrl(), requestInfo.getParameters());
-		}
-
-		HttpURLConnection connection;
-		try {
-			URL url = new URL(urlAddress);
-			if (requestInfo.getProxyInfo() != null) {
-				ProxyInfo proxyInfo = requestInfo.getProxyInfo();
-				connection = (HttpURLConnection) url.openConnection(new Proxy(proxyInfo.getProxyType(),
-						new InetSocketAddress(proxyInfo.getProxyAddress(), proxyInfo.getProxyPort())));
-				if (proxyInfo.getUserName() != null && proxyInfo.getUserName().length() > 0) {
-					String authentication = proxyInfo.getUserName() + ":";
-					if (proxyInfo.getPassword() != null && proxyInfo.getPassword().length() > 0) {
-						authentication += proxyInfo.getPassword();
-					}
-
-					connection.setRequestProperty("Proxy-Authorization",
-							StringUtils.base64Encode(authentication.getBytes(Charset.forName(Globals.DEFAULT_ENCODING))));
-				}
-			} else {
-				connection = (HttpURLConnection) url.openConnection();
-			}
-			connection.setRequestProperty("Connection", "Keep-Alive");
-			String method;
-			switch (requestInfo.getHttpMethodOption()) {
-				case GET:
-					method = RequestUtils.HTTP_METHOD_GET;
-					break;
-				case POST:
-					method = RequestUtils.HTTP_METHOD_POST;
-					break;
-				case PUT:
-					method = RequestUtils.HTTP_METHOD_PUT;
-					break;
-				case TRACE:
-					method = RequestUtils.HTTP_METHOD_TRACE;
-					break;
-				case HEAD:
-					method = RequestUtils.HTTP_METHOD_HEAD;
-					break;
-				case DELETE:
-					method = RequestUtils.HTTP_METHOD_DELETE;
-					break;
-				case OPTIONS:
-					method = RequestUtils.HTTP_METHOD_OPTIONS;
-					break;
-				default:
-					throw new UnsupportedEncodingException("Unknown Request Method");
-			}
-			connection.setDoInput(true);
-			if (HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
-					|| HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
-				connection.setDoOutput(true);
-			}
-
-			connection.setRequestMethod(method);
-			connection.setRequestProperty("Accept", "text/html,text/javascript,text/xml");
-			connection.addRequestProperty("Accept-Encoding", "gzip, deflate");
-			if (StringUtils.isEmpty(requestInfo.getUserAgent())) {
-				connection.setRequestProperty("User-Agent", "NervousyncBot");
-			} else {
-				connection.setRequestProperty("User-Agent", requestInfo.getUserAgent());
-			}
-			String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), requestInfo.getCookieList());
-			if (cookie != null) {
-				connection.setRequestProperty("Cookie", cookie);
-			}
-			if (urlAddress.startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
-				((HttpsURLConnection) connection).setHostnameVerifier(new GeneHostnameVerifier());
-				SSLContext sslContext = SSLContext.getInstance("TLS");
-				GeneX509TrustManager x509TrustManager =
-						GeneX509TrustManager.init(requestInfo.getPassPhrase(), requestInfo.getTrustCertInfos());
-				sslContext.init(new KeyManager[0], new TrustManager[]{x509TrustManager}, new SecureRandom());
-				((HttpsURLConnection) connection).setSSLSocketFactory(sslContext.getSocketFactory());
-			}
-		} catch (IOException | NoSuchAlgorithmException e) {
-			LOGGER.error("Build connection error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-			connection = null;
-		} catch (CertInfoException | KeyManagementException e) {
-			LOGGER.error("Process security certificate error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-			connection = null;
-		}
-		return connection;
-	}
-
 	/**
 	 * Expand IPv6 address ignore data
 	 *
@@ -1075,11 +1125,8 @@ public final class RequestUtils {
 	public static String expandIgnore(String ipv6Address) {
 		if (ipv6Address.contains("::")) {
 			int count = StringUtils.countOccurrencesOf(ipv6Address, ":");
-			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = count; i < 8; i++) {
-				stringBuilder.append(":0000");
-			}
-			ipv6Address = StringUtils.replace(ipv6Address, "::", stringBuilder.toString() + ":");
+			ipv6Address = StringUtils.replace(ipv6Address, "::",
+					":0000".repeat(Math.max(0, 8 - count)) + ":");
 			if (ipv6Address.startsWith(":")) {
 				ipv6Address = "0000" + ipv6Address;
 			}
@@ -1205,7 +1252,7 @@ public final class RequestUtils {
 			while (binItem.length() < 4) {
 				binItem.insert(0, "0");
 			}
-			binBuilder.append(binItem.toString());
+			binBuilder.append(binItem);
 			index++;
 		}
 		return binBuilder.toString();
@@ -1373,6 +1420,108 @@ public final class RequestUtils {
 			queryString.append(value);
 		} catch (UnsupportedEncodingException e) {
 			// do nothing
+		}
+	}
+
+	private static final class ArrayBodyHandler<T> implements HttpResponse.BodyHandler<Supplier<List<T>>> {
+
+		private final Class<T> targetClass;
+		private final StringUtils.StringType dataType;
+
+		/**
+		 * Instantiates a new Array body handler.
+		 *
+		 * @param targetClass the target class
+		 * @param dataType    the data type
+		 */
+		public ArrayBodyHandler(Class<T> targetClass, StringUtils.StringType dataType) {
+			this.targetClass = targetClass;
+			this.dataType = dataType;
+		}
+
+		public HttpResponse.BodySubscriber<Supplier<List<T>>> apply(HttpResponse.ResponseInfo responseInfo) {
+			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
+			return HttpResponse.BodySubscribers.mapping(upstream, inputStream -> () -> {
+				switch (this.dataType) {
+					case JSON:
+					case YAML:
+						try {
+							ObjectMapper objectMapper = new ObjectMapper();
+							JavaType javaType =
+									objectMapper.getTypeFactory().constructParametricType(ArrayList.class, targetClass);
+							return objectMapper.readValue(inputStream, javaType);
+						} catch (IOException e) {
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("Convert json string to object bean error! ", e);
+							}
+							throw new UncheckedIOException(e);
+						}
+				}
+				return null;
+			});
+		}
+	}
+
+	private static final class ResponseContentHandler implements HttpResponse.BodyHandler<Supplier<HttpResponseContent>> {
+
+		/**
+		 * Instantiates a new Response content handler.
+		 */
+		public ResponseContentHandler() {
+		}
+
+		public HttpResponse.BodySubscriber<Supplier<HttpResponseContent>> apply(HttpResponse.ResponseInfo responseInfo) {
+			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
+			return HttpResponse.BodySubscribers.mapping(upstream,
+					inputStream -> () -> new HttpResponseContent(responseInfo, inputStream));
+		}
+	}
+
+	private static final class ObjectBodyHandler<T> implements HttpResponse.BodyHandler<Supplier<T>> {
+
+		private final Class<T> targetClass;
+		private final StringUtils.StringType dataType;
+
+		/**
+		 * Instantiates a new Object body handler.
+		 *
+		 * @param targetClass the target class
+		 * @param dataType    the data type
+		 */
+		public ObjectBodyHandler(Class<T> targetClass, StringUtils.StringType dataType) {
+			this.targetClass = targetClass;
+			this.dataType = dataType;
+		}
+
+		public HttpResponse.BodySubscriber<Supplier<T>> apply(HttpResponse.ResponseInfo responseInfo) {
+			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
+			return HttpResponse.BodySubscribers.mapping(upstream, inputStream -> () -> {
+				switch (this.dataType) {
+					case JSON:
+					case YAML:
+						try {
+							ObjectMapper objectMapper = new ObjectMapper();
+							return objectMapper.readValue(inputStream, targetClass);
+						} catch (IOException e) {
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("Convert json string to object bean error! ", e);
+							}
+							throw new UncheckedIOException(e);
+						}
+					case XML:
+						return BeanUtils.parseXml(IOUtils.readContent(inputStream), this.targetClass);
+					case SIMPLE:
+						try {
+							return StringUtils.parseSimpleData(IOUtils.readContent(inputStream), this.targetClass);
+						} catch (ParseException e) {
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("Convert string to simple object error! ", e);
+							}
+							return null;
+						}
+				}
+				return null;
+			});
 		}
 	}
 }

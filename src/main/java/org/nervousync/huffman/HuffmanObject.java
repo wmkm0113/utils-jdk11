@@ -50,7 +50,7 @@ public class HuffmanObject {
 	 * @return the string
 	 */
 	public String generateCodeMapping() {
-		return StringUtils.objectToString(this.codeMapping, StringUtils.StringType.JSON);
+		return StringUtils.objectToString(this.codeMapping, StringUtils.StringType.JSON, true);
 	}
 
 	/**

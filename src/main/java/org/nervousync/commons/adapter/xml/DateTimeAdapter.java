@@ -18,8 +18,7 @@ package org.nervousync.commons.adapter.xml;
 
 import org.nervousync.utils.DateTimeUtils;
 
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Date;
 
 /**
@@ -32,7 +31,7 @@ public class DateTimeAdapter extends XmlAdapter<String, Date> {
 	 *
 	 * @param v The value to be converted. Can be null.
 	 * @throws Exception if there's an error during the conversion. The caller is responsible for
-	 *                   reporting the error to the user through {@link ValidationEventHandler}.
+	 *                   reporting the error to the user through.
 	 */
 	@Override
 	public Date unmarshal(String v) throws Exception {

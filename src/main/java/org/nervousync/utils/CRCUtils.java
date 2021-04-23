@@ -377,7 +377,7 @@ public final class CRCUtils {
 				result.insert(0, "0");
 			}
 			this.reset();
-			return "0x" + result.toString();
+			return "0x" + result;
 		}
 
 		/**

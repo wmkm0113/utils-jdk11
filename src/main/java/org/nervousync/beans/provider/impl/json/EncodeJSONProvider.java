@@ -37,7 +37,7 @@ public final class EncodeJSONProvider implements ConvertProvider {
 	@Override
 	public <T> T convert(Object origObj, Class<T> targetClass) {
 		if (origObj != null && String.class.equals(targetClass)) {
-			return targetClass.cast(StringUtils.objectToString(origObj, StringUtils.StringType.JSON));
+			return targetClass.cast(StringUtils.objectToString(origObj, StringUtils.StringType.JSON, true));
 		}
 		return null;
 	}

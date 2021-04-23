@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
@@ -126,8 +125,8 @@ public final class StringUtils {
 	 * StringUtils.base32Encode([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], true) = "JBSWY3DPEBLW64TMMQ=="
 	 * </pre>
 	 *
-	 * @param bytes byte arrays
-	 * @param padding   append padding character if needed
+	 * @param bytes   byte arrays
+	 * @param padding append padding character if needed
 	 * @return Encoded base32 string
 	 */
 	public static String base32Encode(final byte[] bytes, boolean padding) {
@@ -213,7 +212,7 @@ public final class StringUtils {
 					stringBuilder = new StringBuilder(8);
 					stringBuilder.append(temp.substring(currentLength));
 				} else {
-					stringBuilder.append(temp.toString());
+					stringBuilder.append(temp);
 				}
 			}
 		}
@@ -320,9 +319,9 @@ public final class StringUtils {
 	/**
 	 * Convert the given string to HuffmanTree Object using given code mapping
 	 *
-	 * @param codeMapping   Geven code mapping
-	 * @param content       Given data string
-	 * @return              Converted HuffmanTree object
+	 * @param codeMapping Geven code mapping
+	 * @param content     Given data string
+	 * @return Converted HuffmanTree object
 	 */
 	public static String encodeWithHuffman(Hashtable<String, Object> codeMapping, String content) {
 		return HuffmanTree.encodeString(codeMapping, content);
@@ -331,8 +330,8 @@ public final class StringUtils {
 	/**
 	 * Convert the given string to HuffmanTree Object
 	 *
-	 * @param content       Given data string
-	 * @return              Converted HuffmanTree object
+	 * @param content Given data string
+	 * @return Converted HuffmanTree object
 	 */
 	public static HuffmanObject encodeWithHuffman(String content) {
 		HuffmanTree huffmanTree = new HuffmanTree();
@@ -436,7 +435,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
 		if (hasLength(str)) {
@@ -456,7 +455,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
 		if (hasLength(str)) {
@@ -476,7 +475,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check (may be <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
-	 * @see #containsWhitespace(CharSequence)
+	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
 		return containsWhitespace((CharSequence) str);
@@ -487,7 +486,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
@@ -501,7 +500,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (hasLength(str)) {
@@ -524,7 +523,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -542,7 +541,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -599,7 +598,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @return check result
-	 * @see java.lang.String#startsWith
+	 * @see java.lang.String#startsWith java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -623,7 +622,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @return check result
-	 * @see java.lang.String#endsWith
+	 * @see java.lang.String#endsWith java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -1245,8 +1244,8 @@ public final class StringUtils {
 	 * @param delimiters the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(String str, String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
@@ -1265,8 +1264,8 @@ public final class StringUtils {
 	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String was <code>null</code>)
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(
 			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
@@ -1297,7 +1296,7 @@ public final class StringUtils {
 	 * @param str       the input String
 	 * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
@@ -1313,7 +1312,7 @@ public final class StringUtils {
 	 * @param delimiter     the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
 		if (str == null) {
@@ -1487,14 +1486,15 @@ public final class StringUtils {
 	/**
 	 * Convert object to JSON string
 	 *
-	 * @param object     object
-	 * @param stringType the string type
+	 * @param object       object
+	 * @param stringType   the string type
+	 * @param formatOutput the format output
 	 * @return JSON string
 	 */
-	public static String objectToString(Object object, StringType stringType) {
+	public static String objectToString(Object object, StringType stringType, boolean formatOutput) {
 		if (object instanceof Map || object.getClass().isArray()
 				|| Collection.class.isAssignableFrom(object.getClass())) {
-			return StringUtils.writeToString(object, stringType);
+			return StringUtils.writeToString(object, stringType, formatOutput);
 		}
 
 		TreeMap<String, Object> valueMap = new TreeMap<>();
@@ -1511,7 +1511,7 @@ public final class StringUtils {
 					valueMap.put(field.getName(), mapValue);
 				});
 
-		return StringUtils.writeToString(valueMap, stringType);
+		return StringUtils.writeToString(valueMap, stringType, formatOutput);
 	}
 
 	/**
@@ -1525,10 +1525,18 @@ public final class StringUtils {
 		/**
 		 * Yaml string type.
 		 */
-		YAML
+		YAML,
+		/**
+		 * XML string type
+		 */
+		XML,
+		/**
+		 * Simple string type, include basic type wrapper class etc.
+		 */
+		SIMPLE
 	}
 
-	private static String writeToString(Object object, StringType stringType) {
+	private static String writeToString(Object object, StringType stringType, boolean formatOutput) {
 		ObjectMapper objectMapper;
 		switch (stringType) {
 			case JSON:
@@ -1542,35 +1550,15 @@ public final class StringUtils {
 				return Globals.DEFAULT_VALUE_STRING;
 		}
 		try {
-			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+			return formatOutput
+					? objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object)
+					: objectMapper.writeValueAsString(object);
 		} catch (JsonProcessingException e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
 				StringUtils.LOGGER.debug("Convert object to string error! ", e);
 			}
 		}
 		return Globals.DEFAULT_VALUE_STRING;
-	}
-
-	/**
-	 * Convert JSON string to List and bind data to java bean
-	 *
-	 * @param <T>      T
-	 * @param jsonData JSON String
-	 * @param clazz    Bind JavaBean define class
-	 * @return List of JavaBean
-	 */
-	public static <T> List<T> JSONToList(String jsonData, Class<T> clazz) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
-			return objectMapper.readValue(jsonData, javaType);
-		} catch (Exception e) {
-			if (StringUtils.LOGGER.isDebugEnabled()) {
-				StringUtils.LOGGER.debug("Convert json string to object bean error! ", e);
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -1594,7 +1582,7 @@ public final class StringUtils {
 				return new HashMap<>();
 		}
 		try {
-			return objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
+			return objectMapper.readValue(data, new TypeReference<>() {
 			});
 		} catch (Exception e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
@@ -2127,9 +2115,9 @@ public final class StringUtils {
 	/**
 	 * Validate given code, support China ID Code, China Social Credit Code, Luhn Algorithm
 	 *
-	 * @param code          Code
-	 * @param codeType      Code type
-	 * @return              Validate result
+	 * @param code     Code
+	 * @param codeType Code type
+	 * @return Validate result
 	 */
 	public static boolean validateCode(String code, CodeType codeType) {
 		switch (codeType) {
@@ -2212,7 +2200,21 @@ public final class StringUtils {
 		return buf.toString();
 	}
 
+	/**
+	 * The enum Code type.
+	 */
 	public enum CodeType {
-		CHN_Social_Code, CHN_ID_Code, Luhn
+		/**
+		 * Chn social code code type.
+		 */
+		CHN_Social_Code,
+		/**
+		 * Chn id code code type.
+		 */
+		CHN_ID_Code,
+		/**
+		 * Luhn code type.
+		 */
+		Luhn
 	}
 }

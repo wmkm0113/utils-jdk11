@@ -212,7 +212,7 @@ public final class HttpEntity {
 			}
 			
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Write data: {}", stringBuilder.toString());
+				this.logger.debug("Write data: {}", stringBuilder);
 			}
 			outputStream.write(stringBuilder.substring(1).getBytes(charset));
 		}

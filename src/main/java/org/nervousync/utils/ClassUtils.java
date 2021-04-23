@@ -707,6 +707,16 @@ public final class ClassUtils {
 		return null;
 	}
 
+	public static Class<?> primitiveWrapper(Class<?> clazz) {
+		if (clazz.isPrimitive()) {
+			for (Map.Entry<Object, Object> entry : PRIMITIVE_WRAPPER_TYPE_MAP.entrySet()) {
+				if (entry.getValue().equals(clazz)) {
+					return (Class<?>)entry.getKey();
+				}
+			}
+		}
+		return clazz;
+	}
 
 	/**
 	 * Check if the given class represents a primitive wrapper,

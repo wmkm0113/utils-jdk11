@@ -19,9 +19,13 @@ package org.nervousync.utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXB;
 import org.nervousync.beans.config.BeanConfig;
 import org.nervousync.commons.core.Globals;
@@ -122,10 +126,25 @@ public final class BeanUtils {
 	 * @return the t
 	 */
 	public static <T> T parseJSON(String string, Class<T> beanClass) {
+		if (String.class.equals(beanClass)) {
+			return beanClass.cast(string);
+		}
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
 		}
 		return convertMapToBean(string, StringUtils.StringType.JSON, beanClass);
+	}
+
+	/**
+	 * Convert JSON string to List and bind data to java bean
+	 *
+	 * @param <T>      T
+	 * @param jsonData JSON String
+	 * @param clazz    Bind JavaBean define class
+	 * @return List of JavaBean
+	 */
+	public static <T> List<T> parseJSONToList(String jsonData, Class<T> clazz) {
+		return parseToList(jsonData, clazz);
 	}
 
 	/**
@@ -141,6 +160,18 @@ public final class BeanUtils {
 			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
 		}
 		return convertMapToBean(string, StringUtils.StringType.YAML, beanClass);
+	}
+
+	/**
+	 * Convert Yaml string to List and bind data to java bean
+	 *
+	 * @param <T>      T
+	 * @param yamlData the yaml data
+	 * @param clazz    Bind JavaBean define class
+	 * @return List of JavaBean
+	 */
+	public static <T> List<T> parseYamlToList(String yamlData, Class<T> clazz) {
+		return parseToList(yamlData, clazz);
 	}
 
 	/**
@@ -165,7 +196,7 @@ public final class BeanUtils {
 	 */
 	public static void copyProperties(Map<?, ?> dataMap, Object dest) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Data Map: {}", StringUtils.objectToString(dataMap, StringUtils.StringType.JSON));
+			LOGGER.debug("Data Map: {}", StringUtils.objectToString(dataMap, StringUtils.StringType.JSON, true));
 		}
 		String className = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(className);
@@ -198,6 +229,19 @@ public final class BeanUtils {
 				.forEach(entry ->
 						targetBean.copyValue(convertMapping.getOrDefault(entry.getKey(), entry.getKey()),
 								dest, entry.getValue()));
+	}
+
+	private static <T> List<T> parseToList(String string, Class<T> clazz) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
+			return objectMapper.readValue(string, javaType);
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Convert json string to object bean error! ", e);
+			}
+			return new ArrayList<>();
+		}
 	}
 
 	/**

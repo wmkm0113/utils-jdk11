@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.net.Proxy;
 import java.util.*;
 
+import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.web.HttpMethodOption;
 import org.nervousync.commons.http.cert.TrustCert;
 import org.nervousync.commons.http.cookie.CookieEntity;
@@ -327,7 +328,7 @@ public final class RequestInfo implements Serializable {
 		/**
 		 * Request timeout
 		 */
-		private int timeOut;
+		private int timeOut = Globals.DEFAULT_TIME_OUT;
 		/**
 		 * Post ata arrays
 		 */

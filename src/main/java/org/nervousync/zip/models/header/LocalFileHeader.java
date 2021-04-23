@@ -102,11 +102,10 @@ public class LocalFileHeader extends FileHeader {
 						return Globals.DEFAULT_VALUE_BOOLEAN;
 					}
 
-					readLength = Globals.DEFAULT_VALUE_INT;
 					byte[] passwordBytes = new byte[2];
 					if (input instanceof RandomAccessFile) {
 						readLength = ((RandomAccessFile) input).read(passwordBytes);
-					} else if (input instanceof InputStream) {
+					} else {
 						readLength = ((InputStream) input).read(passwordBytes);
 					}
 
