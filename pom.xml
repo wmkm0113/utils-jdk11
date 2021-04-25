@@ -20,7 +20,7 @@
 		</license>
 	</licenses>
 	<scm>
-		<tag>master</tag>
+		<tag>mainline</tag>
 		<url>https://github.com/Nervousync/Gene</url>
 		<connection>scm:git:https://github.com/Nervousync/Gene.git</connection>
 		<developerConnection>scm:git:https://github.com/Nervousync/Gene.git</developerConnection>
