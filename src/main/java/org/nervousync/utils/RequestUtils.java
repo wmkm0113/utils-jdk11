@@ -1033,7 +1033,7 @@ public final class RequestUtils {
 		}
 		String requestUrl = request.getRequestURI();
 
-		if (request.getContextPath().length() > 0) {
+		if (StringUtils.notBlank(request.getContextPath())) {
 			requestUrl = requestUrl.substring(request.getContextPath().length());
 		}
 		return requestUrl;
@@ -1044,9 +1044,8 @@ public final class RequestUtils {
 	 *
 	 * @param request the request
 	 * @return the request url
-	 * @throws Exception the exception
 	 */
-	public static String getRequestUrl(HttpServletRequest request) throws Exception {
+	public static String getRequestUrl(HttpServletRequest request) {
 		return getRequestUrl(request, true);
 	}
 
@@ -1056,11 +1055,10 @@ public final class RequestUtils {
 	 * @param request       the request
 	 * @param includeDomain the include domain
 	 * @return the request url
-	 * @throws Exception the exception
 	 */
-	public static String getRequestUrl(HttpServletRequest request, boolean includeDomain) throws Exception {
+	public static String getRequestUrl(HttpServletRequest request, boolean includeDomain) {
 		if (request == null) {
-			throw new Exception("Request object must not be null");
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 
 		StringBuilder requestUrl = new StringBuilder();
@@ -1069,7 +1067,7 @@ public final class RequestUtils {
 			requestUrl.append(RequestUtils.getAppURL(request));
 		}
 
-		requestUrl.append(request.getRequestURI());
+		requestUrl.append(getRequestURI(request));
 
 		if (request.getQueryString() != null && request.getQueryString().length() > 0) {
 			requestUrl.append("?").append(request.getQueryString());
@@ -1095,9 +1093,8 @@ public final class RequestUtils {
 	 * @param regex   the regex
 	 * @param toPath  the to path
 	 * @return the string
-	 * @throws Exception the exception
 	 */
-	public static String processRewrite(HttpServletRequest request, String regex, String toPath) throws Exception {
+	public static String processRewrite(HttpServletRequest request, String regex, String toPath) {
 		String requestPath = RequestUtils.getRequestUrl(request, false);
 
 		if (StringUtils.matches(requestPath, regex)) {

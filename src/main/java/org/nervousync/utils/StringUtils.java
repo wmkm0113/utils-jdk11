@@ -16,29 +16,11 @@
  */
 package org.nervousync.utils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -435,7 +417,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
 		if (hasLength(str)) {
@@ -455,7 +437,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
 		if (hasLength(str)) {
@@ -475,7 +457,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check (may be <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
-	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)
+	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)#containsWhitespace(CharSequence)#containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
 		return containsWhitespace((CharSequence) str);
@@ -486,7 +468,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
@@ -500,7 +482,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (hasLength(str)) {
@@ -523,7 +505,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -541,7 +523,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -598,7 +580,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @return check result
-	 * @see java.lang.String#startsWith java.lang.String#startsWith
+	 * @see java.lang.String#startsWith java.lang.String#startsWithjava.lang.String#startsWithjava.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -622,7 +604,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @return check result
-	 * @see java.lang.String#endsWith java.lang.String#endsWith
+	 * @see java.lang.String#endsWith java.lang.String#endsWithjava.lang.String#endsWithjava.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -1244,8 +1226,8 @@ public final class StringUtils {
 	 * @param delimiters the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(String str, String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
@@ -1264,8 +1246,8 @@ public final class StringUtils {
 	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String was <code>null</code>)
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(
 			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
@@ -1296,7 +1278,7 @@ public final class StringUtils {
 	 * @param str       the input String
 	 * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
@@ -1312,7 +1294,7 @@ public final class StringUtils {
 	 * @param delimiter     the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
+	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
 		if (str == null) {
@@ -1582,8 +1564,7 @@ public final class StringUtils {
 				return new HashMap<>();
 		}
 		try {
-			return objectMapper.readValue(data, new TypeReference<>() {
-			});
+			return objectMapper.readValue(data, new TypeReference<>() {});
 		} catch (Exception e) {
 			if (StringUtils.LOGGER.isDebugEnabled()) {
 				StringUtils.LOGGER.debug("Convert json string to object bean error! ", e);
@@ -1779,25 +1760,19 @@ public final class StringUtils {
 	 * @return Locale message key
 	 */
 	public static String messageKey(Locale locale, String key) {
-		StringBuilder messageKey = new StringBuilder();
-		String localeKey = localeKey(locale);
-		if (localeKey.length() > 0) {
-			messageKey.append(localeKey(locale)).append(".");
-		}
-		messageKey.append(key);
-
-		return messageKey.toString().toUpperCase();
+		return messageKey(localeKey(locale), key);
 	}
 
 	/**
 	 * Append localeKey and key
 	 *
-	 * @param localeKey Locale key
-	 * @param key       message key
+	 * @param strings the strings
 	 * @return Locale message key
 	 */
-	public static String messageKey(String localeKey, String key) {
-		return (localeKey + "." + key).toUpperCase();
+	public static String messageKey(String... strings) {
+		StringJoiner stringJoiner = new StringJoiner(".");
+		Arrays.asList(strings).forEach(stringJoiner::add);
+		return stringJoiner.toString();
 	}
 
 	/**
@@ -1828,22 +1803,27 @@ public final class StringUtils {
 	/**
 	 * Replace template string with regex
 	 *
-	 * @param str      input string
-	 * @param regex    regex message
-	 * @param template template string
+	 * @param str         input string
+	 * @param regex       regex message
+	 * @param template    template string
+	 * @param placeHolder the place holder
 	 * @return replaced string. null for match failed
 	 */
-	public static String replaceWithRegex(String str, String regex, String template) {
+	public static String replaceWithRegex(String str, String regex, String template, String placeHolder) {
 		if (!matches(str, regex)) {
 			return null;
 		}
 
-		String matchesString = template;
+		String matchesString = prepareRegexTemplate(template, placeHolder);
 		Matcher matcher = Pattern.compile(regex).matcher(str);
 		if (matcher.find()) {
 			for (int i = 0; i < matcher.groupCount(); i++) {
 				int index = i + 1;
-				matchesString = replace(matchesString, "$" + index, matcher.group(index));
+				String matchValue = matcher.group(index);
+				if (matchValue == null) {
+					matchValue = Globals.DEFAULT_VALUE_STRING;
+				}
+				matchesString = replace(matchesString, "$" + index, matchValue);
 			}
 
 			return matchesString;
@@ -2128,10 +2108,7 @@ public final class StringUtils {
 					if (validateCode != -1) {
 						int sigma = 0;
 						for (int i = 0; i < 17; i++) {
-							int currentCode = Character.digit(cardCode.charAt(i), 10);
-							if (currentCode != 0) {
-								sigma += currentCode * (Math.pow(2, 17 - i) % 11);
-							}
+							sigma += Character.digit(cardCode.charAt(i), 10) * (Math.pow(2, 17 - i) % 11);
 						}
 						return validateCode == ((12 - (sigma % 11)) % 11);
 					}
@@ -2144,10 +2121,7 @@ public final class StringUtils {
 					if (validateCode != -1) {
 						int sigma = 0;
 						for (int i = 0; i < 17; i++) {
-							int currentCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(i));
-							if (currentCode != 0) {
-								sigma += currentCode * (Math.pow(3, i) % 31);
-							}
+							sigma += CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(i)) * (Math.pow(3, i) % 31);
 						}
 
 						int authCode = 31 - (sigma % 31);
@@ -2158,18 +2132,17 @@ public final class StringUtils {
 			case Luhn:
 				if (StringUtils.matches(code, LUHN_CODE_REGEX)) {
 					int result = 0;
-					boolean process = Globals.DEFAULT_VALUE_BOOLEAN;
-					while (code.length() > 0) {
-						int currentCode = Integer.parseInt(code.substring(code.length() - 1));
-						if (process) {
+					int index = code.length() - 1;
+					while (index >= 0) {
+						int currentCode = Character.getNumericValue(code.charAt(index));
+						if (index % 2 == 0) {
 							currentCode *= 2;
 							if (currentCode > 9) {
 								currentCode -= 9;
 							}
 						}
 						result += currentCode;
-						process = !process;
-						code = code.substring(0, code.length() - 1);
+						index--;
 					}
 					return result % 10 == 0;
 				}
@@ -2178,12 +2151,23 @@ public final class StringUtils {
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
-	private static int hexToBinary(final byte b) throws IOException {
-		final int i = Character.digit((char) b, 16);
-		if (i == Globals.DEFAULT_VALUE_INT) {
-			throw new IOException("Invalid quoted printable encoding: not a valid hex digit: " + b);
+	private static String prepareRegexTemplate(String template, String placeHolder) {
+		if (StringUtils.isEmpty(template)) {
+			return Globals.DEFAULT_VALUE_STRING;
 		}
-		return i;
+		if (StringUtils.isEmpty(placeHolder)) {
+			return template;
+		}
+		String preparedTemplate = template;
+		int index;
+		int count = 1;
+		while ((index = preparedTemplate.indexOf(placeHolder)) > 0) {
+			preparedTemplate = preparedTemplate.substring(0, index)
+					+ "$" + count
+					+ preparedTemplate.substring(index + placeHolder.length());
+			count++;
+		}
+		return preparedTemplate;
 	}
 
 	private static String changeFirstCharacterCase(String str, boolean capitalize) {

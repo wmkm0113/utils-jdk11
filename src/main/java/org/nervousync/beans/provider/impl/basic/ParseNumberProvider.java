@@ -44,7 +44,6 @@ public final class ParseNumberProvider implements ConvertProvider {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T> T convert(Object origObj, Class<T> targetClass) {
 		if (origObj != null && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
 			if (targetClass.equals(BigInteger.class)) {
@@ -62,7 +61,7 @@ public final class ParseNumberProvider implements ConvertProvider {
 				}
 			}
 			if (targetClass.equals(byte.class)) {
-				return (T)Byte.valueOf(string);
+				return targetClass.cast(Byte.valueOf(string));
 			}
 
 			Method method;
@@ -76,7 +75,7 @@ public final class ParseNumberProvider implements ConvertProvider {
 			}
 			if (method != null) {
 				try {
-					return (T) method.invoke(null, string);
+					return targetClass.cast(method.invoke(null, string));
 				} catch (IllegalAccessException | InvocationTargetException ignored) {
 				}
 			}

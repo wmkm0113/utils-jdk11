@@ -26,17 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Miscellaneous class utility methods. Mainly for internal use within the
@@ -133,6 +123,14 @@ public final class ClassUtils {
 		}
 		
 		return cl;
+	}
+
+	public static <T> Optional<T> defaultClassLoader(Class<T> clazz) {
+		try {
+			return Optional.of(clazz.cast(getDefaultClassLoader()));
+		} catch (Exception e) {
+			return Optional.empty();
+		}
 	}
 
 	/**

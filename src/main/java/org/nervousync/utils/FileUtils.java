@@ -355,7 +355,7 @@ public final class FileUtils {
 		if (fileExtensionInfo != null) {
 			byte[] fileTypeByte = FileUtils.readFileBytes(resourceLocation, 0,
 					fileExtensionInfo.getIdentifiedCode().length() / 2);
-			String fileType = ConvertUtils.byteArrayToHexString(fileTypeByte);
+			String fileType = ConvertUtils.byteToHex(fileTypeByte);
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -379,7 +379,7 @@ public final class FileUtils {
 
 			System.arraycopy(fileContent, 0, fileTypeByte, 0, identifiedLength);
 
-			String fileType = ConvertUtils.byteArrayToHexString(fileTypeByte);
+			String fileType = ConvertUtils.byteToHex(fileTypeByte);
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
 		}
 
@@ -393,7 +393,7 @@ public final class FileUtils {
 	 * @return matched file extension name
 	 */
 	public static String identifiedFileType(byte[] identifiedByteCode) {
-		String identifiedCode = ConvertUtils.byteArrayToHexString(identifiedByteCode);
+		String identifiedCode = ConvertUtils.byteToHex(identifiedByteCode);
 		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDENTIFIED_MAP.values()) {
 			if (identifiedCode.startsWith(fileExtensionInfo.getIdentifiedCode())) {
 				return fileExtensionInfo.getExtensionName();
@@ -524,8 +524,7 @@ public final class FileUtils {
 	 *
 	 * @param resourceLocation resource location
 	 * @return <code>java.io.InputStream</code>
-	 * @throws FileNotFoundException target file does not exists
-	 * @throws IOException           when opening input stream error
+	 * @throws IOException when opening input stream error
 	 */
 	public static InputStream loadFile(String resourceLocation) throws IOException {
 		//	Convert resource location to input stream
@@ -724,15 +723,28 @@ public final class FileUtils {
 	 *
 	 * @param filePath  jar file location
 	 * @param entryPath read entry path
-	 * @return entry content or null if not exists
+	 * @return entry content or zero length array if not exists
 	 */
 	public static byte[] readJarEntryBytes(String filePath, String entryPath) {
-		byte[] classContent = null;
+		return FileUtils.readJarEntryBytes(filePath, entryPath, 0, Globals.DEFAULT_VALUE_INT);
+	}
+
+	/**
+	 * Read entry content from jar file
+	 *
+	 * @param filePath  jar file location
+	 * @param entryPath read entry path
+	 * @param offset    read offset
+	 * @param length    read length
+	 * @return entry content or zero length array if not exists
+	 */
+	public static byte[] readJarEntryBytes(String filePath, String entryPath, int offset, int length) {
+		JarFile jarFile = null;
 		InputStream inputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 
 		try {
-			JarFile jarFile = new JarFile(getFile(filePath));
+			jarFile = new JarFile(getFile(filePath));
 
 			JarEntry packageEntry = jarFile.getJarEntry(entryPath);
 
@@ -740,19 +752,24 @@ public final class FileUtils {
 				inputStream = jarFile.getInputStream(packageEntry);
 				byteArrayOutputStream = new ByteArrayOutputStream();
 
-				byte [] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-				int readLength;
-				while (((readLength = inputStream.read(buffer)) != -1)) {
-					byteArrayOutputStream.write(buffer, 0 , readLength);
-				}
+				byte [] buffer;
+				int readLength = 0;
+				int position = Math.max(offset, Globals.INITIALIZE_INT_VALUE);
+				int limitLength = Math.min(length, inputStream.available());
+				do {
+					int itemLength = Math.min((limitLength - readLength), Globals.DEFAULT_BUFFER_SIZE);
+					buffer = new byte[itemLength];
+					int currentLength = inputStream.read(buffer, position + readLength, itemLength);
+					if (currentLength == itemLength) {
+						byteArrayOutputStream.write(buffer, 0, buffer.length);
+					} else if (currentLength == Globals.DEFAULT_VALUE_INT) {
+						break;
+					}
+					readLength += itemLength;
+				} while (readLength != limitLength);
 
-				classContent = byteArrayOutputStream.toByteArray();
-
-				inputStream.close();
-				inputStream = null;
+				return byteArrayOutputStream.toByteArray();
 			}
-
-			jarFile.close();
 		} catch (Exception e) {
 			if (FileUtils.LOGGER.isDebugEnabled()) {
 				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
@@ -760,9 +777,9 @@ public final class FileUtils {
 		} finally {
 			IOUtils.closeStream(inputStream);
 			IOUtils.closeStream(byteArrayOutputStream);
+			IOUtils.closeStream(jarFile);
 		}
-
-		return classContent;
+		return new byte[0];
 	}
 
 	/**
@@ -1643,9 +1660,9 @@ public final class FileUtils {
 	/**
 	 * Save String to File use default charset: UTF-8
 	 *
-	 * @param fileName      File name
-	 * @param folderPath    Folder path
-	 * @param content       File content
+	 * @param fileName   File name
+	 * @param folderPath Folder path
+	 * @param content    File content
 	 * @return Save result
 	 */
 	public static boolean saveFile(String fileName, String folderPath, String content) {
@@ -1655,10 +1672,10 @@ public final class FileUtils {
 	/**
 	 * Save String to File
 	 *
-	 * @param fileName      File name
-	 * @param folderPath    Folder path
-	 * @param content       File content
-	 * @param encoding      Charset encoding
+	 * @param fileName   File name
+	 * @param folderPath Folder path
+	 * @param content    File content
+	 * @param encoding   Charset encoding
 	 * @return Save result
 	 */
 	public static boolean saveFile(String fileName, String folderPath, String content, String encoding) {
@@ -2357,6 +2374,40 @@ public final class FileUtils {
 	}
 
 	/**
+	 * Read entry length
+	 *
+	 * @param filePath  Zip/jar file path
+	 * @param entryPath Check entry path
+	 * @return Entry length
+	 */
+	public static int readEntryLength(String filePath, String entryPath) {
+		InputStream inputStream = null;
+		JarFile jarFile = null;
+		try {
+			if (filePath.endsWith(URL_PROTOCOL_JAR)) {
+				jarFile = new JarFile(getFile(filePath));
+				JarEntry packageEntry = jarFile.getJarEntry(entryPath);
+
+				if(packageEntry != null){
+					inputStream = jarFile.getInputStream(jarFile.getJarEntry(entryPath));
+					return inputStream.available();
+				}
+			} else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
+				ZipFile zipFile = new ZipFile(filePath);
+				return zipFile.readEntryLength(entryPath);
+			}
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Read entry length error! ", e);
+			}
+		} finally {
+			IOUtils.closeStream(inputStream);
+			IOUtils.closeStream(jarFile);
+		}
+		return Globals.DEFAULT_VALUE_INT;
+	}
+
+	/**
 	 * Check given entry path is exists in zip/jar file
 	 *
 	 * @param filePath  Zip/jar file path
@@ -2364,16 +2415,15 @@ public final class FileUtils {
 	 * @return Check result
 	 */
 	public static boolean isEntryExists(String filePath, String entryPath) {
-		if (filePath.endsWith(URL_PROTOCOL_JAR)) {
+		if (StringUtils.isEmpty(filePath) || StringUtils.isEmpty(entryPath)) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+
+		if (filePath.toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
 			JarFile jarFile = null;
 			try {
 				jarFile = new JarFile(getFile(filePath));
-
-				JarEntry packageEntry = jarFile.getJarEntry(entryPath);
-
-				if(packageEntry != null){
-					return true;
-				}
+				return jarFile.getJarEntry(entryPath) != null;
 			} catch (Exception e) {
 				if (FileUtils.LOGGER.isDebugEnabled()) {
 					FileUtils.LOGGER.debug("Load jar entry content error! ", e);
@@ -2389,11 +2439,39 @@ public final class FileUtils {
 					}
 				}
 			}
-		} else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
+		} else if (filePath.toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
 			ZipFile zipFile = new ZipFile(filePath);
 			return zipFile.isEntryExists(entryPath);
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
+	}
+
+	/**
+	 * Entry input stream input stream.
+	 *
+	 * @param fileObject the file object
+	 * @param entryPath  the entry path
+	 * @return input stream
+	 * @throws IOException the io exception
+	 */
+	public static InputStream openInputStream(Object fileObject, String entryPath) throws IOException {
+		if (fileObject == null || StringUtils.isEmpty(entryPath)) {
+			return null;
+		}
+
+		if (fileObject instanceof JarFile) {
+			JarEntry jarEntry = ((JarFile) fileObject).getJarEntry(entryPath);
+			if(jarEntry != null){
+				return ((JarFile) fileObject).getInputStream(jarEntry);
+			}
+			return null;
+		}
+
+		if (fileObject instanceof ZipFile) {
+			return ((ZipFile) fileObject).entryInputStream(entryPath);
+		}
+
+		return null;
 	}
 
 	/**
@@ -2445,10 +2523,10 @@ public final class FileUtils {
 	/**
 	 * Check current file can write
 	 *
-	 * @param path File path
-	 * @param domain    SMB domain
-	 * @param userName  SMB user name
-	 * @param passWord  SMB password
+	 * @param path     File path
+	 * @param domain   SMB domain
+	 * @param userName SMB user name
+	 * @param passWord SMB password
 	 * @return Check result
 	 */
 	public static boolean canWrite(String path, String domain, String userName, String passWord) {
@@ -2610,9 +2688,10 @@ public final class FileUtils {
 
 	/**
 	 * Open SMB file
-	 * @param smbPath  SMB file path
-	 * @return  SmbFile object
-	 * @throws FileNotFoundException    if open file error
+	 *
+	 * @param smbPath SMB file path
+	 * @return SmbFile object
+	 * @throws FileNotFoundException if open file error
 	 */
 	public static SmbFile openSMBFile(String smbPath) throws FileNotFoundException {
 		return openSMBFile(smbPath, null, null, null);
@@ -2620,12 +2699,13 @@ public final class FileUtils {
 
 	/**
 	 * Open SMB file
+	 *
 	 * @param smbPath  SMB file path
-	 * @param domain        SMB domain
-	 * @param userName      SMB user name
-	 * @param passWord      SMB password
-	 * @return  SmbFile object
-	 * @throws FileNotFoundException    if open file error
+	 * @param domain   SMB domain
+	 * @param userName SMB user name
+	 * @param passWord SMB password
+	 * @return SmbFile object
+	 * @throws FileNotFoundException if open file error
 	 */
 	public static SmbFile openSMBFile(String smbPath, String domain,
 	                                  String userName, String passWord) throws FileNotFoundException {

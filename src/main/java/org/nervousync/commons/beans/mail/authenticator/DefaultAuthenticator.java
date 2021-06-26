@@ -18,6 +18,8 @@ package org.nervousync.commons.beans.mail.authenticator;
 
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
+import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 
 /**
  * Username and password authenticator for SMTP/POP3/IMAP server
@@ -33,8 +35,10 @@ public final class DefaultAuthenticator extends Authenticator {
 	 * @param username		Authenticate user name
 	 * @param password		Authenticate password
 	 */
-	public DefaultAuthenticator(String username, String password){
-		this.passwordAuthentication = new PasswordAuthentication(username, password);
+	public DefaultAuthenticator(String username, String password) {
+		this.passwordAuthentication =
+				new PasswordAuthentication(StringUtils.notBlank(username) ? username : Globals.DEFAULT_VALUE_STRING,
+						StringUtils.notBlank(password) ? password : Globals.DEFAULT_VALUE_STRING);
 	}
 	
 	@Override

@@ -16,15 +16,24 @@
  */
 package org.nervousync.commons.beans.mail.protocol.impl;
 
-import org.nervousync.enumerations.mail.ProtocolOption;
+import com.sun.mail.imap.IMAPFolder;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import org.nervousync.commons.beans.mail.operator.MailReceiver;
+import org.nervousync.commons.beans.mail.operator.MailSender;
 import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implement IMAP protocol
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:58:05 PM $
  */
-public final class IMAPProtocol extends BaseProtocol {
+public final class IMAPProtocol extends BaseProtocol implements MailSender, MailReceiver {
 
 	/**
 	 * 
@@ -32,10 +41,31 @@ public final class IMAPProtocol extends BaseProtocol {
 	private static final long serialVersionUID = 8284024432628098776L;
 	
 	public IMAPProtocol() {
-		super(ProtocolOption.IMAP);
 		this.hostParam = "mail.imap.host";
 		this.portParam = "mail.imap.port";
 		this.connectionTimeoutParam = "mail.imap.connectiontimeout";
 		this.timeoutParam = "mail.imap.timeout";
+	}
+
+	@Override
+	public String readUID(Folder folder, Message message) throws MessagingException {
+		return Long.toString(((IMAPFolder) folder).getUID(message));
+	}
+
+	@Override
+	public Message readMessage(Folder folder, String uid) throws MessagingException {
+		return ((IMAPFolder) folder).getMessageByUID(Long.parseLong(uid));
+	}
+
+	@Override
+	public List<Message> readMessages(Folder folder, String... uidArrays) throws MessagingException {
+		List<Message> messageList = new ArrayList<>();
+		long[] uidList = new long[uidArrays.length];
+
+		for (int i = 0 ; i < uidArrays.length ; i++) {
+			uidList[i] = Long.parseLong(uidArrays[i]);
+		}
+		Collections.addAll(messageList, ((IMAPFolder) folder).getMessagesByUID(uidList));
+		return messageList;
 	}
 }

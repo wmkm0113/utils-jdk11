@@ -16,7 +16,7 @@
  */
 package org.nervousync.commons.beans.mail.protocol.impl;
 
-import org.nervousync.enumerations.mail.ProtocolOption;
+import org.nervousync.commons.beans.mail.operator.MailSender;
 import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
 
 /**
@@ -24,7 +24,7 @@ import org.nervousync.commons.beans.mail.protocol.BaseProtocol;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:10:30 PM $
  */
-public final class SMTPProtocol extends BaseProtocol {
+public final class SMTPProtocol extends BaseProtocol implements MailSender {
 
 	/**
 	 * 
@@ -32,7 +32,6 @@ public final class SMTPProtocol extends BaseProtocol {
 	private static final long serialVersionUID = -5226459745420272131L;
 
 	public SMTPProtocol() {
-		super(ProtocolOption.SMTP);
 		this.hostParam = "mail.smtp.host";
 		this.portParam = "mail.smtp.port";
 		this.connectionTimeoutParam = "mail.smtp.connectiontimeout";

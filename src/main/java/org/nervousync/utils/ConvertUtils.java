@@ -116,38 +116,34 @@ public final class ConvertUtils {
 	 * @param strIn			Hex string
 	 * @return				Convert byte arrays
 	 */
-	public static byte[] hexStrToByteArr(String strIn) {
+	public static byte[] hexToByte(String strIn) {
+		if (strIn.length() % 2 != 0) {
+			return new byte[0];
+		}
+
 		byte[] arrB = strIn.getBytes(Charset.defaultCharset());
 		int iLen = arrB.length;
 
 		byte[] arrOut = new byte[iLen / 2];
 		for (int i = 0; i < iLen; i = i + 2) {
 			String strTmp = new String(arrB, i, 2, Charset.defaultCharset());
-			arrOut[i / 2] = (byte) Integer.parseInt(strTmp, 16);
+			arrOut[i / 2] = Integer.valueOf(strTmp, 16).byteValue();
 		}
 		return arrOut;
 	}
-	
-	/**
-	 * Convert hex to String
-	 * @param sourceBytes	hex byte arrays
-	 * @return convert String
-	 */
-	public static String byteArrayToHexString(byte [] sourceBytes) {
-		int length = sourceBytes.length;
-		StringBuilder stringBuilder = new StringBuilder(length * 2);
-		for (byte source : sourceBytes) {
-			int intTmp = source;
 
-			while (intTmp < 0) {
-				intTmp = intTmp + 256;
-			}
+	public static String byteToHex(byte[] dataBytes) {
+		if (dataBytes == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
 
-			if (intTmp < 16) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (byte b : dataBytes) {
+			String tmp = Integer.toHexString(b & 0xFF);
+			if (tmp.length() == 1) {
 				stringBuilder.append("0");
 			}
-
-			stringBuilder.append(Integer.toString(intTmp, 16));
+			stringBuilder.append(tmp);
 		}
 		return stringBuilder.toString();
 	}

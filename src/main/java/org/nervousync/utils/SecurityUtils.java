@@ -17,27 +17,20 @@
 package org.nervousync.utils;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.security.*;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.util.Optional;
 
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.digests.SM3Digest;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.nervousync.crypto.Cryptor;
+import org.nervousync.crypto.impl.*;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +49,9 @@ import org.nervousync.commons.core.Globals;
  * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:23:13 AM $
  */
 public final class SecurityUtils implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2929476536772097530L;
 
@@ -67,176 +60,9 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
 
-	/**
-	 * DES Algorithm
-	 */
-	public transient static final String DES_ECB_NO_PADDING         = "DES/ECB/NoPadding";
-	/**
-	 * The constant DES_ECB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_ECB_PKCS5_PADDING      = "DES/ECB/PKCS5Padding";
-	/**
-	 * The constant DES_CBC_NO_PADDING.
-	 */
-	public transient static final String DES_CBC_NO_PADDING         = "DES/CBC/NoPadding";
-	/**
-	 * The constant DES_CBC_PKCS5_PADDING.
-	 */
-	public transient static final String DES_CBC_PKCS5_PADDING      = "DES/CBC/PKCS5Padding";
-	/**
-	 * The constant DES_CFB_NO_PADDING.
-	 */
-	public transient static final String DES_CFB_NO_PADDING         = "DES/CFB/NoPadding";
-	/**
-	 * The constant DES_CFB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_CFB_PKCS5_PADDING      = "DES/CFB/PKCS5Padding";
-	/**
-	 * The constant DES_OFB_NO_PADDING.
-	 */
-	public transient static final String DES_OFB_NO_PADDING         = "DES/OFB/NoPadding";
-	/**
-	 * The constant DES_OFB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_OFB_PKCS5_PADDING      = "DES/OFB/PKCS5Padding";
-	/**
-	 * The constant DES_EDE_ECB_NO_PADDING.
-	 */
-	public transient static final String DES_EDE_ECB_NO_PADDING     = "DESede/ECB/NoPadding";
-	/**
-	 * The constant DES_EDE_ECB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_EDE_ECB_PKCS5_PADDING  = "DESede/ECB/PKCS5Padding";
-	/**
-	 * The constant DES_EDE_CBC_NO_PADDING.
-	 */
-	public transient static final String DES_EDE_CBC_NO_PADDING     = "DESede/CBC/NoPadding";
-	/**
-	 * The constant DES_EDE_CBC_PKCS5_PADDING.
-	 */
-	public transient static final String DES_EDE_CBC_PKCS5_PADDING  = "DESede/CBC/PKCS5Padding";
-	/**
-	 * The constant DES_EDE_CFB_NO_PADDING.
-	 */
-	public transient static final String DES_EDE_CFB_NO_PADDING     = "DESede/CFB/NoPadding";
-	/**
-	 * The constant DES_EDE_CFB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_EDE_CFB_PKCS5_PADDING  = "DESede/CFB/PKCS5Padding";
-	/**
-	 * The constant DES_EDE_OFB_NO_PADDING.
-	 */
-	public transient static final String DES_EDE_OFB_NO_PADDING     = "DESede/OFB/NoPadding";
-	/**
-	 * The constant DES_EDE_OFB_PKCS5_PADDING.
-	 */
-	public transient static final String DES_EDE_OFB_PKCS5_PADDING  = "DESede/OFB/PKCS5Padding";
-	/**
-	 * AES Algorithm
-	 */
-	public transient static final String AES_CBC_NO_PADDING         = "AES/CBC/NoPadding";
-	/**
-	 * The constant AES_CBC_PKCS5_PADDING.
-	 */
-	public transient static final String AES_CBC_PKCS5_PADDING      = "AES/CBC/PKCS5Padding";
-	/**
-	 * The constant AES_CBC_PKCS7_PADDING.
-	 */
-	public transient static final String AES_CBC_PKCS7_PADDING      = "AES/CBC/PKCS7Padding";
-	/**
-	 * The constant AES_CBC_ISO10126_Padding.
-	 */
-	public transient static final String AES_CBC_ISO10126_Padding   = "AES/CBC/ISO10126Padding";
-	/**
-	 * The constant AES_CFB_NO_PADDING.
-	 */
-	public transient static final String AES_CFB_NO_PADDING         = "AES/CFB/NoPadding";
-	/**
-	 * The constant AES_CFB_PKCS5_PADDING.
-	 */
-	public transient static final String AES_CFB_PKCS5_PADDING      = "AES/CFB/PKCS5Padding";
-	/**
-	 * The constant AES_CFB_PKCS7_PADDING.
-	 */
-	public transient static final String AES_CFB_PKCS7_PADDING      = "AES/CFB/PKCS7Padding";
-	/**
-	 * The constant AES_CFB_ISO10126_Padding.
-	 */
-	public transient static final String AES_CFB_ISO10126_Padding   = "AES/CFB/ISO10126Padding";
-	/**
-	 * The constant AES_ECB_NO_PADDING.
-	 */
-	public transient static final String AES_ECB_NO_PADDING         = "AES/ECB/NoPadding";
-	/**
-	 * The constant AES_ECB_PKCS5_PADDING.
-	 */
-	public transient static final String AES_ECB_PKCS5_PADDING      = "AES/ECB/PKCS5Padding";
-	/**
-	 * The constant AES_ECB_PKCS7_PADDING.
-	 */
-	public transient static final String AES_ECB_PKCS7_PADDING      = "AES/ECB/PKCS7Padding";
-	/**
-	 * The constant AES_ECB_ISO10126_Padding.
-	 */
-	public transient static final String AES_ECB_ISO10126_Padding   = "AES/ECB/ISO10126Padding";
-	/**
-	 * The constant AES_OFB_NO_PADDING.
-	 */
-	public transient static final String AES_OFB_NO_PADDING         = "AES/OFB/NoPadding";
-	/**
-	 * The constant AES_OFB_PKCS5_PADDING.
-	 */
-	public transient static final String AES_OFB_PKCS5_PADDING      = "AES/OFB/PKCS5Padding";
-	/**
-	 * The constant AES_OFB_PKCS7_PADDING.
-	 */
-	public transient static final String AES_OFB_PKCS7_PADDING      = "AES/OFB/PKCS7Padding";
-	/**
-	 * The constant AES_OFB_ISO10126_Padding.
-	 */
-	public transient static final String AES_OFB_ISO10126_Padding   = "AES/OFB/ISO10126Padding";
-	/**
-	 * RSA Algorithm
-	 */
-	public transient static final String RSA_PKCS1_PADDING          = "RSA/ECB/PKCS1Padding";
-	/**
-	 * The constant RSA_OAEP_SHA1_PADDING.
-	 */
-	public transient static final String RSA_OAEP_SHA1_PADDING      = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
-	/**
-	 * The constant RSA_OAEP_SHA256_PADDING.
-	 */
-	public transient static final String RSA_OAEP_SHA256_PADDING    = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
-
-	/**
-	 * PRNG Algorithm
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE                  = "NativePRNG";
-	/**
-	 * The constant PRNG_ALGORITHM_NATIVE_BLOCKING.
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE_BLOCKING         = "NativePRNGBlocking";
-	/**
-	 * The constant PRNG_ALGORITHM_NATIVE_NON_BLOCKING.
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE_NON_BLOCKING     = "NativePRNGNonBlocking";
-	/**
-	 * The constant PRNG_ALGORITHM_NATIVE_PKCS11.
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE_PKCS11           = "PKCS11";
-	/**
-	 * The constant PRNG_ALGORITHM_NATIVE_SHA1PRNG.
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE_SHA1PRNG         = "SHA1PRNG";
-	/**
-	 * The constant PRNG_ALGORITHM_NATIVE_WINDOWS.
-	 */
-	public transient static final String PRNG_ALGORITHM_NATIVE_WINDOWS          = "Windows-PRNG";
-
-	/**
-	 * Default key value
-	 */
-	private static final String PRIVATE_KEY = StringUtils.randomString(32);
+	static {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
 	private SecurityUtils() {
 	}
@@ -252,7 +78,7 @@ public final class SecurityUtils implements Serializable {
 	public static String MD5(Object source) {
 		return digestEncode(source, "MD5");
 	}
-	
+
 	/* SHA Method */
 
 	/**
@@ -287,978 +113,14 @@ public final class SecurityUtils implements Serializable {
 		return digestEncode(source, "SHA-512");
 	}
 
-	/* Encrypt Data Method*/
-
 	/**
-	 * Encrypt byte arrays with given encrypt key by AES128
+	 * Get SHA512 value. Only encode <code>String</code>
 	 *
-	 * @param arrB   Byte arrays will be encrypted
-	 * @param strKey encrypt key
-	 * @return Encrypted result
+	 * @param source source object
+	 * @return SHA512 value
 	 */
-	public static byte[] AES128Encrypt(byte[] arrB, String strKey) {
-		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte arrays will be encrypted
-	 * @param strKey    encrypt key
-	 * @return Encrypted result
-	 */
-	public static byte[] AES128Encrypt(String algorithm, byte[] arrB, String strKey) {
-		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param strKey        encrypt key
-	 * @return Encrypted result
-	 */
-	public static byte[] AES128Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by AES128
-	 *
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES128Encrypt(byte[] arrB, byte[] keyContent) {
-		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 *
-	 * @param algorithm  Algorithm
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES128Encrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param keyContent    Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES128Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by AES256
-	 *
-	 * @param arrB   Byte arrays will be encrypted
-	 * @param strKey encrypt key
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(byte[] arrB, String strKey) {
-		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte arrays will be encrypted
-	 * @param strKey    encrypt key
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(String algorithm, byte[] arrB, String strKey) {
-		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param strKey        encrypt key
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by AES256
-	 *
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(byte[] arrB, byte[] keyContent) {
-		return EncryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 *
-	 * @param algorithm  Algorithm
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return EncryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm and encrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param keyContent    Binary key content
-	 * @return Encrypted result
-	 */
-	public static byte[] AES256Encrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Encrypt string with default encrypt key by AES128
-	 *
-	 * @param strIn String will be encrypted
-	 * @return Encrypted result
-	 */
-	public static String AES128Encrypt(String strIn) {
-		return AES128Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, SecurityUtils.PRIVATE_KEY);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES128
-	 *
-	 * @param strIn  String will be encrypted
-	 * @param strKey encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES128Encrypt(String strIn, String strKey) {
-		return AES128Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES128
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be encrypted
-	 * @param strKey    encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES128Encrypt(String algorithm, String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(
-				AES128Encrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be encrypted
-	 * @param strKey        encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES128Encrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(
-				AES128Encrypt(algorithm, prngAlgorithm, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt string with default encrypt key by AES256
-	 *
-	 * @param strIn String will be encrypted
-	 * @return Encrypted result
-	 */
-	public static String AES256Encrypt(String strIn) {
-		return AES256Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, SecurityUtils.PRIVATE_KEY);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES256
-	 *
-	 * @param strIn  String will be encrypted
-	 * @param strKey encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES256Encrypt(String strIn, String strKey) {
-		return AES256Encrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES256
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be encrypted
-	 * @param strKey    encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES256Encrypt(String algorithm, String strIn, String strKey) {
-		return AES256Encrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be encrypted
-	 * @param strKey        encrypt key
-	 * @return Encrypted result
-	 */
-	public static String AES256Encrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(
-				AES256Encrypt(algorithm, prngAlgorithm, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(byte[] arrB, byte[] keyContent) {
-		return DESEncrypt(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, keyContent);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param algorithm  Encrypt algorithm
-	 * @param arrB       Byte arrays will be encrypted
-	 * @param keyContent Binary key content
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return DESEncrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, keyContent);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param algorithm     Encrypt algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param keyContent    Binary key content
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, keyContent, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param arrB   Byte arrays will be encrypted
-	 * @param strKey Encrypt key
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(byte[] arrB, String strKey) {
-		return DESEncrypt(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, strKey);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param algorithm Encrypt algorithm
-	 * @param arrB      Byte arrays will be encrypted
-	 * @param strKey    Encrypt key
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(String algorithm, byte[] arrB, String strKey) {
-		return DESEncrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, strKey);
-	}
-
-	/**
-	 * Encrypt byte arrays with given encrypt key by DES
-	 *
-	 * @param algorithm     Encrypt algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be encrypted
-	 * @param strKey        Encrypt key
-	 * @return Encrypt result
-	 */
-	public static byte[] DESEncrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return EncryptData(algorithm, prngAlgorithm, arrB, null, strKey, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by DES
-	 *
-	 * @param strIn  String will be encrypted
-	 * @param strKey Encrypt key
-	 * @return Encrypt result
-	 */
-	public static String DESEncrypt(String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(DESEncrypt(DES_CBC_PKCS5_PADDING,
-				PRNG_ALGORITHM_NATIVE_SHA1PRNG, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by DES
-	 *
-	 * @param algorithm Encrypt algorithm
-	 * @param strIn     String will be encrypted
-	 * @param strKey    Encrypt key
-	 * @return Encrypt result
-	 */
-	public static String DESEncrypt(String algorithm, String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(DESEncrypt(algorithm,
-				PRNG_ALGORITHM_NATIVE_SHA1PRNG, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt string with given encrypt key by DES
-	 *
-	 * @param algorithm     Encrypt algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be encrypted
-	 * @param strKey        Encrypt key
-	 * @return Encrypt result
-	 */
-	public static String DESEncrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		return ConvertUtils.byteArrayToHexString(DESEncrypt(algorithm,
-				prngAlgorithm, ConvertUtils.convertToByteArray(strIn), strKey));
-	}
-
-	/**
-	 * Encrypt string with given key by RSA
-	 *
-	 * @param strIn String will be encrypted
-	 * @param key   RSA key
-	 * @return Encrypt result
-	 */
-	public static String RSAEncrypt(String strIn, Key key) {
-		return ConvertUtils.byteArrayToHexString(SecurityUtils.EncryptData(RSA_PKCS1_PADDING, null,
-				ConvertUtils.convertToByteArray(strIn), key, (String)null, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Encrypt string with given key by RSA
-	 *
-	 * @param algorithm Encrypt algorithm
-	 * @param strIn     String will be encrypted
-	 * @param key       RSA key
-	 * @return Encrypt result
-	 */
-	public static String RSAEncrypt(String algorithm, String strIn, Key key) {
-		return ConvertUtils.byteArrayToHexString(SecurityUtils.EncryptData(algorithm, null,
-				ConvertUtils.convertToByteArray(strIn), key, (String)null, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Encrypt byte arrays with given key by RSA
-	 *
-	 * @param arrB Byte arrays will be encrypted
-	 * @param key  RSA key
-	 * @return Encrypt result
-	 */
-	public static byte[] RSAEncrypt(byte[] arrB, Key key) {
-		return SecurityUtils.EncryptData(RSA_PKCS1_PADDING, null, arrB, key, (String)null, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/* Decrypt Data Method */
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by AES128
-	 *
-	 * @param arrB   Byte arrays will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(byte[] arrB, String strKey) {
-		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte arrays will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(String algorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 128);
-	}
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by AES128
-	 *
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Binary key content
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(byte[] arrB, byte[] keyContent) {
-		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm  Algorithm
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Binary key content
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param keyContent    Binary key content
-	 * @return Decrypted result
-	 */
-	public static byte[] AES128Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 128);
-	}
-
-	/**
-	 * Decrypt string with given decrypt key by AES128
-	 *
-	 * @param strIn  String will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES128Decrypt(String strIn, String strKey) {
-		return AES128Decrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Decrypt string with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES128Decrypt(String algorithm, String strIn, String strKey) {
-		return AES128Decrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Decrypt string with given algorithm and decrypt key by AES128
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES128Decrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		try {
-			byte[] decryptData = DecryptData(algorithm, prngAlgorithm,
-					ConvertUtils.hexStrToByteArr(strIn), null, strKey, 128);
-			return ConvertUtils.convertToString(decryptData);
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Decrypt data error! ", e);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by AES256
-	 *
-	 * @param arrB   Byte arrays will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(byte[] arrB, String strKey) {
-		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte arrays will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(String algorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by AES256
-	 *
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(byte[] arrB, byte[] keyContent) {
-		return DecryptData(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm  Algorithm
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param keyContent    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] AES256Decrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt string with given decrypt key by AES256
-	 *
-	 * @param strIn  String will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES256Decrypt(String strIn, String strKey) {
-		return AES256Decrypt(AES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Decrypt string with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES256Decrypt(String algorithm, String strIn, String strKey) {
-		return AES256Decrypt(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, strIn, strKey);
-	}
-
-	/**
-	 * Decrypt string with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypted result
-	 */
-	public static String AES256Decrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		try {
-			byte[] decryptData = DecryptData(algorithm, prngAlgorithm, ConvertUtils.hexStrToByteArr(strIn), null, strKey, 256);
-			return ConvertUtils.convertToString(decryptData);
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Decrypt data error! ", e);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by DES
-	 *
-	 * @param arrB   Byte arrays will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(byte[] arrB, String strKey) {
-		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by AES256
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte arrays will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(String algorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, String strKey) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, strKey, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given decrypt key by DES
-	 *
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(byte[] arrB, byte[] keyContent) {
-		return DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 *
-	 * @param algorithm  Algorithm
-	 * @param arrB       Byte arrays will be decrypted
-	 * @param keyContent Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(String algorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt byte arrays with given algorithm and decrypt key by DES
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param arrB          Byte arrays will be decrypted
-	 * @param keyContent    Decrypt key
-	 * @return Decrypted result
-	 */
-	public static byte[] DESDecrypt(String algorithm, String prngAlgorithm, byte[] arrB, byte[] keyContent) {
-		return DecryptData(algorithm, prngAlgorithm, arrB, null, keyContent, 256);
-	}
-
-	/**
-	 * Decrypt string with given decrypt key by DES
-	 *
-	 * @param strIn  String will be decrypted
-	 * @param strKey Decrypt key
-	 * @return Decrypt result
-	 */
-	public static String DESDecrypt(String strIn, String strKey) {
-		return ConvertUtils.convertToString(DecryptData(DES_CBC_PKCS5_PADDING, PRNG_ALGORITHM_NATIVE_SHA1PRNG,
-				ConvertUtils.hexStrToByteArr(strIn), null, strKey, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Decrypt string with given decrypt key by DES
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be decrypted
-	 * @param strKey    Decrypt key
-	 * @return Decrypt result
-	 */
-	public static String DESDecrypt(String algorithm, String strIn, String strKey) {
-		return ConvertUtils.convertToString(DecryptData(algorithm, PRNG_ALGORITHM_NATIVE_SHA1PRNG,
-				ConvertUtils.hexStrToByteArr(strIn), null, strKey, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Decrypt string with given decrypt key by DES
-	 *
-	 * @param algorithm     Algorithm
-	 * @param prngAlgorithm PRNG Algorithm
-	 * @param strIn         String will be decrypted
-	 * @param strKey        Decrypt key
-	 * @return Decrypt result
-	 */
-	public static String DESDecrypt(String algorithm, String prngAlgorithm, String strIn, String strKey) {
-		return ConvertUtils.convertToString(DecryptData(algorithm, prngAlgorithm,
-				ConvertUtils.hexStrToByteArr(strIn), null, strKey, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Decrypt string with given key by RSA
-	 *
-	 * @param strIn String will be encrypted
-	 * @param key   RSA key
-	 * @return Decrypt result
-	 */
-	public static String RSADecrypt(String strIn, Key key) {
-		return ConvertUtils.convertToString(DecryptData(RSA_PKCS1_PADDING, null,
-				ConvertUtils.hexStrToByteArr(strIn), key, (String)null, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Decrypt string with given key by RSA
-	 *
-	 * @param algorithm Algorithm
-	 * @param strIn     String will be encrypted
-	 * @param key       RSA key
-	 * @return Decrypt result
-	 */
-	public static String RSADecrypt(String algorithm, String strIn, Key key) {
-		return ConvertUtils.convertToString(SecurityUtils.DecryptData(algorithm, null,
-				ConvertUtils.hexStrToByteArr(strIn), key, (String)null, Globals.DEFAULT_VALUE_INT));
-	}
-
-	/**
-	 * Decrypt byte array with given key by RSA
-	 *
-	 * @param arrB Byte array will be encrypted
-	 * @param key  RSA key
-	 * @return Decrypt result
-	 */
-	public static byte[] RSADecrypt(byte[] arrB, Key key) {
-		return SecurityUtils.DecryptData(RSA_PKCS1_PADDING, null, arrB,
-				key, (String)null, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Decrypt byte array with given key by RSA
-	 *
-	 * @param algorithm Algorithm
-	 * @param arrB      Byte array will be encrypted
-	 * @param key       RSA key
-	 * @return Decrypt result
-	 */
-	public static byte[] RSADecrypt(String algorithm, byte[] arrB, Key key) {
-		return SecurityUtils.DecryptData(algorithm, null, arrB,
-				key, (String)null, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Generate RSA key pair with default key size: 1024
-	 *
-	 * @return Key pair
-	 */
-	public static Optional<KeyPair> RSAKeyPair() {
-		return SecurityUtils.KeyPair("RSA", 1024);
-	}
-
-	/**
-	 * Generate RSA key pair with given key size
-	 *
-	 * @param keySize key size
-	 * @return Key pair
-	 */
-	public static Optional<KeyPair> RSAKeyPair(int keySize) {
-		return SecurityUtils.KeyPair("RSA", keySize);
-	}
-
-	/**
-	 * Generate DSA key pair with default key size: 1024
-	 *
-	 * @return Key pair
-	 */
-	public static Optional<KeyPair> DSAKeyPair() {
-		return SecurityUtils.KeyPair("DSA", 1024);
-	}
-
-	/**
-	 * Generate DSA key pair with given key size
-	 *
-	 * @param keySize key size
-	 * @return Key pair
-	 */
-	public static Optional<KeyPair> DSAKeyPair(int keySize) {
-		return SecurityUtils.KeyPair("DSA", keySize);
-	}
-
-	/**
-	 * Generate DSA public key with given key content
-	 *
-	 * @param keyContent key content
-	 * @return DSA public key object
-	 */
-	public static Optional<PublicKey> DSAPublicKey(byte[] keyContent) {
-		return generateKey(PublicKey.class, "DSA", keyContent);
-	}
-
-	/**
-	 * Generate DSA private key with given key content
-	 *
-	 * @param keyContent key content
-	 * @return DSA private key object
-	 */
-	public static Optional<PrivateKey> DSAPrivateKey(byte[] keyContent) {
-		return generateKey(PrivateKey.class, "DSA", keyContent);
-	}
-
-	/**
-	 * Generate RSA public key with given key content
-	 *
-	 * @param keyContent key content
-	 * @return RSA public key object
-	 */
-	public static Optional<PublicKey> RSAPublicKey(byte[] keyContent) {
-		return generateKey(PublicKey.class, "RSA", keyContent);
-	}
-
-	/**
-	 * Generate RSA public key with given modulus and exponent
-	 *
-	 * @param modulus  modulus
-	 * @param exponent exponent
-	 * @return RSA public key object
-	 */
-	public static Optional<PublicKey> RSAPublicKey(BigInteger modulus, BigInteger exponent) {
-		return generateRSAKey(PublicKey.class, modulus, exponent);
-	}
-
-	/**
-	 * Generate RSA private key with given key content
-	 *
-	 * @param keyContent key content
-	 * @return RSA private key object
-	 */
-	public static Optional<PrivateKey> RSAPrivateKey(byte[] keyContent) {
-		return generateKey(PrivateKey.class, "RSA", keyContent);
-	}
-
-	/**
-	 * Generate RSA private key with given modulus and exponent
-	 *
-	 * @param modulus  modulus
-	 * @param exponent exponent
-	 * @return RSA private key object
-	 */
-	public static Optional<PrivateKey> RSAPrivateKey(BigInteger modulus, BigInteger exponent) {
-		return generateRSAKey(PrivateKey.class, modulus, exponent);
-	}
-
-	/**
-	 * Signature data with DSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param message    Signature datas
-	 * @return Signature info
-	 */
-	public static byte[] signDataWithDSA(PrivateKey privateKey, String message) {
-		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withDSA");
-	}
-
-	/**
-	 * Signature data with DSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param filePath   Signature file path
-	 * @return Signature info
-	 */
-	public static byte[] signFileWithDSA(PrivateKey privateKey, String filePath) {
-		return signFile(privateKey, filePath, "SHA256withDSA");
-	}
-
-	/**
-	 * Signature data with DSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param datas      Signature datas
-	 * @return Signature info
-	 */
-	public static byte[] signDataWithDSA(PrivateKey privateKey, byte[] datas) {
-		return signData(privateKey, datas, "SHA256withDSA");
-	}
-
-	/**
-	 * Verify signature info is valid
-	 *
-	 * @param publicKey Verify public key
-	 * @param datas     Signature datas
-	 * @param signature Signature info
-	 * @return Verify result
-	 */
-	public static boolean verifyDSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
-		return verifySign(publicKey, datas, signature, "SHA256withDSA");
-	}
-
-	/**
-	 * Verify signature info is valid
-	 *
-	 * @param publicKey Verify public key
-	 * @param filePath  Signature file path
-	 * @param signature Signature info
-	 * @return Verify result
-	 */
-	public static boolean verifyDSASign(PublicKey publicKey, String filePath, byte[] signature) {
-		return verifySign(publicKey, filePath, signature, "SHA256withDSA");
-	}
-
-	/**
-	 * Signature data with RSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param message    Signature datas
-	 * @return Signature info
-	 */
-	public static byte[] signDataWithRSA(PrivateKey privateKey, String message) {
-		return signData(privateKey, message.getBytes(Charset.defaultCharset()), "SHA256withRSA");
-	}
-
-	/**
-	 * Signature data with RSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param datas      Signature datas
-	 * @return Signature info
-	 */
-	public static byte[] signDataWithRSA(PrivateKey privateKey, byte[] datas) {
-		return signData(privateKey, datas, "SHA256withRSA");
-	}
-
-	/**
-	 * Signature data with RSA
-	 *
-	 * @param privateKey Signature private key
-	 * @param filePath   Signature file path
-	 * @return Signature info
-	 */
-	public static byte[] signFileWithRSA(PrivateKey privateKey, String filePath) {
-		return signFile(privateKey, filePath, "SHA256withRSA");
+	public static String SM3(Object source) {
+		return digestEncode(source, "SM3");
 	}
 
 	/**
@@ -1339,281 +201,942 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * Verify signature info is valid
+	 * Initialize AES128 Cryptor
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 * RandomAlgorithm:     SHA1PRNG
 	 *
-	 * @param publicKey Verify public key
-	 * @param datas     Signature datas
-	 * @param signature Signature info
-	 * @return Verify result
+	 * @return AESCryptor instance
 	 */
-	public static boolean verifyRSASign(PublicKey publicKey, byte[] datas, byte[] signature) {
-		return verifySign(publicKey, datas, signature, "SHA256withRSA");
+	public static AESCryptor AES128() {
+		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
 	}
 
 	/**
-	 * Verify signature info is valid
+	 * Initialize AES128 Cryptor
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 * RandomAlgorithm:     SHA1PRNG
 	 *
-	 * @param publicKey Verify public key
-	 * @param filePath  Signature file path
-	 * @param signature Signature info
-	 * @return Verify result
+	 * @param encodeType the encode type
+	 * @return AESCryptor instance
 	 */
-	public static boolean verifyRSASign(PublicKey publicKey, String filePath, byte[] signature) {
-		return verifySign(publicKey, filePath, signature, "SHA256withRSA");
+	public static AESCryptor AES128(Cryptor.EncodeType encodeType) {
+		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize AES128 Cryptor using given random algorithm
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 *
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES128(Cryptor.RandomAlgorithm randomAlgorithm) {
+		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize AES128 Cryptor using given AES Mode
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @param aesMode AES Mode
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 */
+	public static AESCryptor AES128(AESCryptor.AESMode aesMode) {
+		return AES128(aesMode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize AES128 Cryptor using given AES Mode and random algorithm
+	 *
+	 * @param aesMode         AES Mode
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES128(AESCryptor.AESMode aesMode, Cryptor.RandomAlgorithm randomAlgorithm) {
+		return AES128(aesMode, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize AES128 Cryptor using given AES Mode and random algorithm
+	 *
+	 * @param aesMode         AES Mode
+	 * @param encodeType      the encode type
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES128(AESCryptor.AESMode aesMode, Cryptor.EncodeType encodeType,
+									Cryptor.RandomAlgorithm randomAlgorithm) {
+		return new AESCryptor(128, aesMode, encodeType, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @return AESCryptor instance
+	 */
+	public static AESCryptor AES256() {
+		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @param encodeType the encode type
+	 * @return AESCryptor instance
+	 */
+	public static AESCryptor AES256(Cryptor.EncodeType encodeType) {
+		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor using given random algorithm
+	 * AES Mode:            AES/CBC/PKCS5Padding
+	 *
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES256(Cryptor.RandomAlgorithm randomAlgorithm) {
+		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor using given AES Mode
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @param aesMode AES Mode
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 */
+	public static AESCryptor AES256(AESCryptor.AESMode aesMode) {
+		return AES256(aesMode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor using given AES Mode and random algorithm
+	 *
+	 * @param aesMode         AES Mode
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES256(AESCryptor.AESMode aesMode, Cryptor.RandomAlgorithm randomAlgorithm) {
+		return AES256(aesMode, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize AES256 Cryptor using given AES Mode and random algorithm
+	 *
+	 * @param aesMode         AES Mode
+	 * @param encodeType      the encode type
+	 * @param randomAlgorithm Random algorithm
+	 * @return AESCryptor instance
+	 * @see AESCryptor.AESMode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static AESCryptor AES256(AESCryptor.AESMode aesMode, Cryptor.EncodeType encodeType,
+									Cryptor.RandomAlgorithm randomAlgorithm) {
+		return new AESCryptor(256, aesMode, encodeType, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize DES Cryptor
+	 * DES Mode: DES/CBC/PKCS5Padding
+	 *
+	 * @return DESCryptor instance
+	 */
+	public static DESCryptor DES() {
+		return DES(DESCryptor.DESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default);
+	}
+
+	/**
+	 * Initialize DES Cryptor
+	 * DES Mode: DES/CBC/PKCS5Padding
+	 *
+	 * @param encodeType the encode type
+	 * @return DESCryptor instance
+	 */
+	public static DESCryptor DES(Cryptor.EncodeType encodeType) {
+		return DES(DESCryptor.DESMode.CBC_PKCS5Padding, encodeType);
+	}
+
+	/**
+	 * Initialize DES Cryptor using given DES Mode
+	 *
+	 * @param desMode DES Mode
+	 * @return DESCryptor instance
+	 * @see DESCryptor.DESMode
+	 */
+	public static DESCryptor DES(DESCryptor.DESMode desMode) {
+		return DES(desMode, Cryptor.EncodeType.Default);
+	}
+
+	/**
+	 * Initialize DES Cryptor using given DES Mode
+	 *
+	 * @param desMode    DES Mode
+	 * @param encodeType the encode type
+	 * @return DESCryptor instance
+	 * @see DESCryptor.DESMode
+	 */
+	public static DESCryptor DES(DESCryptor.DESMode desMode, Cryptor.EncodeType encodeType) {
+		return new DESCryptor("DES", desMode, encodeType);
+	}
+
+	/**
+	 * Initialize Triple DES Cryptor
+	 * DES Mode: DESede/CBC/PKCS5Padding
+	 *
+	 * @return DESCryptor instance
+	 */
+	public static DESCryptor TripleDES() {
+		return TripleDES(DESCryptor.DESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default);
+	}
+
+	/**
+	 * Initialize Triple DES Cryptor
+	 * DES Mode: DESede/CBC/PKCS5Padding
+	 *
+	 * @param encodeType the encode type
+	 * @return DESCryptor instance
+	 */
+	public static DESCryptor TripleDES(Cryptor.EncodeType encodeType) {
+		return TripleDES(DESCryptor.DESMode.CBC_PKCS5Padding, encodeType);
+	}
+
+	/**
+	 * Initialize Triple DES Cryptor using given DES Mode
+	 *
+	 * @param desMode DES Mode
+	 * @return DESCryptor instance
+	 * @see DESCryptor.DESMode
+	 */
+	public static DESCryptor TripleDES(DESCryptor.DESMode desMode) {
+		return TripleDES(desMode, Cryptor.EncodeType.Default);
+	}
+
+	/**
+	 * Initialize Triple DES Cryptor using given DES Mode
+	 *
+	 * @param desMode    DES Mode
+	 * @param encodeType the encode type
+	 * @return DESCryptor instance
+	 * @see DESCryptor.DESMode
+	 */
+	public static DESCryptor TripleDES(DESCryptor.DESMode desMode, Cryptor.EncodeType encodeType) {
+		return new DESCryptor("DESede", desMode, encodeType);
+	}
+
+	/**
+	 * Initialize RSA Cryptor and generate key pair
+	 *
+	 * @return RSACryptor instance
+	 * @throws CryptoException if generate key pair error
+	 */
+	public static RSACryptor RSA() throws CryptoException {
+		return RSA(1024);
+	}
+
+	/**
+	 * Initialize RSA Cryptor and generate key pair
+	 *
+	 * @param keySize the key size
+	 * @return RSACryptor instance
+	 * @throws CryptoException if generate key pair error
+	 */
+	public static RSACryptor RSA(int keySize) throws CryptoException {
+		return RSACryptor.generateKeyPair(keySize)
+				.map(SecurityUtils::RSA)
+				.orElseThrow(() -> new CryptoException("Generate key pair error"));
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given key pair
+	 *
+	 * @param storePath the key store path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return RSACryptor instance
+	 * @throws CryptoException       the crypto exception
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static RSACryptor RSA(String storePath, String certAlias, String password)
+			throws CryptoException, FileNotFoundException {
+		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
+				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+				.map(keyStore -> RSA(keyStore, certAlias, password))
+				.orElseThrow(() -> new CryptoException("Read cert file error"));
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given key pair
+	 *
+	 * @param storeBytes the key store byte arrays
+	 * @param certAlias  the cert alias
+	 * @param password   the password
+	 * @return RSACryptor instance
+	 * @throws CryptoException the crypto exception
+	 */
+	public static RSACryptor RSA(byte[] storeBytes, String certAlias, String password) throws CryptoException {
+		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
+				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+				.map(keyStore -> RSA(keyStore, certAlias, password))
+				.orElseThrow(() -> new CryptoException("Read cert file error"));
+	}
+
+	private static RSACryptor RSA(KeyStore keyStore, String certAlias, String password) throws CryptoException {
+		try {
+			PrivateKey privateKey =
+					(PrivateKey) keyStore.getKey(certAlias,
+							password == null ? null : password.toCharArray());
+			PublicKey publicKey = keyStore.getCertificate(certAlias).getPublicKey();
+			return RSA(publicKey, privateKey);
+		} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+			throw new CryptoException("Read key from cert file error! ");
+		}
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given key pair
+	 *
+	 * @param keyPair RSA Key pair
+	 * @return RSACryptor instance
+	 */
+	public static RSACryptor RSA(KeyPair keyPair) {
+		return RSA(RSACryptor.RSAMode.PKCS1Padding, Cryptor.EncodeType.Default,
+				keyPair.getPublic(), keyPair.getPrivate());
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given key pair
+	 *
+	 * @param encodeType the encode type
+	 * @param keyPair    RSA Key pair
+	 * @return RSACryptor instance
+	 */
+	public static RSACryptor RSA(Cryptor.EncodeType encodeType, KeyPair keyPair) {
+		return RSA(RSACryptor.RSAMode.PKCS1Padding, encodeType, keyPair.getPublic(), keyPair.getPrivate());
+	}
+
+	/**
+	 * Initialize RSA Cryptor
+	 * RSA Mode: RSA/ECB/PKCS1Padding
+	 *
+	 * @param publicKey  the public key
+	 * @param privateKey the private key
+	 * @return RSACryptor instance
+	 */
+	public static RSACryptor RSA(PublicKey publicKey, PrivateKey privateKey) {
+		return RSA(RSACryptor.RSAMode.PKCS1Padding, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize RSA Cryptor
+	 * RSA Mode: RSA/ECB/PKCS1Padding
+	 *
+	 * @param encodeType the encode type
+	 * @param publicKey  the public key
+	 * @param privateKey the private key
+	 * @return RSACryptor instance
+	 */
+	public static RSACryptor RSA(Cryptor.EncodeType encodeType, PublicKey publicKey, PrivateKey privateKey) {
+		return RSA(RSACryptor.RSAMode.PKCS1Padding, encodeType, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given RSA Mode
+	 *
+	 * @param rsaMode    RSA Mode
+	 * @param publicKey  the public key
+	 * @param privateKey the private key
+	 * @return RSACryptor instance
+	 * @see RSACryptor.RSAMode
+	 */
+	public static RSACryptor RSA(RSACryptor.RSAMode rsaMode, PublicKey publicKey, PrivateKey privateKey) {
+		return RSA(rsaMode, Cryptor.EncodeType.Default, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize RSA Cryptor using given RSA Mode
+	 *
+	 * @param rsaMode    RSA Mode
+	 * @param encodeType the encode type
+	 * @param publicKey  the public key
+	 * @param privateKey the private key
+	 * @return RSACryptor instance
+	 * @see RSACryptor.RSAMode
+	 */
+	public static RSACryptor RSA(RSACryptor.RSAMode rsaMode, Cryptor.EncodeType encodeType,
+								 PublicKey publicKey, PrivateKey privateKey) {
+		return new RSACryptor(rsaMode, encodeType, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor and generate key pair
+	 *
+	 * @return SM2Cryptor instance
+	 * @throws CryptoException if generate key pair error
+	 */
+	public static SM2Cryptor SM2() throws CryptoException {
+		return SM2Cryptor.generateKeyPair()
+				.map(SecurityUtils::SM2)
+				.orElseThrow(() -> new CryptoException("Generate key pair error"));
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param certPath  the cert path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return SM2Cryptor instance
+	 * @throws CryptoException       the crypto exception
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static SM2Cryptor SM2(String certPath, String certAlias, String password)
+			throws CryptoException, FileNotFoundException {
+		return SM2(SM2Cryptor.SM2Mode.C1C3C2, certPath, certAlias, password);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param sm2Mode   the sm 2 mode
+	 * @param storePath the key store path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return SM2Cryptor instance
+	 * @throws CryptoException       the crypto exception
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, String storePath, String certAlias, String password)
+			throws CryptoException, FileNotFoundException {
+		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
+				.filter(keyStore -> {
+					try {
+						return keyStore.isKeyEntry(certAlias);
+					} catch (KeyStoreException e) {
+						return Globals.DEFAULT_VALUE_BOOLEAN;
+					}
+				})
+				.map(keyStore -> SM2(keyStore, sm2Mode, certAlias, password))
+				.orElseThrow(() -> new CryptoException("Read cert file error"));
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param sm2Mode    the sm 2 mode
+	 * @param storeBytes the key store byte arrays
+	 * @param certAlias  the cert alias
+	 * @param password   the password
+	 * @return SM2Cryptor instance
+	 * @throws CryptoException the crypto exception
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, byte[] storeBytes, String certAlias, String password)
+			throws CryptoException {
+		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
+				.filter(keyStore -> {
+					try {
+						return keyStore.isKeyEntry(certAlias);
+					} catch (KeyStoreException e) {
+						return Globals.DEFAULT_VALUE_BOOLEAN;
+					}
+				})
+				.map(keyStore -> SM2(keyStore, sm2Mode, certAlias, password))
+				.orElseThrow(() -> new CryptoException("Read cert file error"));
+	}
+
+	private static SM2Cryptor SM2(KeyStore keyStore, SM2Cryptor.SM2Mode sm2Mode, String certAlias, String password)
+			throws CryptoException {
+		try {
+			PrivateKey privateKey =
+					(PrivateKey) keyStore.getKey(certAlias,
+							password == null ? null : password.toCharArray());
+			PublicKey publicKey = keyStore.getCertificate(certAlias).getPublicKey();
+			return SM2(sm2Mode, publicKey, privateKey);
+		} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+			throw new CryptoException("Read key from cert file error! ");
+		}
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param keyPair SM2 Key pair
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(KeyPair keyPair) {
+		return SM2(SM2Cryptor.SM2Mode.C1C3C2, keyPair);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param encodeType the encode type
+	 * @param keyPair    SM2 Key pair
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(Cryptor.EncodeType encodeType, KeyPair keyPair) {
+		return SM2(SM2Cryptor.SM2Mode.C1C3C2, Cryptor.EncodeType.Default, keyPair);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param sm2Mode the sm 2 mode
+	 * @param keyPair SM2 Key pair
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, KeyPair keyPair) {
+		return SM2(sm2Mode, Cryptor.EncodeType.Default, keyPair.getPublic(), keyPair.getPrivate());
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given key pair
+	 *
+	 * @param sm2Mode    the sm 2 mode
+	 * @param encodeType the encode type
+	 * @param keyPair    SM2 Key pair
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, Cryptor.EncodeType encodeType, KeyPair keyPair) {
+		return SM2(sm2Mode, encodeType, keyPair.getPublic(), keyPair.getPrivate());
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given privateKey and publicKey
+	 *
+	 * @param publicKey  Public key
+	 * @param privateKey Private key
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(PublicKey publicKey, PrivateKey privateKey) {
+		return SM2(SM2Cryptor.SM2Mode.C1C3C2, Cryptor.EncodeType.Default, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given privateKey and publicKey
+	 *
+	 * @param encodeType the encode type
+	 * @param publicKey  Public key
+	 * @param privateKey Private key
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(Cryptor.EncodeType encodeType, PublicKey publicKey, PrivateKey privateKey) {
+		return SM2(SM2Cryptor.SM2Mode.C1C3C2, encodeType, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given privateKey and publicKey
+	 *
+	 * @param sm2Mode    the sm 2 mode
+	 * @param publicKey  Public key
+	 * @param privateKey Private key
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, PublicKey publicKey, PrivateKey privateKey) {
+		return SM2(sm2Mode, Cryptor.EncodeType.Default, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize SM2 Cryptor using given privateKey and publicKey
+	 *
+	 * @param sm2Mode    the sm 2 mode
+	 * @param encodeType the encode type
+	 * @param publicKey  Public key
+	 * @param privateKey Private key
+	 * @return SM2Cryptor instance
+	 */
+	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, Cryptor.EncodeType encodeType,
+								 PublicKey publicKey, PrivateKey privateKey) {
+		return new SM2Cryptor(sm2Mode, encodeType, publicKey, privateKey);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor
+	 * SM4 Mode:            SM4/CBC/NoPadding
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @return SM4Cryptor instance
+	 */
+	public static SM4Cryptor SM4() {
+		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor
+	 * SM4 Mode:            SM4/CBC/NoPadding
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @param encodeType the encode type
+	 * @return SM4Cryptor instance
+	 */
+	public static SM4Cryptor SM4(Cryptor.EncodeType encodeType) {
+		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor using given random algorithm
+	 * SM4 Mode:            SM4/CBC/NoPadding
+	 *
+	 * @param randomAlgorithm Random algorithm
+	 * @return SM4Cryptor instance
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static SM4Cryptor SM4(Cryptor.RandomAlgorithm randomAlgorithm) {
+		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor using given random algorithm
+	 * SM4 Mode:            SM4/CBC/NoPadding
+	 *
+	 * @param encodeType      the encode type
+	 * @param randomAlgorithm Random algorithm
+	 * @return SM4Cryptor instance
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static SM4Cryptor SM4(Cryptor.EncodeType encodeType, Cryptor.RandomAlgorithm randomAlgorithm) {
+		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor using given SM4 Mode
+	 * RandomAlgorithm:     SHA1PRNG
+	 *
+	 * @param sm4Mode SM4 Mode
+	 * @return SM4Cryptor instance
+	 * @see SM4Cryptor.SM4Mode
+	 */
+	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode) {
+		return SM4(sm4Mode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor using given SM4 Mode and random algorithm
+	 *
+	 * @param sm4Mode         SM4 Mode
+	 * @param randomAlgorithm Random algorithm
+	 * @return SM4Cryptor instance
+	 * @see SM4Cryptor.SM4Mode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode, Cryptor.RandomAlgorithm randomAlgorithm) {
+		return SM4(sm4Mode, Cryptor.EncodeType.Default, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize SM4 Cryptor using given SM4 Mode and random algorithm
+	 *
+	 * @param sm4Mode         SM4 Mode
+	 * @param encodeType      the encode type
+	 * @param randomAlgorithm Random algorithm
+	 * @return SM4Cryptor instance
+	 * @see SM4Cryptor.SM4Mode
+	 * @see Cryptor.RandomAlgorithm
+	 */
+	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode, Cryptor.EncodeType encodeType,
+								 Cryptor.RandomAlgorithm randomAlgorithm) {
+		return new SM4Cryptor(sm4Mode, encodeType, randomAlgorithm);
 	}
 
 	/**
 	 * Read public key from X.509 certificate file
 	 *
-	 * @param dataBytes Certificate file data bytes
+	 * @param certBytes Certificate file data bytes
 	 * @return Public key
 	 */
-	public static PublicKey readPublicKeyFromX509(byte[] dataBytes) {
-		return SecurityUtils.readPublicKeyFromX509(dataBytes, Globals.DEFAULT_VALUE_BOOLEAN);
+	public static PublicKey readPublicKey(byte[] certBytes) {
+		return SecurityUtils.readPublicKey(certBytes, null, Boolean.TRUE);
 	}
 
 	/**
 	 * Read public key from X.509 certificate file
 	 *
-	 * @param dataBytes     Certificate file data bytes
+	 * @param certBytes     Certificate file data bytes
+	 * @param checkValidity the check validity
+	 * @return Public key
+	 */
+	public static PublicKey readPublicKey(byte[] certBytes, boolean checkValidity) {
+		return SecurityUtils.readPublicKey(certBytes, null, checkValidity);
+	}
+
+	/**
+	 * Read public key from X.509 certificate file
+	 *
+	 * @param certBytes Certificate file data bytes
+	 * @param publicKey the public key
+	 * @return Public key
+	 */
+	public static PublicKey readPublicKey(byte[] certBytes, PublicKey publicKey) {
+		return SecurityUtils.readPublicKey(certBytes, publicKey, Boolean.TRUE);
+	}
+
+	/**
+	 * Read public key from X.509 certificate file
+	 *
+	 * @param certBytes     Certificate file data bytes
+	 * @param verifyKey     the verify key
 	 * @param checkValidity Check certificate validity
 	 * @return Public key
 	 */
-	public static PublicKey readPublicKeyFromX509(byte[] dataBytes, boolean checkValidity) {
-		PublicKey publicKey = null;
+	public static PublicKey readPublicKey(byte[] certBytes, PublicKey verifyKey, boolean checkValidity) {
+		return readCertificate(certBytes, verifyKey, checkValidity)
+				.map(X509Certificate::getPublicKey)
+				.orElse(null);
+	}
+
+	/**
+	 * Read certificate optional.
+	 *
+	 * @param certBytes the cert bytes
+	 * @return the optional
+	 */
+	public static Optional<X509Certificate> readCertificate(byte[] certBytes) {
+		return readCertificate(certBytes, null, Boolean.TRUE);
+	}
+
+	/**
+	 * Read certificate optional.
+	 *
+	 * @param certBytes the cert bytes
+	 * @param verifyKey the verify key
+	 * @return the optional
+	 */
+	public static Optional<X509Certificate> readCertificate(byte[] certBytes, PublicKey verifyKey) {
+		return readCertificate(certBytes, verifyKey, Boolean.TRUE);
+	}
+
+	/**
+	 * Read certificate optional.
+	 *
+	 * @param certBytes     the cert bytes
+	 * @param checkValidity the check validity
+	 * @return the optional
+	 */
+	public static Optional<X509Certificate> readCertificate(byte[] certBytes, boolean checkValidity) {
+		return readCertificate(certBytes, null, checkValidity);
+	}
+
+	/**
+	 * Read certificate optional.
+	 *
+	 * @param certBytes     the cert bytes
+	 * @param verifyKey     the verify key
+	 * @param checkValidity the check validity
+	 * @return the optional
+	 */
+	public static Optional<X509Certificate> readCertificate(byte[] certBytes, PublicKey verifyKey,
+															boolean checkValidity) {
+		X509Certificate x509Certificate;
 		try {
-			CertificateFactory certificateFactory =
-					CertificateFactory.getInstance("X.509", new BouncyCastleProvider());
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);
-			X509Certificate x509Certificate =
-					(X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
+			CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(certBytes);
+			x509Certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Certificate SN: {}", x509Certificate.getSerialNumber().toString());
 			}
 			if (checkValidity) {
 				x509Certificate.checkValidity();
 			}
-			publicKey = x509Certificate.getPublicKey();
-		} catch (CertificateExpiredException | CertificateNotYetValidException e) {
+			if (verifyKey != null) {
+				x509Certificate.verify(verifyKey, "BC");
+			}
+		} catch (Exception e) {
 			LOGGER.error("Certificate is invalid! ");
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Stack message: ", e);
 			}
-		} catch (Exception e) {
-			LOGGER.error("Read public key error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
+			x509Certificate = null;
 		}
-		return publicKey;
-	}
-
-	private static <T> Optional<T> generateRSAKey(Class<T> clazz, BigInteger modulus, BigInteger exponent) {
-		Object generatedKey = null;
-		try {
-			KeyFactory keyFactory = KeyFactory.getInstance("RSA", new BouncyCastleProvider());
-			if (PrivateKey.class.equals(clazz)) {
-				RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
-				generatedKey = keyFactory.generatePrivate(privateKeySpec);
-			} else if (PublicKey.class.equals(clazz)) {
-				RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, exponent);
-				generatedKey = keyFactory.generatePublic(publicKeySpec);
-			}
-		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-			LOGGER.error("Generate key from data bytes error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-		}
-		return generatedKey == null ? Optional.empty() : Optional.of(clazz.cast(generatedKey));
-	}
-
-	private static <T> Optional<T> generateKey(Class<T> clazz, String algorithm, byte[] keyContent) {
-		Object generatedKey = null;
-		try {
-			if (PrivateKey.class.equals(clazz)) {
-				generatedKey = KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(keyContent));
-			} else if (PublicKey.class.equals(clazz)) {
-				generatedKey = KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(keyContent));
-			}
-		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-			LOGGER.error("Generate key from data bytes error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-		}
-		return generatedKey == null ? Optional.empty() : Optional.of(clazz.cast(generatedKey));
+		return Optional.ofNullable(x509Certificate);
 	}
 
 	/**
-	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB                  Array data
-	 * @param key                   RSA Key
-	 * @param strKey                Given encrypt key
-	 * @param keySize               Key Size
-	 * @return                      Encrypted Data
+	 * Read certificate optional.
+	 *
+	 * @param storeBytes the store bytes
+	 * @param certAlias  the cert alias
+	 * @param password   the password
+	 * @return the optional
 	 */
-	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB,
-	                                  Key key, String strKey, int keySize) {
+	public static Optional<X509Certificate> readCertificate(byte[] storeBytes, String certAlias, String password) {
 		try {
-			return EncryptData(algorithm, prngAlgorithm, arrB, key,
-					strKey == null ? null : strKey.getBytes(Globals.DEFAULT_ENCODING),
-					keySize);
+			return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
+					.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias));
 		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Encrypt data error! ", e);
-			}
-		}
-		return new byte[0];
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB                  Array data
-	 * @param key                   RSA Key
-	 * @param keyData               Given binary key
-	 * @param keySize               Key Size
-	 * @return                      Encrypted Data
-	 */
-	private static byte[] EncryptData(String algorithm, String prngAlgorithm, byte[] arrB,
-	                                  Key key, byte[] keyData, int keySize) {
-		try {
-			if (algorithm.startsWith("AES")) {
-				return initCipher(algorithm, Cipher.ENCRYPT_MODE,
-						CipherKey.AESKey(keyData, prngAlgorithm, keySize)).doFinal(arrB);
-			} else if (algorithm.startsWith("DESede")) {
-				return initCipher(algorithm, Cipher.ENCRYPT_MODE,
-						CipherKey.DESKey(keyData, prngAlgorithm)).doFinal(arrB);
-			} else if (algorithm.startsWith("DES")) {
-				return initCipher(algorithm, Cipher.ENCRYPT_MODE,
-						CipherKey.DESKey(keyData, prngAlgorithm)).doFinal(arrB);
-			} else if (algorithm.startsWith("RSA")) {
-				Cipher cipher = SecurityUtils.initCipher(algorithm, Cipher.ENCRYPT_MODE, CipherKey.RSAKey(key));
-				int blockSize = cipher.getBlockSize();
-				int outputSize = cipher.getOutputSize(arrB.length);
-
-				int leftSize = arrB.length % blockSize;
-
-				int blocksSize = leftSize != 0 ? arrB.length / blockSize + 1
-						: arrB.length / blockSize;
-
-				byte[] byteArray = new byte[outputSize * blocksSize];
-				int i = 0;
-
-				while (arrB.length - i * blockSize > 0) {
-					cipher.doFinal(arrB, i * blockSize, Math.min(arrB.length - i * blockSize, blockSize),
-							byteArray, i * outputSize);
-					i++;
-				}
-				return byteArray;
-			} else {
-				throw new Exception("Unknown algorithm! ");
-			}
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Encrypt data error! ", e);
-			}
-		}
-		return new byte[0];
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB                  Array data
-	 * @param key                   RSA Key
-	 * @param strKey                Given encrypt key
-	 * @param keySize               Key Size
-	 * @return                      Encrypted Data
-	 */
-	private static byte[] DecryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, String strKey, int keySize) {
-		try {
-			return DecryptData(algorithm, prngAlgorithm, arrB, key,
-					strKey == null ? null : strKey.getBytes(Globals.DEFAULT_ENCODING),
-					keySize);
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Decrypt data error! ", e);
-			}
-		}
-		return new byte[0];
-	}
-
-	/**
-	 * Encrypt byte arrays with given algorithm, PRNG algorithm, key size and encrypt key
-	 * @param algorithm             Encrypt algorithm
-	 * @param prngAlgorithm         PRNG Algorithm
-	 * @param arrB                  Array data
-	 * @param key                   RSA Key
-	 * @param keyData               Given binary key
-	 * @param keySize               Key Size
-	 * @return                      Encrypted Data
-	 */
-	private static byte[] DecryptData(String algorithm, String prngAlgorithm, byte[] arrB, Key key, byte[] keyData, int keySize) {
-		try {
-			if (algorithm.startsWith("AES")) {
-				return initCipher(algorithm, Cipher.DECRYPT_MODE,
-						CipherKey.AESKey(keyData, prngAlgorithm, keySize)).doFinal(arrB);
-			} else if (algorithm.startsWith("DESede")) {
-				return initCipher(algorithm, Cipher.DECRYPT_MODE,
-						CipherKey.DESKey(keyData, prngAlgorithm)).doFinal(arrB);
-			} else if (algorithm.startsWith("DES")) {
-				return initCipher(algorithm, Cipher.DECRYPT_MODE,
-						CipherKey.DESKey(keyData, prngAlgorithm)).doFinal(arrB);
-			} else if (algorithm.startsWith("RSA")) {
-				Cipher cipher = SecurityUtils.initCipher(algorithm, Cipher.DECRYPT_MODE, CipherKey.RSAKey(key));
-				int blockSize = cipher.getBlockSize();
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-				int j = 0;
-
-				while (arrB.length - j * blockSize > 0) {
-					byteArrayOutputStream.write(cipher.doFinal(arrB, j * blockSize, blockSize));
-					j++;
-				}
-
-				return byteArrayOutputStream.toByteArray();
-			} else {
-				throw new Exception("Unknown algorithm! ");
-			}
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Decrypt data error! ", e);
-			}
-		}
-		return new byte[0];
-	}
-
-	/**
-	 * Generate key pair by given algorithm
-	 * @param algorithm     Algorithm
-	 * @param keySize       Key size
-	 * @return              Generated key pair
-	 */
-	private static Optional<KeyPair> KeyPair(String algorithm, int keySize) {
-		if (keySize % 128 != 0) {
-			LOGGER.error("Key size is invalid");
 			return Optional.empty();
 		}
+	}
 
-		KeyPair keyPair = null;
+	/**
+	 * Read certificate optional.
+	 *
+	 * @param storePath the store path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return the optional
+	 */
+	public static Optional<X509Certificate> readCertificate(String storePath, String certAlias, String password) {
 		try {
-			//	Initialize keyPair instance
-			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm, new BouncyCastleProvider());
-			keyPairGenerator.initialize(keySize, new SecureRandom());
-			keyPair = keyPairGenerator.generateKeyPair();
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("Initialize key pair generator error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
+			return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
+					.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+					.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias));
+		} catch (Exception e) {
+			return Optional.empty();
 		}
-		return Optional.ofNullable(keyPair);
+	}
+
+	/**
+	 * Read private key optional.
+	 *
+	 * @param storeBytes the key store byte arrays
+	 * @param certAlias  the cert alias
+	 * @param password   the password
+	 * @return the optional
+	 */
+	public static Optional<PrivateKey> readPrivateKey(byte[] storeBytes, String certAlias, String password) {
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(storeBytes);
+		final char[] certPwd = password == null ? null : password.toCharArray();
+		try {
+			return loadKeyStore(new ByteArrayInputStream(storeBytes), certPwd)
+					.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+					.map(keyStore -> {
+						try {
+							return (PrivateKey) keyStore.getKey(certAlias, certPwd);
+						} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+							e.printStackTrace();
+							return null;
+						}
+					});
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Read private key from pfx optional.
+	 *
+	 * @param storePath the key store path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return the optional
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static Optional<PrivateKey> readPrivateKey(String storePath, String certAlias, String password)
+			throws FileNotFoundException {
+		final char[] certPwd = password == null ? null : password.toCharArray();
+		return loadKeyStore(new FileInputStream(storePath), certPwd)
+				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+				.map(keyStore -> {
+					try {
+						return (PrivateKey) keyStore.getKey(certAlias, certPwd);
+					} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+						e.printStackTrace();
+						return null;
+					}
+				});
+	}
+
+	/**
+	 * Read public key from pfx optional.
+	 *
+	 * @param storeBytes the key store byte arrays
+	 * @param certAlias  the cert alias
+	 * @param password   the password
+	 * @return the optional
+	 */
+	public static Optional<PublicKey> readPublicKey(byte[] storeBytes, String certAlias, String password) {
+		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
+				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+				.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias))
+				.map(Certificate::getPublicKey);
+	}
+
+	/**
+	 * Read public key from pfx optional.
+	 *
+	 * @param storePath the key store path
+	 * @param certAlias the cert alias
+	 * @param password  the password
+	 * @return the optional
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static Optional<PublicKey> readPublicKey(String storePath, String certAlias, String password)
+			throws FileNotFoundException {
+		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
+				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
+				.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias))
+				.map(Certificate::getPublicKey);
+	}
+
+	/**
+	 * Load key store optional.
+	 *
+	 * @param storeBytes the store bytes
+	 * @param password   the password
+	 * @return the optional
+	 */
+	public static Optional<KeyStore> loadKeyStore(byte[] storeBytes, String password) {
+		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray());
+	}
+
+	/**
+	 * Load key store optional.
+	 *
+	 * @param storePath the store path
+	 * @param password  the password
+	 * @return the optional
+	 * @throws FileNotFoundException the file not found exception
+	 */
+	public static Optional<KeyStore> loadKeyStore(String storePath, String password) throws FileNotFoundException {
+		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray());
+	}
+
+	private static boolean checkKeyEntry(KeyStore keyStore, String certAlias) {
+		if (keyStore == null || certAlias == null) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+		try {
+			return keyStore.isKeyEntry(certAlias);
+		} catch (KeyStoreException e) {
+			return Globals.DEFAULT_VALUE_BOOLEAN;
+		}
+	}
+
+	private static Optional<KeyStore> loadKeyStore(InputStream inputStream, char[] certPwd) {
+		KeyStore keyStore;
+		try {
+			keyStore = KeyStore.getInstance("PKCS12", "BC");
+			keyStore.load(inputStream, certPwd);
+		} catch (Exception e) {
+			e.printStackTrace();
+			keyStore = null;
+		} finally {
+			IOUtils.closeStream(inputStream);
+		}
+		return Optional.ofNullable(keyStore);
+	}
+
+	private static Optional<X509Certificate> readCertificate(KeyStore keyStore, String certAlias) {
+		try {
+			return Optional.ofNullable((X509Certificate) keyStore.getCertificate(certAlias));
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+			return Optional.empty();
+		}
 	}
 
 	/**
@@ -1634,115 +1157,6 @@ public final class SecurityUtils implements Serializable {
 	}
 
 	/**
-	 * Signature data by given private key and algorithm
-	 * @param privateKey        Signature using private key
-	 * @param datas             Signature data
-	 * @param algorithm         Algorithm
-	 * @return                  Signature value bytes
-	 */
-	private static byte[] signData(PrivateKey privateKey, byte[] datas, String algorithm) {
-		try {
-			Signature signature = Signature.getInstance(algorithm);
-			signature.initSign(privateKey);
-			signature.update(datas);
-			
-			return signature.sign();
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Signature data by given private key and algorithm
-	 * @param privateKey        Signature using private key
-	 * @param filePath          Signature file path
-	 * @param algorithm         Algorithm
-	 * @return                  Signature value bytes
-	 */
-	private static byte[] signFile(PrivateKey privateKey, String filePath, String algorithm) {
-		if (FileUtils.isExists(filePath)) {
-			InputStream inputStream = null;
-			try {
-				Signature signature = Signature.getInstance(algorithm);
-				signature.initSign(privateKey);
-				inputStream = FileUtils.loadFile(filePath);
-
-				byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-				int readLength;
-				while ((readLength = inputStream.read(buffer)) != -1) {
-					signature.update(buffer, 0, readLength);
-				}
-
-				return signature.sign();
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Stack message: ", e);
-				}
-			} finally {
-				IOUtils.closeStream(inputStream);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Verify signature data
-	 * @param publicKey     Verify using public key
-	 * @param datas         Signature data
-	 * @param signature     Signature value bytes
-	 * @param algorithm     Algorithm
-	 * @return              Verify result
-	 */
-	private static boolean verifySign(PublicKey publicKey,
-			byte[] datas, byte[] signature, String algorithm) {
-		try {
-			Signature signInstance = Signature.getInstance(algorithm);
-			
-			signInstance.initVerify(publicKey);
-			signInstance.update(datas);
-			
-			return signInstance.verify(signature);
-		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
-	}
-
-	/**
-	 * Verify signature data
-	 * @param publicKey     Verify using public key
-	 * @param filePath		Signature file path
-	 * @param signature     Signature value bytes
-	 * @param algorithm     Algorithm
-	 * @return              Verify result
-	 */
-	private static boolean verifySign(PublicKey publicKey,
-	                                  String filePath, byte[] signature, String algorithm) {
-		if (FileUtils.isExists(filePath)) {
-			InputStream inputStream = null;
-			try {
-				Signature signInstance = Signature.getInstance(algorithm);
-				signInstance.initVerify(publicKey);
-				inputStream = FileUtils.loadFile(filePath);
-
-				byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-				int readLength;
-				while ((readLength = inputStream.read(buffer)) != -1) {
-					signInstance.update(buffer, 0, readLength);
-				}
-
-				return signInstance.verify(signature);
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Stack message: ", e);
-				}
-			} finally {
-				IOUtils.closeStream(inputStream);
-			}
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
-	}
-
-	/**
 	 * Get digest value
 	 * @param source		Input source
 	 * @param algorithm	Calc algorithm
@@ -1750,11 +1164,11 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private static String digestEncode(Object source, String algorithm) {
 		MessageDigest messageDigest;
-		
+
 		//	Initialize MessageDigest Instance
 		try {
-			messageDigest = MessageDigest.getInstance(algorithm);
-		} catch (NoSuchAlgorithmException ex) {
+			messageDigest = MessageDigest.getInstance(algorithm, "BC");
+		} catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
 			LOGGER.error("Initialize failed, maybe the MessageDigest does not support " + algorithm + "!", ex);
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -1767,7 +1181,7 @@ public final class SecurityUtils implements Serializable {
 				messageDigest.update(tempBytes);
 			}
 		}
-		return ConvertUtils.byteArrayToHexString(messageDigest.digest());
+		return ConvertUtils.byteToHex(messageDigest.digest());
 	}
 
 	/**
@@ -1796,269 +1210,6 @@ public final class SecurityUtils implements Serializable {
 			}
 		} else {
 			LOGGER.error("File does not exists" + file.getAbsolutePath());
-		}
-	}
-
-	/**
-	 * Generate AES Key Instance
-	 * @param prngAlgorithm     PRNG Algorithm
-	 * @param keyContent        key bytes
-	 * @param keySize           Key size
-	 * @return                  Key Instance
-	 * @throws NoSuchAlgorithmException     Algorithm not supported
-	 */
-	private static Key generateAESKey(String prngAlgorithm,
-	                                  byte[] keyContent, int keySize) throws NoSuchAlgorithmException {
-		if (keyContent == null) {
-			return null;
-		}
-
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-		SecureRandom secureRandom = SecureRandom.getInstance(prngAlgorithm);
-		secureRandom.setSeed(keyContent);
-		keyGenerator.init(keySize, secureRandom);
-
-		SecretKey secretKey = keyGenerator.generateKey();
-
-		return new SecretKeySpec(secretKey.getEncoded(), "AES");
-	}
-
-	/**
-	 * Generate DES Key Instance
-	 * @param keyContent    Encrypt key bytes
-	 * @return              Key Instance
-	 * @throws NoSuchAlgorithmException     Algorithm not supported
-	 */
-	private static Key generateDESKey(byte[] keyContent) throws NoSuchAlgorithmException {
-		if (keyContent == null) {
-			return null;
-		}
-
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
-		keyGenerator.init(new SecureRandom(keyContent));
-		return keyGenerator.generateKey();
-	}
-
-	/**
-	 * Generate 3DES Key Instance
-	 * @param keyContent    Encrypt key bytes
-	 * @return              Key Instance
-	 * @throws NoSuchAlgorithmException     Algorithm not supported
-	 */
-	private static Key generateTripleDESKey(byte[] keyContent) throws NoSuchAlgorithmException {
-		if (keyContent == null) {
-			return null;
-		}
-
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("DESede");
-		keyGenerator.init(new SecureRandom(keyContent));
-		return keyGenerator.generateKey();
-	}
-
-	/**
-	 * Generate SM4 Key Instance
-	 * @param keyContent        key bytes
-	 * @param keySize           Key size
-	 * @return                  Key Instance
-	 * @throws NoSuchAlgorithmException     Algorithm not supported
-	 */
-	private static Key generateSM4Key(byte[] keyContent, int keySize)
-			throws NoSuchAlgorithmException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("SM4", new BouncyCastleProvider());
-		keyGenerator.init(keySize, new SecureRandom());
-		return keyGenerator.generateKey();
-	}
-
-	/**
-	 * Initialize Cipher Instance
-	 * @param algorithm         Algorithm
-	 * @param cipherMode        Cipher Mode
-	 * @param cipherKey         CipherKey Instance
-	 * @return                  Cipher Instance
-	 * @throws NoSuchAlgorithmException     If Algorithm not supported
-	 * @throws NoSuchPaddingException       If padding type not supported
-	 * @throws InvalidAlgorithmParameterException   If IV data invalid
-	 * @throws InvalidKeyException          If RSA Key invalid
-	 */
-	private static Cipher initCipher(String algorithm, int cipherMode, CipherKey cipherKey)
-			throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException,
-			InvalidKeyException {
-		IvParameterSpec ivParameterSpec = null;
-		byte[] keyContent = cipherKey.getKeyContent();
-		byte[] ivContent = new byte[0];
-		Provider provider = null;
-		Key key;
-
-		if (algorithm.startsWith("AES")) {
-			key = generateAESKey(cipherKey.getPrngAlgorithm(), keyContent, cipherKey.getKeySize());
-			if (!algorithm.startsWith("AES/ECB")) {
-				ivContent = new byte[16];
-			}
-			if (algorithm.endsWith("PKCS7Padding")) {
-				provider = new BouncyCastleProvider();
-			}
-		} else if (algorithm.startsWith("DESede")) {
-			key = generateTripleDESKey(keyContent);
-			if (!algorithm.startsWith("DESede/ECB")) {
-				ivContent = new byte[8];
-			}
-		} else if (algorithm.startsWith("DES")) {
-			key = generateDESKey(keyContent);
-			if (!algorithm.startsWith("DES/ECB")) {
-				ivContent = new byte[8];
-			}
-		} else if (algorithm.startsWith("SM4")) {
-			provider = new BouncyCastleProvider();
-			key = generateSM4Key(cipherKey.getKeyContent(), cipherKey.getKeySize());
-		} else {
-			provider = new BouncyCastleProvider();
-			key = cipherKey.getRsaKey();
-		}
-
-		if (ivContent.length > 0) {
-			System.arraycopy(SecurityUtils.MD5(keyContent).getBytes(Charset.defaultCharset()),
-					0, ivContent, 0, ivContent.length);
-			ivParameterSpec = new IvParameterSpec(ivContent);
-		}
-
-		Cipher cipher = (provider == null) ? Cipher.getInstance(algorithm) : Cipher.getInstance(algorithm, provider);
-		cipher.init(cipherMode, key, ivParameterSpec);
-
-		return cipher;
-	}
-
-	/**
-	 * Cipher key
-	 */
-	private static final class CipherKey {
-
-		//  RSA key(PublicKey or PrivateKey)
-		private final Key rsaKey;
-		//  AES/DES/3DES Key bytes
-		private final byte[] keyContent;
-		//  PRNG Algorithm
-		private final String prngAlgorithm;
-		//  AES Key Size
-		private final int keySize;
-
-		/**
-		 * Constructor for CipherKey
-		 * @param rsaKey            RSA Key Instance
-		 * @param keyContent        AES/DES/3DES Key bytes
-		 * @param prngAlgorithm     PRNG Algorithm
-		 * @param keySize           AES Key Size
-		 */
-		private CipherKey(Key rsaKey, byte[] keyContent, String prngAlgorithm, int keySize) {
-			this.rsaKey = rsaKey;
-			this.keyContent = keyContent;
-			this.prngAlgorithm = prngAlgorithm;
-			this.keySize = keySize;
-		}
-
-		/**
-		 * Generate DES CipherKey Instance
-		 *
-		 * @param strKey Key content
-		 * @return CipherKey Instance
-		 * @throws UnsupportedEncodingException Unsupported Encoding
-		 */
-		public static CipherKey DESKey(String strKey) throws UnsupportedEncodingException {
-			return new CipherKey(null, strKey.getBytes(Globals.DEFAULT_ENCODING),
-					PRNG_ALGORITHM_NATIVE_SHA1PRNG, Globals.DEFAULT_VALUE_INT);
-		}
-
-		/**
-		 * Generate DES CipherKey Instance
-		 *
-		 * @param keyContent    Key content
-		 * @param prngAlgorithm PRNG Algorithm
-		 * @return CipherKey Instance
-		 */
-		public static CipherKey DESKey(byte[] keyContent, String prngAlgorithm) {
-			return new CipherKey(null, keyContent, prngAlgorithm, Globals.DEFAULT_VALUE_INT);
-		}
-
-		/**
-		 * Generate DES CipherKey Instance
-		 *
-		 * @param strKey        Key content
-		 * @param prngAlgorithm PRNG Algorithm
-		 * @return CipherKey Instance
-		 * @throws UnsupportedEncodingException Unsupported Encoding
-		 */
-		public static CipherKey DESKey(String strKey, String prngAlgorithm) throws UnsupportedEncodingException {
-			return new CipherKey(null, strKey.getBytes(Globals.DEFAULT_ENCODING),
-					prngAlgorithm, Globals.DEFAULT_VALUE_INT);
-		}
-
-		/**
-		 * Generate AES CipherKey Instance
-		 *
-		 * @param keyContent AES Key bytes
-		 * @param keySize    AES Key Size
-		 * @return CipherKey Instance
-		 */
-		public static CipherKey AESKey(byte[] keyContent, int keySize) {
-			return new CipherKey(null, keyContent, PRNG_ALGORITHM_NATIVE_SHA1PRNG, keySize);
-		}
-
-		/**
-		 * Generate AES CipherKey Instance
-		 *
-		 * @param keyContent    AES Key bytes
-		 * @param prngAlgorithm PRNG Algorithm
-		 * @param keySize       AES Key Size
-		 * @return CipherKey Instance
-		 */
-		public static CipherKey AESKey(byte[] keyContent, String prngAlgorithm, int keySize) {
-			return new CipherKey(null, keyContent, prngAlgorithm, keySize);
-		}
-
-		/**
-		 * Generate RSA CipherKey Instance
-		 *
-		 * @param rsaKey RSA Key Instance
-		 * @return CipherKey Instance
-		 */
-		public static CipherKey RSAKey(Key rsaKey) {
-			return new CipherKey(rsaKey, new byte[0],
-					null, Globals.DEFAULT_VALUE_INT);
-		}
-
-		/**
-		 * Gets the value of rsaKey
-		 *
-		 * @return the value of rsaKey
-		 */
-		public Key getRsaKey() {
-			return rsaKey;
-		}
-
-		/**
-		 * Gets the value of keyContent
-		 *
-		 * @return the value of keyContent
-		 */
-		public byte[] getKeyContent() {
-			return keyContent;
-		}
-
-		/**
-		 * Gets the value of prngAlgorithm
-		 *
-		 * @return the value of prngAlgorithm
-		 */
-		public String getPrngAlgorithm() {
-			return prngAlgorithm;
-		}
-
-		/**
-		 * Gets the value of keySize
-		 *
-		 * @return the value of keySize
-		 */
-		public int getKeySize() {
-			return keySize;
 		}
 	}
 }

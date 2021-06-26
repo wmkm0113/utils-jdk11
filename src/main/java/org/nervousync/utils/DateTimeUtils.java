@@ -34,9 +34,9 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Date time utils
- * 
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 11:15:20 AM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:15:20 AM $
  */
 public final class DateTimeUtils {
 
@@ -48,6 +48,11 @@ public final class DateTimeUtils {
 	 * Static value for date format yyyy-MM-dd'T'HH:mm:ss
 	 */
 	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
+	/**
+	 * Static value for date format EEE, dd MMM yyyy HH:mm:ss 'GMT'
+	 * Using for generate Response header: Last-Modified
+	 */
+	public static final String LAST_MODIFIED_DATETIME_PATTERN = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
 	/**
 	 * Static value for date format EEE, dd-MMM-yyyy HH:mm:ss 'GMT'
 	 */
@@ -86,8 +91,9 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Formats given date according to string with ISO8601 format
-	 * @param date		date instance
-	 * @return			formatted result by ISO8601
+	 *
+	 * @param date date instance
+	 * @return formatted result by ISO8601
 	 */
 	public static String formatDateForSiteMap(Date date) {
 		if (date == null) {
@@ -98,9 +104,10 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given string according to <code>java.util.Date</code> with ISO8601 format
-	 * @param string			String value with ISO8601 format
-	 * @return					Date object
-	 * @throws ParseException	given string is null
+	 *
+	 * @param string String value with ISO8601 format
+	 * @return Date object
+	 * @throws ParseException given string is null
 	 */
 	public static Date parseSiteMapDate(String string) throws ParseException {
 		return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
@@ -108,7 +115,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to string with vCard format
-	 * @return			formatted result by ISO8601 and ending character is 'Z'
+	 *
+	 * @return formatted result by ISO8601 and ending character is 'Z'
 	 */
 	public static String formatGMTDateForVCard() {
 		return ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("+00:00"))
@@ -117,8 +125,9 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to string with vCard format
-	 * @param date		date instance
-	 * @return			formatted result by ISO8601 and ending character is 'Z'
+	 *
+	 * @param date date instance
+	 * @return formatted result by ISO8601 and ending character is 'Z'
 	 */
 	public static String formatDateForVCard(Date date) {
 		if (date == null) {
@@ -129,9 +138,10 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given cookie expire string according to java.util.Date
-	 * @param string			string will be parsed
-	 * @return					Date object
-	 * @throws ParseException	given string is null
+	 *
+	 * @param string string will be parsed
+	 * @return Date object
+	 * @throws ParseException given string is null
 	 */
 	public static Date parseGMTDate(String string) throws ParseException {
 		return parseDate(string, COOKIE_DATETIME_PATTERN);
@@ -139,10 +149,11 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Parses given string according to format style
-	 * @param string			string will be parsed
-	 * @param format			Date format
-	 * @return					Date object
-	 * @throws ParseException	given string is null or format was not matched
+	 *
+	 * @param string string will be parsed
+	 * @param format Date format
+	 * @return Date object
+	 * @throws ParseException given string is null or format was not matched
 	 */
 	public static Date parseDate(String string, String format) throws ParseException {
 		if (string == null || string.length() == 0) {
@@ -158,9 +169,30 @@ public final class DateTimeUtils {
 	}
 
 	/**
+	 * Last modified string.
+	 *
+	 * @param date the date
+	 * @return the string
+	 */
+	public static String lastModified(Date date) {
+		return formatDate(date, DateTimeFormatter.ofPattern(LAST_MODIFIED_DATETIME_PATTERN));
+	}
+
+	/**
+	 * Last modified string.
+	 *
+	 * @param timeMilliseconds the time milliseconds
+	 * @return the string
+	 */
+	public static String lastModified(long timeMilliseconds) {
+		return formatDate(new Date(timeMilliseconds), DateTimeFormatter.ofPattern(LAST_MODIFIED_DATETIME_PATTERN));
+	}
+
+	/**
 	 * Formats given date according to system style
-	 * @param date		date instance
-	 * @return			formatted result by system default format
+	 *
+	 * @param date date instance
+	 * @return formatted result by system default format
 	 */
 	public static String formatDate(Date date) {
 		return formatDate(date, DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL));
@@ -168,7 +200,8 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Return current day value with format "yyyyMMdd"
-	 * @return		current day
+	 *
+	 * @return current day
 	 */
 	public static int currentDay() {
 		return Integer.parseInt(LocalDate.now().format(DEFAULT_INT_PATTERN));
@@ -176,7 +209,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return current GMT day value with format "yyyyMMdd"
-	 * @return		current GMT day
+	 *
+	 * @return current GMT day
 	 */
 	public static int currentUTCDay() {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis()), DEFAULT_INT_PATTERN));
@@ -184,6 +218,7 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Return expire day value with format "yyyyMMdd"
+	 *
 	 * @param expireTime expire time
 	 * @return		expire day
 	 */
@@ -193,6 +228,7 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return expire day value with format "yyyyMMdd"
+	 *
 	 * @param expireTime expire time
 	 * @return		expire GMT day
 	 */
@@ -203,8 +239,9 @@ public final class DateTimeUtils {
 
 	/**
 	 * Calc expire time millis by given month count
-	 * @param monthCount        month count
-	 * @return                  expire time millis
+	 *
+	 * @param monthCount month count
+	 * @return expire time millis
 	 */
 	public static long expireMonth(int monthCount) {
 		return currentTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
@@ -212,8 +249,9 @@ public final class DateTimeUtils {
 
 	/**
 	 * Calc expire UTC time millis by given month count
-	 * @param monthCount        month count
-	 * @return                  expire UTC time millis
+	 *
+	 * @param monthCount month count
+	 * @return expire UTC time millis
 	 */
 	public static long expireUTCMonth(int monthCount) {
 		return currentUTCTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
@@ -221,7 +259,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Current Year
-	 * @return  Current Year
+	 *
+	 * @return Current Year
 	 */
 	public static int currentYear() {
 		return Calendar.getInstance().get(Calendar.YEAR);
@@ -229,7 +268,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Current Month
-	 * @return  Current Month
+	 *
+	 * @return Current Month
 	 */
 	public static int currentMonth() {
 		return Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -237,9 +277,10 @@ public final class DateTimeUtils {
 
 	/**
 	 * Days count of given year and month
-	 * @param year      year
-	 * @param month     month
-	 * @return  Days count
+	 *
+	 * @param year  year
+	 * @param month month
+	 * @return Days count
 	 */
 	public static int getDaysOfMonth(int year, int month) {
 		Calendar calendar = Calendar.getInstance();
@@ -288,8 +329,9 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Converts input time from Java to DOS format
-	 * @param time		time value
-	 * @return time in DOS format 
+	 *
+	 * @param time time value
+	 * @return time in DOS format
 	 */
 	public static long toDosTime(long time) {
 		Calendar cal = Calendar.getInstance();
@@ -309,7 +351,8 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Converts time in dos format to Java format
-	 * @param dosTime		dos time
+	 *
+	 * @param dosTime dos time
 	 * @return time in java format
 	 */
 	public static long dosToJavaTme(long dosTime) {
@@ -367,7 +410,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return current time in milliseconds.
-	 * @return		current time in milliseconds.
+	 *
+	 * @return current time in milliseconds.
 	 */
 	public static long currentTime() {
 		return Long.parseLong(formatDate(new Date(currentTimeMillis()), DEFAULT_LONG_PATTERN));
@@ -375,7 +419,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Return current time in milliseconds.
-	 * @return		current time in milliseconds.
+	 *
+	 * @return current time in milliseconds.
 	 */
 	public static long currentTimeMillis() {
 		return UTC_CLOCK.currentTimeMillis();
@@ -383,7 +428,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Returns the GMT time in milliseconds.
-	 * @return		current GMT time in milliseconds.
+	 *
+	 * @return current GMT time in milliseconds.
 	 */
 	public static long currentUTCTime() {
 		return Long.parseLong(formatDate(new Date(currentUTCTimeMillis()), DEFAULT_LONG_PATTERN));
@@ -391,7 +437,8 @@ public final class DateTimeUtils {
 
 	/**
 	 * Returns the GMT time in milliseconds.
-	 * @return		current GMT time in milliseconds.
+	 *
+	 * @return current GMT time in milliseconds.
 	 */
 	public static long currentUTCTimeMillis() {
 		return UTC_CLOCK.currentUTCTimeMillis();
@@ -399,9 +446,10 @@ public final class DateTimeUtils {
 
 	/**
 	 * Formats given date according to format style
-	 * @param date			        Date instance
-	 * @param dateTimeFormatter		Datetime formatter
-	 * @return				        Format date value as string
+	 *
+	 * @param date              Date instance
+	 * @param dateTimeFormatter Datetime formatter
+	 * @return Format date value as string
 	 */
 	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter) {
 		return DateTimeUtils.formatDate(date, dateTimeFormatter, TimeZone.getDefault());
@@ -409,10 +457,11 @@ public final class DateTimeUtils {
 	
 	/**
 	 * Formats given date according to format style
-	 * @param date			        Date instance
-	 * @param dateTimeFormatter		Datetime formatter
-	 * @param timeZone		        Time zone
-	 * @return				        Time value of String
+	 *
+	 * @param date              Date instance
+	 * @param dateTimeFormatter Datetime formatter
+	 * @param timeZone          Time zone
+	 * @return Time value of String
 	 */
 	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter, TimeZone timeZone) {
 		if (date == null) {
@@ -426,8 +475,8 @@ public final class DateTimeUtils {
 	/**
 	 * Formats given date according to specified locale and date style
 	 *
-	 * @param date	  Date to convert
-	 * @param locale	Locale to use for formatting date
+	 * @param date      Date to convert
+	 * @param locale    Locale to use for formatting date
 	 * @param dateStyle Date style
 	 * @return String representation of date according to given locale and date style
 	 * @see java.text.DateFormat
@@ -453,8 +502,8 @@ public final class DateTimeUtils {
 	/**
 	 * Parses given string according to specified locale and date style
 	 *
-	 * @param source	Source string to parse date from
-	 * @param locale	Locale to use for parsing date
+	 * @param source    Source string to parse date from
+	 * @param locale    Locale to use for parsing date
 	 * @param dateStyle Date style
 	 * @return Date object corresponding to representation given in source string
 	 * @throws ParseException if given string could not be properly parsed according to given locale and style
@@ -483,8 +532,8 @@ public final class DateTimeUtils {
 	/**
 	 * Formats given time according to specified locale and time style
 	 *
-	 * @param time	  Time to convert
-	 * @param locale	Locale to use for formatting time
+	 * @param time      Time to convert
+	 * @param locale    Locale to use for formatting time
 	 * @param timeStyle Time style
 	 * @return String representation of time according to given locale and time style
 	 * @see java.text.DateFormat
@@ -510,8 +559,8 @@ public final class DateTimeUtils {
 	/**
 	 * Parses given string according to specified locale and time style
 	 *
-	 * @param source	Source string to parse time from
-	 * @param locale	Locale to use for parsing time
+	 * @param source    Source string to parse time from
+	 * @param locale    Locale to use for parsing time
 	 * @param timeStyle Time style
 	 * @return Time object corresponding to representation given in source string
 	 * @throws ParseException if given string could not be properly parsed according to given locale and style
@@ -720,6 +769,9 @@ public final class DateTimeUtils {
 		private final AtomicLong currentUTCTime =
 				new AtomicLong(System.currentTimeMillis() - TimeZone.getDefault().getRawOffset());
 
+		/**
+		 * Instantiates a new Utc clock.
+		 */
 		public UTCClock() {
 			ScheduledThreadPoolExecutor threadPoolExecutor =
 					new ScheduledThreadPoolExecutor(1, r -> {
@@ -730,10 +782,20 @@ public final class DateTimeUtils {
 			threadPoolExecutor.scheduleAtFixedRate(this::readTime, 0L, 1L, TimeUnit.MILLISECONDS);
 		}
 
+		/**
+		 * Current time millis long.
+		 *
+		 * @return the long
+		 */
 		public long currentTimeMillis() {
 			return this.currentLocalTime.get();
 		}
 
+		/**
+		 * Current utc time millis long.
+		 *
+		 * @return the long
+		 */
 		public long currentUTCTimeMillis() {
 			return this.currentUTCTime.get();
 		}

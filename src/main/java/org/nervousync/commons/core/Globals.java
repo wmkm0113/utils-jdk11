@@ -33,8 +33,6 @@ public final class Globals {
 	//  32K
 	public static final int READ_FILE_BUFFER_SIZE = 32768;
 
-	public static final int DEFAULT_CACHE_SERVER_WEIGHT = 1;
-	
 	public static final int DEFAULT_TIME_OUT = 0;
 	public static final int DEFAULT_DOWNLOAD_SINGLE_THREAD = 1;
 	public static final int DEFAULT_DOWNLOAD_THREAD_COUNT = 5;

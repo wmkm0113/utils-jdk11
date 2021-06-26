@@ -443,6 +443,20 @@ public final class ZipFile implements Cloneable {
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
+
+	/**
+	 * Read entry length
+	 *
+	 * @param entryPath		Check entry path
+	 * @return				Entry length
+	 * @throws ZipException		file list is empty or zipOptions is null
+	 */
+	public int readEntryLength(String entryPath) throws ZipException {
+		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
+			throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
+		}
+		return this.readEntryLength(this.retrieveGeneralFileHeader(entryPath));
+	}
 	
 	/**
 	 * Read entry datas
@@ -456,6 +470,20 @@ public final class ZipFile implements Cloneable {
 		}
 
 		return this.readEntry(this.retrieveGeneralFileHeader(entryPath));
+	}
+
+	/**
+	 * Open input stream by given entry path
+	 * @param entryPath		Zip entry path
+	 * @return				Opened input stream
+	 * @throws ZipException	File is split archive
+	 */
+	public InputStream entryInputStream(String entryPath) throws ZipException {
+		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
+			throw new ZipException("This is a split archive. Zip file format does not allow updating split/spanned files");
+		}
+
+		return this.openInputStream(this.retrieveGeneralFileHeader(entryPath));
 	}
 	
 	/**
@@ -1619,6 +1647,25 @@ public final class ZipFile implements Cloneable {
 			if (!Arrays.equals(calculateMac, storedMac)) {
 				throw new ZipException("CRC check failed!");
 			}
+		}
+	}
+
+	private int readEntryLength(GeneralFileHeader generalFileHeader) throws ZipException {
+		if (generalFileHeader == null) {
+			throw new ZipException("General file header is null!");
+		}
+
+		ZipInputStream inputStream = null;
+		try {
+			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+			int readLength;
+
+			inputStream = this.openInputStream(generalFileHeader);
+			return inputStream.available();
+		} catch (IOException e) {
+			throw new ZipException(e);
+		} finally {
+			IOUtils.closeStream(inputStream);
 		}
 	}
 

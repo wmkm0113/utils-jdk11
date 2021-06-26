@@ -14,12 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.enumerations.mail;
 
-/**
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:24:12 PM $
- */
-public enum ProtocolOption {
-	SMTP, POP3, IMAP, UNKNOWN
+package org.nervousync.exceptions.crypto;
+
+public class CryptoException extends RuntimeException {
+
+    private static final long serialVersionUID = 6112136690122627440L;
+
+    /**
+     * Creates a new instance of CryptoException without detail message.
+     */
+    public CryptoException() {
+    }
+
+    /**
+     * Constructs an instance of CryptoException with the specified detail message.
+     *
+     * @param errorMessage The detail message.
+     */
+    public CryptoException(String errorMessage) {
+        super(errorMessage);
+    }
+
+    /**
+     * Creates an instance of CryptoException with nested exception
+     *
+     * @param e Nested exception
+     */
+    public CryptoException(Exception e) {
+        super(e);
+    }
 }

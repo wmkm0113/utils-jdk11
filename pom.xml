@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.nervousync</groupId>
+	<groupId>org.nervousync.gene</groupId>
 	<artifactId>utils-jdk11</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -40,14 +40,16 @@
 	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<junit.jupiter.version>5.6.2</junit.jupiter.version>
-		<junit.platform.version>1.6.2</junit.platform.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<junit.jupiter.version>5.7.1</junit.jupiter.version>
+		<junit.platform.version>1.7.1</junit.platform.version>
 		<jakarta.activation.version>2.0.1</jakarta.activation.version>
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
 		<jakarta.webservice.version>3.0.0</jakarta.webservice.version>
 		<jakarta.xml.binding.version>3.0.0</jakarta.xml.binding.version>
 		<jakarta.xml.soap.version>2.0.0</jakarta.xml.soap.version>
-		<bcprov.version>1.67</bcprov.version>
+		<bcprov.version>1.68</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
 		<log4j.version>2.14.1</log4j.version>
 		<slf4j.version>1.7.30</slf4j.version>
@@ -73,16 +75,6 @@
 			<artifactId>jakarta.servlet-api</artifactId>
 			<version>4.0.4</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.activation</groupId>
-			<artifactId>jakarta.activation-api</artifactId>
-			<version>${jakarta.activation.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.activation</groupId>
-			<artifactId>jakarta.activation</artifactId>
-			<version>${jakarta.activation.version}</version>
 		</dependency>
 		<!-- Java WebService -->
 		<dependency>
@@ -116,6 +108,11 @@
 		</dependency>
 		<!-- Java Mail Support -->
 		<dependency>
+			<groupId>com.sun.activation</groupId>
+			<artifactId>jakarta.activation</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>jakarta.mail</artifactId>
 			<version>${jakarta.mail.version}</version>
@@ -135,16 +132,42 @@
 					<groupId>com.sun.mail</groupId>
 					<artifactId>jakarta.mail</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
-				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>mailapi</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>imap</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>gimap</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>smtp</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>pop3</artifactId>
+			<version>${jakarta.mail.version}</version>
 		</dependency>
 		<!-- Security Support -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bcprov.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>${bcprov.version}</version>
 		</dependency>
 		<!-- CGLIB -->
@@ -269,18 +292,22 @@
 		</dependency>
 		<!-- XML Support -->
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
 			<version>${jakarta.xml.binding.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.sun.xml.bind</groupId>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jaxb</groupId>
 					<artifactId>jaxb-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
+			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-core</artifactId>
 			<version>${jakarta.xml.binding.version}</version>
 			<exclusions>
@@ -373,41 +400,43 @@
 				<filtering>true</filtering>
 			</testResource>
 		</testResources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>${maven.scm.version}</version>
-				<configuration>
-					<connectionType>developerConnection</connectionType>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven.compiler.version}</version>
-				<configuration>
-					<source>11</source>
-					<target>11</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${maven.jar.version}</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<Built-By>Nervousync Studio</Built-By>
-							<Class-Path>.</Class-Path>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-        </plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-scm-plugin</artifactId>
+					<version>${maven.scm.version}</version>
+					<configuration>
+						<connectionType>developerConnection</connectionType>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven.compiler.version}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven.jar.version}</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							</manifest>
+							<manifestEntries>
+								<Built-By>Nervousync Studio</Built-By>
+								<Class-Path>.</Class-Path>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -425,33 +454,37 @@
 				</repository>
 			</distributionManagement>
 			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>${maven.compiler.version}</version>
+							<configuration>
+								<source>${maven.compiler.source}</source>
+								<target>${maven.compiler.target}</target>
+								<encoding>UTF-8</encoding>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-jar-plugin</artifactId>
+							<version>${maven.jar.version}</version>
+							<configuration>
+								<archive>
+									<manifest>
+										<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+										<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+									</manifest>
+									<manifestEntries>
+										<Built-By>Nervousync Studio</Built-By>
+										<Class-Path>.</Class-Path>
+									</manifestEntries>
+								</archive>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
 				<plugins>
-					<plugin>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>${maven.compiler.version}</version>
-						<configuration>
-							<source>11</source>
-							<target>11</target>
-							<encoding>UTF-8</encoding>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<version>${maven.jar.version}</version>
-						<configuration>
-							<archive>
-								<manifest>
-									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-									<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-								</manifest>
-								<manifestEntries>
-									<Built-By>Nervousync Studio</Built-By>
-									<Class-Path>.</Class-Path>
-								</manifestEntries>
-							</archive>
-						</configuration>
-					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>
@@ -479,6 +512,23 @@
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${maven.javadoc.version}</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>${maven.gpg.version}</version>
 						<executions>
@@ -491,7 +541,6 @@
 								<configuration>
 									<executable>gpg</executable>
 									<keyname>${gpg.keyname}</keyname>
-									<passphrase>${gpg.passphrase}</passphrase>
 								</configuration>
 							</execution>
 						</executions>

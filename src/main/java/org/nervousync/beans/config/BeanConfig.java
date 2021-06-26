@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -52,7 +51,13 @@ public final class BeanConfig implements Serializable {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	/**
+	 * Java bean class name
+	 */
 	private final String className;
+	/**
+	 * Field config map
+	 */
 	private final Hashtable<String, FieldConfig> fieldConfigHashtable;
 
 	/**
@@ -63,35 +68,33 @@ public final class BeanConfig implements Serializable {
 	public BeanConfig(Class<?> beanClass) {
 		this.className = beanClass.getName();
 		List<FieldConfig> fieldConfigList = new ArrayList<>();
-
-		for (Field field : ReflectionUtils.getAllDeclaredFields(beanClass)) {
-			if (ReflectionUtils.isStatic(field) || ReflectionUtils.isFinal(field)) {
-				continue;
-			}
-			Class<?>[] dataConverters;
-			if (field.isAnnotationPresent(BeanConvert.class)) {
-				dataConverters = field.getAnnotation(BeanConvert.class).value();
-			} else {
-				dataConverters = new Class<?>[0];
-			}
-			String fieldName = field.getName();
-			boolean isArray = field.getType().isArray() || List.class.isAssignableFrom(field.getType());
-			Class<?> paramClass;
-			if (isArray) {
-				if (field.getType().isArray()) {
-					paramClass = field.getType().getComponentType();
-				} else {
-					paramClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-				}
-			} else {
-				paramClass = field.getType();
-			}
-			fieldConfigList.add(new FieldConfig(fieldName, isArray, field.getType(), paramClass,
-					ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
-					ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
-					dataConverters));
-		}
-		this.fieldConfigHashtable = new Hashtable<>(fieldConfigList.size());
+		ReflectionUtils.getAllDeclaredFields(beanClass).stream()
+				.filter(field -> !ReflectionUtils.isStatic(field) && !ReflectionUtils.isFinal(field))
+				.forEach(field -> {
+					Class<?>[] dataConverters;
+					if (field.isAnnotationPresent(BeanConvert.class)) {
+						dataConverters = field.getAnnotation(BeanConvert.class).value();
+					} else {
+						dataConverters = new Class<?>[0];
+					}
+					String fieldName = field.getName();
+					boolean isArray = field.getType().isArray() || List.class.isAssignableFrom(field.getType());
+					Class<?> paramClass;
+					if (isArray) {
+						if (field.getType().isArray()) {
+							paramClass = field.getType().getComponentType();
+						} else {
+							paramClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+						}
+					} else {
+						paramClass = field.getType();
+					}
+					fieldConfigList.add(new FieldConfig(fieldName, isArray, field.getType(), paramClass,
+							ReflectionUtils.retrieveGetMethod(fieldName, beanClass),
+							ReflectionUtils.retrieveSetMethod(fieldName, beanClass),
+							dataConverters));
+				});
+		this.fieldConfigHashtable = new Hashtable<>(fieldConfigList.size(), 1f);
 		fieldConfigList.forEach(fieldConfig ->
 				this.fieldConfigHashtable.put(fieldConfig.getFieldName(), fieldConfig));
 	}

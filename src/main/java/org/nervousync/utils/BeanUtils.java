@@ -61,17 +61,15 @@ public final class BeanUtils {
 			return null;
 		}
 		String textContent = FileUtils.readFile(filePath);
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {}", textContent);
-		}
 		String extName = StringUtils.getFilenameExtension(filePath);
 		switch (extName.toLowerCase()) {
 			case "json":
-				return BeanUtils.parseJSON(FileUtils.readFile(filePath), beanClass);
+				return BeanUtils.parseJSON(textContent, beanClass);
 			case "xml":
-				return BeanUtils.parseXml(FileUtils.readFile(filePath), beanClass);
+				return BeanUtils.parseXml(textContent, beanClass);
+			case "yml":
 			case "yaml":
-				return BeanUtils.parseYaml(FileUtils.readFile(filePath), beanClass);
+				return BeanUtils.parseYaml(textContent, beanClass);
 			default:
 				return null;
 		}
@@ -86,9 +84,6 @@ public final class BeanUtils {
 	 * @return Convert object
 	 */
 	public static <T> T parseXml(String string, Class<T> beanClass) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
-		}
 		return parseXml(string, Globals.DEFAULT_ENCODING, beanClass);
 	}
 
@@ -206,6 +201,16 @@ public final class BeanUtils {
 	}
 
 	/**
+	 * Copy properties.
+	 *
+	 * @param orig the orig
+	 * @param dest the dest
+	 */
+	public static void copyProperties(Object orig, Object dest) {
+		copyProperties(orig, dest, null);
+	}
+
+	/**
 	 * Copy the property values of the given source bean into the target bean.
 	 * <p>
 	 * Note: The source and target classes do not have to match or even be derived
@@ -217,7 +222,7 @@ public final class BeanUtils {
 	 * @param dest           the target bean
 	 * @param convertMapping field mapping
 	 */
-	public static void copyProperties(Object orig, Object dest, Hashtable<String, String> convertMapping) {
+	public static void copyProperties(Object orig, Object dest, final Hashtable<String, String> convertMapping) {
 		String origClass = retrieveClassName(orig.getClass());
 		String destClass = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(origClass);
@@ -226,9 +231,15 @@ public final class BeanUtils {
 		BeanConfig targetBean = BEAN_CONFIG_MAP.get(destClass);
 		BEAN_CONFIG_MAP.get(origClass).retrieveValue(orig)
 				.entrySet().stream().filter(entry -> entry.getValue() != null)
-				.forEach(entry ->
-						targetBean.copyValue(convertMapping.getOrDefault(entry.getKey(), entry.getKey()),
-								dest, entry.getValue()));
+				.forEach(entry -> {
+					String fieldName;
+					if (convertMapping == null) {
+						fieldName = entry.getKey();
+					} else {
+						fieldName = convertMapping.getOrDefault(entry.getKey(), entry.getKey());
+					}
+					targetBean.copyValue(fieldName, dest, entry.getValue());
+				});
 	}
 
 	private static <T> List<T> parseToList(String string, Class<T> clazz) {

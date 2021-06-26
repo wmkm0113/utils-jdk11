@@ -18,25 +18,27 @@ package org.nervousync.commons.beans.mail.protocol;
 
 import java.io.Serializable;
 import java.security.Security;
-import java.util.Properties;
+import java.util.*;
 
-import org.nervousync.enumerations.mail.ProtocolOption;
+import org.nervousync.commons.beans.mail.config.ServerConfig;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 
 /**
  * JavaMail base protocol
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:07:08 PM $
  */
-public class BaseProtocol implements Serializable {
+public abstract class BaseProtocol implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6441571927997267674L;
-	
+
 	private static final String SSL_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
-	
+
 	/**
 	 * Connection timeout parameter name
 	 */
@@ -53,203 +55,102 @@ public class BaseProtocol implements Serializable {
 	 * Timeout parameter name
 	 */
 	protected String timeoutParam;
-	/**
-	 * Protocol type
-	 * @see ProtocolOption
-	 */
-	private final ProtocolOption protocolOption;
 
 	/**
 	 * Constructor for define protocol type
-	 * @param protocolOption		Protocol type
-	 * @see ProtocolOption
 	 */
-	protected BaseProtocol(ProtocolOption protocolOption) {
-		this.protocolOption = protocolOption;
+	protected BaseProtocol() {
 	}
 
 	/**
 	 * Read configuration for JavaMail using
-	 * @param host		Target server domain name or address
-	 * @param port		Target server port
-	 * @return			java.util.Properties for JavaMail using
+	 *
+	 * @param serverConfig      the server config
+	 * @param connectionTimeout the connection timeout
+	 * @param processTimeout    the process timeout
+	 * @param userName          the user name
+	 * @return java.util.Properties for JavaMail using
 	 */
-	public Properties getConfigInfo(String host, int port) {
-		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, false);
-	}
-
-	/**
-	 * Read configuration for JavaMail using
-	 * @param host			Target server domain name or address
-	 * @param port			Target server port
-	 * @param authLogin		Server must authentication login
-	 * @return				java.util.Properties for JavaMail using
-	 */
-	public Properties getConfigInfo(String host, int port, boolean authLogin) {
-		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, authLogin);
-	}
-
-	/**
-	 * Read configuration for JavaMail using
-	 * @param host			Target server domain name or address
-	 * @param port			Target server port
-	 * @param ssl			The connection must using SSL
-	 * @param authLogin		Server must authentication login
-	 * @return				java.util.Properties for JavaMail using
-	 */
-	public Properties getConfigInfo(String host, int port, boolean ssl, boolean authLogin) {
-		return getConfigInfo(host, port, null, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, ssl, authLogin);
-	}
-	
-	/**
-	 * Read configuration for JavaMail using
-	 * @param host			Target server domain name or address
-	 * @param port			Target server port
-	 * @param sendAddress	Sender e-mail address, using for SMTP
-	 * @param authLogin		Server must authentication login
-	 * @return				java.util.Properties for JavaMail using
-	 */
-	public Properties getConfigInfo(String host, int port, String sendAddress, boolean authLogin) {
-		return getConfigInfo(host, port, sendAddress, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, false, authLogin);
-	}
-	
-	/**
-	 * Read configuration for JavaMail using
-	 * @param host			Target server domain name or address
-	 * @param port			Target server port
-	 * @param sendAddress	Sender e-mail address, using for SMTP
-	 * @param ssl			The connection must using SSL
-	 * @param authLogin		Server must authentication login
-	 * @return				java.util.Properties for JavaMail using
-	 */
-	public Properties getConfigInfo(String host, int port, String sendAddress, boolean ssl, boolean authLogin) {
-		return getConfigInfo(host, port, sendAddress, Globals.DEFAULT_TIME_OUT, Globals.DEFAULT_TIME_OUT, ssl, authLogin);
-	}
-	
-	/**
-	 * Read configuration for JavaMail using
-	 * @param host						Target server domain name or address
-	 * @param port						Target server port
-	 * @param sendAddress				Sender e-mail address, using for SMTP
-	 * @param connectionTimeout			Connection timeout value
-	 * @param timeout					Operate timeout value
-	 * @param ssl						The connection must using SSL
-	 * @param authLogin					Server must authentication login
-	 * @return							java.util.Properties for JavaMail using
-	 */
-	public Properties getConfigInfo(String host, int port, String sendAddress, 
-			int connectionTimeout, int timeout, boolean ssl, boolean authLogin) {
+	public final Properties readConfig(ServerConfig serverConfig, int connectionTimeout, int processTimeout, String userName) {
 		Properties properties = new Properties();
-		
-		properties.setProperty(hostParam, host);
+
+		properties.setProperty(this.hostParam, serverConfig.getHostName());
+		int port = serverConfig.getHostPort();
 		if (port != Globals.DEFAULT_VALUE_INT) {
 			properties.setProperty(portParam, Integer.toString(port));
 		}
-		properties.setProperty(connectionTimeoutParam, Integer.toString(connectionTimeout));
-		properties.setProperty(timeoutParam, Integer.toString(timeout));
-		
-		if (ssl) {
+
+		if (connectionTimeout > 0) {
+			properties.setProperty(connectionTimeoutParam, Integer.toString(connectionTimeout * 1000));
+		}
+		if (processTimeout > 0) {
+			properties.setProperty(timeoutParam, Integer.toString(processTimeout * 1000));
+		}
+
+		if (serverConfig.isSsl()) {
 			Security.addProvider(Security.getProvider("SunJSSE"));
 		}
-		
-		switch (protocolOption) {
-		case IMAP:
-			properties.setProperty("mail.store.protocol", "imap");
 
-			if (authLogin) {
-				properties.setProperty("mail.imap.auth.plain.disable", "true");
-				properties.setProperty("mail.imap.auth.login.disable", "true");
-			}
-			
-			if (ssl) {
-				properties.setProperty("mail.store.protocol", "imaps");
-				properties.setProperty("mail.imap.socketFactory.class", SSL_FACTORY_CLASS);
-				if (port != 0) {
-					properties.setProperty("mail.imap.socketFactory.port", Integer.toString(port));
-				}
-			}
-			break;
-		case SMTP:
-			properties.setProperty("mail.store.protocol", "smtp");
+		switch (serverConfig.getProtocolOption().toUpperCase()) {
+			case "IMAP":
+				properties.setProperty("mail.store.protocol", "imap");
 
-			if (authLogin) {
-				properties.setProperty("mail.smtp.auth", "true");
-				if (sendAddress != null) {
-					properties.setProperty("mail.smtp.from", sendAddress);
+				if (serverConfig.isAuthLogin()) {
+					properties.setProperty("mail.imap.auth.plain.disable", "true");
+					properties.setProperty("mail.imap.auth.login.disable", "true");
 				}
-			}
-			
-			if (ssl) {
-				properties.setProperty("mail.store.protocol", "smtps");
-				properties.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY_CLASS);
-				if (port != 0) {
-					properties.setProperty("mail.smtp.socketFactory.port", Integer.toString(port));
+
+				if (serverConfig.isSsl()) {
+					properties.setProperty("mail.store.protocol", "imaps");
+					properties.setProperty("mail.imap.socketFactory.class", SSL_FACTORY_CLASS);
+					if (port != 0) {
+						properties.setProperty("mail.imap.socketFactory.port", Integer.toString(port));
+					}
+					properties.setProperty("mail.imap.starttls.Enable", "true");
 				}
-			} else {
-				properties.setProperty("mail.smtp.starttls.enable", "true");
-			}
-			break;
-		case POP3:
-			properties.setProperty("mail.store.protocol", "pop3");
-			
-			if (ssl) {
-				properties.setProperty("mail.store.protocol", "pop3s");
-				properties.setProperty("mail.pop3.socketFactory.class", SSL_FACTORY_CLASS);
-				if (port != 0) {
-					properties.setProperty("mail.pop3.socketFactory.port", Integer.toString(port));
-				}
-				properties.setProperty("mail.pop3.disabletop", "true");
-				properties.setProperty("mail.pop3.ssl.enable", "true");
-			} else {
-				properties.setProperty("mail.pop3.useStartTLS", "true");
-			}
-			break;
-			default:
 				break;
+			case "SMTP":
+				properties.setProperty("mail.store.protocol", "smtp");
+				properties.setProperty("mail.transport.protocol", "smtp");
+
+				if (serverConfig.isAuthLogin()) {
+					properties.setProperty("mail.smtp.auth", "true");
+					if (StringUtils.notBlank(userName)) {
+						properties.setProperty("mail.smtp.from", userName);
+					}
+				}
+
+				if (serverConfig.isSsl()) {
+					properties.setProperty("mail.store.protocol", "smtps");
+					properties.setProperty("mail.smtp.ssl.enable", "true");
+					properties.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY_CLASS);
+					properties.setProperty("mail.smtp.socketFactory.fallback", "false");
+					if (port != 0) {
+						properties.setProperty("mail.smtp.socketFactory.port", Integer.toString(port));
+					}
+					properties.setProperty("mail.smtp.starttls.Enable", "true");
+				}
+				break;
+			case "POP3":
+				properties.setProperty("mail.store.protocol", "pop3");
+				properties.setProperty("mail.transport.protocol", "pop3");
+
+				if (serverConfig.isSsl()) {
+					properties.setProperty("mail.store.protocol", "pop3s");
+					properties.setProperty("mail.transport.protocol", "pop3s");
+					properties.setProperty("mail.pop3.socketFactory.class", SSL_FACTORY_CLASS);
+					if (port != 0) {
+						properties.setProperty("mail.pop3.socketFactory.port", Integer.toString(port));
+					}
+					properties.setProperty("mail.pop3.disabletop", "true");
+					properties.setProperty("mail.pop3.ssl.enable", "true");
+					properties.setProperty("mail.pop3.useStartTLS", "true");
+				}
+				break;
+			default:
+				return new Properties();
 		}
-		
+
 		return properties;
-	}
-
-	/**
-	 * @return the serialVersionUID
-	 */
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
-
-	/**
-	 * @return the connectionTimeoutParam
-	 */
-	public String getConnectionTimeoutParam() {
-		return connectionTimeoutParam;
-	}
-
-	/**
-	 * @return the hostParam
-	 */
-	public String getHostParam() {
-		return hostParam;
-	}
-
-	/**
-	 * @return the portParam
-	 */
-	public String getPortParam() {
-		return portParam;
-	}
-
-	/**
-	 * @return the timeoutParam
-	 */
-	public String getTimeoutParam() {
-		return timeoutParam;
-	}
-
-	/**
-	 * @return the protocolOption
-	 */
-	public ProtocolOption getProtocolOption() {
-		return protocolOption;
 	}
 }

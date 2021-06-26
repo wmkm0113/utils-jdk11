@@ -143,7 +143,8 @@ public final class ObjectUtils {
 	 * @param <T>		T
 	 * @return			object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor[] methodInterceptors) {
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args,
+											HandlerInterceptor[] methodInterceptors) {
 		Object object;
 
 		if (methodInterceptors != null && methodInterceptors.length > 0) {

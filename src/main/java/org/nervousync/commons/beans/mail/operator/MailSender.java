@@ -14,32 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.provider;
 
-/**
- * Interface for java bean convert
- *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 3:17 PM $
- */
-public interface ConvertProvider {
+package org.nervousync.commons.beans.mail.operator;
 
-	/**
-	 * Match the given data type
-	 *
-	 * @param dataType	Data type
-	 * @return			Match result
-	 */
-	boolean checkType(Class<?> dataType);
+import org.nervousync.commons.beans.mail.config.ServerConfig;
 
-	/**
-	 * Convert given object to target class type
-	 *
-	 * @param origObj		Original data object
-	 * @param targetClass	Target class type
-	 * @param <T>			Target template class
-	 * @return				Converted object
-	 */
-	<T> T convert(Object origObj, Class<T> targetClass);
+import java.util.Properties;
+
+public interface MailSender {
+
+    Properties readConfig(ServerConfig serverConfig, int connectionTimeout, int processTimeout, String userName);
 
 }

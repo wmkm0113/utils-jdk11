@@ -14,32 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.provider;
+
+package org.nervousync.commons.beans.mail.operator;
+
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import org.nervousync.commons.beans.mail.config.ServerConfig;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
- * Interface for java bean convert
- *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 3:17 PM $
+ * The interface Mail receiver.
  */
-public interface ConvertProvider {
+public interface MailReceiver {
 
-	/**
-	 * Match the given data type
-	 *
-	 * @param dataType	Data type
-	 * @return			Match result
-	 */
-	boolean checkType(Class<?> dataType);
+    String readUID(Folder folder, Message message) throws MessagingException;
 
-	/**
-	 * Convert given object to target class type
-	 *
-	 * @param origObj		Original data object
-	 * @param targetClass	Target class type
-	 * @param <T>			Target template class
-	 * @return				Converted object
-	 */
-	<T> T convert(Object origObj, Class<T> targetClass);
+    Message readMessage(Folder folder, String uid) throws MessagingException;
+
+    List<Message> readMessages(Folder folder, String... uidArrays) throws MessagingException;
+
+    Properties readConfig(ServerConfig serverConfig, int connectionTimeout, int processTimeout, String userName);
 
 }
