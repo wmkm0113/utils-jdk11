@@ -347,11 +347,10 @@ public final class HttpResponseContent implements Serializable {
 	 *
 	 * @param savePath the save path
 	 * @return the file
-	 * @throws IOException the io exception
+	 * @throws FileNotFoundException the io exception
 	 */
-	public File parseFile(String savePath) throws IOException {
-		FileUtils.saveFile(this.getResponseContent(), savePath);
-		return FileUtils.getFile(savePath);
+	public File parseFile(String savePath) throws FileNotFoundException {
+		return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
 	}
 
 	/**

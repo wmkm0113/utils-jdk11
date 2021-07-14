@@ -223,7 +223,8 @@ public final class DateTimeUtils {
 	 * @return		expire day
 	 */
 	public static int expireDay(long expireTime) {
-		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentTimeMillis()), DEFAULT_INT_PATTERN));
+		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentTimeMillis() + expireTime), 
+				DEFAULT_INT_PATTERN));
 	}
 
 	/**

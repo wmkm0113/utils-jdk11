@@ -196,7 +196,8 @@ public final class BeanUtils {
 		String className = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(className);
 		BeanConfig targetBean = BEAN_CONFIG_MAP.get(className);
-		dataMap.entrySet().stream().filter(entry -> entry.getValue() != null)
+		dataMap.entrySet().stream()
+				.filter(entry -> entry.getValue() != null)
 				.forEach(entry -> targetBean.parseValue((String)entry.getKey(), dest, entry.getValue()));
 	}
 

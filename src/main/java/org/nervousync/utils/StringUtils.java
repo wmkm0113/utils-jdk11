@@ -231,7 +231,6 @@ public final class StringUtils {
 				tempBytes[i] = 0;
 			}
 		}
-		char[] charArray = new char[((length + 2) / 3) * 4];
 
 		StringBuilder stringBuilder = new StringBuilder();
 		int index = 0;
@@ -1481,7 +1480,7 @@ public final class StringUtils {
 
 		TreeMap<String, Object> valueMap = new TreeMap<>();
 		Arrays.stream(object.getClass().getDeclaredFields())
-				.filter(field -> !ReflectionUtils.isStatic(field))
+				.filter(ReflectionUtils::nonStaticMember)
 				.forEach(field -> {
 					Object fieldValue = ReflectionUtils.getFieldValue(field, object);
 					Object mapValue;

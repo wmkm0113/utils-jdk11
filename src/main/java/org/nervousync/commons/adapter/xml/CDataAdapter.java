@@ -22,7 +22,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $Date: 2018-10-15 14:09
  */
-public class CDataAdapter extends XmlAdapter<String, String> {
+public final class CDataAdapter extends XmlAdapter<String, String> {
 	
 	public static final String CDATA_BEGIN = "<![CDATA[";
 	public static final String CDATA_END = "]]>";

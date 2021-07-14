@@ -660,7 +660,7 @@ public final class ZipFile implements Cloneable {
 	 * @throws ZipException		given entry path is null or zip file was not exists
 	 */
 	public void removeExistsEntry(String entryPath) throws ZipException {
-		this.removeExistsEntries();
+		this.removeExistsEntries(entryPath);
 	}
 	
 	/**
@@ -1657,9 +1657,6 @@ public final class ZipFile implements Cloneable {
 
 		ZipInputStream inputStream = null;
 		try {
-			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-			int readLength;
-
 			inputStream = this.openInputStream(generalFileHeader);
 			return inputStream.available();
 		} catch (IOException e) {

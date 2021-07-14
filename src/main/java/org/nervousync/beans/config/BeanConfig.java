@@ -26,7 +26,6 @@ import org.nervousync.beans.provider.impl.basic.ParseNumberProvider;
 import org.nervousync.beans.provider.impl.xml.EncodeXMLProvider;
 import org.nervousync.beans.provider.impl.xml.ParseXMLProvider;
 import org.nervousync.commons.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.ObjectUtils;
@@ -69,7 +68,7 @@ public final class BeanConfig implements Serializable {
 		this.className = beanClass.getName();
 		List<FieldConfig> fieldConfigList = new ArrayList<>();
 		ReflectionUtils.getAllDeclaredFields(beanClass).stream()
-				.filter(field -> !ReflectionUtils.isStatic(field) && !ReflectionUtils.isFinal(field))
+				.filter(field -> ReflectionUtils.nonStaticMember(field) && !ReflectionUtils.publicMember(field))
 				.forEach(field -> {
 					Class<?>[] dataConverters;
 					if (field.isAnnotationPresent(BeanConvert.class)) {
@@ -217,13 +216,11 @@ public final class BeanConfig implements Serializable {
 	 * @param fieldName field name
 	 * @param object    Bean object
 	 * @param value     field value
-	 * @return Copy result
 	 */
-	public boolean parseValue(String fieldName, Object object, Object value) {
+	public void parseValue(String fieldName, Object object, Object value) {
 		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
 			try {
-				Class<?> dataType = value.getClass();
 				Object args = null;
 				if (matchFieldType(fieldConfig.getFieldType(), value.getClass())) {
 					args = value;
@@ -261,14 +258,12 @@ public final class BeanConfig implements Serializable {
 				} else {
 					fieldConfig.getMethodSet().invoke(object, args);
 				}
-				return true;
 			} catch (Exception e) {
 				if (this.logger.isDebugEnabled()) {
 					this.logger.debug("Stack message: ", e);
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
 	/**
@@ -277,9 +272,8 @@ public final class BeanConfig implements Serializable {
 	 * @param fieldName     field name
 	 * @param object        Bean object
 	 * @param value         field value
-	 * @return              Copy result
 	 */
-	public boolean copyValue(String fieldName, Object object, Object value) {
+	public void copyValue(String fieldName, Object object, Object value) {
 		if (this.fieldConfigHashtable.containsKey(fieldName)) {
 			FieldConfig fieldConfig = this.fieldConfigHashtable.get(fieldName);
 			try {
@@ -321,14 +315,12 @@ public final class BeanConfig implements Serializable {
 				} else {
 					fieldConfig.getMethodSet().invoke(object, args);
 				}
-				return true;
 			} catch (Exception e) {
 				if (this.logger.isDebugEnabled()) {
 					this.logger.debug("Stack message: ", e);
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
 	}
 
 	private static boolean matchFieldType(Class<?> fieldType, Class<?> currentType) {
@@ -338,14 +330,6 @@ public final class BeanConfig implements Serializable {
 		Class<?> matchType = fieldType.isPrimitive() ? convertPrimitiveToWrapperClass(fieldType) : fieldType;
 		Class<?> targetType = currentType.isPrimitive() ? convertPrimitiveToWrapperClass(currentType) : currentType;
 		return matchType.equals(targetType);
-	}
-
-	private static boolean isPrimitiveClass(Class<?> clazz) {
-		return clazz.isPrimitive() || Integer.class.equals(clazz)
-				|| Double.class.equals(clazz) || Float.class.equals(clazz)
-				|| Long.class.equals(clazz) || Short.class.equals(clazz)
-				|| Boolean.class.equals(clazz) || Byte.class.equals(clazz)
-				|| Character.class.equals(clazz)|| String.class.equals(clazz);
 	}
 
 	private static Class<?> convertPrimitiveToWrapperClass(Class<?> primitiveClass) {

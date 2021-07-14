@@ -126,15 +126,14 @@ public final class RSACryptor extends AsymmetricCryptor {
      * @param serialNumber the serial number
      * @param beginDate    the begin date
      * @param endDate      the end date
-     * @param certAlias    the cert alias
      * @param certName     the cert name
      * @param signKey      the sign key
      * @return byte [ ]
      */
     public static byte[] x509Certificate(PublicKey publicKey, long serialNumber, Date beginDate, Date endDate,
-                                         String certAlias, String certName, PrivateKey signKey) {
+                                         String certName, PrivateKey signKey) {
         return AsymmetricCryptor.x509Certificate(publicKey, serialNumber, beginDate, endDate,
-                certAlias, certName, signKey, "SHA256withRSA")
+                certName, signKey, "SHA256withRSA")
                 .map(x509Certificate -> {
                     try {
                         return x509Certificate.getEncoded();

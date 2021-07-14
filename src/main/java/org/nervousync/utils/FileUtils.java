@@ -1343,8 +1343,10 @@ public final class FileUtils {
 			if (childFiles != null) {
 				for (File childFile : childFiles) {
 					if (childFile.isDirectory()) {
-						FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles,
-								includeRootFolder, iterateChildFolder);
+						if (iterateChildFolder) {
+							FileUtils.listFiles(childFile, filter, fileList, readHiddenFiles,
+									includeRootFolder, Boolean.TRUE);
+						}
 					} else {
 						if (!readHiddenFiles && file.isHidden()) {
 							continue;
@@ -1660,31 +1662,28 @@ public final class FileUtils {
 	/**
 	 * Save String to File use default charset: UTF-8
 	 *
-	 * @param fileName   File name
-	 * @param folderPath Folder path
+	 * @param filePath    write to file path
 	 * @param content    File content
 	 * @return Save result
 	 */
-	public static boolean saveFile(String fileName, String folderPath, String content) {
-		return FileUtils.saveFile(fileName, folderPath, content, Globals.DEFAULT_ENCODING);
+	public static boolean saveFile(String filePath, String content) {
+		return FileUtils.saveFile(filePath, content, Globals.DEFAULT_ENCODING);
 	}
 
 	/**
 	 * Save String to File
 	 *
-	 * @param fileName   File name
-	 * @param folderPath Folder path
+	 * @param filePath    write to file path
 	 * @param content    File content
 	 * @param encoding   Charset encoding
 	 * @return Save result
 	 */
-	public static boolean saveFile(String fileName, String folderPath, String content, String encoding) {
+	public static boolean saveFile(String filePath, String content, String encoding) {
 		PrintWriter printWriter = null;
 		OutputStreamWriter outputStreamWriter = null;
 		try {
-			FileUtils.makeHome(folderPath);
-			outputStreamWriter = new OutputStreamWriter(
-					new FileOutputStream(folderPath + Globals.DEFAULT_PAGE_SEPARATOR + fileName), encoding);
+			FileUtils.makeHome(filePath);
+			outputStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath), encoding);
 			printWriter = new PrintWriter(outputStreamWriter);
 
 			printWriter.print(content);
@@ -2057,8 +2056,7 @@ public final class FileUtils {
 			try {
 				File homeDir = FileUtils.getFile(homePath);
 				String parentPath = homeDir.getParent();
-				if (parentPath != null
-						&& !FileUtils.isExists(parentPath)) {
+				if (parentPath != null && !FileUtils.isExists(parentPath)) {
 					if (!FileUtils.makeHome(parentPath)) {
 						return Globals.DEFAULT_VALUE_BOOLEAN;
 					}

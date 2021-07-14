@@ -17,7 +17,6 @@
 
 package org.nervousync.crypto.impl;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.crypto.core.SymmetricCryptor;
 import org.nervousync.utils.StringUtils;

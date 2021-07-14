@@ -614,65 +614,94 @@ public final class ReflectionUtils {
 	}
 
 	/**
-	 * Determine whether the given field is a "public" constant.
+	 * Determine whether the given field/method is a "public" constant.
 	 *
-	 * @param field the field to check
-	 * @return is a "public" constant.
+	 * @param member 	the field/method to check
+	 * @return 			is a "public" constant.
 	 */
-	public static boolean isPublic(Field field) {
-		if (field != null) {
-			return Modifier.isPublic(field.getModifiers());
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+	public static boolean publicMember(Member member) {
+		return Optional.ofNullable(member)
+				.map(checkMember -> Modifier.isPublic(checkMember.getModifiers()))
+				.orElse(Boolean.FALSE);
 	}
 
 	/**
-	 * Is public boolean.
+	 * Determine whether the given field/method is a "protected" constant.
 	 *
-	 * @param method the method
-	 * @return the boolean
+	 * @param member 	the field/method to check
+	 * @return 			is a "protected" constant.
 	 */
-	public static boolean isPublic(Method method) {
-		if (method != null) {
-			return Modifier.isPublic(method.getModifiers());
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+	public static boolean protectedMember(Member member) {
+		return Optional.ofNullable(member)
+				.map(checkMember -> Modifier.isProtected(checkMember.getModifiers()))
+				.orElse(Boolean.FALSE);
 	}
 
 	/**
-	 * Determine whether the given field is a "static" constant.
-	 * @param field the field to check
-	 * @return is a "static" constant.
+	 * Determine whether the given field/method is a "protected" constant.
+	 *
+	 * @param member 	the field/method to check
+	 * @return 			is a "protected" constant.
 	 */
-	public static boolean isStatic(Field field) {
-		if (field != null) {
-			return Modifier.isStatic(field.getModifiers());
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+	public static boolean privateMember(Member member) {
+		return Optional.ofNullable(member)
+				.map(checkMember -> Modifier.isPrivate(checkMember.getModifiers()))
+				.orElse(Boolean.FALSE);
 	}
 
 	/**
-	 * Determine whether the given field is a "final" constant.
+	 * Determine whether the given field/method is a "static" constant.
 	 *
-	 * @param field the field to check
-	 * @return is a "final" constant.
+	 * @param member 	the field/method to check
+	 * @return 			is a "static" constant.
 	 */
-	public static boolean isFinal(Field field) {
-		if (field != null) {
-			return Modifier.isFinal(field.getModifiers());
-		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+	public static boolean staticMember(Member member) {
+		return Optional.ofNullable(member)
+				.map(checkMember -> Modifier.isStatic(checkMember.getModifiers()))
+				.orElse(Boolean.FALSE);
+	}
+
+	/**
+	 * Determine whether the given field/method is not a "static" constant.
+	 *
+	 * @param member 	the field/method to check
+	 * @return 			is not a "static" constant.
+	 */
+	public static boolean nonStaticMember(Member member) {
+		return !ReflectionUtils.staticMember(member);
+	}
+
+	/**
+	 * Determine whether the given field/method is a "final" constant.
+	 *
+	 * @param member 	the field/method to check
+	 * @return 			is a "final" constant.
+	 */
+	public static boolean finalMember(Member member) {
+		return Optional.ofNullable(member)
+				.map(checkMember -> Modifier.isFinal(checkMember.getModifiers()))
+				.orElse(Boolean.FALSE);
+	}
+
+	/**
+	 * Determine whether the given field/method is not a "final" constant.
+	 *
+	 * @param member 	the field/method to check
+	 * @return 			is not a "final" constant.
+	 */
+	public static boolean nonFinalMember(Member member) {
+		return !ReflectionUtils.finalMember(member);
 	}
 
 	/**
 	 * Determine whether the given field is a "public static final" constant.
 	 *
-	 * @param field the field to check
-	 * @return is a "public static final" constant.
+	 * @param member 	the field/method to check
+	 * @return 			is a "public static final" constant.
 	 */
-	public static boolean isPublicStaticFinal(Field field) {
-		if (field != null) {
-			int modifiers = field.getModifiers();
+	public static boolean isPublicStaticFinal(Member member) {
+		if (member != null) {
+			int modifiers = member.getModifiers();
 			return (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers));
 		}
 		return Globals.DEFAULT_VALUE_BOOLEAN;
@@ -927,9 +956,8 @@ public final class ReflectionUtils {
 	 * @param fieldName field name
 	 * @param target    target object
 	 * @param value     field value
-	 * @return operate result
 	 */
-	public static boolean setField(String fieldName, Object target, Object value) {
+	public static void setField(String fieldName, Object target, Object value) {
 		try {
 			Method setMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.SetMethod);
 			if (setMethod != null) {
@@ -937,7 +965,7 @@ public final class ReflectionUtils {
 			} else {
 				Field field = getFieldIfAvailable(target.getClass(), fieldName);
 				if (field == null) {
-					return false;
+					return;
 				}
 				
 				Object object = null;
@@ -1103,7 +1131,6 @@ public final class ReflectionUtils {
 				makeAccessible(field);
 				setField(field, target, object);
 			}
-			return true;
 		} catch (Exception e) {
 			if (ReflectionUtils.LOGGER.isDebugEnabled()) {
 				ReflectionUtils.LOGGER.debug("Convert to Object set field value error! ", e);
@@ -1111,7 +1138,6 @@ public final class ReflectionUtils {
 					ReflectionUtils.LOGGER.debug(fieldName + "" + value.getClass().getName());
 				}
 			}
-			return false;
 		}
 	}
 
@@ -1131,7 +1157,6 @@ public final class ReflectionUtils {
 		}
 
 		String methodName = ReflectionUtils.convertFieldNameToMethodName(field, methodType);
-		Method method = null;
 		switch(methodType) {
 		case GetMethod:
 			return ReflectionUtils.findMethod(targetClass, methodName);

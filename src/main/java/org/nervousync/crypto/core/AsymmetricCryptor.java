@@ -179,12 +179,12 @@ public abstract class AsymmetricCryptor extends Cryptor {
     /**
      * Verify boolean.
      *
-     * @param datas     the datas
+     * @param dataBytes     the data byte array
      * @param signature the signature
      * @return the boolean
      */
-    public final boolean verify(byte[] datas, byte[] signature) {
-        return this.verify(datas, signature, this.signAlgorithm);
+    public final boolean verify(byte[] dataBytes, byte[] signature) {
+        return this.verify(dataBytes, signature, this.signAlgorithm);
     }
 
     /**
@@ -324,15 +324,14 @@ public abstract class AsymmetricCryptor extends Cryptor {
      * @param serialNumber  the serial number
      * @param beginDate     the begin date
      * @param endDate       the end date
-     * @param certAlias     the cert alias
      * @param certName      the cert name
      * @param signKey       the sign key
      * @param signAlgorithm the sign algorithm
      * @return the optional
      */
     protected static Optional<X509Certificate> x509Certificate(PublicKey publicKey, long serialNumber, Date beginDate,
-                                                               Date endDate, String certAlias, String certName,
-                                                               PrivateKey signKey, String signAlgorithm) {
+                                                               Date endDate, String certName, PrivateKey signKey,
+                                                               String signAlgorithm) {
         if (publicKey == null || signKey == null || StringUtils.isEmpty(signAlgorithm)) {
             return Optional.empty();
         }
@@ -422,7 +421,7 @@ public abstract class AsymmetricCryptor extends Cryptor {
     }
 
     /**
-     * Pcks 12 certificate byte [ ].
+     * PKCS 12 certificate byte [ ].
      *
      * @param keyPair       the key pair
      * @param serialNumber  the serial number

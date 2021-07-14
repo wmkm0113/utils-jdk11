@@ -25,7 +25,7 @@ import java.util.Date;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $Date: 2018-10-15 14:31
  */
-public class DateTimeAdapter extends XmlAdapter<String, Date> {
+public final class DateTimeAdapter extends XmlAdapter<String, Date> {
 	/**
 	 * Convert a value type to a bound type.
 	 *

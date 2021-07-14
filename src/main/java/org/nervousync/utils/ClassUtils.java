@@ -226,7 +226,6 @@ public final class ClassUtils {
 			return Array.newInstance(elementClass, 0).getClass();
 		}
 
-		// "[Ljava.lang.String;" style arrays
 		int internalArrayMarker = name.indexOf(INTERNAL_ARRAY_PREFIX);
 		if (internalArrayMarker != -1 && name.endsWith(";")) {
 			String elementClassName = null;
