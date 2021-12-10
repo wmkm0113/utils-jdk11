@@ -143,7 +143,7 @@ public class SplitOutputStream extends OutputStream {
 				throw new ZipException(e);
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 	
 	private boolean isBufferSizeFitForCurrentSplitFile(int bufferSize) throws ZipException {
@@ -225,7 +225,7 @@ public class SplitOutputStream extends OutputStream {
 	
 	private boolean isHeaderData(byte[] buffer) {
 		if (buffer != null && buffer.length >= 4) {
-			int signature = RawUtils.readIntFromLittleEndian(buffer, 0);
+			int signature = RawUtils.readInt(buffer, 0, RawUtils.Endian.LITTLE);
 			
 			for (long headerSignature : HEADER_SIGNATURES) {
 				if (headerSignature != ZipConstants.SPLITSIG && headerSignature == signature) {
@@ -233,6 +233,6 @@ public class SplitOutputStream extends OutputStream {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 }

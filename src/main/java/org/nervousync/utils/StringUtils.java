@@ -19,6 +19,8 @@ package org.nervousync.utils;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -27,7 +29,9 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import org.nervousync.commons.beans.core.BeanObject;
+import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.exceptions.zip.ZipException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +99,7 @@ public final class StringUtils {
 	 * @return Encoded base32 string
 	 */
 	public static String base32Encode(final byte[] bytes) {
-		return base32Encode(bytes, Globals.DEFAULT_VALUE_BOOLEAN);
+		return base32Encode(bytes, Boolean.FALSE);
 	}
 
 	/**
@@ -432,6 +436,77 @@ public final class StringUtils {
 	}
 
 	/**
+	 * returns the length of the string by wrapping it in a byte buffer with
+	 * the appropriate charset of the input string and returns the limit of the
+	 * byte buffer
+	 *
+	 * @param strIn string
+	 * @return length of the string
+	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 */
+	public static int encodedStringLength(String strIn) {
+		return encodedStringLength(strIn, detectCharset(strIn));
+	}
+
+	/**
+	 * returns the length of the string in the input encoding
+	 *
+	 * @param str     string
+	 * @param charset charset encoding
+	 * @return length of the string
+	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 */
+	public static int encodedStringLength(String str, String charset) {
+		if (StringUtils.isEmpty(str)) {
+			return Globals.INITIALIZE_INT_VALUE;
+		}
+
+		if (StringUtils.isEmpty(charset)) {
+			return Globals.DEFAULT_VALUE_INT;
+		}
+
+		ByteBuffer byteBuffer;
+
+		try {
+			byteBuffer = ByteBuffer.wrap(str.getBytes(charset));
+		} catch (UnsupportedEncodingException e) {
+			byteBuffer = ByteBuffer.wrap(str.getBytes(Charset.defaultCharset()));
+		} catch (Exception e) {
+			throw new ZipException(e);
+		}
+
+		return byteBuffer.limit();
+	}
+
+	/**
+	 * Detects the encoding charset for the input string
+	 *
+	 * @param strIn string
+	 * @return String - charset for the String
+	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 */
+	public static String detectCharset(String strIn) {
+		if (StringUtils.isEmpty(strIn)) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+
+		try {
+			String tempString = new String(strIn.getBytes(ZipConstants.CHARSET_CP850), ZipConstants.CHARSET_CP850);
+			if (strIn.equals(tempString)) {
+				return ZipConstants.CHARSET_CP850;
+			}
+
+			tempString = new String(strIn.getBytes(Globals.DEFAULT_ENCODING), Globals.DEFAULT_ENCODING);
+			if (strIn.equals(tempString)) {
+				return Globals.DEFAULT_ENCODING;
+			}
+		} catch (Exception e) {
+			return Globals.DEFAULT_SYSTEM_CHARSET;
+		}
+		return Globals.DEFAULT_SYSTEM_CHARSET;
+	}
+
+	/**
 	 * Check whether the given CharSequence contains any whitespace characters.
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
@@ -659,7 +734,7 @@ public final class StringUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -1794,9 +1869,9 @@ public final class StringUtils {
 	 */
 	public static boolean matches(String str, String regex) {
 		if (str == null || regex == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
-		return Pattern.compile(regex).matcher(str).find();
+		return str.matches(regex);
 	}
 
 	/**
@@ -1805,7 +1880,7 @@ public final class StringUtils {
 	 * @param str         input string
 	 * @param regex       regex message
 	 * @param template    template string
-	 * @param placeHolder the place holder
+	 * @param placeHolder the placeholder
 	 * @return replaced string. null for match failed
 	 */
 	public static String replaceWithRegex(String str, String regex, String template, String placeHolder) {
@@ -2028,7 +2103,7 @@ public final class StringUtils {
 					break;
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2147,7 +2222,7 @@ public final class StringUtils {
 				}
 				break;
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	private static String prepareRegexTemplate(String template, String placeHolder) {

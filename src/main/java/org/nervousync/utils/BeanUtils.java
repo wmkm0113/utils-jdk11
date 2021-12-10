@@ -27,7 +27,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXB;
-import org.nervousync.beans.config.BeanConfig;
+import org.nervousync.beans.converter.config.BeanConfig;
 import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

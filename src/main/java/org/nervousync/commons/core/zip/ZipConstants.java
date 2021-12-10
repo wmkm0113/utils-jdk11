@@ -88,9 +88,12 @@ public final class ZipConstants {
 	public static final int FOLDER_MODE_NONE = 16;
 
 	public static final String CHARSET_CP850 = "Cp850";
+	public static final String CHARSET_GBK = "GBK";
 	public static final String CHARSET_COMMENTS_DEFAULT = "windows-1254";
 
 	public static final String ZIP_FILE_SEPARATOR = "/";
 	public static final String ZIP_ENTRY_SEPARATOR = ":" + Globals.DEFAULT_PAGE_SEPARATOR;
 
+	private ZipConstants() {
+	}
 }

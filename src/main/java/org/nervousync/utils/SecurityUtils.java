@@ -18,18 +18,17 @@ package org.nervousync.utils;
 
 import java.io.*;
 import java.security.*;
-import java.security.cert.*;
-import java.security.cert.Certificate;
-import java.util.Optional;
-
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.bouncycastle.crypto.digests.SM3Digest;
+import java.util.*;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.nervousync.crypto.Cryptor;
-import org.nervousync.crypto.impl.*;
+import org.nervousync.security.SecureProvider;
+import org.nervousync.security.config.CRCConfig;
+import org.nervousync.security.config.CipherConfig;
+import org.nervousync.security.digest.impl.*;
+import org.nervousync.security.crypto.BaseCryptoProvider;
+import org.nervousync.security.crypto.SymmetricCryptoProvider;
+import org.nervousync.security.crypto.impl.*;
+import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,1157 +58,1658 @@ public final class SecurityUtils implements Serializable {
 	 * Log for SecurityUtils class
 	 */
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
+	private transient static final Map<String, CRCConfig> REGISTERED_CRC_CONFIG = new HashMap<>();
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());
+		CRC();
+		LOGGER.info("Registered CRC config: {}",
+				String.join(",", new ArrayList<>(REGISTERED_CRC_CONFIG.keySet())));
 	}
 
 	private SecurityUtils() {
 	}
 
-	/* MD5 Method */
-
 	/**
-	 * Get MD5 value. Only encode <code>String</code>
+	 * Register CRC algorithm
 	 *
-	 * @param source source object
-	 * @return MD5 value
+	 * @param algorithm		Algorithm name
+	 * @param crcConfig		CRC config
 	 */
-	public static String MD5(Object source) {
-		return digestEncode(source, "MD5");
+	public static void registerConfig(String algorithm, CRCConfig crcConfig) {
+		if (StringUtils.isEmpty(algorithm) || crcConfig == null) {
+			LOGGER.error("Algorithm or crcConfig is null! ");
+			return;
+		}
+		if (crcConfig.getBit() > 32) {
+			LOGGER.error("Cannot calculate CRC value lager than 32 bit");
+			return;
+		}
+		if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
+			LOGGER.warn("Algorithm name: " + algorithm + " was exists, override exists config!");
+		}
+		REGISTERED_CRC_CONFIG.put(algorithm, crcConfig);
 	}
 
-	/* SHA Method */
+	public static List<String> registeredCRC() {
+		return new ArrayList<>(REGISTERED_CRC_CONFIG.keySet());
+	}
 
 	/**
-	 * Get SHA1 value. Only encode <code>String</code>
-	 * Using SHA256 instead
+	 * Initialize CRC provider
 	 *
-	 * @param source source object
-	 * @return SHA1 value
+	 * @param algorithm		CRC algorithm
+	 * @return				Initialized crc provider
+	 * @throws CryptoException	CRC algorithm not found
+	 */
+	public static SecureProvider CRC(String algorithm) throws CryptoException {
+		if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
+			return new CRCDigestProviderImpl(REGISTERED_CRC_CONFIG.get(algorithm));
+		}
+		throw new CryptoException("Unknown algorithm: " + algorithm);
+	}
+
+	public static Optional<CRCConfig> crcConfig(String algorithm) {
+		return Optional.ofNullable(REGISTERED_CRC_CONFIG.get(algorithm));
+	}
+
+	/*
+	 * Digest Methods
+	 */
+
+	/**
+	 * MD5 Digest Provider
+	 *
+	 * @return	Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider MD5() throws CryptoException {
+		return new MD5DigestProviderImpl();
+	}
+
+	/**
+	 * Calculate MD5 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] MD5(Object source) {
+		try {
+			return digest(source, MD5());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate MD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacMD5 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacMD5(byte[] keyBytes) throws CryptoException {
+		return new MD5DigestProviderImpl(keyBytes);
+	}
+
+	/**
+	 * Calculate HmacMD5 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacMD5(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacMD5(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA1 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
 	@Deprecated
-	public static String SHA1(Object source) {
-		return digestEncode(source, "SHA1");
+	public static SecureProvider SHA1() throws CryptoException {
+		return new SHA1DigestProviderImpl();
 	}
 
 	/**
-	 * Get SHA256 value. Only encode <code>String</code>
+	 * Calculate SHA1 value of given source object
 	 *
-	 * @param source source object
-	 * @return SHA256 value
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
 	 */
-	public static String SHA256(Object source) {
-		return digestEncode(source, "SHA-256");
-	}
-
-	/**
-	 * Get SHA512 value. Only encode <code>String</code>
-	 *
-	 * @param source source object
-	 * @return SHA512 value
-	 */
-	public static String SHA512(Object source) {
-		return digestEncode(source, "SHA-512");
-	}
-
-	/**
-	 * Get SHA512 value. Only encode <code>String</code>
-	 *
-	 * @param source source object
-	 * @return SHA512 value
-	 */
-	public static String SM3(Object source) {
-		return digestEncode(source, "SM3");
-	}
-
-	/**
-	 * Signature data with HmacMD5
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacMD5(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacMD5");
-	}
-
-	/**
-	 * Signature data with HmacSHA1
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA1(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA1");
-	}
-
-	/**
-	 * Signature data with HmacSHA256
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA256(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA256");
-	}
-
-	/**
-	 * Signature data with HmacSHA384
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA384(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA384");
-	}
-
-	/**
-	 * Signature data with HmacSHA512
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA512(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA512");
-	}
-
-	/**
-	 * Signature data with HmacSHA512-224
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA512_224(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA512/224");
-	}
-
-	/**
-	 * Signature data with HmacSHA512-256
-	 *
-	 * @param keyBytes  sign key bytes
-	 * @param signDatas sign data bytes
-	 * @return signature datas
-	 */
-	public static byte[] signDataByHmacSHA512_256(byte[] keyBytes, byte[] signDatas) {
-		return Hmac(keyBytes, signDatas, "HmacSHA512/256");
-	}
-
-	/**
-	 * Initialize AES128 Cryptor
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @return AESCryptor instance
-	 */
-	public static AESCryptor AES128() {
-		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES128 Cryptor
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param encodeType the encode type
-	 * @return AESCryptor instance
-	 */
-	public static AESCryptor AES128(Cryptor.EncodeType encodeType) {
-		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES128 Cryptor using given random algorithm
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 *
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES128(Cryptor.RandomAlgorithm randomAlgorithm) {
-		return AES128(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize AES128 Cryptor using given AES Mode
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param aesMode AES Mode
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 */
-	public static AESCryptor AES128(AESCryptor.AESMode aesMode) {
-		return AES128(aesMode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES128 Cryptor using given AES Mode and random algorithm
-	 *
-	 * @param aesMode         AES Mode
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES128(AESCryptor.AESMode aesMode, Cryptor.RandomAlgorithm randomAlgorithm) {
-		return AES128(aesMode, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize AES128 Cryptor using given AES Mode and random algorithm
-	 *
-	 * @param aesMode         AES Mode
-	 * @param encodeType      the encode type
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES128(AESCryptor.AESMode aesMode, Cryptor.EncodeType encodeType,
-									Cryptor.RandomAlgorithm randomAlgorithm) {
-		return new AESCryptor(128, aesMode, encodeType, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @return AESCryptor instance
-	 */
-	public static AESCryptor AES256() {
-		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param encodeType the encode type
-	 * @return AESCryptor instance
-	 */
-	public static AESCryptor AES256(Cryptor.EncodeType encodeType) {
-		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor using given random algorithm
-	 * AES Mode:            AES/CBC/PKCS5Padding
-	 *
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES256(Cryptor.RandomAlgorithm randomAlgorithm) {
-		return AES256(AESCryptor.AESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor using given AES Mode
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param aesMode AES Mode
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 */
-	public static AESCryptor AES256(AESCryptor.AESMode aesMode) {
-		return AES256(aesMode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor using given AES Mode and random algorithm
-	 *
-	 * @param aesMode         AES Mode
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES256(AESCryptor.AESMode aesMode, Cryptor.RandomAlgorithm randomAlgorithm) {
-		return AES256(aesMode, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize AES256 Cryptor using given AES Mode and random algorithm
-	 *
-	 * @param aesMode         AES Mode
-	 * @param encodeType      the encode type
-	 * @param randomAlgorithm Random algorithm
-	 * @return AESCryptor instance
-	 * @see AESCryptor.AESMode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static AESCryptor AES256(AESCryptor.AESMode aesMode, Cryptor.EncodeType encodeType,
-									Cryptor.RandomAlgorithm randomAlgorithm) {
-		return new AESCryptor(256, aesMode, encodeType, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize DES Cryptor
-	 * DES Mode: DES/CBC/PKCS5Padding
-	 *
-	 * @return DESCryptor instance
-	 */
-	public static DESCryptor DES() {
-		return DES(DESCryptor.DESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default);
-	}
-
-	/**
-	 * Initialize DES Cryptor
-	 * DES Mode: DES/CBC/PKCS5Padding
-	 *
-	 * @param encodeType the encode type
-	 * @return DESCryptor instance
-	 */
-	public static DESCryptor DES(Cryptor.EncodeType encodeType) {
-		return DES(DESCryptor.DESMode.CBC_PKCS5Padding, encodeType);
-	}
-
-	/**
-	 * Initialize DES Cryptor using given DES Mode
-	 *
-	 * @param desMode DES Mode
-	 * @return DESCryptor instance
-	 * @see DESCryptor.DESMode
-	 */
-	public static DESCryptor DES(DESCryptor.DESMode desMode) {
-		return DES(desMode, Cryptor.EncodeType.Default);
-	}
-
-	/**
-	 * Initialize DES Cryptor using given DES Mode
-	 *
-	 * @param desMode    DES Mode
-	 * @param encodeType the encode type
-	 * @return DESCryptor instance
-	 * @see DESCryptor.DESMode
-	 */
-	public static DESCryptor DES(DESCryptor.DESMode desMode, Cryptor.EncodeType encodeType) {
-		return new DESCryptor("DES", desMode, encodeType);
-	}
-
-	/**
-	 * Initialize Triple DES Cryptor
-	 * DES Mode: DESede/CBC/PKCS5Padding
-	 *
-	 * @return DESCryptor instance
-	 */
-	public static DESCryptor TripleDES() {
-		return TripleDES(DESCryptor.DESMode.CBC_PKCS5Padding, Cryptor.EncodeType.Default);
-	}
-
-	/**
-	 * Initialize Triple DES Cryptor
-	 * DES Mode: DESede/CBC/PKCS5Padding
-	 *
-	 * @param encodeType the encode type
-	 * @return DESCryptor instance
-	 */
-	public static DESCryptor TripleDES(Cryptor.EncodeType encodeType) {
-		return TripleDES(DESCryptor.DESMode.CBC_PKCS5Padding, encodeType);
-	}
-
-	/**
-	 * Initialize Triple DES Cryptor using given DES Mode
-	 *
-	 * @param desMode DES Mode
-	 * @return DESCryptor instance
-	 * @see DESCryptor.DESMode
-	 */
-	public static DESCryptor TripleDES(DESCryptor.DESMode desMode) {
-		return TripleDES(desMode, Cryptor.EncodeType.Default);
-	}
-
-	/**
-	 * Initialize Triple DES Cryptor using given DES Mode
-	 *
-	 * @param desMode    DES Mode
-	 * @param encodeType the encode type
-	 * @return DESCryptor instance
-	 * @see DESCryptor.DESMode
-	 */
-	public static DESCryptor TripleDES(DESCryptor.DESMode desMode, Cryptor.EncodeType encodeType) {
-		return new DESCryptor("DESede", desMode, encodeType);
-	}
-
-	/**
-	 * Initialize RSA Cryptor and generate key pair
-	 *
-	 * @return RSACryptor instance
-	 * @throws CryptoException if generate key pair error
-	 */
-	public static RSACryptor RSA() throws CryptoException {
-		return RSA(1024);
-	}
-
-	/**
-	 * Initialize RSA Cryptor and generate key pair
-	 *
-	 * @param keySize the key size
-	 * @return RSACryptor instance
-	 * @throws CryptoException if generate key pair error
-	 */
-	public static RSACryptor RSA(int keySize) throws CryptoException {
-		return RSACryptor.generateKeyPair(keySize)
-				.map(SecurityUtils::RSA)
-				.orElseThrow(() -> new CryptoException("Generate key pair error"));
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given key pair
-	 *
-	 * @param storePath the key store path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return RSACryptor instance
-	 * @throws CryptoException       the crypto exception
-	 * @throws FileNotFoundException the file not found exception
-	 */
-	public static RSACryptor RSA(String storePath, String certAlias, String password)
-			throws CryptoException, FileNotFoundException {
-		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
-				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-				.map(keyStore -> RSA(keyStore, certAlias, password))
-				.orElseThrow(() -> new CryptoException("Read cert file error"));
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given key pair
-	 *
-	 * @param storeBytes the key store byte arrays
-	 * @param certAlias  the cert alias
-	 * @param password   the password
-	 * @return RSACryptor instance
-	 * @throws CryptoException the crypto exception
-	 */
-	public static RSACryptor RSA(byte[] storeBytes, String certAlias, String password) throws CryptoException {
-		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
-				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-				.map(keyStore -> RSA(keyStore, certAlias, password))
-				.orElseThrow(() -> new CryptoException("Read cert file error"));
-	}
-
-	private static RSACryptor RSA(KeyStore keyStore, String certAlias, String password) throws CryptoException {
+	@Deprecated
+	public static byte[] SHA1(Object source) {
 		try {
-			PrivateKey privateKey =
-					(PrivateKey) keyStore.getKey(certAlias,
-							password == null ? null : password.toCharArray());
-			PublicKey publicKey = keyStore.getCertificate(certAlias).getPublicKey();
-			return RSA(publicKey, privateKey);
-		} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-			throw new CryptoException("Read key from cert file error! ");
-		}
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given key pair
-	 *
-	 * @param keyPair RSA Key pair
-	 * @return RSACryptor instance
-	 */
-	public static RSACryptor RSA(KeyPair keyPair) {
-		return RSA(RSACryptor.RSAMode.PKCS1Padding, Cryptor.EncodeType.Default,
-				keyPair.getPublic(), keyPair.getPrivate());
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given key pair
-	 *
-	 * @param encodeType the encode type
-	 * @param keyPair    RSA Key pair
-	 * @return RSACryptor instance
-	 */
-	public static RSACryptor RSA(Cryptor.EncodeType encodeType, KeyPair keyPair) {
-		return RSA(RSACryptor.RSAMode.PKCS1Padding, encodeType, keyPair.getPublic(), keyPair.getPrivate());
-	}
-
-	/**
-	 * Initialize RSA Cryptor
-	 * RSA Mode: RSA/ECB/PKCS1Padding
-	 *
-	 * @param publicKey  the public key
-	 * @param privateKey the private key
-	 * @return RSACryptor instance
-	 */
-	public static RSACryptor RSA(PublicKey publicKey, PrivateKey privateKey) {
-		return RSA(RSACryptor.RSAMode.PKCS1Padding, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize RSA Cryptor
-	 * RSA Mode: RSA/ECB/PKCS1Padding
-	 *
-	 * @param encodeType the encode type
-	 * @param publicKey  the public key
-	 * @param privateKey the private key
-	 * @return RSACryptor instance
-	 */
-	public static RSACryptor RSA(Cryptor.EncodeType encodeType, PublicKey publicKey, PrivateKey privateKey) {
-		return RSA(RSACryptor.RSAMode.PKCS1Padding, encodeType, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given RSA Mode
-	 *
-	 * @param rsaMode    RSA Mode
-	 * @param publicKey  the public key
-	 * @param privateKey the private key
-	 * @return RSACryptor instance
-	 * @see RSACryptor.RSAMode
-	 */
-	public static RSACryptor RSA(RSACryptor.RSAMode rsaMode, PublicKey publicKey, PrivateKey privateKey) {
-		return RSA(rsaMode, Cryptor.EncodeType.Default, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize RSA Cryptor using given RSA Mode
-	 *
-	 * @param rsaMode    RSA Mode
-	 * @param encodeType the encode type
-	 * @param publicKey  the public key
-	 * @param privateKey the private key
-	 * @return RSACryptor instance
-	 * @see RSACryptor.RSAMode
-	 */
-	public static RSACryptor RSA(RSACryptor.RSAMode rsaMode, Cryptor.EncodeType encodeType,
-								 PublicKey publicKey, PrivateKey privateKey) {
-		return new RSACryptor(rsaMode, encodeType, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor and generate key pair
-	 *
-	 * @return SM2Cryptor instance
-	 * @throws CryptoException if generate key pair error
-	 */
-	public static SM2Cryptor SM2() throws CryptoException {
-		return SM2Cryptor.generateKeyPair()
-				.map(SecurityUtils::SM2)
-				.orElseThrow(() -> new CryptoException("Generate key pair error"));
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param certPath  the cert path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return SM2Cryptor instance
-	 * @throws CryptoException       the crypto exception
-	 * @throws FileNotFoundException the file not found exception
-	 */
-	public static SM2Cryptor SM2(String certPath, String certAlias, String password)
-			throws CryptoException, FileNotFoundException {
-		return SM2(SM2Cryptor.SM2Mode.C1C3C2, certPath, certAlias, password);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param sm2Mode   the sm 2 mode
-	 * @param storePath the key store path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return SM2Cryptor instance
-	 * @throws CryptoException       the crypto exception
-	 * @throws FileNotFoundException the file not found exception
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, String storePath, String certAlias, String password)
-			throws CryptoException, FileNotFoundException {
-		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
-				.filter(keyStore -> {
-					try {
-						return keyStore.isKeyEntry(certAlias);
-					} catch (KeyStoreException e) {
-						return Globals.DEFAULT_VALUE_BOOLEAN;
-					}
-				})
-				.map(keyStore -> SM2(keyStore, sm2Mode, certAlias, password))
-				.orElseThrow(() -> new CryptoException("Read cert file error"));
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param sm2Mode    the sm 2 mode
-	 * @param storeBytes the key store byte arrays
-	 * @param certAlias  the cert alias
-	 * @param password   the password
-	 * @return SM2Cryptor instance
-	 * @throws CryptoException the crypto exception
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, byte[] storeBytes, String certAlias, String password)
-			throws CryptoException {
-		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
-				.filter(keyStore -> {
-					try {
-						return keyStore.isKeyEntry(certAlias);
-					} catch (KeyStoreException e) {
-						return Globals.DEFAULT_VALUE_BOOLEAN;
-					}
-				})
-				.map(keyStore -> SM2(keyStore, sm2Mode, certAlias, password))
-				.orElseThrow(() -> new CryptoException("Read cert file error"));
-	}
-
-	private static SM2Cryptor SM2(KeyStore keyStore, SM2Cryptor.SM2Mode sm2Mode, String certAlias, String password)
-			throws CryptoException {
-		try {
-			PrivateKey privateKey =
-					(PrivateKey) keyStore.getKey(certAlias,
-							password == null ? null : password.toCharArray());
-			PublicKey publicKey = keyStore.getCertificate(certAlias).getPublicKey();
-			return SM2(sm2Mode, publicKey, privateKey);
-		} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-			throw new CryptoException("Read key from cert file error! ");
-		}
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param keyPair SM2 Key pair
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(KeyPair keyPair) {
-		return SM2(SM2Cryptor.SM2Mode.C1C3C2, keyPair);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param encodeType the encode type
-	 * @param keyPair    SM2 Key pair
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(Cryptor.EncodeType encodeType, KeyPair keyPair) {
-		return SM2(SM2Cryptor.SM2Mode.C1C3C2, Cryptor.EncodeType.Default, keyPair);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param sm2Mode the sm 2 mode
-	 * @param keyPair SM2 Key pair
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, KeyPair keyPair) {
-		return SM2(sm2Mode, Cryptor.EncodeType.Default, keyPair.getPublic(), keyPair.getPrivate());
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given key pair
-	 *
-	 * @param sm2Mode    the sm 2 mode
-	 * @param encodeType the encode type
-	 * @param keyPair    SM2 Key pair
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, Cryptor.EncodeType encodeType, KeyPair keyPair) {
-		return SM2(sm2Mode, encodeType, keyPair.getPublic(), keyPair.getPrivate());
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given privateKey and publicKey
-	 *
-	 * @param publicKey  Public key
-	 * @param privateKey Private key
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(PublicKey publicKey, PrivateKey privateKey) {
-		return SM2(SM2Cryptor.SM2Mode.C1C3C2, Cryptor.EncodeType.Default, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given privateKey and publicKey
-	 *
-	 * @param encodeType the encode type
-	 * @param publicKey  Public key
-	 * @param privateKey Private key
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(Cryptor.EncodeType encodeType, PublicKey publicKey, PrivateKey privateKey) {
-		return SM2(SM2Cryptor.SM2Mode.C1C3C2, encodeType, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given privateKey and publicKey
-	 *
-	 * @param sm2Mode    the sm 2 mode
-	 * @param publicKey  Public key
-	 * @param privateKey Private key
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, PublicKey publicKey, PrivateKey privateKey) {
-		return SM2(sm2Mode, Cryptor.EncodeType.Default, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize SM2 Cryptor using given privateKey and publicKey
-	 *
-	 * @param sm2Mode    the sm 2 mode
-	 * @param encodeType the encode type
-	 * @param publicKey  Public key
-	 * @param privateKey Private key
-	 * @return SM2Cryptor instance
-	 */
-	public static SM2Cryptor SM2(SM2Cryptor.SM2Mode sm2Mode, Cryptor.EncodeType encodeType,
-								 PublicKey publicKey, PrivateKey privateKey) {
-		return new SM2Cryptor(sm2Mode, encodeType, publicKey, privateKey);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor
-	 * SM4 Mode:            SM4/CBC/NoPadding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @return SM4Cryptor instance
-	 */
-	public static SM4Cryptor SM4() {
-		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor
-	 * SM4 Mode:            SM4/CBC/NoPadding
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param encodeType the encode type
-	 * @return SM4Cryptor instance
-	 */
-	public static SM4Cryptor SM4(Cryptor.EncodeType encodeType) {
-		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, encodeType, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor using given random algorithm
-	 * SM4 Mode:            SM4/CBC/NoPadding
-	 *
-	 * @param randomAlgorithm Random algorithm
-	 * @return SM4Cryptor instance
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static SM4Cryptor SM4(Cryptor.RandomAlgorithm randomAlgorithm) {
-		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor using given random algorithm
-	 * SM4 Mode:            SM4/CBC/NoPadding
-	 *
-	 * @param encodeType      the encode type
-	 * @param randomAlgorithm Random algorithm
-	 * @return SM4Cryptor instance
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static SM4Cryptor SM4(Cryptor.EncodeType encodeType, Cryptor.RandomAlgorithm randomAlgorithm) {
-		return SM4(SM4Cryptor.SM4Mode.CBC_NoPadding, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor using given SM4 Mode
-	 * RandomAlgorithm:     SHA1PRNG
-	 *
-	 * @param sm4Mode SM4 Mode
-	 * @return SM4Cryptor instance
-	 * @see SM4Cryptor.SM4Mode
-	 */
-	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode) {
-		return SM4(sm4Mode, Cryptor.EncodeType.Default, Cryptor.RandomAlgorithm.SHA1PRNG);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor using given SM4 Mode and random algorithm
-	 *
-	 * @param sm4Mode         SM4 Mode
-	 * @param randomAlgorithm Random algorithm
-	 * @return SM4Cryptor instance
-	 * @see SM4Cryptor.SM4Mode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode, Cryptor.RandomAlgorithm randomAlgorithm) {
-		return SM4(sm4Mode, Cryptor.EncodeType.Default, randomAlgorithm);
-	}
-
-	/**
-	 * Initialize SM4 Cryptor using given SM4 Mode and random algorithm
-	 *
-	 * @param sm4Mode         SM4 Mode
-	 * @param encodeType      the encode type
-	 * @param randomAlgorithm Random algorithm
-	 * @return SM4Cryptor instance
-	 * @see SM4Cryptor.SM4Mode
-	 * @see Cryptor.RandomAlgorithm
-	 */
-	public static SM4Cryptor SM4(SM4Cryptor.SM4Mode sm4Mode, Cryptor.EncodeType encodeType,
-								 Cryptor.RandomAlgorithm randomAlgorithm) {
-		return new SM4Cryptor(sm4Mode, encodeType, randomAlgorithm);
-	}
-
-	/**
-	 * Read public key from X.509 certificate file
-	 *
-	 * @param certBytes Certificate file data bytes
-	 * @return Public key
-	 */
-	public static PublicKey readPublicKey(byte[] certBytes) {
-		return SecurityUtils.readPublicKey(certBytes, null, Boolean.TRUE);
-	}
-
-	/**
-	 * Read public key from X.509 certificate file
-	 *
-	 * @param certBytes     Certificate file data bytes
-	 * @param checkValidity the check validity
-	 * @return Public key
-	 */
-	public static PublicKey readPublicKey(byte[] certBytes, boolean checkValidity) {
-		return SecurityUtils.readPublicKey(certBytes, null, checkValidity);
-	}
-
-	/**
-	 * Read public key from X.509 certificate file
-	 *
-	 * @param certBytes Certificate file data bytes
-	 * @param publicKey the public key
-	 * @return Public key
-	 */
-	public static PublicKey readPublicKey(byte[] certBytes, PublicKey publicKey) {
-		return SecurityUtils.readPublicKey(certBytes, publicKey, Boolean.TRUE);
-	}
-
-	/**
-	 * Read public key from X.509 certificate file
-	 *
-	 * @param certBytes     Certificate file data bytes
-	 * @param verifyKey     the verify key
-	 * @param checkValidity Check certificate validity
-	 * @return Public key
-	 */
-	public static PublicKey readPublicKey(byte[] certBytes, PublicKey verifyKey, boolean checkValidity) {
-		return readCertificate(certBytes, verifyKey, checkValidity)
-				.map(X509Certificate::getPublicKey)
-				.orElse(null);
-	}
-
-	/**
-	 * Read certificate optional.
-	 *
-	 * @param certBytes the cert bytes
-	 * @return the optional
-	 */
-	public static Optional<X509Certificate> readCertificate(byte[] certBytes) {
-		return readCertificate(certBytes, null, Boolean.TRUE);
-	}
-
-	/**
-	 * Read certificate optional.
-	 *
-	 * @param certBytes the cert bytes
-	 * @param verifyKey the verify key
-	 * @return the optional
-	 */
-	public static Optional<X509Certificate> readCertificate(byte[] certBytes, PublicKey verifyKey) {
-		return readCertificate(certBytes, verifyKey, Boolean.TRUE);
-	}
-
-	/**
-	 * Read certificate optional.
-	 *
-	 * @param certBytes     the cert bytes
-	 * @param checkValidity the check validity
-	 * @return the optional
-	 */
-	public static Optional<X509Certificate> readCertificate(byte[] certBytes, boolean checkValidity) {
-		return readCertificate(certBytes, null, checkValidity);
-	}
-
-	/**
-	 * Read certificate optional.
-	 *
-	 * @param certBytes     the cert bytes
-	 * @param verifyKey     the verify key
-	 * @param checkValidity the check validity
-	 * @return the optional
-	 */
-	public static Optional<X509Certificate> readCertificate(byte[] certBytes, PublicKey verifyKey,
-															boolean checkValidity) {
-		X509Certificate x509Certificate;
-		try {
-			CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(certBytes);
-			x509Certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
+			return digest(source, SHA1());
+		} catch (CryptoException e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Certificate SN: {}", x509Certificate.getSerialNumber().toString());
+				LOGGER.debug("Calculate SHA1 value error! ", e);
 			}
-			if (checkValidity) {
-				x509Certificate.checkValidity();
-			}
-			if (verifyKey != null) {
-				x509Certificate.verify(verifyKey, "BC");
-			}
-		} catch (Exception e) {
-			LOGGER.error("Certificate is invalid! ");
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA1 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA1(byte[] keyBytes) throws CryptoException {
+		return new SHA1DigestProviderImpl(keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA1 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA1(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA1(keyBytes));
+		} catch (CryptoException e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
 			}
-			x509Certificate = null;
+			return new byte[0];
 		}
-		return Optional.ofNullable(x509Certificate);
 	}
 
 	/**
-	 * Read certificate optional.
+	 * SHA-224 Digest Provider
 	 *
-	 * @param storeBytes the store bytes
-	 * @param certAlias  the cert alias
-	 * @param password   the password
-	 * @return the optional
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	public static Optional<X509Certificate> readCertificate(byte[] storeBytes, String certAlias, String password) {
-		try {
-			return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
-					.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias));
-		} catch (Exception e) {
-			return Optional.empty();
-		}
+	public static SecureProvider SHA224() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-224", new byte[0]);
 	}
 
 	/**
-	 * Read certificate optional.
+	 * Calculate SHA-224 value of given source object
 	 *
-	 * @param storePath the store path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return the optional
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
 	 */
-	public static Optional<X509Certificate> readCertificate(String storePath, String certAlias, String password) {
+	public static byte[] SHA224(Object source) {
 		try {
-			return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
-					.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-					.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias));
-		} catch (Exception e) {
-			return Optional.empty();
+			return digest(source, SHA256());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
 		}
 	}
 
 	/**
-	 * Read private key optional.
+	 * HmacSHA224 Digest Provider
 	 *
-	 * @param storeBytes the key store byte arrays
-	 * @param certAlias  the cert alias
-	 * @param password   the password
-	 * @return the optional
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	public static Optional<PrivateKey> readPrivateKey(byte[] storeBytes, String certAlias, String password) {
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(storeBytes);
-		final char[] certPwd = password == null ? null : password.toCharArray();
-		try {
-			return loadKeyStore(new ByteArrayInputStream(storeBytes), certPwd)
-					.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-					.map(keyStore -> {
-						try {
-							return (PrivateKey) keyStore.getKey(certAlias, certPwd);
-						} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-							e.printStackTrace();
-							return null;
-						}
-					});
-		} catch (Exception e) {
-			return Optional.empty();
-		}
+	public static SecureProvider HmacSHA224(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-224/HMAC", keyBytes);
 	}
 
 	/**
-	 * Read private key from pfx optional.
+	 * Calculate HmacSHA224 value of given source object
 	 *
-	 * @param storePath the key store path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return the optional
-	 * @throws FileNotFoundException the file not found exception
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
 	 */
-	public static Optional<PrivateKey> readPrivateKey(String storePath, String certAlias, String password)
-			throws FileNotFoundException {
-		final char[] certPwd = password == null ? null : password.toCharArray();
-		return loadKeyStore(new FileInputStream(storePath), certPwd)
-				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-				.map(keyStore -> {
-					try {
-						return (PrivateKey) keyStore.getKey(certAlias, certPwd);
-					} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-						e.printStackTrace();
-						return null;
-					}
-				});
+	public static byte[] HmacSHA224(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA256(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
 	}
 
 	/**
-	 * Read public key from pfx optional.
+	 * SHA-256 Digest Provider
 	 *
-	 * @param storeBytes the key store byte arrays
-	 * @param certAlias  the cert alias
-	 * @param password   the password
-	 * @return the optional
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	public static Optional<PublicKey> readPublicKey(byte[] storeBytes, String certAlias, String password) {
-		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray())
-				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-				.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias))
-				.map(Certificate::getPublicKey);
+	public static SecureProvider SHA256() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-256", new byte[0]);
 	}
 
 	/**
-	 * Read public key from pfx optional.
+	 * Calculate SHA-256 value of given source object
 	 *
-	 * @param storePath the key store path
-	 * @param certAlias the cert alias
-	 * @param password  the password
-	 * @return the optional
-	 * @throws FileNotFoundException the file not found exception
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
 	 */
-	public static Optional<PublicKey> readPublicKey(String storePath, String certAlias, String password)
-			throws FileNotFoundException {
-		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray())
-				.filter(keyStore -> SecurityUtils.checkKeyEntry(keyStore, certAlias))
-				.flatMap(keyStore -> SecurityUtils.readCertificate(keyStore, certAlias))
-				.map(Certificate::getPublicKey);
+	public static byte[] SHA256(Object source) {
+		try {
+			return digest(source, SHA256());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
 	}
 
 	/**
-	 * Load key store optional.
+	 * HmacSHA256 Digest Provider
 	 *
-	 * @param storeBytes the store bytes
-	 * @param password   the password
-	 * @return the optional
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	public static Optional<KeyStore> loadKeyStore(byte[] storeBytes, String password) {
-		return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray());
+	public static SecureProvider HmacSHA256(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-256/HMAC", keyBytes);
 	}
 
 	/**
-	 * Load key store optional.
+	 * Calculate HmacSHA256 value of given source object
 	 *
-	 * @param storePath the store path
-	 * @param password  the password
-	 * @return the optional
-	 * @throws FileNotFoundException the file not found exception
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
 	 */
-	public static Optional<KeyStore> loadKeyStore(String storePath, String password) throws FileNotFoundException {
-		return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray());
-	}
-
-	private static boolean checkKeyEntry(KeyStore keyStore, String certAlias) {
-		if (keyStore == null || certAlias == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
+	public static byte[] HmacSHA256(byte[] keyBytes, Object source) {
 		try {
-			return keyStore.isKeyEntry(certAlias);
-		} catch (KeyStoreException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
-		}
-	}
-
-	private static Optional<KeyStore> loadKeyStore(InputStream inputStream, char[] certPwd) {
-		KeyStore keyStore;
-		try {
-			keyStore = KeyStore.getInstance("PKCS12", "BC");
-			keyStore.load(inputStream, certPwd);
-		} catch (Exception e) {
-			e.printStackTrace();
-			keyStore = null;
-		} finally {
-			IOUtils.closeStream(inputStream);
-		}
-		return Optional.ofNullable(keyStore);
-	}
-
-	private static Optional<X509Certificate> readCertificate(KeyStore keyStore, String certAlias) {
-		try {
-			return Optional.ofNullable((X509Certificate) keyStore.getCertificate(certAlias));
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-			return Optional.empty();
+			return digest(source, HmacSHA256(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
 		}
 	}
 
 	/**
-	 * Calculate Hmac value by given algorithm
-	 * @param keyBytes      Signature key bytes
-	 * @param signDatas     Signature Data
-	 * @param algorithm     Algorithm
-	 * @return              Hmac bytes
+	 * SHA-384 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	private static byte[] Hmac(byte[] keyBytes, byte[] signDatas, String algorithm) {
+	public static SecureProvider SHA384() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-384", new byte[0]);
+	}
+
+	/**
+	 * Calculate SHA-384 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA384(Object source) {
 		try {
-			Mac hmac = Mac.getInstance(algorithm);
-			hmac.init(new SecretKeySpec(keyBytes, algorithm));
-			return hmac.doFinal(signDatas);
-		} catch (Exception e) {
-			return null;
+			return digest(source, SHA384());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
 		}
 	}
 
 	/**
-	 * Get digest value
-	 * @param source		Input source
-	 * @param algorithm	Calc algorithm
-	 * @return calc value
+	 * HmacSHA384 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
 	 */
-	private static String digestEncode(Object source, String algorithm) {
-		MessageDigest messageDigest;
+	public static SecureProvider HmacSHA384(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-384/HMAC", keyBytes);
+	}
 
-		//	Initialize MessageDigest Instance
+	/**
+	 * Calculate HmacSHA384 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA384(byte[] keyBytes, Object source) {
 		try {
-			messageDigest = MessageDigest.getInstance(algorithm, "BC");
-		} catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-			LOGGER.error("Initialize failed, maybe the MessageDigest does not support " + algorithm + "!", ex);
-			return Globals.DEFAULT_VALUE_STRING;
+			return digest(source, HmacSHA384(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
 		}
+	}
 
+	/**
+	 * SHA-512 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA512() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512", new byte[0]);
+	}
+
+	/**
+	 * Calculate SHA-512 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA512(Object source) {
+		try {
+			return digest(source, SHA512());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA512 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA512(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA512 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA512(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA512(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA-512/224 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA512_224() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512/224", new byte[0]);
+	}
+
+	/**
+	 * Calculate SHA-512/224 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA512_224(Object source) {
+		try {
+			return digest(source, SHA512_224());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA512/224 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA512_224(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512/224/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA512/224 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA512_224(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA512_224(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA512-256 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA512_256() throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512/256", new byte[0]);
+	}
+
+	/**
+	 * Calculate SHA-512/256 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA512_256(Object source) {
+		try {
+			return digest(source, SHA512_256());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA512/256 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA512_256(byte[] keyBytes) throws CryptoException {
+		return new SHA2DigestProviderImpl("SHA-512/256/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA512/256 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA512_256(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA512_256(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA3-224 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA3_224() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-224");
+	}
+
+	/**
+	 * Calculate SHA3-224 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA3_224(Object source) {
+		try {
+			return digest(source, SHA3_224());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA3-224 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA3_224(byte[] keyBytes) throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-224/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA3-224 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA3_224(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA3_224(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA3-256 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA3_256() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-256");
+	}
+
+	/**
+	 * Calculate SHA3-256 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA3_256(Object source) {
+		try {
+			return digest(source, SHA3_256());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA3-256 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA3_256(byte[] keyBytes) throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-256/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA3-256 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA3_256(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA3_256(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA3-384 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA3_384() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-384");
+	}
+
+	/**
+	 * Calculate SHA3-384 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA3_384(Object source) {
+		try {
+			return digest(source, SHA3_384());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA3-384 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA3_384(byte[] keyBytes) throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-384/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA3-384 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA3_384(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA3_384(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHA3-512 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHA3_512() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-512");
+	}
+
+	/**
+	 * Calculate SHA3-512 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHA3_512(Object source) {
+		try {
+			return digest(source, SHA3_512());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSHA3-512 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSHA3_512(byte[] keyBytes) throws CryptoException {
+		return new SHA3DigestProviderImpl("SHA3-512/HMAC", keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSHA3-512 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSHA3_512(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSHA3_512(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHAKE128 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHAKE128() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHAKE128");
+	}
+
+	/**
+	 * Calculate SHAKE128 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHAKE128(Object source) {
+		try {
+			return digest(source, SHAKE128());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SHAKE256 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SHAKE256() throws CryptoException {
+		return new SHA3DigestProviderImpl("SHAKE256");
+	}
+
+	/**
+	 * Calculate SHAKE256 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SHAKE256(Object source) {
+		try {
+			return digest(source, SHAKE256());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * SM3 Digest Provider
+	 *
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM3() throws CryptoException {
+		return new SM3DigestProviderImpl();
+	}
+
+	/**
+	 * Calculate SM3 value of given source object
+	 *
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] SM3(Object source) {
+		try {
+			return digest(source, SM3());
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * HmacSM3 Digest Provider
+	 *
+	 * @param keyBytes		Hmac key bytes
+	 * @return				Initialized provider
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider HmacSM3(byte[] keyBytes) throws CryptoException {
+		return new SM3DigestProviderImpl(keyBytes);
+	}
+
+	/**
+	 * Calculate HmacSM3 value of given source object
+	 *
+	 * @param keyBytes	Hmac key bytes
+	 * @param source	Input source
+	 * @return			Calculate result or zero length array if process has error
+	 */
+	public static byte[] HmacSM3(byte[] keyBytes, Object source) {
+		try {
+			return digest(source, HmacSM3(keyBytes));
+		} catch (CryptoException e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Calculate HmacMD5 value error! ", e);
+			}
+			return new byte[0];
+		}
+	}
+
+	/*
+	 *	Symmetric methods
+	 */
+
+	/**
+	 * Initialize DES encryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			DES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider DESEncryptor(byte[] keyBytes) throws CryptoException {
+		return DESEncryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize DES encryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			DES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider DESEncryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return new DESCryptoProviderImpl(new CipherConfig("DES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
+	}
+
+	/**
+	 * Initialize DES decryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			DES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider DESDecryptor(byte[] keyBytes) throws CryptoException {
+		return DESDecryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize DES decryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			DES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider DESDecryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return new DESCryptoProviderImpl(new CipherConfig("DES", mode, padding), CryptoMode.DECRYPT, keyBytes);
+	}
+
+	/**
+	 * Generate DES key
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] DESKey() {
+		try {
+			return SymmetricCryptoProvider.generateKey("DES", Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_STRING);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * Initialize TripleDES encryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			TripleDES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider TripleDESEncryptor(byte[] keyBytes) throws CryptoException {
+		return TripleDESEncryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize TripleDES encryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			TripleDES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider TripleDESEncryptor(String mode, String padding, byte[] keyBytes)
+			throws CryptoException {
+		return new TripleDESCryptoProviderImpl(new CipherConfig("DESede", mode, padding),
+				CryptoMode.ENCRYPT, keyBytes);
+	}
+
+	/**
+	 * Initialize TripleDES decryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			TripleDES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider TripleDESDecryptor(byte[] keyBytes) throws CryptoException {
+		return TripleDESDecryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize TripleDES decryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			TripleDES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider TripleDESDecryptor(String mode, String padding, byte[] keyBytes)
+			throws CryptoException {
+		return new TripleDESCryptoProviderImpl(new CipherConfig("DESede", mode, padding),
+				CryptoMode.DECRYPT, keyBytes);
+	}
+
+	/**
+	 * Generate TripleDES key
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] TripleDESKey() {
+		try {
+			return SymmetricCryptoProvider.generateKey("DESede", Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_STRING);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * Initialize SM4 encryptor using default cipher mode, padding mode and random algorithm
+	 *
+	 * @param keyBytes			SM4 key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Encryptor(byte[] keyBytes) throws CryptoException {
+		return SM4Encryptor("CBC", "NoPadding", keyBytes, "SHA1PRNG");
+	}
+
+	/**
+	 * Initialize SM4 encryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			SM4 key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Encryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return SM4Encryptor(mode, padding, keyBytes, "SHA1PRNG");
+	}
+
+	/**
+	 * Initialize SM4 encryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			SM4 key bytes
+	 * @param randomAlgorithm 	Random algorithm
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Encryptor(String mode, String padding, byte[] keyBytes, String randomAlgorithm)
+			throws CryptoException {
+		return new SM4CryptoProviderImpl(new CipherConfig("SM4", mode, padding),
+				CryptoMode.ENCRYPT, keyBytes, randomAlgorithm);
+	}
+
+	/**
+	 * Initialize SM4 decryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			SM4 key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Decryptor(byte[] keyBytes) throws CryptoException {
+		return SM4Decryptor("CBC", "PKCS5Padding", keyBytes, "SHA1PRNG");
+	}
+
+	/**
+	 * Initialize SM4 decryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			SM4 key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Decryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return SM4Decryptor(mode, padding, keyBytes, "SHA1PRNG");
+	}
+
+	/**
+	 * Initialize SM4 decryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			SM4 key bytes
+	 * @param randomAlgorithm 	Random algorithm
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM4Decryptor(String mode, String padding, byte[] keyBytes, String randomAlgorithm)
+			throws CryptoException {
+		return new SM4CryptoProviderImpl(new CipherConfig("SM4", mode, padding),
+				CryptoMode.DECRYPT, keyBytes, randomAlgorithm);
+	}
+
+	/**
+	 * Generate SM4 key
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] SM4Key() {
+		try {
+			return SymmetricCryptoProvider.generateKey("SM4", 128, Globals.DEFAULT_VALUE_STRING);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/*
+	 * Asymmetric methods
+	 */
+
+	/**
+	 * Initialize RSA encryptor using default padding mode: PKCS1Padding
+	 *
+	 * @param publicKey			RSA PublicKey
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSAEncryptor(PublicKey publicKey) throws CryptoException {
+		return RSAEncryptor("PKCS1Padding", publicKey);
+	}
+
+	/**
+	 * Initialize RSA encryptor using given padding mode
+	 *
+	 * @param padding			Padding mode
+	 * @param publicKey			RSA PublicKey
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSAEncryptor(String padding, PublicKey publicKey) throws CryptoException {
+		return new RSACryptoProviderImpl(new CipherConfig("RSA", "ECB", padding),
+				CryptoMode.ENCRYPT, new BaseCryptoProvider.CipherKey(publicKey));
+	}
+
+	/**
+	 * Initialize RSA decryptor using default padding mode: PKCS1Padding
+	 *
+	 * @param privateKey		RSA PrivateKey
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSADecryptor(PrivateKey privateKey) throws CryptoException {
+		return RSADecryptor("PKCS1Padding", privateKey);
+	}
+
+	/**
+	 * Initialize RSA decryptor using given padding mode
+	 *
+	 * @param padding			Padding mode
+	 * @param privateKey		RSA PrivateKey
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSADecryptor(String padding, PrivateKey privateKey) throws CryptoException {
+		return new RSACryptoProviderImpl(new CipherConfig("RSA", "ECB", padding),
+				CryptoMode.DECRYPT, new BaseCryptoProvider.CipherKey(privateKey));
+	}
+
+	/**
+	 * Initialize RSA Signer using default algorithm: SHA256withRSA
+	 *
+	 * @param privateKey		RSA PrivateKey
+	 * @return					Initialized signer
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSASigner(PrivateKey privateKey) throws CryptoException {
+		return RSASigner("SHA256withRSA", privateKey);
+	}
+
+	/**
+	 * Initialize RSA Signer using given algorithm
+	 *
+	 * @param algorithm 		Sign algorithm
+	 * @param privateKey		RSA PrivateKey
+	 * @return					Initialized signer
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSASigner(String algorithm, PrivateKey privateKey) throws CryptoException {
+		return new RSACryptoProviderImpl(
+				new CipherConfig(algorithm, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.SIGNATURE, new BaseCryptoProvider.CipherKey(privateKey));
+	}
+
+	/**
+	 * Initialize RSA signature verifier using default algorithm: SHA256withRSA
+	 *
+	 * @param publicKey			RSA PublicKey
+	 * @return					Initialized signer
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSAVerifier(PublicKey publicKey) throws CryptoException {
+		return RSAVerifier("SHA256withRSA", publicKey);
+	}
+
+	/**
+	 * Initialize RSA signature verifier using given algorithm
+	 *
+	 * @param algorithm 		Sign algorithm
+	 * @param publicKey			RSA PublicKey
+	 * @return					Initialized signer
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider RSAVerifier(String algorithm, PublicKey publicKey) throws CryptoException {
+		return new RSACryptoProviderImpl(
+				new CipherConfig(algorithm, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.VERIFY, new BaseCryptoProvider.CipherKey(publicKey));
+	}
+
+	/**
+	 * Generate RSA KeyPair using default Key size: 1024 and default random algorithm: SHA1PRNG
+	 *
+	 * @return	Generated key pair
+	 */
+	public static KeyPair RSAKeyPair() {
+		return RSAKeyPair(1024, "SHA1PRNG");
+	}
+
+	/**
+	 * Generate RSA KeyPair using given Key size and default random algorithm: SHA1PRNG
+	 *
+	 * @param keySize		RSA key size
+	 * @return	Generated key pair
+	 */
+	public static KeyPair RSAKeyPair(int keySize) {
+		return RSAKeyPair(keySize, "SHA1PRNG");
+	}
+
+	/**
+	 * Generate RSA KeyPair using given Key size and random algorithm
+	 *
+	 * @param keySize			RSA key size
+	 * @param randomAlgorithm	Random algorithm
+	 * @return	Generated key pair
+	 */
+	public static KeyPair RSAKeyPair(int keySize, String randomAlgorithm) {
+		return CertificateUtils.KeyPair("RSA", randomAlgorithm, keySize);
+	}
+
+	/**
+	 * Initialize SM2 encryptor
+	 *
+	 * @param publicKey			SM2 PublicKey
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM2Encryptor(PublicKey publicKey) throws CryptoException {
+		return new SM2CryptoProviderImpl(
+				new CipherConfig("SM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.ENCRYPT, new BaseCryptoProvider.CipherKey(publicKey));
+	}
+
+	/**
+	 * Initialize SM2 decryptor
+	 *
+	 * @param privateKey		SM2 PrivateKey
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM2Decryptor(PrivateKey privateKey) throws CryptoException {
+		return new SM2CryptoProviderImpl(
+				new CipherConfig("SM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.DECRYPT, new BaseCryptoProvider.CipherKey(privateKey));
+	}
+
+	/**
+	 * Initialize SM2 signer
+	 *
+	 * @param privateKey		SM2 PrivateKey
+	 * @return					Initialized signer
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM2Signer(PrivateKey privateKey) throws CryptoException {
+		return new SM2CryptoProviderImpl(
+				new CipherConfig("SM3withSM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.SIGNATURE, new BaseCryptoProvider.CipherKey(privateKey));
+	}
+
+	/**
+	 * Initialize SM2 signature verifier
+	 *
+	 * @param publicKey			SM2 PublicKey
+	 * @return					Initialized verifier
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider SM2Verifier(PublicKey publicKey) throws CryptoException {
+		return new SM2CryptoProviderImpl(
+				new CipherConfig("SM3withSM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
+				CryptoMode.VERIFY, new BaseCryptoProvider.CipherKey(publicKey));
+	}
+
+	/**
+	 * Generate SM2 KeyPair using default random algorithm: SHA1PRNG
+	 *
+	 * @return	Generated key pair
+	 */
+	public static KeyPair SM2KeyPair() {
+		return CertificateUtils.KeyPair("EC", "SHA1PRNG", Globals.INITIALIZE_INT_VALUE);
+	}
+
+	/**
+	 * Generate SM2 KeyPair using given random algorithm
+	 *
+	 * @param randomAlgorithm	Random algorithm
+	 * @return	Generated key pair
+	 */
+	public static KeyPair SM2KeyPair(String randomAlgorithm) {
+		return CertificateUtils.KeyPair("EC", randomAlgorithm, Globals.DEFAULT_VALUE_INT);
+	}
+
+	/**
+	 * Convert C1|C2|C3 to C1|C3|C2
+	 *
+	 * @param dataBytes		C1|C2|C3 data bytes
+	 * @return				C1|C3|C2 data bytes
+	 */
+	public static byte[] C1C2C3toC1C3C2(byte[] dataBytes) {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
+		byteArrayOutputStream.write(dataBytes, 0, 65);
+		byteArrayOutputStream.write(dataBytes, 65, 32);
+		byteArrayOutputStream.write(dataBytes, 97, dataBytes.length - 97);
+		return byteArrayOutputStream.toByteArray();
+	}
+
+	/**
+	 * Convert C1|C3|C2 to C1|C2|C3
+	 *
+	 * @param dataBytes		C1|C3|C2 data bytes
+	 * @return				C1|C2|C3 data bytes
+	 */
+	public static byte[] C1C3C2toC1C2C3(byte[] dataBytes) {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
+		byteArrayOutputStream.write(dataBytes, 0, 65);
+		byteArrayOutputStream.write(dataBytes, dataBytes.length - 32, 32);
+		byteArrayOutputStream.write(dataBytes, 65, dataBytes.length - 97);
+		return byteArrayOutputStream.toByteArray();
+	}
+
+	/**
+	 * Initialize AES encryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			AES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider AESEncryptor(byte[] keyBytes) throws CryptoException {
+		return AESEncryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize AES encryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			AES key bytes
+	 * @return					Initialized encryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider AESEncryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return new AESCryptoProviderImpl(new CipherConfig("AES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
+	}
+
+	/**
+	 * Initialize AES decryptor using default cipher mode and padding mode
+	 *
+	 * @param keyBytes			AES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider AESDecryptor(byte[] keyBytes) throws CryptoException {
+		return AESDecryptor("CBC", "PKCS5Padding", keyBytes);
+	}
+
+	/**
+	 * Initialize AES decryptor
+	 *
+	 * @param mode 				Block cipher mode
+	 * @param padding 			Padding mode
+	 * @param keyBytes			AES key bytes
+	 * @return					Initialized decryptor
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	public static SecureProvider AESDecryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
+		return new AESCryptoProviderImpl(new CipherConfig("AES", mode, padding), CryptoMode.DECRYPT, keyBytes);
+	}
+
+	/*
+	 * Key generators
+	 */
+	
+	/**
+	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 128
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES128Key() {
+		return AES128Key("SHA1PRNG");
+	}
+
+	/**
+	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 128
+	 *
+	 * @param randomAlgorithm 	Random algorithm
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES128Key(String randomAlgorithm) {
+		try {
+			return SymmetricCryptoProvider.generateKey("AES", 128, randomAlgorithm);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 192
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES192Key() {
+		return AES192Key("SHA1PRNG");
+	}
+
+	/**
+	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 192
+	 *
+	 * @param randomAlgorithm 	Random algorithm
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES192Key(String randomAlgorithm) {
+		try {
+			return SymmetricCryptoProvider.generateKey("AES", 192, randomAlgorithm);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 256
+	 *
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES256Key() {
+		return AES256Key("SHA1PRNG");
+	}
+
+	/**
+	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 256
+	 *
+	 * @param randomAlgorithm 	Random algorithm
+	 * @return		Generated key bytes or 0 length byte array if process error
+	 */
+	public static byte[] AES256Key(String randomAlgorithm) {
+		try {
+			return SymmetricCryptoProvider.generateKey("AES", 256, randomAlgorithm);
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
+	}
+
+	/**
+	 * Process digest operate to given source using crypto provider
+	 *
+	 * @param source			Data source
+	 * @param secureProvider	Crypto provider
+	 * @return					Calculate result, convert byte array to hex string
+	 * @throws CryptoException	Cipher transformation not found
+	 */
+	private static byte[] digest(Object source, SecureProvider secureProvider) throws CryptoException {
 		if (source instanceof File) {
-			digestFile((File)source, messageDigest);
-		} else {
-			byte[] tempBytes = ConvertUtils.convertToByteArray(source);
-			if (tempBytes != null) {
-				messageDigest.update(tempBytes);
-			}
-		}
-		return ConvertUtils.byteToHex(messageDigest.digest());
-	}
-
-	/**
-	 * Calculate given file digest value
-	 * @param file      File object
-	 * @param digest    Digest instance
-	 */
-	private static void digestFile(File file, Object digest) {
-		if (file.exists() && file.isFile()) {
 			RandomAccessFile randomAccessFile = null;
 			try {
-				randomAccessFile = new RandomAccessFile(file, Globals.READ_MODE);
+				randomAccessFile = new RandomAccessFile((File)source, Globals.READ_MODE);
 				byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
 				int readLength;
 				while ((readLength = randomAccessFile.read(readBuffer)) > 0) {
-					if (digest instanceof MessageDigest) {
-						((MessageDigest)digest).update(readBuffer, 0, readLength);
-					} else {
-						((SM3Digest)digest).update(readBuffer, 0, readLength);
-					}
+					secureProvider.append(readBuffer, 0, readLength);
 				}
 			} catch (Exception e) {
 				LOGGER.error("Message digest error! ", e);
 			} finally {
 				IOUtils.closeStream(randomAccessFile);
 			}
+			return secureProvider.finish();
 		} else {
-			LOGGER.error("File does not exists" + file.getAbsolutePath());
+			return secureProvider.finish(ConvertUtils.convertToByteArray(source));
 		}
+	}
+
+	/**
+	 * Register CRC Algorithm
+	 */
+	private static void CRC() {
+		SecurityUtils.registerConfig("CRC-3/GSM",
+				new CRCConfig(3, 0x3, 0x0, 0x7, false, false));
+		SecurityUtils.registerConfig("CRC-3/ROHC",
+				new CRCConfig(3, 0x3, 0x7, 0x0, true, true));
+		SecurityUtils.registerConfig("CRC-4/G-704",
+				new CRCConfig(4, 0x3, 0x0, 0x0, true, true));
+		SecurityUtils.registerConfig("CRC-4/INTERLAKEN",
+				new CRCConfig(4, 0x3, 0xF, 0xF, false, false));
+		SecurityUtils.registerConfig("CRC-5/EPC-C1G2",
+				new CRCConfig(5, 0x09, 0x09, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-5/G-704",
+				new CRCConfig(5, 0x15, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-5/USB",
+				new CRCConfig(5, 0x05, 0x1F, 0x1F, true, true));
+		SecurityUtils.registerConfig("CRC-6/CDMA2000-A",
+				new CRCConfig(6, 0x27, 0x3F, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-6/CDMA2000-B",
+				new CRCConfig(6, 0x07, 0x3F, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-6/DARC",
+				new CRCConfig(6, 0x19, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-6/G-704",
+				new CRCConfig(6, 0x03, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-6/GSM",
+				new CRCConfig(6, 0x2F, 0x00, 0x3F, false, false));
+		SecurityUtils.registerConfig("CRC-7/MMC",
+				new CRCConfig(7, 0x09, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-7/ROHC",
+				new CRCConfig(7, 0x4F, 0x7F, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-7/UMTS",
+				new CRCConfig(7, 0x45, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/AUTOSAR",
+				new CRCConfig(8, 0x2F, 0xFF, 0xFF, false, false));
+		SecurityUtils.registerConfig("CRC-8/BLUETOOTH",
+				new CRCConfig(8, 0xA7, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-8/CDMA2000",
+				new CRCConfig(8, 0x9B, 0xFF, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/DARC",
+				new CRCConfig(8, 0x39, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-8/DVB-S2",
+				new CRCConfig(8, 0xD5, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/GSM-A",
+				new CRCConfig(8, 0x1D, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/GSM-B",
+				new CRCConfig(8, 0x49, 0x00, 0xFF, false, false));
+		SecurityUtils.registerConfig("CRC-8/I-432-1",
+				new CRCConfig(8, 0x07, 0x00, 0x55, false, false));
+		SecurityUtils.registerConfig("CRC-8/I-CODE",
+				new CRCConfig(8, 0x1D, 0xFD, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/LTE",
+				new CRCConfig(8, 0x9B, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/MAXIM-DOW",
+				new CRCConfig(8, 0x31, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-8/MIFARE-MAD",
+				new CRCConfig(8, 0x1D, 0xC7, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/NRSC-5",
+				new CRCConfig(8, 0x31, 0xFF, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/OPENSAFETY",
+				new CRCConfig(8, 0x2F, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/ROHC",
+				new CRCConfig(8, 0x07, 0xFF, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-8/SAE-J1850",
+				new CRCConfig(8, 0x1D, 0xFF, 0xFF, false, false));
+		SecurityUtils.registerConfig("CRC-8/SMBUS",
+				new CRCConfig(8, 0x07, 0x00, 0x00, false, false));
+		SecurityUtils.registerConfig("CRC-8/TECH-3250",
+				new CRCConfig(8, 0x1D, 0xFF, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-8/WCDMA",
+				new CRCConfig(8, 0x9B, 0x00, 0x00, true, true));
+		SecurityUtils.registerConfig("CRC-10/ATM",
+				new CRCConfig(10, 0x233, 0x000, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-10/CDMA2000",
+				new CRCConfig(10, 0x3D9, 0x3FF, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-10/GSM",
+				new CRCConfig(10, 0x175, 0x000, 0x3FF, false, false));
+		SecurityUtils.registerConfig("CRC-11/FLEXRAY",
+				new CRCConfig(11, 0x385, 0x01A, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-11/UMTS",
+				new CRCConfig(11, 0x307, 0x000, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-12/CDMA2000",
+				new CRCConfig(12, 0xF13, 0xFFF, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-12/DECT",
+				new CRCConfig(12, 0x80F, 0x000, 0x000, false, false));
+		SecurityUtils.registerConfig("CRC-12/GSM",
+				new CRCConfig(12, 0xD31, 0x000, 0xFFF, false, false));
+		SecurityUtils.registerConfig("CRC-12/UMTS",
+				new CRCConfig(12, 0x80F, 0x000, 0x000, false, true));
+		SecurityUtils.registerConfig("CRC-13/BBC",
+				new CRCConfig(13, 0x1CF5, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-14/DARC",
+				new CRCConfig(14, 0x0805, 0x0000, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-14/GSM",
+				new CRCConfig(14, 0x202D, 0x0000, 0x3FFF, false, false));
+		SecurityUtils.registerConfig("CRC-15/CAN",
+				new CRCConfig(15, 0x4599, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-15/MPT1327",
+				new CRCConfig(15, 0x6815, 0x0000, 0x0001, false, false));
+		SecurityUtils.registerConfig("CRC-16/ARC",
+				new CRCConfig(16, 0x8005, 0x0000, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/CDMA2000",
+				new CRCConfig(16, 0xC867, 0xFFFF, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/CMS",
+				new CRCConfig(16, 0x8005, 0xFFFF, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/DDS-110",
+				new CRCConfig(16, 0x8005, 0x800D, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/DECT-R",
+				new CRCConfig(16, 0x0589, 0x0000, 0x0001, false, false));
+		SecurityUtils.registerConfig("CRC-16/DECT-X",
+				new CRCConfig(16, 0x0589, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/DNP",
+				new CRCConfig(16, 0x3D65, 0x0000, 0xFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-16/EN-13757",
+				new CRCConfig(16, 0x3D65, 0x0000, 0xFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-16/GENIBUS",
+				new CRCConfig(16, 0x1021, 0xFFFF, 0xFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-16/GSM",
+				new CRCConfig(16, 0x1021, 0x0000, 0xFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-16/IBM-3740",
+				new CRCConfig(16, 0x1021, 0xFFFF, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/IBM-SDLC",
+				new CRCConfig(16, 0x1021, 0xFFFF, 0xFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-16/ISO-IEC-14443-3-A",
+				new CRCConfig(16, 0x1021, 0xC6C6, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/KERMIT",
+				new CRCConfig(16, 0x1021, 0x0000, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/LJ1200",
+				new CRCConfig(16, 0x6F63, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/MAXIM-DOW",
+				new CRCConfig(16, 0x8005, 0x0000, 0xFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-16/MCRF4XX",
+				new CRCConfig(16, 0x1021, 0xFFFF, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/MODBUS",
+				new CRCConfig(16, 0x8005, 0xFFFF, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/NRSC-5",
+				new CRCConfig(16, 0x080B, 0xFFFF, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/OPENSAFETY-A",
+				new CRCConfig(16, 0x5935, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/OPENSAFETY-B",
+				new CRCConfig(16, 0x755B, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/PROFIBUS",
+				new CRCConfig(16, 0x1DCF, 0xFFFF, 0xFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-16/RIELLO",
+				new CRCConfig(16, 0x1021, 0xB2AA, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/SPI-FUJITSU",
+				new CRCConfig(16, 0x1021, 0x1D0F, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/T10-DIF",
+				new CRCConfig(16, 0x8BB7, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/TELEDISK",
+				new CRCConfig(16, 0xA097, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/TMS37157",
+				new CRCConfig(16, 0x1021, 0x89EC, 0x0000, true, true));
+		SecurityUtils.registerConfig("CRC-16/UMTS",
+				new CRCConfig(16, 0x8005, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-16/USB",
+				new CRCConfig(16, 0x8005, 0xFFFF, 0xFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-16/XMODEM",
+				new CRCConfig(16, 0x1021, 0x0000, 0x0000, false, false));
+		SecurityUtils.registerConfig("CRC-17/CAN-FD",
+				new CRCConfig(17, 0x1685B, 0x00000, 0x00000, false, false));
+		SecurityUtils.registerConfig("CRC-21/CAN-FD",
+				new CRCConfig(21, 0x102899, 0x000000, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/BLE",
+				new CRCConfig(24, 0x00065B, 0x555555, 0x000000, true, true));
+		SecurityUtils.registerConfig("CRC-24/FLEXRAY-A",
+				new CRCConfig(24, 0x5D6DCB, 0xFEDCBA, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/FLEXRAY-B",
+				new CRCConfig(24, 0x5D6DCB, 0xABCDEF, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/INTERLAKEN",
+				new CRCConfig(24, 0x328B63, 0xFFFFFF, 0xFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-24/LTE-A",
+				new CRCConfig(24, 0x864CFB, 0x000000, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/LTE-B",
+				new CRCConfig(24, 0x800063, 0x000000, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/OPENPGP",
+				new CRCConfig(24, 0x864CFB, 0xB704CE, 0x000000, false, false));
+		SecurityUtils.registerConfig("CRC-24/OS-9",
+				new CRCConfig(24, 0x800063, 0xFFFFFF, 0xFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-30/CDMA",
+				new CRCConfig(30, 0x2030B9C7, 0x3FFFFFFF, 0x3FFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-31/PHILIPS",
+				new CRCConfig(31, 0x04C11DB7, 0x7FFFFFFF, 0x7FFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-32/AIXM",
+				new CRCConfig(32, 0x814141AB, 0x00000000, 0x00000000, false, false));
+		SecurityUtils.registerConfig("CRC-32/AUTOSAR",
+				new CRCConfig(32, 0xF4ACFB13, 0xFFFFFFFF, 0xFFFFFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-32/BASE91-D",
+				new CRCConfig(32, 0xA833982B, 0xFFFFFFFF, 0xFFFFFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-32/BZIP2",
+				new CRCConfig(32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-32/CD-ROM-EDC",
+				new CRCConfig(32, 0x8001801B, 0x00000000, 0x00000000, true, true));
+		SecurityUtils.registerConfig("CRC-32/CKSUM",
+				new CRCConfig(32, 0x04C11DB7, 0x00000000, 0xFFFFFFFF, false, false));
+		SecurityUtils.registerConfig("CRC-32/ISCSI",
+				new CRCConfig(32, 0x1EDC6F41, 0xFFFFFFFF, 0xFFFFFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-32/ISO-HDLC",
+				new CRCConfig(32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true, true));
+		SecurityUtils.registerConfig("CRC-32/JAMCRC",
+				new CRCConfig(32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, true, true));
+		SecurityUtils.registerConfig("CRC-32/MPEG-2",
+				new CRCConfig(32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, false, false));
+		SecurityUtils.registerConfig("CRC-32/XFER",
+				new CRCConfig(32, 0x000000AF, 0x00000000, 0x00000000, false, false));
 	}
 }

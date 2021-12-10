@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +33,7 @@ import java.util.List;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.commons.core.zip.ZipOptions;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.zip.crypto.impl.standard.StandardDecryptor;
@@ -53,7 +54,6 @@ import org.nervousync.zip.models.header.utils.HeaderOperator;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.commons.io.NervousyncRandomAccessFile;
 import org.nervousync.utils.*;
-import org.nervousync.zip.utils.ZipUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,9 +80,9 @@ public final class ZipFile implements Cloneable {
 	 */
 	private final String filePath;
 	/**
-	 * File name charset encoding
+	 * Charset encoding
 	 */
-	private final String fileNameCharset;
+	private final String charsetEncoding;
 	/**
 	 * List of local file headers
 	 */
@@ -120,7 +120,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Archive is split file status
 	 */
-	private boolean splitArchive = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean splitArchive = Boolean.FALSE;
 	/**
 	 * Maximum length of split item
 	 */
@@ -132,50 +132,21 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Is Zip64 format
 	 */
-	private boolean zip64Format = Globals.DEFAULT_VALUE_BOOLEAN;
-	
-	/**
-	 * ZipFile Constructor
-	 * @param filePath			Zip file path
-	 * @throws ZipException        Zip file cannot access and read
-	 */
-	public ZipFile(String filePath) throws ZipException {
-		this(filePath, Globals.DEFAULT_ENCODING);
-	}
-	
-	/**
-	 * ZipFile Constructor
-	 * @param file				File object
-	 * @throws ZipException		Zip file cannot access and read
-	 */
-	public ZipFile(File file) throws ZipException {
-		this(file == null ? null : file.getPath());
-	}
-
-	/**
-	 * ZipFile Constructor
-	 * @param file				File object
-	 * @param fileNameCharset	File name charset encoding
-	 * @throws ZipException		Zip file cannot access and read
-	 */
-	public ZipFile(File file, String fileNameCharset) throws ZipException {
-		this(file == null ? null : file.getPath(), fileNameCharset);
-	}
+	private boolean zip64Format = Boolean.FALSE;
 
 	/**
 	 * ZipFile Constructor
 	 * @param filePath			Zip file path
-	 * @param fileNameCharset	File name charset encoding
+	 * @param charsetEncoding	Charset encoding
 	 * @throws ZipException		Zip file cannot access and read
 	 */
-	public ZipFile(String filePath, String fileNameCharset) throws ZipException {
+	private ZipFile(String filePath, String charsetEncoding) throws ZipException {
 		this.filePath = filePath;
-		this.fileNameCharset = fileNameCharset;
+		this.charsetEncoding = charsetEncoding;
 		if (FileUtils.isExists(this.filePath)) {
 			if (!FileUtils.canRead(this.filePath)) {
 				throw new ZipException("Current file doesn't have read access!");
 			}
-			
 			this.readHeaders();
 		} else {
 			throw new ZipException("Current file doesn't exists!");
@@ -185,16 +156,23 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * ZipFile Constructor
 	 * @param filePath			Zip file path
-	 * @param fileNameCharset	File name charset encoding
+	 * @param charsetEncoding	Charset encoding
 	 * @param splitArchive      Split archive
 	 * @param splitLength       Split length
 	 */
-	private ZipFile(String filePath, String fileNameCharset,
-	                boolean splitArchive, long splitLength) {
+	private ZipFile(String filePath, String charsetEncoding, boolean splitArchive, long splitLength) {
 		this.filePath = filePath;
-		this.fileNameCharset = fileNameCharset == null ? Globals.DEFAULT_ENCODING : fileNameCharset;
+		this.charsetEncoding = charsetEncoding == null ? Globals.DEFAULT_SYSTEM_CHARSET : charsetEncoding;
 		this.splitArchive = splitArchive;
 		this.splitLength = splitLength;
+	}
+
+	public static ZipFile openZipFile(String filePath) throws ZipException {
+		return openZipFile(filePath, Globals.DEFAULT_SYSTEM_CHARSET);
+	}
+
+	public static ZipFile openZipFile(String filePath, String charsetEncoding) throws ZipException {
+		return new ZipFile(filePath, charsetEncoding);
 	}
 
 	/**
@@ -208,26 +186,10 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			String... addFiles) throws ZipException {
-		return ZipFile.createZipFile(filePath, Globals.DEFAULT_ENCODING, zipOptions,
-				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, addFiles);
+		return ZipFile.createZipFile(filePath, zipOptions,
+				Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, addFiles);
 	}
-	
-	/**
-	 * Create zip file
-	 * @param filePath			Zip file path
-	 * @param charsetName		File name charset encoding
-	 * @param zipOptions		Zip options
-	 * @see ZipOptions
-	 * @param addFiles			List of files in zip file
-	 * @return					ZipFile instance
-	 * @throws ZipException		If target file was exists or add files is null or empty
-	 */
-	public static ZipFile createZipFile(String filePath, String charsetName, ZipOptions zipOptions, 
-			String... addFiles) throws ZipException {
-		return ZipFile.createZipFile(filePath, charsetName, zipOptions, 
-				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, addFiles);
-	}
-	
+
 	/**
 	 * Create a split archive zip file
 	 * @param filePath			Zip file path
@@ -241,7 +203,16 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
-		return ZipFile.createZipFile(filePath, Globals.DEFAULT_ENCODING, zipOptions, splitArchive, splitLength, addFiles);
+		ZipFile.checkFilePath(filePath);
+
+		if (addFiles == null || addFiles.length == 0) {
+			throw new ZipException("Zip file entity is null");
+		}
+
+		ZipFile zipFile = ZipFile.createZipFile(filePath, zipOptions.getCharsetEncoding(), splitArchive, splitLength);
+		zipFile.addFiles(Arrays.asList(addFiles), zipOptions);
+
+		return zipFile;
 	}
 
 	private static void checkFilePath(String filePath) throws ZipException {
@@ -255,32 +226,6 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Create a split archive zip file
-	 * @param filePath			Zip file path
-	 * @param charsetName		File name charset encoding
-	 * @param zipOptions		Zip options
-	 * @see ZipOptions
-	 * @param splitArchive		Status of split archive
-	 * @param splitLength		Maximum size of split file
-	 * @param addFiles			List of files in zip file
-	 * @return					ZipFile instance
-	 * @throws ZipException		If target file was exists or add files is null or empty
-	 */
-	public static ZipFile createZipFile(String filePath, String charsetName, ZipOptions zipOptions, 
-			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
-		ZipFile.checkFilePath(filePath);
-
-		if (addFiles == null || addFiles.length == 0) {
-			throw new ZipException("Zip file entity is null");
-		}
-
-		ZipFile zipFile = ZipFile.createZipFile(filePath, charsetName, splitArchive, splitLength);
-		zipFile.addFiles(Arrays.asList(addFiles), zipOptions);
-
-		return zipFile;
-	}
-
-	/**
 	 * Create zip file and add folder to zip file
 	 * @param filePath			Zip file path
 	 * @param zipOptions		Zip options
@@ -291,24 +236,8 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
 			String folderPath) throws ZipException {
-		return ZipFile.createZipFileFromFolder(filePath, Globals.DEFAULT_ENCODING, zipOptions,
-				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, folderPath);
-	}
-	
-	/**
-	 * Create zip file and add folder to zip file
-	 * @param filePath			Zip file path
-	 * @param charsetName		File name charset encoding
-	 * @param zipOptions		Zip options
-	 * @see ZipOptions
-	 * @param folderPath		Folder will add to zip file
-	 * @return					ZipFile instance
-	 * @throws ZipException		If target file was exists or folder is empty
-	 */
-	public static ZipFile createZipFileFromFolder(String filePath, String charsetName, ZipOptions zipOptions, 
-			String folderPath) throws ZipException {
-		return ZipFile.createZipFileFromFolder(filePath, charsetName, zipOptions, 
-				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_LONG, folderPath);
+		return ZipFile.createZipFileFromFolder(filePath, zipOptions,
+				Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, folderPath);
 	}
 	
 	/**
@@ -323,23 +252,6 @@ public final class ZipFile implements Cloneable {
 	 * @throws ZipException		If target file was exists or folder is empty
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions, 
-			boolean splitArchive, long splitLength, String folderPath) throws ZipException {
-		return ZipFile.createZipFileFromFolder(filePath, Globals.DEFAULT_ENCODING, zipOptions, splitArchive, splitLength, folderPath);
-	}
-	
-	/**
-	 * Create zip file and add folder to zip file
-	 * @param filePath			Zip file path
-	 * @param charsetName		File name charset encoding
-	 * @param zipOptions		Zip options
-	 * @see ZipOptions
-	 * @param splitArchive		Status of split archive
-	 * @param splitLength		Maximum size of split file
-	 * @param folderPath		Folder will add to zip file
-	 * @return					ZipFile instance
-	 * @throws ZipException		If target file was exists or folder is empty
-	 */
-	public static ZipFile createZipFileFromFolder(String filePath, String charsetName, ZipOptions zipOptions, 
 			boolean splitArchive, long splitLength, String folderPath) throws ZipException {
 		ZipFile.checkFilePath(filePath);
 
@@ -347,8 +259,8 @@ public final class ZipFile implements Cloneable {
 			throw new ZipException("Zip file entity is null");
 		}
 		
-		ZipFile zipFile = ZipFile.createZipFile(filePath, charsetName, splitArchive, splitLength);
-		zipFile.addFolder(folderPath, zipOptions, Globals.DEFAULT_VALUE_BOOLEAN);
+		ZipFile zipFile = ZipFile.createZipFile(filePath, zipOptions.getCharsetEncoding(), splitArchive, splitLength);
+		zipFile.addFolder(folderPath, zipOptions, Boolean.FALSE);
 		if (zipOptions.getPassword() != null) {
 			zipFile.setPassword(zipOptions.getPassword());
 		}
@@ -441,7 +353,7 @@ public final class ZipFile implements Cloneable {
 				return true;
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -459,9 +371,9 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	/**
-	 * Read entry datas
+	 * Read entry data bytes
 	 * @param entryPath		Check entry path
-	 * @return				entry datas as byte arrays
+	 * @return				entry data bytes
 	 * @throws ZipException		file list is empty or zipOptions is null
 	 */
 	public byte[] readEntry(String entryPath) throws ZipException {
@@ -592,7 +504,7 @@ public final class ZipFile implements Cloneable {
 	 * @throws ZipException		Target path is null or file exists
 	 */
 	public void extractAll(String destPath) throws ZipException {
-		this.extractAll(destPath, Globals.DEFAULT_VALUE_BOOLEAN);
+		this.extractAll(destPath, Boolean.FALSE);
 	}
 	
 	/**
@@ -620,7 +532,7 @@ public final class ZipFile implements Cloneable {
 	 * @throws ZipException		Target path is null or entry path is null/not exists or zip file invalid
 	 */
 	public void extractFile(String entryPath, String destPath) throws ZipException {
-		this.extractFile(entryPath, destPath, Globals.DEFAULT_VALUE_BOOLEAN);
+		this.extractFile(entryPath, destPath, Boolean.FALSE);
 	}
 	
 	/**
@@ -644,7 +556,7 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Remove entry folder from zip file
-	 * @param folderPath		Which entry folder will removed
+	 * @param folderPath		Which entry folder will be removed
 	 * @throws ZipException		Given path was not a directory
 	 */
 	public void removeFolder(String folderPath) throws ZipException {
@@ -656,7 +568,7 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Remove entry path from zip file
-	 * @param entryPath			Which entry path will removed
+	 * @param entryPath			Which entry path will be removed
 	 * @throws ZipException		given entry path is null or zip file was not exists
 	 */
 	public void removeExistsEntry(String entryPath) throws ZipException {
@@ -665,7 +577,7 @@ public final class ZipFile implements Cloneable {
 	
 	/**
 	 * Remove entry paths from zip file
-	 * @param existsEntries		Which entry paths will removed
+	 * @param existsEntries		Which entry paths will be removed
 	 * @throws ZipException		given entry path is null or zip file was not exists
 	 */
 	public void removeExistsEntries(String... existsEntries) throws ZipException {
@@ -732,26 +644,16 @@ public final class ZipFile implements Cloneable {
 		if (this.endCentralDirectoryRecord == null) {
 			throw new ZipException("end of central directory is null, cannot set comment");
 		}
-		
-		String encodedComment;
-		byte[] commentBytes = null;
+
+		byte[] commentBytes;
 		int commentLength;
-		
-		if (ZipUtils.supportedCharset(ZipConstants.CHARSET_COMMENTS_DEFAULT)) {
-			try {
-				encodedComment = new String(comment.getBytes(ZipConstants.CHARSET_COMMENTS_DEFAULT), ZipConstants.CHARSET_COMMENTS_DEFAULT);
-				commentBytes = encodedComment.getBytes(ZipConstants.CHARSET_COMMENTS_DEFAULT);
-			} catch (UnsupportedEncodingException e) {
-				encodedComment = comment;
-			}
-		} else {
-			encodedComment = comment;
+
+		try {
+			commentBytes = comment.getBytes(this.charsetEncoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new ZipException(e);
 		}
-		
-		if (commentBytes == null) {
-			commentBytes = encodedComment.getBytes(Charset.defaultCharset());
-		}
-		
+
 		commentLength = commentBytes.length;
 
 		if (commentLength > ZipConstants.MAX_ALLOWED_ZIP_COMMENT_LENGTH) {
@@ -796,12 +698,8 @@ public final class ZipFile implements Cloneable {
 	 * @throws ZipException		zip file was not exists, zip file does not include comment content or charset encoding was not supported
 	 */
 	public String getComment(String charset) throws ZipException {
-		if (charset == null) {
-			if (ZipUtils.supportedCharset(ZipConstants.CHARSET_COMMENTS_DEFAULT)) {
-				charset = ZipConstants.CHARSET_COMMENTS_DEFAULT;
-			} else {
-				charset = Globals.DEFAULT_SYSTEM_CHARSET;
-			}
+		if (StringUtils.isEmpty(charset)) {
+			charset = Globals.DEFAULT_SYSTEM_CHARSET;
 		}
 		
 		if (!FileUtils.isExists(this.filePath)) {
@@ -842,7 +740,7 @@ public final class ZipFile implements Cloneable {
 		NervousyncRandomAccessFile input = null;
 		List<Long> sizeList = new ArrayList<>();
 		long totalWriteBytes = 0L;
-		boolean removeSplitSig = Globals.DEFAULT_VALUE_BOOLEAN;
+		boolean removeSplitSig = Boolean.FALSE;
 		
 		try {
 			outputStream = this.openMergeOutputStream(outputPath);
@@ -859,7 +757,7 @@ public final class ZipFile implements Cloneable {
 						
 						input.seek(0L);
 						if (input.read(buffer) > 0
-								&& RawUtils.readIntFromLittleEndian(buffer, 0) == ZipConstants.SPLITSIG) {
+								&& RawUtils.readInt(buffer, 0, RawUtils.Endian.LITTLE) == ZipConstants.SPLITSIG) {
 							start = 4;
 							removeSplitSig = true;
 						}
@@ -897,7 +795,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Finalize zip file
 	 * @param outputStream			Output stream
-	 * @throws ZipException			Write datas to output stream error
+	 * @throws ZipException			Write data bytes to output stream error
 	 */
 	public void finalizeZipFile(OutputStream outputStream) throws ZipException {
 		if (outputStream == null) {
@@ -968,11 +866,8 @@ public final class ZipFile implements Cloneable {
 		this.centralDirectory = centralDirectory;
 	}
 
-	/**
-	 * @return the fileNameCharset
-	 */
-	public String getFileNameCharset() {
-		return fileNameCharset;
+	public String getCharsetEncoding() {
+		return charsetEncoding;
 	}
 
 	/**
@@ -1077,7 +972,7 @@ public final class ZipFile implements Cloneable {
 		if (generalFileHeader != null) {
 			return generalFileHeader.isDirectory();
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 	
 	private List<String> listFolderGeneralFileHeaders(String folderPath) {
@@ -1403,7 +1298,7 @@ public final class ZipFile implements Cloneable {
 		
 		SplitOutputStream outputStream = null;
 		NervousyncRandomAccessFile input = null;
-		boolean success = Globals.DEFAULT_VALUE_BOOLEAN;
+		boolean success = Boolean.FALSE;
 		String tempFileName = this.filePath + System.currentTimeMillis() % 1000L;
 		
 		try {
@@ -1634,7 +1529,12 @@ public final class ZipFile implements Cloneable {
 
 	private void checkMac() throws ZipException {
 		if (this.decryptor instanceof AESDecryptor) {
-			byte[] tempMacBytes = ((AESDecryptor)this.decryptor).calculateAuthenticationBytes();
+			byte[] tempMacBytes;
+			try {
+				tempMacBytes = ((AESDecryptor)this.decryptor).calculateAuthenticationBytes();
+			} catch (CryptoException e) {
+				throw new ZipException("CRC check failed!");
+			}
 			byte[] storedMac = ((AESDecryptor)this.decryptor).getStoredMac();
 			byte[] calculateMac = new byte[ZipConstants.AES_AUTH_LENGTH];
 
@@ -1775,12 +1675,12 @@ public final class ZipFile implements Cloneable {
 			boolean isAESEncryptedFile = generalFileHeader.isEncrypted() 
 						&& generalFileHeader.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES;
 			switch (compressionMethod) {
-			case ZipConstants.COMP_STORE:
-				return new ZipInputStream(new PartInputStream(this, input,
-						compressedSize, this.decryptor, isAESEncryptedFile));
-			case ZipConstants.COMP_DEFLATE:
-				return new ZipInputStream(new InflaterInputStream(this, input,
-						compressedSize, generalFileHeader.getOriginalSize(), this.decryptor, isAESEncryptedFile));
+				case ZipConstants.COMP_STORE:
+					return new ZipInputStream(new PartInputStream(this, input,
+							compressedSize, this.decryptor, isAESEncryptedFile));
+				case ZipConstants.COMP_DEFLATE:
+					return new ZipInputStream(new InflaterInputStream(this, input,
+							compressedSize, generalFileHeader.getOriginalSize(), this.decryptor, isAESEncryptedFile));
 				default:
 					throw new ZipException("Compression type not supported");
 			}
@@ -1876,7 +1776,7 @@ public final class ZipFile implements Cloneable {
 	
 	private void updateSplitZipEntity(List<Long> sizeList, 
 			boolean removeSplitSig) throws ZipException {
-		this.splitArchive = Globals.DEFAULT_VALUE_BOOLEAN;
+		this.splitArchive = Boolean.FALSE;
 		this.updateSplitZipHeader(sizeList, removeSplitSig);
 		this.updateSplitEndCentralDirectory();
 		
@@ -2010,9 +1910,9 @@ public final class ZipFile implements Cloneable {
 
 			byte[] shortBuffer = new byte[2];
 			System.arraycopy(tempBuffer, 0, shortBuffer, 0, 2);
-			int fileNameLength = RawUtils.readShortFromLittleEndian(shortBuffer, 0);
+			int fileNameLength = RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE);
 			System.arraycopy(tempBuffer, 2, shortBuffer, 0, 2);
-			int extraFieldLength = RawUtils.readShortFromLittleEndian(shortBuffer, 0);
+			int extraFieldLength = RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE);
 			
 			input.seek(localHeaderOffset);
 
@@ -2029,7 +1929,7 @@ public final class ZipFile implements Cloneable {
 
 			// Signature
 			System.arraycopy(readBuffer, 0, intBuffer, 0, 4);
-			int signature = RawUtils.readIntFromLittleEndian(intBuffer, 0);
+			int signature = RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE);
 			if (signature != ZipConstants.LOCSIG) {
 				throw new ZipException("invalid local header signature for file: " + generalFileHeader.getEntryPath());
 			}
@@ -2038,13 +1938,13 @@ public final class ZipFile implements Cloneable {
 
 			// Extract needed
 			System.arraycopy(readBuffer, 4, shortBuffer, 0, 2);
-			localFileHeader.setExtractNeeded(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			localFileHeader.setExtractNeeded(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 			length += 2;
 
 			// General purpose bit flag
 			System.arraycopy(readBuffer, 6, shortBuffer, 0, 2);
 			localFileHeader.setFileNameUTF8Encoded(
-					(RawUtils.readShortFromLittleEndian(shortBuffer, 0) & ZipConstants.UFT8_NAMES_FLAG) != 0);
+					(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE) & ZipConstants.UFT8_NAMES_FLAG) != 0);
 			localFileHeader.setGeneralPurposeFlag(shortBuffer.clone());
 			length += 2;
 
@@ -2058,28 +1958,28 @@ public final class ZipFile implements Cloneable {
 
 			// Compression method
 			System.arraycopy(readBuffer, 8, shortBuffer, 0, 2);
-			localFileHeader.setCompressionMethod(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			localFileHeader.setCompressionMethod(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 			length += 2;
 
 			// Lase modify time
 			System.arraycopy(readBuffer, 10, intBuffer, 0, 4);
-			localFileHeader.setLastModFileTime(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+			localFileHeader.setLastModFileTime(RawUtils.readShort(intBuffer, 0, RawUtils.Endian.LITTLE));
 			length += 4;
 
 			// CRC
 			System.arraycopy(readBuffer, 14, intBuffer, 0, 4);
-			localFileHeader.setCrc32(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+			localFileHeader.setCrc32(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 			localFileHeader.setCrcBuffer(intBuffer.clone());
 			length += 4;
 
 			// Compressed size
 			System.arraycopy(readBuffer, 18, intBuffer, 0, 4);
-			localFileHeader.setCompressedSize(RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0));
+			localFileHeader.setCompressedSize(RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE));
 			length += 4;
 
 			// Original size
 			System.arraycopy(readBuffer, 22, intBuffer, 0, 4);
-			localFileHeader.setOriginalSize(RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0));
+			localFileHeader.setOriginalSize(RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE));
 			length += 4;
 
 			// File name length
@@ -2095,17 +1995,7 @@ public final class ZipFile implements Cloneable {
 				byte[] fileNameBuffer = new byte[fileNameLength];
 				System.arraycopy(readBuffer, 30, fileNameBuffer, 0, fileNameLength);
 
-				String entryPath;
-
-				try {
-					if (localFileHeader.isFileNameUTF8Encoded()) {
-						entryPath = new String(fileNameBuffer, Globals.DEFAULT_ENCODING);
-					} else {
-						entryPath = new String(fileNameBuffer, ZipConstants.CHARSET_CP850);
-					}
-				} catch (UnsupportedEncodingException e) {
-					entryPath = new String(fileNameBuffer, Charset.forName(Globals.DEFAULT_ENCODING));
-				}
+				String entryPath = new String(fileNameBuffer, this.charsetEncoding);
 
 				if (entryPath.contains(ZipConstants.ZIP_ENTRY_SEPARATOR)) {
 					entryPath = entryPath.substring(entryPath.indexOf(ZipConstants.ZIP_ENTRY_SEPARATOR) 
@@ -2229,7 +2119,7 @@ public final class ZipFile implements Cloneable {
 			HeaderOperator.appendShortToArrayList((short)generalFileHeader.getExtractNeeded(), headerBytesList);
 			sizeOfFileHeader += 2;
 
-			HeaderOperator.copyByteArrayToArrayList(generalFileHeader.getGeneralPurposeFlag(), headerBytesList);
+			HeaderOperator.copyByteArrayToList(generalFileHeader.getGeneralPurposeFlag(), headerBytesList);
 			sizeOfFileHeader += 2;
 
 			HeaderOperator.appendShortToArrayList((short)generalFileHeader.getCompressionMethod(), headerBytesList);
@@ -2244,30 +2134,30 @@ public final class ZipFile implements Cloneable {
 			if (generalFileHeader.getCompressedSize() >= ZipConstants.ZIP_64_LIMIT
 					|| generalFileHeader.getOriginalSize()
 							+ ZipConstants.ZIP64_EXTRA_BUFFER_SIZE >= ZipConstants.ZIP_64_LIMIT) {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, ZipConstants.ZIP_64_LIMIT);
+				RawUtils.writeLong(longBuffer, 0, ZipConstants.ZIP_64_LIMIT);
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
 
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+				HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 				sizeOfFileHeader += 4;
 
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+				HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 				sizeOfFileHeader += 4;
 
 				writeZip64FileSize = true;
 			} else {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, generalFileHeader.getCompressedSize());
+				RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE, generalFileHeader.getCompressedSize());
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+				HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 				sizeOfFileHeader += 4;
 
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, generalFileHeader.getOriginalSize());
+				RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE, generalFileHeader.getOriginalSize());
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-				HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+				HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 				sizeOfFileHeader += 4;
 			}
 
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) generalFileHeader.getFileNameLength());
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE, (short) generalFileHeader.getFileNameLength());
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 			sizeOfFileHeader += 2;
 
 			// Compute offset bytes before extra field is written for Zip64
@@ -2275,11 +2165,11 @@ public final class ZipFile implements Cloneable {
 			// NOTE: this data is not written now, but written at a later point
 			byte[] offsetLocalHeaderBytes = new byte[4];
 			if (generalFileHeader.getOffsetLocalHeader() > ZipConstants.ZIP_64_LIMIT) {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, ZipConstants.ZIP_64_LIMIT);
+				RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE, ZipConstants.ZIP_64_LIMIT);
 				System.arraycopy(longBuffer, 0, offsetLocalHeaderBytes, 0, 4);
 				writeZip64OffsetLocalHeader = true;
 			} else {
-				RawUtils.writeLongFromLittleEndian(longBuffer, 0, generalFileHeader.getOffsetLocalHeader());
+				RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE, generalFileHeader.getOffsetLocalHeader());
 				System.arraycopy(longBuffer, 0, offsetLocalHeaderBytes, 0, 4);
 			}
 
@@ -2299,7 +2189,7 @@ public final class ZipFile implements Cloneable {
 			sizeOfFileHeader += 2;
 
 			// Skip file comment length for now
-			HeaderOperator.copyByteArrayToArrayList(EMPTY_SHORT_BUFFER, headerBytesList);
+			HeaderOperator.copyByteArrayToList(EMPTY_SHORT_BUFFER, headerBytesList);
 			sizeOfFileHeader += 2;
 
 			// Skip disk number start for now
@@ -2307,29 +2197,29 @@ public final class ZipFile implements Cloneable {
 			sizeOfFileHeader += 2;
 
 			// Skip internal file attributes for now
-			HeaderOperator.copyByteArrayToArrayList(EMPTY_SHORT_BUFFER, headerBytesList);
+			HeaderOperator.copyByteArrayToList(EMPTY_SHORT_BUFFER, headerBytesList);
 			sizeOfFileHeader += 2;
 
 			// External file attributes
 			if (generalFileHeader.getExternalFileAttr() != null) {
-				HeaderOperator.copyByteArrayToArrayList(generalFileHeader.getExternalFileAttr(), headerBytesList);
+				HeaderOperator.copyByteArrayToList(generalFileHeader.getExternalFileAttr(), headerBytesList);
 			} else {
-				HeaderOperator.copyByteArrayToArrayList(EMPTY_INT_BUFFER, headerBytesList);
+				HeaderOperator.copyByteArrayToList(EMPTY_INT_BUFFER, headerBytesList);
 			}
 			sizeOfFileHeader += 4;
 
 			// offset local header
 			// this data is computed above
-			HeaderOperator.copyByteArrayToArrayList(offsetLocalHeaderBytes, headerBytesList);
+			HeaderOperator.copyByteArrayToList(offsetLocalHeaderBytes, headerBytesList);
 			sizeOfFileHeader += 4;
 
-			if (StringUtils.notBlank(this.fileNameCharset)) {
-				byte[] fileNameBytes = generalFileHeader.getEntryPath().getBytes(this.fileNameCharset);
-				HeaderOperator.copyByteArrayToArrayList(fileNameBytes, headerBytesList);
+			if (StringUtils.notBlank(this.charsetEncoding)) {
+				byte[] fileNameBytes = generalFileHeader.getEntryPath().getBytes(this.charsetEncoding);
+				HeaderOperator.copyByteArrayToList(fileNameBytes, headerBytesList);
 				sizeOfFileHeader += fileNameBytes.length;
 			} else {
-				HeaderOperator.copyByteArrayToArrayList(generalFileHeader.getEntryPath(), headerBytesList);
-				sizeOfFileHeader += ZipUtils.getEncodedStringLength(generalFileHeader.getEntryPath());
+				HeaderOperator.copyByteArrayToList(generalFileHeader.getEntryPath(), headerBytesList);
+				sizeOfFileHeader += StringUtils.encodedStringLength(generalFileHeader.getEntryPath());
 			}
 
 			if (writeZip64FileSize || writeZip64OffsetLocalHeader) {
@@ -2403,19 +2293,19 @@ public final class ZipFile implements Cloneable {
 				HeaderOperator.appendShortToArrayList((short)this.centralDirectory.getFileHeaders().get(0).getMadeVersion(), headerBytesList);
 				HeaderOperator.appendShortToArrayList((short)this.centralDirectory.getFileHeaders().get(0).getExtractNeeded(), headerBytesList);
 			} else {
-				HeaderOperator.copyByteArrayToArrayList(EMPTY_SHORT_BUFFER, headerBytesList);
-				HeaderOperator.copyByteArrayToArrayList(EMPTY_SHORT_BUFFER, headerBytesList);
+				HeaderOperator.copyByteArrayToList(EMPTY_SHORT_BUFFER, headerBytesList);
+				HeaderOperator.copyByteArrayToList(EMPTY_SHORT_BUFFER, headerBytesList);
 			}
 
 			// number of this disk
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0,
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.endCentralDirectoryRecord.getIndexOfThisDisk());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// number of the disk with start of central directory
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0,
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.endCentralDirectoryRecord.getIndexOfThisDiskStartOfCentralDirectory());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// total number of entries in the central directory on this disk
 			int numEntries;
@@ -2463,24 +2353,24 @@ public final class ZipFile implements Cloneable {
 			byte[] longBuffer = new byte[8];
 
 			// zip64 end of central dir locator signature
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) ZipConstants.ZIP64ENDCENDIRLOC);
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE, (int) ZipConstants.ZIP64ENDCENDIRLOC);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// number of the disk with the start of the zip64 end of central
 			// directory
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0,
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.zip64EndCentralDirectoryLocator.getIndexOfZip64EndOfCentralDirectoryRecord());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// relative offset of the zip64 end of central directory record
-			RawUtils.writeLongFromLittleEndian(longBuffer, 0,
+			RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE,
 					this.zip64EndCentralDirectoryLocator.getOffsetZip64EndOfCentralDirectoryRecord());
-			HeaderOperator.copyByteArrayToArrayList(longBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(longBuffer, headerBytesList);
 
 			// total number of disks
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0,
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.zip64EndCentralDirectoryLocator.getTotalNumberOfDiscs());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 		} catch (Exception e) {
 			if (e instanceof ZipException) {
 				throw e;
@@ -2502,19 +2392,19 @@ public final class ZipFile implements Cloneable {
 			byte[] longBuffer = new byte[8];
 
 			// End of central directory signature
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0,
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					(int) this.endCentralDirectoryRecord.getSignature());
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// number of this disk
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0,
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE,
 					(short) (this.endCentralDirectoryRecord.getIndexOfThisDisk()));
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 			// number of the disk with start of central directory
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0,
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE,
 					(short) (this.endCentralDirectoryRecord.getIndexOfThisDiskStartOfCentralDirectory()));
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 			// Total number of entries in central directory on this disk
 			int numEntries;
@@ -2532,33 +2422,33 @@ public final class ZipFile implements Cloneable {
 					numEntriesOnThisDisk = numEntries;
 				}
 			}
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) numEntriesOnThisDisk);
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE, (short) numEntriesOnThisDisk);
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 			// Total number of entries in central directory
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) numEntries);
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE, (short) numEntries);
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 			// Size of central directory
-			RawUtils.writeIntFromLittleEndian(intBuffer, 0, sizeOfCentralDirectory);
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE, sizeOfCentralDirectory);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 			
 			// Offset central directory
-			RawUtils.writeLongFromLittleEndian(longBuffer, 0, Math.min(offsetCentralDirectory, ZipConstants.ZIP_64_LIMIT));
+			RawUtils.writeLong(longBuffer, 0, RawUtils.Endian.LITTLE, Math.min(offsetCentralDirectory, ZipConstants.ZIP_64_LIMIT));
 			System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
-			HeaderOperator.copyByteArrayToArrayList(intBuffer, headerBytesList);
+			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
 			// Zip File comment length
 			int commentLength = 0;
 			if (this.endCentralDirectoryRecord.getCommentBytes() != null) {
 				commentLength = this.endCentralDirectoryRecord.getCommentLength();
 			}
-			RawUtils.writeShortFromLittleEndian(shortBuffer, 0, (short) commentLength);
-			HeaderOperator.copyByteArrayToArrayList(shortBuffer, headerBytesList);
+			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE, (short) commentLength);
+			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 			// Comment
 			if (commentLength > 0) {
-				HeaderOperator.copyByteArrayToArrayList(this.endCentralDirectoryRecord.getCommentBytes(), headerBytesList);
+				HeaderOperator.copyByteArrayToList(this.endCentralDirectoryRecord.getCommentBytes(), headerBytesList);
 			}
 		} catch (Exception e) {
 			if (e instanceof ZipException) {
@@ -2617,7 +2507,7 @@ public final class ZipFile implements Cloneable {
 			} while ((readIntFromDataInput(input, buffer) != ZipConstants.ENDSIG)
 					&& count <= 3000);
 			
-			if (RawUtils.readIntFromLittleEndian(buffer, 0) != ZipConstants.ENDSIG) {
+			if (RawUtils.readInt(buffer, 0, RawUtils.Endian.LITTLE) != ZipConstants.ENDSIG) {
 				throw new ZipException("zip headers not found. probably not a zip file");
 			}
 			
@@ -2633,29 +2523,29 @@ public final class ZipFile implements Cloneable {
 			this.endCentralDirectoryRecord.setSignature(ZipConstants.ENDSIG);
 
 			System.arraycopy(readBuffer, 0, shortBuffer, 0, 2);
-			this.endCentralDirectoryRecord.setIndexOfThisDisk(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			this.endCentralDirectoryRecord.setIndexOfThisDisk(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 2, shortBuffer, 0, 2);
 			this.endCentralDirectoryRecord
-					.setIndexOfThisDiskStartOfCentralDirectory(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+					.setIndexOfThisDiskStartOfCentralDirectory(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 4, shortBuffer, 0, 2);
 			this.endCentralDirectoryRecord.setTotalOfEntriesInCentralDirectoryOnThisDisk(
-					RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+					RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 6, shortBuffer, 0, 2);
 			this.endCentralDirectoryRecord
-					.setTotalOfEntriesInCentralDirectory(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+					.setTotalOfEntriesInCentralDirectory(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 8, intBuffer, 0, 4);
-			this.endCentralDirectoryRecord.setSizeOfCentralDirectory(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+			this.endCentralDirectoryRecord.setSizeOfCentralDirectory(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 12, intBuffer, 0, 4);
 			this.endCentralDirectoryRecord.setOffsetOfStartOfCentralDirectory(
-					RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0));
+					RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE));
 			
 			System.arraycopy(readBuffer, 16, shortBuffer, 0, 2);
-			this.endCentralDirectoryRecord.setCommentLength(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			this.endCentralDirectoryRecord.setCommentLength(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 			
 			if (this.endCentralDirectoryRecord.getCommentLength() > 0) {
 				byte[] commentBuffer = new byte[endCentralDirectoryRecord.getCommentLength()];
@@ -2721,14 +2611,14 @@ public final class ZipFile implements Cloneable {
 
 			System.arraycopy(readBuffer, 4, intBuffer, 0, 4);
 			this.zip64EndCentralDirectoryLocator
-					.setIndexOfZip64EndOfCentralDirectoryRecord(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+					.setIndexOfZip64EndOfCentralDirectoryRecord(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 8, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryLocator
-					.setOffsetZip64EndOfCentralDirectoryRecord(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					.setOffsetZip64EndOfCentralDirectoryRecord(RawUtils.readInt(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			System.arraycopy(readBuffer, 16, intBuffer, 0, 4);
-			this.zip64EndCentralDirectoryLocator.setTotalNumberOfDiscs(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+			this.zip64EndCentralDirectoryLocator.setTotalNumberOfDiscs(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}
@@ -2737,7 +2627,7 @@ public final class ZipFile implements Cloneable {
 	private int readSignature(byte[] dataBytes) {
 		byte[] intBuffer = new byte[4];
 		System.arraycopy(dataBytes, 0, intBuffer, 0, 4);
-		return RawUtils.readIntFromLittleEndian(intBuffer, 0);
+		return RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE);
 	}
 
 	private void readCentralDirectory(NervousyncRandomAccessFile input)
@@ -2773,7 +2663,7 @@ public final class ZipFile implements Cloneable {
 				GeneralFileHeader fileHeader = new GeneralFileHeader();
 				
 				System.arraycopy(readBuffer, pos, intBuffer, 0, 4);
-				int signature = RawUtils.readIntFromLittleEndian(intBuffer, 0);
+				int signature = RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE);
 				if (signature != ZipConstants.CENSIG) {
 					throw new ZipException("Expected central directory entry not found! Index: " + i);
 				}
@@ -2782,56 +2672,56 @@ public final class ZipFile implements Cloneable {
 				
 				// Made version
 				System.arraycopy(readBuffer, pos + 4, shortBuffer, 0, 2);
-				fileHeader.setMadeVersion(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setMadeVersion(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 				
 				// Extract needed
 				System.arraycopy(readBuffer, pos + 6, shortBuffer, 0, 2);
-				fileHeader.setExtractNeeded(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setExtractNeeded(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 				// Purpose bit flag
 				System.arraycopy(readBuffer, pos + 8, shortBuffer, 0, 2);
 				fileHeader.setFileNameUTF8Encoded(
-						(RawUtils.readShortFromLittleEndian(shortBuffer, 0) & ZipConstants.UFT8_NAMES_FLAG) != 0);
+						(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE) & ZipConstants.UFT8_NAMES_FLAG) != 0);
 				int firstByte = shortBuffer[0];
 				fileHeader.setGeneralPurposeFlag(shortBuffer.clone());
 				fileHeader.setDataDescriptorExists((firstByte >> 3) == 1);
 
 				// Compression method
 				System.arraycopy(readBuffer, pos + 10, shortBuffer, 0, 2);
-				fileHeader.setCompressionMethod(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setCompressionMethod(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 				// Last modify file time
 				System.arraycopy(readBuffer, pos + 12, intBuffer, 0, 4);
-				fileHeader.setLastModFileTime(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+				fileHeader.setLastModFileTime(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
 				// Crc32
 				System.arraycopy(readBuffer, pos + 16, intBuffer, 0, 4);
-				fileHeader.setCrc32(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+				fileHeader.setCrc32(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 				fileHeader.setCrcBuffer(intBuffer.clone());
 
 				// Compressed size
 				System.arraycopy(readBuffer, pos + 20, intBuffer, 0, 4);
-				fileHeader.setCompressedSize(RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0));
+				fileHeader.setCompressedSize(RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE));
 
 				// Original size
 				System.arraycopy(readBuffer, pos + 24, intBuffer, 0, 4);
-				fileHeader.setOriginalSize(RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0));
+				fileHeader.setOriginalSize(RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE));
 
 				// File name length
 				System.arraycopy(readBuffer, pos + 28, shortBuffer, 0, 2);
-				fileHeader.setFileNameLength(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setFileNameLength(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 				// Extra field length
 				System.arraycopy(readBuffer, pos + 30, shortBuffer, 0, 2);
-				fileHeader.setExtraFieldLength(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setExtraFieldLength(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 				// Comment length
 				System.arraycopy(readBuffer, pos + 32, shortBuffer, 0, 2);
-				fileHeader.setFileCommentLength(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setFileCommentLength(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 				
 				// Disk number of start
 				System.arraycopy(readBuffer, pos + 34, shortBuffer, 0, 2);
-				fileHeader.setDiskNumberStart(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				fileHeader.setDiskNumberStart(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 				
 				// Internal file attributes
 				System.arraycopy(readBuffer, pos + 36, shortBuffer, 0, 2);
@@ -2844,23 +2734,13 @@ public final class ZipFile implements Cloneable {
 				// Relative offset of local header
 				System.arraycopy(readBuffer, pos + 42, intBuffer, 0, 4);
 				fileHeader.setOffsetLocalHeader(
-						RawUtils.readLongFromLittleEndian(readLongByteFromIntByte(intBuffer), 0) & 0xFFFFFFFFL);
+						RawUtils.readLong(readLongByteFromIntByte(intBuffer), 0, RawUtils.Endian.LITTLE) & 0xFFFFFFFFL);
 				
 				if (fileHeader.getFileNameLength() > 0) {
 					byte[] fileNameBuffer = new byte[fileHeader.getFileNameLength()];
 					System.arraycopy(readBuffer, pos + 46, fileNameBuffer, 0, fileHeader.getFileNameLength());
 
-					String entryPath;
-
-					if (this.fileNameCharset != null) {
-						entryPath = new String(fileNameBuffer, this.fileNameCharset);
-					} else {
-						if (fileHeader.isFileNameUTF8Encoded()) {
-							entryPath = new String(fileNameBuffer, Globals.DEFAULT_ENCODING);
-						} else {
-							entryPath = new String(fileNameBuffer, Charset.defaultCharset());
-						}
-					}
+					String entryPath = new String(fileNameBuffer, this.charsetEncoding);
 
 					if (entryPath.contains(ZipConstants.ZIP_ENTRY_SEPARATOR)) {
 						entryPath = entryPath.substring(entryPath.indexOf(ZipConstants.ZIP_ENTRY_SEPARATOR) 
@@ -2872,7 +2752,7 @@ public final class ZipFile implements Cloneable {
 							|| entryPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 						fileHeader.setDirectory(true);
 					} else {
-						fileHeader.setDirectory(Globals.DEFAULT_VALUE_BOOLEAN);
+						fileHeader.setDirectory(Boolean.FALSE);
 					}
 				} else {
 					fileHeader.setEntryPath(null);
@@ -2893,8 +2773,10 @@ public final class ZipFile implements Cloneable {
 				
 				if (fileHeader.getFileCommentLength() > 0) {
 					byte[] commentBuffer = new byte[fileHeader.getFileCommentLength()];
-					System.arraycopy(readBuffer, pos + 46 + fileHeader.getFileNameLength() + fileHeader.getExtraFieldLength(), commentBuffer, 0, fileHeader.getFileCommentLength());
-					fileHeader.setFileComment(new String(commentBuffer, Charset.forName(Globals.DEFAULT_ENCODING)));
+					System.arraycopy(readBuffer,
+							pos + 46 + fileHeader.getFileNameLength() + fileHeader.getExtraFieldLength(),
+							commentBuffer, 0, fileHeader.getFileCommentLength());
+					fileHeader.setFileComment(new String(commentBuffer, this.charsetEncoding));
 				}
 				fileHeaderList.add(fileHeader);
 				pos += (46 + fileHeader.getFileNameLength() + fileHeader.getExtraFieldLength() + fileHeader.getFileCommentLength());
@@ -2905,19 +2787,20 @@ public final class ZipFile implements Cloneable {
 			this.centralDirectory.setFileHeaders(fileHeaderList);
 			
 			System.arraycopy(readBuffer, pos, intBuffer, 0, 4);
-			int signature = RawUtils.readIntFromLittleEndian(intBuffer, 0);
+			int signature = RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE);
 			if (signature == ZipConstants.DIGSIG) {
 				DigitalSignature digitalSignature = new DigitalSignature();
 				
 				digitalSignature.setSignature(signature);
 
 				System.arraycopy(readBuffer, pos + 4, shortBuffer, 0, 2);
-				digitalSignature.setDataSize(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+				digitalSignature.setDataSize(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 				
 				if (digitalSignature.getDataSize() > 0) {
 					byte[] signatureDataBuffer = new byte[digitalSignature.getDataSize()];
-					System.arraycopy(readBuffer, pos + 6, signatureDataBuffer, 0, digitalSignature.getDataSize());
-					digitalSignature.setSignatureData(new String(signatureDataBuffer, Charset.forName(Globals.DEFAULT_ENCODING)));
+					System.arraycopy(readBuffer, pos + 6, signatureDataBuffer,
+							0, digitalSignature.getDataSize());
+					digitalSignature.setSignatureData(new String(signatureDataBuffer, this.charsetEncoding));
 				}
 				
 				this.centralDirectory.setDigitalSignature(digitalSignature);
@@ -2962,45 +2845,45 @@ public final class ZipFile implements Cloneable {
 
 			// Read size of zip64 end of central directory record
 			System.arraycopy(readBuffer, 4, longBuffer, 0, 8);
-			this.zip64EndCentralDirectoryRecord.setRecordSize(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+			this.zip64EndCentralDirectoryRecord.setRecordSize(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Made version
 			System.arraycopy(readBuffer, 12, shortBuffer, 0, 2);
-			this.zip64EndCentralDirectoryRecord.setMadeVersion(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			this.zip64EndCentralDirectoryRecord.setMadeVersion(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Extract needed
 			System.arraycopy(readBuffer, 14, shortBuffer, 0, 2);
-			this.zip64EndCentralDirectoryRecord.setExtractNeeded(RawUtils.readShortFromLittleEndian(shortBuffer, 0));
+			this.zip64EndCentralDirectoryRecord.setExtractNeeded(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Number of this disk
 			System.arraycopy(readBuffer, 16, intBuffer, 0, 4);
-			this.zip64EndCentralDirectoryRecord.setIndex(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+			this.zip64EndCentralDirectoryRecord.setIndex(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Start of central directory
 			System.arraycopy(readBuffer, 20, intBuffer, 0, 4);
 			this.zip64EndCentralDirectoryRecord
-					.setStartOfCentralDirectory(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+					.setStartOfCentralDirectory(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Total of entries in the central directory on this disk
 			System.arraycopy(readBuffer, 24, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord
-					.setTotalEntriesInCentralDirectoryOnThisDisk(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					.setTotalEntriesInCentralDirectoryOnThisDisk(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Total of entries in the central directory
 			System.arraycopy(readBuffer, 32, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord
-					.setTotalEntriesInCentralDirectory(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					.setTotalEntriesInCentralDirectory(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Size of the central directory
 			System.arraycopy(readBuffer, 40, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord
-					.setSizeOfCentralDirectory(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					.setSizeOfCentralDirectory(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Offset of start of central directory with respect to the starting
 			// disk number
 			System.arraycopy(readBuffer, 48, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord
-					.setOffsetStartCenDirWRTStartDiskNo(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					.setOffsetStartCenDirWRTStartDiskNo(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
 			// Zip64 extensible data sector
 			long extDataSize = zip64EndCentralDirectoryRecord.getRecordSize() - 44L;
@@ -3025,7 +2908,7 @@ public final class ZipFile implements Cloneable {
 		if (fileHeader.getExtraDataRecords() != null && fileHeader.getExtraDataRecords().size() > 0) {
 			for (ExtraDataRecord extraDataRecord : fileHeader.getExtraDataRecords()) {
 				if (extraDataRecord != null) {
-					if (extraDataRecord.getHeader() == ZipConstants.AESSIG) {
+					if (extraDataRecord.getHeader() == ((short) ZipConstants.AESSIG)) {
 						if (extraDataRecord.getDataContent() == null) {
 							throw new ZipException("Corrupt AES extra data records");
 						}
@@ -3036,13 +2919,13 @@ public final class ZipFile implements Cloneable {
 						aesExtraDataRecord.setDataSize(extraDataRecord.getDataSize());
 						
 						byte[] aesData = extraDataRecord.getDataContent();
-						aesExtraDataRecord.setVersionNumber(RawUtils.readShortFromLittleEndian(aesData, 0));
+						aesExtraDataRecord.setVersionNumber(RawUtils.readShort(aesData, 0, RawUtils.Endian.LITTLE));
 						
 						byte[] vendorIDBuffer = new byte[2];
 						System.arraycopy(aesData, 2, vendorIDBuffer, 0, 2);
-						aesExtraDataRecord.setVendorID(new String(vendorIDBuffer, Charset.forName(Globals.DEFAULT_ENCODING)));
+						aesExtraDataRecord.setVendorID(new String(vendorIDBuffer, StandardCharsets.UTF_8));
 						aesExtraDataRecord.setAesStrength((aesData[4] & 0xFF));
-						aesExtraDataRecord.setCompressionMethod(RawUtils.readShortFromLittleEndian(aesData, 5));
+						aesExtraDataRecord.setCompressionMethod(RawUtils.readShort(aesData, 5, RawUtils.Endian.LITTLE));
 
 						fileHeader.setAesExtraDataRecord(aesExtraDataRecord);
 						fileHeader.setEncryptionMethod(ZipConstants.ENC_METHOD_AES);
@@ -3070,28 +2953,28 @@ public final class ZipFile implements Cloneable {
 
 				if ((originalSize & 0xFFFF) == 0xFFFF) {
 					System.arraycopy(extraDataRecord.getDataContent(), count, longBuffer, 0, 8);
-					zip64ExtendInfo.setOriginalSize(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					zip64ExtendInfo.setOriginalSize(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 					count += 8;
 					addValue = true;
 				}
 
 				if (((compressedSize & 0xFFFF) == 0xFFFF) && count < extraDataRecord.getDataSize()) {
 					System.arraycopy(extraDataRecord.getDataContent(), count, longBuffer, 0, 8);
-					zip64ExtendInfo.setCompressedSize(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					zip64ExtendInfo.setCompressedSize(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 					count += 8;
 					addValue = true;
 				}
 
 				if (((offsetLocalHeader & 0xFFFF) == 0xFFFF) && count < extraDataRecord.getDataSize()) {
 					System.arraycopy(extraDataRecord.getDataContent(), count, longBuffer, 0, 8);
-					zip64ExtendInfo.setOffsetLocalHeader(RawUtils.readLongFromLittleEndian(longBuffer, 0));
+					zip64ExtendInfo.setOffsetLocalHeader(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 					count += 8;
 					addValue = true;
 				}
 
 				if (((diskNumberStart & 0xFFFF) == 0xFFFF) && count < extraDataRecord.getDataSize()) {
 					System.arraycopy(extraDataRecord.getDataContent(), count, intBuffer, 0, 4);
-					zip64ExtendInfo.setDiskNumberStart(RawUtils.readIntFromLittleEndian(intBuffer, 0));
+					zip64ExtendInfo.setDiskNumberStart(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 					addValue = true;
 				}
 
@@ -3161,14 +3044,14 @@ public final class ZipFile implements Cloneable {
 		while (count < extraFieldLength) {
 			ExtraDataRecord extraDataRecord = new ExtraDataRecord();
 			
-			extraDataRecord.setHeader(RawUtils.readShortFromLittleEndian(extraFieldBuffer, count));
+			extraDataRecord.setHeader(RawUtils.readShort(extraFieldBuffer, count, RawUtils.Endian.LITTLE));
 
 			count += 2;
 
-			int dataSize = RawUtils.readShortFromLittleEndian(extraFieldBuffer, count);
+			int dataSize = RawUtils.readShort(extraFieldBuffer, count, RawUtils.Endian.LITTLE);
 
 			if ((dataSize + 2) > extraFieldLength) {
-				dataSize = RawUtils.readShortFromBigEndian(extraFieldBuffer, count);
+				dataSize = RawUtils.readShort(extraFieldBuffer, count, RawUtils.Endian.BIG);
 				if ((dataSize + 2) > extraFieldLength) {
 					break;
 				}
@@ -3224,7 +3107,7 @@ public final class ZipFile implements Cloneable {
 	private static int readIntFromDataInput(NervousyncRandomAccessFile input, byte[] bytes) throws ZipException {
 		try {
 			if (input.read(bytes, 0, 4) == 4) {
-				return RawUtils.readIntFromLittleEndian(bytes, 0);
+				return RawUtils.readInt(bytes, 0, RawUtils.Endian.LITTLE);
 			}
 		} catch (IOException e) {
 			throw new ZipException(e);

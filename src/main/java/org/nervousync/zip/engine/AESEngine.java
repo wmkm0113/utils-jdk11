@@ -22,6 +22,7 @@ import org.nervousync.zip.models.header.utils.HeaderOperator;
 import org.nervousync.exceptions.zip.ZipException;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -61,11 +62,11 @@ public final class AESEngine {
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getSignature(), headerBytesList);
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getDataSize(), headerBytesList);
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getVersionNumber(), headerBytesList);
-		HeaderOperator.copyByteArrayToArrayList(aesExtraDataRecord.getVendorID().getBytes(Charset.forName(Globals.DEFAULT_ENCODING)), headerBytesList);
+		HeaderOperator.copyByteArrayToList(aesExtraDataRecord.getVendorID().getBytes(StandardCharsets.UTF_8), headerBytesList);
 
 		byte[] aesStrengthBytes = new byte[1];
 		aesStrengthBytes[0] = (byte) aesExtraDataRecord.getAesStrength();
-		HeaderOperator.copyByteArrayToArrayList(aesStrengthBytes, headerBytesList);
+		HeaderOperator.copyByteArrayToList(aesStrengthBytes, headerBytesList);
 
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getCompressionMethod(), headerBytesList);
 	}

@@ -17,6 +17,7 @@
 package org.nervousync.zip.crypto.impl.aes;
 
 import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Decryptor;
@@ -64,7 +65,7 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 				this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ? 
 						ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
 				
-				this.macBasedPRF.update(buff, i, this.loopCount);
+				this.macBasedPRF.append(buff, i, this.loopCount);
 				super.processData(buff, i);
 			}
 			
@@ -78,8 +79,8 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 		}
 	}
 	
-	public byte[] calculateAuthenticationBytes() {
-		return this.macBasedPRF.doFinal();
+	public byte[] calculateAuthenticationBytes() throws CryptoException {
+		return this.macBasedPRF.finish();
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 	 * @return the storedMac
 	 */
 	public byte[] getStoredMac() {
-		return storedMac == null ? new byte[0] : storedMac.clone();
+		return storedMac == null ? null : storedMac.clone();
 	}
 
 	/**

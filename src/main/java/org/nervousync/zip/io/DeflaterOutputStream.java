@@ -36,7 +36,7 @@ public class DeflaterOutputStream extends CipherOutputStream {
 
 	private final Deflater deflater;
 	private final byte[] buffer = new byte[ZipConstants.BUFFER_SIZE];
-	private boolean firstBytesRead = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean firstBytesRead = Boolean.FALSE;
 	
 	DeflaterOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		super(outputStream, zipFile);
@@ -88,7 +88,7 @@ public class DeflaterOutputStream extends CipherOutputStream {
 					this.deflate();
 				}
 			}
-			this.firstBytesRead = Globals.DEFAULT_VALUE_BOOLEAN;
+			this.firstBytesRead = Boolean.FALSE;
 		}
 		super.closeEntry();
 	}

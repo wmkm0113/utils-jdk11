@@ -56,7 +56,7 @@ public final class CookieEntity {
 	/**
 	 * Secure status
 	 */
-	private boolean secure = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean secure = Boolean.FALSE;
 	/**
 	 * Version value if exists cookie name is "version"
 	 */

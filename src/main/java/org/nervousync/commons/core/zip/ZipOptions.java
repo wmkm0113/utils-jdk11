@@ -24,11 +24,16 @@ import org.nervousync.utils.StringUtils;
 
 /**
  * ZIP options
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 3:51:12 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 3:51:12 PM $
  */
 public final class ZipOptions implements Cloneable {
 
+	/**
+	 * Folder, file name and comment charset encoding
+	 */
+	private String charsetEncoding = Globals.DEFAULT_SYSTEM_CHARSET;
 	/**
 	 * Compress method
 	 */
@@ -40,7 +45,7 @@ public final class ZipOptions implements Cloneable {
 	/**
 	 * Encrypt files status
 	 */
-	private boolean encryptFiles = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean encryptFiles = Boolean.FALSE;
 	/**
 	 * Encrypt method
 	 */
@@ -85,7 +90,7 @@ public final class ZipOptions implements Cloneable {
 	/**
 	 * Status of source external stream
 	 */
-	private boolean isSourceExternalStream = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean sourceExternalStream = Boolean.FALSE;
 	
 	/**
 	 * Default Constructor
@@ -115,48 +120,52 @@ public final class ZipOptions implements Cloneable {
 		this.encryptionMethod = ZipConstants.ENC_METHOD_AES;
 		this.aesKeyStrength = aesKeyStrength;
 	}
-	
+
 	/**
 	 * Generate default ZipOptions instance
+	 *
 	 * @return generated instance
 	 */
 	public static ZipOptions newOptions() {
 		return new ZipOptions();
 	}
-	
+
 	/**
 	 * Generate a standard encrypt ZipOptions instance by given password
+	 *
 	 * @param password encrypt password
 	 * @return generated instance
-	 * @throws ZipException    if password is null
+	 * @throws ZipException if password is null
 	 */
-	public static ZipOptions standardEncryptOptions(String password) 
+	public static ZipOptions standardEncryptOptions(String password)
 			throws ZipException {
 		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
 		}
 		return new ZipOptions(password);
 	}
-	
+
 	/**
 	 * Generate an AES encrypt ZipOptions instance by given password
+	 *
 	 * @param password encrypt password
 	 * @return generated instance
-	 * @throws ZipException	if password is null
+	 * @throws ZipException if password is null
 	 */
-	public static ZipOptions aesEncryptOptions(String password) 
+	public static ZipOptions aesEncryptOptions(String password)
 			throws ZipException {
 		return ZipOptions.aesEncryptOptions(password, ZipConstants.AES_STRENGTH_128);
 	}
 
 	/**
 	 * Generate an AES encrypt ZipOptions instance by given password and key strength
-	 * @param password encrypt password
+	 *
+	 * @param password       encrypt password
 	 * @param aesKeyStrength AES key strength
 	 * @return generated instance
-	 * @throws ZipException	if password is null
+	 * @throws ZipException if password is null
 	 */
-	public static ZipOptions aesEncryptOptions(String password, 
+	public static ZipOptions aesEncryptOptions(String password,
 			int aesKeyStrength) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
@@ -172,6 +181,26 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets charset encoding.
+	 *
+	 * @return the charset encoding
+	 */
+	public String getCharsetEncoding() {
+		return charsetEncoding;
+	}
+
+	/**
+	 * Sets charset encoding.
+	 *
+	 * @param charsetEncoding the charset encoding
+	 */
+	public void setCharsetEncoding(String charsetEncoding) {
+		this.charsetEncoding = charsetEncoding;
+	}
+
+	/**
+	 * Gets compression method.
+	 *
 	 * @return the compressionMethod
 	 */
 	public int getCompressionMethod() {
@@ -179,6 +208,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets compression method.
+	 *
 	 * @param compressionMethod the compressionMethod to set
 	 */
 	public void setCompressionMethod(int compressionMethod) {
@@ -186,6 +217,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets compression level.
+	 *
 	 * @return the compressionLevel
 	 */
 	public int getCompressionLevel() {
@@ -193,6 +226,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets compression level.
+	 *
 	 * @param compressionLevel the compressionLevel to set
 	 */
 	public void setCompressionLevel(int compressionLevel) {
@@ -200,6 +235,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Is encrypt files boolean.
+	 *
 	 * @return the encryptFiles
 	 */
 	public boolean isEncryptFiles() {
@@ -216,6 +253,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets encryption method.
+	 *
 	 * @return the encryptionMethod
 	 */
 	public int getEncryptionMethod() {
@@ -232,6 +271,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Is read hidden files boolean.
+	 *
 	 * @return the readHiddenFiles
 	 */
 	public boolean isReadHiddenFiles() {
@@ -239,6 +280,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets read hidden files.
+	 *
 	 * @param readHiddenFiles the readHiddenFiles to set
 	 */
 	public void setReadHiddenFiles(boolean readHiddenFiles) {
@@ -246,6 +289,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Get password char [ ].
+	 *
 	 * @return the password
 	 */
 	public char[] getPassword() {
@@ -253,6 +298,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets aes key strength.
+	 *
 	 * @return the aesKeyStrength
 	 */
 	public int getAesKeyStrength() {
@@ -260,6 +307,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Is include root folder boolean.
+	 *
 	 * @return the includeRootFolder
 	 */
 	public boolean isIncludeRootFolder() {
@@ -267,6 +316,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets include root folder.
+	 *
 	 * @param includeRootFolder the includeRootFolder to set
 	 */
 	public void setIncludeRootFolder(boolean includeRootFolder) {
@@ -274,6 +325,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets root folder in zip.
+	 *
 	 * @return the rootFolderInZip
 	 */
 	public String getRootFolderInZip() {
@@ -281,6 +334,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets root folder in zip.
+	 *
 	 * @param rootFolderInZip the rootFolderInZip to set
 	 */
 	public void setRootFolderInZip(String rootFolderInZip) {
@@ -291,6 +346,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets time zone.
+	 *
 	 * @return the timeZone
 	 */
 	public TimeZone getTimeZone() {
@@ -298,6 +355,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets time zone.
+	 *
 	 * @param timeZone the timeZone to set
 	 */
 	public void setTimeZone(TimeZone timeZone) {
@@ -305,6 +364,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets source file crc.
+	 *
 	 * @return the sourceFileCRC
 	 */
 	public long getSourceFileCRC() {
@@ -312,6 +373,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets source file crc.
+	 *
 	 * @param sourceFileCRC the sourceFileCRC to set
 	 */
 	public void setSourceFileCRC(long sourceFileCRC) {
@@ -319,6 +382,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets default folder path.
+	 *
 	 * @return the defaultFolderPath
 	 */
 	public String getDefaultFolderPath() {
@@ -326,6 +391,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets default folder path.
+	 *
 	 * @param defaultFolderPath the defaultFolderPath to set
 	 */
 	public void setDefaultFolderPath(String defaultFolderPath) {
@@ -333,6 +400,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Gets file name in zip.
+	 *
 	 * @return the fileNameInZip
 	 */
 	public String getFileNameInZip() {
@@ -340,6 +409,8 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Sets file name in zip.
+	 *
 	 * @param fileNameInZip the fileNameInZip to set
 	 */
 	public void setFileNameInZip(String fileNameInZip) {
@@ -347,17 +418,21 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
+	 * Is source external stream boolean.
+	 *
 	 * @return the isSourceExternalStream
 	 */
 	public boolean isSourceExternalStream() {
-		return isSourceExternalStream;
+		return sourceExternalStream;
 	}
 
 	/**
+	 * Sets source external stream.
+	 *
 	 * @param isSourceExternalStream the isSourceExternalStream to set
 	 */
 	public void setSourceExternalStream(boolean isSourceExternalStream) {
-		this.isSourceExternalStream = isSourceExternalStream;
+		this.sourceExternalStream = isSourceExternalStream;
 	}
 	
 	public Object clone() throws CloneNotSupportedException {

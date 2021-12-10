@@ -16,7 +16,6 @@
  */
 package org.nervousync.exceptions.zip;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.ObjectUtils;
 
 /**
@@ -59,7 +58,7 @@ public class ZipException extends RuntimeException {
 
 	public boolean equals(Object other) {
 		if (this == other) {
-			return true;
+			return Boolean.TRUE;
 		}
 		if (other instanceof ZipException) {
 			ZipException otherBe = (ZipException) other;
@@ -67,7 +66,7 @@ public class ZipException extends RuntimeException {
 					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 		}
 		
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	public int hashCode() {

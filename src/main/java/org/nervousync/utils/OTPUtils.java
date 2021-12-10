@@ -192,7 +192,7 @@ public final class OTPUtils {
 			}
 			byte[] randomKeyBytes =
 					secureRandom.generateSeed(size == Globals.DEFAULT_VALUE_INT ? DEFAULT_SECRET_SIZE : size);
-			randomKey = StringUtils.base32Encode(randomKeyBytes, Globals.DEFAULT_VALUE_BOOLEAN);
+			randomKey = StringUtils.base32Encode(randomKeyBytes, Boolean.FALSE);
 		} catch (NoSuchAlgorithmException e) {
 			LOGGER.error("Generate random key error!");
 			if (LOGGER.isDebugEnabled()) {
@@ -275,7 +275,7 @@ public final class OTPUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -289,7 +289,7 @@ public final class OTPUtils {
 	public static boolean validateHOTPCode(int authCode, String randomKey, long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
 				? authCode == generateHOTPCode(CalcType.HmacSHA1, randomKey, randomCode)
-				: Globals.DEFAULT_VALUE_BOOLEAN;
+				: Boolean.FALSE;
 	}
 
 	/**
@@ -304,7 +304,7 @@ public final class OTPUtils {
 	public static boolean validateHOTPCode(int authCode, CalcType calcType, String randomKey, long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
 				? authCode == generateHOTPCode(calcType, randomKey, randomCode)
-				: Globals.DEFAULT_VALUE_BOOLEAN;
+				: Boolean.FALSE;
 	}
 
 	/**
@@ -334,13 +334,13 @@ public final class OTPUtils {
 		byte[] hash;
 		switch (calcType) {
 			case HmacSHA1:
-				hash = SecurityUtils.signDataByHmacSHA1(secret, signData);
+				hash = SecurityUtils.HmacSHA1(secret, signData);
 				break;
 			case HmacSHA256:
-				hash = SecurityUtils.signDataByHmacSHA256(secret, signData);
+				hash = SecurityUtils.HmacSHA256(secret, signData);
 				break;
 			case HmacSHA512:
-				hash = SecurityUtils.signDataByHmacSHA512(secret, signData);
+				hash = SecurityUtils.HmacSHA512(secret, signData);
 				break;
 			default:
 				return Globals.DEFAULT_VALUE_INT;

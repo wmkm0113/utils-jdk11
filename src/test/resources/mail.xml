@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="config.sendAddress">smtp address</entry>
+    <entry key="config.sendPort">smtp port</entry>
+    <entry key="config.receiveAddress">pop3 or imap address</entry>
+    <entry key="config.receivePort">pop3 or imap port</entry>
+    <entry key="config.userName">account address</entry>
+    <entry key="config.passWord">account password</entry>
+    <entry key="config.storagePath">receive attaches file storage path</entry>
+    <entry key="mail.sender">Test mail sender</entry>
+    <entry key="mail.receiver">Test mail receiver</entry>
+    <entry key="mail.replies">Test mail reply address</entry>
+    <entry key="mail.attaches">attaches file list, split by '|'</entry>
+</properties>

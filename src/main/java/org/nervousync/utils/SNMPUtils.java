@@ -46,9 +46,8 @@ import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
-import org.nervousync.commons.beans.snmp.SNMPData;
-import org.nervousync.commons.beans.snmp.TargetHost;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.beans.snmp.SNMPData;
+import org.nervousync.beans.snmp.TargetHost;
 import org.nervousync.commons.snmp.SNMPDataOperator;
 import org.nervousync.enumerations.net.IPProtocol;
 import org.nervousync.enumerations.snmp.SNMPVersion;
@@ -115,7 +114,7 @@ public final class SNMPUtils {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Initialize instance error! ", e);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 	
@@ -139,7 +138,7 @@ public final class SNMPUtils {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Add monitor target host error! ", e);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 	
@@ -162,10 +161,10 @@ public final class SNMPUtils {
 		this.snmp.close();
 	}
 
-	private List<VariableBinding> retrieveData(Target target, PDU pdu) {
+	private List<VariableBinding> retrieveData(Target<Address> target, PDU pdu) {
 		if (this.snmp != null) {
 			try {
-				ResponseEvent responseEvent = this.snmp.send(pdu, target);
+				ResponseEvent<Address> responseEvent = this.snmp.send(pdu, target);
 				if (responseEvent != null && responseEvent.getResponse() != null) {
 					PDU response = responseEvent.getResponse();
 					if (response.getErrorIndex() == PDU.noError 
@@ -185,7 +184,7 @@ public final class SNMPUtils {
 	private static final class SNMPProcessor implements Runnable {
 
 		private final String identifiedKey;
-		private final Target target;
+		private final Target<Address> target;
 		private final List<PDU> pduList;
 		private final SNMPDataOperator snmpDataOperator;
 		
@@ -229,7 +228,7 @@ public final class SNMPUtils {
 		return null;
 	}
 	
-	private Target generateTarget(TargetHost targetHost) {
+	private Target<Address> generateTarget(TargetHost targetHost) {
 		if (targetHost == null) {
 			return null;
 		}
@@ -244,13 +243,13 @@ public final class SNMPUtils {
 			address = PROTOCOL_UDP + targetHost.getIpAddress() + "/" + targetHost.getPort();
 			break;
 		}
-		Target target;
+		Target<Address> target;
 		
 		if (SNMPVersion.VERSION3.equals(targetHost.getVersion())) {
 			USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
 			SecurityModels.getInstance().addSecurityModel(usm);
 
-			target = new UserTarget();
+			target = new UserTarget<>();
 
 			OctetString securityName = null;
 			OID authProtocol = null;
@@ -293,8 +292,8 @@ public final class SNMPUtils {
 				this.snmp.getUSM().addUser(securityName, usmUser);
 			}
 		} else {
-			target = new CommunityTarget();
-			((CommunityTarget)target).setCommunity(new OctetString(targetHost.getCommunity()));
+			target = new CommunityTarget<>();
+			((CommunityTarget<Address>)target).setCommunity(new OctetString(targetHost.getCommunity()));
 		}
 
 		target.setAddress(GenericAddress.parse(address));

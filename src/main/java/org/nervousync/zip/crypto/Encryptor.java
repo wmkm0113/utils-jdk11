@@ -28,19 +28,17 @@ public interface Encryptor {
 	/**
 	 * Encrypt given data array
 	 * @param buff	data array
-	 * @return processed data length
 	 * @throws ZipException if encrypt engine was not initialized or data index out of size
 	 */
-	int encryptData(byte[] buff) throws ZipException;
+	void encryptData(byte[] buff) throws ZipException;
 	
 	/**
 	 * Encrypt given data array which index from start and process data length was given
 	 * @param buff		data buffer
 	 * @param start		start index
 	 * @param len		process length
-	 * @return processed data length
 	 * @throws ZipException if encrypt engine was not initialized or data index out of size
 	 */
-	int encryptData(byte[] buff, int start, int len) throws ZipException;
+	void encryptData(byte[] buff, int start, int len) throws ZipException;
 	
 }

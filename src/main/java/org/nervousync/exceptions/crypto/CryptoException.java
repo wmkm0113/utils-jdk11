@@ -17,7 +17,7 @@
 
 package org.nervousync.exceptions.crypto;
 
-public class CryptoException extends RuntimeException {
+public class CryptoException extends Exception {
 
     private static final long serialVersionUID = 6112136690122627440L;
 

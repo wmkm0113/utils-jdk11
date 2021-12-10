@@ -16,7 +16,7 @@
  */
 package org.nervousync.commons.snmp;
 
-import org.nervousync.commons.beans.snmp.SNMPData;
+import org.nervousync.beans.snmp.SNMPData;
 
 /**
  * SNMP Operator

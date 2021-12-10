@@ -49,9 +49,9 @@ import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
-import org.nervousync.commons.beans.files.FileExtensionInfo;
-import org.nervousync.commons.beans.xml.files.SegmentationFile;
-import org.nervousync.commons.beans.xml.files.SegmentationItem;
+import org.nervousync.beans.files.FileExtensionInfo;
+import org.nervousync.beans.xml.files.SegmentationFile;
+import org.nervousync.beans.xml.files.SegmentationItem;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.MIMETypes;
 import org.nervousync.zip.ZipFile;
@@ -253,7 +253,7 @@ public final class FileUtils {
 	 */
 	public static boolean matchFolder(String entryPath, String folderPath) {
 		if (entryPath == null || folderPath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		String convertFolderPath = FileUtils.replacePageSeparator(folderPath) + "|";
@@ -270,7 +270,7 @@ public final class FileUtils {
 	 */
 	public static boolean matchFilePath(String origPath, String destPath, boolean ignoreCase) {
 		if (origPath == null || destPath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		String origConvert = FileUtils.replacePageSeparator(origPath);
@@ -299,7 +299,7 @@ public final class FileUtils {
 				== FileUtils.FILE_TYPE_JAVA_PACKAGE) {
 			return FileUtils.validateFileType(resourceLocation);
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -346,7 +346,7 @@ public final class FileUtils {
 	 */
 	public static boolean validateFileType(String resourceLocation) {
 		if (resourceLocation == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
@@ -358,7 +358,7 @@ public final class FileUtils {
 			String fileType = ConvertUtils.byteToHex(fileTypeByte);
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -373,7 +373,7 @@ public final class FileUtils {
 		if (fileExtensionInfo != null) {
 			int identifiedLength = fileExtensionInfo.getIdentifiedCode().length() / 2;
 			if (fileContent.length < identifiedLength) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 			byte[] fileTypeByte = new byte[identifiedLength];
 
@@ -383,7 +383,7 @@ public final class FileUtils {
 			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
 		}
 
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -407,19 +407,19 @@ public final class FileUtils {
 	 * either a special "classpath" pseudo URL or a standard URL.
 	 *
 	 * @param resourceLocation the location String to check
-	 * @return true when location qualifies as a URL, Globals.DEFAULT_VALUE_BOOLEAN for others
+	 * @return true when location qualifies as a URL, Boolean.FALSE for others
 	 * @see java.net.URL
 	 */
 	public static boolean isUrl(String resourceLocation) {
 		if (!FileUtils.isExists(resourceLocation)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		try {
 			new URL(resourceLocation);
 			return true;
 		} catch (MalformedURLException ex) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -665,8 +665,8 @@ public final class FileUtils {
 				}
 			}
 		} catch (Exception e) {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Load jar entry content error! ", e);
 			}
 		}
 
@@ -707,8 +707,8 @@ public final class FileUtils {
 
 			jarFile.close();
 		} catch (Exception e) {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Load jar entry content error! ", e);
 			}
 		} finally {
 			IOUtils.closeStream(inputStreamReader);
@@ -771,8 +771,8 @@ public final class FileUtils {
 				return byteArrayOutputStream.toByteArray();
 			}
 		} catch (Exception e) {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Load jar entry content error! ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Load jar entry content error! ", e);
 			}
 		} finally {
 			IOUtils.closeStream(inputStream);
@@ -1167,7 +1167,7 @@ public final class FileUtils {
 	public static List<String> listFiles(File file, FilenameFilter filter) {
 		List<String> returnList = new ArrayList<>();
 		FileUtils.listFiles(file, filter, returnList, true,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 		return returnList;
 	}
 
@@ -1182,7 +1182,7 @@ public final class FileUtils {
 	public static List<String> listFiles(File file, FilenameFilter filter, boolean readHiddenFiles) {
 		List<String> returnList = new ArrayList<>();
 		FileUtils.listFiles(file, filter, returnList, readHiddenFiles,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 		return returnList;
 	}
 
@@ -1228,7 +1228,7 @@ public final class FileUtils {
 	 */
 	public static void listFiles(String filePath, List<String> fileList) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, true,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 	}
 
 	/**
@@ -1241,7 +1241,7 @@ public final class FileUtils {
 	 */
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 	}
 
 	/**
@@ -1256,7 +1256,7 @@ public final class FileUtils {
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles,
 	                             boolean iterateChildFolder) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
-				Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+				Boolean.FALSE, iterateChildFolder);
 	}
 
 	/**
@@ -1285,7 +1285,7 @@ public final class FileUtils {
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter, List<String> fileList) throws IOException {
 		FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, true,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 	}
 
 	/**
@@ -1352,7 +1352,7 @@ public final class FileUtils {
 							continue;
 						}
 
-						boolean match = Globals.DEFAULT_VALUE_BOOLEAN;
+						boolean match = Boolean.FALSE;
 						if (filter == null) {
 							match = true;
 						} else if (filter.accept(childFile.getParentFile(), childFile.getName())) {
@@ -1443,7 +1443,7 @@ public final class FileUtils {
 	public static List<String> listExtNameFiles(String filePath, String fileExtName,
 	                                            boolean iterateChildFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName),
-				Globals.DEFAULT_VALUE_BOOLEAN, Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+				Boolean.FALSE, Boolean.FALSE, iterateChildFolder);
 	}
 
 	/**
@@ -1459,7 +1459,7 @@ public final class FileUtils {
 	public static List<String> listExtNameFiles(String filePath, String fileExtName, boolean readHiddenFile,
 	                                            boolean iterateChildFolder) throws FileNotFoundException {
 		return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName),
-				readHiddenFile, Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+				readHiddenFile, Boolean.FALSE, iterateChildFolder);
 	}
 
 	/**
@@ -1557,7 +1557,7 @@ public final class FileUtils {
 	public static List<String> listFilesByRegex(String filePath, String fileNameRegex)
 			throws FileNotFoundException {
 		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true,
-				Globals.DEFAULT_VALUE_BOOLEAN, true);
+				Boolean.FALSE, true);
 	}
 
 	/**
@@ -1572,7 +1572,7 @@ public final class FileUtils {
 	public static List<String> listFilesByRegex(String filePath, String fileNameRegex,
 	                                            boolean iterateChildFolder) throws FileNotFoundException {
 		return FileUtils.listFilesByRegex(filePath, fileNameRegex, true,
-				Globals.DEFAULT_VALUE_BOOLEAN, iterateChildFolder);
+				Boolean.FALSE, iterateChildFolder);
 	}
 
 	/**
@@ -1600,7 +1600,7 @@ public final class FileUtils {
 	 *
 	 * @param fileData file content
 	 * @param filePath write path
-	 * @return true for success and Globals.DEFAULT_VALUE_BOOLEAN for error
+	 * @return true for success and Boolean.FALSE for error
 	 */
 	public static boolean saveFile(byte[] fileData, String filePath) {
 		FileOutputStream fileOutputStream = null;
@@ -1618,7 +1618,7 @@ public final class FileUtils {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Stack trace message: ", e);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		} finally {
 			IOUtils.closeStream(fileOutputStream);
 		}
@@ -1629,7 +1629,7 @@ public final class FileUtils {
 	 *
 	 * @param inputStream file content by input stream
 	 * @param filePath    write to file path
-	 * @return true for success and Globals.DEFAULT_VALUE_BOOLEAN for error
+	 * @return true for success and Boolean.FALSE for error
 	 * @throws IOException close stream error
 	 */
 	public static boolean saveFile(InputStream inputStream, String filePath) throws IOException {
@@ -1646,7 +1646,7 @@ public final class FileUtils {
 			}
 			return true;
 		} catch(Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		} finally {
 			if (outputStream != null) {
 				outputStream.flush();
@@ -1682,7 +1682,9 @@ public final class FileUtils {
 		PrintWriter printWriter = null;
 		OutputStreamWriter outputStreamWriter = null;
 		try {
-			FileUtils.makeHome(filePath);
+			int index = filePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
+			String homePath = filePath.substring(0, index);
+			FileUtils.makeHome(homePath);
 			outputStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath), encoding);
 			printWriter = new PrintWriter(outputStreamWriter);
 
@@ -1690,7 +1692,7 @@ public final class FileUtils {
 			outputStreamWriter.flush();
 			return true;
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		} finally {
 			IOUtils.closeStream(printWriter);
 			IOUtils.closeStream(outputStreamWriter);
@@ -1737,7 +1739,7 @@ public final class FileUtils {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("Remove samba file error");
 					}
-					return Globals.DEFAULT_VALUE_BOOLEAN;
+					return Boolean.FALSE;
 				}
 			} else {
 				return FileUtils.removeFile(FileUtils.getFile(filePath));
@@ -1792,7 +1794,7 @@ public final class FileUtils {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Remove smb file error! ", e);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -1818,7 +1820,7 @@ public final class FileUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -1829,7 +1831,7 @@ public final class FileUtils {
 	 * @return Move result
 	 */
 	public static boolean moveFile(String basePath, String moveToPath) {
-		return FileUtils.moveFile(basePath, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
+		return FileUtils.moveFile(basePath, moveToPath, Boolean.FALSE);
 	}
 
 	/**
@@ -1847,7 +1849,7 @@ public final class FileUtils {
 					File destFile = FileUtils.getFile(moveToPath);
 					if (destFile.exists()) {
 						if (override && !FileUtils.removeFile(destFile)) {
-							return Globals.DEFAULT_VALUE_BOOLEAN;
+							return Boolean.FALSE;
 						}
 					}
 
@@ -1855,7 +1857,7 @@ public final class FileUtils {
 						return true;
 					}
 
-					return Globals.DEFAULT_VALUE_BOOLEAN;
+					return Boolean.FALSE;
 				} catch (Exception e) {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("Move file error! ", e);
@@ -1863,7 +1865,7 @@ public final class FileUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -1874,7 +1876,7 @@ public final class FileUtils {
 	 * @return Move result
 	 */
 	public static boolean moveDir(String basePath, String moveToPath) {
-		return FileUtils.moveDir(basePath, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
+		return FileUtils.moveDir(basePath, moveToPath, Boolean.FALSE);
 	}
 
 	/**
@@ -1889,7 +1891,7 @@ public final class FileUtils {
 		try {
 			return FileUtils.moveDir(FileUtils.getFile(basePath), moveToPath, override);
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -1901,7 +1903,7 @@ public final class FileUtils {
 	 * @return Move result
 	 */
 	public static boolean moveDir(File baseFile, String moveToPath) {
-		return FileUtils.moveDir(baseFile, moveToPath, Globals.DEFAULT_VALUE_BOOLEAN);
+		return FileUtils.moveDir(baseFile, moveToPath, Boolean.FALSE);
 	}
 
 	/**
@@ -1914,12 +1916,12 @@ public final class FileUtils {
 	 */
 	public static boolean moveDir(File baseFile, String moveToPath, boolean override) {
 		if (baseFile == null || !baseFile.exists()) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 		try {
 			FileUtils.makeHome(moveToPath);
 
-			boolean error = Globals.DEFAULT_VALUE_BOOLEAN;
+			boolean error = Boolean.FALSE;
 			if (baseFile.isDirectory()) {
 				File[] childFiles = baseFile.listFiles();
 				if (childFiles != null) {
@@ -1933,7 +1935,7 @@ public final class FileUtils {
 						}
 
 						if (!error) {
-							return Globals.DEFAULT_VALUE_BOOLEAN;
+							return Boolean.FALSE;
 						}
 					}
 				}
@@ -1942,10 +1944,10 @@ public final class FileUtils {
 				return FileUtils.moveFile(baseFile.getAbsolutePath(),
 						moveToPath + Globals.DEFAULT_PAGE_SEPARATOR + baseFile.getName(), override);
 			} else {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -1988,8 +1990,8 @@ public final class FileUtils {
 				return true;
 			}
 		} catch (Exception e) {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Copy file error! ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Copy file error! ", e);
 			}
 		} finally {
 			try {
@@ -2002,12 +2004,12 @@ public final class FileUtils {
 					outputStream.close();
 				}
 			} catch (IOException e) {
-				if (FileUtils.LOGGER.isDebugEnabled()) {
-					FileUtils.LOGGER.debug("Close stream error! ", e);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Close stream error! ", e);
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2031,7 +2033,7 @@ public final class FileUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2050,7 +2052,7 @@ public final class FileUtils {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Make smb file directories error! ", e);
 				}
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 		} else {
 			try {
@@ -2058,7 +2060,7 @@ public final class FileUtils {
 				String parentPath = homeDir.getParent();
 				if (parentPath != null && !FileUtils.isExists(parentPath)) {
 					if (!FileUtils.makeHome(parentPath)) {
-						return Globals.DEFAULT_VALUE_BOOLEAN;
+						return Boolean.FALSE;
 					}
 				}
 
@@ -2068,11 +2070,11 @@ public final class FileUtils {
 					try {
 						return homeDir.mkdirs();
 					} catch (Exception e) {
-						return Globals.DEFAULT_VALUE_BOOLEAN;
+						return Boolean.FALSE;
 					}
 				}
 			} catch (FileNotFoundException e) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 		}
 	}
@@ -2124,14 +2126,14 @@ public final class FileUtils {
 	 */
 	public static boolean isDirectory(String resourceLocation) {
 		if (resourceLocation == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		try {
 			File directory = FileUtils.getFile(resourceLocation);
 			return (directory.exists() && directory.isDirectory());
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2144,7 +2146,7 @@ public final class FileUtils {
 	 */
 	public static boolean copyDir(String baseDir, String destDir) {
 		if (!FileUtils.isDirectory(baseDir)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		File baseFiles = new File(baseDir);
@@ -2153,7 +2155,7 @@ public final class FileUtils {
 		String [] fileList = baseFiles.list();
 
 		if (fileList == null || !FileUtils.makeHome(destDir)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		boolean copyStatus = true;
@@ -2199,7 +2201,7 @@ public final class FileUtils {
 				}
 
 				if (!operateStatus) {
-					return Globals.DEFAULT_VALUE_BOOLEAN;
+					return Boolean.FALSE;
 				}
 			}
 		}
@@ -2225,7 +2227,7 @@ public final class FileUtils {
 					SmbFile childFile = openSMBFile(filePath);
 					if (childFile.isDirectory()) {
 						if (!FileUtils.removeSmbDir(childFile)) {
-							return Globals.DEFAULT_VALUE_BOOLEAN;
+							return Boolean.FALSE;
 						}
 					} else {
 						childFile.delete();
@@ -2239,7 +2241,7 @@ public final class FileUtils {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Remove smb folder error! ", e);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2283,7 +2285,7 @@ public final class FileUtils {
 	 */
 	public static boolean isCompressFile(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
@@ -2292,7 +2294,7 @@ public final class FileUtils {
 			return fileExtensionInfo.isCompressFile();
 		}
 
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2303,7 +2305,7 @@ public final class FileUtils {
 	 */
 	public static boolean isPrintable(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
@@ -2312,7 +2314,7 @@ public final class FileUtils {
 			return fileExtensionInfo.isPrintable();
 		}
 
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2323,7 +2325,7 @@ public final class FileUtils {
 	 */
 	public static boolean isPicture(String resourceLocation) {
 		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
 
@@ -2332,7 +2334,16 @@ public final class FileUtils {
 			return fileExtensionInfo.isPicture();
 		}
 
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
+	}
+
+	public static Optional<FileExtensionInfo> retrieveExtensionInfo(String resourceLocation) {
+		FileExtensionInfo fileExtensionInfo = null;
+		if (FileUtils.validateFileType(resourceLocation)) {
+			String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
+			fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
+		}
+		return Optional.ofNullable(fileExtensionInfo);
 	}
 
 	/**
@@ -2356,7 +2367,7 @@ public final class FileUtils {
 	 */
 	public static boolean isExists(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
@@ -2367,7 +2378,7 @@ public final class FileUtils {
 			File file = FileUtils.getFile(filePath);
 			return file.exists();
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2391,7 +2402,7 @@ public final class FileUtils {
 					return inputStream.available();
 				}
 			} else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
-				ZipFile zipFile = new ZipFile(filePath);
+				ZipFile zipFile = ZipFile.openZipFile(filePath);
 				return zipFile.readEntryLength(entryPath);
 			}
 		} catch (Exception e) {
@@ -2414,7 +2425,7 @@ public final class FileUtils {
 	 */
 	public static boolean isEntryExists(String filePath, String entryPath) {
 		if (StringUtils.isEmpty(filePath) || StringUtils.isEmpty(entryPath)) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (filePath.toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
@@ -2423,25 +2434,25 @@ public final class FileUtils {
 				jarFile = new JarFile(getFile(filePath));
 				return jarFile.getJarEntry(entryPath) != null;
 			} catch (Exception e) {
-				if (FileUtils.LOGGER.isDebugEnabled()) {
-					FileUtils.LOGGER.debug("Load jar entry content error! ", e);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Load jar entry content error! ", e);
 				}
 			} finally {
 				if (jarFile != null) {
 					try {
 						jarFile.close();
 					} catch (Exception e) {
-						if (FileUtils.LOGGER.isDebugEnabled()) {
-							FileUtils.LOGGER.debug("Close jar file error! ", e);
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("Close jar file error! ", e);
 						}
 					}
 				}
 			}
 		} else if (filePath.toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
-			ZipFile zipFile = new ZipFile(filePath);
+			ZipFile zipFile = ZipFile.openZipFile(filePath);
 			return zipFile.isEntryExists(entryPath);
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2493,7 +2504,7 @@ public final class FileUtils {
 	 */
 	public static boolean canRead(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
@@ -2504,7 +2515,7 @@ public final class FileUtils {
 			File file = FileUtils.getFile(filePath);
 			return file.canRead();
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2529,7 +2540,7 @@ public final class FileUtils {
 	 */
 	public static boolean canWrite(String path, String domain, String userName, String passWord) {
 		if (path == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (path.startsWith(SAMBA_URL_PREFIX)) {
@@ -2540,7 +2551,7 @@ public final class FileUtils {
 			File file = FileUtils.getFile(path);
 			return file.canWrite();
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2555,7 +2566,7 @@ public final class FileUtils {
 			File file = FileUtils.getFile(filePath);
 			return file.canExecute();
 		} catch (FileNotFoundException e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2581,7 +2592,7 @@ public final class FileUtils {
 
 			for (SegmentationItem segmentationItem : segmentationFile.getSegmentationItemList()) {
 				if (segmentationItem == null) {
-					return Globals.DEFAULT_VALUE_BOOLEAN;
+					return Boolean.FALSE;
 				}
 
 				if (FileUtils.mergeFile(randomAccessFile, segmentationItem)) {
@@ -2589,16 +2600,16 @@ public final class FileUtils {
 				}
 			}
 
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Write file size: " + totalSize);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Write file size: " + totalSize);
 			}
 
 			if (totalSize != segmentationFile.getTotalSize()) {
 				FileUtils.removeFile(savePath);
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		return FileUtils.validateFileType(savePath);
@@ -2625,7 +2636,8 @@ public final class FileUtils {
 	 * @param passWord  SMB password
 	 * @return List of split file
 	 */
-	public static SegmentationFile segmentFile(String filePath, int blockSize, String domain, String userName, String passWord) {
+	public static SegmentationFile segmentFile(String filePath, int blockSize, 
+											   String domain, String userName, String passWord) {
 		if (!FileUtils.isExists(filePath, domain, userName, passWord)) {
 			return null;
 		}
@@ -2654,8 +2666,8 @@ public final class FileUtils {
 			int index = 0;
 			int readLength;
 			while ((readLength = fileInputStream.read(readBuffer)) != -1) {
-				if (FileUtils.LOGGER.isDebugEnabled()) {
-					FileUtils.LOGGER.debug("Read index: " + index + ", read length: " + readLength);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Read index: " + index + ", read length: " + readLength);
 				}
 				byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
 				byteArrayOutputStream.write(readBuffer, 0, readLength);
@@ -2665,17 +2677,17 @@ public final class FileUtils {
 				index++;
 			}
 
-			return new SegmentationFile(extName, fileSize, blockSize,
-					SecurityUtils.MD5(file), SecurityUtils.SHA256(file), segmentationItemList);
+			return new SegmentationFile(extName, fileSize, blockSize, ConvertUtils.byteToHex(SecurityUtils.MD5(file)),
+					ConvertUtils.byteToHex(SecurityUtils.SHA256(file)), segmentationItemList);
 		} catch (FileNotFoundException e) {
-			FileUtils.LOGGER.error("Target file not exists! ");
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Stack message: ", e);
+			LOGGER.error("Target file not exists! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
 			}
 		} catch (IOException e) {
-			FileUtils.LOGGER.error("Read file data error! ");
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Stack message: ", e);
+			LOGGER.error("Read file data error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
 			}
 		} finally {
 			IOUtils.closeStream(fileInputStream);
@@ -2730,7 +2742,7 @@ public final class FileUtils {
 		}
 		extensionName = extensionName.toLowerCase();
 		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName.toLowerCase())) {
-			FileUtils.LOGGER.warn("Override file type define! Ext name: " + extensionName);
+			LOGGER.warn("Override file type define! Ext name: " + extensionName);
 		}
 	}
 
@@ -2753,7 +2765,7 @@ public final class FileUtils {
 	private static boolean mergeFile(RandomAccessFile randomAccessFile,
 	                                 SegmentationItem segmentationItem) throws IOException {
 		if (segmentationItem == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (segmentationItem.securityCheck()) {
@@ -2761,11 +2773,11 @@ public final class FileUtils {
 			randomAccessFile.write(StringUtils.base64Decode(segmentationItem.getDataInfo()));
 			return true;
 		} else {
-			if (FileUtils.LOGGER.isDebugEnabled()) {
-				FileUtils.LOGGER.debug("Segmentation file part is invalid");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Segmentation file part is invalid");
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -2778,7 +2790,7 @@ public final class FileUtils {
 	 */
 	private static boolean isSMBFileExists(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
@@ -2789,7 +2801,7 @@ public final class FileUtils {
 			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
 			return smbFile.exists();
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2803,7 +2815,7 @@ public final class FileUtils {
 	 */
 	private static boolean isSMBFileCanRead(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
@@ -2814,7 +2826,7 @@ public final class FileUtils {
 			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
 			return smbFile.canRead();
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2828,7 +2840,7 @@ public final class FileUtils {
 	 */
 	private static boolean isSMBFileCanWrite(String filePath, String domain, String userName, String passWord) {
 		if (filePath == null) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 
 		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
@@ -2839,14 +2851,14 @@ public final class FileUtils {
 			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
 			return !smbFile.exists() || smbFile.canWrite();
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
 	private static void generateFileData(String folderPath, String targetPath) throws IOException {
 		List<String> fileList = FileUtils.listFiles(folderPath);
 		byte[] intBuffer = new byte[4];
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, fileList.size());
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, fileList.size());
 		RandomAccessFile randomAccessFile = new RandomAccessFile(targetPath, Globals.WRITE_MODE);
 		randomAccessFile.write(intBuffer);
 		fileList.forEach(filePath -> {
@@ -2880,7 +2892,7 @@ public final class FileUtils {
 		byte[] readBuffer;
 		byte[] intBuffer = new byte[4];
 		System.arraycopy(bytes, 0, intBuffer, 0, 4);
-		int dataCount = RawUtils.readIntFromLittleEndian(intBuffer, 0);
+		int dataCount = RawUtils.readInt(intBuffer, RawUtils.Endian.LITTLE);
 		int srcPos = 4;
 		LOGGER.info("File identified information count: {}", dataCount);
 		for (int i = 0 ; i < dataCount ; i++) {
@@ -2890,7 +2902,7 @@ public final class FileUtils {
 
 			int fileType = indexData[0];
 			boolean printing = ((int)indexData[1]) == 1;
-			int dataLength = RawUtils.readIntFromLittleEndian(indexData, 2);
+			int dataLength = RawUtils.readInt(indexData, 2, RawUtils.Endian.LITTLE);
 
 			readBuffer = new byte[dataLength];
 			System.arraycopy(bytes, srcPos, readBuffer, 0, dataLength);
@@ -2907,7 +2919,7 @@ public final class FileUtils {
 
 		for (FileExtensionInfo fileExtensionInfo : extensionInfoList) {
 			if (REGISTER_IDENTIFIED_MAP.containsKey(fileExtensionInfo.getExtensionName())) {
-				FileUtils.LOGGER.warn("Override file extension info, extension name: " + fileExtensionInfo.getExtensionName());
+				LOGGER.warn("Override file extension info, extension name: " + fileExtensionInfo.getExtensionName());
 			}
 			REGISTER_IDENTIFIED_MAP.put(fileExtensionInfo.getExtensionName(), fileExtensionInfo);
 		}
@@ -2934,7 +2946,7 @@ public final class FileUtils {
 				String fileName = StringUtils.getFilename(name);
 				return StringUtils.matches(fileName, this.fileNameRegex);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 
@@ -2959,7 +2971,7 @@ public final class FileUtils {
 				String fileExtName = StringUtils.getFilenameExtension(name);
 				return fileExtName.equalsIgnoreCase(this.fileExtName);
 			}
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 

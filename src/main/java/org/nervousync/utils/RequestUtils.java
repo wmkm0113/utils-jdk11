@@ -18,11 +18,12 @@ package org.nervousync.utils;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.nervousync.annotations.service.RestfulClient;
-import org.nervousync.commons.beans.ip.IPRange;
-import org.nervousync.commons.beans.servlet.request.RequestAttribute;
-import org.nervousync.commons.beans.servlet.request.RequestInfo;
-import org.nervousync.commons.beans.servlet.response.HttpResponseContent;
+import org.nervousync.beans.ip.IPRange;
+import org.nervousync.beans.servlet.request.RequestAttribute;
+import org.nervousync.beans.servlet.request.RequestInfo;
+import org.nervousync.beans.servlet.response.HttpResponseContent;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.commons.http.cookie.CookieEntity;
@@ -32,10 +33,11 @@ import org.nervousync.commons.http.security.GeneX509TrustManager;
 import org.nervousync.enumerations.ip.IPType;
 import org.nervousync.enumerations.web.HttpMethodOption;
 
+import javax.naming.ldap.LdapName;
 import javax.net.ssl.*;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.HandlerResolver;
@@ -53,6 +55,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.time.Duration;
 import java.util.*;
@@ -171,8 +175,8 @@ public final class RequestUtils {
 			endAddress = RequestUtils.endIPv6(beginAddress, cidr);
 		} else {
 			ipRange.setIpType(IPType.IPv4);
-			beginAddress = RequestUtils.beginIPv4(ipAddress, convertCIDRToNetmask(cidr));
-			endAddress = RequestUtils.endIPv4(beginAddress, convertCIDRToNetmask(cidr));
+			beginAddress = RequestUtils.beginIPv4(ipAddress, CIDRToNetmask(cidr));
+			endAddress = RequestUtils.endIPv4(beginAddress, CIDRToNetmask(cidr));
 		}
 
 		ipRange.setBeginAddress(beginAddress);
@@ -187,7 +191,7 @@ public final class RequestUtils {
 	 * @param netmask Net mask address
 	 * @return CIDR int
 	 */
-	public static int convertNetmaskToCIDR(String netmask) {
+	public static int NetmaskToCIDR(String netmask) {
 		int result = 0;
 
 		String[] splitItems = StringUtils.tokenizeToStringArray(netmask, ".");
@@ -211,7 +215,7 @@ public final class RequestUtils {
 	 * @param cidr CIDR
 	 * @return Net mask address
 	 */
-	public static String convertCIDRToNetmask(int cidr) {
+	public static String CIDRToNetmask(int cidr) {
 		if (cidr >= 0 && cidr <= 32) {
 			int[] arrays = new int[]{0, 0, 0, 0};
 			int index = 0;
@@ -237,7 +241,7 @@ public final class RequestUtils {
 	 * @param ipAddress IPv4 address
 	 * @return Compatible IPv6 address
 	 */
-	public static String convertIPv4ToCompatibleIPv6(String ipAddress) {
+	public static String IPv4ToCompatibleIPv6(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return "::" + ipAddress;
 		}
@@ -250,8 +254,8 @@ public final class RequestUtils {
 	 * @param ipAddress IPv4 address
 	 * @return Collapse IPv6 address
 	 */
-	public static String convertIPv4ToIPv6(String ipAddress) {
-		return convertIPv4ToIPv6(ipAddress, true);
+	public static String IPv4ToIPv6(String ipAddress) {
+		return IPv4ToIPv6(ipAddress, true);
 	}
 
 	/**
@@ -261,7 +265,7 @@ public final class RequestUtils {
 	 * @param collapse  Collapse IPv6 address
 	 * @return IPv6 address
 	 */
-	public static String convertIPv4ToIPv6(String ipAddress, boolean collapse) {
+	public static String IPv4ToIPv6(String ipAddress, boolean collapse) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			StringBuilder stringBuilder;
@@ -285,12 +289,28 @@ public final class RequestUtils {
 	}
 
 	/**
+	 * Convert IP Address to byte array
+	 * @param ipAddress		IP Address
+	 * @return byte array
+	 */
+	public static byte[] IPToBytes(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
+			return IPv4ToBytes(ipAddress);
+		} else if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
+				|| StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
+			return IPv6ToBytes(ipAddress);
+		} else {
+			return new byte[0];
+		}
+	}
+
+	/**
 	 * Convert IPv4 address to byte array
 	 *
 	 * @param ipAddress IPv4 address
-	 * @return byte array
+	 * @return byte array length 4
 	 */
-	public static byte[] convertIPv4ToBytes(String ipAddress) {
+	public static byte[] IPv4ToBytes(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			byte[] addressBytes = new byte[4];
@@ -306,16 +326,68 @@ public final class RequestUtils {
 	}
 
 	/**
+	 * Convert IPv6 address to byte array
+	 *
+	 * @param ipAddress IPv6 address
+	 * @return byte array length 16
+	 */
+	public static byte[] IPv6ToBytes(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
+				|| StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
+			String ipv6Address = expandIPv6(ipAddress);
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipv6Address, ":");
+			byte[] addressBytes = new byte[16];
+			int index = 0;
+			for (String address : splitAddress) {
+				int tmp = Integer.parseInt(address, 16);
+				addressBytes[index] = (byte) (tmp >> 8);
+				addressBytes[index + 1] = (byte) tmp;
+				index += 2;
+			}
+			return addressBytes;
+		}
+		return null;
+	}
+
+	public static String expandIPv6(String ipAddress) {
+		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
+			int sigCount = StringUtils.countOccurrencesOf(ipAddress, ":");
+			int expandCount = 8 - sigCount;
+			int position = 0;
+			StringBuilder stringBuilder = new StringBuilder();
+			while (true) {
+				int index = ipAddress.indexOf(":", position);
+				if (index == Globals.DEFAULT_VALUE_INT) {
+					stringBuilder.append(":").append(ipAddress.substring(position));
+					break;
+				} else {
+					if (index == position) {
+						while (expandCount > 0) {
+							stringBuilder.append(":0");
+							expandCount--;
+						}
+					} else {
+						stringBuilder.append(":").append(ipAddress, position, index);
+					}
+					position = index + 1;
+				}
+			}
+			return stringBuilder.substring(1);
+		}
+		return ipAddress;
+	}
+
+	/**
 	 * Convert IP address to BigInteger(supported IPv4 and IPv6)
 	 *
 	 * @param ipAddress IP address
 	 * @return BigInteger big integer
 	 */
-	public static BigInteger convertIPtoBigInteger(String ipAddress) {
+	public static BigInteger IPtoBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			return RequestUtils.convertIPv4ToBigInteger(ipAddress);
+			return RequestUtils.IPv4ToBigInteger(ipAddress);
 		} else {
-			return RequestUtils.convertIPv6ToBigInteger(ipAddress);
+			return RequestUtils.IPv6ToBigInteger(ipAddress);
 		}
 	}
 
@@ -325,7 +397,7 @@ public final class RequestUtils {
 	 * @param ipAddress IPv4 address
 	 * @return BigInteger big integer
 	 */
-	public static BigInteger convertIPv4ToBigInteger(String ipAddress) {
+	public static BigInteger IPv4ToBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
 			if (splitAddress.length == 4) {
@@ -345,7 +417,7 @@ public final class RequestUtils {
 	 * @param ipAddress IPv6 address
 	 * @return BigInteger big integer
 	 */
-	public static BigInteger convertIPv6ToBigInteger(String ipAddress) {
+	public static BigInteger IPv6ToBigInteger(String ipAddress) {
 		String fullAddress = expandIgnore(ipAddress);
 		if (StringUtils.matches(fullAddress, RegexGlobals.IPV6_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(fullAddress, ":");
@@ -354,7 +426,7 @@ public final class RequestUtils {
 			for (String split : splitAddress) {
 				BigInteger currentInteger;
 				if (StringUtils.matches(split, RegexGlobals.IPV4_REGEX)) {
-					currentInteger = convertIPv4ToBigInteger(split);
+					currentInteger = IPv4ToBigInteger(split);
 				} else {
 					currentInteger = BigInteger.valueOf(Long.valueOf(split, 16));
 				}
@@ -375,7 +447,7 @@ public final class RequestUtils {
 	 * @param bigInteger BigInteger value
 	 * @return IPv4 address
 	 */
-	public static String convertBigIntegerToIPv4(BigInteger bigInteger) {
+	public static String BigIntegerToIPv4(BigInteger bigInteger) {
 		StringBuilder ipv4Address = new StringBuilder();
 		BigInteger ff = BigInteger.valueOf(0xFFL);
 
@@ -393,7 +465,7 @@ public final class RequestUtils {
 	 * @param bigInteger BigInteger value
 	 * @return IPv6 address
 	 */
-	public static String convertBigIntegerToIPv6Address(BigInteger bigInteger) {
+	public static String BigIntegerToIPv6Address(BigInteger bigInteger) {
 		StringBuilder ipv6Address = new StringBuilder();
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
 
@@ -403,6 +475,66 @@ public final class RequestUtils {
 		}
 
 		return ipv6Address.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
+	}
+
+	/**
+	 * Read HTTPS server certificate
+	 *
+	 * @param urlAddress	Https url address
+	 * @return				Matched server certificate
+	 */
+	public static Optional<Certificate> serverCertificate(String urlAddress) {
+		Certificate certificate = null;
+		if (StringUtils.notBlank(urlAddress)) {
+			int beginIndex, endIndex;
+			if (urlAddress.toLowerCase().startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
+				beginIndex = Globals.SECURE_HTTP_PROTOCOL.length();
+			} else if (urlAddress.toLowerCase().startsWith(Globals.HTTP_PROTOCOL)) {
+				beginIndex = Globals.HTTP_PROTOCOL.length();
+			} else {
+				beginIndex = Globals.INITIALIZE_INT_VALUE;
+			}
+			endIndex = urlAddress.indexOf("/", beginIndex);
+			if (endIndex < 0) {
+				endIndex = urlAddress.length();
+			}
+			final String domainName = urlAddress.substring(beginIndex, endIndex);
+			try {
+				HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(urlAddress).openConnection();
+				httpsURLConnection.connect();
+				Date currentDate = new Date();
+				certificate = Arrays.stream(httpsURLConnection.getServerCertificates())
+						.filter(serverCertificate -> {
+							X509Certificate x509Certificate = (X509Certificate) serverCertificate;
+							if ((x509Certificate.getNotBefore().getTime() <= currentDate.getTime())
+									&& (currentDate.getTime() <= x509Certificate.getNotAfter().getTime())) {
+								try {
+									LdapName ldapName = new LdapName(x509Certificate.getSubjectX500Principal().getName());
+									String matchDomain =
+											ldapName.getRdns().stream()
+													.filter(rdn -> rdn.getType().equalsIgnoreCase("CN"))
+													.findFirst()
+													.map(rdn -> (String) rdn.getValue())
+													.orElse(Globals.DEFAULT_VALUE_STRING);
+									return matchDomain.startsWith("*")
+											? domainName.toLowerCase().endsWith(matchDomain.substring(1).toLowerCase())
+											: domainName.equalsIgnoreCase(matchDomain);
+								} catch (Exception ignored) {
+									return Boolean.FALSE;
+								}
+							}
+							return Boolean.FALSE;
+						})
+						.findFirst()
+						.orElse(null);
+			} catch (IOException e) {
+				LOGGER.error("Read server certificate error! ");
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack message: ", e);
+				}
+			}
+		}
+		return Optional.ofNullable(certificate);
 	}
 
 	/**

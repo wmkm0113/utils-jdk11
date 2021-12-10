@@ -16,8 +16,8 @@
  */
 package org.nervousync.zip.crypto.impl.aes;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Encryptor;
 
@@ -28,7 +28,7 @@ import org.nervousync.zip.crypto.Encryptor;
  */
 public class AESEncryptor extends AESCrypto implements Encryptor {
 	
-	private boolean finished = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean finished = Boolean.FALSE;
 	
 	public AESEncryptor(char[] password, int aesStrength) throws ZipException {
 		super.preInit(aesStrength);
@@ -36,15 +36,15 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 	}
 
 	@Override
-	public int encryptData(byte[] buff) throws ZipException {
+	public void encryptData(byte[] buff) throws ZipException {
 		if (buff == null) {
 			throw new ZipException("input bytes are null, cannot perform AES encryption");
 		}
-		return this.encryptData(buff, 0, buff.length);
+		this.encryptData(buff, 0, buff.length);
 	}
 
 	@Override
-	public int encryptData(byte[] buff, int start, int len) throws ZipException {
+	public void encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (this.finished) {
 			throw new ZipException("AES Encryptor is in finished state (A non 16 byte block has already been passed to encryptor)");
 		}
@@ -52,22 +52,30 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 		if (len % 16 != 0) {
 			this.finished = true;
 		}
-		
-		for (int i = start ; i < (start + len) ; i += ZipConstants.AES_BLOCK_SIZE) {
-			this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ? 
-					ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
-			super.processData(buff, i);
-			this.macBasedPRF.update(buff, i, this.loopCount);
+
+		try {
+			for (int i = start ; i < (start + len) ; i += ZipConstants.AES_BLOCK_SIZE) {
+				this.loopCount =
+						(i + ZipConstants.AES_BLOCK_SIZE <= (start + len))
+								? ZipConstants.AES_BLOCK_SIZE
+								: ((start + len) - i);
+				super.processData(buff, i);
+				this.macBasedPRF.append(buff, i, this.loopCount);
+			}
+		} catch (CryptoException e) {
+			throw new ZipException(e);
 		}
-		
-		return len;
 	}
 	
 	public byte[] getFinalMac() {
-		byte[] rawMacBytes = this.macBasedPRF.doFinal();
-		byte[] macBytes = new byte[10];
-		System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
-		return macBytes;
+		try {
+			byte[] rawMacBytes = this.macBasedPRF.finish();
+			byte[] macBytes = new byte[10];
+			System.arraycopy(rawMacBytes, 0, macBytes, 0, 10);
+			return macBytes;
+		} catch (CryptoException e) {
+			return new byte[0];
+		}
 	}
 	
 	/**

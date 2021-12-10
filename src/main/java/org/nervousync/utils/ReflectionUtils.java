@@ -704,7 +704,7 @@ public final class ReflectionUtils {
 			int modifiers = member.getModifiers();
 			return (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers));
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**

@@ -30,15 +30,16 @@ import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
-import org.nervousync.commons.beans.mail.MailObject;
-import org.nervousync.commons.beans.mail.authenticator.DefaultAuthenticator;
-import org.nervousync.commons.beans.mail.config.MailConfig;
-import org.nervousync.commons.beans.mail.operator.MailReceiver;
-import org.nervousync.commons.beans.mail.operator.MailSender;
-import org.nervousync.commons.beans.mail.config.ServerConfig;
-import org.nervousync.commons.beans.mail.protocol.impl.IMAPProtocol;
-import org.nervousync.commons.beans.mail.protocol.impl.POP3Protocol;
-import org.nervousync.commons.beans.mail.protocol.impl.SMTPProtocol;
+import org.nervousync.exceptions.builder.BuilderException;
+import org.nervousync.mail.MailObject;
+import org.nervousync.mail.authenticator.DefaultAuthenticator;
+import org.nervousync.mail.config.MailConfig;
+import org.nervousync.mail.operator.ReceiveOperator;
+import org.nervousync.mail.operator.SendOperator;
+import org.nervousync.mail.config.ServerConfig;
+import org.nervousync.mail.protocol.impl.IMAPProtocol;
+import org.nervousync.mail.protocol.impl.POP3Protocol;
+import org.nervousync.mail.protocol.impl.SMTPProtocol;
 import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,187 +56,124 @@ public final class MailUtils {
 	}
 
 	/**
-	 * Operator optional.
+	 * Initialize a new mail agent by given mail config
 	 *
-	 * @param mailConfig the mail config
-	 * @return the optional
+	 * @param mailConfig 		Mail config
+	 * @return Optional instance of generated mail agent or empty Option instance if mail config is invalid
 	 */
-	public static Optional<MailOperator> operator(MailConfig mailConfig) {
-		return mailConfig == null ? Optional.empty() : Optional.of(new MailOperator(mailConfig));
+	public static Optional<Agent> mailAgent(MailConfig mailConfig) {
+		if (mailConfig == null || StringUtils.isEmpty(mailConfig.getUserName())
+				|| StringUtils.isEmpty(mailConfig.getPassWord())) {
+			return Optional.empty();
+		}
+		return Optional.of(new Agent(mailConfig));
 	}
 
 	/**
-	 * The type Mail operator.
+	 * Generate mail server config builder instance by given server config
+	 *
+	 * @param serverConfig		Server config
+	 * @return	Mail server config builder instance
+	 * @throws BuilderException	Builder Exception
 	 */
-	public static final class MailOperator {
+	public static ServerConfig.Builder builder(ServerConfig serverConfig) throws BuilderException {
+		return new ServerConfig.Builder(serverConfig);
+	}
+
+	/**
+	 * Generate a new SMTP server config builder
+	 *
+	 * @return	Generated config builder
+	 * @throws BuilderException	Builder Exception
+	 */
+	public static ServerConfig.Builder SMTPBuilder() throws BuilderException {
+		return new ServerConfig.Builder("SMTP");
+	}
+
+	/**
+	 * Generate a new POP3 server config builder
+	 *
+	 * @return	Generated config builder
+	 * @throws BuilderException	Builder Exception
+	 */
+	public static ServerConfig.Builder POP3Builder() throws BuilderException {
+		return new ServerConfig.Builder("POP3");
+	}
+
+	/**
+	 * Generate a new IMAP server config builder
+	 *
+	 * @return	Generated config builder
+	 * @throws BuilderException	Builder Exception
+	 */
+	public static ServerConfig.Builder IMAPBuilder() throws BuilderException {
+		return new ServerConfig.Builder("IMAP");
+	}
+
+	public static final class Agent {
 
 		private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-		private final MailConfig mailConfig;
-		private final MailSender mailSender = new SMTPProtocol();
-		private final MailReceiver mailReceiver;
+		private final String userName;
+		private final String passWord;
+		private final ServerConfig sendConfig;
+		private final SendOperator sendOperator;
+		private final ServerConfig receiveConfig;
+		private final ReceiveOperator receiveOperator;
+		private final String storagePath;
 
-		private MailOperator(MailConfig mailConfig) {
-			this.mailConfig = mailConfig;
-			ServerConfig receiveConfig = this.mailConfig.getRecvConfig();
-			if (receiveConfig != null && StringUtils.notBlank(receiveConfig.getProtocolOption())) {
-				switch (receiveConfig.getProtocolOption().toUpperCase()) {
+		private Agent(MailConfig mailConfig) {
+			this.userName = mailConfig.getUserName().toLowerCase();
+			this.passWord = mailConfig.getPassWord();
+			if (mailConfig.getSendConfig() == null
+					|| !"SMTP".equalsIgnoreCase(mailConfig.getSendConfig().getProtocolOption())) {
+				this.sendConfig = null;
+				this.sendOperator = null;
+			} else {
+				this.sendConfig = mailConfig.getSendConfig();
+				this.sendOperator = new SMTPProtocol();
+			}
+			if (mailConfig.getReceiveConfig() == null
+					|| StringUtils.isEmpty(mailConfig.getReceiveConfig().getProtocolOption())) {
+				this.receiveConfig = null;
+				this.receiveOperator = null;
+			} else {
+				this.receiveConfig = mailConfig.getReceiveConfig();
+				switch (this.receiveConfig.getProtocolOption().toUpperCase()) {
 					case "IMAP":
-						this.mailReceiver = new IMAPProtocol();
+						this.receiveOperator = new IMAPProtocol();
 						break;
 					case "POP3":
-						this.mailReceiver = new POP3Protocol();
+						this.receiveOperator = new POP3Protocol();
 						break;
 					default:
-						this.mailReceiver = null;
+						this.receiveOperator = null;
 						break;
 				}
-			} else {
-				this.mailReceiver = null;
 			}
+			this.storagePath = mailConfig.getStoragePath();
 		}
 
-		/**
-		 * Send mail boolean.
-		 *
-		 * @param mailObject the mail object
-		 * @return the boolean
-		 */
-		public final boolean sendMail(MailObject mailObject) {
+		public boolean sendMail(MailObject mailObject) {
+			if (this.sendOperator == null) {
+				//	Not config send server
+				return Boolean.FALSE;
+			}
 			try {
-				Properties properties = this.mailSender.readConfig(this.mailConfig.getSendConfig(),
-						this.mailConfig.getConnectionTimeout(), this.mailConfig.getProcessTimeout(),
-						this.mailConfig.getSendUserName());
-				Session session = Session.getInstance(properties,
-						new DefaultAuthenticator(this.mailConfig.getSendUserName(), this.mailConfig.getSendPassWord()));
-				session.setDebug(true);
-				MimeMessage message = new MimeMessage(session);
-
-				message.setSubject(mailObject.getSubject(), mailObject.getCharset());
-
-				MimeMultipart mimeMultipart = new MimeMultipart();
-
-				if (mailObject.getAttachFiles() != null) {
-					for (String attachment : mailObject.getAttachFiles()) {
-						MimeBodyPart mimeBodyPart = new MimeBodyPart();
-
-						File file;
-
-						try {
-							file = FileUtils.getFile(attachment);
-						} catch (FileNotFoundException e) {
-							return Globals.DEFAULT_VALUE_BOOLEAN;
-						}
-
-						DataSource dataSource = new FileDataSource(file);
-
-						mimeBodyPart.setFileName(StringUtils.getFilename(attachment));
-						mimeBodyPart.setDataHandler(new DataHandler(dataSource));
-
-						mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
-					}
+				Properties properties = this.sendOperator.readConfig(this.sendConfig);
+				if (StringUtils.notBlank(this.userName)) {
+					properties.setProperty("mail.smtp.from", this.userName);
 				}
-
-				if (mailObject.getIncludeFiles() != null) {
-					List<String> includeFiles = mailObject.getIncludeFiles();
-					for (String filePath : includeFiles) {
-						File file;
-						MimeBodyPart mimeBodyPart;
-
-						try {
-							file = FileUtils.getFile(filePath);
-							String fileName = StringUtils.getFilename(filePath);
-							mimeBodyPart = new MimeBodyPart();
-							DataHandler dataHandler =
-									new DataHandler(new ByteArrayDataSource(file.toURI().toURL().openStream(),
-											"application/octet-stream"));
-							mimeBodyPart.setDataHandler(dataHandler);
-
-							mimeBodyPart.setFileName(fileName);
-							mimeBodyPart.setHeader("Content-ID", fileName);
-						} catch (Exception e) {
-							return Globals.DEFAULT_VALUE_BOOLEAN;
-						}
-
-						mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
-					}
+				Session session =
+						Session.getInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+				session.setDebug(this.logger.isDebugEnabled());
+				if (StringUtils.isEmpty(mailObject.getSendAddress())) {
+					mailObject.setSendAddress(this.userName);
 				}
-
-				if (mailObject.getContent() != null) {
-					String content = mailObject.getContent();
-
-					if (mailObject.getContentMap() != null) {
-						Map<String, String> argsMap = mailObject.getContentMap();
-
-						for (Map.Entry<String, String> entry : argsMap.entrySet()) {
-							content = StringUtils.replace(content, "###" + entry.getKey() + "###", entry.getValue());
-						}
-					}
-
-					MimeBodyPart mimeBodyPart = new MimeBodyPart();
-					mimeBodyPart.setContent(content, mailObject.getContentType() + "; charset=" + mailObject.getCharset());
-					mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
-				}
-
-				message.setContent(mimeMultipart);
-				if (StringUtils.notBlank(mailObject.getSendAddress())) {
-					message.setFrom(new InternetAddress(mailObject.getSendAddress()));
-				} else {
-					message.setFrom(new InternetAddress(this.mailConfig.getSendUserName()));
-				}
-
-				StringBuilder receiveAddress = new StringBuilder();
-
-				for (String address : mailObject.getReceiveAddress()) {
-					receiveAddress.append(",").append(address);
-				}
-
-				message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveAddress.substring(1)));
-
-				if (mailObject.getCcAddress() != null) {
-					StringBuilder ccAddress = new StringBuilder();
-
-					for (String address : mailObject.getCcAddress()) {
-						ccAddress.append(",").append(address);
-					}
-
-					message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccAddress.substring(1)));
-				}
-
-				if (mailObject.getBccAddress() != null) {
-					StringBuilder bccAddress = new StringBuilder();
-
-					for (String address : mailObject.getBccAddress()) {
-						bccAddress.append(",").append(address);
-					}
-
-					message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccAddress.substring(1)));
-				}
-
-				if (mailObject.getReplyAddress() != null) {
-					StringBuilder replyAddress = new StringBuilder();
-
-					for (String address : mailObject.getReplyAddress()) {
-						replyAddress.append(",").append(address);
-					}
-
-					message.setReplyTo(InternetAddress.parse(replyAddress.substring(1)));
-				} else {
-					if (mailObject.getSendAddress() != null) {
-						message.setReplyTo(InternetAddress.parse(mailObject.getSendAddress()));
-					} else {
-						message.setReplyTo(InternetAddress.parse(this.mailConfig.getSendUserName()));
-					}
-				}
-
-				message.setSentDate(mailObject.getSendDate());
-
-				Transport.send(message);
-
+				Transport.send(convert(session, mailObject));
 				return Boolean.TRUE;
 			} catch (MessagingException e) {
 				this.logger.error("Send mail failed!");
-				e.printStackTrace();
 				if (this.logger.isDebugEnabled()) {
 					this.logger.debug("Stack message: ", e);
 				}
@@ -248,7 +186,7 @@ public final class MailUtils {
 		 *
 		 * @return the int
 		 */
-		public final int mailCount() {
+		public int mailCount() {
 			return this.mailCount(Globals.DEFAULT_EMAIL_FOLDER_INBOX);
 		}
 
@@ -258,8 +196,9 @@ public final class MailUtils {
 		 * @param folderName the folder name
 		 * @return the int
 		 */
-		public final int mailCount(String folderName) {
-			if (this.mailReceiver == null) {
+		public int mailCount(String folderName) {
+			if (this.receiveOperator == null) {
+				//	Not config receive server
 				return Globals.DEFAULT_VALUE_INT;
 			}
 			try (Store store = connect(); Folder folder = openReadOnlyFolder(store, folderName)) {
@@ -279,7 +218,7 @@ public final class MailUtils {
 		 *
 		 * @return the list
 		 */
-		public final List<String> mailList() {
+		public List<String> mailList() {
 			return this.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX);
 		}
 
@@ -289,7 +228,7 @@ public final class MailUtils {
 		 * @param folderName the folder name
 		 * @return the list
 		 */
-		public final List<String> mailList(String folderName) {
+		public List<String> mailList(String folderName) {
 			return mailList(folderName, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 		}
 
@@ -301,8 +240,8 @@ public final class MailUtils {
 		 * @param end        the end
 		 * @return the list
 		 */
-		public final List<String> mailList(String folderName, int begin, int end) {
-			if (this.mailReceiver == null || end < begin) {
+		public List<String> mailList(String folderName, int begin, int end) {
+			if (this.receiveOperator == null || end < begin) {
 				return Collections.emptyList();
 			}
 
@@ -311,8 +250,8 @@ public final class MailUtils {
 					return Collections.emptyList();
 				}
 
-				if (begin < 0) {
-					begin = 0;
+				if (begin < 1) {
+					begin = 1;
 				}
 				if (end < 0) {
 					end = folder.getMessageCount();
@@ -320,7 +259,7 @@ public final class MailUtils {
 
 				List<String> mailList = new ArrayList<>();
 				for (Message message : folder.getMessages(begin, end)) {
-					mailList.add(this.mailReceiver.readUID(folder, message));
+					mailList.add(this.receiveOperator.readUID(folder, message));
 				}
 				return mailList;
 			} catch (Exception e) {
@@ -338,8 +277,20 @@ public final class MailUtils {
 		 * @param uid        the uid
 		 * @return the optional
 		 */
-		public final Optional<MailObject> readMail(String folderName, String uid) {
-			if (this.mailReceiver == null) {
+		public Optional<MailObject> readMail(String folderName, String uid) {
+			return this.readMail(folderName, uid, Boolean.FALSE);
+		}
+
+		/**
+		 * Read mail optional.
+		 *
+		 * @param folderName 	the folder name
+		 * @param uid        	the uid
+		 * @param detail 		read mail detail
+		 * @return the optional
+		 */
+		public Optional<MailObject> readMail(String folderName, String uid, boolean detail) {
+			if (this.receiveOperator == null) {
 				return Optional.empty();
 			}
 			try (Store store = connect(); Folder folder = openReadOnlyFolder(store, folderName)) {
@@ -347,9 +298,9 @@ public final class MailUtils {
 					return Optional.empty();
 				}
 
-				Message message = this.mailReceiver.readMessage(folder, uid);
+				Message message = this.receiveOperator.readMessage(folder, uid);
 				if (message != null) {
-					return receiveMessage((MimeMessage) message, Boolean.TRUE);
+					return receiveMessage((MimeMessage) message, detail);
 				}
 			} catch (Exception e) {
 				if (this.logger.isDebugEnabled()) {
@@ -367,9 +318,9 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the list
 		 */
-		public final List<MailObject> readMailList(String folderName, String... uidArrays) {
+		public List<MailObject> readMailList(String folderName, String... uidArrays) {
 			List<MailObject> mailList = new ArrayList<>();
-			if (this.mailReceiver == null) {
+			if (this.receiveOperator == null) {
 				return mailList;
 			}
 
@@ -377,7 +328,7 @@ public final class MailUtils {
 				if (!folder.exists() || !folder.isOpen()) {
 					return mailList;
 				}
-				this.mailReceiver.readMessages(folder, uidArrays)
+				this.receiveOperator.readMessages(folder, uidArrays)
 						.forEach(message ->
 								receiveMessage((MimeMessage) message, Boolean.FALSE)
 										.ifPresent(mailList::add));
@@ -398,7 +349,7 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the boolean
 		 */
-		public final boolean readMails(String folderName, String... uidArrays) {
+		public boolean readMails(String folderName, String... uidArrays) {
 			return this.flagMailsStatus(Flags.Flag.SEEN, Boolean.TRUE, folderName, uidArrays);
 		}
 
@@ -409,7 +360,7 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the boolean
 		 */
-		public final boolean unreadMails(String folderName, String... uidArrays) {
+		public boolean unreadMails(String folderName, String... uidArrays) {
 			return this.flagMailsStatus(Flags.Flag.SEEN, Boolean.FALSE, folderName, uidArrays);
 		}
 
@@ -420,8 +371,30 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the boolean
 		 */
-		public final boolean answerMails(String folderName, String... uidArrays) {
+		public boolean answerMails(String folderName, String... uidArrays) {
 			return this.flagMailsStatus(Flags.Flag.ANSWERED, Boolean.TRUE, folderName, uidArrays);
+		}
+
+		/**
+		 * Set mails status as deleted by uid list
+		 *
+		 * @param folderName the folder name
+		 * @param uidArrays  the uid arrays
+		 * @return the boolean
+		 */
+		public boolean deleteMails(String folderName, String... uidArrays) {
+			return this.flagMailsStatus(Flags.Flag.DELETED, Boolean.TRUE, folderName, uidArrays);
+		}
+
+		/**
+		 * Set mails status as not deleted by uid list
+		 *
+		 * @param folderName the folder name
+		 * @param uidArrays  the uid arrays
+		 * @return the boolean
+		 */
+		public boolean recoverMails(String folderName, String... uidArrays) {
+			return this.flagMailsStatus(Flags.Flag.DELETED, Boolean.FALSE, folderName, uidArrays);
 		}
 
 		/**
@@ -431,7 +404,7 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the boolean
 		 */
-		public final boolean flagMails(String folderName, String... uidArrays) {
+		public boolean flagMails(String folderName, String... uidArrays) {
 			return this.flagMailsStatus(Flags.Flag.FLAGGED, Boolean.TRUE, folderName, uidArrays);
 		}
 
@@ -442,7 +415,7 @@ public final class MailUtils {
 		 * @param uidArrays  the uid arrays
 		 * @return the boolean
 		 */
-		public final boolean unflagMails(String folderName, String... uidArrays) {
+		public boolean unflagMails(String folderName, String... uidArrays) {
 			return this.flagMailsStatus(Flags.Flag.FLAGGED, Boolean.FALSE, folderName, uidArrays);
 		}
 
@@ -455,8 +428,8 @@ public final class MailUtils {
 		 * @return the boolean
 		 */
 		private boolean flagMailsStatus(Flags.Flag flag, boolean status, String folderName, String... uidArrays) {
-			if (this.mailReceiver == null) {
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+			if (this.receiveOperator == null) {
+				return Boolean.FALSE;
 			}
 			try (Store store = connect(); Folder folder = openFolder(store, Boolean.FALSE, folderName)) {
 
@@ -464,7 +437,7 @@ public final class MailUtils {
 					return Boolean.FALSE;
 				}
 
-				List<Message> messageList = this.mailReceiver.readMessages(folder, uidArrays);
+				List<Message> messageList = this.receiveOperator.readMessages(folder, uidArrays);
 
 				for (Message message : messageList) {
 					message.setFlag(flag, status);
@@ -484,41 +457,15 @@ public final class MailUtils {
 		 * @throws MessagingException   connect failed
 		 */
 		private Store connect() throws MessagingException {
-			Properties properties = this.mailReceiver.readConfig(this.mailConfig.getRecvConfig(),
-					this.mailConfig.getConnectionTimeout(), this.mailConfig.getProcessTimeout(),
-					this.mailConfig.getRecvUserName());
-			Session session = Session.getDefaultInstance(properties,
-					new DefaultAuthenticator(this.mailConfig.getRecvUserName(), this.mailConfig.getRecvPassWord()));
+			Properties properties = this.receiveOperator.readConfig(this.receiveConfig);
+			Session session =
+					Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
 
 			Store store = session.getStore(properties.getProperty("mail.store.protocol"));
 
-			if (this.mailConfig.getRecvConfig().getHostPort() == 0) {
-				store.connect(this.mailConfig.getRecvConfig().getHostName(),
-						this.mailConfig.getRecvUserName(), this.mailConfig.getRecvPassWord());
-			} else {
-				store.connect(this.mailConfig.getRecvConfig().getHostName(),
-						this.mailConfig.getRecvConfig().getHostPort(),
-						this.mailConfig.getRecvUserName(), this.mailConfig.getRecvPassWord());
-			}
+			store.connect(this.receiveConfig.getHostName(), this.receiveConfig.getHostPort(),
+					this.userName, this.passWord);
 			return store;
-		}
-
-		private static Folder openReadOnlyFolder(Store store, String folderName)
-				throws MessagingException {
-			return openFolder(store, true, folderName);
-		}
-
-		private static Folder openFolder(Store store, boolean readOnly, String folderName)
-				throws MessagingException {
-			Folder folder = store.getFolder(folderName);
-
-			if (readOnly) {
-				folder.open(Folder.READ_ONLY);
-			} else {
-				folder.open(Folder.READ_WRITE);
-			}
-
-			return folder;
 		}
 
 		/**
@@ -530,17 +477,13 @@ public final class MailUtils {
 		private Optional<MailObject> receiveMessage(MimeMessage mimeMessage, boolean detail) {
 			try {
 				MailObject mailObject = new MailObject();
-				InternetAddress[] internetAddresses =
-						(InternetAddress[]) mimeMessage.getRecipients(IMAPMessage.RecipientType.TO);
 				List<String> receiveList = new ArrayList<>();
-				Arrays.asList(mimeMessage.getRecipients(IMAPMessage.RecipientType.TO)).forEach(address -> {
-					if (address instanceof InternetAddress) {
-						receiveList.add(((InternetAddress)address).getAddress());
-					}
-				});
+				Arrays.stream(mimeMessage.getRecipients(IMAPMessage.RecipientType.TO))
+						.filter(address -> address instanceof InternetAddress)
+						.forEach(address -> receiveList.add(((InternetAddress)address).getAddress().toLowerCase()));
 
-				if (!receiveList.contains(this.mailConfig.getRecvUserName())) {
-					return Optional.empty();
+				if (!receiveList.contains(this.userName)) {
+					throw new MessagingException("Current account not in receive list! ");
 				}
 
 				mailObject.setReceiveAddress(receiveList);
@@ -564,39 +507,27 @@ public final class MailUtils {
 
 				if (detail) {
 					//	Read mail cc address
-					InternetAddress[] ccAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.CC);
-
-					if (ccAddress != null) {
-						List<String> ccList = new ArrayList<>();
-
-						for (InternetAddress address : ccAddress) {
-							ccList.add(address.getAddress());
-						}
-
-						mailObject.setCcAddress(ccList);
-					}
+					Optional.ofNullable((InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.CC))
+							.ifPresent(ccAddress -> {
+								List<String> ccList = new ArrayList<>();
+								Arrays.asList(ccAddress).forEach(address -> ccList.add(address.getAddress()));
+								mailObject.setCcAddress(ccList);
+							});
 
 					//	Read mail bcc address
-					InternetAddress[] bccAddress = (InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.BCC);
-
-					if (bccAddress != null) {
-						List<String> bccList = new ArrayList<>();
-
-						for (InternetAddress address : bccAddress) {
-							bccList.add(address.getAddress());
-						}
-
-						mailObject.setBccAddress(bccList);
-					}
+					Optional.ofNullable((InternetAddress[]) mimeMessage.getRecipients(Message.RecipientType.BCC))
+							.ifPresent(bccAddress -> {
+								List<String> bccList = new ArrayList<>();
+								Arrays.asList(bccAddress).forEach(address -> bccList.add(address.getAddress()));
+								mailObject.setBccAddress(bccList);
+							});
 
 					//	Read mail content message
 					StringBuilder contentBuffer = new StringBuilder();
 					getMailContent(mimeMessage, contentBuffer);
 					mailObject.setContent(contentBuffer.toString());
 
-					List<String> attachFiles = new ArrayList<>();
-					getMailAttachment(mimeMessage, attachFiles);
-					mailObject.setAttachFiles(attachFiles);
+					mailObject.setAttachFiles(getMailAttachment(mimeMessage));
 				}
 
 				return Optional.of(mailObject);
@@ -608,41 +539,9 @@ public final class MailUtils {
 			}
 		}
 
-		private static void getMailContent(Part part, StringBuilder contentBuffer) throws MessagingException, IOException {
-			String contentType = part.getContentType();
-			int nameIndex = contentType.indexOf("name");
-
-			if (contentBuffer == null) {
-				throw new IOException();
-			}
-
-			if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT) && (nameIndex == -1)) {
-				contentBuffer.append(part.getContent().toString());
-			} else {
-				if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_HTML) && (nameIndex == -1)) {
-					contentBuffer.append(part.getContent().toString());
-				} else {
-					if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
-						Multipart multipart = (Multipart) part.getContent();
-						int count = multipart.getCount();
-						for (int i = 0; i < count; i++) {
-							getMailContent(multipart.getBodyPart(i), contentBuffer);
-						}
-					} else {
-						if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822)) {
-							getMailContent((Part) part.getContent(), contentBuffer);
-						}
-					}
-				}
-			}
-		}
-
-		private void getMailAttachment(Part part, List<String> saveFiles) throws MessagingException, IOException {
-			if (saveFiles == null) {
-				saveFiles = new ArrayList<>();
-			}
-			String saveAttachPath = this.mailConfig.getStoragePath();
-			if (StringUtils.isEmpty(saveAttachPath)) {
+		private List<String> getMailAttachment(Part part) throws MessagingException, IOException {
+			List<String> saveFiles = new ArrayList<>();
+			if (StringUtils.isEmpty(this.storagePath)) {
 				throw new IOException("Save attach file path error! ");
 			}
 			if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
@@ -652,18 +551,159 @@ public final class MailUtils {
 					Part bodyPart = multipart.getBodyPart(i);
 					if (bodyPart.getFileName() != null) {
 						String disposition = bodyPart.getDisposition();
-						if (disposition != null && (disposition.equals(Part.ATTACHMENT) || disposition.equals(Part.INLINE))) {
-							boolean saveFile = FileUtils.saveFile(bodyPart.getInputStream(),
-									saveAttachPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
+						if (disposition != null
+								&& (disposition.equals(Part.ATTACHMENT) || disposition.equals(Part.INLINE))) {
+							String savePath = this.storagePath + Globals.DEFAULT_PAGE_SEPARATOR
+									+ MimeUtility.decodeText(bodyPart.getFileName());
+							boolean saveFile = FileUtils.saveFile(bodyPart.getInputStream(), savePath);
 							if (saveFile) {
-								saveFiles.add(saveAttachPath + Globals.DEFAULT_PAGE_SEPARATOR + MimeUtility.decodeText(bodyPart.getFileName()));
+								saveFiles.add(savePath);
 							}
 						} else if (bodyPart.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
-							getMailAttachment(bodyPart, saveFiles);
+							saveFiles.addAll(getMailAttachment(bodyPart));
 						}
 					}
 				}
 			}
+			return saveFiles;
+		}
+	}
+
+	private static MimeMessage convert(Session session, MailObject mailObject) throws MessagingException {
+		MimeMessage message = new MimeMessage(session);
+
+		message.setSubject(mailObject.getSubject(), mailObject.getCharset());
+
+		MimeMultipart mimeMultipart = new MimeMultipart();
+
+		if (mailObject.getAttachFiles() != null) {
+			for (String attachment : mailObject.getAttachFiles()) {
+				MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+				File file;
+
+				try {
+					file = FileUtils.getFile(attachment);
+				} catch (FileNotFoundException e) {
+					throw new MessagingException("Attachment file not found! ", e);
+				}
+
+				DataSource dataSource = new FileDataSource(file);
+
+				mimeBodyPart.setFileName(StringUtils.getFilename(attachment));
+				mimeBodyPart.setDataHandler(new DataHandler(dataSource));
+
+				mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
+			}
+		}
+
+		if (mailObject.getIncludeFiles() != null) {
+			List<String> includeFiles = mailObject.getIncludeFiles();
+			for (String filePath : includeFiles) {
+				File file;
+				MimeBodyPart mimeBodyPart;
+
+				try {
+					file = FileUtils.getFile(filePath);
+					String fileName = StringUtils.getFilename(filePath);
+					mimeBodyPart = new MimeBodyPart();
+					DataHandler dataHandler =
+							new DataHandler(new ByteArrayDataSource(file.toURI().toURL().openStream(),
+									"application/octet-stream"));
+					mimeBodyPart.setDataHandler(dataHandler);
+
+					mimeBodyPart.setFileName(fileName);
+					mimeBodyPart.setHeader("Content-ID", fileName);
+				} catch (Exception e) {
+					throw new MessagingException("Process include file error! ", e);
+				}
+
+				mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
+			}
+		}
+
+		if (mailObject.getContent() != null) {
+			String content = mailObject.getContent();
+
+			if (mailObject.getContentMap() != null) {
+				Map<String, String> argsMap = mailObject.getContentMap();
+
+				for (Map.Entry<String, String> entry : argsMap.entrySet()) {
+					content = StringUtils.replace(content, "###" + entry.getKey() + "###", entry.getValue());
+				}
+			}
+
+			MimeBodyPart mimeBodyPart = new MimeBodyPart();
+			mimeBodyPart.setContent(content, mailObject.getContentType() + "; charset=" + mailObject.getCharset());
+			mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
+		}
+
+		message.setContent(mimeMultipart);
+		message.setFrom(new InternetAddress(mailObject.getSendAddress()));
+
+		if (mailObject.getReceiveAddress() == null || mailObject.getReceiveAddress().isEmpty()) {
+			throw new MessagingException("Unknown receive address");
+		}
+		StringBuilder receiveAddress = new StringBuilder();
+		mailObject.getReceiveAddress().forEach(address -> receiveAddress.append(",").append(address));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveAddress.substring(1)));
+
+		if (mailObject.getCcAddress() != null && !mailObject.getCcAddress().isEmpty()) {
+			StringBuilder ccAddress = new StringBuilder();
+			mailObject.getCcAddress().forEach(address -> ccAddress.append(",").append(address));
+			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccAddress.substring(1)));
+		}
+
+		if (mailObject.getBccAddress() != null && !mailObject.getBccAddress().isEmpty()) {
+			StringBuilder bccAddress = new StringBuilder();
+			mailObject.getBccAddress().forEach(address -> bccAddress.append(",").append(address));
+			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccAddress.substring(1)));
+		}
+
+		if (mailObject.getReplyAddress() != null && !mailObject.getReplyAddress().isEmpty()) {
+			StringBuilder replyAddress = new StringBuilder();
+			mailObject.getReplyAddress().forEach(address -> replyAddress.append(",").append(address));
+			message.setReplyTo(InternetAddress.parse(replyAddress.substring(1)));
+		} else {
+			message.setReplyTo(InternetAddress.parse(mailObject.getSendAddress()));
+		}
+		message.setSentDate(mailObject.getSendDate() == null ? new Date() : mailObject.getSendDate());
+		return message;
+	}
+
+	private static Folder openReadOnlyFolder(Store store, String folderName)
+			throws MessagingException {
+		return openFolder(store, Boolean.TRUE, folderName);
+	}
+
+	private static Folder openFolder(Store store, boolean readOnly, String folderName)
+			throws MessagingException {
+		Folder folder = store.getFolder(folderName);
+		folder.open(readOnly ? Folder.READ_ONLY : Folder.READ_WRITE);
+		return folder;
+	}
+
+	private static void getMailContent(Part part, StringBuilder contentBuffer)
+			throws MessagingException, IOException {
+		String contentType = part.getContentType();
+		int nameIndex = contentType.indexOf("name");
+
+		if (contentBuffer == null) {
+			throw new IOException();
+		}
+
+		if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT) && (nameIndex == -1)) {
+			contentBuffer.append(part.getContent().toString());
+		} else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_HTML) && (nameIndex == -1)) {
+			contentBuffer.append(part.getContent().toString());
+		} else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
+			Multipart multipart = (Multipart) part.getContent();
+			int count = multipart.getCount();
+			for (int i = 0; i < count; i++) {
+				getMailContent(multipart.getBodyPart(i), contentBuffer);
+			}
+		} else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822)) {
+			getMailContent((Part) part.getContent(), contentBuffer);
 		}
 	}
 }

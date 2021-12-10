@@ -39,7 +39,7 @@ public class HuffmanObject {
 	 */
 	public HuffmanObject(Hashtable<String, Object> codeMapping, String huffmanValue) {
 		if (codeMapping != null) {
-			codeMapping.forEach(this.codeMapping::put);
+			this.codeMapping.putAll(codeMapping);
 		}
 		this.huffmanValue = huffmanValue;
 	}
@@ -59,9 +59,7 @@ public class HuffmanObject {
 	 * @return the codeMapping
 	 */
 	public Hashtable<String, Object> getCodeMapping() {
-		Hashtable<String, Object> returnMap = new Hashtable<>();
-		codeMapping.forEach(returnMap::put);
-		return returnMap;
+		return this.codeMapping;
 	}
 
 	/**

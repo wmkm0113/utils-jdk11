@@ -26,7 +26,7 @@ import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.nervousync.commons.beans.network.NetworkInfo;
+import org.nervousync.beans.network.NetworkInfo;
 import org.nervousync.exceptions.beans.network.NetworkInfoException;
 
 /**
@@ -427,8 +427,6 @@ public final class SystemUtils {
 				LOGGER.error("Retrieve local MAC address error! ", e);
 			}
 			if (macAddress == null || macAddress.length == 0) {
-				// Emulate a mac address with an IP v4 or v6
-				final byte[] address = localHost.getAddress();
 				// Take only 6 bytes if the address is an IPv6 otherwise will pad with two zero bytes
 				macAddress = Arrays.copyOf(localHost.getAddress(), 6);
 			}
@@ -455,7 +453,7 @@ public final class SystemUtils {
 			}
 			
 			Collections.sort(macAddressList);
-			return SecurityUtils.SHA256(macAddressList);
+			return ConvertUtils.byteToHex(SecurityUtils.SHA256(macAddressList));
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Generate identified key error!", e);

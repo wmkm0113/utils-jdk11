@@ -44,15 +44,15 @@ public final class StandardEncryptor implements Encryptor {
 	}
 	
 	@Override
-	public int encryptData(byte[] buff) throws ZipException {
+	public void encryptData(byte[] buff) throws ZipException {
 		if (buff == null) {
 			throw new NullPointerException();
 		}
-		return encryptData(buff, 0, buff.length);
+		encryptData(buff, 0, buff.length);
 	}
 
 	@Override
-	public int encryptData(byte[] buff, int start, int len) throws ZipException {
+	public void encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (len < 0) {
 			throw new ZipException("invalid length specified to decrypt data");
 		}
@@ -61,7 +61,6 @@ public final class StandardEncryptor implements Encryptor {
 			for (int i = start; i <  start + len; i++) {
 				buff[i] = encryptByte(buff[i]);
 			}
-			return len;
 		} catch (Exception e) {
 			throw new ZipException(e);
 		}

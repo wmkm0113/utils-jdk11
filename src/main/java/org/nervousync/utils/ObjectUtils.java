@@ -27,7 +27,7 @@ import java.util.List;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-import org.nervousync.commons.beans.core.BeanObject;
+import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.interceptor.beans.HandlerInterceptor;

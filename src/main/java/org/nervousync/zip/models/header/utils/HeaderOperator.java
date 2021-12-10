@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.utils.StringUtils;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.utils.RawUtils;
-import org.nervousync.zip.utils.ZipUtils;
 
 /**
  * @author Steven Wee   <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -64,28 +64,28 @@ public final class HeaderOperator {
 		byte[] intBuffer = new byte[4];
 
 		// Extended local file header signature
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) ZipConstants.EXTSIG);
-		copyByteArrayToArrayList(intBuffer, byteArrayList);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) ZipConstants.EXTSIG);
+		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// CRC
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) localFileHeader.getCrc32());
-		copyByteArrayToArrayList(intBuffer, byteArrayList);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) localFileHeader.getCrc32());
+		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// Compressed size
 		long compressedSize = localFileHeader.getCompressedSize();
 		if (compressedSize > Integer.MAX_VALUE) {
 			compressedSize = Integer.MAX_VALUE;
 		}
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) compressedSize);
-		copyByteArrayToArrayList(intBuffer, byteArrayList);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) compressedSize);
+		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// Original size
 		long originalSize = localFileHeader.getOriginalSize();
 		if (originalSize > Integer.MAX_VALUE) {
 			originalSize = Integer.MAX_VALUE;
 		}
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, (int) originalSize);
-		copyByteArrayToArrayList(intBuffer, byteArrayList);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) originalSize);
+		copyByteArrayToList(intBuffer, byteArrayList);
 
 		byte[] extendLocationHdrBytes = convertByteArrayListToByteArray(byteArrayList);
 		outputStream.write(extendLocationHdrBytes);
@@ -112,23 +112,23 @@ public final class HeaderOperator {
 
 	public static void appendShortToArrayList(short value, List<String> arrayList) throws ZipException {
 		byte[] shortBuffer = new byte[2];
-		RawUtils.writeShortFromLittleEndian(shortBuffer, 0, value);
-		HeaderOperator.copyByteArrayToArrayList(shortBuffer, arrayList);
+		RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, value);
+		HeaderOperator.copyByteArrayToList(shortBuffer, arrayList);
 	}
 
 	public static void appendIntToArrayList(int value, List<String> arrayList) throws ZipException {
 		byte[] intBuffer = new byte[4];
-		RawUtils.writeIntFromLittleEndian(intBuffer, 0, value);
-		HeaderOperator.copyByteArrayToArrayList(intBuffer, arrayList);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, value);
+		HeaderOperator.copyByteArrayToList(intBuffer, arrayList);
 	}
 
 	public static void appendLongToArrayList(long value, List<String> arrayList) throws ZipException {
 		byte[] longBuffer = new byte[8];
-		RawUtils.writeLongFromLittleEndian(longBuffer, 0, value);
-		HeaderOperator.copyByteArrayToArrayList(longBuffer, arrayList);
+		RawUtils.writeLong(longBuffer, RawUtils.Endian.LITTLE, value);
+		HeaderOperator.copyByteArrayToList(longBuffer, arrayList);
 	}
 
-	public static void copyByteArrayToArrayList(byte[] byteArray, List<String> arrayList) throws ZipException {
+	public static void copyByteArrayToList(byte[] byteArray, List<String> arrayList) throws ZipException {
 		if (arrayList == null || byteArray == null) {
 			throw new ZipException("one of the input parameters is null, cannot copy byte array to array list");
 		}
@@ -138,8 +138,8 @@ public final class HeaderOperator {
 		}
 	}
 
-	public static void copyByteArrayToArrayList(String entryPath, List<String> arrayList) throws ZipException {
-		copyByteArrayToArrayList(convertCharset(entryPath), arrayList);
+	public static void copyByteArrayToList(String entryPath, List<String> arrayList) throws ZipException {
+		copyByteArrayToList(convertCharset(entryPath), arrayList);
 	}
 
 	/**
@@ -152,7 +152,7 @@ public final class HeaderOperator {
 	private static byte[] convertCharset(String string) throws ZipException {
 		try {
 			byte[] converted;
-			String charSet = ZipUtils.detectCharSet(string);
+			String charSet = StringUtils.detectCharset(string);
 			switch (charSet) {
 				case ZipConstants.CHARSET_CP850:
 					converted = string.getBytes(ZipConstants.CHARSET_CP850);

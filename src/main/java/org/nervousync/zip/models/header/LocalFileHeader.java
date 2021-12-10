@@ -99,7 +99,7 @@ public class LocalFileHeader extends FileHeader {
 					}
 
 					if (readLength != salt.length) {
-						return Globals.DEFAULT_VALUE_BOOLEAN;
+						return Boolean.FALSE;
 					}
 
 					byte[] passwordBytes = new byte[2];
@@ -114,7 +114,7 @@ public class LocalFileHeader extends FileHeader {
 								salt, this.getPassword(), passwordBytes);
 					}
 				}
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			} else if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
 				//	Not supported verify password of standard encrypt
 				return true;
@@ -122,7 +122,7 @@ public class LocalFileHeader extends FileHeader {
 				throw new ZipException("Unsupported encryption method");
 			}
 		} catch (Exception e) {
-			return Globals.DEFAULT_VALUE_BOOLEAN;
+			return Boolean.FALSE;
 		}
 	}
 }

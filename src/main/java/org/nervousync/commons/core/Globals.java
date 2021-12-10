@@ -53,7 +53,6 @@ public final class Globals {
 	public static final short DEFAULT_VALUE_SHORT = -1;
 	public static final double DEFAULT_VALUE_DOUBLE = -1;
 	public static final float DEFAULT_VALUE_FLOAT = -1;
-	public static final boolean DEFAULT_VALUE_BOOLEAN = false;
 	public static final String DEFAULT_VALUE_STRING = "";
 
 	public static final String READ_MODE = "r";

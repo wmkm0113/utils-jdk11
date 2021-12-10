@@ -275,12 +275,15 @@ public final class PropertiesUtils {
 
 			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
 
-			if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "xml")) {
-				properties.storeToXML(fileOutputStream, comment, Globals.DEFAULT_ENCODING);
-			} else if (StringUtils.endsWithIgnoreCase(propertiesFilePath, "properties")) {
-				properties.store(fileOutputStream, comment);
-			} else {
-				throw new Exception("Properties file error");
+			switch (fileExtName.toLowerCase()) {
+				case "xml":
+					properties.storeToXML(fileOutputStream, comment, Globals.DEFAULT_ENCODING);
+					break;
+				case "properties":
+					properties.store(fileOutputStream, comment);
+					break;
+				default:
+					throw new Exception("Properties file error");
 			}
 			return true;
 		} catch (Exception e) {

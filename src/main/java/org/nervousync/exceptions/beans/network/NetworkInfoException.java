@@ -16,7 +16,6 @@
  */
 package org.nervousync.exceptions.beans.network;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.ObjectUtils;
 
 /**
@@ -50,11 +49,11 @@ public class NetworkInfoException extends Exception {
 
 	public boolean equals(Object other) {
 		if (other == null) {
-			return false;
+			return Boolean.FALSE;
 		}
 		
 		if (this == other) {
-			return true;
+			return Boolean.TRUE;
 		}
 		
 		if (other instanceof NetworkInfoException) {
@@ -63,7 +62,7 @@ public class NetworkInfoException extends Exception {
 					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 		}
 		
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	public int hashCode() {

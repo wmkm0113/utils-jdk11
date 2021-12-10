@@ -16,7 +16,6 @@
  */
 package org.nervousync.exceptions.http;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.ObjectUtils;
 
 /**
@@ -45,11 +44,11 @@ public class CertInfoException extends Exception {
 	
 	public boolean equals(Object other) {
 		if (other == null) {
-			return false;
+			return Boolean.FALSE;
 		}
 		
 		if (this == other) {
-			return true;
+			return Boolean.TRUE;
 		}
 		
 		if (other instanceof CertInfoException) {
@@ -58,7 +57,7 @@ public class CertInfoException extends Exception {
 					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 		}
 		
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 	
 	public int hashCode() {

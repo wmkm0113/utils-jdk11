@@ -711,6 +711,16 @@ public final class DateTimeUtils {
 	}
 
 	/**
+	 * Check given year is leap year
+	 * @param year 	given year
+	 *
+	 * @return		check result
+	 */
+	public static boolean isLeapYear(int year) {
+		return ((year%400==0) || (year%100!=0) && (year%4==0));
+	}
+
+	/**
 	 * Get current month first day
 	 * @param format        Date format
 	 * @return              Formatted date string

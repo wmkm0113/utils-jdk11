@@ -41,7 +41,6 @@ public class ZipCryptoEngine {
 	}
 	
 	public ZipCryptoEngine() {
-		
 	}
 	
 	public void initKeys(char[] password) {
@@ -53,7 +52,7 @@ public class ZipCryptoEngine {
 			this.updateKeys((byte)(ch & 0xFF));
 		}
 	}
-	
+
 	public void updateKeys(byte b) {
 		this.keys[0] = crc32(this.keys[0], b);
 		this.keys[1] += this.keys[0] & 0xff;
@@ -66,7 +65,7 @@ public class ZipCryptoEngine {
 		return (byte)((temp * (temp ^ 1)) >>> 8);
 	}
 	
-	private int crc32(int currentCrc, byte b) {
+	private static int crc32(int currentCrc, byte b) {
 		return ((currentCrc >>> 8) ^ CRC_TABLE[(currentCrc ^ b) & 0xFF]);
 	}
 }

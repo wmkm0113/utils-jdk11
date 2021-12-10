@@ -29,9 +29,9 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.nervousync.commons.beans.image.CutOptions;
-import org.nervousync.commons.beans.image.MarkOptions;
-import org.nervousync.commons.beans.image.MarkOptions.MarkPosition;
+import org.nervousync.beans.image.CutOptions;
+import org.nervousync.beans.image.MarkOptions;
+import org.nervousync.beans.image.MarkOptions.MarkPosition;
 import org.nervousync.commons.core.Globals;
 
 /**
@@ -114,11 +114,11 @@ public final class ImageUtils {
 		if (origPath != null && FileUtils.isExists(origPath) && cutOptions != null) {
 			if (cutOptions.getPositionX() + cutOptions.getCutWidth() > ImageUtils.imageWidth(origPath)) {
 				LOGGER.error("Width is out of original file");
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 			if (cutOptions.getPositionY() + cutOptions.getCutHeight() > ImageUtils.imageHeight(origPath)) {
 				LOGGER.error("Height is out of original file");
-				return Globals.DEFAULT_VALUE_BOOLEAN;
+				return Boolean.FALSE;
 			}
 
 			try {
@@ -141,7 +141,7 @@ public final class ImageUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public final class ImageUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 	
 	/**
@@ -240,7 +240,7 @@ public final class ImageUtils {
 				}
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -254,7 +254,6 @@ public final class ImageUtils {
 		int imageWidth = ImageUtils.imageWidth(filePath);
 		int imageHeight = ImageUtils.imageHeight(filePath);
 		try {
-			BufferedImage srcImage = ImageIO.read(FileUtils.getFile(filePath));
 			BufferedImage bufferedImage =
 					new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 			return ImageIO.write(processImage(bufferedImage, imageWidth, imageHeight, markOptions),
@@ -265,7 +264,7 @@ public final class ImageUtils {
 				LOGGER.debug("Mark picture error! ", e);
 			}
 		}
-		return Globals.DEFAULT_VALUE_BOOLEAN;
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -338,8 +337,6 @@ public final class ImageUtils {
 	 * @return                  signature value
 	 */
 	public static String dHash(BufferedImage bufferedImage) {
-		int width = bufferedImage.getWidth();
-		int height = bufferedImage.getHeight();
 		BufferedImage prepareImage;
 		if (bufferedImage.getWidth() != 9 || bufferedImage.getHeight() != 8) {
 			prepareImage = ImageUtils.processImage(bufferedImage, 9, 8, null);
@@ -395,8 +392,6 @@ public final class ImageUtils {
 	 * @return                  signature value
 	 */
 	public static String pHash(BufferedImage bufferedImage) {
-		int width = bufferedImage.getWidth();
-		int height = bufferedImage.getHeight();
 		BufferedImage prepareImage;
 		if (bufferedImage.getWidth() != 8 || bufferedImage.getHeight() != 8) {
 			prepareImage = ImageUtils.processImage(bufferedImage, 8, 8, null);

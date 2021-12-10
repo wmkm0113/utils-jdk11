@@ -73,11 +73,11 @@ public final class HttpEntity {
 	/**
 	 * Is multipart request
 	 */
-	private boolean multipart = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean multipart = Boolean.FALSE;
 	/**
 	 * Is mixed parameters, means include form field and upload files
 	 */
-	private boolean mixed = Globals.DEFAULT_VALUE_BOOLEAN;
+	private boolean mixed = Boolean.FALSE;
 	
 	/**
 	 * Constructor
@@ -280,7 +280,7 @@ public final class HttpEntity {
 		}
 		
 		public static EntityInfo generateTextEntity(String name, String value) {
-			return new EntityInfo(Globals.DEFAULT_VALUE_BOOLEAN, name, value);
+			return new EntityInfo(Boolean.FALSE, name, value);
 		}
 
 		public static EntityInfo generateBinaryEntity(String name, String value) 
