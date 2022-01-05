@@ -16,12 +16,10 @@
  */
 package org.nervousync.zip.engine;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.zip.models.AESExtraDataRecord;
 import org.nervousync.zip.models.header.utils.HeaderOperator;
 import org.nervousync.exceptions.zip.ZipException;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

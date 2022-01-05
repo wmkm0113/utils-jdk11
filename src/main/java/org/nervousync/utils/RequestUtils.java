@@ -948,7 +948,7 @@ public final class RequestUtils {
 	 *
 	 * @param m         A map of parameters
 	 * @param ampersand String to use for ampersands (e.g. "&amp;" or "&amp;amp;")
-	 * @param encode    Whether or not to encode non-ASCII characters
+	 * @param encode    Whether to encode non-ASCII characters
 	 * @return query string (with no leading "?")
 	 */
 	public static StringBuilder createQueryStringFromMap(Map<String, String[]> m, String ampersand, boolean encode) {
@@ -1185,7 +1185,7 @@ public final class RequestUtils {
 	 * Gets request url.
 	 *
 	 * @param request       the request
-	 * @param includeDomain the include domain
+	 * @param includeDomain to include domain
 	 * @return the request url
 	 */
 	public static String getRequestUrl(HttpServletRequest request, boolean includeDomain) {
@@ -1223,7 +1223,7 @@ public final class RequestUtils {
 	 *
 	 * @param request the request
 	 * @param regex   the regex
-	 * @param toPath  the to path
+	 * @param toPath  target path
 	 * @return the string
 	 */
 	public static String processRewrite(HttpServletRequest request, String regex, String toPath) {

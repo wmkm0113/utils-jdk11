@@ -66,6 +66,21 @@ public final class SecureFactory {
     }
 
     /**
+     * Check given secure algorithm was supported
+     *
+     * @param secureAlgorithm   Secure algorithm name
+     * @return                  Check result
+     */
+    public static boolean supportedAlgorithm(String secureAlgorithm) {
+        try {
+            SecureAlgorithm.valueOf(secureAlgorithm);
+            return Boolean.TRUE;
+        } catch (IllegalArgumentException e) {
+            return Boolean.FALSE;
+        }
+    }
+
+    /**
      * Initialize boolean.
      *
      * @param folderPath      the folder path

@@ -444,7 +444,7 @@ public class BeanObject implements Serializable {
 		}
 
 		/**
-		 * Writes an xml comment with the data enclosed
+		 * Writes a xml comment with the data enclosed
 		 *
 		 * @param data the data contained in the comment, may be null
 		 * @throws XMLStreamException   XMLStreamException

@@ -58,7 +58,7 @@ public abstract class BaseDigestProvider extends SecureProvider {
     }
 
     @Override
-    public final boolean verify(byte[] signature) throws CryptoException {
+    public final boolean verify(byte[] signature) {
         byte[] calcResult;
         if (this.macMode) {
             calcResult = new byte[this.hmac.getMacSize()];
@@ -72,7 +72,7 @@ public abstract class BaseDigestProvider extends SecureProvider {
     }
 
     @Override
-    public final void reset() throws CryptoException {
+    public final void reset() {
         if (this.macMode) {
             this.hmac.reset();
         } else {

@@ -41,7 +41,7 @@ public final class ProxyInfo {
 	 */
 	private final int proxyPort;
 	/**
-	 * Proxy server user name
+	 * Proxy server username
 	 */
 	private final String userName;
 	/**
@@ -104,7 +104,7 @@ public final class ProxyInfo {
 	 * @param proxyType			Proxy type
 	 * @param proxyAddress		Proxy server address
 	 * @param proxyPort			Proxy server port
-	 * @param userName			Proxy server user name
+	 * @param userName			Proxy server username
 	 * @param password			Proxy server password
 	 * @return					Proxy info instance
 	 */

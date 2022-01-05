@@ -343,7 +343,7 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
-	 * Parse file file.
+	 * Parse file.
 	 *
 	 * @param savePath the save path
 	 * @return the file
@@ -364,7 +364,7 @@ public final class HttpResponseContent implements Serializable {
 	}
 
 	/**
-	 * Header list list.
+	 * Header list.
 	 *
 	 * @return the list
 	 */

@@ -188,7 +188,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param clazz the class to introspect
 	 * @param name  the name of the field
-	 * @param type  the type of the field (may be <code>null</code> if name is specified)
+	 * @param type  the type of the field (maybe <code>null</code> if name is specified)
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
 	public static Field findField(Class<?> clazz, String name, Class<?> type) {
@@ -410,7 +410,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param clazz      the class to introspect
 	 * @param name       the name of the method
-	 * @param paramTypes the parameter types of the method (may be <code>null</code> to indicate any signature)
+	 * @param paramTypes the parameter types of the method (maybe <code>null</code> to indicate any signature)
 	 * @return the Method object, or <code>null</code> if none found
 	 */
 	public static Method findMethod(Class<?> clazz, String name, Class<?>[] paramTypes) {
@@ -456,7 +456,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
-	 * @param args   the invocation arguments (may be <code>null</code>)
+	 * @param args   the invocation arguments (maybe <code>null</code>)
 	 * @return the invocation result, if any
 	 */
 	public static Object invokeMethod(Method method, Object target, Object[] args) {
@@ -489,7 +489,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
-	 * @param args   the invocation arguments (may be <code>null</code>)
+	 * @param args   the invocation arguments (maybe <code>null</code>)
 	 * @return the invocation result, if any
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
 	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
@@ -593,7 +593,7 @@ public final class ReflectionUtils {
 
 	/**
 	 * Determine whether the given method explicitly declares the given exception
-	 * or one of its superclasses, which means that an exception of that type
+	 * or one of its superclasses, which means that an exception to that type
 	 * can be propagated as-is within a reflective invocation.
 	 *
 	 * @param method        the declaring method
@@ -1259,11 +1259,11 @@ public final class ReflectionUtils {
 	 */
 	public enum MethodType {
 		/**
-		 * Get method method type.
+		 * Get method type.
 		 */
 		GetMethod,
 		/**
-		 * Set method method type.
+		 * Set method type.
 		 */
 		SetMethod
 	}

@@ -122,7 +122,7 @@ public final class MIMETypes implements Serializable {
 	}
 	
 	/**
-	 * Identify mimeType is image
+	 * Identify mimeType is image type
 	 * @param mimeType		MIME type
 	 * @return				Check result
 	 */

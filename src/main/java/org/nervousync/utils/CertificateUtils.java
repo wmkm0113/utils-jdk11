@@ -111,6 +111,38 @@ public final class CertificateUtils {
      * Read X.509 Certificate
      *
      * @param certBytes         Certificate data bytes
+     * @return                  Read X.509 certificate or null for invalid
+     */
+    public static X509Certificate x509(byte[] certBytes) {
+        return x509(certBytes, null, Boolean.FALSE);
+    }
+
+    /**
+     * Read X.509 Certificate
+     *
+     * @param certBytes         Certificate data bytes
+     * @param verifyKey         Verifier key
+     * @return                  Read X.509 certificate or null for invalid
+     */
+    public static X509Certificate x509(byte[] certBytes, PublicKey verifyKey) {
+        return x509(certBytes, verifyKey, Boolean.FALSE);
+    }
+
+    /**
+     * Read X.509 Certificate
+     *
+     * @param certBytes         Certificate data bytes
+     * @param checkValidity     <code>true</code> for check certificate signature, <code>false</code> for not check
+     * @return                  Read X.509 certificate or null for invalid
+     */
+    public static X509Certificate x509(byte[] certBytes, boolean checkValidity) {
+        return x509(certBytes, null, checkValidity);
+    }
+
+    /**
+     * Read X.509 Certificate
+     *
+     * @param certBytes         Certificate data bytes
      * @param verifyKey         Verifier key
      * @param checkValidity     <code>true</code> for check certificate signature, <code>false</code> for not check
      * @return                  Read X.509 certificate or null for invalid

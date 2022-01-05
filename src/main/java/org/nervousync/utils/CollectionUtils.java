@@ -103,7 +103,7 @@ public final class CollectionUtils {
 
 	/**
 	 * Merge the given array into the given Collection.
-	 * @param array the array to merge (may be <code>null</code>)
+	 * @param array the array to merge (maybe <code>null</code>)
 	 * @param collection the target Collection to merge the array into
 	 */
 	public static void mergeArrayIntoCollection(Object array, Collection<Object> collection) {
@@ -119,7 +119,7 @@ public final class CollectionUtils {
 	 * copying all properties (key-value pairs) over.
 	 * <p>Uses <code>Properties.propertyNames()</code> to even catch
 	 * default properties linked into the original Properties instance.
-	 * @param props the Properties instance to merge (may be <code>null</code>)
+	 * @param props the Properties instance to merge (maybe <code>null</code>)
 	 * @param map the target Map to merge the properties into
 	 */
 	public static void mergePropertiesIntoMap(Properties props, Map<Object, Object> map) {

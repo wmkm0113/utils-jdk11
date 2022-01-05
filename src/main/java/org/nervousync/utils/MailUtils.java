@@ -214,7 +214,7 @@ public final class MailUtils {
 		}
 
 		/**
-		 * Mail list list.
+		 * Mail list.
 		 *
 		 * @return the list
 		 */
@@ -223,7 +223,7 @@ public final class MailUtils {
 		}
 
 		/**
-		 * Mail list list.
+		 * Mail list.
 		 *
 		 * @param folderName the folder name
 		 * @return the list
@@ -233,11 +233,11 @@ public final class MailUtils {
 		}
 
 		/**
-		 * Mail list list.
+		 * Mail list.
 		 *
 		 * @param folderName the folder name
-		 * @param begin      the begin
-		 * @param end        the end
+		 * @param begin      the beginning index
+		 * @param end        the end index
 		 * @return the list
 		 */
 		public List<String> mailList(String folderName, int begin, int end) {
@@ -312,7 +312,7 @@ public final class MailUtils {
 		}
 
 		/**
-		 * Read mail list list.
+		 * Read mail list.
 		 *
 		 * @param folderName the folder name
 		 * @param uidArrays  the uid arrays

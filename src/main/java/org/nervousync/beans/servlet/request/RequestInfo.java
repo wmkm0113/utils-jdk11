@@ -243,7 +243,7 @@ public final class RequestInfo implements Serializable {
 	/**
 	 * Gets time out.
 	 *
-	 * @return the time out
+	 * @return the time-out
 	 */
 	public int getTimeOut() {
 		return timeOut;
@@ -396,7 +396,7 @@ public final class RequestInfo implements Serializable {
 		 * @param proxyType    Proxy type
 		 * @param proxyAddress Proxy server address
 		 * @param proxyPort    Proxy server port
-		 * @param userName     Proxy server user name
+		 * @param userName     Proxy server username
 		 * @param password     Proxy server password
 		 * @return Proxy info instance
 		 */
@@ -488,7 +488,7 @@ public final class RequestInfo implements Serializable {
 		/**
 		 * Time out request builder.
 		 *
-		 * @param timeOut the time out
+		 * @param timeOut the time-out
 		 * @return the request builder
 		 */
 		public RequestBuilder timeOut(int timeOut) {

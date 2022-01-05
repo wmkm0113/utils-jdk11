@@ -195,7 +195,7 @@ public final class ObjectUtils {
 
 	/**
 	 * Check whether the given exception is compatible with the exceptions
-	 * declared in a throws clause.
+	 * declared in a throw clause.
 	 * @param ex the exception to checked
 	 * @param declaredExceptions the exceptions declared in the throws clause
 	 * @return whether the given exception is compatible
@@ -248,7 +248,7 @@ public final class ObjectUtils {
 
 	/**
 	 * Check whether the given array contains the given element.
-	 * @param array the array to check (may be <code>null</code>,
+	 * @param array the array to check (maybe <code>null</code>,
 	 * in which case the return value will always be <code>false</code>)
 	 * @param element the element to check for
 	 * @return whether the element has been found in the given array
@@ -665,7 +665,7 @@ public final class ObjectUtils {
 
 	/**
 	 * Return a String representation of an object's overall identity.
-	 * @param obj the object (may be <code>null</code>)
+	 * @param obj the object (maybe <code>null</code>)
 	 * @return the object's identity as String representation,
 	 * or an empty String if the object was <code>null</code>
 	 */
@@ -704,7 +704,7 @@ public final class ObjectUtils {
 	/**
 	 * Determine the class name for the given object.
 	 * <p>Returns <code>"null"</code> if <code>obj</code> is <code>null</code>.
-	 * @param obj the object to introspect (may be <code>null</code>)
+	 * @param obj the object to introspect (maybe <code>null</code>)
 	 * @return the corresponding class name
 	 */
 	public static String nullSafeClassName(Object obj) {

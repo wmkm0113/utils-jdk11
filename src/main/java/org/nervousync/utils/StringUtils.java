@@ -304,7 +304,7 @@ public final class StringUtils {
 	/**
 	 * Convert the given string to HuffmanTree Object using given code mapping
 	 *
-	 * @param codeMapping Geven code mapping
+	 * @param codeMapping Given code mapping
 	 * @param content     Given data string
 	 * @return Converted HuffmanTree object
 	 */
@@ -348,7 +348,7 @@ public final class StringUtils {
 	 * StringUtils.isEmpty("Hello") = false
 	 * </pre>
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is null or length 0.
 	 */
 	public static boolean isEmpty(CharSequence str) {
@@ -365,7 +365,7 @@ public final class StringUtils {
 	 * StringUtils.notNull("Hello") = true
 	 * </pre>
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null and has length
 	 */
 	public static boolean notNull(CharSequence str) {
@@ -382,7 +382,7 @@ public final class StringUtils {
 	 * StringUtils.notBlank("Hello") = true
 	 * </pre>
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null/blank character and has length
 	 */
 	public static boolean notBlank(String str) {
@@ -399,7 +399,7 @@ public final class StringUtils {
 	 * StringUtils.hasLength("Hello") = true
 	 * </pre>
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null and has length
 	 */
 	public static boolean hasLength(CharSequence str) {
@@ -418,7 +418,7 @@ public final class StringUtils {
 	 * StringUtils.hasText(" 12345 ") = true
 	 * </pre>
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
@@ -509,7 +509,7 @@ public final class StringUtils {
 	/**
 	 * Check whether the given CharSequence contains any whitespace characters.
 	 *
-	 * @param str the CharSequence to check (may be <code>null</code>)
+	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
 	 */
@@ -529,7 +529,7 @@ public final class StringUtils {
 	/**
 	 * Check whether the given String contains any whitespace characters.
 	 *
-	 * @param str the String to check (may be <code>null</code>)
+	 * @param str the String to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
 	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)#containsWhitespace(CharSequence)#containsWhitespace(CharSequence)
 	 */
@@ -888,7 +888,7 @@ public final class StringUtils {
 	 * upper case as per {@link Character#toUpperCase(char)}.
 	 * No other letters are changed.
 	 *
-	 * @param str the String to capitalize, may be <code>null</code>
+	 * @param str the String to capitalize, maybe <code>null</code>
 	 * @return the capitalized String, <code>null</code> if null
 	 */
 	public static String capitalize(String str) {
@@ -900,7 +900,7 @@ public final class StringUtils {
 	 * lower case as per {@link Character#toLowerCase(char)}.
 	 * No other letters are changed.
 	 *
-	 * @param str the String to uncapitalized, may be <code>null</code>
+	 * @param str the String to uncapitalized, maybe <code>null</code>
 	 * @return the uncapitalized String, <code>null</code> if null
 	 */
 	public static String uncapitalized(String str) {
@@ -911,7 +911,7 @@ public final class StringUtils {
 	 * Extract the filename from the given path,
 	 * e.g. "mypath/myfile.txt" -&gt; "myfile.txt".
 	 *
-	 * @param path the file path (may be <code>null</code>)
+	 * @param path the file path (maybe <code>null</code>)
 	 * @return the extracted filename, or <code>null</code> if none
 	 */
 	public static String getFilename(String path) {
@@ -927,7 +927,7 @@ public final class StringUtils {
 	 * Extract the filename extension from the given path,
 	 * e.g. "mypath/myfile.txt" -&gt; "txt".
 	 *
-	 * @param path the file path (may be <code>null</code>)
+	 * @param path the file path (maybe <code>null</code>)
 	 * @return the extracted filename extension, or <code>null</code> if none
 	 */
 	public static String getFilenameExtension(String path) {
@@ -942,7 +942,7 @@ public final class StringUtils {
 	 * Strip the filename extension from the given path,
 	 * e.g. "mypath/myfile.txt" -&gt; "mypath/myfile".
 	 *
-	 * @param path the file path (may be <code>null</code>)
+	 * @param path the file path (maybe <code>null</code>)
 	 * @return the path with stripped filename extension, or <code>null</code> if none
 	 */
 	public static String stripFilenameExtension(String path) {
@@ -1118,7 +1118,7 @@ public final class StringUtils {
 	 * Merge the given String arrays into one, with overlapping
 	 * array elements only included once.
 	 * <p>The order of elements in the original arrays is preserved
-	 * (with the exception of overlapping elements, which are only
+	 * (except for overlapping elements, which are only
 	 * included on their first occurrence).
 	 *
 	 * @param array1 the first array (can be <code>null</code>)
@@ -1345,8 +1345,8 @@ public final class StringUtils {
 
 	/**
 	 * Take a String which is a delimited list and convert it to a String array.
-	 * <p>A single delimiter can consists of more than one character: It will still
-	 * be considered as single delimiter string, rather than as bunch of potential
+	 * <p>A single delimiter can consist of more than one character: It will still
+	 * be considered as single delimiter string, rather than as a bunch of potential
 	 * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
 	 *
 	 * @param str       the input String
@@ -1360,8 +1360,8 @@ public final class StringUtils {
 
 	/**
 	 * Take a String which is a delimited list and convert it to a String array.
-	 * <p>A single delimiter can consists of more than one character: It will still
-	 * be considered as single delimiter string, rather than as bunch of potential
+	 * <p>A single delimiter can consist of more than one character: It will still
+	 * be considered as single delimiter string, rather than as a bunch of potential
 	 * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
 	 *
 	 * @param str           the input String
@@ -1937,7 +1937,7 @@ public final class StringUtils {
 	/**
 	 * Random index char.
 	 *
-	 * @param beginIndex the begin index
+	 * @param beginIndex the beginning index
 	 * @param endIndex   the end index
 	 * @return the char
 	 */
@@ -1948,7 +1948,7 @@ public final class StringUtils {
 	/**
 	 * Random char char.
 	 *
-	 * @param beginIndex the begin index
+	 * @param beginIndex the beginning index
 	 * @param endIndex   the end index
 	 * @return the char
 	 */
@@ -2263,11 +2263,11 @@ public final class StringUtils {
 	 */
 	public enum CodeType {
 		/**
-		 * Chn social code code type.
+		 * Chn social code type.
 		 */
 		CHN_Social_Code,
 		/**
-		 * Chn id code code type.
+		 * Chn id code type.
 		 */
 		CHN_ID_Code,
 		/**

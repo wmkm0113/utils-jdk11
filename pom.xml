@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nervousync</groupId>
 	<artifactId>utils-jdk11</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<name>Pure Java Utils</name>
 	<url>https://nervousync.org/project/gene</url>
@@ -47,15 +47,17 @@
 		<jakarta.activation.version>2.0.1</jakarta.activation.version>
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
 		<jakarta.webservice.version>3.0.0</jakarta.webservice.version>
-		<jakarta.xml.binding.version>3.0.1</jakarta.xml.binding.version>
+		<jakarta.xml.webservice.version>3.0.1</jakarta.xml.webservice.version>
+		<jakarta.xml.binding.version>3.0.2</jakarta.xml.binding.version>
 		<jakarta.xml.soap.version>2.0.1</jakarta.xml.soap.version>
-		<bcprov.version>1.69</bcprov.version>
+		<bcprov.version>1.70</bcprov.version>
+		<asm.version>9.2</asm.version>
 		<cglib.version>3.3.0</cglib.version>
-		<log4j.version>2.15.0</log4j.version>
-		<slf4j.version>1.7.30</slf4j.version>
-		<jackson.version>2.13.0</jackson.version>
+		<log4j.version>2.17.1</log4j.version>
+		<slf4j.version>1.7.32</slf4j.version>
+		<jackson.version>2.13.1</jackson.version>
 		<yaml.version>1.29</yaml.version>
-		<snmp4j.version>3.6.0</snmp4j.version>
+		<snmp4j.version>3.6.4</snmp4j.version>
 		<jcifs.version>2.1.7</jcifs.version>
 	</properties>
 	<dependencies>
@@ -84,9 +86,14 @@
 			<version>${jakarta.webservice.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.ws.rs</groupId>
+			<artifactId>jakarta.ws.rs-api</artifactId>
+			<version>${jakarta.webservice.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>jakarta.xml.ws</groupId>
 			<artifactId>jakarta.xml.ws-api</artifactId>
-			<version>${jakarta.webservice.version}</version>
+			<version>${jakarta.xml.webservice.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.xml.soap</groupId>
@@ -102,27 +109,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>jakarta.ws.rs</groupId>
-			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>${jakarta.webservice.version}</version>
-		</dependency>
 		<!-- Java Mail Support -->
 		<dependency>
 			<groupId>com.sun.activation</groupId>
 			<artifactId>jakarta.activation</artifactId>
 			<version>${jakarta.mail.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>jakarta.mail</artifactId>
-			<version>${jakarta.mail.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.activation</groupId>
-					<artifactId>jakarta.activation</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -139,6 +130,12 @@
 			<groupId>com.sun.mail</groupId>
 			<artifactId>mailapi</artifactId>
 			<version>${jakarta.mail.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -173,8 +170,13 @@
 		</dependency>
 		<!-- CGLIB -->
 		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
+			<artifactId>cglib</artifactId>
 			<version>${cglib.version}</version>
 		</dependency>
 		<!-- Logging Support -->
@@ -212,6 +214,12 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -325,7 +333,7 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>${jakarta.xml.binding.version}</version>
+			<version>3.0.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.activation</groupId>

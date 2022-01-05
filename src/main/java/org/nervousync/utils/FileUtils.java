@@ -68,17 +68,17 @@ public final class FileUtils {
 	private transient static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 
 	/**
-	 * URL prefix for loading from the class path: "classpath:"
+	 * URL prefixes for loading from the class path: "classpath:"
 	 */
 	public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
 	/**
-	 * URL prefix for loading from the file system: "file:"
+	 * URL prefixes for loading from the file system: "file:"
 	 */
 	public static final String FILE_URL_PREFIX = "file:";
 
 	/**
-	 * URL prefix for loading from the samba path: "smb:"
+	 * URL prefixes for loading from the samba path: "smb:"
 	 */
 	public static final String SAMBA_URL_PREFIX = "smb:";
 
@@ -175,7 +175,7 @@ public final class FileUtils {
 	 */
 	public static final int FILE_TYPE_DATABASE_SQL 		= 12;
 	/**
-	 * Define file type code for outlook email configure
+	 * Define file type code for Outlook email configure
 	 */
 	public static final int FILE_TYPE_EMAIL_CONF 		= 13;
 	/**
@@ -1044,7 +1044,7 @@ public final class FileUtils {
 	 *
 	 * @param filePath           parent file path
 	 * @param readHiddenFiles    List include hidden files
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1059,7 +1059,7 @@ public final class FileUtils {
 	 * @param filePath           parent file path
 	 * @param readHiddenFiles    List include hidden files
 	 * @param includeRootFolder  List include directories
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1094,7 +1094,7 @@ public final class FileUtils {
 	 *
 	 * @param file               parent file object
 	 * @param readHiddenFiles    List include hidden files
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 */
 	public static List<String> listFiles(File file, boolean readHiddenFiles, boolean iterateChildFolder) {
@@ -1107,7 +1107,7 @@ public final class FileUtils {
 	 * @param file               parent file object
 	 * @param readHiddenFiles    List include hidden files
 	 * @param includeRootFolder  List include directories
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 */
 	public static List<String> listFiles(File file, boolean readHiddenFiles,
@@ -1148,7 +1148,7 @@ public final class FileUtils {
 	 * @param filePath           parent file path
 	 * @param filter             file name filter
 	 * @param readHiddenFiles    List include hidden files
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1209,7 +1209,7 @@ public final class FileUtils {
 	 * @param filter             file name filter
 	 * @param readHiddenFiles    List include hidden files
 	 * @param includeRootFolder  List include directories
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of child file path
 	 */
 	public static List<String> listFiles(File file, FilenameFilter filter, boolean readHiddenFiles,
@@ -1250,7 +1250,7 @@ public final class FileUtils {
 	 * @param filePath           parent file path
 	 * @param fileList           current child file list
 	 * @param readHiddenFiles    List include hidden files
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @throws IOException the io exception
 	 */
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles,
@@ -1266,7 +1266,7 @@ public final class FileUtils {
 	 * @param fileList           current child file list
 	 * @param readHiddenFiles    List include hidden files
 	 * @param includeRootFolder  List include directories
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @throws IOException the io exception
 	 */
 	public static void listFiles(String filePath, List<String> fileList, boolean readHiddenFiles,
@@ -1310,7 +1310,7 @@ public final class FileUtils {
 	 * @param filter             file name filter
 	 * @param fileList           current child file list
 	 * @param includeRootFolder  include root folder
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
 	public static void listFiles(String filePath, FilenameFilter filter, List<String> fileList,
@@ -1327,7 +1327,7 @@ public final class FileUtils {
 	 * @param fileList           current child file list
 	 * @param readHiddenFiles    include hidden file
 	 * @param includeRootFolder  include root folder
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 */
 	public static void listFiles(File file, FilenameFilter filter, List<String> fileList,
 	                             boolean readHiddenFiles, boolean includeRootFolder, boolean iterateChildFolder) {
@@ -1436,7 +1436,7 @@ public final class FileUtils {
 	 *
 	 * @param filePath           parent file path
 	 * @param fileExtName        extension name
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1452,7 +1452,7 @@ public final class FileUtils {
 	 * @param filePath           parent file path
 	 * @param fileExtName        extension name
 	 * @param readHiddenFile     the read hidden file
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1565,7 +1565,7 @@ public final class FileUtils {
 	 *
 	 * @param filePath           folder path
 	 * @param fileNameRegex      file name regex
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -1582,7 +1582,7 @@ public final class FileUtils {
 	 * @param fileNameRegex      file name regex
 	 * @param readHiddenFiles    include hidden file
 	 * @param includeRootFolder  include root folder
-	 * @param iterateChildFolder the iterate child folder
+	 * @param iterateChildFolder to iterate child folder
 	 * @return list of file path
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
@@ -2081,7 +2081,7 @@ public final class FileUtils {
 
 	/**
 	 * Makes a directory, including any necessary but nonexistent parent
-	 * directories. If a file already exists with specified name but it is
+	 * directories. If a file already exists with specified name, but it is
 	 * not a directory then an IOException is thrown.
 	 * If the directory cannot be created (or the file already exists but is not a directory)
 	 * then an IOException is thrown.
@@ -2456,7 +2456,7 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Entry input stream input stream.
+	 * Entry input stream.
 	 *
 	 * @param fileObject the file object
 	 * @param entryPath  the entry path

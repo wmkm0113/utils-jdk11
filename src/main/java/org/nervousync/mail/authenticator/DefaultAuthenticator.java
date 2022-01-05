@@ -32,7 +32,7 @@ public final class DefaultAuthenticator extends Authenticator {
 	
 	/**
 	 * Initialize authenticator
-	 * @param username		Authenticate user name
+	 * @param username		Authenticate username
 	 * @param password		Authenticate password
 	 */
 	public DefaultAuthenticator(String username, String password) {

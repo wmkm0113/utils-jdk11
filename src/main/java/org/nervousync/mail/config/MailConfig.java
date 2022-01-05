@@ -70,18 +70,18 @@ public final class MailConfig extends BeanObject {
     }
 
     /**
-     * Gets user name.
+     * Gets username.
      *
-     * @return the user name
+     * @return the username
      */
     public String getUserName() {
         return userName;
     }
 
     /**
-     * Sets user name.
+     * Sets username.
      *
-     * @param userName the user name
+     * @param userName the username
      */
     public void setUserName(String userName) {
         this.userName = userName;
@@ -108,7 +108,7 @@ public final class MailConfig extends BeanObject {
     /**
      * Gets send config.
      *
-     * @return the send config
+     * @return send config
      */
     public ServerConfig getSendConfig() {
         return sendConfig;
@@ -117,7 +117,7 @@ public final class MailConfig extends BeanObject {
     /**
      * Sets send config.
      *
-     * @param sendConfig the send config
+     * @param sendConfig send config
      */
     public void setSendConfig(ServerConfig sendConfig) {
         this.sendConfig = sendConfig;
@@ -126,7 +126,7 @@ public final class MailConfig extends BeanObject {
     /**
      * Gets receive config.
      *
-     * @return the receive config
+     * @return receive config
      */
     public ServerConfig getReceiveConfig() {
         return receiveConfig;
@@ -135,7 +135,7 @@ public final class MailConfig extends BeanObject {
     /**
      * Sets receive config.
      *
-     * @param receiveConfig the receive config
+     * @param receiveConfig receive config
      */
     public void setReceiveConfig(ServerConfig receiveConfig) {
         this.receiveConfig = receiveConfig;

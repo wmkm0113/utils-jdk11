@@ -169,7 +169,7 @@ public final class ClassUtils {
 	 * one of its dependencies is not present or cannot be loaded.
 	 * @param className the name of the class to check
 	 * @param classLoader the class loader to use
-	 * (may be <code>null</code>, which indicates the default class loader)
+	 * (maybe <code>null</code>, which indicates the default class loader)
 	 * @return whether the specified class is present
 	 */
 	public static boolean isPresent(String className, ClassLoader classLoader) {
@@ -203,7 +203,7 @@ public final class ClassUtils {
 	 * for primitives (like "int") and array class names (like "String[]").
 	 * @param name the name of the Class
 	 * @param classLoader the class loader to use
-	 * (may be <code>null</code>, which indicates the default class loader)
+	 * (maybe <code>null</code>, which indicates the default class loader)
 	 * @return Class instance for the supplied name
 	 * @throws ClassNotFoundException if the class was not found
 	 * @throws LinkageError if the class file could not be loaded
@@ -253,7 +253,7 @@ public final class ClassUtils {
 	 * the exceptions thrown in case of class loading failure.
 	 * @param className the name of the Class
 	 * @param classLoader the class loader to use
-	 * (may be <code>null</code>, which indicates the default class loader)
+	 * (maybe <code>null</code>, which indicates the default class loader)
 	 * @return Class instance for the supplied name
 	 * @throws IllegalArgumentException if the class name was not resolvable
 	 * (that is, the class could not be found or the class file could not be loaded)
@@ -877,7 +877,7 @@ public final class ClassUtils {
 	 * in the given array.
 	 * <p>Basically like <code>AbstractCollection.toString()</code>, but stripping
 	 * the "class "/"interface " prefix before every class name.
-	 * @param classes a Collection of Class objects (may be <code>null</code>)
+	 * @param classes a Collection of Class objects (maybe <code>null</code>)
 	 * @return a String of form "[com.foo.Bar, com.foo.Baz]"
 	 * @see java.util.AbstractCollection#toString()
 	 */
@@ -890,7 +890,7 @@ public final class ClassUtils {
 	 * in the given collection.
 	 * <p>Basically like <code>AbstractCollection.toString()</code>, but stripping
 	 * the "class "/"interface " prefix before every class name.
-	 * @param classes a Collection of Class objects (may be <code>null</code>)
+	 * @param classes a Collection of Class objects (maybe <code>null</code>)
 	 * @return a String of form "[com.foo.Bar, com.foo.Baz]"
 	 * @see java.util.AbstractCollection#toString()
 	 */
@@ -941,7 +941,7 @@ public final class ClassUtils {
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyse for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in
-	 * (may be <code>null</code> when accepting all declared interfaces)
+	 * (maybe <code>null</code> when accepting all declared interfaces)
 	 * @return all interfaces that the given object implements as array
 	 */
 	public static Class<?>[] getAllInterfacesForClass(Class<?> clazz, ClassLoader classLoader) {
@@ -995,7 +995,7 @@ public final class ClassUtils {
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyse for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in
-	 * (may be <code>null</code> when accepting all declared interfaces)
+	 * (maybe <code>null</code> when accepting all declared interfaces)
 	 * @return all interfaces that the given object implements as Set
 	 */
 	public static Set<?> getAllInterfacesForClassAsSet(Class<?> clazz, ClassLoader classLoader) {
@@ -1021,7 +1021,7 @@ public final class ClassUtils {
 	/**
 	 * Check whether the given class is visible in the given ClassLoader.
 	 * @param clazz the class to check (typically an interface)
-	 * @param classLoader the ClassLoader to check against (may be <code>null</code>,
+	 * @param classLoader the ClassLoader to check against (maybe <code>null</code>,
 	 * in which case this method will always return <code>true</code>)
 	 * @return class is visible
 	 */

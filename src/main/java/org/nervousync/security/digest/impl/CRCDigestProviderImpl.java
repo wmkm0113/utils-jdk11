@@ -105,11 +105,11 @@ public final class CRCDigestProviderImpl extends SecureProvider {
     }
 
     @Override
-    public boolean verify(byte[] signature) throws CryptoException {
+    public boolean verify(byte[] signature) {
         if (signature == null || signature.length != 8) {
             return Boolean.FALSE;
         }
-        return this.crc == RawUtils.readLong(signature, 0, RawUtils.Endian.LITTLE);
+        return this.crc == RawUtils.readLong(signature, RawUtils.Endian.LITTLE);
     }
 
     @Override

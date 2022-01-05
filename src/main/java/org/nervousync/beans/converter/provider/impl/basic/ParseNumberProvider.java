@@ -44,6 +44,7 @@ public final class ParseNumberProvider implements ConvertProvider {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T convert(Object origObj, Class<T> targetClass) {
 		if (origObj != null && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
 			if (targetClass.equals(BigInteger.class)) {
@@ -60,22 +61,22 @@ public final class ParseNumberProvider implements ConvertProvider {
 					string = string.substring(0, string.indexOf("."));
 				}
 			}
-			if (targetClass.equals(byte.class)) {
-				return targetClass.cast(Byte.valueOf(string));
-			}
 
-			Method method;
-			if (targetClass.isPrimitive()) {
-				String className = targetClass.getName();
-				String methodName = "parse" + className.substring(0, 1).toUpperCase() + className.substring(1);
-				method = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
-						methodName, new Class[]{String.class});
-			} else {
-				method = ReflectionUtils.findMethod(targetClass, "valueOf", new Class[]{String.class});
-			}
+			Method method = ReflectionUtils.findMethod(targetClass, "valueOf", new Class[]{String.class});
 			if (method != null) {
 				try {
-					return targetClass.cast(method.invoke(null, string));
+					Object object = method.invoke(null, string);
+					if (targetClass.isPrimitive()) {
+						String className = targetClass.getName();
+						String methodName = className + "Value";
+						Method convertMethod = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
+								methodName, new Class[]{});
+						if (convertMethod != null) {
+							return (T) convertMethod.invoke(object, new Object[0]);
+						}
+					} else {
+						return targetClass.cast(object);
+					}
 				} catch (IllegalAccessException | InvocationTargetException ignored) {
 				}
 			}

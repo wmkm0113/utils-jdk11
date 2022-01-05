@@ -180,7 +180,7 @@ public final class SystemUtils {
 	}
 
 	/**
-	 * Current operate system is Apple MacOS X
+	 * Current operate system is Apple Mac OS X
 	 * @return  check result
 	 */
 	public static boolean isMacOSX() {

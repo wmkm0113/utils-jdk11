@@ -1,7 +1,6 @@
 package org.nervousync.security;
 
 import org.nervousync.exceptions.crypto.CryptoException;
-import org.nervousync.security.config.CRCConfig;
 import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.SecurityUtils;
 
