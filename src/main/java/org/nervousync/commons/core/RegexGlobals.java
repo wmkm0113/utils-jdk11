@@ -16,6 +16,8 @@
  */
 package org.nervousync.commons.core;
 
+import org.nervousync.utils.StringUtils;
+
 /**
  * Regex Library
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -36,4 +38,6 @@ public final class RegexGlobals {
 	public static final String IPV6_COMPRESS_REGEX = "(?ix)(?<![:.\\w])(?:(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}|(?=(?:[A-F0-9]{0,4}:){0,7}[A-F0-9]{0,4}$)(([A-F0-9]{1,4}:){1,7}|:)((:[A-F0-9]{1,4}){1,7}|:)|(?:[A-F0-9]{1,4}:){7}:|:(:[A-F0-9]{1,4}){7})(?![:.\\w])";
 
 	public static final String LOCAL_FILE_PATH_REGEX = "^(\\/.*)|(([a-zA-Z]{1}\\:\\\\).*)$";
+
+	public static final String PHONE_NUMBER = "^(00|\\+)(\\d){1,}$";
 }

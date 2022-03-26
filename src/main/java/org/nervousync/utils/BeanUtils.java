@@ -76,6 +76,42 @@ public final class BeanUtils {
 	}
 
 	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string  	Parsed string
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T parseString(String string, Class<T> beanClass) {
+		return BeanUtils.parseString(string, null, beanClass);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string  	Parsed string
+	 * @param encoding 	String encoding, just using for parse xml
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T parseString(String string, String encoding, Class<T> beanClass) {
+		if (StringUtils.isEmpty(string)) {
+			LOGGER.error("Can't parse empty string");
+			return null;
+		}
+
+		if (string.startsWith("<")) {
+			return BeanUtils.parseXml(string, encoding, beanClass);
+		}
+		if (string.startsWith("{") || string.startsWith("[")) {
+			return BeanUtils.parseJSON(string, beanClass);
+		}
+		return BeanUtils.parseYaml(string, beanClass);
+	}
+
+	/**
 	 * Parse xml string and setting fields data to this object
 	 *
 	 * @param <T>       Object

@@ -48,7 +48,6 @@ public final class ObjectUtils {
 	private static final String ARRAY_ELEMENT_SEPARATOR = ", ";
 	
 	private ObjectUtils() {
-		
 	}
 
 	/**
@@ -145,6 +144,10 @@ public final class ObjectUtils {
 	 */
 	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args,
 											HandlerInterceptor[] methodInterceptors) {
+		if (clazz == null) {
+			return null;
+		}
+
 		Object object;
 
 		if (methodInterceptors != null && methodInterceptors.length > 0) {

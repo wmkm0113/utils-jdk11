@@ -1,10 +1,7 @@
 package org.nervousync.security.factory;
 
-import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.security.SecureProvider;
-import org.nervousync.security.factory.config.FactoryConfig;
-import org.nervousync.security.factory.config.SecureConfig;
 import org.nervousync.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +24,14 @@ public final class SecureFactory {
 
     private static final String SECURE_CERTIFICATE_ALIAS = "NSYC";
     private static final String SECURE_CERTIFICATE_PASSWORD = "ns0528AO";
-    private static final String SETTING_FILE_NAME = "settings.xml";
-    private static final String CONFIG_FILE_NAME = "secure.xml";
 
-    private static String FOLDER_PATH = Globals.DEFAULT_VALUE_STRING;
-    private static SecureAlgorithm FACTORY_ALGORITHM;
-    private static SecureNode FACTORY_NODE = null;
-    private static final Map<String, SecureNode> REGISTERED_NODE_MAP = new HashMap<>();
+    private final static SecureFactory INSTANCE = new SecureFactory();
+
+    private SecureNode factoryNode = null;
+    private final Map<String, SecureNode> registeredNodeMap;
 
     private SecureFactory() {
+        this.registeredNodeMap = new HashMap<>();
     }
 
     /**
@@ -44,32 +40,42 @@ public final class SecureFactory {
      * @return the boolean
      */
     public static boolean initialized() {
-        return FACTORY_NODE != null && FACTORY_NODE.isInitialized();
+        return INSTANCE.factoryNode != null && INSTANCE.factoryNode.isInitialized();
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static SecureFactory getInstance() {
+        return SecureFactory.INSTANCE;
     }
 
     /**
      * Initialize boolean.
      *
-     * @param folderPath the folder path
+     * @param secureConfig the secure config
      * @return the boolean
      */
-    public static boolean initialize(String folderPath) {
-        if (StringUtils.isEmpty(folderPath)) {
-            return Boolean.FALSE;
-        }
-
-        FOLDER_PATH = folderPath;
-        String settingPath = FOLDER_PATH + Globals.DEFAULT_PAGE_SEPARATOR + SETTING_FILE_NAME;
-        return FileUtils.isExists(settingPath)
-                ? initialize(BeanUtils.parseXml(FileUtils.readFile(settingPath), FactoryConfig.class))
-                : initialize(settingPath, SecureAlgorithm.AES256);
+    public static boolean initialize(final SecureConfig secureConfig) {
+        return SecureNode.initFactory(secureConfig)
+                .filter(SecureNode::isInitialized)
+                .map(secureNode -> {
+                    if (INSTANCE.factoryNode != null && LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Override factory config! ");
+                    }
+                    INSTANCE.factoryNode = secureNode;
+                    return Boolean.TRUE;
+                })
+                .orElse(Boolean.FALSE);
     }
 
     /**
      * Check given secure algorithm was supported
      *
-     * @param secureAlgorithm   Secure algorithm name
-     * @return                  Check result
+     * @param secureAlgorithm Secure algorithm name
+     * @return Check result
      */
     public static boolean supportedAlgorithm(String secureAlgorithm) {
         try {
@@ -81,58 +87,71 @@ public final class SecureFactory {
     }
 
     /**
-     * Initialize boolean.
+     * Init config optional.
      *
-     * @param folderPath      the folder path
      * @param secureAlgorithm the secure algorithm
-     * @return the boolean
+     * @return optional optional
      */
-    public static boolean initialize(String folderPath, SecureAlgorithm secureAlgorithm) {
-        if (StringUtils.isEmpty(folderPath)) {
-            return Boolean.FALSE;
+    public static Optional<SecureConfig> initConfig(SecureAlgorithm secureAlgorithm) {
+        final byte[] keyBytes = generate(secureAlgorithm);
+        if (keyBytes.length == 0) {
+            LOGGER.error("Key bytes is empty! ");
+            return Optional.empty();
         }
+        byte[] encBytes = INSTANCE.initKey(keyBytes, Boolean.TRUE);
 
-        FOLDER_PATH = folderPath;
-        String settingPath = FOLDER_PATH + Globals.DEFAULT_PAGE_SEPARATOR + SETTING_FILE_NAME;
-        if (FileUtils.isExists(settingPath)) {
-            return initialize(BeanUtils.parseXml(FileUtils.readFile(settingPath), FactoryConfig.class));
-        }
-
-        FactoryConfig factoryConfig = new FactoryConfig();
-        factoryConfig.setLastModify(DateTimeUtils.currentTimeMillis());
-        factoryConfig.setFactoryAlgorithm(secureAlgorithm.toString());
-        factoryConfig.setFactoryKey(StringUtils.base64Encode(generate(secureAlgorithm)));
-        if (FileUtils.saveFile(settingPath, factoryConfig.toXML())) {
-            return initialize(factoryConfig);
-        }
-        return Boolean.FALSE;
+        SecureConfig secureConfig = new SecureConfig();
+        secureConfig.setSecureAlgorithm(secureAlgorithm.toString());
+        secureConfig.setSecureKey(StringUtils.base64Encode(encBytes));
+        return Optional.of(secureConfig);
     }
 
     /**
-     * Config boolean.
+     * Registered config boolean.
      *
-     * @param configName      the config name
-     * @param secureAlgorithm the secure algorithm
+     * @param configName the config name
      * @return the boolean
      */
-    public static boolean config(String configName, SecureAlgorithm secureAlgorithm) {
-        return config(configName, secureAlgorithm, generate(secureAlgorithm));
+    public boolean registeredConfig(String configName) {
+        if (StringUtils.isEmpty(configName) || this.factoryNode == null || !this.factoryNode.isInitialized()) {
+            return Boolean.FALSE;
+        }
+        return this.registeredNodeMap.containsKey(configName);
     }
 
     /**
-     * Config boolean.
+     * Register boolean.
      *
-     * @param configName      the config name
-     * @param secureAlgorithm the secure algorithm
-     * @param keyBytes        the key bytes
+     * @param configName   the config name
+     * @param secureConfig the secure config
      * @return the boolean
      */
-    public static boolean config(String configName, SecureAlgorithm secureAlgorithm, byte[] keyBytes) {
-        if (StringUtils.isEmpty(configName) || keyBytes.length == 0) {
+    public boolean register(String configName, SecureConfig secureConfig) {
+        if (StringUtils.isEmpty(configName) || this.factoryNode == null || !this.factoryNode.isInitialized()) {
             return Boolean.FALSE;
         }
-        register(secureConfig(configName, secureAlgorithm, keyBytes));
-        return saveConfig();
+        return SecureNode.initialize(secureConfig).filter(SecureNode::isInitialized)
+                .map(secureNode -> {
+                    if (this.registeredNodeMap.containsKey(configName)) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Override secure config: {}", configName);
+                        }
+                    }
+                    this.registeredNodeMap.put(configName, secureNode);
+                    return Boolean.TRUE;
+                })
+                .orElse(Boolean.FALSE);
+    }
+
+    /**
+     * Deregister.
+     *
+     * @param configName the config name
+     */
+    public void deregister(String configName) {
+        if (StringUtils.notBlank(configName)) {
+            this.registeredNodeMap.remove(configName);
+        }
     }
 
     /**
@@ -142,11 +161,11 @@ public final class SecureFactory {
      * @param dataBytes  the data bytes
      * @return the byte [ ]
      */
-    public static byte[] encrypt(String configName, byte[] dataBytes) {
+    public byte[] encrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            if (REGISTERED_NODE_MAP.containsKey(configName)) {
+            if (this.registeredNodeMap.containsKey(configName)) {
                 try {
-                    return REGISTERED_NODE_MAP.get(configName).initCryptor(Boolean.TRUE).finish(dataBytes);
+                    return this.registeredNodeMap.get(configName).initCryptor(Boolean.TRUE).finish(dataBytes);
                 } catch (CryptoException e) {
                     LOGGER.error("Encrypt data error! ");
                     if (LOGGER.isDebugEnabled()) {
@@ -165,11 +184,11 @@ public final class SecureFactory {
      * @param dataBytes  the data bytes
      * @return the byte [ ]
      */
-    public static byte[] decrypt(String configName, byte[] dataBytes) {
+    public byte[] decrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            if (REGISTERED_NODE_MAP.containsKey(configName)) {
+            if (this.registeredNodeMap.containsKey(configName)) {
                 try {
-                    return REGISTERED_NODE_MAP.get(configName).initCryptor(Boolean.FALSE).finish(dataBytes);
+                    return this.registeredNodeMap.get(configName).initCryptor(Boolean.FALSE).finish(dataBytes);
                 } catch (CryptoException e) {
                     LOGGER.error("Decrypt data error! ");
                     if (LOGGER.isDebugEnabled()) {
@@ -181,112 +200,17 @@ public final class SecureFactory {
         return dataBytes;
     }
 
-    private static boolean initialize(FactoryConfig factoryConfig) {
-        if (factoryConfig == null) {
-            return Boolean.FALSE;
-        }
-        FACTORY_NODE = new SecureNode(SecureAlgorithm.valueOf(factoryConfig.getFactoryAlgorithm()),
-                StringUtils.base64Decode(factoryConfig.getFactoryKey()));
-        if (FACTORY_NODE.isInitialized()) {
-            SecureProvider secureProvider = FACTORY_NODE.initCryptor(Boolean.FALSE);
-            if (secureProvider == null) {
-                return Boolean.FALSE;
-            }
-
-            String configPath = FOLDER_PATH + Globals.DEFAULT_PAGE_SEPARATOR + CONFIG_FILE_NAME;
-            if (FileUtils.isExists(configPath)) {
-                SecureConfig secureConfig = BeanUtils.parseFile(configPath, SecureConfig.class);
-                if (secureConfig == null) {
-                    LOGGER.error("Read config error! ");
-                    return Boolean.FALSE;
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Last modify: {}", new Date(secureConfig.getLastModify()));
-                }
-                secureConfig.getConfigItemList().forEach(SecureFactory::register);
-            } else {
-                SecureConfig secureConfig = new SecureConfig();
-                secureConfig.setLastModify(DateTimeUtils.currentTimeMillis());
-                return FileUtils.saveFile(configPath, secureConfig.toXML());
-            }
-        }
-        return Boolean.TRUE;
-    }
-
-    private static void register(SecureConfig.ConfigItem configItem) {
-        SecureProvider secureProvider = FACTORY_NODE.initCryptor(Boolean.FALSE);
+    private byte[] initKey(byte[] dataBytes, boolean encrypt) {
+        SecureProvider secureProvider = this.factoryNode.initCryptor(encrypt);
         if (secureProvider == null) {
             LOGGER.error("Secure factory not initialized! ");
-            return;
+            return new byte[0];
         }
-        byte[] keyBytes, encBytes = StringUtils.base64Decode(configItem.getSecureKey());
         try {
-            keyBytes = secureProvider.finish(encBytes);
-        } catch (CryptoException e) {
-            keyBytes = encBytes;
+            return secureProvider.finish(dataBytes);
+        } catch (Exception e) {
+            return dataBytes;
         }
-        if (keyBytes.length == 0) {
-            keyBytes = encBytes;
-        }
-        SecureNode secureNode = new SecureNode(SecureAlgorithm.valueOf(configItem.getSecureAlgorithm()), keyBytes);
-        if (secureNode.isInitialized()) {
-            REGISTERED_NODE_MAP.put(configItem.getConfigName(), secureNode);
-        } else {
-            LOGGER.error("Initialize secure node {} error! ", configItem.getConfigName());
-        }
-    }
-
-    private static boolean saveConfig() {
-        if (StringUtils.isEmpty(FOLDER_PATH)) {
-            return Boolean.FALSE;
-        }
-
-        long lastModify = DateTimeUtils.currentTimeMillis();
-        FactoryConfig factoryConfig = new FactoryConfig();
-        factoryConfig.setLastModify(lastModify);
-        factoryConfig.setFactoryAlgorithm(FACTORY_NODE.getSecureAlgorithm().toString());
-        factoryConfig.setFactoryKey(StringUtils.base64Encode(FACTORY_NODE.getKeyBytes()));
-        String settingPath = FOLDER_PATH + Globals.DEFAULT_PAGE_SEPARATOR + SETTING_FILE_NAME;
-        if (!FileUtils.saveFile(settingPath, factoryConfig.toXML())) {
-            LOGGER.error("Save setting file error! Save path: {}", settingPath);
-            return Boolean.FALSE;
-        }
-
-        List<SecureConfig.ConfigItem> configItemList = new ArrayList<>();
-        REGISTERED_NODE_MAP.forEach((configName, secureNode) -> {
-            SecureConfig.ConfigItem configItem =
-                    secureConfig(configName, secureNode.getSecureAlgorithm(), secureNode.getKeyBytes());
-            if (configItem != null) {
-                configItemList.add(configItem);
-            }
-        });
-
-        SecureConfig secureConfig = new SecureConfig();
-        secureConfig.setLastModify(lastModify);
-        secureConfig.setConfigItemList(configItemList);
-        return FileUtils.saveFile(FOLDER_PATH + Globals.DEFAULT_PAGE_SEPARATOR + CONFIG_FILE_NAME,
-                secureConfig.toXML());
-    }
-
-    private static SecureConfig.ConfigItem secureConfig(String configName,
-                                                        SecureAlgorithm secureAlgorithm, byte[] keyBytes) {
-        SecureProvider secureProvider = FACTORY_NODE.initCryptor(Boolean.TRUE);
-        if (secureProvider == null) {
-            LOGGER.error("Secure factory not initialized! ");
-            return null;
-        }
-
-        byte[] encBytes;
-        try {
-            encBytes = secureProvider.finish(keyBytes);
-        } catch (CryptoException e) {
-            encBytes = keyBytes;
-        }
-        SecureConfig.ConfigItem configItem = new SecureConfig.ConfigItem();
-        configItem.setConfigName(configName);
-        configItem.setSecureAlgorithm(secureAlgorithm.toString());
-        configItem.setSecureKey(StringUtils.base64Encode(encBytes));
-        return configItem;
     }
 
     private static byte[] generate(SecureAlgorithm secureAlgorithm) {
@@ -335,7 +259,7 @@ public final class SecureFactory {
          * @param secureAlgorithm the algorithm
          * @param dataBytes       the data bytes
          */
-        public SecureNode(SecureAlgorithm secureAlgorithm, byte[] dataBytes) {
+        private SecureNode(SecureAlgorithm secureAlgorithm, byte[] dataBytes) {
             this.secureAlgorithm = secureAlgorithm;
             switch (this.secureAlgorithm) {
                 case RSA1024:
@@ -374,6 +298,38 @@ public final class SecureFactory {
                     this.privateKey = null;
                     this.publicKey = null;
                     break;
+            }
+        }
+
+        /**
+         * Initialize optional.
+         *
+         * @param secureConfig the secure config
+         * @return the optional
+         */
+        public static Optional<SecureNode> initialize(SecureConfig secureConfig) {
+            if (secureConfig == null) {
+                return Optional.empty();
+            }
+
+            try {
+                return Optional.of(new SecureNode(SecureAlgorithm.valueOf(secureConfig.getSecureAlgorithm()),
+                        INSTANCE.initKey(StringUtils.base64Decode(secureConfig.getSecureKey()), Boolean.FALSE)));
+            } catch (IllegalArgumentException e) {
+                return Optional.empty();
+            }
+        }
+
+        private static Optional<SecureNode> initFactory(SecureConfig secureConfig) {
+            if (secureConfig == null) {
+                return Optional.empty();
+            }
+
+            try {
+                return Optional.of(new SecureNode(SecureAlgorithm.valueOf(secureConfig.getSecureAlgorithm()),
+                        StringUtils.base64Decode(secureConfig.getSecureKey())));
+            } catch (IllegalArgumentException e) {
+                return Optional.empty();
             }
         }
 

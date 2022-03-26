@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -27,17 +28,24 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * The type Certificate utils.
+ */
 public final class CertificateUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificateUtils.class);
 
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     /**
      * Generate KeyPair using given algorithm/random algorithm/key size
      *
-     * @param algorithm             Algorithm
-     * @param randomAlgorithm       Random algorithm
-     * @param keySize               Key size
-     * @return                      Generated key pair
+     * @param algorithm       Algorithm
+     * @param randomAlgorithm Random algorithm
+     * @param keySize         Key size
+     * @return Generated key pair
      */
     public static KeyPair KeyPair(String algorithm, String randomAlgorithm, int keySize) {
         if (keySize % 128 != 0) {
@@ -73,14 +81,14 @@ public final class CertificateUtils {
     /**
      * Convert public key instance to X.509 certificate
      *
-     * @param publicKey         Public key
-     * @param serialNumber      Certificate serial number
-     * @param beginDate         Certificate begin date
-     * @param endDate           Certificate end date
-     * @param certName          Certificate name
-     * @param signKey           Certificate signer private key
-     * @param signAlgorithm     Signature algorithm
-     * @return                  Generated X.509 certificate
+     * @param publicKey     Public key
+     * @param serialNumber  Certificate serial number
+     * @param beginDate     Certificate begin date
+     * @param endDate       Certificate end date
+     * @param certName      Certificate name
+     * @param signKey       Certificate signer private key
+     * @param signAlgorithm Signature algorithm
+     * @return Generated X.509 certificate
      */
     public static X509Certificate x509(PublicKey publicKey, long serialNumber, Date beginDate, Date endDate,
                                        String certName, PrivateKey signKey, String signAlgorithm) {
@@ -110,8 +118,8 @@ public final class CertificateUtils {
     /**
      * Read X.509 Certificate
      *
-     * @param certBytes         Certificate data bytes
-     * @return                  Read X.509 certificate or null for invalid
+     * @param certBytes Certificate data bytes
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] certBytes) {
         return x509(certBytes, null, Boolean.FALSE);
@@ -120,9 +128,9 @@ public final class CertificateUtils {
     /**
      * Read X.509 Certificate
      *
-     * @param certBytes         Certificate data bytes
-     * @param verifyKey         Verifier key
-     * @return                  Read X.509 certificate or null for invalid
+     * @param certBytes Certificate data bytes
+     * @param verifyKey Verifier key
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] certBytes, PublicKey verifyKey) {
         return x509(certBytes, verifyKey, Boolean.FALSE);
@@ -131,9 +139,9 @@ public final class CertificateUtils {
     /**
      * Read X.509 Certificate
      *
-     * @param certBytes         Certificate data bytes
-     * @param checkValidity     <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return                  Read X.509 certificate or null for invalid
+     * @param certBytes     Certificate data bytes
+     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] certBytes, boolean checkValidity) {
         return x509(certBytes, null, checkValidity);
@@ -142,10 +150,10 @@ public final class CertificateUtils {
     /**
      * Read X.509 Certificate
      *
-     * @param certBytes         Certificate data bytes
-     * @param verifyKey         Verifier key
-     * @param checkValidity     <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return                  Read X.509 certificate or null for invalid
+     * @param certBytes     Certificate data bytes
+     * @param verifyKey     Verifier key
+     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] certBytes, PublicKey verifyKey, boolean checkValidity) {
         X509Certificate x509Certificate;
@@ -173,12 +181,61 @@ public final class CertificateUtils {
     }
 
     /**
+     * Verify boolean.
+     *
+     * @param x509Certificate the x 509 certificate
+     * @return the boolean
+     */
+    public static boolean verify(final X509Certificate x509Certificate) {
+        return verify(x509Certificate, null, Boolean.FALSE);
+    }
+
+    /**
+     * Verify boolean.
+     *
+     * @param x509Certificate the x 509 certificate
+     * @param verifyKey       the verify key
+     * @return the boolean
+     */
+    public static boolean verify(final X509Certificate x509Certificate, final PublicKey verifyKey) {
+        return verify(x509Certificate, verifyKey, Boolean.FALSE);
+    }
+
+    /**
+     * Verify boolean.
+     *
+     * @param x509Certificate the x 509 certificate
+     * @param verifyKey       the verify key
+     * @param checkValidity   the check validity
+     * @return the boolean
+     */
+    public static boolean verify(final X509Certificate x509Certificate, final PublicKey verifyKey,
+                                 final boolean checkValidity) {
+        if (x509Certificate == null) {
+            return Boolean.FALSE;
+        }
+        try {
+            if (checkValidity) {
+                x509Certificate.checkValidity();
+            }
+            x509Certificate.verify((verifyKey == null) ? x509Certificate.getPublicKey() : verifyKey, "BC");
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            LOGGER.error("Certificate is invalid! ");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Stack message: ", e);
+            }
+            return Boolean.FALSE;
+        }
+    }
+
+    /**
      * Read X.509 certificate from keystore/PKCS12 data bytes
      *
-     * @param storeBytes        Keystore/PKCS12 data bytes
-     * @param certAlias         Certificate alias
-     * @param password          Certificate password
-     * @return                  Read X.509 certificate or null for invalid
+     * @param storeBytes Keystore/PKCS12 data bytes
+     * @param certAlias  Certificate alias
+     * @param password   Certificate password
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] storeBytes, String certAlias, String password) {
         return x509(storeBytes, certAlias, password, null, Boolean.FALSE);
@@ -187,10 +244,10 @@ public final class CertificateUtils {
     /**
      * Read X.509 certificate from file. File format: keystore/PKCS12
      *
-     * @param storePath         Keystore/PKCS12 file path
-     * @param certAlias         Certificate alias
-     * @param password          Certificate password
-     * @return                  Read X.509 certificate or null for invalid
+     * @param storePath Keystore/PKCS12 file path
+     * @param certAlias Certificate alias
+     * @param password  Certificate password
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(String storePath, String certAlias, String password) {
         try {
@@ -203,12 +260,12 @@ public final class CertificateUtils {
     /**
      * Read X.509 certificate from file. File format: keystore/PKCS12
      *
-     * @param storeBytes        Keystore/PKCS12 data bytes
-     * @param certAlias         Certificate alias
-     * @param password          Certificate password
-     * @param verifyKey         Verifier key
-     * @param checkValidity     <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return                  Read X.509 certificate or null for invalid
+     * @param storeBytes    Keystore/PKCS12 data bytes
+     * @param certAlias     Certificate alias
+     * @param password      Certificate password
+     * @param verifyKey     Verifier key
+     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
+     * @return Read X.509 certificate or null for invalid
      */
     public static X509Certificate x509(byte[] storeBytes, String certAlias, String password,
                                                   PublicKey verifyKey, boolean checkValidity) {
@@ -242,9 +299,9 @@ public final class CertificateUtils {
     /**
      * Generate PublicKey from key data bytes
      *
-     * @param algorithm     Key algorithm
-     * @param keyBytes      Key data bytes
-     * @return              Generated publicKey
+     * @param algorithm Key algorithm
+     * @param keyBytes  Key data bytes
+     * @return Generated publicKey
      */
     public static Optional<PublicKey> publicKey(String algorithm, byte[] keyBytes) {
         try {
@@ -261,9 +318,9 @@ public final class CertificateUtils {
     /**
      * Generate PrivateKey from key data bytes
      *
-     * @param algorithm     Key algorithm
-     * @param keyBytes      Key data bytes
-     * @return              Generated privateKey
+     * @param algorithm Key algorithm
+     * @param keyBytes  Key data bytes
+     * @return Generated privateKey
      */
     public static PrivateKey privateKey(String algorithm, byte[] keyBytes) {
         try {
@@ -280,10 +337,10 @@ public final class CertificateUtils {
     /**
      * Read Private key from keystore/PKCS12 data bytes
      *
-     * @param storeBytes        Keystore/PKCS12 data bytes
-     * @param certAlias         Certificate alias
-     * @param password          Certificate password
-     * @return                  Read privateKey or null for invalid
+     * @param storeBytes Keystore/PKCS12 data bytes
+     * @param certAlias  Certificate alias
+     * @param password   Certificate password
+     * @return Read privateKey or null for invalid
      */
     public static PrivateKey privateKey(byte[] storeBytes, String certAlias, String password) {
         try {
@@ -303,11 +360,11 @@ public final class CertificateUtils {
     /**
      * Read X.509 certificate from file. File format: keystore/PKCS12
      *
-     * @param storePath         Keystore/PKCS12 file path
-     * @param certAlias         Certificate alias
-     * @param password          Certificate password
-     * @return                  Read X.509 certificate or null for invalid
-     * @throws FileNotFoundException        If storePath file not found
+     * @param storePath Keystore/PKCS12 file path
+     * @param certAlias Certificate alias
+     * @param password  Certificate password
+     * @return Read X.509 certificate or null for invalid
+     * @throws FileNotFoundException If storePath file not found
      */
     public static PrivateKey privateKey(String storePath, String certAlias, String password)
             throws FileNotFoundException {
@@ -321,16 +378,16 @@ public final class CertificateUtils {
     /**
      * Generate PKCS12
      *
-     * @param keyPair           Key pair
-     * @param serialNumber      Certificate serial number
-     * @param beginDate         Certificate begin date
-     * @param endDate           Certificate end date
-     * @param certAlias         Certificate alias name
-     * @param certName          Certificate name
-     * @param passWord          Certificate password
-     * @param signKey           Certificate signer private key
-     * @param signAlgorithm     Signature algorithm
-     * @return                  Generated PKCS12 data bytes
+     * @param keyPair       Key pair
+     * @param serialNumber  Certificate serial number
+     * @param beginDate     Certificate begin date
+     * @param endDate       Certificate end date
+     * @param certAlias     Certificate alias name
+     * @param certName      Certificate name
+     * @param passWord      Certificate password
+     * @param signKey       Certificate signer private key
+     * @param signAlgorithm Signature algorithm
+     * @return Generated PKCS12 data bytes
      */
     public static byte[] PKCS12(KeyPair keyPair, long serialNumber, Date beginDate, Date endDate, String certAlias,
                                 String certName, String passWord, PrivateKey signKey, String signAlgorithm) {
@@ -374,9 +431,9 @@ public final class CertificateUtils {
     /**
      * Read PKCS12 from data bytes
      *
-     * @param storeBytes        Data bytes
-     * @param password          Certificate password
-     * @return                  Read PKCS12 instance
+     * @param storeBytes Data bytes
+     * @param password   Certificate password
+     * @return Read PKCS12 instance
      */
     public static KeyStore loadKeyStore(byte[] storeBytes, String password) {
         return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray());
@@ -385,10 +442,10 @@ public final class CertificateUtils {
     /**
      * Read PKCS12 from file
      *
-     * @param storePath         File path
-     * @param password          Certificate password
-     * @return                  Read PKCS12 instance
-     * @throws FileNotFoundException    If storePath file not found
+     * @param storePath File path
+     * @param password  Certificate password
+     * @return Read PKCS12 instance
+     * @throws FileNotFoundException If storePath file not found
      */
     public static KeyStore loadKeyStore(String storePath, String password) throws FileNotFoundException {
         return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray());
@@ -397,9 +454,9 @@ public final class CertificateUtils {
     /**
      * Read PKCS12 from stream
      *
-     * @param inputStream       Input stream
-     * @param certPassword      Password char array
-     * @return                  Read PKCS12 instance
+     * @param inputStream  Input stream
+     * @param certPassword Password char array
+     * @return Read PKCS12 instance
      */
     public static KeyStore loadKeyStore(InputStream inputStream, char[] certPassword) {
         KeyStore keyStore;
@@ -418,9 +475,9 @@ public final class CertificateUtils {
     /**
      * Check certificate alias was exists
      *
-     * @param keyStore      PKCS12
-     * @param certAlias     Certificate alias
-     * @return              Check result
+     * @param keyStore  PKCS12
+     * @param certAlias Certificate alias
+     * @return Check result
      */
     public static boolean checkKey(KeyStore keyStore, String certAlias) {
         if (keyStore == null || certAlias == null) {
@@ -435,9 +492,10 @@ public final class CertificateUtils {
 
     /**
      * Read X.509 certificate from PKCS12 instance
-     * @param keyStore          PKCS12 instance
-     * @param certAlias         Certificate alias name
-     * @return                  X.509 certificate
+     *
+     * @param keyStore  PKCS12 instance
+     * @param certAlias Certificate alias name
+     * @return X.509 certificate
      */
     public static X509Certificate x509(KeyStore keyStore, String certAlias) {
         try {
@@ -453,10 +511,11 @@ public final class CertificateUtils {
 
     /**
      * Read private key from PKCS12 instance
-     * @param keyStore          PKCS12 instance
-     * @param certAlias         Certificate alias name
-     * @param password          Certificate password
-     * @return                  Private key
+     *
+     * @param keyStore  PKCS12 instance
+     * @param certAlias Certificate alias name
+     * @param password  Certificate password
+     * @return Private key
      */
     public static PrivateKey privateKey(KeyStore keyStore, String certAlias, String password) {
         try {

@@ -55,6 +55,8 @@ public final class Globals {
 	public static final float DEFAULT_VALUE_FLOAT = -1;
 	public static final String DEFAULT_VALUE_STRING = "";
 
+	public static final long DEFAULT_REFERENCE_TIME = 1303315200000L;
+
 	public static final String READ_MODE = "r";
 	public static final String WRITE_MODE = "rw";
 

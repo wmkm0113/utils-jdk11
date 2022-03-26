@@ -2,19 +2,18 @@ package org.nervousync.generator.nano;
 
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.generator.IGenerator;
+import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 
-@GeneratorProvider("NanoID")
+@GeneratorProvider(IDUtils.NANO_ID)
 public final class NanoGenerator implements IGenerator {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String ALPHABET_CONFIG = "org.nervousync.nano.Alphabet";
-    public static final String LENGTH_CONFIG = "org.nervousync.nano.Length";
     private static final String DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
     private static final int DEFAULT_LENGTH = 27;
 
@@ -22,18 +21,15 @@ public final class NanoGenerator implements IGenerator {
     private char[] alphabetArray = DEFAULT_ALPHABET.toCharArray();
     private int generateLength = DEFAULT_LENGTH;
 
-    @Override
-    public void initialize() {
-        if (StringUtils.notBlank(System.getProperty(ALPHABET_CONFIG))) {
-            if (System.getProperty(ALPHABET_CONFIG).length() > 255) {
+    public void config(final String alphabetConfig, final int generateLength) {
+        if (StringUtils.notBlank(alphabetConfig)) {
+            if (alphabetConfig.length() > 255) {
                 this.logger.error("Alphabet must contain between 1 and 255 symbols.");
             } else {
-                this.alphabetArray = System.getProperty(ALPHABET_CONFIG).toCharArray();
+                this.alphabetArray = alphabetConfig.toCharArray();
             }
         }
-        if (StringUtils.matches(System.getProperty(LENGTH_CONFIG), "^\\d{1,}$")) {
-            this.generateLength = Integer.parseInt(System.getProperty(LENGTH_CONFIG));
-        }
+        this.generateLength = generateLength > 0 ? generateLength : DEFAULT_LENGTH;
     }
 
     @Override

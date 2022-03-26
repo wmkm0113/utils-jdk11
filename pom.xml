@@ -26,7 +26,7 @@
 		<developerConnection>scm:git:https://github.com/Nervousync/Gene.git</developerConnection>
 	</scm>
 	<organization>
-		<url>https://development.nervousync.org/</url>
+		<url>https://nervousync.org/</url>
 		<name>Nervousync Studio</name>
 	</organization>
 	<developers>
@@ -53,12 +53,12 @@
 		<bcprov.version>1.70</bcprov.version>
 		<asm.version>9.2</asm.version>
 		<cglib.version>3.3.0</cglib.version>
-		<log4j.version>2.17.1</log4j.version>
-		<slf4j.version>1.7.32</slf4j.version>
-		<jackson.version>2.13.1</jackson.version>
-		<yaml.version>1.29</yaml.version>
-		<snmp4j.version>3.6.4</snmp4j.version>
-		<jcifs.version>2.1.7</jcifs.version>
+		<log4j.version>2.17.2</log4j.version>
+		<slf4j.version>2.0.0-alpha7</slf4j.version>
+		<jackson.version>2.13.2</jackson.version>
+		<yaml.version>1.30</yaml.version>
+		<snmp4j.version>3.6.6</snmp4j.version>
+		<jcifs.version>2.1.28</jcifs.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -371,8 +371,8 @@
 		</dependency>
 		<!-- SMB Support -->
 		<dependency>
-			<groupId>eu.agno3.jcifs</groupId>
-			<artifactId>jcifs-ng</artifactId>
+			<groupId>org.codelibs</groupId>
+			<artifactId>jcifs</artifactId>
 			<version>${jcifs.version}</version>
 			<exclusions>
 				<exclusion>

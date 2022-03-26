@@ -3,6 +3,7 @@ package org.nervousync.generator.uuid.impl;
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.generator.uuid.UUIDGenerator;
+import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.StringUtils;
 import org.nervousync.utils.SystemUtils;
 
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@GeneratorProvider("UUIDv1")
+@GeneratorProvider(IDUtils.UUIDv1)
 public final class UUIDv1Generator extends UUIDGenerator {
 
     private static final long INTERVAL = 0x01B21DD213814000L;
@@ -22,10 +23,6 @@ public final class UUIDv1Generator extends UUIDGenerator {
 
     private final SecureRandom secureRandom = new SecureRandom();
     private final AtomicInteger generateCount = new AtomicInteger(0);
-
-    @Override
-    public void initialize() {
-    }
 
     @Override
     public Object random() {

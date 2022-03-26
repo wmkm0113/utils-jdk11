@@ -4,19 +4,19 @@ import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.generator.IGenerator;
 import org.nervousync.utils.DateTimeUtils;
-import org.nervousync.utils.StringUtils;
+import org.nervousync.utils.IDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@GeneratorProvider("Snowflake")
+@GeneratorProvider(IDUtils.SNOWFLAKE)
 public final class SnowflakeGenerator implements IGenerator {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * Default reference time, default is 2011-04-21 00:00 CST
+     * Default ID
      */
-    private static final long REFERENCE_TIME = 1303315200000L;
+    private static final long DEFAULT_ID = 1L;
     /**
      * Sequence mask code, sequence id bits: 12
      */
@@ -24,45 +24,28 @@ public final class SnowflakeGenerator implements IGenerator {
     /**
      * Node identified id (between 0 and 63), default: 1L
      */
-    private long deviceId;
+    private long deviceId = DEFAULT_ID;
     /**
      * Node instance id (between 0 and 63), default: 1L
      */
-    private long instanceId;
+    private long instanceId = DEFAULT_ID;
     /**
      * Begin timestamp value
      */
-    private long referenceTime = REFERENCE_TIME;
+    private long referenceTime = Globals.DEFAULT_REFERENCE_TIME;
     /**
      * Sequence index in millisecond
      */
-    private long sequenceIndex;
+    private long sequenceIndex = 0L;
     /**
      * Previous generate time
      */
     private long lastTime = Globals.DEFAULT_VALUE_LONG;
 
-    public static final String REFERENCE_CONFIG = "org.nervousync.snowflake.ReferenceTime";
-    public static final String DEVICE_CONFIG = "org.nervousync.snowflake.DeviceID";
-    public static final String INSTANCE_CONFIG = "org.nervousync.snowflake.InstanceID";
-
-    @Override
-    public void initialize() {
-        this.referenceTime =
-                StringUtils.matches(System.getProperty(REFERENCE_CONFIG), "^\\d{1,}$")
-                        ? Long.parseLong(System.getProperty(REFERENCE_CONFIG)) : REFERENCE_TIME;
-        if (StringUtils.matches(System.getProperty(DEVICE_CONFIG), "^\\d{1,2}$")) {
-            long deviceId = Long.parseLong(System.getProperty(DEVICE_CONFIG));
-            this.deviceId = (deviceId >= 0L && deviceId <= 64L) ? deviceId : 1L;
-        } else {
-            this.deviceId = 1L;
-        }
-        if (StringUtils.matches(System.getProperty(INSTANCE_CONFIG), "^\\d{1,2}$")) {
-            long instanceId = Long.parseLong(System.getProperty(INSTANCE_CONFIG));
-            this.instanceId = (instanceId >= 0L && instanceId <= 64L) ? instanceId : 1L;
-        } else {
-            this.instanceId = 1L;
-        }
+    public void config(final long referenceTime, final long deviceId, final long instanceId) {
+        this.referenceTime = (referenceTime >= 0L) ? referenceTime : Globals.DEFAULT_REFERENCE_TIME;
+        this.deviceId = (deviceId >= 0L && deviceId <= 64L) ? deviceId : DEFAULT_ID;
+        this.instanceId = (instanceId >= 0L && instanceId <= 64L) ? instanceId : DEFAULT_ID;
         this.sequenceIndex = 0L;
         if (this.logger.isDebugEnabled()) {
             this.logger.debug("Snowflake config: reference time: {}, deviceId: {}, instanceId: {}",

@@ -203,7 +203,7 @@ public final class DateTimeUtils {
 	 *
 	 * @return current day
 	 */
-	public static int currentDay() {
+	public static int currentDate() {
 		return Integer.parseInt(LocalDate.now().format(DEFAULT_INT_PATTERN));
 	}
 
@@ -212,7 +212,7 @@ public final class DateTimeUtils {
 	 *
 	 * @return current GMT day
 	 */
-	public static int currentUTCDay() {
+	public static int currentUTCDate() {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis()), DEFAULT_INT_PATTERN));
 	}
 	
@@ -274,6 +274,33 @@ public final class DateTimeUtils {
 	 */
 	public static int currentMonth() {
 		return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+
+	/**
+	 * Current Day
+	 *
+	 * @return Current Day
+	 */
+	public static int currentDay() {
+		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+	}
+
+	/**
+	 * Current Hour
+	 *
+	 * @return Current Hour
+	 */
+	public static int currentHour() {
+		return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+	}
+
+	/**
+	 * Current Minute
+	 *
+	 * @return Current Minute
+	 */
+	public static int currentMinute() {
+		return Calendar.getInstance().get(Calendar.MINUTE);
 	}
 
 	/**

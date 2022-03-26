@@ -40,11 +40,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 
-import jcifs.config.PropertyConfiguration;
-import jcifs.context.BaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jcifs.config.PropertyConfiguration;
+import jcifs.context.BaseContext;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
@@ -317,6 +317,22 @@ public final class FileUtils {
 			}
 		}
 
+		return FileUtils.FILE_TYPE_UNKNOWN;
+	}
+
+	/**
+	 * Retrieve data type int.
+	 *
+	 * @param dataBytes the data bytes
+	 * @return the int
+	 */
+	public static int retrieveDataType(byte[] dataBytes) {
+		String identifiedCode = ConvertUtils.byteToHex(dataBytes);
+		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDENTIFIED_MAP.values()) {
+			if (identifiedCode.startsWith(fileExtensionInfo.getIdentifiedCode())) {
+				return fileExtensionInfo.getFileType();
+			}
+		}
 		return FileUtils.FILE_TYPE_UNKNOWN;
 	}
 
@@ -947,7 +963,7 @@ public final class FileUtils {
 	 * @param url the URL to convert into a URI instance
 	 * @return the URI instance
 	 * @throws URISyntaxException if the URL wasn't a valid URI
-	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()
+	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()
 	 */
 	public static URI toURI(URL url) throws URISyntaxException {
 		return FileUtils.toURI(url.toString());
@@ -1630,9 +1646,8 @@ public final class FileUtils {
 	 * @param inputStream file content by input stream
 	 * @param filePath    write to file path
 	 * @return true for success and Boolean.FALSE for error
-	 * @throws IOException close stream error
 	 */
-	public static boolean saveFile(InputStream inputStream, String filePath) throws IOException {
+	public static boolean saveFile(InputStream inputStream, String filePath) {
 		OutputStream outputStream = null;
 		try {
 			File file = FileUtils.getFile(filePath);
@@ -1644,26 +1659,23 @@ public final class FileUtils {
 			while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
 				outputStream.write(buffer, 0, bytesRead);
 			}
-			return true;
+			return Boolean.TRUE;
 		} catch(Exception e) {
+			LOGGER.error("Save file to path: {} error! ", filePath);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack trace message: ", e);
+			}
 			return Boolean.FALSE;
 		} finally {
-			if (outputStream != null) {
-				outputStream.flush();
-				outputStream.close();
-			}
-
-			if (inputStream != null) {
-				inputStream.close();
-			}
+			IOUtils.closeStream(outputStream);
 		}
 	}
 
 	/**
 	 * Save String to File use default charset: UTF-8
 	 *
-	 * @param filePath    write to file path
-	 * @param content    File content
+	 * @param filePath write to file path
+	 * @param content  File content
 	 * @return Save result
 	 */
 	public static boolean saveFile(String filePath, String content) {
@@ -1673,9 +1685,9 @@ public final class FileUtils {
 	/**
 	 * Save String to File
 	 *
-	 * @param filePath    write to file path
-	 * @param content    File content
-	 * @param encoding   Charset encoding
+	 * @param filePath write to file path
+	 * @param content  File content
+	 * @param encoding Charset encoding
 	 * @return Save result
 	 */
 	public static boolean saveFile(String filePath, String content, String encoding) {
@@ -2087,7 +2099,7 @@ public final class FileUtils {
 	 * then an IOException is thrown.
 	 *
 	 * @param directory directory to create, must not be {@code null}
-	 * @throws IOException          if the directory cannot be created or the file already exists but is not a directory
+	 * @throws IOException if the directory cannot be created or the file already exists but is not a directory
 	 */
 	public static void forceMakeDir(final File directory) throws IOException {
 		if (directory == null) {
@@ -2108,8 +2120,8 @@ public final class FileUtils {
 	 * Makes any necessary but nonexistent parent directories for a given File. If the parent directory cannot be
 	 * created then an IOException is thrown.
 	 *
-	 * @param file              file with parent to create
-	 * @throws IOException      if the parent directory cannot be created
+	 * @param file file with parent to create
+	 * @throws IOException if the parent directory cannot be created
 	 */
 	public static void forceMakeParent(final File file) throws IOException {
 		if (file == null) {
@@ -2337,6 +2349,25 @@ public final class FileUtils {
 		return Boolean.FALSE;
 	}
 
+	/**
+	 * Check current file type is a picture file
+	 *
+	 * @param fileContent the file content
+	 * @return Check result
+	 */
+	public static boolean isPicture(byte[] fileContent) {
+		return FileUtils.REGISTER_IDENTIFIED_MAP.values()
+				.stream()
+				.filter(FileExtensionInfo::isPicture)
+				.anyMatch(fileExtensionInfo -> validateFileType(fileExtensionInfo.getExtensionName(), fileContent));
+	}
+
+	/**
+	 * Retrieve extension info optional.
+	 *
+	 * @param resourceLocation the resource location
+	 * @return the optional
+	 */
 	public static Optional<FileExtensionInfo> retrieveExtensionInfo(String resourceLocation) {
 		FileExtensionInfo fileExtensionInfo = null;
 		if (FileUtils.validateFileType(resourceLocation)) {
@@ -2360,9 +2391,9 @@ public final class FileUtils {
 	 * Check current file is exists
 	 *
 	 * @param filePath File path
-	 * @param domain    SMB domain
-	 * @param userName  SMB user name
-	 * @param passWord  SMB password
+	 * @param domain   SMB domain
+	 * @param userName SMB user name
+	 * @param passWord SMB password
 	 * @return Check result
 	 */
 	public static boolean isExists(String filePath, String domain, String userName, String passWord) {
@@ -2497,9 +2528,9 @@ public final class FileUtils {
 	 * Check current file can read
 	 *
 	 * @param filePath File path
-	 * @param domain    SMB domain
-	 * @param userName  SMB user name
-	 * @param passWord  SMB password
+	 * @param domain   SMB domain
+	 * @param userName SMB user name
+	 * @param passWord SMB password
 	 * @return Check result
 	 */
 	public static boolean canRead(String filePath, String domain, String userName, String passWord) {
@@ -2636,7 +2667,7 @@ public final class FileUtils {
 	 * @param passWord  SMB password
 	 * @return List of split file
 	 */
-	public static SegmentationFile segmentFile(String filePath, int blockSize, 
+	public static SegmentationFile segmentFile(String filePath, int blockSize,
 											   String domain, String userName, String passWord) {
 		if (!FileUtils.isExists(filePath, domain, userName, passWord)) {
 			return null;

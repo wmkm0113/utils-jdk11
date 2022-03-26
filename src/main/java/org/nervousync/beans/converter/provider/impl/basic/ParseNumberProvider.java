@@ -62,7 +62,8 @@ public final class ParseNumberProvider implements ConvertProvider {
 				}
 			}
 
-			Method method = ReflectionUtils.findMethod(targetClass, "valueOf", new Class[]{String.class});
+			Method method = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
+					"valueOf", new Class[]{String.class});
 			if (method != null) {
 				try {
 					Object object = method.invoke(null, string);

@@ -2,18 +2,15 @@ package org.nervousync.generator.uuid.impl;
 
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.generator.uuid.UUIDGenerator;
+import org.nervousync.utils.IDUtils;
 
 import java.security.SecureRandom;
 import java.util.UUID;
 
-@GeneratorProvider("UUIDv4")
+@GeneratorProvider(IDUtils.UUIDv4)
 public final class UUIDv4Generator extends UUIDGenerator {
 
     private final SecureRandom secureRandom = new SecureRandom();
-
-    @Override
-    public void initialize() {
-    }
 
     @Override
     public Object random() {

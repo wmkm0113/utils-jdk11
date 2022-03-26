@@ -834,6 +834,24 @@ public final class ReflectionUtils {
 	}
 
 	/**
+	 * Parse component type from field
+	 *
+	 * @param field	Field instance
+	 * @return		Parsed component type or null if not a list or array
+	 */
+	public static Class<?> parseComponentType(Field field) {
+		Class<?> fieldClass = field.getType();
+		Class<?> componentClass = null;
+
+		if (fieldClass.isArray()) {
+			componentClass = fieldClass.getComponentType();
+		} else if (List.class.isAssignableFrom(fieldClass)) {
+			componentClass = (Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+		}
+		return componentClass;
+	}
+
+	/**
 	 * Invoke the given callback on all fields in the target class,
 	 * going up the class hierarchy to get all declared fields.
 	 *

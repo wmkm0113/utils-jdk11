@@ -19,7 +19,7 @@ package org.nervousync.utils;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.nervousync.annotations.service.RestfulClient;
+import jakarta.ws.rs.*;
 import org.nervousync.beans.ip.IPRange;
 import org.nervousync.beans.servlet.request.RequestAttribute;
 import org.nervousync.beans.servlet.request.RequestInfo;
@@ -33,21 +33,17 @@ import org.nervousync.commons.http.security.GeneX509TrustManager;
 import org.nervousync.enumerations.ip.IPType;
 import org.nervousync.enumerations.web.HttpMethodOption;
 
+import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.net.ssl.*;
-import javax.xml.namespace.QName;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.xml.ws.Service;
-import jakarta.xml.ws.WebServiceClient;
-import jakarta.xml.ws.handler.HandlerResolver;
-
-import org.nervousync.interceptor.beans.HandlerInterceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.*;
 import java.net.http.HttpClient;
@@ -56,6 +52,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.time.Duration;
@@ -142,6 +140,44 @@ public final class RequestUtils {
 	}
 
 	/**
+	 * Http method option http method option.
+	 *
+	 * @param method the method
+	 * @return the http method option
+	 */
+	public static HttpMethodOption httpMethodOption(Method method) {
+		if (method == null) {
+			return HttpMethodOption.UNKNOWN;
+		}
+
+		if (method.isAnnotationPresent(GET.class)) {
+			return HttpMethodOption.GET;
+		}
+
+		if (method.isAnnotationPresent(HEAD.class)) {
+			return HttpMethodOption.HEAD;
+		}
+
+		if (method.isAnnotationPresent(PUT.class)) {
+			return HttpMethodOption.PUT;
+		}
+
+		if (method.isAnnotationPresent(POST.class)) {
+			return HttpMethodOption.POST;
+		}
+
+		if (method.isAnnotationPresent(DELETE.class)) {
+			return HttpMethodOption.DELETE;
+		}
+
+		if (method.isAnnotationPresent(PATCH.class)) {
+			return HttpMethodOption.PATCH;
+		}
+
+		return HttpMethodOption.UNKNOWN;
+	}
+
+	/**
 	 * Resolve domain name to IP address
 	 *
 	 * @param domainName domain name
@@ -171,12 +207,12 @@ public final class RequestUtils {
 		String endAddress;
 		if (ipAddress.contains(":")) {
 			ipRange.setIpType(IPType.IPv6);
-			beginAddress = RequestUtils.beginIPv6(ipAddress, cidr);
-			endAddress = RequestUtils.endIPv6(beginAddress, cidr);
+			beginAddress = beginIPv6(ipAddress, cidr);
+			endAddress = endIPv6(beginAddress, cidr);
 		} else {
 			ipRange.setIpType(IPType.IPv4);
-			beginAddress = RequestUtils.beginIPv4(ipAddress, CIDRToNetmask(cidr));
-			endAddress = RequestUtils.endIPv4(beginAddress, CIDRToNetmask(cidr));
+			beginAddress = beginIPv4(ipAddress, CIDRToNetmask(cidr));
+			endAddress = endIPv4(beginAddress, CIDRToNetmask(cidr));
 		}
 
 		ipRange.setBeginAddress(beginAddress);
@@ -220,7 +256,7 @@ public final class RequestUtils {
 			int[] arrays = new int[]{0, 0, 0, 0};
 			int index = 0;
 			while (index < 4 && cidr >= 0) {
-				arrays[index] = RequestUtils.fillBitsFromLeft(cidr);
+				arrays[index] = fillBitsFromLeft(cidr);
 				cidr -= 8;
 				index++;
 			}
@@ -290,7 +326,8 @@ public final class RequestUtils {
 
 	/**
 	 * Convert IP Address to byte array
-	 * @param ipAddress		IP Address
+	 *
+	 * @param ipAddress IP Address
 	 * @return byte array
 	 */
 	public static byte[] IPToBytes(String ipAddress) {
@@ -349,6 +386,12 @@ public final class RequestUtils {
 		return null;
 	}
 
+	/**
+	 * Expand i pv 6 string.
+	 *
+	 * @param ipAddress the ip address
+	 * @return the string
+	 */
 	public static String expandIPv6(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
 			int sigCount = StringUtils.countOccurrencesOf(ipAddress, ":");
@@ -385,9 +428,9 @@ public final class RequestUtils {
 	 */
 	public static BigInteger IPtoBigInteger(String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			return RequestUtils.IPv4ToBigInteger(ipAddress);
+			return IPv4ToBigInteger(ipAddress);
 		} else {
-			return RequestUtils.IPv6ToBigInteger(ipAddress);
+			return IPv6ToBigInteger(ipAddress);
 		}
 	}
 
@@ -480,8 +523,8 @@ public final class RequestUtils {
 	/**
 	 * Read HTTPS server certificate
 	 *
-	 * @param urlAddress	Https url address
-	 * @return				Matched server certificate
+	 * @param urlAddress Https url address
+	 * @return Matched server certificate
 	 */
 	public static Optional<Certificate> serverCertificate(String urlAddress) {
 		Certificate certificate = null;
@@ -502,29 +545,8 @@ public final class RequestUtils {
 			try {
 				HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(urlAddress).openConnection();
 				httpsURLConnection.connect();
-				Date currentDate = new Date();
 				certificate = Arrays.stream(httpsURLConnection.getServerCertificates())
-						.filter(serverCertificate -> {
-							X509Certificate x509Certificate = (X509Certificate) serverCertificate;
-							if ((x509Certificate.getNotBefore().getTime() <= currentDate.getTime())
-									&& (currentDate.getTime() <= x509Certificate.getNotAfter().getTime())) {
-								try {
-									LdapName ldapName = new LdapName(x509Certificate.getSubjectX500Principal().getName());
-									String matchDomain =
-											ldapName.getRdns().stream()
-													.filter(rdn -> rdn.getType().equalsIgnoreCase("CN"))
-													.findFirst()
-													.map(rdn -> (String) rdn.getValue())
-													.orElse(Globals.DEFAULT_VALUE_STRING);
-									return matchDomain.startsWith("*")
-											? domainName.toLowerCase().endsWith(matchDomain.substring(1).toLowerCase())
-											: domainName.equalsIgnoreCase(matchDomain);
-								} catch (Exception ignored) {
-									return Boolean.FALSE;
-								}
-							}
-							return Boolean.FALSE;
-						})
+						.filter(serverCertificate -> verifyCertificate((X509Certificate) serverCertificate, domainName))
 						.findFirst()
 						.orElse(null);
 			} catch (IOException e) {
@@ -537,63 +559,24 @@ public final class RequestUtils {
 		return Optional.ofNullable(certificate);
 	}
 
-	/**
-	 * Generate Restful service client instance
-	 *
-	 * @param <T>                Client interface
-	 * @param serviceClient      Client interface class
-	 * @param handlerInterceptor Handler interceptor
-	 * @return Generated instance
-	 */
-	public static <T> T RestfulClient(Class<T> serviceClient, HandlerInterceptor handlerInterceptor) {
-		if (!serviceClient.isAnnotationPresent(RestfulClient.class)) {
-			return null;
+	private static boolean verifyCertificate(final X509Certificate x509Certificate, final String domainName) {
+		if (x509Certificate == null || StringUtils.isEmpty(domainName)) {
+			return Boolean.FALSE;
 		}
-		return ObjectUtils.createProxyInstance(serviceClient, handlerInterceptor);
-	}
-
-	/**
-	 * Generate SOAP client instance
-	 *
-	 * @param <T>              End point interface
-	 * @param serviceInterface End point interface
-	 * @param handlerResolver  Handler resolver
-	 * @return Generated instance
-	 * @throws MalformedURLException if no protocol is specified, or an unknown protocol is found, or spec is null.
-	 */
-	public static <T> T SOAPClient(Class<T> serviceInterface, HandlerResolver handlerResolver)
-			throws MalformedURLException {
-		if (!serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
-			return null;
+		try {
+			x509Certificate.checkValidity();
+			LdapName ldapName = new LdapName(x509Certificate.getSubjectX500Principal().getName());
+			String matchDomain = ldapName.getRdns().stream()
+					.filter(rdn -> rdn.getType().equalsIgnoreCase("CN"))
+					.findFirst()
+					.map(rdn -> (String) rdn.getValue())
+					.orElse(Globals.DEFAULT_VALUE_STRING);
+			return matchDomain.startsWith("*")
+					? domainName.toLowerCase().endsWith(matchDomain.substring(1).toLowerCase())
+					: domainName.equalsIgnoreCase(matchDomain);
+		} catch (CertificateNotYetValidException | CertificateExpiredException | InvalidNameException e) {
+			return Boolean.FALSE;
 		}
-
-		WebServiceClient serviceClient = serviceInterface.getAnnotation(WebServiceClient.class);
-
-		String namespaceURI = serviceClient.targetNamespace();
-		String serviceName = serviceClient.name();
-		URL wsdlLocation = new URL(serviceClient.wsdlLocation());
-
-		if (namespaceURI.length() == 0) {
-			String packageName = serviceInterface.getPackage().getName();
-			String[] packageNames = StringUtils.tokenizeToStringArray(packageName, ".");
-			StringBuilder stringBuilder = new StringBuilder(wsdlLocation.getProtocol() + "://");
-			for (int i = packageNames.length - 1; i >= 0; i--) {
-				stringBuilder.append(packageNames[i]).append(".");
-			}
-
-			namespaceURI = stringBuilder.substring(0, stringBuilder.length() - 1) + "/";
-		}
-
-		if (StringUtils.isEmpty(serviceName)) {
-			serviceName = serviceInterface.getSimpleName() + "Service";
-		}
-
-		Service service = Service.create(wsdlLocation, new QName(namespaceURI, serviceName));
-		if (handlerResolver != null) {
-			service.setHandlerResolver(handlerResolver);
-		}
-
-		return service.getPort(new QName(namespaceURI, serviceName), serviceInterface);
 	}
 
 	/**
@@ -764,7 +747,7 @@ public final class RequestUtils {
 			}
 			if (!HttpMethodOption.POST.equals(requestInfo.getHttpMethodOption())
 					&& !HttpMethodOption.PUT.equals(requestInfo.getHttpMethodOption())) {
-				uri = RequestUtils.appendParams(uri, requestInfo.getParameters());
+				uri = appendParams(uri, requestInfo.getParameters());
 			}
 		} else {
 			requestBuilder.header("Content-Type",
@@ -783,7 +766,7 @@ public final class RequestUtils {
 		} else {
 			requestBuilder.setHeader("User-Agent", requestInfo.getUserAgent());
 		}
-		String cookie = RequestUtils.generateCookie(requestInfo.getRequestUrl(), requestInfo.getCookieList());
+		String cookie = generateCookie(requestInfo.getRequestUrl(), requestInfo.getCookieList());
 		if (StringUtils.notBlank(cookie)) {
 			requestBuilder.setHeader("Cookie", cookie);
 		}
@@ -830,8 +813,8 @@ public final class RequestUtils {
 					.body()
 					.get());
 		} catch (IOException | InterruptedException e) {
-			if (RequestUtils.LOGGER.isDebugEnabled()) {
-				RequestUtils.LOGGER.debug("Send Request ERROR: ", e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Send Request ERROR: ", e);
 			}
 			return Optional.empty();
 		} finally {
@@ -845,9 +828,9 @@ public final class RequestUtils {
 	 * @param request The request that will supply parameters
 	 * @return Query string corresponding to that request parameters
 	 */
-	public static String getRequestParameters(HttpServletRequest request) {
-		Map<String, String[]> m = request.getParameterMap();
-		return createQueryStringFromMap(m, "&").toString();
+	public static String createQueryString(HttpServletRequest request) {
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		return createQueryStringFromMap(parameterMap, "&").toString();
 	}
 
 	/**
@@ -857,8 +840,20 @@ public final class RequestUtils {
 	 * @param queryString Query string to get parameters from
 	 * @return Map with request parameters mapped to their values
 	 */
-	public static Map<String, String[]> getRequestParametersFromString(String queryString) {
-		return getRequestParametersFromString(queryString, true);
+	public static Map<String, String[]> parseQueryString(final String queryString) {
+		return parseQueryString(queryString, Boolean.TRUE, Boolean.FALSE);
+	}
+
+	/**
+	 * Creates map of request parameters from given query string. Values are
+	 * decoded.
+	 *
+	 * @param queryString Query string to get parameters from
+	 * @param parseMatrix the parse matrix
+	 * @return Map with request parameters mapped to their values
+	 */
+	public static Map<String, String[]> parseQueryString(final String queryString, final boolean parseMatrix) {
+		return parseQueryString(queryString, Boolean.TRUE, parseMatrix);
 	}
 
 	/**
@@ -866,10 +861,11 @@ public final class RequestUtils {
 	 *
 	 * @param queryString  Query string to get parameters from
 	 * @param decodeValues Whether to decode values (which are URL-encoded)
+	 * @param parseMatrix  the parse matrix
 	 * @return Map with request parameters mapped to their values
 	 */
-	public static Map<String, String[]> getRequestParametersFromString(String queryString,
-	                                                                   boolean decodeValues) {
+	public static Map<String, String[]> parseQueryString(final String queryString, final boolean decodeValues,
+														 final boolean parseMatrix) {
 		HashMap<String, String[]> parameterMap = new HashMap<>();
 
 		if (queryString == null) {
@@ -891,7 +887,20 @@ public final class RequestUtils {
 					if (decodeValues) {
 						value = URLDecoder.decode(value, Globals.DEFAULT_ENCODING);
 					}
-					parameterMap.put(key, mergeValues(parameterMap.get(key), value));
+					if (parseMatrix) {
+						int splitIndex = value.indexOf(";");
+						if (splitIndex == Globals.DEFAULT_VALUE_INT) {
+							parameterMap.put(key, mergeValues(parameterMap.get(key), value));
+						} else {
+							String paramValue = value.substring(0, splitIndex);
+							parameterMap.put(key, mergeValues(parameterMap.get(key), paramValue));
+
+							Arrays.asList(StringUtils.tokenizeToStringArray(value.substring(splitIndex), ";"))
+									.forEach(matrixString -> parseMatrixString(parameterMap, matrixString));
+						}
+					} else {
+						parameterMap.put(key, mergeValues(parameterMap.get(key), value));
+					}
 				} catch (UnsupportedEncodingException e) {
 					// do nothing
 				}
@@ -902,6 +911,18 @@ public final class RequestUtils {
 		return parameterMap;
 	}
 
+	private static void parseMatrixString(Map<String, String[]> parameterMap, String matrixString) {
+		if (StringUtils.isEmpty(matrixString)) {
+			return;
+		}
+		int equalIndex = matrixString.indexOf("=");
+		if (equalIndex != Globals.DEFAULT_VALUE_INT) {
+			String matrixKey = matrixString.substring(0, equalIndex);
+			String matrixValue = matrixString.substring(equalIndex + 1);
+
+			parameterMap.put(matrixKey, mergeValues(parameterMap.get(matrixKey), matrixValue));
+		}
+	}
 
 	/**
 	 * Creates a map of request parameters from URI.
@@ -909,7 +930,18 @@ public final class RequestUtils {
 	 * @param uri An address to extract request parameters from
 	 * @return map of request parameters
 	 */
-	public static Map<String, String[]> getRequestParametersFromUri(String uri) {
+	public static Map<String, String[]> parseParametersFromUri(String uri) {
+		return parseParametersFromUri(uri, Boolean.FALSE);
+	}
+
+	/**
+	 * Creates a map of request parameters from URI.
+	 *
+	 * @param uri         An address to extract request parameters from
+	 * @param parseMatrix the parse matrix
+	 * @return map of request parameters
+	 */
+	public static Map<String, String[]> parseParametersFromUri(String uri, boolean parseMatrix) {
 		if (ObjectUtils.isNull(uri) || uri.trim().length() == 0) {
 			return new HashMap<>();
 		}
@@ -919,7 +951,7 @@ public final class RequestUtils {
 			return new HashMap<>();
 		}
 
-		return RequestUtils.getRequestParametersFromString(uri.substring(qSignPos + 1));
+		return parseQueryString(uri.substring(qSignPos + 1), parseMatrix);
 	}
 
 
@@ -990,7 +1022,7 @@ public final class RequestUtils {
 	 */
 	public static String appendParams(String uri, Map<String, String[]> params) {
 		String delimiter = (uri.indexOf('?') == -1) ? "?" : "&";
-		return uri + delimiter + RequestUtils.createQueryStringFromMap(params, "&");
+		return uri + delimiter + createQueryStringFromMap(params, "&");
 	}
 
 	/**
@@ -1145,7 +1177,7 @@ public final class RequestUtils {
 	 * @return the request uri
 	 */
 	public static String getRequestURI(HttpServletRequest request) {
-		String requestUrl = RequestUtils.getRequestPath(request);
+		String requestUrl = getRequestPath(request);
 
 		if (requestUrl.lastIndexOf('.') != -1) {
 			return requestUrl.substring(0, requestUrl.lastIndexOf("."));
@@ -1196,7 +1228,7 @@ public final class RequestUtils {
 		StringBuilder requestUrl = new StringBuilder();
 
 		if (includeDomain) {
-			requestUrl.append(RequestUtils.getAppURL(request));
+			requestUrl.append(getAppURL(request));
 		}
 
 		requestUrl.append(getRequestURI(request));
@@ -1227,7 +1259,7 @@ public final class RequestUtils {
 	 * @return the string
 	 */
 	public static String processRewrite(HttpServletRequest request, String regex, String toPath) {
-		String requestPath = RequestUtils.getRequestUrl(request, false);
+		String requestPath = getRequestUrl(request, false);
 
 		if (StringUtils.matches(requestPath, regex)) {
 			String redirectPath = toPath;
@@ -1333,7 +1365,7 @@ public final class RequestUtils {
 	 */
 	private static String beginIPv6(String ipAddress, int cidr) {
 		if (cidr >= 0 && cidr <= 128) {
-			String hexAddress = StringUtils.replace(RequestUtils.expandIgnore(ipAddress), ":", "");
+			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), ":", "");
 			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
 
 			while (baseIP.length() < 128) {
@@ -1354,7 +1386,7 @@ public final class RequestUtils {
 	 */
 	private static String endIPv6(String ipAddress, int cidr) {
 		if (cidr >= 0 && cidr <= 128) {
-			String hexAddress = StringUtils.replace(RequestUtils.expandIgnore(ipAddress), ":", "");
+			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), ":", "");
 			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
 
 			while (baseIP.length() < 128) {
@@ -1469,9 +1501,8 @@ public final class RequestUtils {
 	 * @param v2 Second object to merge
 	 * @return Array contains merged objects
 	 */
-	private static String[] mergeValues(String[] v1, String v2) {
+	private static String[] mergeValues(String[] v1, String... v2) {
 		String[] values1;
-		String[] values2;
 
 		// get first array of values
 		if (v1 == null) {
@@ -1482,13 +1513,11 @@ public final class RequestUtils {
 
 		// get second array of values
 		if (v2 == null) {
-			values2 = new String[0];
+			return values1;
 		} else {
-			values2 = new String[]{v2};
+			// merge arrays
+			return StringUtils.concatenateStringArrays(values1, v2);
 		}
-
-		// merge arrays
-		return StringUtils.concatenateStringArrays(values1, values2);
 	}
 
 	/**

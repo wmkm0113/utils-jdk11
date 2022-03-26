@@ -49,7 +49,7 @@ public final class OTPUtils {
 	 * @param authCode  Auth code
 	 * @return Fixed time
 	 */
-	public static long calculateFixedTime(String randomKey, int authCode) {
+	public static long calculateFixedTime(final String randomKey, final int authCode) {
 		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -61,7 +61,7 @@ public final class OTPUtils {
 	 * @param syncCount Synchronize count
 	 * @return Fixed time
 	 */
-	public static long calculateFixedTime(String randomKey, int authCode, int syncCount) {
+	public static long calculateFixedTime(final String randomKey, final int authCode, final int syncCount) {
 		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, syncCount);
 	}
 
@@ -73,7 +73,7 @@ public final class OTPUtils {
 	 * @param authCode  Auth code
 	 * @return Fixed time
 	 */
-	public static long calculateFixedTime(CalcType calcType, String randomKey, int authCode) {
+	public static long calculateFixedTime(final CalcType calcType, final String randomKey, final int authCode) {
 		return calculateFixedTime(calcType, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -86,7 +86,8 @@ public final class OTPUtils {
 	 * @param syncCount Synchronize count
 	 * @return Fixed time
 	 */
-	public static long calculateFixedTime(CalcType calcType, String randomKey, int authCode, int syncCount) {
+	public static long calculateFixedTime(final CalcType calcType, final String randomKey,
+										  final int authCode, final int syncCount) {
 		for (int i = -12 ; i <= 12 ; i++) {
 			long fixedTime = i * 60 * 60 * 1000L;
 			if (validateTOTPCode(calcType, authCode, randomKey, fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE)) {
@@ -100,10 +101,20 @@ public final class OTPUtils {
 	 * Generate auth code
 	 *
 	 * @param secret    Secret string
+	 * @return Auth code
+	 */
+	public static String generateTOTPCode(final String secret) {
+		return generateTOTPCode(CalcType.HmacSHA1, secret, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_VALUE_INT);
+	}
+
+	/**
+	 * Generate auth code
+	 *
+	 * @param secret    Secret string
 	 * @param fixedTime Fixed time
 	 * @return Auth code
 	 */
-	public static String generateTOTPCode(String secret, long fixedTime) {
+	public static String generateTOTPCode(final String secret, final long fixedTime) {
 		return generateTOTPCode(CalcType.HmacSHA1, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -115,7 +126,7 @@ public final class OTPUtils {
 	 * @param syncCount Synchronize count
 	 * @return Auth code
 	 */
-	public static String generateTOTPCode(String secret, long fixedTime, int syncCount) {
+	public static String generateTOTPCode(final String secret, final long fixedTime, final int syncCount) {
 		return generateTOTPCode(CalcType.HmacSHA1, secret, fixedTime, syncCount);
 	}
 
@@ -127,7 +138,7 @@ public final class OTPUtils {
 	 * @param fixedTime Fixed time
 	 * @return Auth code
 	 */
-	public static String generateTOTPCode(CalcType calcType, String secret, long fixedTime) {
+	public static String generateTOTPCode(final CalcType calcType, final String secret, final long fixedTime) {
 		return generateTOTPCode(calcType, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -140,7 +151,8 @@ public final class OTPUtils {
 	 * @param syncCount Synchronize count
 	 * @return Auth code
 	 */
-	public static String generateTOTPCode(CalcType calcType, String secret, long fixedTime, int syncCount) {
+	public static String generateTOTPCode(final CalcType calcType, final String secret,
+										  final long fixedTime, final int syncCount) {
 		int authCode = OTPUtils.generateTOTPCode(calcType, secret,
 				fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE);
 		if (authCode == Globals.DEFAULT_VALUE_INT) {
@@ -169,7 +181,7 @@ public final class OTPUtils {
 	 * @param size seed size
 	 * @return Random secret key
 	 */
-	public static String generateRandomKey(int size) {
+	public static String generateRandomKey(final int size) {
 		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, size);
 	}
 
@@ -181,7 +193,7 @@ public final class OTPUtils {
 	 * @param size      Seed size
 	 * @return Random secret key
 	 */
-	public static String generateRandomKey(String algorithm, String seed, int size) {
+	public static String generateRandomKey(final String algorithm, final String seed, final int size) {
 		String randomKey = null;
 		try {
 			SecureRandom secureRandom = StringUtils.notBlank(algorithm)
@@ -209,7 +221,7 @@ public final class OTPUtils {
 	 * @param randomCode random code
 	 * @return generated code
 	 */
-	public static int generateHOTPCode(String randomKey, long randomCode) {
+	public static int generateHOTPCode(final String randomKey, final long randomCode) {
 		return generateCode(CalcType.HmacSHA1, randomKey, randomCode);
 	}
 
@@ -221,7 +233,7 @@ public final class OTPUtils {
 	 * @param randomCode random code
 	 * @return generated code
 	 */
-	public static int generateHOTPCode(CalcType calcType, String randomKey, long randomCode) {
+	public static int generateHOTPCode(final CalcType calcType, final String randomKey, final long randomCode) {
 		return generateCode(calcType, randomKey, randomCode);
 	}
 
@@ -233,7 +245,7 @@ public final class OTPUtils {
 	 * @param fixedTime fixed time
 	 * @return validate result
 	 */
-	public static boolean validateTOTPCode(int authCode, String randomKey, long fixedTime) {
+	public static boolean validateTOTPCode(final int authCode, final String randomKey, final long fixedTime) {
 		return validateTOTPCode(CalcType.HmacSHA1, authCode, randomKey,
 				fixedTime, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 	}
@@ -247,7 +259,8 @@ public final class OTPUtils {
 	 * @param fixWindow fix window
 	 * @return validate result
 	 */
-	public static boolean validateTOTPCode(int authCode, String randomKey, long fixedTime, int fixWindow) {
+	public static boolean validateTOTPCode(final int authCode, final String randomKey,
+										   final long fixedTime, final int fixWindow) {
 		return validateTOTPCode(CalcType.HmacSHA1, authCode, randomKey,
 				fixedTime, Globals.DEFAULT_VALUE_INT, fixWindow);
 	}
@@ -263,8 +276,8 @@ public final class OTPUtils {
 	 * @param fixWindow fix window
 	 * @return validate result
 	 */
-	public static boolean validateTOTPCode(CalcType calcType, int authCode,
-	                                       String randomKey, long fixedTime, int syncCount, int fixWindow) {
+	public static boolean validateTOTPCode(final CalcType calcType, final int authCode, final String randomKey,
+										   final long fixedTime, final int syncCount, final int fixWindow) {
 		if (authCode > Globals.INITIALIZE_INT_VALUE) {
 			int minWindow = fixWindow < 0 ? (-1 * DEFAULT_WINDOW_SIZE) : (-1 * fixWindow);
 			int maxWindow = fixWindow < 0 ? DEFAULT_WINDOW_SIZE : fixWindow;
@@ -286,7 +299,7 @@ public final class OTPUtils {
 	 * @param randomCode the random code
 	 * @return validate result
 	 */
-	public static boolean validateHOTPCode(int authCode, String randomKey, long randomCode) {
+	public static boolean validateHOTPCode(final int authCode, final String randomKey, final long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
 				? authCode == generateHOTPCode(CalcType.HmacSHA1, randomKey, randomCode)
 				: Boolean.FALSE;
@@ -301,7 +314,8 @@ public final class OTPUtils {
 	 * @param randomCode the random code
 	 * @return validate result
 	 */
-	public static boolean validateHOTPCode(int authCode, CalcType calcType, String randomKey, long randomCode) {
+	public static boolean validateHOTPCode(final int authCode, final CalcType calcType, final String randomKey,
+										   final long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
 				? authCode == generateHOTPCode(calcType, randomKey, randomCode)
 				: Boolean.FALSE;
@@ -316,20 +330,22 @@ public final class OTPUtils {
 	 * @param fixWindow     fix window
 	 * @return      generated code
 	 */
-	private static int generateTOTPCode(CalcType calcType, String randomKey,
-	                                    long fixedTime, int syncCount, int fixWindow) {
-		long currentGMTTime = DateTimeUtils.currentUTCTimeMillis();
-		long calcTime = (currentGMTTime + fixedTime) / 1000L
-				/ (syncCount == Globals.DEFAULT_VALUE_INT ? DEFAULT_SYNC_COUNT : syncCount);
+	private static int generateTOTPCode(final CalcType calcType, final String randomKey, final long fixedTime,
+										final int syncCount, final int fixWindow) {
+		long currentTime = DateTimeUtils.currentTimeMillis();
+		long calcTime = (currentTime + fixedTime) / 1000L;
+		if (syncCount > 0) {
+			calcTime /= syncCount;
+		} else {
+			calcTime /= DEFAULT_SYNC_COUNT;
+		}
 		calcTime += fixWindow;
 		return generateCode(calcType, randomKey, calcTime);
 	}
 
-	private static int generateCode(CalcType calcType, String randomKey, long calcTime) {
+	private static int generateCode(final CalcType calcType, final String randomKey, long calcTime) {
 		byte[] signData = new byte[8];
-		for (int i = 8 ; i-- > 0 ; calcTime >>>= 8) {
-			signData[i] = (byte)calcTime;
-		}
+		RawUtils.writeLong(signData, calcTime);
 		byte[] secret = StringUtils.base32Decode(randomKey);
 		byte[] hash;
 		switch (calcType) {

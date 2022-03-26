@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
 
 public final class UUIDTimer {
@@ -21,17 +20,23 @@ public final class UUIDTimer {
     private static final int MAX_WAIT_COUNT = 50;
 
     public UUIDTimer() {
-        this.initialize();
+        this.config(null);
     }
 
-    public void initialize() {
-        this.synchronizer = ServiceLoader.load(TimeSynchronizer.class).findFirst().orElse(null);
+    public void config(final TimeSynchronizer synchronizer) {
+        if (this.synchronizer == null || !this.synchronizer.equals(synchronizer)) {
+            this.synchronizer = synchronizer;
+            this.init();
+        }
+    }
+
+    private void init() {
         this.random = new Random(System.currentTimeMillis());
         this.initCounters();
         this.systemTimestamp = 0L;
         this.usedTimestamp = 0L;
-        if (synchronizer != null) {
-            long initTimestamp = synchronizer.initialize();
+        if (this.synchronizer != null) {
+            long initTimestamp = this.synchronizer.initialize();
             if (initTimestamp > this.usedTimestamp) {
                 this.usedTimestamp = initTimestamp;
             }

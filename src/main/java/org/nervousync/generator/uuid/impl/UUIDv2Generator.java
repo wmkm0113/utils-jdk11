@@ -2,19 +2,24 @@ package org.nervousync.generator.uuid.impl;
 
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.generator.uuid.UUIDGenerator;
+import org.nervousync.generator.uuid.timer.TimeSynchronizer;
 import org.nervousync.generator.uuid.timer.UUIDTimer;
+import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.SystemUtils;
 
 import java.util.UUID;
 
-@GeneratorProvider("UUIDv2")
+@GeneratorProvider(IDUtils.UUIDv2)
 public final class UUIDv2Generator extends UUIDGenerator {
 
-    private final UUIDTimer uuidTimer = new UUIDTimer();
+    private final UUIDTimer uuidTimer;
 
-    @Override
-    public void initialize() {
-        this.uuidTimer.initialize();
+    public UUIDv2Generator() {
+        this.uuidTimer = new UUIDTimer();
+    }
+
+    public void config(final TimeSynchronizer synchronizer) {
+        this.uuidTimer.config(synchronizer);
     }
 
     @Override

@@ -207,6 +207,10 @@ public class BeanObject implements Serializable {
 
 		try {
 			for (Field field : fields) {
+				if (ReflectionUtils.staticMember(field)) {
+					//	Ignore static field
+					continue;
+				}
 				Object origValue = ReflectionUtils.getFieldValue(field, this);
 				Object destValue = ReflectionUtils.getFieldValue(field, o);
 

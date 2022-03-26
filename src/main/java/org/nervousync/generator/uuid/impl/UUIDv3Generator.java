@@ -3,17 +3,14 @@ package org.nervousync.generator.uuid.impl;
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.generator.uuid.UUIDGenerator;
+import org.nervousync.utils.IDUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-@GeneratorProvider("UUIDv3")
+@GeneratorProvider(IDUtils.UUIDv3)
 public final class UUIDv3Generator extends UUIDGenerator {
-
-    @Override
-    public void initialize() {
-    }
 
     @Override
     public Object random() {
