@@ -1,4 +1,10 @@
 Nervousync Java Utils Package
+[05/03/2022]
+Add Jersey dependency for ServiceUtils
+Update slf4j to 1.7.36
+Update snmp4j to 3.6.7
+Update jcifs to 2.1.29
+
 [07/09/2020]
 Add TOTP(Time-based One-time Password Algorithm) Utility
 

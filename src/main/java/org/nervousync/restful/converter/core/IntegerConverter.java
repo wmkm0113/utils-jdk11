@@ -16,7 +16,10 @@ public final class IntegerConverter implements ParameterConverter {
     }
 
     @Override
-    public Object fromString(String value) {
+    public Object fromString(Class<?> clazz, String value) {
+        if (!Integer.class.equals(clazz)) {
+            return null;
+        }
         return StringUtils.notBlank(value) ? Integer.valueOf(value) : null;
     }
 }

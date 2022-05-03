@@ -16,7 +16,10 @@ public final class ShortConverter implements ParameterConverter {
     }
 
     @Override
-    public Object fromString(String value) {
+    public Object fromString(Class<?> clazz, String value) {
+        if (!Short.class.equals(clazz)) {
+            return null;
+        }
         return StringUtils.notBlank(value) ? Short.valueOf(value) : null;
     }
 }

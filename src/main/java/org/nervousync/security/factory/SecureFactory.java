@@ -90,7 +90,7 @@ public final class SecureFactory {
      * Init config optional.
      *
      * @param secureAlgorithm the secure algorithm
-     * @return optional optional
+     * @return optional
      */
     public static Optional<SecureConfig> initConfig(SecureAlgorithm secureAlgorithm) {
         final byte[] keyBytes = generate(secureAlgorithm);
@@ -129,6 +129,9 @@ public final class SecureFactory {
     public boolean register(String configName, SecureConfig secureConfig) {
         if (StringUtils.isEmpty(configName) || this.factoryNode == null || !this.factoryNode.isInitialized()) {
             return Boolean.FALSE;
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current Config: {}", secureConfig.toXML(Boolean.TRUE));
         }
         return SecureNode.initialize(secureConfig).filter(SecureNode::isInitialized)
                 .map(secureNode -> {
@@ -201,6 +204,9 @@ public final class SecureFactory {
     }
 
     private byte[] initKey(byte[] dataBytes, boolean encrypt) {
+        if (this.factoryNode == null) {
+            return dataBytes;
+        }
         SecureProvider secureProvider = this.factoryNode.initCryptor(encrypt);
         if (secureProvider == null) {
             LOGGER.error("Secure factory not initialized! ");

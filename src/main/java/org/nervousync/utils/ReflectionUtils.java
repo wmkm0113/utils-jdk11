@@ -442,7 +442,7 @@ public final class ReflectionUtils {
 	 * @param method the method to invoke
 	 * @param target the target object to invoke the method on
 	 * @return the invocation result, if any
-	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeMethod(Method method, Object target) {
 		return invokeMethod(method, target, null);
@@ -477,7 +477,7 @@ public final class ReflectionUtils {
 	 * @param target the target object to invoke the method on
 	 * @return the invocation result, if any
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
-	 * @see #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[]) #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeJdbcMethod(Method method, Object target) throws SQLException {
 		return invokeJdbcMethod(method, target, null);
@@ -492,7 +492,7 @@ public final class ReflectionUtils {
 	 * @param args   the invocation arguments (maybe <code>null</code>)
 	 * @return the invocation result, if any
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
-	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
+	 * @see #invokeMethod(Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
 	public static Object invokeJdbcMethod(Method method, Object target, Object[] args) throws SQLException {
 		try {
@@ -713,7 +713,7 @@ public final class ReflectionUtils {
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
 	 *
 	 * @param field the field to make accessible
-	 * @see java.lang.reflect.Field#setAccessible java.lang.reflect.Field#setAccessible
+	 * @see java.lang.reflect.Field#setAccessible
 	 */
 	public static void makeAccessible(Field field) {
 		if (!Modifier.isPublic(field.getModifiers()) ||
@@ -728,7 +728,7 @@ public final class ReflectionUtils {
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
 	 *
 	 * @param method the method to make accessible
-	 * @see java.lang.reflect.Method#setAccessible java.lang.reflect.Method#setAccessible
+	 * @see java.lang.reflect.Method#setAccessible
 	 */
 	public static void makeAccessible(Method method) {
 		if (!Modifier.isPublic(method.getModifiers()) ||
@@ -743,7 +743,7 @@ public final class ReflectionUtils {
 	 * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
 	 *
 	 * @param ctor the constructor to make accessible
-	 * @see java.lang.reflect.Constructor#setAccessible java.lang.reflect.Constructor#setAccessible
+	 * @see java.lang.reflect.Constructor#setAccessible
 	 */
 	public static void makeAccessible(Constructor<?> ctor) {
 		if (!Modifier.isPublic(ctor.getModifiers()) ||

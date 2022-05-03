@@ -30,6 +30,9 @@ public final class Zip64ExtendInfo {
 	private long originalSize = Globals.DEFAULT_VALUE_LONG;
 	private long offsetLocalHeader = Globals.DEFAULT_VALUE_LONG;
 	private int diskNumberStart = Globals.DEFAULT_VALUE_INT;
+
+	public Zip64ExtendInfo() {
+	}
 	
 	/**
 	 * @return the header

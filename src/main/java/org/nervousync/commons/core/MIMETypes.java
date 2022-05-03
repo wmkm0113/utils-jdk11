@@ -49,6 +49,12 @@ public final class MIMETypes implements Serializable {
 	public static final String MIME_TYPE_ZIP = "application/zip";
 	public static final String MIME_TYPE_RAR = "application/x-rar-compressed";
 	public static final String MIME_TYPE_XZ = "application/x-xz";
+	public static final String MIME_TYPE_XML = "application/xml";
+	public static final String MIME_TYPE_JSON = "application/json";
+	public static final String MIME_TYPE_JAVA_SCRIPT = "application/x-javascript";
+	public static final String MIME_TYPE_XHTML = "application/xhtml+xml";
+
+	public static final String MIME_TYPE_YAML = "application/x-yaml";
 	
 	/* Media MIME Type */
 	public static final String MIME_TYPE_MPEG_AUDIO = "audio/x-ms-wma";
@@ -85,15 +91,12 @@ public final class MIMETypes implements Serializable {
 	public static final String MIME_TYPE_CSS = "text/css";
 	public static final String MIME_TYPE_TEXT = "text/plain";
 	public static final String MIME_TYPE_TEXT_XML = "text/xml";
-	public static final String MIME_TYPE_APPLICATION_XML = "application/xml";
 	public static final String MIME_TYPE_XUL = "text/xul";
-	public static final String MIME_TYPE_JSON = "application/json";
-	public static final String MIME_TYPE_JAVA_SCRIPT = "application/x-javascript";
 	public static final String MIME_TYPE_HTML = "text/html";
-	public static final String MIME_TYPE_XHTML = "application/xhtml+xml";
+	public static final String MIME_TYPE_TEXT_YAML = "text/yaml";
 	
 	private static final String [] MIME_TYPE_TEXTS = {
-		MIME_TYPE_CSS, MIME_TYPE_TEXT, MIME_TYPE_TEXT_XML, MIME_TYPE_APPLICATION_XML, MIME_TYPE_XUL, 
+		MIME_TYPE_CSS, MIME_TYPE_TEXT, MIME_TYPE_TEXT_XML, MIME_TYPE_XML, MIME_TYPE_XUL,
 		MIME_TYPE_JSON, MIME_TYPE_JAVA_SCRIPT, MIME_TYPE_HTML, MIME_TYPE_XHTML
 	};
 	
@@ -156,7 +159,7 @@ public final class MIMETypes implements Serializable {
 	 */
 	public static boolean isXml(String mimeType) {
 		return mimeType.contains(MIME_TYPE_TEXT_XML)
-				|| mimeType.contains(MIME_TYPE_APPLICATION_XML);
+				|| mimeType.contains(MIME_TYPE_XML);
 	}
 	
 	/**

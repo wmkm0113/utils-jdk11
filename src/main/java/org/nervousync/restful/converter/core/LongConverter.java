@@ -16,7 +16,10 @@ public final class LongConverter implements ParameterConverter {
     }
 
     @Override
-    public Object fromString(String value) {
+    public Object fromString(Class<?> clazz, String value) {
+        if (!Long.class.equals(clazz)) {
+            return null;
+        }
         return StringUtils.notBlank(value) ? Long.valueOf(value) : null;
     }
 }

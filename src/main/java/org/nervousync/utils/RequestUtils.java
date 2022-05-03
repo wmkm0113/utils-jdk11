@@ -55,7 +55,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.time.Duration;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1654,31 +1653,11 @@ public final class RequestUtils {
 		public HttpResponse.BodySubscriber<Supplier<T>> apply(HttpResponse.ResponseInfo responseInfo) {
 			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
 			return HttpResponse.BodySubscribers.mapping(upstream, inputStream -> () -> {
-				switch (this.dataType) {
-					case JSON:
-					case YAML:
-						try {
-							ObjectMapper objectMapper = new ObjectMapper();
-							return objectMapper.readValue(inputStream, targetClass);
-						} catch (IOException e) {
-							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Convert json string to object bean error! ", e);
-							}
-							throw new UncheckedIOException(e);
-						}
-					case XML:
-						return BeanUtils.parseXml(IOUtils.readContent(inputStream), this.targetClass);
-					case SIMPLE:
-						try {
-							return StringUtils.parseSimpleData(IOUtils.readContent(inputStream), this.targetClass);
-						} catch (ParseException e) {
-							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Convert string to simple object error! ", e);
-							}
-							return null;
-						}
+				try {
+					return StringUtils.parseStream(inputStream, this.dataType, targetClass);
+				} catch (IOException e) {
+					return null;
 				}
-				return null;
 			});
 		}
 	}

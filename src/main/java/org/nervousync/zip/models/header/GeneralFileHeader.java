@@ -30,6 +30,9 @@ public final class GeneralFileHeader extends FileHeader {
 	private long offsetLocalHeader;
 	private String fileComment;
 	private boolean isDirectory;
+
+	public GeneralFileHeader() {
+	}
 	
 	/**
 	 * @return the madeVersion

@@ -49,6 +49,9 @@ public final class ImageUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImageUtils.class);
 
+	private ImageUtils() {
+	}
+
 	/**
 	 * Read image width
 	 * @param imagePath		image file path

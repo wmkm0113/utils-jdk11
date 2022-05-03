@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.FileUtils;
 
 import jcifs.smb.SmbRandomAccessFile;
@@ -38,6 +39,9 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * Operate file path
 	 */
 	private final String filePath;
+	private final String domain;
+	private final String userName;
+	private final String passWord;
 	/**
 	 * The object of RandomAccessFile/SmbRandomAccessFile
 	 */
@@ -51,6 +55,9 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 */
 	public NervousyncRandomAccessFile(String filePath, String mode) throws FileNotFoundException {
 		this.filePath = filePath;
+		this.domain = Globals.DEFAULT_VALUE_STRING;
+		this.userName = Globals.DEFAULT_VALUE_STRING;
+		this.passWord = Globals.DEFAULT_VALUE_STRING;
 		this.openFile(mode);
 	}
 
@@ -66,7 +73,10 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	public NervousyncRandomAccessFile(String smbPath, String mode,
 	                                  String domain, String userName, String passWord) throws FileNotFoundException {
 		this.filePath = smbPath;
-		this.openSMBFile(mode, domain, userName, passWord);
+		this.domain = domain;
+		this.userName = userName;
+		this.passWord = passWord;
+		this.openFile(mode);
 	}
 
 	/**
@@ -75,11 +85,8 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @throws IOException	If read file length failed
 	 */
 	public long length() throws IOException {
-		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			return FileUtils.getSMBFileSize(this.filePath);
-		} else {
-			return ((RandomAccessFile)this.originObject).length();
-		}
+		return FileUtils.fileSize(this.filePath,
+				FileUtils.generateContext(FileUtils.smbAuthenticator(this.domain, this.userName, this.passWord)));
 	}
 
 	/**
@@ -534,15 +541,15 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @throws FileNotFoundException	if target file was not found
 	 */
 	private void openFile(String mode) throws FileNotFoundException {
-		this.originObject = new RandomAccessFile(this.filePath, mode);
-	}
-
-	private void openSMBFile(String mode, String domain, String userName, String passWord) throws FileNotFoundException {
-		try {
-			this.originObject = new SmbRandomAccessFile(
-					FileUtils.openSMBFile(this.filePath, domain, userName, passWord), mode);
-		} catch (Exception e) {
-			throw new FileNotFoundException("Open file error! File location: " + this.filePath);
+		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			try {
+				this.originObject = FileUtils.getFile(this.filePath,
+						FileUtils.smbAuthenticator(this.domain, this.userName, this.passWord));
+			} catch (Exception e) {
+				throw new FileNotFoundException("Open file error! File location: " + this.filePath);
+			}
+		} else {
+			this.originObject = new RandomAccessFile(this.filePath, mode);
 		}
 	}
 }

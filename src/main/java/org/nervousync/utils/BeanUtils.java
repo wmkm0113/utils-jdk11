@@ -16,19 +16,10 @@
  */
 package org.nervousync.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.xml.bind.JAXB;
 import org.nervousync.beans.converter.config.BeanConfig;
-import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,164 +36,6 @@ public final class BeanUtils {
 	private static final Hashtable<String, BeanConfig> BEAN_CONFIG_MAP = new Hashtable<>();
 
 	private BeanUtils() {
-	}
-
-	/**
-	 * Parse file content to target bean class
-	 *
-	 * @param <T>       Template
-	 * @param filePath  File path
-	 * @param beanClass Target bean class
-	 * @return Converted object
-	 */
-	public static <T> T parseFile(String filePath, Class<T> beanClass) {
-		if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
-			LOGGER.error("Can't found file: {}", filePath);
-			return null;
-		}
-		String textContent = FileUtils.readFile(filePath);
-		String extName = StringUtils.getFilenameExtension(filePath);
-		switch (extName.toLowerCase()) {
-			case "json":
-				return BeanUtils.parseJSON(textContent, beanClass);
-			case "xml":
-				return BeanUtils.parseXml(textContent, beanClass);
-			case "yml":
-			case "yaml":
-				return BeanUtils.parseYaml(textContent, beanClass);
-			default:
-				return null;
-		}
-	}
-
-	/**
-	 * Parse string to target bean class
-	 *
-	 * @param <T>       Template
-	 * @param string  	Parsed string
-	 * @param beanClass Target bean class
-	 * @return Converted object
-	 */
-	public static <T> T parseString(String string, Class<T> beanClass) {
-		return BeanUtils.parseString(string, null, beanClass);
-	}
-
-	/**
-	 * Parse string to target bean class
-	 *
-	 * @param <T>       Template
-	 * @param string  	Parsed string
-	 * @param encoding 	String encoding, just using for parse xml
-	 * @param beanClass Target bean class
-	 * @return Converted object
-	 */
-	public static <T> T parseString(String string, String encoding, Class<T> beanClass) {
-		if (StringUtils.isEmpty(string)) {
-			LOGGER.error("Can't parse empty string");
-			return null;
-		}
-
-		if (string.startsWith("<")) {
-			return BeanUtils.parseXml(string, encoding, beanClass);
-		}
-		if (string.startsWith("{") || string.startsWith("[")) {
-			return BeanUtils.parseJSON(string, beanClass);
-		}
-		return BeanUtils.parseYaml(string, beanClass);
-	}
-
-	/**
-	 * Parse xml string and setting fields data to this object
-	 *
-	 * @param <T>       Object
-	 * @param string    XML string or XML file location will be parsed
-	 * @param beanClass Entity class
-	 * @return Convert object
-	 */
-	public static <T> T parseXml(String string, Class<T> beanClass) {
-		return parseXml(string, Globals.DEFAULT_ENCODING, beanClass);
-	}
-
-	/**
-	 * Parse xml string and setting fields data to this object
-	 *
-	 * @param <T>       Object
-	 * @param string    the string
-	 * @param encoding  Character encoding
-	 * @param beanClass the bean class
-	 * @return Convert object
-	 */
-	public static <T> T parseXml(String string, String encoding, Class<T> beanClass) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
-		}
-		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
-		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
-			return JAXB.unmarshal(inputStream, beanClass);
-		} catch (IOException e) {
-			LOGGER.error("Parse xml error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Parse json t.
-	 *
-	 * @param <T>       the type parameter
-	 * @param string    the string
-	 * @param beanClass the bean class
-	 * @return the t
-	 */
-	public static <T> T parseJSON(String string, Class<T> beanClass) {
-		if (String.class.equals(beanClass)) {
-			return beanClass.cast(string);
-		}
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
-		}
-		return convertMapToBean(string, StringUtils.StringType.JSON, beanClass);
-	}
-
-	/**
-	 * Convert JSON string to List and bind data to java bean
-	 *
-	 * @param <T>      T
-	 * @param jsonData JSON String
-	 * @param clazz    Bind JavaBean define class
-	 * @return List of JavaBean
-	 */
-	public static <T> List<T> parseJSONToList(String jsonData, Class<T> clazz) {
-		return parseToList(jsonData, clazz);
-	}
-
-	/**
-	 * Parse YAML t.
-	 *
-	 * @param <T>       the type parameter
-	 * @param string    the string
-	 * @param beanClass the bean class
-	 * @return the t
-	 */
-	public static <T> T parseYaml(String string, Class<T> beanClass) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {} to bean: {}", string, beanClass.getName());
-		}
-		return convertMapToBean(string, StringUtils.StringType.YAML, beanClass);
-	}
-
-	/**
-	 * Convert Yaml string to List and bind data to java bean
-	 *
-	 * @param <T>      T
-	 * @param yamlData the yaml data
-	 * @param clazz    Bind JavaBean define class
-	 * @return List of JavaBean
-	 */
-	public static <T> List<T> parseYamlToList(String yamlData, Class<T> clazz) {
-		return parseToList(yamlData, clazz);
 	}
 
 	/**
@@ -279,19 +112,6 @@ public final class BeanUtils {
 				});
 	}
 
-	private static <T> List<T> parseToList(String string, Class<T> clazz) {
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, clazz);
-			return objectMapper.readValue(string, javaType);
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Convert json string to object bean error! ", e);
-			}
-			return new ArrayList<>();
-		}
-	}
-
 	/**
 	 * Register bean class if needed
 	 *
@@ -313,15 +133,5 @@ public final class BeanUtils {
 			className = className.substring(0, className.indexOf("$$"));
 		}
 		return className;
-	}
-
-	private static <T> T convertMapToBean(String data, StringUtils.StringType stringType, Class<T> beanClass) {
-		Map<String, Object> dataMap = StringUtils.dataToMap(data, stringType);
-		if (dataMap.isEmpty()) {
-			return null;
-		}
-		T object = ObjectUtils.newInstance(beanClass);
-		BeanUtils.copyProperties(dataMap, object);
-		return object;
 	}
 }

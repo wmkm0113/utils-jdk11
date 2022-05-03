@@ -85,6 +85,9 @@ public class AESCrypto {
 	 */
 	SecureProvider macBasedPRF = null;
 
+	public AESCrypto() {
+	}
+
 	/**
 	 * Verify given password
 	 * @param aesStrength		AES key strength

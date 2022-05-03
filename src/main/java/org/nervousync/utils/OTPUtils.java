@@ -42,6 +42,9 @@ public final class OTPUtils {
 	private static final String DEFAULT_SECRET_SEED = "TmVydm91c3luY0RlZmF1bHRTZWNyZXRTZWVk";
 	private static final String DEFAULT_RANDOM_ALGORITHM = "SHA1PRNG";
 
+	private OTPUtils() {
+	}
+
 	/**
 	 * Calculate fixed time
 	 *

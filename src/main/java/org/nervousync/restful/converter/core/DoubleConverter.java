@@ -16,7 +16,10 @@ public final class DoubleConverter implements ParameterConverter {
     }
 
     @Override
-    public Object fromString(String value) {
+    public Object fromString(Class<?> clazz, String value) {
+        if (!Double.class.equals(clazz)) {
+            return null;
+        }
         return StringUtils.notBlank(value) ? Double.valueOf(value) : null;
     }
 }

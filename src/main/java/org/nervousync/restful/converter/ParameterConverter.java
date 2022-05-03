@@ -6,5 +6,5 @@ public interface ParameterConverter {
 
     String toString(Object object, String[] mediaTypes);
 
-    Object fromString(String value);
+    Object fromString(Class<?> clazz, String value);
 }

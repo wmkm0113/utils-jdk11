@@ -35,7 +35,7 @@ public class TargetHost implements Serializable {
 	 */
 	private static final long serialVersionUID = -7043141633658888918L;
 	
-	private static transient final int DEFAULT_SNMP_PORT = 161;
+	private static final int DEFAULT_SNMP_PORT = 161;
 
 	/**
 	 * Host ip address

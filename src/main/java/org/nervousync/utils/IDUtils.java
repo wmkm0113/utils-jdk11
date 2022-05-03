@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * The type Id utils.
+ * The type ID utils.
  */
 public final class IDUtils {
 
@@ -46,7 +46,7 @@ public final class IDUtils {
      */
     public static final String SNOWFLAKE = "Snowflake";
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(IDUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IDUtils.class);
     private static final Map<String, IGenerator> INITIALIZE_MAP = new HashMap<>();
 
     static {
@@ -68,7 +68,7 @@ public final class IDUtils {
      * Nano generator generator.
      *
      * @param alphabetConfig the alphabet config
-     * @param generateLength the generate length
+     * @param generateLength generate length
      * @return the generator
      */
     public static IGenerator nanoGenerator(final String alphabetConfig, final int generateLength) {

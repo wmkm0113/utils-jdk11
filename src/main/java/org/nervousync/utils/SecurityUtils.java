@@ -20,6 +20,8 @@ import java.io.*;
 import java.security.*;
 import java.util.*;
 
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.nervousync.security.SecureProvider;
 import org.nervousync.security.config.CRCConfig;
@@ -57,8 +59,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Log for SecurityUtils class
 	 */
-	private transient static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
-	private transient static final Map<String, CRCConfig> REGISTERED_CRC_CONFIG = new HashMap<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtils.class);
+	private static final Map<String, CRCConfig> REGISTERED_CRC_CONFIG = new HashMap<>();
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());
@@ -1486,18 +1488,27 @@ public final class SecurityUtils implements Serializable {
 	 */
 	private static byte[] digest(Object source, SecureProvider secureProvider) throws CryptoException {
 		if (source instanceof File) {
-			RandomAccessFile randomAccessFile = null;
-			try {
-				randomAccessFile = new RandomAccessFile((File)source, Globals.READ_MODE);
+			try (InputStream inputStream = new FileInputStream((File) source)) {
 				byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
 				int readLength;
-				while ((readLength = randomAccessFile.read(readBuffer)) > 0) {
+				while ((readLength = inputStream.read(readBuffer)) > 0) {
 					secureProvider.append(readBuffer, 0, readLength);
 				}
 			} catch (Exception e) {
 				LOGGER.error("Message digest error! ", e);
-			} finally {
-				IOUtils.closeStream(randomAccessFile);
+				return new byte[0];
+			}
+			return secureProvider.finish();
+		} else if (source instanceof SmbFile) {
+			try (InputStream inputStream = new SmbFileInputStream((SmbFile) source)) {
+				byte[] readBuffer = new byte[Globals.READ_FILE_BUFFER_SIZE];
+				int readLength;
+				while ((readLength = inputStream.read(readBuffer)) > 0) {
+					secureProvider.append(readBuffer, 0, readLength);
+				}
+			} catch (Exception e) {
+				LOGGER.error("Message digest error! ", e);
+				return new byte[0];
 			}
 			return secureProvider.finish();
 		} else {

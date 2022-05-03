@@ -32,6 +32,9 @@ public final class EndCentralDirectoryRecord {
 	private int commentLength;
 	private byte[] commentBytes;
 
+	public EndCentralDirectoryRecord() {
+	}
+
 	/**
 	 * @return the signature
 	 */

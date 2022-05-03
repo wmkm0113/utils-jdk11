@@ -25,6 +25,9 @@ public final class DigitalSignature {
 	private int signature;
 	private int dataSize;
 	private String signatureData;
+
+	public DigitalSignature() {
+	}
 	
 	/**
 	 * @return the signature

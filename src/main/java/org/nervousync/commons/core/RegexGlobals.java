@@ -16,8 +16,6 @@
  */
 package org.nervousync.commons.core;
 
-import org.nervousync.utils.StringUtils;
-
 /**
  * Regex Library
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

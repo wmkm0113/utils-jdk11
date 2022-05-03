@@ -171,6 +171,20 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Open zip file zip file.
 	 *
+	 * @param file the file
+	 * @return the zip file
+	 * @throws ZipException the zip exception
+	 */
+	public static ZipFile openZipFile(final File file) throws ZipException {
+		if (file == null || !file.exists()) {
+			throw new ZipException("File not found... ");
+		}
+		return openZipFile(file.getAbsolutePath());
+	}
+
+	/**
+	 * Open zip file
+	 *
 	 * @param filePath the file path
 	 * @return the zip file
 	 * @throws ZipException the zip exception
@@ -180,7 +194,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Open zip file zip file.
+	 * Open zip file
 	 *
 	 * @param filePath        the file path
 	 * @param charsetEncoding the charset encoding
@@ -1333,7 +1347,7 @@ public final class ZipFile implements Cloneable {
 						fileOptions.setSourceFileCRC(FileUtils.calcFileCRC(filePath));
 					}
 					
-					if (FileUtils.getFileSize(filePath) == 0L) {
+					if (FileUtils.fileSize(filePath) == 0L) {
 						fileOptions.setCompressionMethod(ZipConstants.COMP_STORE);
 					}
 				}
@@ -1505,7 +1519,7 @@ public final class ZipFile implements Cloneable {
 			IOUtils.closeStream(outputStream);
 			
 			if (success) {
-				FileUtils.copyFile(tempFileName, this.filePath);
+				FileUtils.copy(tempFileName, this.filePath);
 			}
 			
 			if (FileUtils.isExists(tempFileName)) {
@@ -1840,7 +1854,7 @@ public final class ZipFile implements Cloneable {
 			throw new ZipException("Output file name is null");
 		}
 		
-		if (!FileUtils.makeHome(folderPath)) {
+		if (!FileUtils.makeDir(folderPath)) {
 			throw new ZipException("Create output folder error");
 		}
 		
@@ -1851,7 +1865,7 @@ public final class ZipFile implements Cloneable {
 			
 			String fullPath = folderPath + fileName;
 			fullPath = StringUtils.replace(fullPath, ZipConstants.ZIP_FILE_SEPARATOR, Globals.DEFAULT_PAGE_SEPARATOR);
-			FileUtils.makeHome(fullPath.substring(0, fullPath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR)));
+			FileUtils.makeDir(fullPath.substring(0, fullPath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR)));
 			return new FileOutputStream(FileUtils.getFile(fullPath));
 		} catch (FileNotFoundException e) {
 			throw new ZipException(e);

@@ -19,7 +19,8 @@ package org.nervousync.beans.converter.provider.impl.xml;
 
 import org.nervousync.beans.converter.provider.ConvertProvider;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.utils.BeanUtils;
+import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -39,7 +40,7 @@ public final class ParseXMLProvider implements ConvertProvider {
 	public <T> T convert(Object origObj, Class<T> targetClass) {
 		if ((origObj instanceof String) && targetClass != null
 				&& BeanObject.class.isAssignableFrom(targetClass)) {
-			return BeanUtils.parseXml((String)origObj, targetClass);
+			return StringUtils.stringToObject((String)origObj, Globals.DEFAULT_ENCODING, targetClass);
 		}
 		return null;
 	}

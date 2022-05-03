@@ -35,11 +35,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 
+import jcifs.CIFSContext;
+import jcifs.CIFSException;
+import jcifs.Config;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +71,7 @@ import org.nervousync.zip.ZipFile;
  */
 public final class FileUtils {
 
-	private transient static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 
 	/**
 	 * URL prefixes for loading from the class path: "classpath:"
@@ -204,6 +210,8 @@ public final class FileUtils {
 
 	static {
 		FileUtils.registerFileType();
+		//  Register SMB protocol handler for using java.net.URL class with "smb://"
+		Config.registerSmbURLHandler();
 	}
 
 	/**
@@ -482,25 +490,41 @@ public final class FileUtils {
 	 * @param resourceLocation resource location
 	 * @return last modified time with long type if file exists
 	 */
-	public static long lastModify(String resourceLocation) {
+	public static long lastModify(final String resourceLocation) {
+		return FileUtils.lastModify(resourceLocation, new Properties());
+	}
+
+	/**
+	 * Read file last modified time
+	 *
+	 * @param resourceLocation resource location
+	 * @param properties       the properties
+	 * @return last modified time with long type if file exists
+	 */
+	public static long lastModify(final String resourceLocation, final Properties properties) {
 		if (resourceLocation == null || resourceLocation.trim().length() == 0) {
 			return Globals.DEFAULT_VALUE_LONG;
 		}
-		try {
-			if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				SmbFile smbFile = openSMBFile(resourceLocation);
+		if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = new SmbFile(resourceLocation, new BaseContext(new PropertyConfiguration(properties)))) {
 				if (smbFile.exists()) {
 					return smbFile.getLastModified();
 				}
-			} else {
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Read file last modify error! ", e);
+				}
+			}
+		} else {
+			try {
 				File file = FileUtils.getFile(resourceLocation);
 				if (file.exists()) {
 					return file.lastModified();
 				}
-			}
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Read file last modify error! ", e);
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Read file last modify error! ", e);
+				}
 			}
 		}
 		return Globals.DEFAULT_VALUE_LONG;
@@ -510,10 +534,11 @@ public final class FileUtils {
 	 * Read file last modified time
 	 *
 	 * @param resourceLocation resource location
+	 * @param properties       the properties
 	 * @return last modified time with <code>java.util.Date</code> type if file exists or null for others
 	 */
-	public static Date getLastModify(String resourceLocation) {
-		long lastModify = FileUtils.lastModify(resourceLocation);
+	public static Date modifyDate(final String resourceLocation, final Properties properties) {
+		long lastModify = FileUtils.lastModify(resourceLocation, properties);
 		if (lastModify != Globals.DEFAULT_VALUE_LONG) {
 			return new Date(lastModify);
 		} else {
@@ -589,6 +614,61 @@ public final class FileUtils {
 		} catch (MalformedURLException ex) {
 			// no URL -> treat as file path
 			return new File(resourceLocation);
+		}
+	}
+
+	/**
+	 * Gets file.
+	 *
+	 * @param filePath   the file path
+	 * @param properties the properties
+	 * @return the file
+	 */
+	public static SmbFile getFile(final String filePath, final Properties properties) {
+		if (StringUtils.isEmpty(filePath)) {
+			return null;
+		}
+		try {
+			return new SmbFile(filePath, generateContext(properties, null));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Gets file.
+	 *
+	 * @param filePath                  the file path
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
+	 * @return the file
+	 */
+	public static SmbFile getFile(final String filePath,
+	                              final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
+		if (StringUtils.isEmpty(filePath)) {
+			return null;
+		}
+		try {
+			return new SmbFile(filePath, generateContext(null, ntlmPasswordAuthenticator));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Gets file.
+	 *
+	 * @param filePath    the file path
+	 * @param cifsContext the cifs context
+	 * @return the file
+	 */
+	public static SmbFile getFile(final String filePath, final CIFSContext cifsContext) {
+		if (StringUtils.isEmpty(filePath)) {
+			return null;
+		}
+		try {
+			return new SmbFile(filePath, cifsContext);
+		} catch (Exception e) {
+			return null;
 		}
 	}
 
@@ -853,58 +933,84 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Retrieve SMB file size
+	 * Retrieve resource location size
 	 *
 	 * @param resourceLocation resource location
 	 * @return File size
 	 */
-	public static long getSMBFileSize(String resourceLocation) {
-		try {
-			SmbFile smbFile = openSMBFile(resourceLocation);
-			return smbFile.length();
-		} catch (Exception e) {
-			return 0L;
-		}
+	public static long fileSize(String resourceLocation) {
+		return FileUtils.fileSize(resourceLocation, null);
 	}
 
 	/**
 	 * Retrieve resource location size
 	 *
 	 * @param resourceLocation resource location
+	 * @param cifsContext      the cifs context
 	 * @return File size
 	 */
-	public static long getFileSize(String resourceLocation) {
-		try {
-			return getFileSize(FileUtils.getFile(resourceLocation));
-		} catch (FileNotFoundException e) {
-			return 0L;
+	public static long fileSize(String resourceLocation, final CIFSContext cifsContext) {
+		if (resourceLocation == null) {
+			return Globals.DEFAULT_VALUE_LONG;
+		}
+
+		if (resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
+			return fileSize(FileUtils.getFile(resourceLocation, cifsContext));
+		} else {
+			try {
+				return fileSize(FileUtils.getFile(resourceLocation));
+			} catch (FileNotFoundException e) {
+				return Globals.DEFAULT_VALUE_LONG;
+			}
 		}
 	}
 
 	/**
-	 * Retrieve file size
+	 * File size long.
 	 *
-	 * @param file File object
-	 * @return File size
+	 * @param fileObject the file object
+	 * @return the long
 	 */
-	public static long getFileSize(File file) {
-		long fileSize = 0L;
+	public static long fileSize(final Object fileObject) {
+		if (fileObject == null) {
+			return Globals.DEFAULT_VALUE_LONG;
+		}
 
-		if (file != null) {
-			if (file.exists()) {
-				if (file.isDirectory()) {
-					File[] childFiles = file.listFiles();
+		long fileSize = 0L;
+		if (fileObject instanceof SmbFile) {
+			try {
+				if (((SmbFile) fileObject).exists()) {
+					if (((SmbFile) fileObject).isDirectory()) {
+						SmbFile[] childFiles = ((SmbFile) fileObject).listFiles();
+						if (childFiles != null) {
+							for (SmbFile childFile : childFiles) {
+								fileSize += fileSize(childFile);
+							}
+						}
+					} else if (((SmbFile) fileObject).isFile()) {
+						fileSize += ((SmbFile) fileObject).length();
+					}
+				}
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Read file size error! ", e);
+				}
+				return Globals.DEFAULT_VALUE_LONG;
+			}
+		} else {
+			if (((File) fileObject).exists()) {
+				if (((File) fileObject).isDirectory()) {
+					File[] childFiles = ((File) fileObject).listFiles();
 					if (childFiles != null) {
 						for (File childFile : childFiles) {
-							fileSize += getFileSize(childFile);
+							fileSize += fileSize(childFile);
 						}
 					}
-				} else if (file.isFile()) {
-					fileSize += file.length();
+				} else if (((File) fileObject).isFile()) {
+					fileSize += ((File) fileObject).length();
 				}
 			}
 		}
-
 		return fileSize;
 	}
 
@@ -963,7 +1069,7 @@ public final class FileUtils {
 	 * @param url the URL to convert into a URI instance
 	 * @return the URI instance
 	 * @throws URISyntaxException if the URL wasn't a valid URI
-	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()
+	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()
 	 */
 	public static URI toURI(URL url) throws URISyntaxException {
 		return FileUtils.toURI(url.toString());
@@ -1005,9 +1111,11 @@ public final class FileUtils {
 				JarFile jarFile = null;
 				try {
 					File file = FileUtils.getFile(filePath);
-					if (file.isDirectory()) {
+					BasicFileAttributes basicFileAttributes =
+							Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+					if (basicFileAttributes.isDirectory()) {
 						returnList = FileUtils.listFiles(file);
-					} else if (file.isFile()) {
+					} else if (basicFileAttributes.isRegularFile()) {
 						jarFile = new JarFile(file);
 						Enumeration<JarEntry> enumeration = jarFile.entries();
 
@@ -1618,25 +1726,52 @@ public final class FileUtils {
 	 * @param filePath write path
 	 * @return true for success and Boolean.FALSE for error
 	 */
-	public static boolean saveFile(byte[] fileData, String filePath) {
-		FileOutputStream fileOutputStream = null;
+	public static boolean saveFile(final byte[] fileData, final String filePath) {
+		return FileUtils.saveFile(fileData, filePath, new Properties());
+	}
 
-		try {
-			File destFile = FileUtils.getFile(filePath);
-			FileUtils.makeHome(destFile.getParent());
+	/**
+	 * Write file content to local file path
+	 *
+	 * @param fileData   file content
+	 * @param filePath   write path
+	 * @param properties the properties
+	 * @return true for success and Boolean.FALSE for error
+	 */
+	public static boolean saveFile(final byte[] fileData, final String filePath, final Properties properties) {
+		if (StringUtils.isEmpty(filePath)) {
+			return Boolean.FALSE;
+		}
 
-			fileOutputStream = new FileOutputStream(destFile);
-			fileOutputStream.write(fileData);
-			fileOutputStream.flush();
-			return true;
-		} catch (IOException e) {
-			LOGGER.error("Save file to storage error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack trace message: ", e);
+		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
+			     OutputStream outputStream = new SmbFileOutputStream(smbFile)) {
+				smbFile.mkdirs();
+				outputStream.write(fileData);
+				outputStream.flush();
+				return Boolean.TRUE;
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
+		} else {
+			FileOutputStream fileOutputStream = null;
+			try {
+				File destFile = FileUtils.getFile(filePath);
+				if (destFile.mkdirs()) {
+					fileOutputStream = new FileOutputStream(destFile);
+					fileOutputStream.write(fileData);
+					fileOutputStream.flush();
+					return Boolean.TRUE;
+				}
+			} catch (IOException e) {
+				LOGGER.error("Save file to storage error! ");
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack trace message: ", e);
+				}
+			} finally {
+				IOUtils.closeStream(fileOutputStream);
 			}
 			return Boolean.FALSE;
-		} finally {
-			IOUtils.closeStream(fileOutputStream);
 		}
 	}
 
@@ -1648,26 +1783,59 @@ public final class FileUtils {
 	 * @return true for success and Boolean.FALSE for error
 	 */
 	public static boolean saveFile(InputStream inputStream, String filePath) {
-		OutputStream outputStream = null;
-		try {
-			File file = FileUtils.getFile(filePath);
-			FileUtils.makeHome(file.getParent());
+		return FileUtils.saveFile(inputStream, filePath, new Properties());
+	}
 
-			outputStream = new FileOutputStream(file);
-			int bytesRead;
-			byte[] buffer = new byte[8192];
-			while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
-				outputStream.write(buffer, 0, bytesRead);
+	/**
+	 * Write input stream content to file path
+	 *
+	 * @param inputStream file content by input stream
+	 * @param filePath    write to file path
+	 * @param properties  the properties
+	 * @return true for success and Boolean.FALSE for error
+	 */
+	public static boolean saveFile(InputStream inputStream, String filePath, final Properties properties) {
+		if (StringUtils.isEmpty(filePath)) {
+			return Boolean.FALSE;
+		}
+
+		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
+			     OutputStream outputStream = new SmbFileOutputStream(smbFile)) {
+				smbFile.mkdirs();
+				int readLength;
+				byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+				while ((readLength = inputStream.read(readBuffer, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_BUFFER_SIZE)) != Globals.DEFAULT_VALUE_INT) {
+					outputStream.write(readBuffer, 0, readLength);
+				}
+				outputStream.flush();
+				return Boolean.TRUE;
+			} catch (Exception e) {
+				return Boolean.FALSE;
 			}
-			return Boolean.TRUE;
-		} catch(Exception e) {
-			LOGGER.error("Save file to path: {} error! ", filePath);
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack trace message: ", e);
+		} else {
+			FileOutputStream fileOutputStream = null;
+			try {
+				File destFile = FileUtils.getFile(filePath);
+				if (destFile.mkdirs()) {
+					fileOutputStream = new FileOutputStream(destFile);
+					int readLength;
+					byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+					while ((readLength = inputStream.read(readBuffer, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_BUFFER_SIZE)) != Globals.DEFAULT_VALUE_INT) {
+						fileOutputStream.write(readBuffer, 0, readLength);
+					}
+					fileOutputStream.flush();
+					return Boolean.TRUE;
+				}
+			} catch (IOException e) {
+				LOGGER.error("Save file to storage error! ");
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack trace message: ", e);
+				}
+			} finally {
+				IOUtils.closeStream(fileOutputStream);
 			}
 			return Boolean.FALSE;
-		} finally {
-			IOUtils.closeStream(outputStream);
 		}
 	}
 
@@ -1678,36 +1846,59 @@ public final class FileUtils {
 	 * @param content  File content
 	 * @return Save result
 	 */
-	public static boolean saveFile(String filePath, String content) {
-		return FileUtils.saveFile(filePath, content, Globals.DEFAULT_ENCODING);
+	public static boolean saveFile(final String filePath, final String content) {
+		return FileUtils.saveFile(filePath, new Properties(), content, Globals.DEFAULT_ENCODING);
+	}
+
+	/**
+	 * Save String to File use default charset: UTF-8
+	 *
+	 * @param filePath   write to file path
+	 * @param properties the properties
+	 * @param content    File content
+	 * @return Save result
+	 */
+	public static boolean saveFile(final String filePath, final Properties properties, final String content) {
+		return FileUtils.saveFile(filePath, properties, content, Globals.DEFAULT_ENCODING);
 	}
 
 	/**
 	 * Save String to File
 	 *
-	 * @param filePath write to file path
-	 * @param content  File content
-	 * @param encoding Charset encoding
+	 * @param filePath   write to file path
+	 * @param properties the properties
+	 * @param content    File content
+	 * @param encoding   Charset encoding
 	 * @return Save result
 	 */
-	public static boolean saveFile(String filePath, String content, String encoding) {
+	public static boolean saveFile(final String filePath, final Properties properties,
+	                               final String content, final String encoding) {
 		PrintWriter printWriter = null;
+		OutputStream outputStream = null;
 		OutputStreamWriter outputStreamWriter = null;
+		SmbFile smbFile = null;
 		try {
-			int index = filePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
-			String homePath = filePath.substring(0, index);
-			FileUtils.makeHome(homePath);
-			outputStreamWriter = new OutputStreamWriter(new FileOutputStream(filePath), encoding);
+			if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+				smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
+				outputStream = new SmbFileOutputStream(smbFile);
+			} else {
+				outputStream = new FileOutputStream(filePath);
+			}
+			outputStreamWriter = new OutputStreamWriter(outputStream, encoding);
 			printWriter = new PrintWriter(outputStreamWriter);
 
 			printWriter.print(content);
 			outputStreamWriter.flush();
-			return true;
+			return Boolean.TRUE;
 		} catch (Exception e) {
 			return Boolean.FALSE;
 		} finally {
 			IOUtils.closeStream(printWriter);
 			IOUtils.closeStream(outputStreamWriter);
+			IOUtils.closeStream(outputStream);
+			if (smbFile != null) {
+				smbFile.close();
+			}
 		}
 	}
 
@@ -1744,21 +1935,24 @@ public final class FileUtils {
 	 */
 	public static boolean removeFile(String filePath) {
 		try {
-			if (filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				try {
-					return FileUtils.removeSmbFile(openSMBFile(filePath));
-				} catch (Exception e) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Remove samba file error");
-					}
-					return Boolean.FALSE;
-				}
-			} else {
-				return FileUtils.removeFile(FileUtils.getFile(filePath));
-			}
+			return FileUtils.removeFile(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
-			return true;
+			return Boolean.TRUE;
 		}
+	}
+
+	/**
+	 * Remove file boolean.
+	 *
+	 * @param filePath the file path
+	 * @param domain   the domain
+	 * @param userName the username
+	 * @param passWord the password
+	 * @return the boolean
+	 */
+	public static boolean removeFile(final String filePath, final String domain,
+	                                 final String userName, final String passWord) {
+		return FileUtils.removeFile(FileUtils.getFile(filePath, smbAuthenticator(domain, userName, passWord)));
 	}
 
 	/**
@@ -1788,20 +1982,20 @@ public final class FileUtils {
 	 * @param smbFile SMB file instance
 	 * @return Remove result
 	 */
-	public static boolean removeSmbFile(SmbFile smbFile) {
+	public static boolean removeFile(SmbFile smbFile) {
 		if (smbFile == null) {
-			return true;
+			return Boolean.TRUE;
 		}
 
 		try {
 			if (smbFile.exists()) {
 				if (smbFile.isDirectory()) {
-					FileUtils.removeSmbDir(smbFile);
+					FileUtils.removeDir(smbFile);
 				} else {
 					smbFile.delete();
 				}
 			}
-			return true;
+			return Boolean.TRUE;
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Remove smb file error! ", e);
@@ -1811,38 +2005,13 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Rename smb file
-	 *
-	 * @param origFile Original file
-	 * @param destFile Rename file
-	 * @return Rename result
-	 */
-	public static boolean renameSmbFile(String origFile, String destFile) {
-		if (origFile.startsWith(FileUtils.SAMBA_URL_PREFIX)
-				&& destFile.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			try {
-				SmbFile origSmbFile = openSMBFile(origFile);
-				SmbFile destSmbFile = openSMBFile(destFile);
-
-				origSmbFile.renameTo(destSmbFile);
-				return true;
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Rename smb file error! ", e);
-				}
-			}
-		}
-		return Boolean.FALSE;
-	}
-
-	/**
 	 * Move file from basePath to moveToPath
 	 *
 	 * @param basePath   Original path
 	 * @param moveToPath Target path
 	 * @return Move result
 	 */
-	public static boolean moveFile(String basePath, String moveToPath) {
+	public static boolean moveFile(final String basePath, final String moveToPath) {
 		return FileUtils.moveFile(basePath, moveToPath, Boolean.FALSE);
 	}
 
@@ -1851,25 +2020,104 @@ public final class FileUtils {
 	 *
 	 * @param basePath   Original path
 	 * @param moveToPath Target path
-	 * @param override   Override target file if exists
+	 * @param override   the override
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String basePath, final String moveToPath, final boolean override) {
+		return FileUtils.moveFile(basePath, null, moveToPath, null, override);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param basePath        Original path
+	 * @param originalContext the original context
+	 * @param moveToPath      Target path
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String basePath, final CIFSContext originalContext, final String moveToPath) {
+		return FileUtils.moveFile(basePath, originalContext, moveToPath, null, Boolean.FALSE);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param basePath        Original path
+	 * @param originalContext the original context
+	 * @param moveToPath      Target path
+	 * @param override        the override
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String basePath, final CIFSContext originalContext,
+	                               final String moveToPath, final boolean override) {
+		return FileUtils.moveFile(basePath, originalContext, moveToPath, null, override);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param basePath      Original path
+	 * @param moveToPath    Target path
+	 * @param targetContext the target context
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String basePath, final String moveToPath, final CIFSContext targetContext) {
+		return FileUtils.moveFile(basePath, null, moveToPath, targetContext, Boolean.FALSE);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param basePath      Original path
+	 * @param moveToPath    Target path
+	 * @param targetContext the target context
+	 * @param override      the override
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String basePath, final String moveToPath,
+	                               final CIFSContext targetContext, final boolean override) {
+		return FileUtils.moveFile(basePath, null, moveToPath, targetContext, override);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @return Move result
+	 */
+	public static boolean moveFile(final String originalPath, final CIFSContext originalContext,
+	                               final String targetPath, final CIFSContext targetContext) {
+		return FileUtils.moveFile(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
+	}
+
+	/**
+	 * Move file from basePath to moveToPath
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @param override        Override target file if exists
 	 * @return Operate result
 	 */
-	public static boolean moveFile(String basePath, String moveToPath, boolean override) {
-		if (FileUtils.isExists(basePath) && FileUtils.canRead(basePath)) {
-			if (override || !FileUtils.isExists(moveToPath)) {
+	public static boolean moveFile(final String originalPath, final CIFSContext originalContext,
+	                               final String targetPath, final CIFSContext targetContext,
+	                               boolean override) {
+		if (FileUtils.isExists(originalPath) && FileUtils.canRead(originalPath)) {
+			if (override || !FileUtils.isExists(targetPath)) {
 				try {
-					File destFile = FileUtils.getFile(moveToPath);
+					File destFile = FileUtils.getFile(targetPath);
 					if (destFile.exists()) {
 						if (override && !FileUtils.removeFile(destFile)) {
 							return Boolean.FALSE;
 						}
 					}
 
-					if (FileUtils.copyFile(basePath, moveToPath) && FileUtils.removeFile(basePath)) {
-						return true;
-					}
-
-					return Boolean.FALSE;
+					return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)
+							&& FileUtils.removeFile(originalPath);
 				} catch (Exception e) {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("Move file error! ", e);
@@ -1880,31 +2128,149 @@ public final class FileUtils {
 		return Boolean.FALSE;
 	}
 
+	private static boolean processFile(final Object originalFile, final Object targetFile, final boolean override) {
+		if (originalFile == null || targetFile == null) {
+			return Boolean.FALSE;
+		}
+
+		try {
+			if (targetFile instanceof SmbFile) {
+				if (!override && ((SmbFile) targetFile).exists()) {
+					return Boolean.FALSE;
+				}
+				try (InputStream inputStream = (originalFile instanceof SmbFile)
+						? new SmbFileInputStream((SmbFile) originalFile) : new FileInputStream((File) originalFile);
+				     OutputStream outputStream = new SmbFileOutputStream((SmbFile) targetFile)) {
+					int readLength;
+					byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+
+					while ((readLength = inputStream.read(readBuffer)) != -1) {
+						outputStream.write(readBuffer, Globals.INITIALIZE_INT_VALUE, readLength);
+					}
+					return Boolean.TRUE;
+				} catch (Exception e) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Copy file error! ", e);
+					}
+					return Boolean.FALSE;
+				}
+			} else {
+				if (!override && ((File) targetFile).exists()) {
+					return Boolean.FALSE;
+				}
+				try (InputStream inputStream = (originalFile instanceof SmbFile)
+						? new SmbFileInputStream((SmbFile) originalFile) : new FileInputStream((File) originalFile);
+				     OutputStream outputStream = new FileOutputStream((File) targetFile)) {
+					int readLength;
+					byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+
+					while ((readLength = inputStream.read(readBuffer)) != -1) {
+						outputStream.write(readBuffer, Globals.INITIALIZE_INT_VALUE, readLength);
+					}
+					return Boolean.TRUE;
+				} catch (Exception e) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Copy file error! ", e);
+					}
+					return Boolean.FALSE;
+				}
+			}
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Move file error! ", e);
+			}
+			return Boolean.FALSE;
+		}
+	}
+
 	/**
 	 * Move directory from basePath to moveToPath and ignore exists file
 	 *
-	 * @param basePath   Original directory
-	 * @param moveToPath Target directory
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
 	 * @return Move result
 	 */
-	public static boolean moveDir(String basePath, String moveToPath) {
-		return FileUtils.moveDir(basePath, moveToPath, Boolean.FALSE);
+	public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+	                              final String targetPath) {
+		return FileUtils.moveDir(originalPath, originalContext, targetPath, null, Boolean.FALSE);
+	}
+
+	/**
+	 * Move directory from basePath to moveToPath and ignore exists file
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param override        the override
+	 * @return Move result
+	 */
+	public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+	                              final String targetPath, final boolean override) {
+		return FileUtils.moveDir(originalPath, originalContext, targetPath, null, override);
+	}
+
+	/**
+	 * Move directory from basePath to moveToPath and ignore exists file
+	 *
+	 * @param originalPath  the original path
+	 * @param targetPath    the target path
+	 * @param targetContext the target context
+	 * @return Move result
+	 */
+	public static boolean moveDir(final String originalPath, final String targetPath, final CIFSContext targetContext) {
+		return FileUtils.moveDir(originalPath, null, targetPath, targetContext, Boolean.FALSE);
+	}
+
+	/**
+	 * Move directory from basePath to moveToPath and ignore exists file
+	 *
+	 * @param originalPath  the original path
+	 * @param targetPath    the target path
+	 * @param targetContext the target context
+	 * @param override      the override
+	 * @return Move result
+	 */
+	public static boolean moveDir(final String originalPath, final String targetPath,
+	                              final CIFSContext targetContext, final boolean override) {
+		return FileUtils.moveDir(originalPath, null, targetPath, targetContext, override);
+	}
+
+	/**
+	 * Move directory from basePath to moveToPath and ignore exists file
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @return Move result
+	 */
+	public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+	                              final String targetPath, final CIFSContext targetContext) {
+		return FileUtils.moveDir(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
 	}
 
 	/**
 	 * Move directory from basePath to moveToPath and override by user defined
 	 *
-	 * @param basePath   Original directory
-	 * @param moveToPath Target directory
-	 * @param override   Override target file if it's exists
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @param override        Override target file if it's exists
 	 * @return Move result
 	 */
-	public static boolean moveDir(String basePath, String moveToPath, boolean override) {
-		try {
-			return FileUtils.moveDir(FileUtils.getFile(basePath), moveToPath, override);
-		} catch (FileNotFoundException e) {
+	public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+	                              final String targetPath, final CIFSContext targetContext,
+	                              final boolean override) {
+		if (StringUtils.isEmpty(originalPath) || !FileUtils.isDirectory(originalPath, originalContext)
+				|| StringUtils.isEmpty(targetPath)) {
 			return Boolean.FALSE;
 		}
+		if (FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)) {
+			return FileUtils.removeDir(originalPath, originalContext);
+		}
+		return Boolean.FALSE;
 	}
 
 	/**
@@ -1912,10 +2278,79 @@ public final class FileUtils {
 	 *
 	 * @param baseFile   Original file instance
 	 * @param moveToPath Target directory
+	 * @param properties the properties
 	 * @return Move result
 	 */
-	public static boolean moveDir(File baseFile, String moveToPath) {
-		return FileUtils.moveDir(baseFile, moveToPath, Boolean.FALSE);
+	public static boolean moveDir(final File baseFile, final String moveToPath, final Properties properties) {
+		return FileUtils.moveDir(baseFile, moveToPath, properties, Boolean.FALSE);
+	}
+
+	private static boolean processDirectory(final Object originalDirectory, final Object targetDirectory,
+	                                        final boolean override) {
+		if (originalDirectory == null || targetDirectory == null) {
+			return Boolean.FALSE;
+		}
+
+		try {
+			String targetBasePath;
+			CIFSContext cifsContext = null;
+			if (targetDirectory instanceof SmbFile) {
+				((SmbFile) targetDirectory).mkdirs();
+				targetBasePath = ((SmbFile) targetDirectory).getPath();
+				cifsContext = ((SmbFile) targetDirectory).getContext();
+			} else {
+				if (((File) targetDirectory).exists() || ((File) targetDirectory).mkdirs()) {
+					targetBasePath = ((File) targetDirectory).getAbsolutePath();
+				} else {
+					return Boolean.FALSE;
+				}
+			}
+
+			boolean processResult = Boolean.TRUE;
+			if (originalDirectory instanceof SmbFile) {
+				SmbFile[] childFiles = ((SmbFile) originalDirectory).listFiles();
+				for (SmbFile tempFile : childFiles) {
+					String childPath = targetBasePath + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName();
+					Object childFile;
+					if (targetDirectory instanceof SmbFile) {
+						childFile = new SmbFile(childPath, cifsContext);
+					} else {
+						childFile = FileUtils.getFile(childPath);
+					}
+					if (tempFile.isDirectory()) {
+						processResult &= FileUtils.processDirectory(tempFile, childFile, override);
+					} else if (tempFile.isFile()) {
+						processResult &= FileUtils.processFile(tempFile, childFile, override);
+					}
+				}
+			} else {
+				File[] childFiles = ((File) originalDirectory).listFiles();
+				if (childFiles != null) {
+					for (File tempFile : childFiles) {
+						BasicFileAttributes basicFileAttributes =
+								Files.readAttributes(tempFile.toPath(), BasicFileAttributes.class);
+						String childPath = targetBasePath + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName();
+						Object childFile;
+						if (targetDirectory instanceof SmbFile) {
+							childFile = new SmbFile(childPath, cifsContext);
+						} else {
+							childFile = FileUtils.getFile(childPath);
+						}
+						if (basicFileAttributes.isDirectory()) {
+							processResult &= FileUtils.processDirectory(tempFile, childFile, override);
+						} else if (basicFileAttributes.isRegularFile()) {
+							processResult &= FileUtils.processFile(tempFile, childFile, override);
+						}
+					}
+				}
+			}
+			return processResult;
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Move directory error! ", e);
+			}
+			return Boolean.FALSE;
+		}
 	}
 
 	/**
@@ -1923,26 +2358,32 @@ public final class FileUtils {
 	 *
 	 * @param baseFile   Original file path
 	 * @param moveToPath Target path
+	 * @param properties the properties
 	 * @param override   Override target file
 	 * @return Move result
 	 */
-	public static boolean moveDir(File baseFile, String moveToPath, boolean override) {
+	public static boolean moveDir(final File baseFile, final String moveToPath,
+	                              final Properties properties, final boolean override) {
 		if (baseFile == null || !baseFile.exists()) {
 			return Boolean.FALSE;
 		}
 		try {
-			FileUtils.makeHome(moveToPath);
+			FileUtils.makeDir(moveToPath, properties);
 
 			boolean error = Boolean.FALSE;
-			if (baseFile.isDirectory()) {
+			BasicFileAttributes basicFileAttributes =
+					Files.readAttributes(baseFile.toPath(), BasicFileAttributes.class);
+			if (basicFileAttributes.isDirectory()) {
 				File[] childFiles = baseFile.listFiles();
 				if (childFiles != null) {
 					for (File tempFile : childFiles) {
 						String childPath = moveToPath + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName();
-						if (tempFile.isDirectory()) {
-							error = FileUtils.moveDir(tempFile, childPath, override);
+						BasicFileAttributes fileAttributes =
+								Files.readAttributes(tempFile.toPath(), BasicFileAttributes.class);
+						if (fileAttributes.isDirectory()) {
+							error = FileUtils.moveDir(tempFile, childPath, properties, override);
 							removeFile(tempFile);
-						} else if (tempFile.isFile()) {
+						} else if (fileAttributes.isRegularFile()) {
 							error = FileUtils.moveFile(tempFile.getAbsolutePath(), childPath, override);
 						}
 
@@ -1952,7 +2393,7 @@ public final class FileUtils {
 					}
 				}
 				return true;
-			} else if (baseFile.isFile()) {
+			} else if (basicFileAttributes.isRegularFile()) {
 				return FileUtils.moveFile(baseFile.getAbsolutePath(),
 						moveToPath + Globals.DEFAULT_PAGE_SEPARATOR + baseFile.getName(), override);
 			} else {
@@ -1964,102 +2405,32 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Copy file from basePath to copyToPath
-	 *
-	 * @param basePath   Original path
-	 * @param copyToPath Target path
-	 * @return Copy result
-	 */
-	public static boolean copyFile(String basePath, String copyToPath) {
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-		try {
-			String folderPath;
-			if (copyToPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				folderPath = copyToPath.substring(0, copyToPath.lastIndexOf("/"));
-			} else {
-				folderPath = copyToPath.substring(0, copyToPath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
-			}
-			if (FileUtils.makeHome(folderPath)) {
-				if (basePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-					inputStream = new SmbFileInputStream(basePath, new BaseContext(new PropertyConfiguration(new Properties())));
-				} else {
-					inputStream = new FileInputStream(basePath);
-				}
-
-				if (copyToPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-					outputStream = new SmbFileOutputStream(openSMBFile(copyToPath));
-				} else {
-					outputStream = new FileOutputStream(copyToPath);
-				}
-
-				int len;
-				byte [] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-
-				while ((len = inputStream.read(buffer)) > -1) {
-					outputStream.write(buffer, 0, len);
-				}
-				return true;
-			}
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Copy file error! ", e);
-			}
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-
-				if (outputStream != null) {
-					outputStream.flush();
-					outputStream.close();
-				}
-			} catch (IOException e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Close stream error! ", e);
-				}
-			}
-		}
-		return Boolean.FALSE;
-	}
-
-	/**
 	 * Make directory
 	 *
 	 * @param destPath Target directory path
 	 * @return Operate result
 	 */
-	public static boolean makeDir(String destPath) {
+	public static boolean makeDir(final String destPath) {
+		return FileUtils.makeDir(destPath, new Properties());
+	}
+
+	/**
+	 * Make directory
+	 *
+	 * @param destPath   Target directory path
+	 * @param properties the properties
+	 * @return Operate result
+	 */
+	public static boolean makeDir(final String destPath, final Properties properties) {
 		if (FileUtils.isExists(destPath)) {
 			return true;
 		}
 
-		if (FileUtils.makeHome(destPath)) {
-			try {
-				File destFile = FileUtils.getFile(destPath);
-				return destFile.exists() || destFile.mkdirs();
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Make directory error! ", e);
-				}
-			}
-		}
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Create file directory
-	 *
-	 * @param homePath Check and create parent directory if it's not exists
-	 * @return Operate result
-	 */
-	public static boolean makeHome(String homePath) {
-		if (homePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			try {
-				SmbFile smbFile = openSMBFile(homePath);
+		if (destPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = new SmbFile(destPath,
+					new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties)))) {
 				smbFile.mkdirs();
-				return true;
+				return Boolean.TRUE;
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Make smb file directories error! ", e);
@@ -2068,23 +2439,8 @@ public final class FileUtils {
 			}
 		} else {
 			try {
-				File homeDir = FileUtils.getFile(homePath);
-				String parentPath = homeDir.getParent();
-				if (parentPath != null && !FileUtils.isExists(parentPath)) {
-					if (!FileUtils.makeHome(parentPath)) {
-						return Boolean.FALSE;
-					}
-				}
-
-				if (homeDir.exists()) {
-					return true;
-				} else {
-					try {
-						return homeDir.mkdirs();
-					} catch (Exception e) {
-						return Boolean.FALSE;
-					}
-				}
+				File destDir = FileUtils.getFile(destPath);
+				return destDir.mkdirs();
 			} catch (FileNotFoundException e) {
 				return Boolean.FALSE;
 			}
@@ -2136,122 +2492,279 @@ public final class FileUtils {
 	 * @param resourceLocation Resource location
 	 * @return Check result
 	 */
-	public static boolean isDirectory(String resourceLocation) {
-		if (resourceLocation == null) {
+	public static boolean isDirectory(final String resourceLocation) {
+		return FileUtils.isDirectory(resourceLocation, null);
+	}
+
+	/**
+	 * Check filePath is exists
+	 *
+	 * @param resourceLocation Resource location
+	 * @param cifsContext      the cifs context
+	 * @return Check result
+	 */
+	public static boolean isDirectory(final String resourceLocation, final CIFSContext cifsContext) {
+		if (StringUtils.isEmpty(resourceLocation)) {
 			return Boolean.FALSE;
 		}
 
-		try {
-			File directory = FileUtils.getFile(resourceLocation);
-			return (directory.exists() && directory.isDirectory());
-		} catch (FileNotFoundException e) {
-			return Boolean.FALSE;
+		if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = new SmbFile(resourceLocation, cifsContext)) {
+				return smbFile.isDirectory();
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
+		} else {
+			try {
+				File directory = FileUtils.getFile(resourceLocation);
+				return (directory.exists() && directory.isDirectory());
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
 		}
 	}
 
 	/**
 	 * Copy directory from baseDir to destDir
 	 *
-	 * @param baseDir Original directory
-	 * @param destDir Target directory
+	 * @param originalPath the original path
+	 * @param targetPath   the target path
 	 * @return Operate result
 	 */
-	public static boolean copyDir(String baseDir, String destDir) {
-		if (!FileUtils.isDirectory(baseDir)) {
-			return Boolean.FALSE;
-		}
-
-		File baseFiles = new File(baseDir);
-		File destFiles = new File(destDir);
-
-		String [] fileList = baseFiles.list();
-
-		if (fileList == null || !FileUtils.makeHome(destDir)) {
-			return Boolean.FALSE;
-		}
-
-		boolean copyStatus = true;
-
-		for (String aFileList : fileList) {
-			String baseFile = baseFiles + Globals.DEFAULT_PAGE_SEPARATOR + aFileList;
-			String destFile = destFiles + Globals.DEFAULT_PAGE_SEPARATOR + aFileList;
-
-			File tempFile = new File(baseFile);
-			if (tempFile.isFile()) {
-				copyStatus = FileUtils.copyFile(baseDir + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName(),
-						destDir + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName());
-			} else if (tempFile.isDirectory()) {
-				copyStatus = FileUtils.copyDir(baseFile, destFile);
-			}
-			if (!copyStatus) {
-				break;
-			}
-		}
-		return copyStatus;
+	public static boolean copy(final String originalPath, final String targetPath) {
+		return FileUtils.copy(originalPath, null, targetPath, null, Boolean.FALSE);
 	}
 
 	/**
-	 * Delete directory
+	 * Copy directory from baseDir to destDir
 	 *
-	 * @param directory directory will be removed
+	 * @param originalPath the original path
+	 * @param targetPath   the target path
+	 * @param override     the override
 	 * @return Operate result
 	 */
-	public static boolean removeDir(File directory) {
-		if (!directory.exists()) {
-			return true;
+	public static boolean copy(final String originalPath, final String targetPath, final boolean override) {
+		return FileUtils.copy(originalPath, null, targetPath, null, override);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath the original path
+	 * @param targetPath   the target path
+	 * @param cifsContext  the cifs context
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final String targetPath, final CIFSContext cifsContext) {
+		return FileUtils.copy(originalPath, null, targetPath, cifsContext, Boolean.FALSE);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath  the original path
+	 * @param targetPath    the target path
+	 * @param targetContext the target context
+	 * @param override      the override
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final String targetPath,
+	                           final CIFSContext targetContext, final boolean override) {
+		return FileUtils.copy(originalPath, null, targetPath, targetContext, override);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final CIFSContext originalContext, final String targetPath) {
+		return FileUtils.copy(originalPath, originalContext, targetPath, null, Boolean.FALSE);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param override        the override
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final CIFSContext originalContext,
+	                           final String targetPath, final boolean override) {
+		return FileUtils.copy(originalPath, originalContext, targetPath, null, override);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final CIFSContext originalContext,
+	                           final String targetPath, final CIFSContext targetContext) {
+		return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
+	}
+
+	/**
+	 * Copy directory from baseDir to destDir
+	 *
+	 * @param originalPath    the original path
+	 * @param originalContext the original context
+	 * @param targetPath      the target path
+	 * @param targetContext   the target context
+	 * @param override        the override
+	 * @return Operate result
+	 */
+	public static boolean copy(final String originalPath, final CIFSContext originalContext,
+	                           final String targetPath, final CIFSContext targetContext,
+	                           final boolean override) {
+		if (StringUtils.isEmpty(originalPath) || !FileUtils.isDirectory(originalPath, originalContext)
+				|| StringUtils.isEmpty(targetPath)) {
+			return Boolean.FALSE;
 		}
-		String [] fileList = directory.list();
 
-		if (fileList != null) {
-			boolean operateStatus;
-			for (String fileName : fileList) {
-				File tempFile = new File(directory.getAbsolutePath(), fileName);
-				if (tempFile.isDirectory()) {
-					operateStatus = FileUtils.removeDir(tempFile);
-				} else {
-					operateStatus = tempFile.delete();
-				}
+		Object original = null;
+		Object target = null;
 
-				if (!operateStatus) {
+		try {
+			boolean directory;
+			if (originalPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+				original = FileUtils.getFile(originalPath, originalContext);
+				if (original == null) {
 					return Boolean.FALSE;
 				}
+				directory = ((SmbFile) original).isDirectory();
+			} else {
+				original = FileUtils.getFile(originalPath);
+				directory = ((File) original).isDirectory();
+			}
+			if (targetPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+				target = FileUtils.getFile(targetPath, targetContext);
+			} else {
+				target = FileUtils.getFile(targetPath);
+			}
+			if (directory) {
+				return FileUtils.processDirectory(original, target, override);
+			} else {
+				return FileUtils.processFile(original, target, override);
+			}
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Copy directory data error! ", e);
+			}
+			return Boolean.FALSE;
+		} finally {
+			if (original instanceof SmbFile) {
+				((SmbFile) original).close();
+			}
+			if (target instanceof SmbFile) {
+				((SmbFile) target).close();
 			}
 		}
-
-		return directory.delete();
 	}
 
 	/**
-	 * Delete directory
+	 * Remove dir boolean.
 	 *
-	 * @param directory Which directory will be removed
-	 * @return Operate result
+	 * @param directoryPath the directory path
+	 * @return the boolean
 	 */
-	public static boolean removeSmbDir(SmbFile directory) {
-		try {
-			if (!directory.exists()) {
-				return true;
-			}
-			String [] fileList = directory.list();
+	public static boolean removeDir(final String directoryPath) {
+		return FileUtils.removeDir(directoryPath, null);
+	}
 
+	/**
+	 * Remove dir boolean.
+	 *
+	 * @param directoryPath the directory path
+	 * @param cifsContext   the cifs context
+	 * @return the boolean
+	 */
+	public static boolean removeDir(final String directoryPath, final CIFSContext cifsContext) {
+		if (directoryPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			return FileUtils.removeDir(FileUtils.getFile(directoryPath, cifsContext));
+		} else {
+			try {
+				return FileUtils.removeDir(FileUtils.getFile(directoryPath));
+			} catch (Exception e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Remove original directory error! ", e);
+				}
+				return Boolean.FALSE;
+			}
+		}
+	}
+
+	/**
+	 * Remove dir boolean.
+	 *
+	 * @param directory the directory
+	 * @return the boolean
+	 */
+	private static boolean removeDir(final Object directory) {
+		if (directory == null) {
+			return Boolean.FALSE;
+		}
+
+		try {
+			final boolean smbFile;
+			final CIFSContext cifsContext;
+			final String basePath;
+			String[] fileList;
+			if (directory instanceof SmbFile) {
+				fileList = ((SmbFile) directory).list();
+				smbFile = Boolean.TRUE;
+				cifsContext = ((SmbFile) directory).getContext();
+				basePath = ((SmbFile) directory).getPath();
+			} else {
+				fileList = ((File) directory).list();
+				smbFile = Boolean.FALSE;
+				cifsContext = null;
+				basePath = ((File) directory).getAbsolutePath();
+			}
 			if (fileList != null) {
 				for (String filePath : fileList) {
-					SmbFile childFile = openSMBFile(filePath);
-					if (childFile.isDirectory()) {
-						if (!FileUtils.removeSmbDir(childFile)) {
+					Object childFile;
+					boolean isDirectory;
+					if (smbFile) {
+						childFile = new SmbFile(basePath + "/" + filePath, cifsContext);
+						isDirectory = ((SmbFile) childFile).isDirectory();
+					} else {
+						childFile = new File(basePath, filePath);
+						isDirectory = ((File) childFile).isDirectory();
+					}
+					if (isDirectory) {
+						if (!FileUtils.removeDir(childFile)) {
 							return Boolean.FALSE;
 						}
 					} else {
-						childFile.delete();
+						if (smbFile) {
+							((SmbFile) childFile).delete();
+						} else {
+							if (!((File) childFile).delete()) {
+								return Boolean.FALSE;
+							}
+						}
 					}
 				}
 			}
-
-			directory.delete();
-			return true;
+			if (directory instanceof SmbFile) {
+				((SmbFile) directory).delete();
+				return Boolean.TRUE;
+			} else {
+				return ((File) directory).delete();
+			}
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Remove smb folder error! ", e);
+				LOGGER.debug("Remove directory error! ", e);
 			}
 			return Boolean.FALSE;
 		}
@@ -2384,32 +2897,47 @@ public final class FileUtils {
 	 * @return Check result
 	 */
 	public static boolean isExists(String filePath) {
-		return isExists(filePath, null, null, null);
+		return isExists(filePath, null);
 	}
 
 	/**
 	 * Check current file is exists
 	 *
-	 * @param filePath File path
-	 * @param domain   SMB domain
-	 * @param userName SMB user name
-	 * @param passWord SMB password
+	 * @param filePath                  File path
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
 	 * @return Check result
 	 */
-	public static boolean isExists(String filePath, String domain, String userName, String passWord) {
-		if (filePath == null) {
+	public static boolean isExists(final String filePath, final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
+		return FileUtils.isExists(filePath, null, ntlmPasswordAuthenticator);
+	}
+
+	/**
+	 * Check current file is exists
+	 *
+	 * @param filePath                  File path
+	 * @param properties                the properties
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
+	 * @return Check result
+	 */
+	public static boolean isExists(final String filePath, final Properties properties,
+	                               final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
+		if (StringUtils.isEmpty(filePath)) {
 			return Boolean.FALSE;
 		}
 
 		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.isSMBFileExists(filePath, domain, userName, passWord);
-		}
-
-		try {
-			File file = FileUtils.getFile(filePath);
-			return file.exists();
-		} catch (FileNotFoundException e) {
-			return Boolean.FALSE;
+			try (SmbFile smbFile = new SmbFile(filePath, generateContext(properties, ntlmPasswordAuthenticator))) {
+				return smbFile.exists();
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
+		} else {
+			try {
+				File file = FileUtils.getFile(filePath);
+				return file.exists();
+			} catch (FileNotFoundException e) {
+				return Boolean.FALSE;
+			}
 		}
 	}
 
@@ -2534,19 +3062,23 @@ public final class FileUtils {
 	 * @return Check result
 	 */
 	public static boolean canRead(String filePath, String domain, String userName, String passWord) {
-		if (filePath == null) {
+		if (StringUtils.isEmpty(filePath)) {
 			return Boolean.FALSE;
 		}
 
 		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.isSMBFileCanRead(filePath, domain, userName, passWord);
-		}
-
-		try {
-			File file = FileUtils.getFile(filePath);
-			return file.canRead();
-		} catch (FileNotFoundException e) {
-			return Boolean.FALSE;
+			try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
+				return smbFile != null && smbFile.canRead();
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
+		} else {
+			try {
+				File file = FileUtils.getFile(filePath);
+				return file.canRead();
+			} catch (FileNotFoundException e) {
+				return Boolean.FALSE;
+			}
 		}
 	}
 
@@ -2563,26 +3095,30 @@ public final class FileUtils {
 	/**
 	 * Check current file can write
 	 *
-	 * @param path     File path
+	 * @param filePath the file path
 	 * @param domain   SMB domain
 	 * @param userName SMB user name
 	 * @param passWord SMB password
 	 * @return Check result
 	 */
-	public static boolean canWrite(String path, String domain, String userName, String passWord) {
-		if (path == null) {
+	public static boolean canWrite(String filePath, String domain, String userName, String passWord) {
+		if (StringUtils.isEmpty(filePath)) {
 			return Boolean.FALSE;
 		}
 
-		if (path.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.isSMBFileCanWrite(path, domain, userName, passWord);
-		}
-
-		try {
-			File file = FileUtils.getFile(path);
-			return file.canWrite();
-		} catch (FileNotFoundException e) {
-			return Boolean.FALSE;
+		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+			try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
+				return smbFile == null || !smbFile.exists() || smbFile.canWrite();
+			} catch (Exception e) {
+				return Boolean.FALSE;
+			}
+		} else {
+			try {
+				File file = FileUtils.getFile(filePath);
+				return file.canWrite();
+			} catch (FileNotFoundException e) {
+				return Boolean.FALSE;
+			}
 		}
 	}
 
@@ -2667,9 +3203,9 @@ public final class FileUtils {
 	 * @param passWord  SMB password
 	 * @return List of split file
 	 */
-	public static SegmentationFile segmentFile(String filePath, int blockSize,
-											   String domain, String userName, String passWord) {
-		if (!FileUtils.isExists(filePath, domain, userName, passWord)) {
+	public static SegmentationFile segmentFile(final String filePath, final int blockSize,
+											   final String domain, final String userName, final String passWord) {
+		if (!FileUtils.isExists(filePath, smbAuthenticator(domain, userName, passWord))) {
 			return null;
 		}
 
@@ -2688,10 +3224,15 @@ public final class FileUtils {
 			} else {
 				extName = extName.toLowerCase();
 			}
-			File file = getFile(filePath);
-			long fileSize = getFileSize(file);
-
-			fileInputStream = new FileInputStream(file);
+			Object fileObject;
+			if (filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+				fileObject = new SmbFile(filePath, generateContext(smbAuthenticator(domain, userName, passWord)));
+				fileInputStream = new SmbFileInputStream((SmbFile) fileObject);
+			} else {
+				fileObject = getFile(filePath);
+				fileInputStream = new FileInputStream((File) fileObject);
+			}
+			long fileSize = fileSize(fileObject);
 
 			byte[] readBuffer = new byte[blockSize];
 			int index = 0;
@@ -2708,8 +3249,10 @@ public final class FileUtils {
 				index++;
 			}
 
-			return new SegmentationFile(extName, fileSize, blockSize, ConvertUtils.byteToHex(SecurityUtils.MD5(file)),
-					ConvertUtils.byteToHex(SecurityUtils.SHA256(file)), segmentationItemList);
+			return new SegmentationFile(extName, fileSize, blockSize,
+					ConvertUtils.byteToHex(SecurityUtils.MD5(fileObject)),
+					ConvertUtils.byteToHex(SecurityUtils.SHA256(fileObject)),
+					segmentationItemList);
 		} catch (FileNotFoundException e) {
 			LOGGER.error("Target file not exists! ");
 			if (LOGGER.isDebugEnabled()) {
@@ -2728,42 +3271,75 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Open SMB file
+	 * Generate context cifs context.
 	 *
-	 * @param smbPath SMB file path
-	 * @return SmbFile object
-	 * @throws FileNotFoundException if open file error
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
+	 * @return the cifs context
+	 * @throws CIFSException the cifs exception
 	 */
-	public static SmbFile openSMBFile(String smbPath) throws FileNotFoundException {
-		return openSMBFile(smbPath, null, null, null);
+	public static CIFSContext generateContext(final NtlmPasswordAuthenticator ntlmPasswordAuthenticator)
+			throws CIFSException {
+		return FileUtils.generateContext(null, ntlmPasswordAuthenticator);
 	}
 
 	/**
-	 * Open SMB file
+	 * Generate context cifs context.
 	 *
-	 * @param smbPath  SMB file path
-	 * @param domain   SMB domain
-	 * @param userName SMB user name
-	 * @param passWord SMB password
-	 * @return SmbFile object
-	 * @throws FileNotFoundException if open file error
+	 * @param properties                the properties
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
+	 * @return the cifs context
+	 * @throws CIFSException the cifs exception
 	 */
-	public static SmbFile openSMBFile(String smbPath, String domain,
-	                                  String userName, String passWord) throws FileNotFoundException {
-		Properties properties = new Properties();
-		if (domain != null) {
-			properties.setProperty("jcifs.smb.client.domain", domain);
+	public static CIFSContext generateContext(final Properties properties,
+	                                          final NtlmPasswordAuthenticator ntlmPasswordAuthenticator)
+			throws CIFSException {
+		CIFSContext cifsContext =
+				new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties));
+		if (ntlmPasswordAuthenticator != null) {
+			cifsContext = cifsContext.withCredentials(ntlmPasswordAuthenticator);
 		}
-		if (userName != null) {
-			properties.setProperty("jcifs.smb.client.username", userName);
-		}
-		if (passWord != null) {
-			properties.setProperty("jcifs.smb.client.password", passWord);
-		}
-		try {
-			return new SmbFile(smbPath, new BaseContext(new PropertyConfiguration(properties)));
-		} catch (Exception e) {
-			throw new FileNotFoundException("Open file error! File location: " + smbPath);
+		return cifsContext;
+	}
+
+	/**
+	 * Smb properties properties.
+	 *
+	 * @param domain   the domain
+	 * @param userName the username
+	 * @param passWord the password
+	 * @return the properties
+	 */
+	public static NtlmPasswordAuthenticator smbAuthenticator(final String domain, final String userName,
+	                                                         final String passWord) {
+		return new NtlmPasswordAuthenticator(domain, userName, passWord);
+	}
+
+	/**
+	 * Generate file data.
+	 *
+	 * @param folderPath the folder path
+	 * @param targetPath the target path
+	 * @throws IOException the io exception
+	 */
+	public static void generateFileData(String folderPath, String targetPath) throws IOException {
+		List<String> fileList = FileUtils.listFiles(folderPath);
+		byte[] intBuffer = new byte[4];
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, fileList.size());
+		try (RandomAccessFile randomAccessFile = new RandomAccessFile(targetPath, Globals.WRITE_MODE)) {
+			randomAccessFile.write(intBuffer);
+			fileList.forEach(filePath ->
+					Optional.ofNullable(StringUtils.fileToObject(filePath, FileExtensionInfo.class))
+							.ifPresent(fileExtensionInfo -> {
+								try {
+									randomAccessFile.write(fileExtensionInfo.convertToByteArray());
+								} catch (IOException e) {
+									if (LOGGER.isDebugEnabled()) {
+										LOGGER.debug("Write data item error! ", e);
+									}
+								}
+							}));
+		} catch (FileNotFoundException e) {
+			LOGGER.error("Generate file data error! ", e);
 		}
 	}
 
@@ -2809,100 +3385,6 @@ public final class FileUtils {
 			}
 		}
 		return Boolean.FALSE;
-	}
-
-	/**
-	 * Check SMB file exists
-	 * @param filePath      file path
-	 * @param domain        smb domain
-	 * @param userName      smb user name
-	 * @param passWord      smb password
-	 * @return              check result
-	 */
-	private static boolean isSMBFileExists(String filePath, String domain, String userName, String passWord) {
-		if (filePath == null) {
-			return Boolean.FALSE;
-		}
-
-		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.isExists(filePath, domain, userName, passWord);
-		}
-
-		try {
-			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
-			return smbFile.exists();
-		} catch (Exception e) {
-			return Boolean.FALSE;
-		}
-	}
-
-	/**
-	 * Check SMB file read access
-	 * @param filePath      file path
-	 * @param domain        smb domain
-	 * @param userName      smb user name
-	 * @param passWord      smb password
-	 * @return              check result
-	 */
-	private static boolean isSMBFileCanRead(String filePath, String domain, String userName, String passWord) {
-		if (filePath == null) {
-			return Boolean.FALSE;
-		}
-
-		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.canRead(filePath, domain, userName, passWord);
-		}
-
-		try {
-			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
-			return smbFile.canRead();
-		} catch (Exception e) {
-			return Boolean.FALSE;
-		}
-	}
-
-	/**
-	 * Check SMB file write access
-	 * @param filePath      file path
-	 * @param domain        smb domain
-	 * @param userName      smb user name
-	 * @param passWord      smb password
-	 * @return              check result
-	 */
-	private static boolean isSMBFileCanWrite(String filePath, String domain, String userName, String passWord) {
-		if (filePath == null) {
-			return Boolean.FALSE;
-		}
-
-		if (!filePath.startsWith(SAMBA_URL_PREFIX)) {
-			return FileUtils.canWrite(filePath, domain, userName, passWord);
-		}
-
-		try {
-			SmbFile smbFile = openSMBFile(filePath, domain, userName, passWord);
-			return !smbFile.exists() || smbFile.canWrite();
-		} catch (Exception e) {
-			return Boolean.FALSE;
-		}
-	}
-
-	private static void generateFileData(String folderPath, String targetPath) throws IOException {
-		List<String> fileList = FileUtils.listFiles(folderPath);
-		byte[] intBuffer = new byte[4];
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, fileList.size());
-		RandomAccessFile randomAccessFile = new RandomAccessFile(targetPath, Globals.WRITE_MODE);
-		randomAccessFile.write(intBuffer);
-		fileList.forEach(filePath -> {
-			FileExtensionInfo fileExtensionInfo =
-					BeanUtils.parseXml(FileUtils.readFile(filePath), FileExtensionInfo.class);
-			if (fileExtensionInfo != null) {
-				try {
-					randomAccessFile.write(fileExtensionInfo.convertToByteArray());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
 	}
 
 	/**
@@ -3007,6 +3489,9 @@ public final class FileUtils {
 	}
 
 	private static final class DirectoryFileFilter implements FileFilter {
+
+		DirectoryFileFilter() {
+		}
 		public boolean accept(File pathname) {
 			return pathname.isDirectory();
 		}

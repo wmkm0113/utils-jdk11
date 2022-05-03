@@ -29,7 +29,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.nervousync.exceptions.xml.XmlException;
 import org.nervousync.commons.http.header.SimpleHeader;
-import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
 import org.nervousync.commons.core.Globals;
@@ -269,7 +268,7 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return BeanUtils.parseXml(this.parseString(), this.charset, clazz);
+		return StringUtils.stringToObject(this.parseString(), this.charset, clazz);
 	}
 
 	/**
@@ -282,7 +281,7 @@ public final class HttpResponseContent implements Serializable {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return BeanUtils.parseJSON(this.parseString(this.charset), clazz);
+		return StringUtils.stringToObject(this.parseString(this.charset), this.charset, clazz);
 	}
 
 	/**

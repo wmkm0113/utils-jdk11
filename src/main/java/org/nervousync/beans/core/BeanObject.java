@@ -54,7 +54,7 @@ public class BeanObject implements Serializable {
 	/**
 	 * The constant LOGGER.
 	 */
-	protected transient static final Logger LOGGER = LoggerFactory.getLogger(BeanObject.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(BeanObject.class);
 
 	/**
 	 * To json string string.
@@ -493,7 +493,7 @@ public class BeanObject implements Serializable {
 		}
 
 		/**
-		 * Write a DTD section.  This string represents the entire doctypedecl production
+		 * Write a DTD section.  This string represents the entire doc type decl production
 		 * from the XML 1.0 specification.
 		 *
 		 * @param dtd the DTD to be written

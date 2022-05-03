@@ -26,6 +26,9 @@ public final class Zip64EndCentralDirectoryLocator {
 	private int indexOfZip64EndOfCentralDirectoryRecord;
 	private long offsetZip64EndOfCentralDirectoryRecord;
 	private int totalNumberOfDiscs;
+
+	public Zip64EndCentralDirectoryLocator() {
+	}
 	
 	/**
 	 * @return the signature

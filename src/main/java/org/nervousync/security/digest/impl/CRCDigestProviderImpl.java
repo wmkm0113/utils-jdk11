@@ -11,7 +11,7 @@ import java.util.*;
 
 public final class CRCDigestProviderImpl extends SecureProvider {
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(CRCDigestProviderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CRCDigestProviderImpl.class);
 
     //  Current crc config
     private final CRCConfig crcConfig;

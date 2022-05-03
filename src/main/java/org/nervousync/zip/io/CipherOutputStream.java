@@ -407,7 +407,7 @@ public class CipherOutputStream extends OutputStream {
 			this.generalFileHeader.setOriginalSize(0L);
 		} else {
 			if (!this.zipOptions.isSourceExternalStream()) {
-				long fileSize = FileUtils.getFileSize(this.sourceFile);
+				long fileSize = FileUtils.fileSize(this.sourceFile);
 				if (this.zipOptions.getCompressionMethod() == ZipConstants.COMP_STORE) {
 					if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
 						this.generalFileHeader.setCompressedSize(fileSize + ZipConstants.STD_DEC_HDR_SIZE);

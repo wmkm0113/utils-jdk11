@@ -33,6 +33,9 @@ public final class Zip64EndCentralDirectoryRecord {
 	private long sizeOfCentralDirectory;
 	private long offsetStartCenDirWRTStartDiskNo;
 	private byte[] extensibleDataSector;
+
+	public Zip64EndCentralDirectoryRecord() {
+	}
 	
 	/**
 	 * @return the signature

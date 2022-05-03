@@ -1,3 +1,4 @@
+org.nervousync.restful.converter.core.BeanObjectConverter
 org.nervousync.restful.converter.core.BooleanConverter
 org.nervousync.restful.converter.core.CharacterConverter
 org.nervousync.restful.converter.core.DoubleConverter

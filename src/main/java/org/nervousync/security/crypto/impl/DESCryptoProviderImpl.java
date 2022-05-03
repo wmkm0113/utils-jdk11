@@ -13,7 +13,7 @@ import javax.crypto.spec.DESKeySpec;
 
 public final class DESCryptoProviderImpl extends SymmetricCryptoProvider {
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(DESCryptoProviderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DESCryptoProviderImpl.class);
 
     public DESCryptoProviderImpl(CipherConfig cipherConfig, CryptoMode cryptoMode, byte[] keyBytes)
             throws CryptoException {

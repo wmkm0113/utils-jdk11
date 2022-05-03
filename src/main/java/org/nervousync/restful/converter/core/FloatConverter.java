@@ -16,7 +16,10 @@ public final class FloatConverter implements ParameterConverter {
     }
 
     @Override
-    public Object fromString(String value) {
+    public Object fromString(Class<?> clazz, String value) {
+        if (!Float.class.equals(clazz)) {
+            return null;
+        }
         return StringUtils.notBlank(value) ? Float.valueOf(value) : null;
     }
 }

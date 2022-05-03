@@ -31,6 +31,9 @@ public final class CentralDirectory {
 
 	private List<GeneralFileHeader> fileHeaders = null;
 	private DigitalSignature digitalSignature = null;
+
+	public CentralDirectory() {
+	}
 	
 	/**
 	 * @return the fileHeaders

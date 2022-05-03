@@ -18,7 +18,8 @@
 package org.nervousync.beans.converter.provider.impl.json;
 
 import org.nervousync.beans.converter.provider.ConvertProvider;
-import org.nervousync.utils.BeanUtils;
+import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -37,7 +38,7 @@ public final class ParseJSONProvider implements ConvertProvider {
 	@Override
 	public <T> T convert(Object origObj, Class<T> targetClass) {
 		if (origObj instanceof String) {
-			return BeanUtils.parseJSON((String)origObj, targetClass);
+			return StringUtils.stringToObject((String)origObj, Globals.DEFAULT_ENCODING, targetClass);
 		}
 		return null;
 	}

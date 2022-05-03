@@ -26,6 +26,8 @@ import org.nervousync.utils.StringUtils;
  */
 public final class ParseBase64Provider implements ConvertProvider {
 
+	public ParseBase64Provider() {
+	}
 	@Override
 	public boolean checkType(Class<?> dataType) {
 		return String.class.equals(dataType);

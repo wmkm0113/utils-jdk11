@@ -50,6 +50,9 @@ public class FileHeader {
 	private boolean dataDescriptorExists;
 	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
 
+	public FileHeader() {
+	}
+
 	/**
 	 * @return the signature
 	 */

@@ -3,8 +3,7 @@ package org.nervousync.generator.test;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.nervousync.generator.nano.NanoGenerator;
-import org.nervousync.generator.snowflake.SnowflakeGenerator;
+import org.nervousync.generator.IGenerator;
 import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.IDUtils;
 import org.slf4j.Logger;
@@ -18,21 +17,15 @@ public final class GeneratorTest {
     @Test
     public void test000Nano() {
         this.logger.info("Nano random: {}", IDUtils.random("NanoID"));
-        System.setProperty(NanoGenerator.ALPHABET_CONFIG, "abcdefghijklmnopqrstuvwxyz".toUpperCase());
-        System.setProperty(NanoGenerator.LENGTH_CONFIG, "16");
-        IDUtils.updateConfig();
-        this.logger.info("Nano reconfigure random: {}", IDUtils.random("NanoID"));
+        IGenerator nanoGenerator = IDUtils.nanoGenerator("abcdefghijklmnopqrstuvwxyz".toUpperCase(), 16);
+        this.logger.info("Nano reconfigure random: {}", nanoGenerator.random());
     }
 
     @Test
     public void test010Snowflake() throws Exception {
         this.logger.info("Snowflake random: {}", IDUtils.random("Snowflake"));
-        System.setProperty(SnowflakeGenerator.REFERENCE_CONFIG,
-                Long.toString(DateTimeUtils.parseDate("20030421", "yyyyMMdd").getTime()));
-        System.setProperty(SnowflakeGenerator.DEVICE_CONFIG, "2");
-        System.setProperty(SnowflakeGenerator.INSTANCE_CONFIG, "5");
-        IDUtils.updateConfig();
-        this.logger.info("Snowflake reconfigure random: {}", IDUtils.random("Snowflake"));
+        IGenerator snowflakeGenerator = IDUtils.snowflakeGenerator(DateTimeUtils.parseDate("20030421", "yyyyMMdd").getTime(), 2L, 5L);
+        this.logger.info("Snowflake reconfigure random: {}", snowflakeGenerator.random());
     }
 
     @Test

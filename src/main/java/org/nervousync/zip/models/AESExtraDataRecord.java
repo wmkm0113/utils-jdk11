@@ -30,6 +30,9 @@ public final class AESExtraDataRecord {
 	private String vendorID = null;
 	private int aesStrength = Globals.DEFAULT_VALUE_INT;
 	private int compressionMethod = Globals.DEFAULT_VALUE_INT;
+
+	public AESExtraDataRecord() {
+	}
 	
 	/**
 	 * @return the signature

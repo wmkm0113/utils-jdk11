@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
-import org.nervousync.utils.SecurityUtils;
+import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -15,29 +15,23 @@ public final class FactoryTest extends BaseTest {
 
     @Test
     public void test000Initialize() {
-        this.logger.info("Initialize result: {}", SecureFactory.initialize("D:\\secure", SecureFactory.SecureAlgorithm.RSA1024));
-    }
-
-    @Test
-    public void test001Initialize() {
-        this.logger.info("Initialize result: {}", SecureFactory.initialize("D:\\secure"));
+        SecureFactory.initConfig(SecureFactory.SecureAlgorithm.RSA1024)
+                .ifPresent(secureConfig ->
+                        this.logger.info("Initialize result: {}", SecureFactory.initialize(secureConfig)));
     }
 
     @Test
     public void test010Config() {
-        this.logger.info("Config result: {}", SecureFactory.config("TestConfig", SecureFactory.SecureAlgorithm.AES128));
-    }
-
-    @Test
-    public void test011Config() {
-        this.logger.info("Config result: {}", SecureFactory.config("TestConfig", SecureFactory.SecureAlgorithm.AES128, SecurityUtils.AES128Key()));
+        SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES128)
+                .ifPresent(secureConfig -> this.logger.info("Config result: {}",
+                        SecureFactory.getInstance().register("TestConfig", secureConfig)));
     }
 
     @Test
     public void test020Crypto() {
-        String encResult = StringUtils.base64Encode(SecureFactory.encrypt("TestConfig", "TestString中文测试".getBytes(StandardCharsets.UTF_8)));
+        String encResult = StringUtils.base64Encode(SecureFactory.getInstance().encrypt("TestConfig", ConvertUtils.convertToByteArray("TestString中文测试")));
         this.logger.info("Encrypt result: {}", encResult);
-        byte[] decryptResult = SecureFactory.decrypt("TestConfig", StringUtils.base64Decode(encResult));
-        this.logger.info("Decrypt result: {}", decryptResult);
+        byte[] decryptResult = SecureFactory.getInstance().decrypt("TestConfig", StringUtils.base64Decode(encResult));
+        this.logger.info("Decrypt result: {}", ConvertUtils.convertToString(decryptResult));
     }
 }

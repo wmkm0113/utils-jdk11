@@ -16,6 +16,9 @@
  */
 package org.nervousync.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
@@ -26,9 +29,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import jakarta.xml.bind.JAXB;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.exceptions.zip.ZipException;
@@ -420,7 +425,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
 		if (hasLength(str)) {
@@ -511,7 +516,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
 		if (hasLength(str)) {
@@ -531,7 +536,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
-	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)#containsWhitespace(CharSequence)#containsWhitespace(CharSequence)
+	 * @see #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
 		return containsWhitespace((CharSequence) str);
@@ -542,7 +547,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
@@ -556,7 +561,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (hasLength(str)) {
@@ -579,7 +584,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -597,7 +602,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespacejava.lang.Character#isWhitespacejava.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -654,7 +659,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @return check result
-	 * @see java.lang.String#startsWith java.lang.String#startsWithjava.lang.String#startsWithjava.lang.String#startsWith
+	 * @see java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -678,7 +683,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @return check result
-	 * @see java.lang.String#endsWith java.lang.String#endsWithjava.lang.String#endsWithjava.lang.String#endsWith
+	 * @see java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -1300,8 +1305,8 @@ public final class StringUtils {
 	 * @param delimiters the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim()
+	 * @see #delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(String str, String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
@@ -1320,8 +1325,8 @@ public final class StringUtils {
 	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String was <code>null</code>)
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim() java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()java.lang.String#trim()
-	 * @see #delimitedListToStringArray #delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray#delimitedListToStringArray
+	 * @see java.lang.String#trim()
+	 * @see #delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(
 			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
@@ -1352,7 +1357,6 @@ public final class StringUtils {
 	 * @param str       the input String
 	 * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
@@ -1368,7 +1372,6 @@ public final class StringUtils {
 	 * @param delimiter     the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
 	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray #tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray#tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
 		if (str == null) {
@@ -1540,37 +1543,6 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Convert object to JSON string
-	 *
-	 * @param object       object
-	 * @param stringType   the string type
-	 * @param formatOutput the format output
-	 * @return JSON string
-	 */
-	public static String objectToString(Object object, StringType stringType, boolean formatOutput) {
-		if (object instanceof Map || object.getClass().isArray()
-				|| Collection.class.isAssignableFrom(object.getClass())) {
-			return StringUtils.writeToString(object, stringType, formatOutput);
-		}
-
-		TreeMap<String, Object> valueMap = new TreeMap<>();
-		Arrays.stream(object.getClass().getDeclaredFields())
-				.filter(ReflectionUtils::nonStaticMember)
-				.forEach(field -> {
-					Object fieldValue = ReflectionUtils.getFieldValue(field, object);
-					Object mapValue;
-					if (fieldValue instanceof byte[]) {
-						mapValue = StringUtils.base64Encode((byte[]) fieldValue);
-					} else {
-						mapValue = fieldValue;
-					}
-					valueMap.put(field.getName(), mapValue);
-				});
-
-		return StringUtils.writeToString(valueMap, stringType, formatOutput);
-	}
-
-	/**
 	 * The enum String type.
 	 */
 	public enum StringType {
@@ -1592,7 +1564,15 @@ public final class StringUtils {
 		SIMPLE
 	}
 
-	private static String writeToString(Object object, StringType stringType, boolean formatOutput) {
+	/**
+	 * Object to string.
+	 *
+	 * @param object       the object
+	 * @param stringType   the string type
+	 * @param formatOutput the format output
+	 * @return the string
+	 */
+	public static String objectToString(Object object, StringType stringType, boolean formatOutput) {
 		ObjectMapper objectMapper;
 		switch (stringType) {
 			case JSON:
@@ -1615,6 +1595,161 @@ public final class StringUtils {
 			}
 		}
 		return Globals.DEFAULT_VALUE_STRING;
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param encoding  String encoding, just using for parse xml
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T stringToObject(String string, String encoding, Class<T> beanClass) {
+		if (StringUtils.isEmpty(string)) {
+			LOGGER.error("Can't parse empty string");
+			return null;
+		}
+
+		if (string.startsWith("<")) {
+			return stringToObject(string, StringType.XML, encoding, beanClass);
+		}
+		if (string.startsWith("{") || string.startsWith("[")) {
+			return stringToObject(string, StringType.JSON, encoding, beanClass);
+		}
+		return stringToObject(string, StringType.YAML, encoding, beanClass);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param encoding  String encoding, just using for parse xml
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> List<T> stringToList(String string, String encoding, Class<T> beanClass) {
+		if (StringUtils.isEmpty(string)) {
+			LOGGER.error("Can't parse empty string");
+			return null;
+		}
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
+		}
+
+		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
+		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
+			return parseStream(inputStream, beanClass);
+		} catch (IOException e) {
+			LOGGER.error("Parse string error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Parse file content to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param filePath  File path
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T fileToObject(String filePath, Class<T> beanClass) {
+		if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
+			LOGGER.error("Can't found file: {}", filePath);
+			return null;
+		}
+		String extName = StringUtils.getFilenameExtension(filePath);
+		try (InputStream inputStream = FileUtils.loadFile(filePath)) {
+			switch (extName.toLowerCase()) {
+				case "json":
+					return parseStream(inputStream, StringType.JSON, beanClass);
+				case "xml":
+					return parseStream(inputStream, StringType.XML, beanClass);
+				case "yml":
+				case "yaml":
+					return parseStream(inputStream, StringType.YAML, beanClass);
+				default:
+					return null;
+			}
+		} catch (IOException e) {
+			LOGGER.error("Parse file error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return null;
+	}
+
+	private static <T> T stringToObject(String string, StringType stringType, String encoding, Class<T> beanClass) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
+		}
+
+		if (StringType.SIMPLE.equals(stringType)) {
+			try {
+				return parseSimpleData(string, beanClass);
+			} catch (ParseException e) {
+				LOGGER.error("Parse simple error! ");
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack message: ", e);
+				}
+			}
+		}
+		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
+		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
+			return parseStream(inputStream, stringType, beanClass);
+		} catch (IOException e) {
+			LOGGER.error("Parse string error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Parse stream t.
+	 *
+	 * @param <T>         the type parameter
+	 * @param inputStream the input stream
+	 * @param stringType  the string type
+	 * @param beanClass   the bean class
+	 * @return the t
+	 * @throws IOException the io exception
+	 */
+	public static <T> T parseStream(final InputStream inputStream, final StringType stringType,
+	                                 final Class<T> beanClass) throws IOException {
+		if (StringType.XML.equals(stringType)) {
+			return JAXB.unmarshal(inputStream, beanClass);
+		} else {
+			ObjectMapper objectMapper;
+			switch (stringType) {
+				case JSON:
+					objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+					break;
+				case YAML:
+					objectMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+							.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+					break;
+				default:
+					return null;
+			}
+			return objectMapper.readValue(inputStream, beanClass);
+		}
+	}
+
+	private static <T> List<T> parseStream(final InputStream inputStream,
+	                                 final Class<T> beanClass) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
+		return objectMapper.readValue(inputStream, javaType);
 	}
 
 	/**
@@ -2072,15 +2207,15 @@ public final class StringUtils {
 				|| unicodeBlock == UnicodeBlock.GENERAL_PUNCTUATION
 				|| unicodeBlock == UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
 				//全角数字字符和日韩字符
-				|| unicodeBlock == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+				|| unicodeBlock == UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
 				//韩文字符集
-				|| unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES
-				|| unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO
-				|| unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO
+				|| unicodeBlock == UnicodeBlock.HANGUL_SYLLABLES
+				|| unicodeBlock == UnicodeBlock.HANGUL_JAMO
+				|| unicodeBlock == UnicodeBlock.HANGUL_COMPATIBILITY_JAMO
 				//日文字符集
-				|| unicodeBlock == Character.UnicodeBlock.HIRAGANA //平假名
-				|| unicodeBlock == Character.UnicodeBlock.KATAKANA //片假名
-				|| unicodeBlock == Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS);
+				|| unicodeBlock == UnicodeBlock.HIRAGANA //平假名
+				|| unicodeBlock == UnicodeBlock.KATAKANA //片假名
+				|| unicodeBlock == UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS);
 	}
 
 	/**
@@ -2122,7 +2257,7 @@ public final class StringUtils {
 		}
 
 		if (BeanObject.class.isAssignableFrom(typeClass)) {
-			paramObj = BeanUtils.parseXml(dataValue, Globals.DEFAULT_ENCODING, typeClass);
+			paramObj = stringToObject(dataValue, Globals.DEFAULT_ENCODING, typeClass);
 		} else {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 

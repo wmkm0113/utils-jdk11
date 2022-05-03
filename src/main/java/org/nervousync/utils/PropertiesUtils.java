@@ -38,7 +38,7 @@ import org.nervousync.commons.core.Globals;
  */
 public final class PropertiesUtils {
 
-	private transient static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
 	
 	private PropertiesUtils() {
 	}
@@ -270,7 +270,7 @@ public final class PropertiesUtils {
 		try {
 			String filePath = propertiesFilePath.substring(0,
 					propertiesFilePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
-			FileUtils.makeHome(filePath);
+			FileUtils.makeDir(filePath);
 			String fileExtName = StringUtils.getFilenameExtension(propertiesFilePath);
 
 			fileOutputStream = new FileOutputStream(propertiesFilePath, false);

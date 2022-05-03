@@ -25,6 +25,9 @@ public final class ExtraDataRecord {
 	private long header;
 	private int dataSize;
 	private byte[] dataContent;
+
+	public ExtraDataRecord() {
+	}
 	
 	/**
 	 * @return the header
