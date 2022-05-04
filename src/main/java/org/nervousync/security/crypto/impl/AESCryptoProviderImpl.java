@@ -8,8 +8,19 @@ import org.nervousync.exceptions.crypto.CryptoException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * The type Aes crypto provider.
+ */
 public final class AESCryptoProviderImpl extends SymmetricCryptoProvider {
 
+    /**
+     * Instantiates a new Aes crypto provider.
+     *
+     * @param cipherConfig the cipher config
+     * @param cryptoMode   the crypto mode
+     * @param keyBytes     the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public AESCryptoProviderImpl(CipherConfig cipherConfig, CryptoMode cryptoMode, byte[] keyBytes)
             throws CryptoException {
         super(cipherConfig, cryptoMode, new CipherKey(keyBytes));

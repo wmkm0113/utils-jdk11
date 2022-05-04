@@ -25,8 +25,10 @@ import org.nervousync.utils.StringUtils;
 import java.io.Serializable;
 
 /**
+ * The type File location.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 2018-12-22 12:48 $
+ * @version $Revision : 1.0 $ $Date: 2018-12-22 12:48 $
  */
 public final class FileLocation implements Serializable {
 
@@ -41,10 +43,25 @@ public final class FileLocation implements Serializable {
 	private final String userName;
 	private final String passWord;
 
+	/**
+	 * Instantiates a new File location.
+	 *
+	 * @param locationPath the location path
+	 * @throws FileProtocolNotSupportException the file protocol not support exception
+	 */
 	public FileLocation(String locationPath) throws FileProtocolNotSupportException {
 		this(locationPath, null, null, null);
 	}
 
+	/**
+	 * Instantiates a new File location.
+	 *
+	 * @param locationPath the location path
+	 * @param domainName   the domain name
+	 * @param userName     the username
+	 * @param passWord     the password
+	 * @throws FileProtocolNotSupportException the file protocol not support exception
+	 */
 	public FileLocation(String locationPath, String domainName, String userName, String passWord)
 			throws FileProtocolNotSupportException {
 		if (locationPath == null) {
@@ -143,7 +160,17 @@ public final class FileLocation implements Serializable {
 		return result;
 	}
 
+	/**
+	 * The enum Location type.
+	 */
 	public enum LocationType {
-		LOCAL, SMB
+		/**
+		 * Local location type.
+		 */
+		LOCAL,
+		/**
+		 * Smb location type.
+		 */
+		SMB
 	}
 }

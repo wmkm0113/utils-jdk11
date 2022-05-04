@@ -24,8 +24,10 @@ import org.nervousync.zip.models.ExtraDataRecord;
 import org.nervousync.zip.models.Zip64ExtendInfo;
 
 /**
+ * The type File header.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:30:48 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:30:48 PM $
  */
 public class FileHeader {
 
@@ -50,10 +52,15 @@ public class FileHeader {
 	private boolean dataDescriptorExists;
 	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
 
+	/**
+	 * Instantiates a new File header.
+	 */
 	public FileHeader() {
 	}
 
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public int getSignature() {
@@ -61,6 +68,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(int signature) {
@@ -68,6 +77,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets extract needed.
+	 *
 	 * @return the extractNeeded
 	 */
 	public int getExtractNeeded() {
@@ -75,6 +86,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets extract needed.
+	 *
 	 * @param extractNeeded the extractNeeded to set
 	 */
 	public void setExtractNeeded(int extractNeeded) {
@@ -82,6 +95,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Get general purpose flag byte [ ].
+	 *
 	 * @return the generalPurposeFlag
 	 */
 	public byte[] getGeneralPurposeFlag() {
@@ -89,6 +104,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets general purpose flag.
+	 *
 	 * @param generalPurposeFlag the generalPurposeFlag to set
 	 */
 	public void setGeneralPurposeFlag(byte[] generalPurposeFlag) {
@@ -99,6 +116,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets compression method.
+	 *
 	 * @return the compressionMethod
 	 */
 	public int getCompressionMethod() {
@@ -106,6 +125,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets compression method.
+	 *
 	 * @param compressionMethod the compressionMethod to set
 	 */
 	public void setCompressionMethod(int compressionMethod) {
@@ -113,6 +134,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets last mod file time.
+	 *
 	 * @return the lastModFileTime
 	 */
 	public int getLastModFileTime() {
@@ -120,6 +143,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets last mod file time.
+	 *
 	 * @param lastModFileTime the lastModFileTime to set
 	 */
 	public void setLastModFileTime(int lastModFileTime) {
@@ -127,6 +152,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets crc 32.
+	 *
 	 * @return the crc32
 	 */
 	public long getCrc32() {
@@ -134,6 +161,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets crc 32.
+	 *
 	 * @param crc32 the crc32 to set
 	 */
 	public void setCrc32(long crc32) {
@@ -141,6 +170,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Get crc buffer byte [ ].
+	 *
 	 * @return the crcBuffer
 	 */
 	public byte[] getCrcBuffer() {
@@ -148,6 +179,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets crc buffer.
+	 *
 	 * @param crcBuffer the crcBuffer to set
 	 */
 	public void setCrcBuffer(byte[] crcBuffer) {
@@ -155,6 +188,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets compressed size.
+	 *
 	 * @return the compressedSize
 	 */
 	public long getCompressedSize() {
@@ -162,6 +197,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets compressed size.
+	 *
 	 * @param compressedSize the compressedSize to set
 	 */
 	public void setCompressedSize(long compressedSize) {
@@ -169,6 +206,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets original size.
+	 *
 	 * @return the originalSize
 	 */
 	public long getOriginalSize() {
@@ -176,6 +215,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets original size.
+	 *
 	 * @param originalSize the originalSize to set
 	 */
 	public void setOriginalSize(long originalSize) {
@@ -183,6 +224,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets file name length.
+	 *
 	 * @return the fileNameLength
 	 */
 	public int getFileNameLength() {
@@ -190,6 +233,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets file name length.
+	 *
 	 * @param fileNameLength the fileNameLength to set
 	 */
 	public void setFileNameLength(int fileNameLength) {
@@ -197,6 +242,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets extra field length.
+	 *
 	 * @return the extraFieldLength
 	 */
 	public int getExtraFieldLength() {
@@ -204,6 +251,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets extra field length.
+	 *
 	 * @param extraFieldLength the extraFieldLength to set
 	 */
 	public void setExtraFieldLength(int extraFieldLength) {
@@ -211,6 +260,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets entry path.
+	 *
 	 * @return the entryPath
 	 */
 	public String getEntryPath() {
@@ -218,6 +269,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets entry path.
+	 *
 	 * @param entryPath the entryPath to set
 	 */
 	public void setEntryPath(String entryPath) {
@@ -225,6 +278,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Is encrypted boolean.
+	 *
 	 * @return the isEncrypted
 	 */
 	public boolean isEncrypted() {
@@ -232,6 +287,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets encrypted.
+	 *
 	 * @param isEncrypted the isEncrypted to set
 	 */
 	public void setEncrypted(boolean isEncrypted) {
@@ -239,6 +296,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Get password char [ ].
+	 *
 	 * @return the password
 	 */
 	public char[] getPassword() {
@@ -246,6 +305,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets password.
+	 *
 	 * @param password the password to set
 	 */
 	public void setPassword(char[] password) {
@@ -253,6 +314,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Is data descriptor exists boolean.
+	 *
 	 * @return the dataDescriptorExists
 	 */
 	public boolean isDataDescriptorExists() {
@@ -260,6 +323,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets data descriptor exists.
+	 *
 	 * @param dataDescriptorExists the dataDescriptorExists to set
 	 */
 	public void setDataDescriptorExists(boolean dataDescriptorExists) {
@@ -267,6 +332,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets zip 64 extend info.
+	 *
 	 * @return the zip64ExtendInfo
 	 */
 	public Zip64ExtendInfo getZip64ExtendInfo() {
@@ -274,6 +341,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets zip 64 extend info.
+	 *
 	 * @param zip64ExtendInfo the zip64ExtendInfo to set
 	 */
 	public void setZip64ExtendInfo(Zip64ExtendInfo zip64ExtendInfo) {
@@ -281,6 +350,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets aes extra data record.
+	 *
 	 * @return the aesExtraDataRecord
 	 */
 	public AESExtraDataRecord getAesExtraDataRecord() {
@@ -288,6 +359,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets aes extra data record.
+	 *
 	 * @param aesExtraDataRecord the aesExtraDataRecord to set
 	 */
 	public void setAesExtraDataRecord(AESExtraDataRecord aesExtraDataRecord) {
@@ -295,6 +368,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets extra data records.
+	 *
 	 * @return the extraDataRecords
 	 */
 	public List<ExtraDataRecord> getExtraDataRecords() {
@@ -302,6 +377,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets extra data records.
+	 *
 	 * @param extraDataRecords the extraDataRecords to set
 	 */
 	public void setExtraDataRecords(List<ExtraDataRecord> extraDataRecords) {
@@ -309,6 +386,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Is file name utf 8 encoded boolean.
+	 *
 	 * @return the fileNameUTF8Encoded
 	 */
 	public boolean isFileNameUTF8Encoded() {
@@ -316,6 +395,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets file name utf 8 encoded.
+	 *
 	 * @param fileNameUTF8Encoded the fileNameUTF8Encoded to set
 	 */
 	public void setFileNameUTF8Encoded(boolean fileNameUTF8Encoded) {
@@ -323,6 +404,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Gets encryption method.
+	 *
 	 * @return the encryptionMethod
 	 */
 	public int getEncryptionMethod() {
@@ -330,6 +413,8 @@ public class FileHeader {
 	}
 
 	/**
+	 * Sets encryption method.
+	 *
 	 * @param encryptionMethod the encryptionMethod to set
 	 */
 	public void setEncryptionMethod(int encryptionMethod) {

@@ -3,6 +3,9 @@ package org.nervousync.restful.converter.core;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.nervousync.utils.StringUtils;
 
+/**
+ * The type Double converter.
+ */
 public final class DoubleConverter implements ParameterConverter {
 
     @Override

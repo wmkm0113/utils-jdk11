@@ -23,7 +23,6 @@ import java.util.zip.Inflater;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.zip.crypto.Decryptor;
-import org.nervousync.commons.io.NervousyncRandomAccessFile;
 import org.nervousync.zip.ZipFile;
 
 /**
@@ -38,10 +37,11 @@ public class InflaterInputStream extends PartInputStream {
 	private long writeBytes;
 	private final long originalSize;
 	
-	public InflaterInputStream(ZipFile zipFile, NervousyncRandomAccessFile input,
-	                           long length, long originalSize, Decryptor decryptor, boolean isAESEncryptedFile) {
-		super(zipFile, input, length, decryptor, isAESEncryptedFile);
-		this.inflater = new Inflater(true);
+	public InflaterInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition, final long length,
+	                           final long originalSize, final Decryptor decryptor, final boolean isAESEncryptedFile)
+			throws IOException {
+		super(zipFile, currentIndex, seekPosition, length, decryptor, isAESEncryptedFile);
+		this.inflater = new Inflater(Boolean.TRUE);
 		this.buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 		this.writeBytes = 0L;
 		this.originalSize = originalSize;

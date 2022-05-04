@@ -154,30 +154,34 @@ public final class ZipOptions implements Cloneable {
 	 */
 	public static ZipOptions aesEncryptOptions(String password)
 			throws ZipException {
-		return ZipOptions.aesEncryptOptions(password, ZipConstants.AES_STRENGTH_128);
+		return ZipOptions.aesEncryptOptions(password, Globals.DEFAULT_VALUE_INT);
 	}
 
 	/**
 	 * Generate an AES encrypt ZipOptions instance by given password and key strength
 	 *
-	 * @param password       encrypt password
-	 * @param aesKeyStrength AES key strength
+	 * @param password     encrypt password
+	 * @param aesKeyLength the aes key length
 	 * @return generated instance
 	 * @throws ZipException if password is null
 	 */
 	public static ZipOptions aesEncryptOptions(String password,
-			int aesKeyStrength) throws ZipException {
+			int aesKeyLength) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
 		}
-		
-		if (aesKeyStrength != ZipConstants.AES_STRENGTH_128 
-				&& aesKeyStrength != ZipConstants.AES_STRENGTH_192 
-				&& aesKeyStrength != ZipConstants.AES_STRENGTH_256) {
-			throw new ZipException("Invalid aes strength");
+
+		switch (aesKeyLength) {
+			case 128:
+			case Globals.DEFAULT_VALUE_INT:
+				return new ZipOptions(password, ZipConstants.AES_STRENGTH_128);
+			case 192:
+				return new ZipOptions(password, ZipConstants.AES_STRENGTH_192);
+			case 256:
+				return new ZipOptions(password, ZipConstants.AES_STRENGTH_256);
+			default:
+				throw new ZipException("Invalid aes strength");
 		}
-		
-		return new ZipOptions(password, aesKeyStrength);
 	}
 
 	/**

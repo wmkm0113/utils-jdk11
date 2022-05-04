@@ -3,6 +3,9 @@ package org.nervousync.restful.converter.core;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.nervousync.utils.StringUtils;
 
+/**
+ * The type Boolean converter.
+ */
 public final class BooleanConverter implements ParameterConverter {
 
     @Override

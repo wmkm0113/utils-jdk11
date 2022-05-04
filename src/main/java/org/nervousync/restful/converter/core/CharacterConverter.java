@@ -3,6 +3,9 @@ package org.nervousync.restful.converter.core;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.nervousync.utils.StringUtils;
 
+/**
+ * The type Character converter.
+ */
 public final class CharacterConverter implements ParameterConverter {
 
     @Override

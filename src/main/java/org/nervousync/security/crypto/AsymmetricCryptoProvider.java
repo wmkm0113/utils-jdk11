@@ -9,14 +9,28 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.*;
 
+/**
+ * The type Asymmetric crypto provider.
+ */
 public abstract class AsymmetricCryptoProvider extends BaseCryptoProvider {
 
     /**
      * The Private key.
      */
     private final Key key;
+    /**
+     * The Signature.
+     */
     protected Signature signature;
 
+    /**
+     * Instantiates a new Asymmetric crypto provider.
+     *
+     * @param cipherConfig the cipher config
+     * @param cryptoMode   the crypto mode
+     * @param cipherKey    the cipher key
+     * @throws CryptoException the crypto exception
+     */
     protected AsymmetricCryptoProvider(CipherConfig cipherConfig, CryptoMode cryptoMode,
                                        CipherKey cipherKey) throws CryptoException {
         super(cipherConfig, cryptoMode, cipherKey);

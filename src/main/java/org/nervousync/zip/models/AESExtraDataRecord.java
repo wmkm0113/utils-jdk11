@@ -19,8 +19,10 @@ package org.nervousync.zip.models;
 import org.nervousync.commons.core.Globals;
 
 /**
+ * The type Aes extra data record.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:50:18 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:50:18 PM $
  */
 public final class AESExtraDataRecord {
 
@@ -31,10 +33,15 @@ public final class AESExtraDataRecord {
 	private int aesStrength = Globals.DEFAULT_VALUE_INT;
 	private int compressionMethod = Globals.DEFAULT_VALUE_INT;
 
+	/**
+	 * Instantiates a new Aes extra data record.
+	 */
 	public AESExtraDataRecord() {
 	}
-	
+
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public long getSignature() {
@@ -42,6 +49,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(long signature) {
@@ -49,6 +58,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Gets data size.
+	 *
 	 * @return the dataSize
 	 */
 	public int getDataSize() {
@@ -56,6 +67,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets data size.
+	 *
 	 * @param dataSize the dataSize to set
 	 */
 	public void setDataSize(int dataSize) {
@@ -63,6 +76,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Gets version number.
+	 *
 	 * @return the versionNumber
 	 */
 	public int getVersionNumber() {
@@ -70,6 +85,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets version number.
+	 *
 	 * @param versionNumber the versionNumber to set
 	 */
 	public void setVersionNumber(int versionNumber) {
@@ -77,6 +94,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Gets vendor id.
+	 *
 	 * @return the vendorID
 	 */
 	public String getVendorID() {
@@ -84,6 +103,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets vendor id.
+	 *
 	 * @param vendorID the vendorID to set
 	 */
 	public void setVendorID(String vendorID) {
@@ -91,6 +112,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Gets aes strength.
+	 *
 	 * @return the aesStrength
 	 */
 	public int getAesStrength() {
@@ -98,6 +121,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets aes strength.
+	 *
 	 * @param aesStrength the aesStrength to set
 	 */
 	public void setAesStrength(int aesStrength) {
@@ -105,6 +130,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Gets compression method.
+	 *
 	 * @return the compressionMethod
 	 */
 	public int getCompressionMethod() {
@@ -112,6 +139,8 @@ public final class AESExtraDataRecord {
 	}
 
 	/**
+	 * Sets compression method.
+	 *
 	 * @param compressionMethod the compressionMethod to set
 	 */
 	public void setCompressionMethod(int compressionMethod) {

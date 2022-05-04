@@ -24,13 +24,22 @@ import org.nervousync.zip.crypto.Decryptor;
 
 /**
  * Decryptor implement of AES
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 10:55:30 AM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 10:55:30 AM $
  */
-public class AESDecryptor extends AESCrypto implements Decryptor {
+public final class AESDecryptor extends AESCrypto implements Decryptor {
 
 	private byte[] storedMac = null;
 
+	/**
+	 * Instantiates a new Aes decryptor.
+	 *
+	 * @param localFileHeader the local file header
+	 * @param salt            the salt
+	 * @param passwordBytes   the password bytes
+	 * @throws ZipException the zip exception
+	 */
 	public AESDecryptor(LocalFileHeader localFileHeader,
 	                    byte[] salt, byte[] passwordBytes) throws ZipException {
 		if (localFileHeader == null) {
@@ -78,12 +87,20 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 			}
 		}
 	}
-	
+
+	/**
+	 * Calculate authentication bytes byte [ ].
+	 *
+	 * @return the byte [ ]
+	 * @throws CryptoException the crypto exception
+	 */
 	public byte[] calculateAuthenticationBytes() throws CryptoException {
 		return this.macBasedPRF.finish();
 	}
 
 	/**
+	 * Gets salt length.
+	 *
 	 * @return the saltLength
 	 */
 	public int getSaltLength() {
@@ -91,6 +108,8 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 	}
 
 	/**
+	 * Get stored mac byte [ ].
+	 *
 	 * @return the storedMac
 	 */
 	public byte[] getStoredMac() {
@@ -98,6 +117,8 @@ public class AESDecryptor extends AESCrypto implements Decryptor {
 	}
 
 	/**
+	 * Sets stored mac.
+	 *
 	 * @param storedMac the storedMac to set
 	 */
 	public void setStoredMac(byte[] storedMac) {

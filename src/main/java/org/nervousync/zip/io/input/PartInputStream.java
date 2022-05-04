@@ -35,6 +35,7 @@ public class PartInputStream extends InputStream {
 
 	private final ZipFile zipFile;
 	private NervousyncRandomAccessFile input;
+	private int currentIndex;
 	private long readBytes;
 	private final long length;
 	private final Decryptor decryptor;
@@ -43,10 +44,13 @@ public class PartInputStream extends InputStream {
 	private int aesBytesReturned = 0;
 	private final boolean isAESEncryptedFile;
 
-	public PartInputStream(ZipFile zipFile, NervousyncRandomAccessFile input, 
-			long length, Decryptor decryptor, boolean isAESEncryptedFile) {
+	public PartInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition,
+	                       final long length, final Decryptor decryptor, final boolean isAESEncryptedFile)
+			throws IOException {
 		this.zipFile = zipFile;
-		this.input = input;
+		this.currentIndex = currentIndex;
+		this.input = this.zipFile.openSplitFile(currentIndex);
+		this.input.seek(seekPosition);
 		this.readBytes = 0L;
 		this.length = length;
 		this.decryptor = decryptor;
@@ -94,7 +98,8 @@ public class PartInputStream extends InputStream {
 		int count = this.input.read(b, off, len);
 		if ((count < len) && this.zipFile.isSplitArchive()) {
 			this.input.close();
-			this.input = this.zipFile.startNextSplitFile();
+			this.currentIndex++;
+			this.input = this.zipFile.openSplitFile(this.currentIndex);
 
 			if (count < 0) {
 				count = 0;
@@ -172,7 +177,8 @@ public class PartInputStream extends InputStream {
 			if (readLength != ZipConstants.AES_AUTH_LENGTH) {
 				if (this.zipFile.isSplitArchive()) {
 					this.input.close();
-					this.input = this.zipFile.startNextSplitFile();
+					this.currentIndex++;
+					this.input = this.zipFile.openSplitFile(this.currentIndex);
 					int newReadLength = this.input.read(storedMac, 
 							readLength, ZipConstants.AES_AUTH_LENGTH - readLength);
 					

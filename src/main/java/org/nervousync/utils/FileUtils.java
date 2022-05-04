@@ -1757,7 +1757,8 @@ public final class FileUtils {
 			FileOutputStream fileOutputStream = null;
 			try {
 				File destFile = FileUtils.getFile(filePath);
-				if (destFile.mkdirs()) {
+				File folder = destFile.getParentFile();
+				if (folder.exists() || folder.mkdirs()) {
 					fileOutputStream = new FileOutputStream(destFile);
 					fileOutputStream.write(fileData);
 					fileOutputStream.flush();
@@ -2626,8 +2627,7 @@ public final class FileUtils {
 	public static boolean copy(final String originalPath, final CIFSContext originalContext,
 	                           final String targetPath, final CIFSContext targetContext,
 	                           final boolean override) {
-		if (StringUtils.isEmpty(originalPath) || !FileUtils.isDirectory(originalPath, originalContext)
-				|| StringUtils.isEmpty(targetPath)) {
+		if (StringUtils.isEmpty(originalPath) || StringUtils.isEmpty(targetPath)) {
 			return Boolean.FALSE;
 		}
 

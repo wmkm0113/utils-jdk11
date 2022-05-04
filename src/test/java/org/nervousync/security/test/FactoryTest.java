@@ -8,8 +8,6 @@ import org.nervousync.test.BaseTest;
 import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class FactoryTest extends BaseTest {
 

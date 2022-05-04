@@ -19,12 +19,20 @@ package org.nervousync.commons.adapter.xml;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
+ * The type C data adapter.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $Date: 2018-10-15 14:09
+ * @version $Revision : 1.0 $Date: 2018-10-15 14:09
  */
 public final class CDataAdapter extends XmlAdapter<String, String> {
-	
+
+	/**
+	 * The constant CDATA_BEGIN.
+	 */
 	public static final String CDATA_BEGIN = "<![CDATA[";
+	/**
+	 * The constant CDATA_END.
+	 */
 	public static final String CDATA_END = "]]>";
 	
 	/**

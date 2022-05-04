@@ -25,12 +25,17 @@ import java.lang.annotation.Target;
  * Annotation for convert between java bean and XML/JSON/YAML
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 3:25 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 3:25 PM $
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface BeanConvert {
 
+	/**
+	 * Value class [ ].
+	 *
+	 * @return the class [ ]
+	 */
 	Class<?>[] value() default {};
 
 }

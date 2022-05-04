@@ -30,8 +30,9 @@ import org.nervousync.utils.RawUtils;
 
 /**
  * AES Crypto
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 11:16:18 AM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 11:16:18 AM $
  */
 public class AESCrypto {
 
@@ -66,7 +67,7 @@ public class AESCrypto {
 	 * loop count
 	 */
 	int loopCount = 0;
-	
+
 	/**
 	 * iv bytes
 	 */
@@ -85,16 +86,20 @@ public class AESCrypto {
 	 */
 	SecureProvider macBasedPRF = null;
 
-	public AESCrypto() {
+	/**
+	 * Instantiates a new Aes crypto.
+	 */
+	protected AESCrypto() {
 	}
 
 	/**
 	 * Verify given password
-	 * @param aesStrength		AES key strength
-	 * @param salt				salt bytes
-	 * @param password			password 
-	 * @param passwordBytes		password bytes
-	 * @return	verify result
+	 *
+	 * @param aesStrength   AES key strength
+	 * @param salt          salt bytes
+	 * @param password      password
+	 * @param passwordBytes password bytes
+	 * @return verify result
 	 */
 	public static boolean verifyPassword(int aesStrength, byte[] salt, char[] password, byte[] passwordBytes) {
 		if (password == null || password.length == 0 || passwordBytes == null || passwordBytes.length == 0) {
@@ -107,6 +112,8 @@ public class AESCrypto {
 	}
 
 	/**
+	 * Get salt bytes byte [ ].
+	 *
 	 * @return the saltBytes
 	 */
 	public byte[] getSaltBytes() {
@@ -115,7 +122,8 @@ public class AESCrypto {
 
 	/**
 	 * Prepare initialize
-	 * @param aesStrength	AES key strength
+	 *
+	 * @param aesStrength AES key strength
 	 */
 	void preInit(int aesStrength) {
 		this.iv = new byte[ZipConstants.AES_BLOCK_SIZE];
@@ -141,10 +149,12 @@ public class AESCrypto {
 				throw new ZipException("Invalid aes key strength!");
 		}
 	}
-	
+
 	/**
 	 * Initialize by given password
-	 * @param password	password
+	 *
+	 * @param password password
+	 * @throws ZipException the zip exception
 	 */
 	void init(char[] password) throws ZipException {
 		if (password == null || password.length == 0) {
@@ -157,11 +167,13 @@ public class AESCrypto {
 			throw new ZipException(e);
 		}
 	}
-	
+
 	/**
 	 * Initialize by given password and salt
-	 * @param salt			salt bytes
-	 * @param password		password char arrays
+	 *
+	 * @param salt     salt bytes
+	 * @param password password char arrays
+	 * @throws ZipException the zip exception
 	 */
 	void init(byte[] salt, char[] password) throws ZipException {
 		if (password == null || password.length == 0) {
@@ -175,6 +187,12 @@ public class AESCrypto {
 		}
 	}
 
+	/**
+	 * Process data.
+	 *
+	 * @param buff  the buff
+	 * @param index the index
+	 */
 	void processData(byte[] buff, int index) {
 		this.iv = RawUtils.intToByteArray(this.nonce, 16);
 		this.aesEngine.processBlock(this.iv, this.countBlock);
@@ -225,11 +243,12 @@ public class AESCrypto {
 		}
 		return tempBytes;
 	}
-	
+
 	/**
 	 * Verify given password
-	 * @param password	password
-	 * @return	verify result
+	 *
+	 * @param password password
+	 * @return verify result
 	 */
 	boolean verifyPassword(byte[] password) {
 		if (this.derivedPasswordVerifier == null) {

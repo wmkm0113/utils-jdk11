@@ -17,17 +17,46 @@
 package org.nervousync.enumerations.xml;
 
 /**
+ * The enum Data type.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 2009/09/28 14:32:00 $
+ * @version $Revision : 1.0 $ $Date: 2009/09/28 14:32:00 $
  */
 public enum DataType {
-	BINARY, 
-	BOOLEAN, 
-	DATE, 
-	ENUM, 
-	UNKNOWN, 
-	NUMBER, 
-	STRING, 
+	/**
+	 * Binary data type.
+	 */
+	BINARY,
+	/**
+	 * Boolean data type.
+	 */
+	BOOLEAN,
+	/**
+	 * Date data type.
+	 */
+	DATE,
+	/**
+	 * Enum data type.
+	 */
+	ENUM,
+	/**
+	 * Unknown data type.
+	 */
+	UNKNOWN,
+	/**
+	 * Number data type.
+	 */
+	NUMBER,
+	/**
+	 * String data type.
+	 */
+	STRING,
+	/**
+	 * Object data type.
+	 */
 	OBJECT,
+	/**
+	 * Cdata data type.
+	 */
 	CDATA
 }

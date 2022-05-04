@@ -23,13 +23,21 @@ import org.nervousync.zip.crypto.Encryptor;
 
 /**
  * Encryptor implement of AES
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 30, 2017 3:42:11 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 30, 2017 3:42:11 PM $
  */
-public class AESEncryptor extends AESCrypto implements Encryptor {
+public final class AESEncryptor extends AESCrypto implements Encryptor {
 	
 	private boolean finished = Boolean.FALSE;
-	
+
+	/**
+	 * Instantiates a new Aes encryptor.
+	 *
+	 * @param password    the password
+	 * @param aesStrength the aes strength
+	 * @throws ZipException the zip exception
+	 */
 	public AESEncryptor(char[] password, int aesStrength) throws ZipException {
 		super.preInit(aesStrength);
 		this.init(password);
@@ -66,7 +74,12 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 			throw new ZipException(e);
 		}
 	}
-	
+
+	/**
+	 * Get final mac byte [ ].
+	 *
+	 * @return the byte [ ]
+	 */
 	public byte[] getFinalMac() {
 		try {
 			byte[] rawMacBytes = this.macBasedPRF.finish();
@@ -77,8 +90,10 @@ public class AESEncryptor extends AESCrypto implements Encryptor {
 			return new byte[0];
 		}
 	}
-	
+
 	/**
+	 * Get derived password verifier byte [ ].
+	 *
 	 * @return the derivedPasswordVerifier
 	 */
 	public byte[] getDerivedPasswordVerifier() {

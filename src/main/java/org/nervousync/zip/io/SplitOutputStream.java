@@ -92,6 +92,12 @@ public class SplitOutputStream extends OutputStream {
 	public void write(byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
+
+	@Override
+	public void close() throws IOException {
+		this.dataOutput.close();
+		super.close();
+	}
 	
 	public void write(byte[] b, int off, int len) throws IOException {
 		if (len < 0) {

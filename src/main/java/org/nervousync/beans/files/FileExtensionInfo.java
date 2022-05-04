@@ -30,8 +30,9 @@ import org.nervousync.utils.StringUtils;
 
 /**
  * File identified information
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Aug 11, 2015 11:03:43 AM $
+ * @version $Revision : 1.0 $ $Date: Aug 11, 2015 11:03:43 AM $
  */
 @XmlRootElement(name = "FileExtensionInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -62,23 +63,24 @@ public final class FileExtensionInfo extends BeanObject {
 	 * Is printable file
 	 */
 	private boolean printable = false;
-	
+
 	/**
 	 * Default Constructor
 	 */
 	public FileExtensionInfo() {
 		
 	}
-	
+
 	/**
 	 * Constructor
-	 * @param extensionName			File extension name
-	 * @param identifiedCode		File identified code
-	 * @param mimeType				File mime type
-	 * @param fileType				File type (define with FileUtils.FILE_TYPE_*)
-	 * @param printable				File can printable
+	 *
+	 * @param extensionName  File extension name
+	 * @param identifiedCode File identified code
+	 * @param mimeType       File mime type
+	 * @param fileType       File type (define with FileUtils.FILE_TYPE_*)
+	 * @param printable      File can printable
 	 */
-	public FileExtensionInfo(String extensionName, String identifiedCode, 
+	public FileExtensionInfo(String extensionName, String identifiedCode,
 			String mimeType, int fileType, boolean printable) {
 		this.extensionName = extensionName;
 		this.identifiedCode = identifiedCode;
@@ -89,9 +91,10 @@ public final class FileExtensionInfo extends BeanObject {
 
 	/**
 	 * Constructor for parse data which read from .dat file
-	 * @param fileType				File type (define with FileUtils.FILE_TYPE_*)
-	 * @param printable				File can printable
-	 * @param contentInfo			File identified information read from .dat file
+	 *
+	 * @param fileType    File type (define with FileUtils.FILE_TYPE_*)
+	 * @param printable   File can printable
+	 * @param contentInfo File identified information read from .dat file
 	 */
 	public FileExtensionInfo(int fileType, boolean printable, String contentInfo) {
 		this.fileType = fileType;
@@ -105,8 +108,10 @@ public final class FileExtensionInfo extends BeanObject {
 			this.mimeType = splitItems[2];
 		}
 	}
-	
+
 	/**
+	 * Gets serial version uid.
+	 *
 	 * @return the Serial Version UID
 	 */
 	public static long getSerialVersionUID() {
@@ -114,6 +119,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Gets extension name.
+	 *
 	 * @return the extName
 	 */
 	public String getExtensionName() {
@@ -121,6 +128,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Gets identified code.
+	 *
 	 * @return the identifiedCode
 	 */
 	public String getIdentifiedCode() {
@@ -128,6 +137,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Gets mime type.
+	 *
 	 * @return the mimeType
 	 */
 	public String getMimeType() {
@@ -135,6 +146,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Gets file type.
+	 *
 	 * @return the fileType
 	 */
 	public int getFileType() {
@@ -142,6 +155,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Is printable boolean.
+	 *
 	 * @return the printable
 	 */
 	public boolean isPrintable() {
@@ -149,6 +164,8 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Is media file boolean.
+	 *
 	 * @return the mediaFile
 	 */
 	public boolean isMediaFile() {
@@ -157,16 +174,29 @@ public final class FileExtensionInfo extends BeanObject {
 	}
 
 	/**
+	 * Is compress file boolean.
+	 *
 	 * @return the compressFile
 	 */
 	public boolean isCompressFile() {
 		return this.fileType == FileUtils.FILE_TYPE_COMPRESS;
 	}
-	
+
+	/**
+	 * Is picture boolean.
+	 *
+	 * @return the boolean
+	 */
 	public boolean isPicture() {
 		return this.fileType == FileUtils.FILE_TYPE_PIC;
 	}
-	
+
+	/**
+	 * Convert to byte array byte [ ].
+	 *
+	 * @return the byte [ ]
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
 	public byte[] convertToByteArray() throws UnsupportedEncodingException {
 		String content = this.extensionName + "|" + this.identifiedCode + "|" + this.mimeType;
 		byte[] dataArray = content.getBytes(Globals.DEFAULT_ENCODING);

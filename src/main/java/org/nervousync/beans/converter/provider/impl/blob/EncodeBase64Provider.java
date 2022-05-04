@@ -21,11 +21,16 @@ import org.nervousync.beans.converter.provider.ConvertProvider;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Encode base 64 provider.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/25/2020 2:57 PM $
+ * @version $Revision : 1.0 $ $Date: 8/25/2020 2:57 PM $
  */
 public final class EncodeBase64Provider implements ConvertProvider {
 
+	/**
+	 * Instantiates a new Encode base 64 provider.
+	 */
 	public EncodeBase64Provider() {
 	}
 

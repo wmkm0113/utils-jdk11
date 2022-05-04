@@ -163,7 +163,7 @@ public class BeanObject implements Serializable {
 				transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
 				transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-				transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+				transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
 
 				String xml = stringWriter.toString();
 				stringWriter = new StringWriter();

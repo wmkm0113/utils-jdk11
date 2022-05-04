@@ -6,8 +6,14 @@ import org.nervousync.commons.core.MIMETypes;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.nervousync.utils.StringUtils;
 
+/**
+ * The type Bean object converter.
+ */
 public final class BeanObjectConverter implements ParameterConverter {
 
+	/**
+	 * Instantiates a new Bean object converter.
+	 */
 	public BeanObjectConverter() {
 	}
 

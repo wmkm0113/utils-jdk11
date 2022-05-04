@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * The type Crc digest provider.
+ */
 public final class CRCDigestProviderImpl extends SecureProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CRCDigestProviderImpl.class);
@@ -26,6 +29,11 @@ public final class CRCDigestProviderImpl extends SecureProvider {
     //  CRC Value
     private long crc;
 
+    /**
+     * Instantiates a new Crc digest provider.
+     *
+     * @param crcConfig the crc config
+     */
     public CRCDigestProviderImpl(CRCConfig crcConfig) {
         this.crcConfig = crcConfig;
         if (this.crcConfig.isRefIn()) {

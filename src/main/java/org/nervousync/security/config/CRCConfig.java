@@ -1,5 +1,8 @@
 package org.nervousync.security.config;
 
+/**
+ * The type Crc config.
+ */
 public final class CRCConfig {
 
     //  CRC bit
@@ -17,6 +20,16 @@ public final class CRCConfig {
     //  Reverse CRC result before final XOR
     private final boolean refOut;
 
+    /**
+     * Instantiates a new Crc config.
+     *
+     * @param bit        the bit
+     * @param polynomial the polynomial
+     * @param init       the init
+     * @param xorOut     the xor out
+     * @param refIn      the ref in
+     * @param refOut     the ref out
+     */
     public CRCConfig(int bit, long polynomial, long init, long xorOut, boolean refIn, boolean refOut) {
         this.bit = bit;
         this.polynomial = polynomial;

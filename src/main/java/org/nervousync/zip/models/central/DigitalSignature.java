@@ -17,8 +17,10 @@
 package org.nervousync.zip.models.central;
 
 /**
+ * The type Digital signature.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:38:01 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:38:01 PM $
  */
 public final class DigitalSignature {
 
@@ -26,10 +28,15 @@ public final class DigitalSignature {
 	private int dataSize;
 	private String signatureData;
 
+	/**
+	 * Instantiates a new Digital signature.
+	 */
 	public DigitalSignature() {
 	}
-	
+
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public int getSignature() {
@@ -37,6 +44,8 @@ public final class DigitalSignature {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(int signature) {
@@ -44,6 +53,8 @@ public final class DigitalSignature {
 	}
 
 	/**
+	 * Gets data size.
+	 *
 	 * @return the dataSize
 	 */
 	public int getDataSize() {
@@ -51,6 +62,8 @@ public final class DigitalSignature {
 	}
 
 	/**
+	 * Sets data size.
+	 *
 	 * @param dataSize the dataSize to set
 	 */
 	public void setDataSize(int dataSize) {
@@ -58,6 +71,8 @@ public final class DigitalSignature {
 	}
 
 	/**
+	 * Gets signature data.
+	 *
 	 * @return the signatureData
 	 */
 	public String getSignatureData() {
@@ -65,6 +80,8 @@ public final class DigitalSignature {
 	}
 
 	/**
+	 * Sets signature data.
+	 *
 	 * @param signatureData the signatureData to set
 	 */
 	public void setSignatureData(String signatureData) {

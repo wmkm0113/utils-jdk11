@@ -25,19 +25,33 @@ import java.util.List;
 
 /**
  * AES Engine
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 30, 2017 2:55:56 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 30, 2017 2:55:56 PM $
  */
 public final class AESEngine {
 
 	private int rounds;
 	private int[][] workingKeys = null;
 	private int C0, C1, C2, C3;
-	
+
+	/**
+	 * Instantiates a new Aes engine.
+	 *
+	 * @param keys the keys
+	 * @throws ZipException the zip exception
+	 */
 	public AESEngine(byte[] keys) throws ZipException {
 		this.generateWorkingKeys(keys);
 	}
-	
+
+	/**
+	 * Process block.
+	 *
+	 * @param in  the in
+	 * @param out the out
+	 * @throws ZipException the zip exception
+	 */
 	public void processBlock(byte[] in, byte[] out) throws ZipException {
 		if (this.workingKeys == null) {
 			throw new ZipException("AES engine not initialized");
@@ -56,6 +70,12 @@ public final class AESEngine {
 		this.stateOut(out);
 	}
 
+	/**
+	 * Process header.
+	 *
+	 * @param aesExtraDataRecord the aes extra data record
+	 * @param headerBytesList    the header bytes list
+	 */
 	public static void processHeader(AESExtraDataRecord aesExtraDataRecord, List<String> headerBytesList) {
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getSignature(), headerBytesList);
 		HeaderOperator.appendShortToArrayList((short) aesExtraDataRecord.getDataSize(), headerBytesList);

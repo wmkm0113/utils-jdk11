@@ -44,8 +44,10 @@ import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Cipher output stream.
+ *
  * @author Steven Wee <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:39:25 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:39:25 PM $
  */
 public class CipherOutputStream extends OutputStream {
 
@@ -60,6 +62,9 @@ public class CipherOutputStream extends OutputStream {
 	private GeneralFileHeader generalFileHeader;
 	private LocalFileHeader localFileHeader;
 	private Encryptor encryptor;
+	/**
+	 * The Zip options.
+	 */
 	ZipOptions zipOptions;
 	/**
 	 * Target zip file object
@@ -71,10 +76,19 @@ public class CipherOutputStream extends OutputStream {
 	final CRC32 crc;
 	private long totalWriteBytes;
 	private long totalReadBytes;
+	/**
+	 * The Bytes written for this file.
+	 */
 	long bytesWrittenForThisFile;
 	private final byte[] pendingBuffer;
 	private int pendingBufferLength;
 
+	/**
+	 * Instantiates a new Cipher output stream.
+	 *
+	 * @param outputStream the output stream
+	 * @param zipFile      the zip file
+	 */
 	CipherOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		this.outputStream = outputStream;
 		this.zipFile = zipFile;
@@ -87,6 +101,13 @@ public class CipherOutputStream extends OutputStream {
 		this.pendingBufferLength = 0;
 	}
 
+	/**
+	 * Put next entry.
+	 *
+	 * @param file       the file
+	 * @param zipOptions the zip options
+	 * @throws ZipException the zip exception
+	 */
 	public void putNextEntry(File file, ZipOptions zipOptions) throws ZipException {
 		if (!zipOptions.isSourceExternalStream() && file == null) {
 			throw new ZipException("Input file is null!");
@@ -225,6 +246,12 @@ public class CipherOutputStream extends OutputStream {
 		}
 	}
 
+	/**
+	 * Close entry.
+	 *
+	 * @throws IOException  the io exception
+	 * @throws ZipException the zip exception
+	 */
 	public void closeEntry() throws IOException, ZipException {
 		if (this.pendingBufferLength != 0) {
 			this.encryptAndWrite(this.pendingBuffer, 0, this.pendingBufferLength);
@@ -273,6 +300,11 @@ public class CipherOutputStream extends OutputStream {
 		this.totalReadBytes = 0L;
 	}
 
+	/**
+	 * Finish.
+	 *
+	 * @throws ZipException the zip exception
+	 */
 	public void finish() throws ZipException {
 		this.zipFile.getEndCentralDirectoryRecord().setOffsetOfStartOfCentralDirectory(this.totalWriteBytes);
 		this.zipFile.finalizeZipFile(this.outputStream);
@@ -284,6 +316,11 @@ public class CipherOutputStream extends OutputStream {
 		}
 	}
 
+	/**
+	 * Update total bytes read.
+	 *
+	 * @param readCount the read count
+	 */
 	void updateTotalBytesRead(int readCount) {
 		if (readCount > 0) {
 			this.totalReadBytes += readCount;

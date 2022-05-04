@@ -21,11 +21,16 @@ import org.nervousync.beans.converter.provider.ConvertProvider;
 import org.nervousync.beans.core.BeanObject;
 
 /**
+ * The type Encode xml provider.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 4:34 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:34 PM $
  */
 public final class EncodeXMLProvider implements ConvertProvider {
 
+	/**
+	 * Instantiates a new Encode xml provider.
+	 */
 	public EncodeXMLProvider() {
 	}
 

@@ -17,8 +17,10 @@
 package org.nervousync.zip.models.central;
 
 /**
+ * The type End central directory record.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:34:55 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:34:55 PM $
  */
 public final class EndCentralDirectoryRecord {
 
@@ -32,10 +34,15 @@ public final class EndCentralDirectoryRecord {
 	private int commentLength;
 	private byte[] commentBytes;
 
+	/**
+	 * Instantiates a new End central directory record.
+	 */
 	public EndCentralDirectoryRecord() {
 	}
 
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public long getSignature() {
@@ -43,6 +50,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(long signature) {
@@ -50,6 +59,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets index of this disk.
+	 *
 	 * @return the indexOfThisDisk
 	 */
 	public int getIndexOfThisDisk() {
@@ -57,6 +68,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets index of this disk.
+	 *
 	 * @param indexOfThisDisk the indexOfThisDisk to set
 	 */
 	public void setIndexOfThisDisk(int indexOfThisDisk) {
@@ -64,6 +77,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets index of this disk start of central directory.
+	 *
 	 * @return the indexOfThisDiskStartOfCentralDirectory
 	 */
 	public int getIndexOfThisDiskStartOfCentralDirectory() {
@@ -71,6 +86,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets index of this disk start of central directory.
+	 *
 	 * @param indexOfThisDiskStartOfCentralDirectory the indexOfThisDiskStartOfCentralDirectory to set
 	 */
 	public void setIndexOfThisDiskStartOfCentralDirectory(int indexOfThisDiskStartOfCentralDirectory) {
@@ -78,6 +95,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets total of entries in central directory on this disk.
+	 *
 	 * @return the totalOfEntriesInCentralDirectoryOnThisDisk
 	 */
 	public int getTotalOfEntriesInCentralDirectoryOnThisDisk() {
@@ -85,6 +104,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets total of entries in central directory on this disk.
+	 *
 	 * @param totalOfEntriesInCentralDirectoryOnThisDisk the totalOfEntriesInCentralDirectoryOnThisDisk to set
 	 */
 	public void setTotalOfEntriesInCentralDirectoryOnThisDisk(int totalOfEntriesInCentralDirectoryOnThisDisk) {
@@ -92,6 +113,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets total of entries in central directory.
+	 *
 	 * @return the totalOfEntriesInCentralDirectory
 	 */
 	public int getTotalOfEntriesInCentralDirectory() {
@@ -99,6 +122,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets total of entries in central directory.
+	 *
 	 * @param totalOfEntriesInCentralDirectory the totalOfEntriesInCentralDirectory to set
 	 */
 	public void setTotalOfEntriesInCentralDirectory(int totalOfEntriesInCentralDirectory) {
@@ -106,6 +131,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets size of central directory.
+	 *
 	 * @return the sizeOfCentralDirectory
 	 */
 	public int getSizeOfCentralDirectory() {
@@ -113,6 +140,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets size of central directory.
+	 *
 	 * @param sizeOfCentralDirectory the sizeOfCentralDirectory to set
 	 */
 	public void setSizeOfCentralDirectory(int sizeOfCentralDirectory) {
@@ -120,6 +149,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets offset of start of central directory.
+	 *
 	 * @return the offsetOfStartOfCentralDirectory
 	 */
 	public long getOffsetOfStartOfCentralDirectory() {
@@ -127,6 +158,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets offset of start of central directory.
+	 *
 	 * @param offsetOfStartOfCentralDirectory the offsetOfStartOfCentralDirectory to set
 	 */
 	public void setOffsetOfStartOfCentralDirectory(long offsetOfStartOfCentralDirectory) {
@@ -134,6 +167,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets comment length.
+	 *
 	 * @return the commentLength
 	 */
 	public int getCommentLength() {
@@ -141,6 +176,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets comment length.
+	 *
 	 * @param commentLength the commentLength to set
 	 */
 	public void setCommentLength(int commentLength) {
@@ -148,6 +185,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Get comment bytes byte [ ].
+	 *
 	 * @return the commentBytes
 	 */
 	public byte[] getCommentBytes() {
@@ -155,6 +194,8 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets comment bytes.
+	 *
 	 * @param commentBytes the commentBytes to set
 	 */
 	public void setCommentBytes(byte[] commentBytes) {

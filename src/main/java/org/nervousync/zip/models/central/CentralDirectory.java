@@ -24,18 +24,25 @@ import org.nervousync.zip.models.header.GeneralFileHeader;
 import org.nervousync.utils.FileUtils;
 
 /**
+ * The type Central directory.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:52:40 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:52:40 PM $
  */
 public final class CentralDirectory {
 
 	private List<GeneralFileHeader> fileHeaders = null;
 	private DigitalSignature digitalSignature = null;
 
+	/**
+	 * Instantiates a new Central directory.
+	 */
 	public CentralDirectory() {
 	}
-	
+
 	/**
+	 * Gets file headers.
+	 *
 	 * @return the fileHeaders
 	 */
 	public List<GeneralFileHeader> getFileHeaders() {
@@ -43,6 +50,8 @@ public final class CentralDirectory {
 	}
 
 	/**
+	 * Sets file headers.
+	 *
 	 * @param fileHeaders the fileHeaders to set
 	 */
 	public void setFileHeaders(List<GeneralFileHeader> fileHeaders) {
@@ -50,6 +59,8 @@ public final class CentralDirectory {
 	}
 
 	/**
+	 * Gets digital signature.
+	 *
 	 * @return the digitalSignature
 	 */
 	public DigitalSignature getDigitalSignature() {
@@ -57,12 +68,20 @@ public final class CentralDirectory {
 	}
 
 	/**
+	 * Sets digital signature.
+	 *
 	 * @param digitalSignature the digitalSignature to set
 	 */
 	public void setDigitalSignature(DigitalSignature digitalSignature) {
 		this.digitalSignature = digitalSignature;
 	}
-	
+
+	/**
+	 * List folder general file headers list.
+	 *
+	 * @param folderPath the folder path
+	 * @return the list
+	 */
 	public List<String> listFolderGeneralFileHeaders(String folderPath) {
 		List<String> headerList = new ArrayList<>();
 		GeneralFileHeader folderFileHeader = this.retrieveGeneralFileHeader(folderPath);
@@ -81,6 +100,12 @@ public final class CentralDirectory {
 		return headerList;
 	}
 
+	/**
+	 * Retrieve general file header general file header.
+	 *
+	 * @param entryPath the entry path
+	 * @return the general file header
+	 */
 	public GeneralFileHeader retrieveGeneralFileHeader(String entryPath) {
 		if (this.fileHeaders != null && this.fileHeaders.size() > 0) {
 			for (GeneralFileHeader generalFileHeader : this.fileHeaders) {
@@ -91,7 +116,13 @@ public final class CentralDirectory {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Retrieve index of general file header int.
+	 *
+	 * @param generalFileHeader the general file header
+	 * @return the int
+	 */
 	public int retrieveIndexOfGeneralFileHeader(GeneralFileHeader generalFileHeader) {
 		if (this.fileHeaders != null && this.fileHeaders.size() > 0) {
 			for (int index = 0 ; index < this.fileHeaders.size() ; index++) {

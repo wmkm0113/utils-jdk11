@@ -30,8 +30,9 @@ import jcifs.smb.SmbRandomAccessFile;
 
 /**
  * RandomAccessFile Supported local files and NAS files
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 22, 2017 11:49:46 AM $
+ * @version $Revision : 1.0 $ $Date: Dec 22, 2017 11:49:46 AM $
  */
 public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closeable {
 	
@@ -46,32 +47,30 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * The object of RandomAccessFile/SmbRandomAccessFile
 	 */
 	private Object originObject = null;
-	
+
 	/**
 	 * Constructor
+	 *
 	 * @param filePath target file path
-	 * @param mode	Open type(Read-Only/Read-Write)
-	 * @throws FileNotFoundException	if target file was not found
+	 * @param mode     Open type(Read-Only/Read-Write)
+	 * @throws FileNotFoundException if target file was not found
 	 */
-	public NervousyncRandomAccessFile(String filePath, String mode) throws FileNotFoundException {
-		this.filePath = filePath;
-		this.domain = Globals.DEFAULT_VALUE_STRING;
-		this.userName = Globals.DEFAULT_VALUE_STRING;
-		this.passWord = Globals.DEFAULT_VALUE_STRING;
-		this.openFile(mode);
+	public NervousyncRandomAccessFile(final String filePath, final String mode) throws FileNotFoundException {
+		this(filePath, mode, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
 	 * Constructor for open SMB file
-	 * @param smbPath       SMB path
-	 * @param mode          Open type
-	 * @param domain        SMB Authentication Domain
-	 * @param userName      SMB Authentication Username
-	 * @param passWord      SMB Authentication Password
-	 * @throws FileNotFoundException    if connect to SMB file error
+	 *
+	 * @param smbPath  SMB path
+	 * @param mode     Open type
+	 * @param domain   SMB Authentication Domain
+	 * @param userName SMB Authentication Username
+	 * @param passWord SMB Authentication Password
+	 * @throws FileNotFoundException if connect to SMB file error
 	 */
-	public NervousyncRandomAccessFile(String smbPath, String mode,
-	                                  String domain, String userName, String passWord) throws FileNotFoundException {
+	public NervousyncRandomAccessFile(final String smbPath, final String mode, final String domain,
+	                                  final String userName, final String passWord) throws FileNotFoundException {
 		this.filePath = smbPath;
 		this.domain = domain;
 		this.userName = userName;
@@ -81,8 +80,9 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 
 	/**
 	 * Read file length
-	 * @return	file length
-	 * @throws IOException	If read file length failed
+	 *
+	 * @return file length
+	 * @throws IOException If read file length failed
 	 */
 	public long length() throws IOException {
 		return FileUtils.fileSize(this.filePath,
@@ -90,9 +90,19 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	}
 
 	/**
+	 * Gets file path.
+	 *
+	 * @return the file path
+	 */
+	public String getFilePath() {
+		return filePath;
+	}
+
+	/**
 	 * Return current file pointer position
-	 * @return		file pointer position
-	 * @throws IOException		Retrieve position failed
+	 *
+	 * @return file pointer position
+	 * @throws IOException Retrieve position failed
 	 */
 	public long getFilePointer() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -104,8 +114,9 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 
 	/**
 	 * Set the file-pointer to position
-	 * @param pos			target position 
-	 * @throws IOException		Seek position failed
+	 *
+	 * @param pos target position
+	 * @throws IOException Seek position failed
 	 */
 	public void seek(long pos) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -309,12 +320,13 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeUTF(s);
 		}
 	}
-	
+
 	/**
 	 * Read data
-	 * @param b		read buffer
-	 * @return		read length
-	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 *
+	 * @param b read buffer
+	 * @return read length
+	 * @throws IOException If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -323,14 +335,15 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).read(b, 0, b.length);
 		}
 	}
-	
+
 	/**
 	 * Read data
-	 * @param b		read buffer
-	 * @param off	buffer offset
-	 * @param len	read length
-	 * @return		read length
-	 * @throws IOException  If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 *
+	 * @param b   read buffer
+	 * @param off buffer offset
+	 * @param len read length
+	 * @return read length
+	 * @throws IOException If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {

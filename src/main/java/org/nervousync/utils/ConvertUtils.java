@@ -39,8 +39,10 @@ import org.slf4j.LoggerFactory;
 import org.nervousync.commons.core.Globals;
 
 /**
+ * The type Convert utils.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 12, 2010 3:12:05 PM $
+ * @version $Revision : 1.0 $ $Date: Jan 12, 2010 3:12:05 PM $
  */
 public final class ConvertUtils {
 
@@ -48,11 +50,12 @@ public final class ConvertUtils {
 
 	private ConvertUtils() {
 	}
-	
+
 	/**
 	 * Convert collection to List
-	 * @param collection	collection
-	 * @return				Convert list
+	 *
+	 * @param collection collection
+	 * @return Convert list
 	 */
 	public static List<Object> convertCollectionToList(Object collection) {
 		List<Object> list;
@@ -87,11 +90,12 @@ public final class ConvertUtils {
 
 		return list;
 	}
-	
+
 	/**
 	 * Convert primitives to object arrays
-	 * @param primitiveArray		primitive arrays
-	 * @return		Object arrays
+	 *
+	 * @param primitiveArray primitive arrays
+	 * @return Object arrays
 	 */
 	public static Object[] convertPrimitivesToObjects(Object primitiveArray) {
 		if (!primitiveArray.getClass().isArray()) {
@@ -113,8 +117,9 @@ public final class ConvertUtils {
 
 	/**
 	 * Convert hex string to byte arrays
-	 * @param strIn			Hex string
-	 * @return				Convert byte arrays
+	 *
+	 * @param strIn Hex string
+	 * @return Convert byte arrays
 	 */
 	public static byte[] hexToByte(String strIn) {
 		if (strIn.length() % 2 != 0) {
@@ -132,6 +137,12 @@ public final class ConvertUtils {
 		return arrOut;
 	}
 
+	/**
+	 * Byte to hex string.
+	 *
+	 * @param dataBytes the data bytes
+	 * @return the string
+	 */
 	public static String byteToHex(byte[] dataBytes) {
 		if (dataBytes == null) {
 			return Globals.DEFAULT_VALUE_STRING;
@@ -147,7 +158,7 @@ public final class ConvertUtils {
 		}
 		return stringBuilder.toString();
 	}
-	
+
 	/**
 	 * Converts byte array to string using default encoding
 	 *
@@ -197,10 +208,11 @@ public final class ConvertUtils {
 			return content.getBytes(Charset.defaultCharset());
 		}
 	}
-	
+
 	/**
 	 * Convert object to byte array
-	 * @param object		if <code>null</code> convert error
+	 *
+	 * @param object if <code>null</code> convert error
 	 * @return byte array
 	 */
 	public static byte[] convertToByteArray(Object object) {
@@ -234,8 +246,9 @@ public final class ConvertUtils {
 
 	/**
 	 * Convert byte array to Object
-	 * @param content       byte array
-	 * @return              Converted object or byte array when failed
+	 *
+	 * @param content byte array
+	 * @return Converted object or byte array when failed
 	 */
 	public static Object convertToObject(byte[] content) {
 		if (content.length == 0) {
@@ -259,8 +272,9 @@ public final class ConvertUtils {
 
 	/**
 	 * Compress given data bytes using gzip
-	 * @param dataBytes     Data bytes
-	 * @return              Compressed byte array
+	 *
+	 * @param dataBytes Data bytes
+	 * @return Compressed byte array
 	 */
 	public static byte[] zipByteArray(byte[] dataBytes) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -284,8 +298,9 @@ public final class ConvertUtils {
 
 	/**
 	 * Decompress given data bytes which data compressed by gzip
-	 * @param dataBytes     Compressed data bytes
-	 * @return              Decompressed data bytes
+	 *
+	 * @param dataBytes Compressed data bytes
+	 * @return Decompressed data bytes
 	 */
 	public static byte[] unzipByteArray(byte[] dataBytes) {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);

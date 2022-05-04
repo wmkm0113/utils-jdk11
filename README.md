@@ -17,6 +17,8 @@ Convert java bean to or parse from XML/JSON/YAML
 **Package**: org.nervousync.zip  
 Create or extract zip file, support standard and aes crypto.
 
+Usage: See org.nervousync.zip.test.ZipTest
+
 ## Utilities List
 ### BeanUtils
 **Package**: org.nervousync.utils  
