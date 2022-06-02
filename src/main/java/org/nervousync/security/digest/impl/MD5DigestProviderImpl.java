@@ -10,12 +10,26 @@ import org.nervousync.exceptions.crypto.CryptoException;
 
 import java.security.MessageDigest;
 
+/**
+ * The type Md 5 digest provider.
+ */
 public final class MD5DigestProviderImpl extends BaseDigestProvider {
 
+    /**
+     * Instantiates a new Md 5 digest provider.
+     *
+     * @throws CryptoException the crypto exception
+     */
     public MD5DigestProviderImpl() throws CryptoException {
         super("MD5", new byte[0]);
     }
 
+    /**
+     * Instantiates a new Md 5 digest provider.
+     *
+     * @param keyBytes the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public MD5DigestProviderImpl(byte[] keyBytes) throws CryptoException {
         super("MD5/HMAC", keyBytes);
     }

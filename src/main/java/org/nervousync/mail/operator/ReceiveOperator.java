@@ -30,12 +30,42 @@ import java.util.Properties;
  */
 public interface ReceiveOperator {
 
+    /**
+     * Read uid string.
+     *
+     * @param folder  the folder
+     * @param message the message
+     * @return the string
+     * @throws MessagingException the messaging exception
+     */
     String readUID(Folder folder, Message message) throws MessagingException;
 
+    /**
+     * Read message.
+     *
+     * @param folder the folder
+     * @param uid    the uid
+     * @return the message
+     * @throws MessagingException the messaging exception
+     */
     Message readMessage(Folder folder, String uid) throws MessagingException;
 
+    /**
+     * Read messages list.
+     *
+     * @param folder    the folder
+     * @param uidArrays the uid arrays
+     * @return the list
+     * @throws MessagingException the messaging exception
+     */
     List<Message> readMessages(Folder folder, String... uidArrays) throws MessagingException;
 
+    /**
+     * Read config properties.
+     *
+     * @param serverConfig the server config
+     * @return the properties
+     */
     Properties readConfig(ServerConfig serverConfig);
 
 }

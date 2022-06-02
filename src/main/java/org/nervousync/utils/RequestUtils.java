@@ -23,7 +23,7 @@ import jakarta.ws.rs.*;
 import org.nervousync.beans.ip.IPRange;
 import org.nervousync.beans.servlet.request.RequestAttribute;
 import org.nervousync.beans.servlet.request.RequestInfo;
-import org.nervousync.beans.servlet.response.HttpResponseContent;
+import org.nervousync.beans.servlet.response.ResponseInfo;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.commons.http.cookie.CookieEntity;
@@ -586,8 +586,8 @@ public final class RequestUtils {
 	 */
 	public int retrieveContentLength(String requestUrl) {
 		return sendRequest(RequestInfo.builder(HttpMethodOption.HEAD).requestUrl(requestUrl).build())
-				.filter(httpResponseContent -> httpResponseContent.getStatusCode() == HttpURLConnection.HTTP_OK)
-				.map(HttpResponseContent::getContentLength)
+				.filter(responseInfo -> responseInfo.getStatusCode() == HttpURLConnection.HTTP_OK)
+				.map(ResponseInfo::getContentLength)
 				.orElse(Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -669,7 +669,7 @@ public final class RequestUtils {
 	 * @param requestInfo the request info
 	 * @return the optional
 	 */
-	public static Optional<HttpResponseContent> sendRequest(RequestInfo requestInfo) {
+	public static Optional<ResponseInfo> sendRequest(RequestInfo requestInfo) {
 		return sendRequest(requestInfo, new ResponseContentHandler());
 	}
 
@@ -1619,7 +1619,7 @@ public final class RequestUtils {
 		}
 	}
 
-	private static final class ResponseContentHandler implements HttpResponse.BodyHandler<Supplier<HttpResponseContent>> {
+	private static final class ResponseContentHandler implements HttpResponse.BodyHandler<Supplier<ResponseInfo>> {
 
 		/**
 		 * Instantiates a new Response content handler.
@@ -1627,10 +1627,10 @@ public final class RequestUtils {
 		public ResponseContentHandler() {
 		}
 
-		public HttpResponse.BodySubscriber<Supplier<HttpResponseContent>> apply(HttpResponse.ResponseInfo responseInfo) {
+		public HttpResponse.BodySubscriber<Supplier<ResponseInfo>> apply(HttpResponse.ResponseInfo responseInfo) {
 			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
 			return HttpResponse.BodySubscribers.mapping(upstream,
-					inputStream -> () -> new HttpResponseContent(responseInfo, inputStream));
+					inputStream -> () -> new ResponseInfo(responseInfo, inputStream));
 		}
 	}
 

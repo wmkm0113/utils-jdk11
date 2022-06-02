@@ -48,6 +48,9 @@ public final class BeanConfig implements Serializable {
 
 	private static final long serialVersionUID = -8220400989433945047L;
 
+	/**
+	 * Logger
+	 */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**

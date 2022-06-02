@@ -18,8 +18,9 @@ package org.nervousync.huffman;
 
 /**
  * Huffman Node
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 3, 2017 4:26:45 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 3, 2017 4:26:45 PM $
  */
 public final class HuffmanNode {
 
@@ -43,17 +44,30 @@ public final class HuffmanNode {
 	 * Next node
 	 */
 	private HuffmanNode nextNode;
-	
+
+	/**
+	 * Instantiates a new Huffman node.
+	 *
+	 * @param frequency the frequency
+	 */
 	public HuffmanNode(int frequency) {
 		this.frequency = frequency;
 	}
-	
+
+	/**
+	 * Instantiates a new Huffman node.
+	 *
+	 * @param keyword   the keyword
+	 * @param frequency the frequency
+	 */
 	public HuffmanNode(String keyword, int frequency) {
 		this.keyword = keyword;
 		this.frequency = frequency;
 	}
 
 	/**
+	 * Gets keyword.
+	 *
 	 * @return the keyword
 	 */
 	public String getKeyword() {
@@ -61,6 +75,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Sets keyword.
+	 *
 	 * @param keyword the keyword to set
 	 */
 	public void setKeyword(String keyword) {
@@ -68,6 +84,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Gets frequency.
+	 *
 	 * @return the frequency
 	 */
 	public int getFrequency() {
@@ -75,6 +93,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Sets frequency.
+	 *
 	 * @param frequency the frequency to set
 	 */
 	public void setFrequency(int frequency) {
@@ -82,6 +102,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Gets left node.
+	 *
 	 * @return the leftNode
 	 */
 	public HuffmanNode getLeftNode() {
@@ -89,6 +111,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Sets left node.
+	 *
 	 * @param leftNode the leftNode to set
 	 */
 	public void setLeftNode(HuffmanNode leftNode) {
@@ -96,6 +120,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Gets right node.
+	 *
 	 * @return the rightNode
 	 */
 	public HuffmanNode getRightNode() {
@@ -103,6 +129,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Sets right node.
+	 *
 	 * @param rightNode the rightNode to set
 	 */
 	public void setRightNode(HuffmanNode rightNode) {
@@ -110,6 +138,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Gets next node.
+	 *
 	 * @return the nextNode
 	 */
 	public HuffmanNode getNextNode() {
@@ -117,6 +147,8 @@ public final class HuffmanNode {
 	}
 
 	/**
+	 * Sets next node.
+	 *
 	 * @param nextNode the nextNode to set
 	 */
 	public void setNextNode(HuffmanNode nextNode) {

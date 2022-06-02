@@ -8,7 +8,6 @@ import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.HandlerResolver;
 import net.sf.cglib.proxy.MethodProxy;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.MIMETypes;
 import org.nervousync.commons.http.HttpStatus;
 import org.nervousync.enumerations.web.HttpMethodOption;
 import org.nervousync.interceptor.beans.HandlerInterceptor;
@@ -426,17 +425,19 @@ public final class ServiceUtils {
                     }
 
                     switch (response.getHeaderString(HttpHeaders.CONTENT_TYPE)) {
-                        case MIMETypes.MIME_TYPE_JSON:
+                        case FileUtils.MIME_TYPE_JSON:
                             if (returnType.isArray()) {
                                 return parseToList(responseData, paramClass).toArray();
                             } else if (List.class.isAssignableFrom(returnType)) {
                                 return parseToList(responseData, paramClass);
                             }
                             return parseToObject(responseData, returnType);
-                        case MIMETypes.MIME_TYPE_TEXT_XML:
-                        case MIMETypes.MIME_TYPE_XML:
+                        case FileUtils.MIME_TYPE_TEXT_XML:
+                        case FileUtils.MIME_TYPE_XML:
+                        case FileUtils.MIME_TYPE_TEXT_YAML:
+                        case FileUtils.MIME_TYPE_YAML:
                             return parseToObject(responseData, returnType);
-                        case MIMETypes.MIME_TYPE_TEXT:
+                        case FileUtils.MIME_TYPE_TEXT:
                             return responseData;
                         default:
                             final String value = responseData;

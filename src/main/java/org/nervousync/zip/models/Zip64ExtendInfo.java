@@ -19,8 +19,10 @@ package org.nervousync.zip.models;
 import org.nervousync.commons.core.Globals;
 
 /**
+ * The type Zip 64 extend info.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:48:01 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:48:01 PM $
  */
 public final class Zip64ExtendInfo {
 
@@ -31,10 +33,15 @@ public final class Zip64ExtendInfo {
 	private long offsetLocalHeader = Globals.DEFAULT_VALUE_LONG;
 	private int diskNumberStart = Globals.DEFAULT_VALUE_INT;
 
+	/**
+	 * Instantiates a new Zip 64 extend info.
+	 */
 	public Zip64ExtendInfo() {
 	}
-	
+
 	/**
+	 * Gets header.
+	 *
 	 * @return the header
 	 */
 	public int getHeader() {
@@ -42,6 +49,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets header.
+	 *
 	 * @param header the header to set
 	 */
 	public void setHeader(int header) {
@@ -49,6 +58,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Gets size.
+	 *
 	 * @return the size
 	 */
 	public int getSize() {
@@ -56,6 +67,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets size.
+	 *
 	 * @param size the size to set
 	 */
 	public void setSize(int size) {
@@ -63,6 +76,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Gets compressed size.
+	 *
 	 * @return the compressedSize
 	 */
 	public long getCompressedSize() {
@@ -70,6 +85,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets compressed size.
+	 *
 	 * @param compressedSize the compressedSize to set
 	 */
 	public void setCompressedSize(long compressedSize) {
@@ -77,6 +94,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Gets original size.
+	 *
 	 * @return the originalSize
 	 */
 	public long getOriginalSize() {
@@ -84,6 +103,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets original size.
+	 *
 	 * @param originalSize the originalSize to set
 	 */
 	public void setOriginalSize(long originalSize) {
@@ -91,6 +112,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Gets offset local header.
+	 *
 	 * @return the offsetLocalHeader
 	 */
 	public long getOffsetLocalHeader() {
@@ -98,6 +121,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets offset local header.
+	 *
 	 * @param offsetLocalHeader the offsetLocalHeader to set
 	 */
 	public void setOffsetLocalHeader(long offsetLocalHeader) {
@@ -105,6 +130,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Gets disk number start.
+	 *
 	 * @return the diskNumberStart
 	 */
 	public int getDiskNumberStart() {
@@ -112,6 +139,8 @@ public final class Zip64ExtendInfo {
 	}
 
 	/**
+	 * Sets disk number start.
+	 *
 	 * @param diskNumberStart the diskNumberStart to set
 	 */
 	public void setDiskNumberStart(int diskNumberStart) {

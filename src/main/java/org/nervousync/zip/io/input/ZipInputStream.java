@@ -23,14 +23,21 @@ import java.util.zip.CRC32;
 import org.nervousync.commons.core.Globals;
 
 /**
+ * The type Zip input stream.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 10:29:09 AM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 10:29:09 AM $
  */
 public class ZipInputStream extends InputStream {
 
 	private final CRC32 crc;
 	private final InputStream inputStream;
-	
+
+	/**
+	 * Instantiates a new Zip input stream.
+	 *
+	 * @param inputStream the input stream
+	 */
 	public ZipInputStream(InputStream inputStream) {
 		this.inputStream = inputStream;
 		this.crc = new CRC32();
@@ -63,7 +70,12 @@ public class ZipInputStream extends InputStream {
 	public void close() throws IOException {
 		this.inputStream.close();
 	}
-	
+
+	/**
+	 * Crc value long.
+	 *
+	 * @return the long
+	 */
 	public long crcValue() {
 		return this.crc.getValue();
 	}

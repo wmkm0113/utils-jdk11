@@ -35,7 +35,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import jakarta.xml.bind.JAXB;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.exceptions.zip.ZipException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,20 +61,7 @@ public final class StringUtils {
 	private static final String TOP_PATH = "..";
 
 	private static final String CURRENT_PATH = ".";
-
-	/**
-	 * The shift value required to create the upper nibble
-	 * from the first of 2 byte values converted from ascii hex.
-	 */
-	private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
-
-	private static final byte TRANSLATED_SPACE_CHARACTER = '_';
-
-	private static final int INVALID_BYTE = -1;
-	private static final int PAD_BYTE = -2;
 	private static final int MASK_BYTE_UNSIGNED = 0xFF;
-
-	private static final int INPUT_BYTES_PER_CHUNK = 4;
 	private static final int PADDING = '=';
 
 	private static final String BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -496,9 +482,14 @@ public final class StringUtils {
 		}
 
 		try {
-			String tempString = new String(strIn.getBytes(ZipConstants.CHARSET_CP850), ZipConstants.CHARSET_CP850);
+			String tempString = new String(strIn.getBytes(Globals.CHARSET_CP850), Globals.CHARSET_CP850);
 			if (strIn.equals(tempString)) {
-				return ZipConstants.CHARSET_CP850;
+				return Globals.CHARSET_CP850;
+			}
+
+			tempString = new String(strIn.getBytes(Globals.CHARSET_GBK), Globals.CHARSET_GBK);
+			if (strIn.equals(tempString)) {
+				return Globals.CHARSET_GBK;
 			}
 
 			tempString = new String(strIn.getBytes(Globals.DEFAULT_ENCODING), Globals.DEFAULT_ENCODING);
@@ -937,10 +928,10 @@ public final class StringUtils {
 	 */
 	public static String getFilenameExtension(String path) {
 		if (path == null) {
-			return "";
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 		int sepIndex = path.lastIndexOf(Globals.EXTENSION_SEPARATOR);
-		return (sepIndex != -1 ? path.substring(sepIndex + 1) : "");
+		return (sepIndex != -1 ? path.substring(sepIndex + 1) : Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
@@ -1602,7 +1593,19 @@ public final class StringUtils {
 	 *
 	 * @param <T>       Template
 	 * @param string    Parsed string
-	 * @param encoding  String encoding, just using for parse xml
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T stringToObject(String string, Class<T> beanClass) {
+		return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param encoding  String encoding
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */

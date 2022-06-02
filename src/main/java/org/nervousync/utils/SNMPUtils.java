@@ -55,8 +55,10 @@ import org.nervousync.enumerations.snmp.auth.SNMPAuthProtocol;
 import org.nervousync.exceptions.snmp.ProcessorConfigException;
 
 /**
+ * The type Snmp utils.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 25, 2017 8:50:34 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 25, 2017 8:50:34 PM $
  */
 public final class SNMPUtils {
 
@@ -94,11 +96,24 @@ public final class SNMPUtils {
 		
 		this.snmp.listen();
 	}
-	
+
+	/**
+	 * Initialize boolean.
+	 *
+	 * @param serverCount the server count
+	 * @return the boolean
+	 */
 	public static boolean initialize(int serverCount) {
 		return SNMPUtils.initialize(IPProtocol.UDP, serverCount);
 	}
-	
+
+	/**
+	 * Initialize boolean.
+	 *
+	 * @param protocol    the protocol
+	 * @param serverCount the server count
+	 * @return the boolean
+	 */
 	public static boolean initialize(IPProtocol protocol, int serverCount) {
 		if (SNMPUtils.INSTANCE != null) {
 			return true;
@@ -117,12 +132,26 @@ public final class SNMPUtils {
 			return Boolean.FALSE;
 		}
 	}
-	
+
+	/**
+	 * Gets instance.
+	 *
+	 * @return the instance
+	 */
 	public static SNMPUtils getInstance() {
 		return SNMPUtils.INSTANCE;
 	}
-	
-	public boolean addMonitor(String identifiedKey, TargetHost targetHost, 
+
+	/**
+	 * Add monitor boolean.
+	 *
+	 * @param identifiedKey    the identified key
+	 * @param targetHost       the target host
+	 * @param pduList          the pdu list
+	 * @param snmpDataOperator the snmp data operator
+	 * @return the boolean
+	 */
+	public boolean addMonitor(String identifiedKey, TargetHost targetHost,
 			List<PDU> pduList, SNMPDataOperator snmpDataOperator) {
 		if (this.existsHosts.contains(targetHost)) {
 			return true;
@@ -141,8 +170,10 @@ public final class SNMPUtils {
 			return Boolean.FALSE;
 		}
 	}
-	
+
 	/**
+	 * Gets period.
+	 *
 	 * @return the period
 	 */
 	public int getPeriod() {
@@ -150,12 +181,19 @@ public final class SNMPUtils {
 	}
 
 	/**
+	 * Sets period.
+	 *
 	 * @param period the period to set
 	 */
 	public void setPeriod(int period) {
 		this.period = period;
 	}
-	
+
+	/**
+	 * Destroy.
+	 *
+	 * @throws IOException the io exception
+	 */
 	public void destroy() throws IOException {
 		this.scheduledExecutorService.shutdownNow();
 		this.snmp.close();
@@ -187,8 +225,17 @@ public final class SNMPUtils {
 		private final Target<Address> target;
 		private final List<PDU> pduList;
 		private final SNMPDataOperator snmpDataOperator;
-		
-		public SNMPProcessor(String identifiedKey, TargetHost targetHost, List<PDU> pduList, 
+
+		/**
+		 * Instantiates a new Snmp processor.
+		 *
+		 * @param identifiedKey    the identified key
+		 * @param targetHost       the target host
+		 * @param pduList          the pdu list
+		 * @param snmpDataOperator the snmp data operator
+		 * @throws ProcessorConfigException the processor config exception
+		 */
+		public SNMPProcessor(String identifiedKey, TargetHost targetHost, List<PDU> pduList,
 				SNMPDataOperator snmpDataOperator) throws ProcessorConfigException {
 			if (identifiedKey == null || targetHost == null || pduList == null 
 					|| pduList.isEmpty() || snmpDataOperator == null) {

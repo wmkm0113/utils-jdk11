@@ -17,9 +17,22 @@
 package org.nervousync.enumerations.snmp;
 
 /**
+ * The enum Snmp version.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 25, 2017 9:59:05 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 25, 2017 9:59:05 PM $
  */
 public enum SNMPVersion {
-	VERSION1, VERSION2C, VERSION3
+	/**
+	 * Version 1 snmp version.
+	 */
+	VERSION1,
+	/**
+	 * Version 2 c snmp version.
+	 */
+	VERSION2C,
+	/**
+	 * Version 3 snmp version.
+	 */
+	VERSION3
 }

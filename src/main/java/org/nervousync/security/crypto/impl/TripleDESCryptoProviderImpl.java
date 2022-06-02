@@ -9,8 +9,19 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 
+/**
+ * The type Triple des crypto provider.
+ */
 public final class TripleDESCryptoProviderImpl extends SymmetricCryptoProvider {
 
+    /**
+     * Instantiates a new Triple des crypto provider.
+     *
+     * @param cipherConfig the cipher config
+     * @param cryptoMode   the crypto mode
+     * @param keyBytes     the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public TripleDESCryptoProviderImpl(CipherConfig cipherConfig, CryptoMode cryptoMode, byte[] keyBytes)
             throws CryptoException {
         super(cipherConfig, cryptoMode, new CipherKey(keyBytes));

@@ -16,6 +16,7 @@
  */
 package org.nervousync.beans.xml.files;
 
+import jakarta.xml.bind.annotation.*;
 import org.nervousync.commons.adapter.xml.CDataAdapter;
 import org.nervousync.commons.adapter.xml.DateTimeAdapter;
 import org.nervousync.beans.core.BeanObject;
@@ -23,9 +24,6 @@ import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.SecurityUtils;
 import org.nervousync.utils.StringUtils;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.util.Date;
@@ -33,11 +31,13 @@ import java.util.Objects;
 
 /**
  * The type Segmentation item.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $Date: 2018-10-15 12:41
  */
-@XmlRootElement(name = "segment-item")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "segment_item")
+@XmlRootElement(name = "segment_item")
+@XmlAccessorType(XmlAccessType.NONE)
 public class SegmentationItem extends BeanObject {
 	
 	private static final long serialVersionUID = 2993229461743423521L;
@@ -45,38 +45,47 @@ public class SegmentationItem extends BeanObject {
 	/**
 	 * Item position
 	 */
+	@XmlElement(name = "position")
 	private long position;
 	/**
 	 * Block item size
 	 */
+	@XmlElement(name = "block_size")
 	private long blockSize;
 	/**
 	 * Item identified value of MD5
 	 */
+	@XmlElement(name = "md5")
 	private String md5;
 	/**
 	 * Item identified value of SHA256
 	 */
+	@XmlElement(name = "sha")
 	private String sha;
 	/**
 	 * Item data info
 	 */
+	@XmlElement(name = "data_info")
 	@XmlJavaTypeAdapter(CDataAdapter.class)
 	private String dataInfo;
+	/**
+	 * Current time
+	 */
+	@XmlElement(name = "current_time")
 	@XmlJavaTypeAdapter(DateTimeAdapter.class)
 	private Date currentTime;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public SegmentationItem() {
-	
 	}
-	
+
 	/**
 	 * Constructor for define segmentation item
-	 * @param position					Item position
-	 * @param dataContent				Item data content
+	 *
+	 * @param position    Item position
+	 * @param dataContent Item data content
 	 */
 	public SegmentationItem(long position, byte[] dataContent) {
 		this.md5 = ConvertUtils.byteToHex(SecurityUtils.MD5(dataContent));
@@ -86,36 +95,46 @@ public class SegmentationItem extends BeanObject {
 		this.dataInfo = StringUtils.base64Encode(dataContent);
 		this.currentTime = new Date();
 	}
-	
+
 	/**
+	 * Gets position.
+	 *
 	 * @return the position
 	 */
 	public long getPosition() {
 		return position;
 	}
-	
+
 	/**
+	 * Gets block size.
+	 *
 	 * @return the totalSize
 	 */
 	public long getBlockSize() {
 		return blockSize;
 	}
-	
+
 	/**
+	 * Gets md 5.
+	 *
 	 * @return the md5
 	 */
 	public String getMd5() {
 		return md5;
 	}
-	
+
 	/**
+	 * Gets sha.
+	 *
 	 * @return the sha
 	 */
 	public String getSha() {
 		return sha;
 	}
-	
+
 	/**
+	 * Gets data info.
+	 *
 	 * @return the dataInfo
 	 */
 	public String getDataInfo() {
@@ -123,15 +142,18 @@ public class SegmentationItem extends BeanObject {
 	}
 
 	/**
+	 * Gets current time.
+	 *
 	 * @return the current time
 	 */
 	public Date getCurrentTime() {
 		return currentTime == null ? null : (Date)currentTime.clone();
 	}
-	
+
 	/**
 	 * Validate this item data
-	 * @return	<code>true</code> for valid, <code>false</code> for invalid
+	 *
+	 * @return <code>true</code> for valid, <code>false</code> for invalid
 	 */
 	public boolean securityCheck() {
 		byte[] dataContent = StringUtils.base64Decode(this.dataInfo);

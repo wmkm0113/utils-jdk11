@@ -21,11 +21,16 @@ import org.nervousync.beans.converter.provider.ConvertProvider;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Parse base 64 provider.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/25/2020 2:56 PM $
+ * @version $Revision : 1.0 $ $Date: 8/25/2020 2:56 PM $
  */
 public final class ParseBase64Provider implements ConvertProvider {
 
+	/**
+	 * Instantiates a new Parse base 64 provider.
+	 */
 	public ParseBase64Provider() {
 	}
 	@Override
@@ -35,7 +40,7 @@ public final class ParseBase64Provider implements ConvertProvider {
 
 	@Override
 	public <T> T convert(Object origObj, Class<T> targetClass) {
-		Object object = StringUtils.base64Decode((String)origObj);
+		byte[] object = StringUtils.base64Decode((String)origObj);
 		if (targetClass.isInstance(object)) {
 			return targetClass.cast(object);
 		}

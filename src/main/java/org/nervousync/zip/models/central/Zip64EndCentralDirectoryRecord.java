@@ -17,8 +17,10 @@
 package org.nervousync.zip.models.central;
 
 /**
+ * The type Zip 64 end central directory record.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:28:52 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:28:52 PM $
  */
 public final class Zip64EndCentralDirectoryRecord {
 
@@ -34,10 +36,15 @@ public final class Zip64EndCentralDirectoryRecord {
 	private long offsetStartCenDirWRTStartDiskNo;
 	private byte[] extensibleDataSector;
 
+	/**
+	 * Instantiates a new Zip 64 end central directory record.
+	 */
 	public Zip64EndCentralDirectoryRecord() {
 	}
-	
+
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public long getSignature() {
@@ -45,6 +52,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(long signature) {
@@ -52,6 +61,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets record size.
+	 *
 	 * @return the recordSize
 	 */
 	public long getRecordSize() {
@@ -59,6 +70,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets record size.
+	 *
 	 * @param recordSize the recordSize to set
 	 */
 	public void setRecordSize(long recordSize) {
@@ -66,6 +79,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets made version.
+	 *
 	 * @return the madeVersion
 	 */
 	public int getMadeVersion() {
@@ -73,6 +88,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets made version.
+	 *
 	 * @param madeVersion the madeVersion to set
 	 */
 	public void setMadeVersion(int madeVersion) {
@@ -80,6 +97,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets extract needed.
+	 *
 	 * @return the extractNeeded
 	 */
 	public int getExtractNeeded() {
@@ -87,6 +106,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets extract needed.
+	 *
 	 * @param extractNeeded the extractNeeded to set
 	 */
 	public void setExtractNeeded(int extractNeeded) {
@@ -94,6 +115,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets index.
+	 *
 	 * @return the index
 	 */
 	public int getIndex() {
@@ -101,6 +124,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets index.
+	 *
 	 * @param index the index to set
 	 */
 	public void setIndex(int index) {
@@ -108,6 +133,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets start of central directory.
+	 *
 	 * @return the startOfCentralDirectory
 	 */
 	public int getStartOfCentralDirectory() {
@@ -115,6 +142,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets start of central directory.
+	 *
 	 * @param startOfCentralDirectory the startOfCentralDirectory to set
 	 */
 	public void setStartOfCentralDirectory(int startOfCentralDirectory) {
@@ -122,6 +151,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets total entries in central directory on this disk.
+	 *
 	 * @return the totalEntriesInCentralDirectoryOnThisDisk
 	 */
 	public long getTotalEntriesInCentralDirectoryOnThisDisk() {
@@ -129,6 +160,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets total entries in central directory on this disk.
+	 *
 	 * @param totalEntriesInCentralDirectoryOnThisDisk the totalEntriesInCentralDirectoryOnThisDisk to set
 	 */
 	public void setTotalEntriesInCentralDirectoryOnThisDisk(long totalEntriesInCentralDirectoryOnThisDisk) {
@@ -136,6 +169,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets total entries in central directory.
+	 *
 	 * @return the totalEntriesInCentralDirectory
 	 */
 	public long getTotalEntriesInCentralDirectory() {
@@ -143,6 +178,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets total entries in central directory.
+	 *
 	 * @param totalEntriesInCentralDirectory the totalEntriesInCentralDirectory to set
 	 */
 	public void setTotalEntriesInCentralDirectory(long totalEntriesInCentralDirectory) {
@@ -150,6 +187,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets size of central directory.
+	 *
 	 * @return the sizeOfCentralDirectory
 	 */
 	public long getSizeOfCentralDirectory() {
@@ -157,6 +196,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets size of central directory.
+	 *
 	 * @param sizeOfCentralDirectory the sizeOfCentralDirectory to set
 	 */
 	public void setSizeOfCentralDirectory(long sizeOfCentralDirectory) {
@@ -164,6 +205,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Gets offset start cen dir wrt start disk no.
+	 *
 	 * @return the offsetStartCenDirWRTStartDiskNo
 	 */
 	public long getOffsetStartCenDirWRTStartDiskNo() {
@@ -171,6 +214,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets offset start cen dir wrt start disk no.
+	 *
 	 * @param offsetStartCenDirWRTStartDiskNo the offsetStartCenDirWRTStartDiskNo to set
 	 */
 	public void setOffsetStartCenDirWRTStartDiskNo(long offsetStartCenDirWRTStartDiskNo) {
@@ -178,6 +223,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Get extensible data sector byte [ ].
+	 *
 	 * @return the extensibleDataSector
 	 */
 	public byte[] getExtensibleDataSector() {
@@ -185,6 +232,8 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
+	 * Sets extensible data sector.
+	 *
 	 * @param extensibleDataSector the extensibleDataSector to set
 	 */
 	public void setExtensibleDataSector(byte[] extensibleDataSector) {

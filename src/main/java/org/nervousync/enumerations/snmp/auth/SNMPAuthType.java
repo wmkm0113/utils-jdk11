@@ -17,9 +17,22 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
+ * The enum Snmp auth type.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 27, 2017 1:57:59 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 1:57:59 PM $
  */
 public enum SNMPAuthType {
-	NOAUTH_NOPRIV, AUTH_NOPRIV, AUTH_PRIV
+	/**
+	 * Noauth nopriv snmp auth type.
+	 */
+	NOAUTH_NOPRIV,
+	/**
+	 * Auth nopriv snmp auth type.
+	 */
+	AUTH_NOPRIV,
+	/**
+	 * Auth priv snmp auth type.
+	 */
+	AUTH_PRIV
 }

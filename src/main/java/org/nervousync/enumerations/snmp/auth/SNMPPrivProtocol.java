@@ -17,9 +17,18 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
+ * The enum Snmp priv protocol.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 27, 2017 2:17:22 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 2:17:22 PM $
  */
 public enum SNMPPrivProtocol {
-	PrivDES, Priv3DES
+	/**
+	 * Priv des snmp priv protocol.
+	 */
+	PrivDES,
+	/**
+	 * Priv 3 des snmp priv protocol.
+	 */
+	Priv3DES
 }

@@ -28,8 +28,10 @@ import org.nervousync.commons.io.NervousyncRandomAccessFile;
 import org.nervousync.zip.ZipFile;
 
 /**
+ * The type Part input stream.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 10:30:23 AM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 10:30:23 AM $
  */
 public class PartInputStream extends InputStream {
 
@@ -44,6 +46,17 @@ public class PartInputStream extends InputStream {
 	private int aesBytesReturned = 0;
 	private final boolean isAESEncryptedFile;
 
+	/**
+	 * Instantiates a new Part input stream.
+	 *
+	 * @param zipFile            the zip file
+	 * @param currentIndex       the current index
+	 * @param seekPosition       the seek position
+	 * @param length             the length
+	 * @param decryptor          the decryptor
+	 * @param isAESEncryptedFile the is aes encrypted file
+	 * @throws IOException the io exception
+	 */
 	public PartInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition,
 	                       final long length, final Decryptor decryptor, final boolean isAESEncryptedFile)
 			throws IOException {
@@ -150,7 +163,13 @@ public class PartInputStream extends InputStream {
 		this.readBytes += length;
 		return length;
 	}
-	
+
+	/**
+	 * Seek.
+	 *
+	 * @param pos the pos
+	 * @throws IOException the io exception
+	 */
 	public void seek(long pos) throws IOException {
 		this.input.seek(pos);
 	}
@@ -158,11 +177,21 @@ public class PartInputStream extends InputStream {
 	public void close() throws IOException {
 		this.input.close();
 	}
-	
+
+	/**
+	 * Seek to end.
+	 *
+	 * @throws IOException the io exception
+	 */
 	protected void seekToEnd() throws IOException {
 		this.seek(this.length);
 	}
-	
+
+	/**
+	 * Check and read aes mac bytes.
+	 *
+	 * @throws IOException the io exception
+	 */
 	protected void checkAndReadAESMacBytes() throws IOException {
 		if (this.isAESEncryptedFile
 				&& (this.decryptor instanceof AESDecryptor)) {

@@ -24,11 +24,13 @@ import java.util.List;
 
 /**
  * Segmentation item define
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jun 9, 2015 9:43:23 AM $
+ * @version $Revision : 1.0 $ $Date: Jun 9, 2015 9:43:23 AM $
  */
-@XmlRootElement(name = "segment-file")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "segment_file")
+@XmlRootElement(name = "segment_file")
+@XmlAccessorType(XmlAccessType.NONE)
 public class SegmentationFile extends BeanObject {
 
 	/**
@@ -39,45 +41,51 @@ public class SegmentationFile extends BeanObject {
 	/**
 	 * File total size
 	 */
+	@XmlElement(name = "total_size")
 	private long totalSize;
 	/**
 	 * File total size
 	 */
+	@XmlElement(name = "block_size")
 	private int blockSize;
 	/**
 	 * File extension name
 	 */
+	@XmlElement(name = "ext_name")
 	private String extName;
 	/**
 	 * Item identified value of MD5
 	 */
+	@XmlElement(name = "md5")
 	private String md5;
 	/**
 	 * Item identified value of SHA256
 	 */
+	@XmlElement(name = "sha")
 	private String sha;
 	/**
 	 * Item data info
 	 */
-	@XmlElementWrapper(name = "segment-items")
-	@XmlElement(name = "segment-item")
+	@XmlElementWrapper(name = "segment_item_list")
+	@XmlElement(name = "segment_item")
 	private List<SegmentationItem> segmentationItemList;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public SegmentationFile() {
 		
 	}
-	
+
 	/**
 	 * Constructor for define segmentation item
-	 * @param extName					File extension name
-	 * @param totalSize					File total size
-	 * @param blockSize					Item block size
-	 * @param md5   				    File MD5
-	 * @param sha   				    File SHA256
-	 * @param segmentationItemList   	Block item list
+	 *
+	 * @param extName              File extension name
+	 * @param totalSize            File total size
+	 * @param blockSize            Item block size
+	 * @param md5                  File MD5
+	 * @param sha                  File SHA256
+	 * @param segmentationItemList Block item list
 	 */
 	public SegmentationFile(String extName, long totalSize, int blockSize, String md5, String sha,
 	                        List<SegmentationItem> segmentationItemList) {
@@ -88,27 +96,57 @@ public class SegmentationFile extends BeanObject {
 		this.sha = sha;
 		this.segmentationItemList = segmentationItemList;
 	}
-	
+
+	/**
+	 * Gets total size.
+	 *
+	 * @return the total size
+	 */
 	public long getTotalSize() {
 		return totalSize;
 	}
-	
+
+	/**
+	 * Gets block size.
+	 *
+	 * @return the block size
+	 */
 	public int getBlockSize() {
 		return blockSize;
 	}
-	
+
+	/**
+	 * Gets ext name.
+	 *
+	 * @return the ext name
+	 */
 	public String getExtName() {
 		return extName;
 	}
-	
+
+	/**
+	 * Gets md 5.
+	 *
+	 * @return the md 5
+	 */
 	public String getMd5() {
 		return md5;
 	}
-	
+
+	/**
+	 * Gets sha.
+	 *
+	 * @return the sha
+	 */
 	public String getSha() {
 		return sha;
 	}
-	
+
+	/**
+	 * Gets segmentation item list.
+	 *
+	 * @return the segmentation item list
+	 */
 	public List<SegmentationItem> getSegmentationItemList() {
 		return segmentationItemList;
 	}

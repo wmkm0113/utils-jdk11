@@ -9,12 +9,26 @@ import org.nervousync.exceptions.crypto.CryptoException;
 
 import java.security.MessageDigest;
 
+/**
+ * The type Sha 1 digest provider.
+ */
 public final class SHA1DigestProviderImpl extends BaseDigestProvider {
 
+    /**
+     * Instantiates a new Sha 1 digest provider.
+     *
+     * @throws CryptoException the crypto exception
+     */
     public SHA1DigestProviderImpl() throws CryptoException {
         super("SHA-1", new byte[0]);
     }
 
+    /**
+     * Instantiates a new Sha 1 digest provider.
+     *
+     * @param keyBytes the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public SHA1DigestProviderImpl(byte[] keyBytes) throws CryptoException {
         super("SHA-1/HMAC", keyBytes);
     }

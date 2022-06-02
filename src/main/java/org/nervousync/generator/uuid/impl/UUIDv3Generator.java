@@ -9,6 +9,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+/**
+ * The type Uui dv 3 generator.
+ */
 @GeneratorProvider(IDUtils.UUIDv3)
 public final class UUIDv3Generator extends UUIDGenerator {
 

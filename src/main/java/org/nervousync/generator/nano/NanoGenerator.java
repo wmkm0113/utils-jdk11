@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 
+/**
+ * The type Nano generator.
+ */
 @GeneratorProvider(IDUtils.NANO_ID)
 public final class NanoGenerator implements IGenerator {
 
@@ -21,6 +24,12 @@ public final class NanoGenerator implements IGenerator {
     private char[] alphabetArray = DEFAULT_ALPHABET.toCharArray();
     private int generateLength = DEFAULT_LENGTH;
 
+    /**
+     * Config.
+     *
+     * @param alphabetConfig the alphabet config
+     * @param generateLength generate length
+     */
     public void config(final String alphabetConfig, final int generateLength) {
         if (StringUtils.notBlank(alphabetConfig)) {
             if (alphabetConfig.length() > 255) {

@@ -19,8 +19,10 @@ package org.nervousync.exceptions.xml;
 import org.nervousync.utils.ObjectUtils;
 
 /**
+ * The type Xml exception.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Mar 28, 2016 11:41:40 AM $
+ * @version $Revision : 1.0 $ $Date: Mar 28, 2016 11:41:40 AM $
  */
 public class XmlException extends RuntimeException {
 
@@ -28,17 +30,26 @@ public class XmlException extends RuntimeException {
 	 * 
 	 */
 	private static final long serialVersionUID = 6884662156679821138L;
-	
+
+	/**
+	 * Instantiates a new Xml exception.
+	 */
 	public XmlException() {
 		super();
 	}
-	
+
+	/**
+	 * Instantiates a new Xml exception.
+	 *
+	 * @param cause the cause
+	 */
 	public XmlException(Throwable cause) {
 		super(cause);
 	}
 
 	/**
 	 * Create a new BeansException with the specified message.
+	 *
 	 * @param msg the detail message
 	 */
 	public XmlException(String msg) {
@@ -48,7 +59,8 @@ public class XmlException extends RuntimeException {
 	/**
 	 * Create a new BeansException with the specified message
 	 * and root cause.
-	 * @param msg the detail message
+	 *
+	 * @param msg   the detail message
 	 * @param cause the root cause
 	 */
 	public XmlException(String msg, Throwable cause) {

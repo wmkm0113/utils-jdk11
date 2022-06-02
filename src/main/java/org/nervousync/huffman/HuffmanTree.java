@@ -19,23 +19,32 @@ package org.nervousync.huffman;
 import java.util.Hashtable;
 
 /**
+ * The type Huffman tree.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 3, 2017 4:39:41 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 3, 2017 4:39:41 PM $
  */
 public final class HuffmanTree {
 
 	private int nodeCount = 0;
 	private HuffmanNode rootNode = null;
 	private Hashtable<String, Object> codeMapping = new Hashtable<>();
-	
+
+	/**
+	 * Instantiates a new Huffman tree.
+	 */
 	public HuffmanTree() {
-		
 	}
 
 	private HuffmanTree(Hashtable<String, Object> codeMapping) {
 		this.codeMapping = codeMapping;
 	}
 
+	/**
+	 * Insert node.
+	 *
+	 * @param huffmanNode the huffman node
+	 */
 	public void insertNode(HuffmanNode huffmanNode) {
 		if (this.rootNode == null) {
 			this.rootNode = huffmanNode;
@@ -65,7 +74,10 @@ public final class HuffmanTree {
 		}
 		this.nodeCount++;
 	}
-	
+
+	/**
+	 * Build.
+	 */
 	public void build() {
 		while (this.nodeCount > 1) {
 			this.mergeNode();
@@ -73,12 +85,25 @@ public final class HuffmanTree {
 		
 		this.buildCodeMapping(this.rootNode, "");
 	}
-	
+
+	/**
+	 * Encode string string.
+	 *
+	 * @param codeMapping the code mapping
+	 * @param content     the content
+	 * @return the string
+	 */
 	public static String encodeString(Hashtable<String, Object> codeMapping, String content) {
 		HuffmanTree huffmanTree = new HuffmanTree(codeMapping);
 		return huffmanTree.encodeString(content).getHuffmanValue();
 	}
-	
+
+	/**
+	 * Encode string huffman object.
+	 *
+	 * @param content the content
+	 * @return the huffman object
+	 */
 	public HuffmanObject encodeString(String content) {
 		if (content == null || content.length() == 0) {
 			return null;

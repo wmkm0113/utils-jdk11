@@ -10,12 +10,26 @@ import org.nervousync.exceptions.crypto.CryptoException;
 
 import java.security.MessageDigest;
 
+/**
+ * The type Sm 3 digest provider.
+ */
 public final class SM3DigestProviderImpl extends BaseDigestProvider {
 
+    /**
+     * Instantiates a new Sm 3 digest provider.
+     *
+     * @throws CryptoException the crypto exception
+     */
     public SM3DigestProviderImpl() throws CryptoException {
         super("SM3", new byte[0]);
     }
 
+    /**
+     * Instantiates a new Sm 3 digest provider.
+     *
+     * @param keyBytes the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public SM3DigestProviderImpl(byte[] keyBytes) throws CryptoException {
         super("SM3/HMAC", keyBytes);
     }

@@ -45,11 +45,11 @@ public final class ZipOptions implements Cloneable {
 	/**
 	 * Encrypt files status
 	 */
-	private boolean encryptFiles = Boolean.FALSE;
+	private boolean encryptFiles;
 	/**
 	 * Encrypt method
 	 */
-	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
+	private int encryptionMethod;
 	/**
 	 * Status of read hidden file
 	 */
@@ -57,11 +57,11 @@ public final class ZipOptions implements Cloneable {
 	/**
 	 * Encrypt/Decrypt password
 	 */
-	private char[] password = null;
+	private final char[] password;
 	/**
 	 * AES key length
 	 */
-	private int aesKeyStrength = Globals.DEFAULT_VALUE_INT;
+	private final int aesKeyStrength;
 	/**
 	 * Include root folder
 	 */
@@ -96,7 +96,7 @@ public final class ZipOptions implements Cloneable {
 	 * Default Constructor
 	 */
 	private ZipOptions() {
-		
+		this(Boolean.FALSE, Globals.DEFAULT_VALUE_STRING, ZipConstants.ENC_NO_ENCRYPTION, Globals.DEFAULT_VALUE_INT);
 	}
 	
 	/**
@@ -104,9 +104,7 @@ public final class ZipOptions implements Cloneable {
 	 * @param password  password
 	 */
 	private ZipOptions(String password) {
-		this.encryptFiles = true;
-		this.password = password.toCharArray();
-		this.encryptionMethod = ZipConstants.ENC_METHOD_STANDARD;
+		this(Boolean.TRUE, password, ZipConstants.ENC_METHOD_STANDARD, Globals.DEFAULT_VALUE_INT);
 	}
 	
 	/**
@@ -115,9 +113,14 @@ public final class ZipOptions implements Cloneable {
 	 * @param aesKeyStrength AES key strength
 	 */
 	private ZipOptions(String password, int aesKeyStrength) {
-		this.encryptFiles = true;
+		this(Boolean.TRUE, password, ZipConstants.ENC_METHOD_AES, aesKeyStrength);
+	}
+
+	private ZipOptions(final boolean encryptFiles, final String password,
+	                   final int encryptionMethod, final int aesKeyStrength) {
+		this.encryptFiles = encryptFiles;
 		this.password = password.toCharArray();
-		this.encryptionMethod = ZipConstants.ENC_METHOD_AES;
+		this.encryptionMethod = encryptionMethod;
 		this.aesKeyStrength = aesKeyStrength;
 	}
 
@@ -152,8 +155,7 @@ public final class ZipOptions implements Cloneable {
 	 * @return generated instance
 	 * @throws ZipException if password is null
 	 */
-	public static ZipOptions aesEncryptOptions(String password)
-			throws ZipException {
+	public static ZipOptions aesEncryptOptions(String password) throws ZipException {
 		return ZipOptions.aesEncryptOptions(password, Globals.DEFAULT_VALUE_INT);
 	}
 
@@ -165,8 +167,7 @@ public final class ZipOptions implements Cloneable {
 	 * @return generated instance
 	 * @throws ZipException if password is null
 	 */
-	public static ZipOptions aesEncryptOptions(String password,
-			int aesKeyLength) throws ZipException {
+	public static ZipOptions aesEncryptOptions(String password, int aesKeyLength) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
 			throw new ZipException("Password is null");
 		}
@@ -230,12 +231,38 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
-	 * Sets compression level.
-	 *
-	 * @param compressionLevel the compressionLevel to set
+	 * Compress level fastest.
 	 */
-	public void setCompressionLevel(int compressionLevel) {
-		this.compressionLevel = compressionLevel;
+	public void compressLevelFastest() {
+		this.compressionLevel = ZipConstants.DEFLATE_LEVEL_FASTEST;
+	}
+
+	/**
+	 * Compress level fast.
+	 */
+	public void compressLevelFast() {
+		this.compressionLevel = ZipConstants.DEFLATE_LEVEL_FAST;
+	}
+
+	/**
+	 * Compress level normal.
+	 */
+	public void compressLevelNormal() {
+		this.compressionLevel = ZipConstants.DEFLATE_LEVEL_NORMAL;
+	}
+
+	/**
+	 * Compress level maximum.
+	 */
+	public void compressLevelMaximum() {
+		this.compressionLevel = ZipConstants.DEFLATE_LEVEL_MAXIMUM;
+	}
+
+	/**
+	 * Compress level ultra.
+	 */
+	public void compressLevelUltra() {
+		this.compressionLevel = ZipConstants.DEFLATE_LEVEL_ULTRA;
 	}
 
 	/**

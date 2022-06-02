@@ -36,6 +36,8 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
+ * The type Gene x 509 trust manager.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 12/18/2020 8:51 PM $
  */
@@ -56,6 +58,14 @@ public class GeneX509TrustManager implements X509TrustManager {
 		this.initManager();
 	}
 
+	/**
+	 * Init gene x 509 trust manager.
+	 *
+	 * @param passPhrase    the pass phrase
+	 * @param trustCertList the trust cert list
+	 * @return the gene x 509 trust manager
+	 * @throws CertInfoException the cert info exception
+	 */
 	public static GeneX509TrustManager init(String passPhrase, List<TrustCert> trustCertList) throws CertInfoException {
 		return new GeneX509TrustManager(passPhrase, trustCertList);
 	}

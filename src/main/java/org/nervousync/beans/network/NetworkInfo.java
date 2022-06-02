@@ -32,8 +32,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * System interface network information
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 24, 2015 11:53:10 AM $
+ * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:53:10 AM $
  */
 public final class NetworkInfo implements Serializable {
 
@@ -68,11 +69,12 @@ public final class NetworkInfo implements Serializable {
 	 * IP address list of interface configured
 	 */
 	private final List<IPAddressInfo> ipAddressList = new ArrayList<>();
-	
+
 	/**
 	 * Constructor for NetworkInfo
-	 * @param networkInterface			NetworkInterface value
-	 * @throws NetworkInfoException        If value of NetworkInterface is null or catch other SocketException
+	 *
+	 * @param networkInterface NetworkInterface value
+	 * @throws NetworkInfoException If value of NetworkInterface is null or catch other SocketException
 	 */
 	public NetworkInfo(NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {
@@ -118,8 +120,10 @@ public final class NetworkInfo implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
+	 * Is virtual boolean.
+	 *
 	 * @return the virtual
 	 */
 	public boolean isVirtual() {
@@ -127,6 +131,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets display name.
+	 *
 	 * @return the displayName
 	 */
 	public String getDisplayName() {
@@ -134,6 +140,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets mac address.
+	 *
 	 * @return the macAddress
 	 */
 	public String getMacAddress() {
@@ -141,6 +149,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets ip address list.
+	 *
 	 * @return the getIpAddressList
 	 */
 	public List<IPAddressInfo> getIpAddressList() {
@@ -148,6 +158,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets i pv 4 address list.
+	 *
 	 * @return the IPv4 address list
 	 */
 	public List<IPAddressInfo> getIPv4AddressList() {
@@ -161,6 +173,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets i pv 6 address list.
+	 *
 	 * @return the IPv6 address list
 	 */
 	public List<IPAddressInfo> getIPv6AddressList() {
@@ -174,6 +188,8 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
+	 * Gets serial version uid.
+	 *
 	 * @return the serialVersionUID
 	 */
 	public static long getSerialVersionUID() {
@@ -182,8 +198,9 @@ public final class NetworkInfo implements Serializable {
 
 	/**
 	 * Configured ip address information
+	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision: 1.0 $ $Date: Jul 2, 2018 $
+	 * @version $Revision : 1.0 $ $Date: Jul 2, 2018 $
 	 */
 	public static final class IPAddressInfo implements Serializable {
 
@@ -208,11 +225,12 @@ public final class NetworkInfo implements Serializable {
 		 * Is link local status
 		 */
 		private final boolean linkLocal;
-		
+
 		/**
 		 * Constructor
-		 * @param inetAddress				InetAddress object read from interface
-		 * @throws IPAddressException		Given inetAddress is null
+		 *
+		 * @param inetAddress InetAddress object read from interface
+		 * @throws IPAddressException Given inetAddress is null
 		 */
 		public IPAddressInfo(InetAddress inetAddress) throws IPAddressException {
 			if (inetAddress == null) {
@@ -231,6 +249,8 @@ public final class NetworkInfo implements Serializable {
 		}
 
 		/**
+		 * Gets ip address.
+		 *
 		 * @return the ipAddress
 		 */
 		public String getIpAddress() {
@@ -238,6 +258,8 @@ public final class NetworkInfo implements Serializable {
 		}
 
 		/**
+		 * Is local boolean.
+		 *
 		 * @return the local
 		 */
 		public boolean isLocal() {
@@ -245,6 +267,8 @@ public final class NetworkInfo implements Serializable {
 		}
 
 		/**
+		 * Is loop boolean.
+		 *
 		 * @return the loop
 		 */
 		public boolean isLoop() {
@@ -252,17 +276,31 @@ public final class NetworkInfo implements Serializable {
 		}
 
 		/**
+		 * Is link local boolean.
+		 *
 		 * @return the linkLocal
 		 */
 		public boolean isLinkLocal() {
 			return linkLocal;
 		}
 	}
-	
+
+	/**
+	 * Is i pv 4 address boolean.
+	 *
+	 * @param ipAddress the ip address
+	 * @return the boolean
+	 */
 	public static boolean isIPv4Address(String ipAddress) {
 		return StringUtils.matches(ipAddress, REGEX_IPv4);
 	}
 
+	/**
+	 * Is i pv 6 address boolean.
+	 *
+	 * @param ipAddress the ip address
+	 * @return the boolean
+	 */
 	public static boolean isIPv6Address(String ipAddress) {
 		return StringUtils.matches(ipAddress, REGEX_IPv6);
 	}

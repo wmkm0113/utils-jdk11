@@ -29,8 +29,10 @@ import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Split output stream.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:57:01 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:57:01 PM $
  */
 public class SplitOutputStream extends OutputStream {
 	
@@ -57,11 +59,26 @@ public class SplitOutputStream extends OutputStream {
 	private final long splitLength;
 	private int currentSplitFileIndex;
 	private long bytesWrittenForThisPart;
-	
+
+	/**
+	 * Instantiates a new Split output stream.
+	 *
+	 * @param filePath the file path
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws ZipException          the zip exception
+	 */
 	public SplitOutputStream(String filePath) throws FileNotFoundException, ZipException {
 		this(filePath, Globals.DEFAULT_VALUE_LONG);
 	}
-	
+
+	/**
+	 * Instantiates a new Split output stream.
+	 *
+	 * @param savePath    the save path
+	 * @param splitLength the split length
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws ZipException          the zip exception
+	 */
 	public SplitOutputStream(String savePath, long splitLength) throws FileNotFoundException, ZipException {
 		if (splitLength >= 0 && splitLength < ZipConstants.MIN_SPLIT_LENGTH) {
 			throw new ZipException("split length less than minimum allowed split length of " + ZipConstants.MIN_SPLIT_LENGTH +" Bytes");
@@ -74,7 +91,7 @@ public class SplitOutputStream extends OutputStream {
 			this.filePath = savePath.substring(0, savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
 			this.fileName = StringUtils.stripFilenameExtension(savePath.substring(savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR) + 1));
 		}
-		this.dataOutput = new NervousyncRandomAccessFile(savePath, Globals.WRITE_MODE);
+		this.dataOutput = new NervousyncRandomAccessFile(savePath, Boolean.TRUE);
 		this.currentFullPath = savePath;
 		this.splitLength = splitLength;
 		this.currentSplitFileIndex = 0;
@@ -134,7 +151,14 @@ public class SplitOutputStream extends OutputStream {
 			this.bytesWrittenForThisPart += len;
 		}
 	}
-	
+
+	/**
+	 * Check buffer size and start next split file boolean.
+	 *
+	 * @param bufferSize the buffer size
+	 * @return the boolean
+	 * @throws ZipException the zip exception
+	 */
 	public boolean checkBufferSizeAndStartNextSplitFile(int bufferSize) throws ZipException {
 		if (bufferSize < 0) {
 			throw new ZipException("negative buffer size for checkBuffSizeAndStartNextSplitFile");
@@ -164,10 +188,22 @@ public class SplitOutputStream extends OutputStream {
 		}
 	}
 
+	/**
+	 * Seek.
+	 *
+	 * @param pos the pos
+	 * @throws IOException the io exception
+	 */
 	public void seek(long pos) throws IOException {
 		this.dataOutput.seek(pos);
 	}
 
+	/**
+	 * Gets file pointer.
+	 *
+	 * @return the file pointer
+	 * @throws IOException the io exception
+	 */
 	public long getFilePointer() throws IOException {
 		return this.dataOutput.getFilePointer();
 	}
@@ -176,11 +212,18 @@ public class SplitOutputStream extends OutputStream {
 		
 	}
 
+	/**
+	 * Is split zip file boolean.
+	 *
+	 * @return the boolean
+	 */
 	public boolean isSplitZipFile() {
 		return this.splitLength != Globals.DEFAULT_VALUE_LONG;
 	}
 
 	/**
+	 * Gets split length.
+	 *
 	 * @return the splitLength
 	 */
 	public long getSplitLength() {
@@ -188,6 +231,8 @@ public class SplitOutputStream extends OutputStream {
 	}
 
 	/**
+	 * Gets current split file index.
+	 *
 	 * @return the currentSplitFileIndex
 	 */
 	public int getCurrentSplitFileIndex() {
@@ -222,7 +267,7 @@ public class SplitOutputStream extends OutputStream {
 				throw new IOException("Cannot create split file!");
 			}
 
-			this.dataOutput = new NervousyncRandomAccessFile(this.currentFullPath, Globals.WRITE_MODE);
+			this.dataOutput = new NervousyncRandomAccessFile(this.currentFullPath, Boolean.TRUE);
 			this.currentSplitFileIndex++;
 		} catch (ZipException e) {
 			throw new IOException(e);
@@ -235,7 +280,7 @@ public class SplitOutputStream extends OutputStream {
 			
 			for (long headerSignature : HEADER_SIGNATURES) {
 				if (headerSignature != ZipConstants.SPLITSIG && headerSignature == signature) {
-					return true;
+					return Boolean.TRUE;
 				}
 			}
 		}

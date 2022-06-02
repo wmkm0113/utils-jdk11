@@ -14,8 +14,18 @@ import org.nervousync.utils.StringUtils;
 
 import java.security.MessageDigest;
 
+/**
+ * The type Sha 2 digest provider.
+ */
 public final class SHA2DigestProviderImpl extends BaseDigestProvider {
 
+    /**
+     * Instantiates a new Sha 2 digest provider.
+     *
+     * @param algorithm the algorithm
+     * @param keyBytes  the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public SHA2DigestProviderImpl(String algorithm, byte[] keyBytes) throws CryptoException {
         super(algorithm, keyBytes);
     }

@@ -22,11 +22,19 @@ import java.io.OutputStream;
 import org.nervousync.zip.ZipFile;
 
 /**
+ * The type Zip output stream.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 1, 2017 12:37:14 PM $
+ * @version $Revision : 1.0 $ $Date: Dec 1, 2017 12:37:14 PM $
  */
 public class ZipOutputStream extends DeflaterOutputStream {
 
+	/**
+	 * Instantiates a new Zip output stream.
+	 *
+	 * @param outputStream the output stream
+	 * @param zipFile      the zip file
+	 */
 	public ZipOutputStream(OutputStream outputStream, ZipFile zipFile) {
 		super(outputStream, zipFile);
 	}

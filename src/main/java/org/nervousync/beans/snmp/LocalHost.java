@@ -18,8 +18,9 @@ package org.nervousync.beans.snmp;
 
 /**
  * Local Host Configuration
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 27, 2017 2:41:56 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 2:41:56 PM $
  */
 public class LocalHost extends TargetHost {
 
@@ -28,6 +29,9 @@ public class LocalHost extends TargetHost {
 	 */
 	private static final long serialVersionUID = -2104360473618474099L;
 
+	/**
+	 * Instantiates a new Local host.
+	 */
 	public LocalHost() {
 		super("127.0.0.1", "public");
 	}

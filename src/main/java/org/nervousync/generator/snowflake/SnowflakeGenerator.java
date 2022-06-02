@@ -8,6 +8,9 @@ import org.nervousync.utils.IDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The type Snowflake generator.
+ */
 @GeneratorProvider(IDUtils.SNOWFLAKE)
 public final class SnowflakeGenerator implements IGenerator {
 
@@ -42,6 +45,13 @@ public final class SnowflakeGenerator implements IGenerator {
      */
     private long lastTime = Globals.DEFAULT_VALUE_LONG;
 
+    /**
+     * Config.
+     *
+     * @param referenceTime the reference time
+     * @param deviceId      the device id
+     * @param instanceId    the instance id
+     */
     public void config(final long referenceTime, final long deviceId, final long instanceId) {
         this.referenceTime = (referenceTime >= 0L) ? referenceTime : Globals.DEFAULT_REFERENCE_TIME;
         this.deviceId = (deviceId >= 0L && deviceId <= 64L) ? deviceId : DEFAULT_ID;

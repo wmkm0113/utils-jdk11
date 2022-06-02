@@ -2,8 +2,8 @@ package org.nervousync.restful.converter.core;
 
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.MIMETypes;
 import org.nervousync.restful.converter.ParameterConverter;
+import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
@@ -27,13 +27,13 @@ public final class BeanObjectConverter implements ParameterConverter {
 		if (object instanceof BeanObject) {
 			for (String mediaType : mediaTypes) {
 				switch (mediaType) {
-					case MIMETypes.MIME_TYPE_JSON:
+					case FileUtils.MIME_TYPE_JSON:
 						return ((BeanObject) object).toJson();
-					case MIMETypes.MIME_TYPE_TEXT_XML:
-					case MIMETypes.MIME_TYPE_XML:
+					case FileUtils.MIME_TYPE_TEXT_XML:
+					case FileUtils.MIME_TYPE_XML:
 						return ((BeanObject) object).toXML();
-					case MIMETypes.MIME_TYPE_TEXT_YAML:
-					case MIMETypes.MIME_TYPE_YAML:
+					case FileUtils.MIME_TYPE_TEXT_YAML:
+					case FileUtils.MIME_TYPE_YAML:
 						return ((BeanObject) object).toYaml();
 				}
 			}

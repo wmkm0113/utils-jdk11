@@ -19,10 +19,15 @@ package org.nervousync.mail.config;
 
 import jakarta.xml.bind.annotation.*;
 import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
+
+import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 /**
  * The type Mail config.
@@ -34,16 +39,35 @@ public final class MailConfig extends BeanObject {
 
     private static final long serialVersionUID = -506685998495058905L;
 
+    /**
+     * Mail account username
+     */
     @XmlElement(name = "username")
     private String userName;
+    /**
+     * Mail account password
+     */
     @XmlElement(name = "password")
     private String passWord;
+    /**
+     * Mail send server config
+     */
     @XmlElement(name = "send-config")
     private ServerConfig sendConfig;
+    /**
+     * Mail receive server config
+     */
     @XmlElement(name = "receive-config")
     private ServerConfig receiveConfig;
+    /**
+     * Attaches file storage path
+     */
     @XmlElement(name = "storage-path")
     private String storagePath;
+    @XmlElement
+    private String certificate;
+    @XmlElement(name = "private-key")
+    private String privateKey;
 
     /**
      * Instantiates a new Mail config.
@@ -51,13 +75,16 @@ public final class MailConfig extends BeanObject {
     public MailConfig() {
     }
 
-    private MailConfig(String userName, String passWord, ServerConfig sendConfig,
-                       ServerConfig receiveConfig, String storagePath) {
+    private MailConfig(final String userName, final String passWord,
+                       final ServerConfig sendConfig, final ServerConfig receiveConfig,
+                       final String storagePath, final String certificate, final String privateKey) {
         this.userName = userName;
         this.passWord = passWord;
         this.sendConfig = sendConfig;
         this.receiveConfig = receiveConfig;
         this.storagePath = storagePath;
+        this.certificate = certificate;
+        this.privateKey = privateKey;
     }
 
     /**
@@ -159,6 +186,45 @@ public final class MailConfig extends BeanObject {
         this.storagePath = storagePath;
     }
 
+    /**
+     * Gets certificate.
+     *
+     * @return the certificate
+     */
+    public String getCertificate() {
+        return certificate;
+    }
+
+    /**
+     * Sets certificate.
+     *
+     * @param certificate the certificate
+     */
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
+
+    /**
+     * Gets private key.
+     *
+     * @return the private key
+     */
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    /**
+     * Sets private key.
+     *
+     * @param privateKey the private key
+     */
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    /**
+     * The type Builder.
+     */
     public static final class Builder {
 
         private String userName;
@@ -166,10 +232,20 @@ public final class MailConfig extends BeanObject {
         private ServerConfig sendConfig;
         private ServerConfig receiveConfig;
         private String storagePath;
+        private String certificate;
+        private String privateKey;
 
+        /**
+         * Instantiates a new Builder.
+         */
         public Builder() {
         }
 
+        /**
+         * Instantiates a new Builder.
+         *
+         * @param mailConfig the mail config
+         */
         public Builder(MailConfig mailConfig) {
             if (mailConfig != null) {
                 this.userName = mailConfig.getUserName();
@@ -177,9 +253,19 @@ public final class MailConfig extends BeanObject {
                 this.sendConfig = mailConfig.getSendConfig();
                 this.receiveConfig = mailConfig.getReceiveConfig();
                 this.storagePath = mailConfig.getStoragePath();
+                this.certificate = mailConfig.getCertificate();
+                this.privateKey = mailConfig.getPrivateKey();
             }
         }
 
+        /**
+         * Authentication builder.
+         *
+         * @param userName the username
+         * @param passWord the password
+         * @return the builder
+         * @throws BuilderException the builder exception
+         */
         public Builder authentication(String userName, String passWord) throws BuilderException {
             if (!StringUtils.matches(userName, RegexGlobals.EMAIL_ADDRESS)) {
                 throw new BuilderException("Invalid username");
@@ -189,6 +275,12 @@ public final class MailConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Send config builder.
+         *
+         * @param sendConfig send config
+         * @return the builder
+         */
         public Builder sendConfig(ServerConfig sendConfig) {
             if (sendConfig != null) {
                 this.sendConfig = sendConfig;
@@ -196,6 +288,12 @@ public final class MailConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Receive config builder.
+         *
+         * @param receiveConfig receive config
+         * @return the builder
+         */
         public Builder receiveConfig(ServerConfig receiveConfig) {
             if (receiveConfig != null) {
                 this.receiveConfig = receiveConfig;
@@ -203,6 +301,13 @@ public final class MailConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Storage path builder.
+         *
+         * @param storagePath the storage path
+         * @return the builder
+         * @throws BuilderException the builder exception
+         */
         public Builder storagePath(String storagePath) throws BuilderException {
             if (StringUtils.isEmpty(storagePath) || !FileUtils.isExists(storagePath)) {
                 throw new BuilderException("Storage path not exists! ");
@@ -211,11 +316,31 @@ public final class MailConfig extends BeanObject {
             return this;
         }
 
+        public Builder signer(final X509Certificate x509Certificate, final PrivateKey privateKey) {
+            if (x509Certificate != null && privateKey != null) {
+                try {
+                    this.certificate = StringUtils.base64Encode(x509Certificate.getEncoded());
+                    this.privateKey = StringUtils.base64Encode(privateKey.getEncoded());
+                } catch (CertificateEncodingException e) {
+                    this.certificate = Globals.DEFAULT_VALUE_STRING;
+                    this.privateKey = Globals.DEFAULT_VALUE_STRING;
+                }
+            }
+            return this;
+        }
+
+        /**
+         * Build mail config.
+         *
+         * @return the mail config
+         * @throws BuilderException the builder exception
+         */
         public MailConfig build() throws BuilderException {
             if (this.sendConfig == null && this.receiveConfig == null) {
                 throw new BuilderException("Unknown server config! ");
             }
-            return new MailConfig(this.userName, this.passWord, this.sendConfig, this.receiveConfig, this.storagePath);
+            return new MailConfig(this.userName, this.passWord, this.sendConfig, this.receiveConfig,
+                    this.storagePath, this.certificate, this.privateKey);
         }
     }
 }

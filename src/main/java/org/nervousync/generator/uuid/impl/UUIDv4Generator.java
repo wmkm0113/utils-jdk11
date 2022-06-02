@@ -7,6 +7,9 @@ import org.nervousync.utils.IDUtils;
 import java.security.SecureRandom;
 import java.util.UUID;
 
+/**
+ * The type Uui dv 4 generator.
+ */
 @GeneratorProvider(IDUtils.UUIDv4)
 public final class UUIDv4Generator extends UUIDGenerator {
 

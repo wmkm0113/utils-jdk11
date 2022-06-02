@@ -19,8 +19,10 @@ package org.nervousync.exceptions.zip;
 import org.nervousync.utils.ObjectUtils;
 
 /**
+ * The type Zip exception.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 22, 2017 4:08:31 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 22, 2017 4:08:31 PM $
  */
 public class ZipException extends RuntimeException {
 
@@ -28,17 +30,26 @@ public class ZipException extends RuntimeException {
 	 * 
 	 */
 	private static final long serialVersionUID = -4262795571663295796L;
-	
+
+	/**
+	 * Instantiates a new Zip exception.
+	 */
 	public ZipException() {
 		super();
 	}
-	
+
+	/**
+	 * Instantiates a new Zip exception.
+	 *
+	 * @param cause the cause
+	 */
 	public ZipException(Throwable cause) {
 		super(cause);
 	}
 
 	/**
 	 * Create a new ZipException with the specified message.
+	 *
 	 * @param msg the detail message
 	 */
 	public ZipException(String msg) {
@@ -48,7 +59,8 @@ public class ZipException extends RuntimeException {
 	/**
 	 * Create a new ZipException with the specified message
 	 * and root cause.
-	 * @param msg the detail message
+	 *
+	 * @param msg   the detail message
 	 * @param cause the root cause
 	 */
 	public ZipException(String msg, Throwable cause) {

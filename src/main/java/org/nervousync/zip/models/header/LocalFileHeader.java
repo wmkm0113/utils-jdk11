@@ -27,8 +27,10 @@ import org.nervousync.zip.crypto.impl.aes.AESCrypto;
 import org.nervousync.zip.models.header.utils.HeaderOperator;
 
 /**
+ * The type Local file header.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 2:29:26 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:29:26 PM $
  */
 public final class LocalFileHeader extends FileHeader {
 
@@ -36,17 +38,24 @@ public final class LocalFileHeader extends FileHeader {
 	private long offsetStartOfData;
 	private boolean writeCompressSizeInZip64ExtraRecord;
 
-	public LocalFileHeader() {
-	}
-	
 	/**
-	 * @return the extraField
+	 * Instantiates a new Local file header.
 	 */
-	public byte[] getExtraField() {
-		return extraField == null ? new byte[0] : extraField.clone();
+	public LocalFileHeader() {
 	}
 
 	/**
+	 * Get extra field byte [ ].
+	 *
+	 * @return the extraField
+	 */
+	public byte[] getExtraField() {
+		return extraField == null ? new byte[Globals.INITIALIZE_INT_VALUE] : extraField.clone();
+	}
+
+	/**
+	 * Sets extra field.
+	 *
 	 * @param extraField the extraField to set
 	 */
 	public void setExtraField(byte[] extraField) {
@@ -54,6 +63,8 @@ public final class LocalFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Gets offset start of data.
+	 *
 	 * @return the offsetStartOfData
 	 */
 	public long getOffsetStartOfData() {
@@ -61,6 +72,8 @@ public final class LocalFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets offset start of data.
+	 *
 	 * @param offsetStartOfData the offsetStartOfData to set
 	 */
 	public void setOffsetStartOfData(long offsetStartOfData) {
@@ -68,6 +81,8 @@ public final class LocalFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Is write compress size in zip 64 extra record boolean.
+	 *
 	 * @return the writeCompressSizeInZip64ExtraRecord
 	 */
 	public boolean isWriteCompressSizeInZip64ExtraRecord() {
@@ -75,12 +90,21 @@ public final class LocalFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets write compress size in zip 64 extra record.
+	 *
 	 * @param writeCompressSizeInZip64ExtraRecord the writeCompressSizeInZip64ExtraRecord to set
 	 */
 	public void setWriteCompressSizeInZip64ExtraRecord(boolean writeCompressSizeInZip64ExtraRecord) {
 		this.writeCompressSizeInZip64ExtraRecord = writeCompressSizeInZip64ExtraRecord;
 	}
-	
+
+	/**
+	 * Verify password boolean.
+	 *
+	 * @param input the input
+	 * @return the boolean
+	 * @throws ZipException the zip exception
+	 */
 	public boolean verifyPassword(DataInput input) throws ZipException {
 		if (!this.isEncrypted()) {
 			return true;

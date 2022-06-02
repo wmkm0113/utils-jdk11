@@ -75,8 +75,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Register CRC algorithm
 	 *
-	 * @param algorithm		Algorithm name
-	 * @param crcConfig		CRC config
+	 * @param algorithm Algorithm name
+	 * @param crcConfig CRC config
 	 */
 	public static void registerConfig(String algorithm, CRCConfig crcConfig) {
 		if (StringUtils.isEmpty(algorithm) || crcConfig == null) {
@@ -93,6 +93,11 @@ public final class SecurityUtils implements Serializable {
 		REGISTERED_CRC_CONFIG.put(algorithm, crcConfig);
 	}
 
+	/**
+	 * Registered crc list.
+	 *
+	 * @return the list
+	 */
 	public static List<String> registeredCRC() {
 		return new ArrayList<>(REGISTERED_CRC_CONFIG.keySet());
 	}
@@ -100,9 +105,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize CRC provider
 	 *
-	 * @param algorithm		CRC algorithm
-	 * @return				Initialized crc provider
-	 * @throws CryptoException	CRC algorithm not found
+	 * @param algorithm CRC algorithm
+	 * @return Initialized crc provider
+	 * @throws CryptoException CRC algorithm not found
 	 */
 	public static SecureProvider CRC(String algorithm) throws CryptoException {
 		if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
@@ -111,6 +116,12 @@ public final class SecurityUtils implements Serializable {
 		throw new CryptoException("Unknown algorithm: " + algorithm);
 	}
 
+	/**
+	 * Crc config optional.
+	 *
+	 * @param algorithm the algorithm
+	 * @return the optional
+	 */
 	public static Optional<CRCConfig> crcConfig(String algorithm) {
 		return Optional.ofNullable(REGISTERED_CRC_CONFIG.get(algorithm));
 	}
@@ -122,8 +133,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * MD5 Digest Provider
 	 *
-	 * @return	Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider MD5() throws CryptoException {
 		return new MD5DigestProviderImpl();
@@ -132,8 +143,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate MD5 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] MD5(Object source) {
 		try {
@@ -149,9 +160,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacMD5 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacMD5(byte[] keyBytes) throws CryptoException {
 		return new MD5DigestProviderImpl(keyBytes);
@@ -160,9 +171,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacMD5 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacMD5(byte[] keyBytes, Object source) {
 		try {
@@ -178,8 +189,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA1 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	@Deprecated
 	public static SecureProvider SHA1() throws CryptoException {
@@ -189,8 +200,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA1 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	@Deprecated
 	public static byte[] SHA1(Object source) {
@@ -207,9 +218,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA1 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA1(byte[] keyBytes) throws CryptoException {
 		return new SHA1DigestProviderImpl(keyBytes);
@@ -218,9 +229,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA1 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA1(byte[] keyBytes, Object source) {
 		try {
@@ -236,8 +247,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA-224 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA224() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-224", new byte[0]);
@@ -246,8 +257,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-224 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA224(Object source) {
 		try {
@@ -263,9 +274,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA224 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA224(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-224/HMAC", keyBytes);
@@ -274,9 +285,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA224 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA224(byte[] keyBytes, Object source) {
 		try {
@@ -292,8 +303,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA-256 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA256() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-256", new byte[0]);
@@ -302,8 +313,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-256 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA256(Object source) {
 		try {
@@ -319,9 +330,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA256 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA256(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-256/HMAC", keyBytes);
@@ -330,9 +341,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA256 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA256(byte[] keyBytes, Object source) {
 		try {
@@ -348,8 +359,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA-384 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA384() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-384", new byte[0]);
@@ -358,8 +369,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-384 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA384(Object source) {
 		try {
@@ -375,9 +386,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA384 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA384(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-384/HMAC", keyBytes);
@@ -386,9 +397,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA384 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA384(byte[] keyBytes, Object source) {
 		try {
@@ -404,8 +415,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA-512 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA512() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512", new byte[0]);
@@ -414,8 +425,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-512 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA512(Object source) {
 		try {
@@ -431,9 +442,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA512 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA512(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512/HMAC", keyBytes);
@@ -442,9 +453,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA512 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA512(byte[] keyBytes, Object source) {
 		try {
@@ -460,8 +471,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA-512/224 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA512_224() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512/224", new byte[0]);
@@ -470,8 +481,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-512/224 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA512_224(Object source) {
 		try {
@@ -487,9 +498,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA512/224 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA512_224(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512/224/HMAC", keyBytes);
@@ -498,9 +509,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA512/224 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA512_224(byte[] keyBytes, Object source) {
 		try {
@@ -516,8 +527,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA512-256 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA512_256() throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512/256", new byte[0]);
@@ -526,8 +537,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA-512/256 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA512_256(Object source) {
 		try {
@@ -543,9 +554,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA512/256 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA512_256(byte[] keyBytes) throws CryptoException {
 		return new SHA2DigestProviderImpl("SHA-512/256/HMAC", keyBytes);
@@ -554,9 +565,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA512/256 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA512_256(byte[] keyBytes, Object source) {
 		try {
@@ -572,8 +583,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA3-224 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA3_224() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-224");
@@ -582,8 +593,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA3-224 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA3_224(Object source) {
 		try {
@@ -599,9 +610,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA3-224 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA3_224(byte[] keyBytes) throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-224/HMAC", keyBytes);
@@ -610,9 +621,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA3-224 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA3_224(byte[] keyBytes, Object source) {
 		try {
@@ -628,8 +639,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA3-256 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA3_256() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-256");
@@ -638,8 +649,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA3-256 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA3_256(Object source) {
 		try {
@@ -655,9 +666,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA3-256 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA3_256(byte[] keyBytes) throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-256/HMAC", keyBytes);
@@ -666,9 +677,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA3-256 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA3_256(byte[] keyBytes, Object source) {
 		try {
@@ -684,8 +695,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA3-384 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA3_384() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-384");
@@ -694,8 +705,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA3-384 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA3_384(Object source) {
 		try {
@@ -711,9 +722,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA3-384 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA3_384(byte[] keyBytes) throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-384/HMAC", keyBytes);
@@ -722,9 +733,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA3-384 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA3_384(byte[] keyBytes, Object source) {
 		try {
@@ -740,8 +751,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHA3-512 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHA3_512() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-512");
@@ -750,8 +761,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHA3-512 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHA3_512(Object source) {
 		try {
@@ -767,9 +778,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSHA3-512 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSHA3_512(byte[] keyBytes) throws CryptoException {
 		return new SHA3DigestProviderImpl("SHA3-512/HMAC", keyBytes);
@@ -778,9 +789,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSHA3-512 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSHA3_512(byte[] keyBytes, Object source) {
 		try {
@@ -796,8 +807,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHAKE128 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHAKE128() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHAKE128");
@@ -806,8 +817,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHAKE128 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHAKE128(Object source) {
 		try {
@@ -823,8 +834,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SHAKE256 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SHAKE256() throws CryptoException {
 		return new SHA3DigestProviderImpl("SHAKE256");
@@ -833,8 +844,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SHAKE256 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SHAKE256(Object source) {
 		try {
@@ -850,8 +861,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * SM3 Digest Provider
 	 *
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM3() throws CryptoException {
 		return new SM3DigestProviderImpl();
@@ -860,8 +871,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate SM3 value of given source object
 	 *
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param source Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] SM3(Object source) {
 		try {
@@ -877,9 +888,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * HmacSM3 Digest Provider
 	 *
-	 * @param keyBytes		Hmac key bytes
-	 * @return				Initialized provider
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes Hmac key bytes
+	 * @return Initialized provider
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider HmacSM3(byte[] keyBytes) throws CryptoException {
 		return new SM3DigestProviderImpl(keyBytes);
@@ -888,9 +899,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Calculate HmacSM3 value of given source object
 	 *
-	 * @param keyBytes	Hmac key bytes
-	 * @param source	Input source
-	 * @return			Calculate result or zero length array if process has error
+	 * @param keyBytes Hmac key bytes
+	 * @param source   Input source
+	 * @return Calculate result or zero length array if process has error
 	 */
 	public static byte[] HmacSM3(byte[] keyBytes, Object source) {
 		try {
@@ -910,9 +921,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize DES encryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			DES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes DES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider DESEncryptor(byte[] keyBytes) throws CryptoException {
 		return DESEncryptor("CBC", "PKCS5Padding", keyBytes);
@@ -921,11 +932,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize DES encryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			DES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes DES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider DESEncryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return new DESCryptoProviderImpl(new CipherConfig("DES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
@@ -934,9 +945,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize DES decryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			DES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes DES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider DESDecryptor(byte[] keyBytes) throws CryptoException {
 		return DESDecryptor("CBC", "PKCS5Padding", keyBytes);
@@ -945,11 +956,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize DES decryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			DES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes DES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider DESDecryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return new DESCryptoProviderImpl(new CipherConfig("DES", mode, padding), CryptoMode.DECRYPT, keyBytes);
@@ -958,7 +969,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate DES key
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] DESKey() {
 		try {
@@ -971,9 +982,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize TripleDES encryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			TripleDES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes TripleDES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider TripleDESEncryptor(byte[] keyBytes) throws CryptoException {
 		return TripleDESEncryptor("CBC", "PKCS5Padding", keyBytes);
@@ -982,11 +993,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize TripleDES encryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			TripleDES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes TripleDES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider TripleDESEncryptor(String mode, String padding, byte[] keyBytes)
 			throws CryptoException {
@@ -997,9 +1008,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize TripleDES decryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			TripleDES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes TripleDES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider TripleDESDecryptor(byte[] keyBytes) throws CryptoException {
 		return TripleDESDecryptor("CBC", "PKCS5Padding", keyBytes);
@@ -1008,11 +1019,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize TripleDES decryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			TripleDES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes TripleDES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider TripleDESDecryptor(String mode, String padding, byte[] keyBytes)
 			throws CryptoException {
@@ -1023,7 +1034,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate TripleDES key
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] TripleDESKey() {
 		try {
@@ -1036,9 +1047,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 encryptor using default cipher mode, padding mode and random algorithm
 	 *
-	 * @param keyBytes			SM4 key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes SM4 key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Encryptor(byte[] keyBytes) throws CryptoException {
 		return SM4Encryptor("CBC", "NoPadding", keyBytes, "SHA1PRNG");
@@ -1047,11 +1058,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 encryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			SM4 key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes SM4 key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Encryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return SM4Encryptor(mode, padding, keyBytes, "SHA1PRNG");
@@ -1060,12 +1071,12 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 encryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			SM4 key bytes
-	 * @param randomAlgorithm 	Random algorithm
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode            Block cipher mode
+	 * @param padding         Padding mode
+	 * @param keyBytes        SM4 key bytes
+	 * @param randomAlgorithm Random algorithm
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Encryptor(String mode, String padding, byte[] keyBytes, String randomAlgorithm)
 			throws CryptoException {
@@ -1076,9 +1087,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 decryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			SM4 key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes SM4 key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Decryptor(byte[] keyBytes) throws CryptoException {
 		return SM4Decryptor("CBC", "PKCS5Padding", keyBytes, "SHA1PRNG");
@@ -1087,11 +1098,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 decryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			SM4 key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes SM4 key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Decryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return SM4Decryptor(mode, padding, keyBytes, "SHA1PRNG");
@@ -1100,12 +1111,12 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM4 decryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			SM4 key bytes
-	 * @param randomAlgorithm 	Random algorithm
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode            Block cipher mode
+	 * @param padding         Padding mode
+	 * @param keyBytes        SM4 key bytes
+	 * @param randomAlgorithm Random algorithm
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM4Decryptor(String mode, String padding, byte[] keyBytes, String randomAlgorithm)
 			throws CryptoException {
@@ -1116,7 +1127,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate SM4 key
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] SM4Key() {
 		try {
@@ -1133,9 +1144,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA encryptor using default padding mode: PKCS1Padding
 	 *
-	 * @param publicKey			RSA PublicKey
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param publicKey RSA PublicKey
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSAEncryptor(PublicKey publicKey) throws CryptoException {
 		return RSAEncryptor("PKCS1Padding", publicKey);
@@ -1144,10 +1155,10 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA encryptor using given padding mode
 	 *
-	 * @param padding			Padding mode
-	 * @param publicKey			RSA PublicKey
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param padding   Padding mode
+	 * @param publicKey RSA PublicKey
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSAEncryptor(String padding, PublicKey publicKey) throws CryptoException {
 		return new RSACryptoProviderImpl(new CipherConfig("RSA", "ECB", padding),
@@ -1157,9 +1168,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA decryptor using default padding mode: PKCS1Padding
 	 *
-	 * @param privateKey		RSA PrivateKey
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param privateKey RSA PrivateKey
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSADecryptor(PrivateKey privateKey) throws CryptoException {
 		return RSADecryptor("PKCS1Padding", privateKey);
@@ -1168,10 +1179,10 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA decryptor using given padding mode
 	 *
-	 * @param padding			Padding mode
-	 * @param privateKey		RSA PrivateKey
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param padding    Padding mode
+	 * @param privateKey RSA PrivateKey
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSADecryptor(String padding, PrivateKey privateKey) throws CryptoException {
 		return new RSACryptoProviderImpl(new CipherConfig("RSA", "ECB", padding),
@@ -1181,9 +1192,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA Signer using default algorithm: SHA256withRSA
 	 *
-	 * @param privateKey		RSA PrivateKey
-	 * @return					Initialized signer
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param privateKey RSA PrivateKey
+	 * @return Initialized signer
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSASigner(PrivateKey privateKey) throws CryptoException {
 		return RSASigner("SHA256withRSA", privateKey);
@@ -1192,10 +1203,10 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA Signer using given algorithm
 	 *
-	 * @param algorithm 		Sign algorithm
-	 * @param privateKey		RSA PrivateKey
-	 * @return					Initialized signer
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param algorithm  Sign algorithm
+	 * @param privateKey RSA PrivateKey
+	 * @return Initialized signer
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSASigner(String algorithm, PrivateKey privateKey) throws CryptoException {
 		return new RSACryptoProviderImpl(
@@ -1206,9 +1217,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA signature verifier using default algorithm: SHA256withRSA
 	 *
-	 * @param publicKey			RSA PublicKey
-	 * @return					Initialized signer
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param publicKey RSA PublicKey
+	 * @return Initialized signer
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSAVerifier(PublicKey publicKey) throws CryptoException {
 		return RSAVerifier("SHA256withRSA", publicKey);
@@ -1217,10 +1228,10 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize RSA signature verifier using given algorithm
 	 *
-	 * @param algorithm 		Sign algorithm
-	 * @param publicKey			RSA PublicKey
-	 * @return					Initialized signer
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param algorithm Sign algorithm
+	 * @param publicKey RSA PublicKey
+	 * @return Initialized signer
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider RSAVerifier(String algorithm, PublicKey publicKey) throws CryptoException {
 		return new RSACryptoProviderImpl(
@@ -1231,7 +1242,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate RSA KeyPair using default Key size: 1024 and default random algorithm: SHA1PRNG
 	 *
-	 * @return	Generated key pair
+	 * @return Generated key pair
 	 */
 	public static KeyPair RSAKeyPair() {
 		return RSAKeyPair(1024, "SHA1PRNG");
@@ -1240,8 +1251,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate RSA KeyPair using given Key size and default random algorithm: SHA1PRNG
 	 *
-	 * @param keySize		RSA key size
-	 * @return	Generated key pair
+	 * @param keySize RSA key size
+	 * @return Generated key pair
 	 */
 	public static KeyPair RSAKeyPair(int keySize) {
 		return RSAKeyPair(keySize, "SHA1PRNG");
@@ -1250,9 +1261,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate RSA KeyPair using given Key size and random algorithm
 	 *
-	 * @param keySize			RSA key size
-	 * @param randomAlgorithm	Random algorithm
-	 * @return	Generated key pair
+	 * @param keySize         RSA key size
+	 * @param randomAlgorithm Random algorithm
+	 * @return Generated key pair
 	 */
 	public static KeyPair RSAKeyPair(int keySize, String randomAlgorithm) {
 		return CertificateUtils.KeyPair("RSA", randomAlgorithm, keySize);
@@ -1261,9 +1272,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM2 encryptor
 	 *
-	 * @param publicKey			SM2 PublicKey
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param publicKey SM2 PublicKey
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM2Encryptor(PublicKey publicKey) throws CryptoException {
 		return new SM2CryptoProviderImpl(
@@ -1274,9 +1285,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM2 decryptor
 	 *
-	 * @param privateKey		SM2 PrivateKey
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param privateKey SM2 PrivateKey
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM2Decryptor(PrivateKey privateKey) throws CryptoException {
 		return new SM2CryptoProviderImpl(
@@ -1287,9 +1298,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM2 signer
 	 *
-	 * @param privateKey		SM2 PrivateKey
-	 * @return					Initialized signer
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param privateKey SM2 PrivateKey
+	 * @return Initialized signer
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM2Signer(PrivateKey privateKey) throws CryptoException {
 		return new SM2CryptoProviderImpl(
@@ -1300,9 +1311,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize SM2 signature verifier
 	 *
-	 * @param publicKey			SM2 PublicKey
-	 * @return					Initialized verifier
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param publicKey SM2 PublicKey
+	 * @return Initialized verifier
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider SM2Verifier(PublicKey publicKey) throws CryptoException {
 		return new SM2CryptoProviderImpl(
@@ -1313,7 +1324,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate SM2 KeyPair using default random algorithm: SHA1PRNG
 	 *
-	 * @return	Generated key pair
+	 * @return Generated key pair
 	 */
 	public static KeyPair SM2KeyPair() {
 		return CertificateUtils.KeyPair("EC", "SHA1PRNG", Globals.INITIALIZE_INT_VALUE);
@@ -1322,8 +1333,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate SM2 KeyPair using given random algorithm
 	 *
-	 * @param randomAlgorithm	Random algorithm
-	 * @return	Generated key pair
+	 * @param randomAlgorithm Random algorithm
+	 * @return Generated key pair
 	 */
 	public static KeyPair SM2KeyPair(String randomAlgorithm) {
 		return CertificateUtils.KeyPair("EC", randomAlgorithm, Globals.DEFAULT_VALUE_INT);
@@ -1332,8 +1343,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Convert C1|C2|C3 to C1|C3|C2
 	 *
-	 * @param dataBytes		C1|C2|C3 data bytes
-	 * @return				C1|C3|C2 data bytes
+	 * @param dataBytes C1|C2|C3 data bytes
+	 * @return C1 |C3|C2 data bytes
 	 */
 	public static byte[] C1C2C3toC1C3C2(byte[] dataBytes) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
@@ -1346,8 +1357,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Convert C1|C3|C2 to C1|C2|C3
 	 *
-	 * @param dataBytes		C1|C3|C2 data bytes
-	 * @return				C1|C2|C3 data bytes
+	 * @param dataBytes C1|C3|C2 data bytes
+	 * @return C1 |C2|C3 data bytes
 	 */
 	public static byte[] C1C3C2toC1C2C3(byte[] dataBytes) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
@@ -1360,9 +1371,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize AES encryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			AES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes AES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider AESEncryptor(byte[] keyBytes) throws CryptoException {
 		return AESEncryptor("CBC", "PKCS5Padding", keyBytes);
@@ -1371,11 +1382,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize AES encryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			AES key bytes
-	 * @return					Initialized encryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes AES key bytes
+	 * @return Initialized encryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider AESEncryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return new AESCryptoProviderImpl(new CipherConfig("AES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
@@ -1384,9 +1395,9 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize AES decryptor using default cipher mode and padding mode
 	 *
-	 * @param keyBytes			AES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param keyBytes AES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider AESDecryptor(byte[] keyBytes) throws CryptoException {
 		return AESDecryptor("CBC", "PKCS5Padding", keyBytes);
@@ -1395,11 +1406,11 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Initialize AES decryptor
 	 *
-	 * @param mode 				Block cipher mode
-	 * @param padding 			Padding mode
-	 * @param keyBytes			AES key bytes
-	 * @return					Initialized decryptor
-	 * @throws CryptoException	Cipher transformation not found
+	 * @param mode     Block cipher mode
+	 * @param padding  Padding mode
+	 * @param keyBytes AES key bytes
+	 * @return Initialized decryptor
+	 * @throws CryptoException Cipher transformation not found
 	 */
 	public static SecureProvider AESDecryptor(String mode, String padding, byte[] keyBytes) throws CryptoException {
 		return new AESCryptoProviderImpl(new CipherConfig("AES", mode, padding), CryptoMode.DECRYPT, keyBytes);
@@ -1408,11 +1419,11 @@ public final class SecurityUtils implements Serializable {
 	/*
 	 * Key generators
 	 */
-	
+
 	/**
 	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 128
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES128Key() {
 		return AES128Key("SHA1PRNG");
@@ -1421,8 +1432,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 128
 	 *
-	 * @param randomAlgorithm 	Random algorithm
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @param randomAlgorithm Random algorithm
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES128Key(String randomAlgorithm) {
 		try {
@@ -1435,7 +1446,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 192
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES192Key() {
 		return AES192Key("SHA1PRNG");
@@ -1444,8 +1455,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 192
 	 *
-	 * @param randomAlgorithm 	Random algorithm
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @param randomAlgorithm Random algorithm
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES192Key(String randomAlgorithm) {
 		try {
@@ -1458,7 +1469,7 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate AES key using default random algorithm: SHA1PRNG, Key size: 256
 	 *
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES256Key() {
 		return AES256Key("SHA1PRNG");
@@ -1467,8 +1478,8 @@ public final class SecurityUtils implements Serializable {
 	/**
 	 * Generate AES key using given random algorithm: SHA1PRNG, Key size: 256
 	 *
-	 * @param randomAlgorithm 	Random algorithm
-	 * @return		Generated key bytes or 0 length byte array if process error
+	 * @param randomAlgorithm Random algorithm
+	 * @return Generated key bytes or 0 length byte array if process error
 	 */
 	public static byte[] AES256Key(String randomAlgorithm) {
 		try {

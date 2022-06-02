@@ -18,24 +18,52 @@ package org.nervousync.commons.core;
 
 /**
  * Regex Library
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Apr 10, 2017 5:23:06 PM $
+ * @version $Revision : 1.0 $ $Date: Apr 10, 2017 5:23:06 PM $
  */
 public final class RegexGlobals {
 
-	public static final String EMAIL_ADDRESS = 
+	/**
+	 * The constant EMAIL_ADDRESS.
+	 */
+	public static final String EMAIL_ADDRESS =
 		"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*" +
 		"[a-zA-Z0-9])?\\.)+(?:[A-Z]{2}|asia|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel)\\b";
+	/**
+	 * The constant UUID.
+	 */
 	public static final String UUID = "^([0-9a-f]{8}((-[0-9a-f]{4}){3})-[0-9a-f]{12})|([0-9a-f]{32})\\b";
+	/**
+	 * The constant MD5_VALUE.
+	 */
 	public static final String MD5_VALUE = "^[0-9a-f]{32}\\b";
-	
+
+	/**
+	 * The constant XML.
+	 */
 	public static final String XML = "<[a-zA-Z0-9]+[^>]*>(?:.|[\\r\\n])*?<\\/[a-zA-Z0-9]+>";
-	
+
+	/**
+	 * The constant IPV4_REGEX.
+	 */
 	public static final String IPV4_REGEX = "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$";
+	/**
+	 * The constant IPV6_REGEX.
+	 */
 	public static final String IPV6_REGEX = "(?ix)(?<![:.\\w])(?:[A-F0-9]{1,4}:){6}(?:[A-F0-9]{1,4}:[A-F0-9]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]))(?![:.\\w])";
+	/**
+	 * The constant IPV6_COMPRESS_REGEX.
+	 */
 	public static final String IPV6_COMPRESS_REGEX = "(?ix)(?<![:.\\w])(?:(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}|(?=(?:[A-F0-9]{0,4}:){0,7}[A-F0-9]{0,4}$)(([A-F0-9]{1,4}:){1,7}|:)((:[A-F0-9]{1,4}){1,7}|:)|(?:[A-F0-9]{1,4}:){7}:|:(:[A-F0-9]{1,4}){7})(?![:.\\w])";
 
+	/**
+	 * The constant LOCAL_FILE_PATH_REGEX.
+	 */
 	public static final String LOCAL_FILE_PATH_REGEX = "^(\\/.*)|(([a-zA-Z]{1}\\:\\\\).*)$";
 
+	/**
+	 * The constant PHONE_NUMBER.
+	 */
 	public static final String PHONE_NUMBER = "^(00|\\+)(\\d){1,}$";
 }

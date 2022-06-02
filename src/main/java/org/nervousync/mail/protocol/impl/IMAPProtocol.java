@@ -31,8 +31,9 @@ import java.util.List;
 
 /**
  * Implement IMAP protocol
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:58:05 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 7:58:05 PM $
  */
 public final class IMAPProtocol extends BaseProtocol implements SendOperator, ReceiveOperator {
 
@@ -40,7 +41,10 @@ public final class IMAPProtocol extends BaseProtocol implements SendOperator, Re
 	 * 
 	 */
 	private static final long serialVersionUID = 8284024432628098776L;
-	
+
+	/**
+	 * Instantiates a new Imap protocol.
+	 */
 	public IMAPProtocol() {
 		this.hostParam = "mail.imap.host";
 		this.portParam = "mail.imap.port";

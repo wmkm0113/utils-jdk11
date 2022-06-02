@@ -18,8 +18,9 @@ package org.nervousync.zip.engine;
 
 /**
  * Standard Crypto Engine
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 4:58:52 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 4:58:52 PM $
  */
 public class ZipCryptoEngine {
 
@@ -39,10 +40,18 @@ public class ZipCryptoEngine {
 			CRC_TABLE[i] = r;
 		}
 	}
-	
+
+	/**
+	 * Instantiates a new Zip crypto engine.
+	 */
 	public ZipCryptoEngine() {
 	}
-	
+
+	/**
+	 * Init keys.
+	 *
+	 * @param password the password
+	 */
 	public void initKeys(char[] password) {
 		this.keys[0] = 305419896;
 		this.keys[1] = 591751049;
@@ -53,13 +62,23 @@ public class ZipCryptoEngine {
 		}
 	}
 
+	/**
+	 * Update keys.
+	 *
+	 * @param b the b
+	 */
 	public void updateKeys(byte b) {
 		this.keys[0] = crc32(this.keys[0], b);
 		this.keys[1] += this.keys[0] & 0xff;
 		this.keys[1] = this.keys[1] * 134775813 + 1;
 		this.keys[2] = crc32(this.keys[2], (byte)(this.keys[1] >> 24));
 	}
-	
+
+	/**
+	 * Decrypt byte.
+	 *
+	 * @return the byte
+	 */
 	public byte decryptByte() {
 		int temp = this.keys[2] | 2;
 		return (byte)((temp * (temp ^ 1)) >>> 8);

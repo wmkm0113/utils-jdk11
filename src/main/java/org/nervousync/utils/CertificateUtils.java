@@ -29,44 +29,73 @@ import java.util.Date;
 import java.util.Optional;
 
 /**
- * The type Certificate utils.
+ * <h2 class="en">Certificate Utils</h2>
+ * <span class="en">
+ *     <ul>Generate Keypair</ul>
+ *     <ul>Signature and generate X.509 certificate</ul>
+ *     <ul>Parse X.509 certificate from certificate file, PKCS12 file or binary data arrays</ul>
+ *     <ul>Validate X.509 certificate period and signature</ul>
+ *     <ul>Read PublicKey/PrivateKey from binary data arrays or PKCS12 file</ul>
+ *     <ul>Signature and generate PKCS12 file</ul>
+ * </span>
+ * <h2 class="zhs">数字证书工具</h2>
+ * <span class="zhs">
+ *     <ul>生成密钥对</ul>
+ *     <ul>签发X.509证书</ul>
+ *     <ul>从证书文件、PKCS12文件或二进制数据中读取X.509证书</ul>
+ *     <ul>验证X.509证书的有效期、数字签名</ul>
+ *     <ul>从PKCS12文件或二进制数据中读取公钥和私钥</ul>
+ *     <ul>生成PKCS12文件</ul>
+ * </span>
  */
 public final class CertificateUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificateUtils.class);
 
     static {
+        /*
+         * <span class="en">Add Bouncy Castle Provider</span>
+         * <span class="zhs">添加Bouncy Castle算法库</span>
+         */
         Security.addProvider(new BouncyCastleProvider());
     }
 
     /**
-     * Generate KeyPair using given algorithm/random algorithm/key size
+     * <h3 class="en">Generate KeyPair using given algorithm/secure random algorithm/key size</h3>
+     * <h3 class="zhs">根据给定的算法、安全随机数算法、密钥长度生成密钥对</h3>
      *
-     * @param algorithm       Algorithm
-     * @param randomAlgorithm Random algorithm
-     * @param keySize         Key size
-     * @return Generated key pair
+     * @param algorithm       <span class="en">Algorithm</span>
+     *                        <span class="zhs">算法</span>
+     * @param randomAlgorithm <span class="en">Secure Random Algorithm</span>
+     *                        <span class="zhs">安全随机数算法</span>
+     * @param keySize         <span class="en">Key size</span>
+     *                        <span class="zhs">密钥长度</span>
+     * @return  <span class="en">Generated key pair</span>
+     *          <span class="zhs">生成的密钥对</span>
      */
-    public static KeyPair KeyPair(String algorithm, String randomAlgorithm, int keySize) {
+    public static KeyPair KeyPair(final String algorithm, final String randomAlgorithm, final int keySize) {
         if (keySize % 128 != 0) {
             LOGGER.error("Key size is invalid");
             return null;
         }
 
-        if (StringUtils.isEmpty(randomAlgorithm)) {
-            LOGGER.error("Random algorithm not configure, use default: SHA1PRNG");
-            randomAlgorithm = "SHA1PRNG";
-        }
-
         KeyPair keyPair = null;
         try {
+            SecureRandom secureRandom;
+            if (StringUtils.isEmpty(randomAlgorithm)) {
+                LOGGER.error("Random algorithm not configure, use default: SHA1PRNG");
+                secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            } else {
+                secureRandom = SecureRandom.getInstance(randomAlgorithm);
+            }
+
             //	Initialize keyPair instance
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm, "BC");
             if (algorithm.equalsIgnoreCase("EC")) {
                 ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("sm2p256v1");
-                keyPairGenerator.initialize(ecGenParameterSpec, SecureRandom.getInstance(randomAlgorithm));
+                keyPairGenerator.initialize(ecGenParameterSpec, secureRandom);
             } else {
-                keyPairGenerator.initialize(keySize, SecureRandom.getInstance(randomAlgorithm));
+                keyPairGenerator.initialize(keySize, secureRandom);
             }
             keyPair = keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
@@ -79,23 +108,33 @@ public final class CertificateUtils {
     }
 
     /**
-     * Convert public key instance to X.509 certificate
+     * <h3 class="en">Convert public key to X.509 certificate, signature certificate by given private key and signature algorithm</h3>
+     * <h3 class="zhs">转换PublicKey为X509证书，并使用给定的私钥和签名算法进行签名</h3>
      *
-     * @param publicKey     Public key
-     * @param serialNumber  Certificate serial number
-     * @param beginDate     Certificate begin date
-     * @param endDate       Certificate end date
-     * @param certName      Certificate name
-     * @param signKey       Certificate signer private key
-     * @param signAlgorithm Signature algorithm
-     * @return Generated X.509 certificate
+     * @param publicKey     <span class="en">Public key</span>
+     *                      <span class="zhs">公钥</span>
+     * @param serialNumber  <span class="en">Certificate Serial Number</span>
+     *                      <span class="zhs">证书的序列号</span>
+     * @param beginDate     <span class="en">Certificate Begin Date</span>
+     *                      <span class="zhs">证书有效期起始时间</span>
+     * @param endDate       <span class="en">Certificate End Date</span>
+     *                      <span class="zhs">证书有效期截至时间</span>
+     * @param commonName    <span class="en">Certificate Common Name</span>
+     *                      <span class="zhs">证书的公用名称（CN字段）</span>
+     * @param signKey       <span class="en">Certificate Signer Private Key</span>
+     *                      <span class="zhs">证书签发者的私钥</span>
+     * @param signAlgorithm <span class="en">Signature Algorithm</span>
+     *                      <span class="zhs">签名算法</span>
+     * @return  <span class="en">Generated X.509 certificate</span>
+     *          <span class="zhs">生成的X.509格式证书</span>
      */
-    public static X509Certificate x509(PublicKey publicKey, long serialNumber, Date beginDate, Date endDate,
-                                       String certName, PrivateKey signKey, String signAlgorithm) {
+    public static X509Certificate x509(final PublicKey publicKey, final long serialNumber,
+                                       final Date beginDate, final Date endDate, final String commonName,
+                                       final PrivateKey signKey, final String signAlgorithm) {
         if (publicKey == null || signKey == null || StringUtils.isEmpty(signAlgorithm)) {
             return null;
         }
-        X500Name subjectDN = new X500Name("CN=" + certName);
+        X500Name subjectDN = new X500Name("CN=" + commonName);
         SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
         X509v3CertificateBuilder x509v3CertificateBuilder =
                 new X509v3CertificateBuilder(subjectDN, BigInteger.valueOf(serialNumber),
@@ -116,44 +155,60 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read X.509 Certificate
+     * <h3 class="en">Read X.509 Certificate</h3>
+     * <h3 class="zhs">读取X.509格式的证书</h3>
      *
-     * @param certBytes Certificate data bytes
-     * @return Read X.509 certificate or null for invalid
+     * @param certBytes <span class="en">Certificate Data Bytes</span>
+     *                  <span class="zhs">证书的字节数组</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法，则返回null</span>
      */
-    public static X509Certificate x509(byte[] certBytes) {
+    public static X509Certificate x509(final byte[] certBytes) {
         return x509(certBytes, null, Boolean.FALSE);
     }
 
     /**
-     * Read X.509 Certificate
+     * <h3 class="en">Read X.509 Certificate and verified by given public key</h3>
+     * <h3 class="zhs">读取X.509格式的证书并使用给定的公钥验证证书签名</h3>
      *
-     * @param certBytes Certificate data bytes
-     * @param verifyKey Verifier key
-     * @return Read X.509 certificate or null for invalid
+     * @param certBytes <span class="en">Certificate Data Bytes</span>
+     *                  <span class="zhs">证书的字节数组</span>
+     * @param verifyKey <span class="en">Verifier Public Key</span>
+     *                  <span class="zhs">验证签名使用的公钥</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法或证书签名验证失败，则返回null</span>
      */
     public static X509Certificate x509(byte[] certBytes, PublicKey verifyKey) {
         return x509(certBytes, verifyKey, Boolean.FALSE);
     }
 
     /**
-     * Read X.509 Certificate
+     * <h3 class="en">Read X.509 Certificate and check certificate validity period</h3>
+     * <h3 class="zhs">读取X.509格式的证书并检查证书是否在有效期内</h3>
      *
-     * @param certBytes     Certificate data bytes
-     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return Read X.509 certificate or null for invalid
+     * @param certBytes <span class="en">Certificate Data Bytes</span>
+     *                  <span class="zhs">证书的字节数组</span>
+     * @param checkValidity <span class="en"><code>true</code> for check certificate signature, <code>false</code> for not check</span>
+     *                      <span class="zhs"><code>true</code>检查证书有效期, <code>false</code>不检查证书有效期</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法或证书未在有效期内，则返回null</span>
      */
     public static X509Certificate x509(byte[] certBytes, boolean checkValidity) {
         return x509(certBytes, null, checkValidity);
     }
 
     /**
-     * Read X.509 Certificate
+     * <h3 class="en">Read X.509 Certificate, verified by given public key and check certificate validity period</h3>
+     * <h3 class="zhs">读取X.509格式的证书，使用给定的公钥验证证书签名并检查证书是否在有效期内</h3>
      *
-     * @param certBytes     Certificate data bytes
-     * @param verifyKey     Verifier key
-     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return Read X.509 certificate or null for invalid
+     * @param certBytes <span class="en">Certificate Data Bytes</span>
+     *                  <span class="zhs">证书的字节数组</span>
+     * @param verifyKey <span class="en">Verifier Public Key</span>
+     *                  <span class="zhs">验证签名使用的公钥</span>
+     * @param checkValidity <span class="en"><code>true</code> for check certificate signature, <code>false</code> for not check</span>
+     *                      <span class="zhs"><code>true</code>检查证书有效期, <code>false</code>不检查证书有效期</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法、证书签名验证失败或证书未在有效期内，则返回null</span>
      */
     public static X509Certificate x509(byte[] certBytes, PublicKey verifyKey, boolean checkValidity) {
         X509Certificate x509Certificate;
@@ -181,33 +236,45 @@ public final class CertificateUtils {
     }
 
     /**
-     * Verify boolean.
+     * <h3 class="en">Check X.509 Certificate Validity Period</h3>
+     * <h3 class="zhs">检查证书是否在有效期内</h3>
      *
-     * @param x509Certificate the x 509 certificate
-     * @return the boolean
+     * @param x509Certificate <span class="en">X.509 Certificate</span>
+     *                        <span class="zhs">X.509证书</span>
+     * @return  <span class="en">Verify Result. <code>true</code> for success, <code>false</code> for failed</span>
+     *          <span class="zhs">验证结果。<code>true</code>验证通过, <code>false</code>验证失败</span>
      */
     public static boolean verify(final X509Certificate x509Certificate) {
-        return verify(x509Certificate, null, Boolean.FALSE);
+        return verify(x509Certificate, null, Boolean.TRUE);
     }
 
     /**
-     * Verify boolean.
+     * <h3 class="en">Verify X.509 Certificate Signature by given Public Key</h3>
+     * <h3 class="zhs">使用给定的公钥检查证书签名是否有效</h3>
      *
-     * @param x509Certificate the x 509 certificate
-     * @param verifyKey       the verify key
-     * @return the boolean
+     * @param x509Certificate   <span class="en">X.509 Certificate</span>
+     *                          <span class="zhs">X.509证书</span>
+     * @param verifyKey         <span class="en">Verifier Public Key</span>
+     *                          <span class="zhs">验证签名使用的公钥</span>
+     * @return  <span class="en">Verify Result. <code>true</code> for success, <code>false</code> for failed</span>
+     *          <span class="zhs">验证结果。<code>true</code>验证通过, <code>false</code>验证失败</span>
      */
     public static boolean verify(final X509Certificate x509Certificate, final PublicKey verifyKey) {
         return verify(x509Certificate, verifyKey, Boolean.FALSE);
     }
 
     /**
-     * Verify boolean.
+     * <h3 class="en">Check X.509 Certificate Validity Period and Verify Signature by given Public Key</h3>
+     * <h3 class="zhs">检查证书是否在有效期内并使用给定的公钥检查证书签名是否有效</h3>
      *
-     * @param x509Certificate the x 509 certificate
-     * @param verifyKey       the verify key
-     * @param checkValidity   the check validity
-     * @return the boolean
+     * @param x509Certificate   <span class="en">X.509 Certificate</span>
+     *                          <span class="zhs">X.509证书</span>
+     * @param verifyKey         <span class="en">Verifier Public Key</span>
+     *                          <span class="zhs">验证签名使用的公钥</span>
+     * @param checkValidity <span class="en"><code>true</code> for check certificate signature, <code>false</code> for not check</span>
+     *                      <span class="zhs"><code>true</code>检查证书有效期, <code>false</code>不检查证书有效期</span>
+     * @return  <span class="en">Verify Result. <code>true</code> for success, <code>false</code> for failed</span>
+     *          <span class="zhs">验证结果。<code>true</code>验证通过, <code>false</code>验证失败</span>
      */
     public static boolean verify(final X509Certificate x509Certificate, final PublicKey verifyKey,
                                  final boolean checkValidity) {
@@ -230,24 +297,34 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read X.509 certificate from keystore/PKCS12 data bytes
+     * <h3 class="en">Read X.509 certificate from Keystore/PKCS12 data bytes</h3>
+     * <h3 class="zhs">从Keystore/PKCS12的二进制数据中读取X.509证书</h3>
      *
-     * @param storeBytes Keystore/PKCS12 data bytes
-     * @param certAlias  Certificate alias
-     * @param password   Certificate password
-     * @return Read X.509 certificate or null for invalid
+     * @param storeBytes <span class="en">Keystore/PKCS12 data bytes</span>
+     *                   <span class="zhs">Keystore/PKCS12的二进制数据</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param password   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法或未找到别名指定的证书，则返回null</span>
      */
     public static X509Certificate x509(byte[] storeBytes, String certAlias, String password) {
         return x509(storeBytes, certAlias, password, null, Boolean.FALSE);
     }
 
     /**
-     * Read X.509 certificate from file. File format: keystore/PKCS12
+     * <h3 class="en">Read X.509 certificate from file. File format: Keystore/PKCS12</h3>
+     * <h3 class="zhs">从指定路径的Keystore/PKCS12文件中读取X.509证书， 文件格式为：Keystore/PKCS12</h3>
      *
-     * @param storePath Keystore/PKCS12 file path
-     * @param certAlias Certificate alias
-     * @param password  Certificate password
-     * @return Read X.509 certificate or null for invalid
+     * @param storePath <span class="en">Keystore/PKCS12 file path</span>
+     *                  <span class="zhs">Keystore/PKCS12文件路径</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param password   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法或未找到别名指定的证书，则返回null</span>
      */
     public static X509Certificate x509(String storePath, String certAlias, String password) {
         try {
@@ -258,17 +335,24 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read X.509 certificate from file. File format: keystore/PKCS12
+     * <h3 class="en">Read X.509 certificate from Keystore/PKCS12 data bytes, Validity Period and Verify Signature by given Public Key.</h3>
+     * <h3 class="zhs">从Keystore/PKCS12的二进制数据中读取X.509证书，检查证书是否在有效期内并使用给定的公钥检查证书签名是否有效</h3>
      *
-     * @param storeBytes    Keystore/PKCS12 data bytes
-     * @param certAlias     Certificate alias
-     * @param password      Certificate password
-     * @param verifyKey     Verifier key
-     * @param checkValidity <code>true</code> for check certificate signature, <code>false</code> for not check
-     * @return Read X.509 certificate or null for invalid
+     * @param storeBytes <span class="en">Keystore/PKCS12 data bytes</span>
+     *                   <span class="zhs">Keystore/PKCS12的二进制数据</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param password   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @param verifyKey         <span class="en">Verifier Public Key</span>
+     *                          <span class="zhs">验证签名使用的公钥</span>
+     * @param checkValidity <span class="en"><code>true</code> for check certificate signature, <code>false</code> for not check</span>
+     *                      <span class="zhs"><code>true</code>检查证书有效期, <code>false</code>不检查证书有效期</span>
+     * @return  <span class="en">Read X.509 certificate or null for invalid</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法、未找到别名指定的证书、证书未在有效期或证书签名错误，则返回null</span>
      */
-    public static X509Certificate x509(byte[] storeBytes, String certAlias, String password,
-                                                  PublicKey verifyKey, boolean checkValidity) {
+    public static X509Certificate x509(final byte[] storeBytes, final String certAlias, final String password,
+                                       final PublicKey verifyKey, final boolean checkValidity) {
         return Optional.ofNullable(loadKeyStore(storeBytes, password))
                 .filter(keyStore -> checkKey(keyStore, certAlias))
                 .map(keyStore -> {
@@ -297,30 +381,38 @@ public final class CertificateUtils {
     }
 
     /**
-     * Generate PublicKey from key data bytes
+     * <h3 class="en">Generate PublicKey from key data bytes and given algorithm</h3>
+     * <h3 class="zhs">根据给定的算法和二进制数据生成公钥</h3>
      *
-     * @param algorithm Key algorithm
-     * @param keyBytes  Key data bytes
-     * @return Generated publicKey
+     * @param algorithm <span class="en">Key algorithm</span>
+     *                  <span class="zhs">算法</span>
+     * @param keyBytes  <span class="en">Key data bytes</span>
+     *                  <span class="zhs">二进制数据</span>
+     * @return  <span class="en">Generated publicKey or null if data bytes invalid</span>
+     *          <span class="zhs">生成的公钥，如果二进制数据非法则返回null</span>
      */
-    public static Optional<PublicKey> publicKey(String algorithm, byte[] keyBytes) {
+    public static PublicKey publicKey(String algorithm, byte[] keyBytes) {
         try {
-            return Optional.of(KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(keyBytes)));
+            return KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(keyBytes));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             LOGGER.error("Generate key from data bytes error! ");
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Stack message: ", e);
             }
-            return Optional.empty();
         }
+        return null;
     }
 
     /**
-     * Generate PrivateKey from key data bytes
+     * <h3 class="en">Generate PrivateKey from key data bytes and given algorithm</h3>
+     * <h3 class="zhs">根据给定的算法和二进制数据生成私钥</h3>
      *
-     * @param algorithm Key algorithm
-     * @param keyBytes  Key data bytes
-     * @return Generated privateKey
+     * @param algorithm <span class="en">Key algorithm</span>
+     *                  <span class="zhs">算法</span>
+     * @param keyBytes  <span class="en">Key data bytes</span>
+     *                  <span class="zhs">二进制数据</span>
+     * @return  <span class="en">Generated privateKey or null if data bytes invalid</span>
+     *          <span class="zhs">生成的私钥，如果二进制数据非法则返回null</span>
      */
     public static PrivateKey privateKey(String algorithm, byte[] keyBytes) {
         try {
@@ -335,39 +427,39 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read Private key from keystore/PKCS12 data bytes
+     * <h3 class="en">Read PrivateKey from Keystore/PKCS12 data bytes</h3>
      *
-     * @param storeBytes Keystore/PKCS12 data bytes
-     * @param certAlias  Certificate alias
-     * @param password   Certificate password
-     * @return Read privateKey or null for invalid
+     * @param storeBytes <span class="en">Keystore/PKCS12 data bytes</span>
+     *                   <span class="zhs">Keystore/PKCS12的二进制数据</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param password   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PrivateKey or null if data bytes invalid</span>
+     *          <span class="zhs">读取的私钥， 如果数据非法、未找到别名指定的证书，则返回null</span>
      */
     public static PrivateKey privateKey(byte[] storeBytes, String certAlias, String password) {
-        try {
-            KeyStore keyStore = loadKeyStore(storeBytes, password);
-            if (keyStore != null && CertificateUtils.checkKey(keyStore, password)) {
-                return CertificateUtils.privateKey(keyStore, certAlias, password);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Read private key from KeyStore error! ");
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Stack message: ", e);
-            }
+        KeyStore keyStore = loadKeyStore(storeBytes, password);
+        if (keyStore != null && CertificateUtils.checkKey(keyStore, password)) {
+            return CertificateUtils.privateKey(keyStore, certAlias, password);
         }
         return null;
     }
 
     /**
-     * Read X.509 certificate from file. File format: keystore/PKCS12
+     * <h3 class="en">Read PrivateKey from file. File format: Keystore/PKCS12</h3>
+     * <h3 class="zhs">从指定路径的Keystore/PKCS12文件中读取私钥， 文件格式为：Keystore/PKCS12</h3>
      *
-     * @param storePath Keystore/PKCS12 file path
-     * @param certAlias Certificate alias
-     * @param password  Certificate password
-     * @return Read X.509 certificate or null for invalid
-     * @throws FileNotFoundException If storePath file not found
+     * @param storePath <span class="en">Keystore/PKCS12 file path</span>
+     *                  <span class="zhs">Keystore/PKCS12文件路径</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param password   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PrivateKey or null if invalid</span>
+     *          <span class="zhs">读取的私钥， 如果数据非法或未找到别名指定的证书，则返回null</span>
      */
-    public static PrivateKey privateKey(String storePath, String certAlias, String password)
-            throws FileNotFoundException {
+    public static PrivateKey privateKey(String storePath, String certAlias, String password) {
         KeyStore keyStore = loadKeyStore(storePath, password);
         if (keyStore != null && CertificateUtils.checkKey(keyStore, password)) {
             return CertificateUtils.privateKey(keyStore, certAlias, password);
@@ -376,25 +468,41 @@ public final class CertificateUtils {
     }
 
     /**
-     * Generate PKCS12
+     * <h3 class="en">Generate PKCS12 Data Bytes, include PrivateKey, PublicKey and generate signature</h3>
+     * <h3 class="zhs">生成PKCS12格式的证书二进制数据，包含公钥、私钥及数字签名</h3>
      *
-     * @param keyPair       Key pair
-     * @param serialNumber  Certificate serial number
-     * @param beginDate     Certificate begin date
-     * @param endDate       Certificate end date
-     * @param certAlias     Certificate alias name
-     * @param certName      Certificate name
-     * @param passWord      Certificate password
-     * @param signKey       Certificate signer private key
-     * @param signAlgorithm Signature algorithm
-     * @return Generated PKCS12 data bytes
+     * @param keyPair       <span class="en">Key pair</span>
+     *                      <span class="zhs">密钥对</span>
+     * @param serialNumber  <span class="en">Certificate Serial Number</span>
+     *                      <span class="zhs">证书的序列号</span>
+     * @param beginDate     <span class="en">Certificate Begin Date</span>
+     *                      <span class="zhs">证书有效期起始时间</span>
+     * @param endDate       <span class="en">Certificate End Date</span>
+     *                      <span class="zhs">证书有效期截至时间</span>
+     * @param certAlias  <span class="en">Certificate alias name</span>
+     *                   <span class="zhs">证书别名</span>
+     * @param commonName    <span class="en">Certificate Common Name</span>
+     *                      <span class="zhs">证书的公用名称（CN字段）</span>
+     * @param passWord   <span class="en">Password of Keystore/PKCS12</span>
+     *                   <span class="zhs">Keystore/PKCS12的密码</span>
+     * @param signKey       <span class="en">Certificate Signer Private Key</span>
+     *                      <span class="zhs">证书签发者的私钥</span>
+     * @param signAlgorithm <span class="en">Signature Algorithm</span>
+     *                      <span class="zhs">签名算法</span>
+     * @return  <span class="en">Generated PKCS12 data bytes or 0 length byte array if has error</span>
+     *          <span class="zhs">生成的PKCS12格式二进制数据，如果出错则返回长度为0的二进制数据</span>
      */
-    public static byte[] PKCS12(KeyPair keyPair, long serialNumber, Date beginDate, Date endDate, String certAlias,
-                                String certName, String passWord, PrivateKey signKey, String signAlgorithm) {
+    public static byte[] PKCS12(final KeyPair keyPair, final long serialNumber,
+                                final Date beginDate, final Date endDate, final String certAlias,
+                                final String commonName, final String passWord,
+                                final PrivateKey signKey, final String signAlgorithm) {
+        char[] charArray;
         if (StringUtils.isEmpty(passWord)) {
-            passWord = Globals.DEFAULT_VALUE_STRING;
+            charArray = Globals.DEFAULT_VALUE_STRING.toCharArray();
+        } else {
+            charArray = passWord.toCharArray();
         }
-        X500Name subjectDN = new X500Name("CN=" + certName);
+        X500Name subjectDN = new X500Name("CN=" + commonName);
         SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
         X509v3CertificateBuilder x509v3CertificateBuilder =
                 new X509v3CertificateBuilder(subjectDN, BigInteger.valueOf(serialNumber),
@@ -412,10 +520,9 @@ public final class CertificateUtils {
 
             KeyStore keyStore = KeyStore.getInstance("PKCS12", "BC");
             keyStore.load(null, null);
-            keyStore.setKeyEntry(certAlias, keyPair.getPrivate(),
-                    passWord.toCharArray(), new Certificate[]{x509Certificate});
+            keyStore.setKeyEntry(certAlias, keyPair.getPrivate(), charArray, new Certificate[]{x509Certificate});
             byteArrayOutputStream = new ByteArrayOutputStream();
-            keyStore.store(byteArrayOutputStream, passWord.toCharArray());
+            keyStore.store(byteArrayOutputStream, charArray);
             return byteArrayOutputStream.toByteArray();
         } catch (OperatorCreationException | GeneralSecurityException | IOException e) {
             LOGGER.error("Generate PKCS12 Certificate Failed! ");
@@ -429,42 +536,62 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read PKCS12 from data bytes
+     * <h3 class="en">Read PKCS12 KeyStore from data bytes</h3>
+     * <h3 class="zhs">从二进制数据中读取PKCS12格式的密钥库</h3>
      *
-     * @param storeBytes Data bytes
-     * @param password   Certificate password
-     * @return Read PKCS12 instance
+     * @param storeBytes <span class="en">Keystore/PKCS12 data bytes</span>
+     *                   <span class="zhs">Keystore/PKCS12的二进制数据</span>
+     * @param password  <span class="en">Password of Keystore/PKCS12</span>
+     *                  <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PKCS12 KeyStore or null for error</span>
+     *          <span class="zhs">读取的PKCS12格式密钥库， 如果数据非法则返回null</span>
      */
     public static KeyStore loadKeyStore(byte[] storeBytes, String password) {
-        return loadKeyStore(new ByteArrayInputStream(storeBytes), password == null ? null : password.toCharArray());
+        return loadKeyStore(new ByteArrayInputStream(storeBytes), password);
     }
 
     /**
-     * Read PKCS12 from file
+     * <h3 class="en">Read PKCS12 KeyStore from given file path</h3>
+     * <h3 class="zhs">从指定的文件位置读取PKCS12格式的密钥库</h3>
      *
-     * @param storePath File path
-     * @param password  Certificate password
-     * @return Read PKCS12 instance
-     * @throws FileNotFoundException If storePath file not found
+     * @param storePath <span class="en">Keystore/PKCS12 file path</span>
+     *                  <span class="zhs">Keystore/PKCS12文件路径</span>
+     * @param password  <span class="en">Password of Keystore/PKCS12</span>
+     *                  <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PKCS12 KeyStore or null for error</span>
+     *          <span class="zhs">读取的PKCS12格式密钥库， 如果文件未找到或数据非法则返回null</span>
      */
-    public static KeyStore loadKeyStore(String storePath, String password) throws FileNotFoundException {
-        return loadKeyStore(new FileInputStream(storePath), password == null ? null : password.toCharArray());
+    public static KeyStore loadKeyStore(String storePath, String password) {
+        try {
+            return loadKeyStore(new FileInputStream(storePath), password);
+        } catch (FileNotFoundException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Read data error! ", e);
+            }
+        }
+        return null;
     }
 
     /**
-     * Read PKCS12 from stream
+     * <h3 class="en">Read PKCS12 KeyStore from input stream</h3>
+     * <h3 class="zhs">从输入流读取PKCS12格式的密钥库</h3>
      *
-     * @param inputStream  Input stream
-     * @param certPassword Password char array
-     * @return Read PKCS12 instance
+     * @param inputStream   <span class="en">Input stream</span>
+     *                      <span class="zhs">输入流</span>
+     * @param password      <span class="en">Password of Keystore/PKCS12</span>
+     *                      <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PKCS12 KeyStore or null for error</span>
+     *          <span class="zhs">读取的PKCS12格式密钥库， 如果数据非法则返回null</span>
      */
-    public static KeyStore loadKeyStore(InputStream inputStream, char[] certPassword) {
+    public static KeyStore loadKeyStore(InputStream inputStream, String password) {
         KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance("PKCS12", "BC");
-            keyStore.load(inputStream, certPassword);
+            keyStore.load(inputStream, password == null ? null : password.toCharArray());
         } catch (Exception e) {
-            e.printStackTrace();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Read data error! ", e);
+            }
             keyStore = null;
         } finally {
             IOUtils.closeStream(inputStream);
@@ -473,11 +600,15 @@ public final class CertificateUtils {
     }
 
     /**
-     * Check certificate alias was exists
+     * <h3 class="en">Check PKCS12 contains certificate alias</h3>
+     * <h3 class="zhs">检查PKCS12标准的密钥库中是否包含给定别名的证书</h3>
      *
-     * @param keyStore  PKCS12
-     * @param certAlias Certificate alias
-     * @return Check result
+     * @param keyStore  <span class="en">PKCS12 KeyStore</span>
+     *                  <span class="zhs">PKCS12标准的密钥库</span>
+     * @param certAlias <span class="en">Certificate alias name</span>
+     *                  <span class="zhs">证书别名</span>
+     * @return  <span class="en">Check result. <code>true</code> for exists <code>false</code> for not found</span>
+     *          <span class="zhs">检查结果 <code>true</code>证书存在 <code>false</code>证书不存在</span>
      */
     public static boolean checkKey(KeyStore keyStore, String certAlias) {
         if (keyStore == null || certAlias == null) {
@@ -491,11 +622,15 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read X.509 certificate from PKCS12 instance
+     * <h3 class="en">Read X.509 certificate from PKCS12 KeyStore</h3>
+     * <h3 class="zhs">从PKCS12格式的密钥库中读取X.509证书</h3>
      *
-     * @param keyStore  PKCS12 instance
-     * @param certAlias Certificate alias name
-     * @return X.509 certificate
+     * @param keyStore  <span class="en">PKCS12 KeyStore</span>
+     *                  <span class="zhs">PKCS12标准的密钥库</span>
+     * @param certAlias <span class="en">Certificate alias name</span>
+     *                  <span class="zhs">证书别名</span>
+     * @return  <span class="en">Read X.509 certificate or null for not found</span>
+     *          <span class="zhs">读取的X.509证书， 如果数据非法、未找到别名指定的证书，则返回null</span>
      */
     public static X509Certificate x509(KeyStore keyStore, String certAlias) {
         try {
@@ -510,12 +645,17 @@ public final class CertificateUtils {
     }
 
     /**
-     * Read private key from PKCS12 instance
+     * <h3 class="en">Read PrivateKey from PKCS12 KeyStore</h3>
+     * <h3 class="zhs">从PKCS12格式的密钥库中读取私钥</h3>
      *
-     * @param keyStore  PKCS12 instance
-     * @param certAlias Certificate alias name
-     * @param password  Certificate password
-     * @return Private key
+     * @param keyStore  <span class="en">PKCS12 KeyStore</span>
+     *                  <span class="zhs">PKCS12标准的密钥库</span>
+     * @param certAlias <span class="en">Certificate alias name</span>
+     *                  <span class="zhs">证书别名</span>
+     * @param password  <span class="en">Password of Keystore/PKCS12</span>
+     *                  <span class="zhs">Keystore/PKCS12的密码</span>
+     * @return  <span class="en">Read PrivateKey or null if invalid</span>
+     *          <span class="zhs">读取的私钥， 如果数据非法或未找到别名指定的证书，则返回null</span>
      */
     public static PrivateKey privateKey(KeyStore keyStore, String certAlias, String password) {
         try {

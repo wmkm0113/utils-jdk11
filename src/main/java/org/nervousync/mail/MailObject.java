@@ -25,8 +25,9 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Mail define
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:03:47 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 7:03:47 PM $
  */
 public final class MailObject implements Serializable {
 
@@ -68,10 +69,6 @@ public final class MailObject implements Serializable {
 	 */
 	private Date sendDate;
 	/**
-	 * Is junk mail flag
-	 */
-	private boolean junk = false;
-	/**
 	 * Receiver e-mail address list
 	 */
 	private List<String> receiveAddress;
@@ -91,12 +88,10 @@ public final class MailObject implements Serializable {
 	 * Mail content include file list
 	 */
 	private List<String> includeFiles;
+
 	/**
-	 * Mail content mapping include file
-	 */
-	private Map<String, String> contentMap;
-	
-	/**
+	 * Gets uid.
+	 *
 	 * @return the uid
 	 */
 	public String getUid() {
@@ -104,6 +99,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets uid.
+	 *
 	 * @param uid the uid to set
 	 */
 	public void setUid(String uid) {
@@ -111,13 +108,17 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets subject.
+	 *
 	 * @return the subject
 	 */
 	public String getSubject() {
 		return subject;
 	}
-	
+
 	/**
+	 * Sets subject.
+	 *
 	 * @param subject the subject to set
 	 */
 	public void setSubject(String subject) {
@@ -125,6 +126,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets content.
+	 *
 	 * @return the content
 	 */
 	public String getContent() {
@@ -132,6 +135,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets content.
+	 *
 	 * @param content the content to set
 	 */
 	public void setContent(String content) {
@@ -139,6 +144,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets charset.
+	 *
 	 * @return the charset
 	 */
 	public String getCharset() {
@@ -146,6 +153,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets charset.
+	 *
 	 * @param charset the charset to set
 	 */
 	public void setCharset(String charset) {
@@ -153,6 +162,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets content type.
+	 *
 	 * @return the contentType
 	 */
 	public String getContentType() {
@@ -160,6 +171,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets content type.
+	 *
 	 * @param contentType the contentType to set
 	 */
 	public void setContentType(String contentType) {
@@ -167,6 +180,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets send address.
+	 *
 	 * @return the sendAddress
 	 */
 	public String getSendAddress() {
@@ -174,6 +189,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets send address.
+	 *
 	 * @param sendAddress the sendAddress to set
 	 */
 	public void setSendAddress(String sendAddress) {
@@ -181,6 +198,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets reply address.
+	 *
 	 * @return the replyAddress
 	 */
 	public List<String> getReplyAddress() {
@@ -188,6 +207,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets reply address.
+	 *
 	 * @param replyAddress the replyAddress to set
 	 */
 	public void setReplyAddress(List<String> replyAddress) {
@@ -195,6 +216,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets send date.
+	 *
 	 * @return the sendDate
 	 */
 	public Date getSendDate() {
@@ -202,6 +225,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets send date.
+	 *
 	 * @param sendDate the sendDate to set
 	 */
 	public void setSendDate(Date sendDate) {
@@ -209,20 +234,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
-	 * @return the junk
-	 */
-	public boolean isJunk() {
-		return junk;
-	}
-
-	/**
-	 * @param junk the junk to set
-	 */
-	public void setJunk(boolean junk) {
-		this.junk = junk;
-	}
-
-	/**
+	 * Gets receive address.
+	 *
 	 * @return the receiveAddress
 	 */
 	public List<String> getReceiveAddress() {
@@ -230,6 +243,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets receive address.
+	 *
 	 * @param receiveAddress the receiveAddress to set
 	 */
 	public void setReceiveAddress(List<String> receiveAddress) {
@@ -237,6 +252,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets cc address.
+	 *
 	 * @return the ccAddress
 	 */
 	public List<String> getCcAddress() {
@@ -244,6 +261,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets cc address.
+	 *
 	 * @param ccAddress the ccAddress to set
 	 */
 	public void setCcAddress(List<String> ccAddress) {
@@ -251,6 +270,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets bcc address.
+	 *
 	 * @return the bccAddress
 	 */
 	public List<String> getBccAddress() {
@@ -258,6 +279,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets bcc address.
+	 *
 	 * @param bccAddress the bccAddress to set
 	 */
 	public void setBccAddress(List<String> bccAddress) {
@@ -265,6 +288,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets attach files.
+	 *
 	 * @return the attachFiles
 	 */
 	public List<String> getAttachFiles() {
@@ -272,6 +297,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets attach files.
+	 *
 	 * @param attachFiles the attachFiles to set
 	 */
 	public void setAttachFiles(List<String> attachFiles) {
@@ -279,6 +306,8 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Gets include files.
+	 *
 	 * @return the includeFiles
 	 */
 	public List<String> getIncludeFiles() {
@@ -286,23 +315,11 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
+	 * Sets include files.
+	 *
 	 * @param includeFiles the includeFiles to set
 	 */
 	public void setIncludeFiles(List<String> includeFiles) {
 		this.includeFiles = includeFiles;
-	}
-
-	/**
-	 * @return the contentMap
-	 */
-	public Map<String, String> getContentMap() {
-		return contentMap;
-	}
-
-	/**
-	 * @param contentMap the contentMap to set
-	 */
-	public void setContentMap(Map<String, String> contentMap) {
-		this.contentMap = contentMap;
 	}
 }

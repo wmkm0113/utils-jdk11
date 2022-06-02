@@ -30,8 +30,9 @@ import java.util.List;
 
 /**
  * Implement POP3 protocol
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:08:48 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 8:08:48 PM $
  */
 public final class POP3Protocol extends BaseProtocol implements ReceiveOperator {
 
@@ -40,6 +41,9 @@ public final class POP3Protocol extends BaseProtocol implements ReceiveOperator 
 	 */
 	private static final long serialVersionUID = -8698112033277399242L;
 
+	/**
+	 * Instantiates a new Pop 3 protocol.
+	 */
 	public POP3Protocol() {
 		this.hostParam = "mail.pop3.host";
 		this.portParam = "mail.pop3.port";

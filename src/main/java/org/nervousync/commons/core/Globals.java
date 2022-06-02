@@ -21,82 +21,272 @@ import java.util.Locale;
 
 /**
  * Globals Constants Value
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 2, 2018 $
+ * @version $Revision : 1.0 $ $Date: Jul 2, 2018 $
  */
 public final class Globals {
 
+	/**
+	 * The constant INITIAL_HASH.
+	 */
 	public static final int INITIAL_HASH = 0;
+	/**
+	 * The constant MULTIPLIER.
+	 */
 	public static final int MULTIPLIER = 31;
 
+	/**
+	 * The constant DEFAULT_BUFFER_SIZE.
+	 */
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
-	//  32K
+	/**
+	 * The constant READ_FILE_BUFFER_SIZE.
+	 */
+//  32K
 	public static final int READ_FILE_BUFFER_SIZE = 32768;
 
+	/**
+	 * The constant DEFAULT_TIME_OUT.
+	 */
 	public static final int DEFAULT_TIME_OUT = 0;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_SINGLE_THREAD.
+	 */
 	public static final int DEFAULT_DOWNLOAD_SINGLE_THREAD = 1;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_THREAD_COUNT.
+	 */
 	public static final int DEFAULT_DOWNLOAD_THREAD_COUNT = 5;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_BLOCK_SIZE.
+	 */
 	public static final int DEFAULT_DOWNLOAD_BLOCK_SIZE = 512;
-	
+
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_WAITING.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_WAITING = 0;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_PROCESSING.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_PROCESSING = 1;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_PAUSE.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_PAUSE = 2;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_FAILED.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_FAILED = 3;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_FINISHED.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_FINISHED = 4;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_DELETE.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_DELETE = 5;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_VALIDATE_FAILED.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_VALIDATE_FAILED = 6;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_CANCEL.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_CANCEL = 7;
+	/**
+	 * The constant DEFAULT_DOWNLOAD_STATUS_RETRY.
+	 */
 	public static final int DEFAULT_DOWNLOAD_STATUS_RETRY = 8;
 
+	/**
+	 * The constant DEFAULT_VALUE_INT.
+	 */
 	public static final int DEFAULT_VALUE_INT = -1;
+	/**
+	 * The constant DEFAULT_VALUE_LONG.
+	 */
 	public static final long DEFAULT_VALUE_LONG = -1L;
+	/**
+	 * The constant DEFAULT_VALUE_SHORT.
+	 */
 	public static final short DEFAULT_VALUE_SHORT = -1;
+	/**
+	 * The constant DEFAULT_VALUE_DOUBLE.
+	 */
 	public static final double DEFAULT_VALUE_DOUBLE = -1;
+	/**
+	 * The constant DEFAULT_VALUE_FLOAT.
+	 */
 	public static final float DEFAULT_VALUE_FLOAT = -1;
+	/**
+	 * The constant DEFAULT_VALUE_STRING.
+	 */
 	public static final String DEFAULT_VALUE_STRING = "";
 
+	/**
+	 * The constant DEFAULT_REFERENCE_TIME.
+	 */
 	public static final long DEFAULT_REFERENCE_TIME = 1303315200000L;
 
+	/**
+	 * The constant READ_MODE.
+	 */
 	public static final String READ_MODE = "r";
+	/**
+	 * The constant WRITE_MODE.
+	 */
 	public static final String WRITE_MODE = "rw";
 
+	/**
+	 * The constant FTP_PROTOCOL.
+	 */
 	public static final String FTP_PROTOCOL = "ftp://";
+	/**
+	 * The constant SECURE_FTP_PROTOCOL.
+	 */
 	public static final String SECURE_FTP_PROTOCOL = "sftp://";
+	/**
+	 * The constant WEBDAV_PROTOCOL.
+	 */
 	public static final String WEBDAV_PROTOCOL = "webdav://";
+	/**
+	 * The constant FILE_PROTOCOL.
+	 */
 	public static final String FILE_PROTOCOL = "file:///";
+	/**
+	 * The constant HTTP_PROTOCOL.
+	 */
 	public static final String HTTP_PROTOCOL = "http://";
+	/**
+	 * The constant SECURE_HTTP_PROTOCOL.
+	 */
 	public static final String SECURE_HTTP_PROTOCOL = "https://";
 
+	/**
+	 * The constant EXTENSION_SEPARATOR.
+	 */
 	public static final char EXTENSION_SEPARATOR = '.';
 
+	/**
+	 * The constant DEFAULT_EMAIL_FOLDER_INBOX.
+	 */
 	public static final String DEFAULT_EMAIL_FOLDER_INBOX = "INBOX";
+	/**
+	 * The constant DEFAULT_EMAIL_FOLDER_INBOX.
+	 */
+	public static final String DEFAULT_EMAIL_FOLDER_SPAM = "Spam";
+	/**
+	 * The constant DEFAULT_EMAIL_FOLDER_INBOX.
+	 */
+	public static final String DEFAULT_EMAIL_FOLDER_DRAFTS = "Drafts";
+	/**
+	 * The constant DEFAULT_EMAIL_FOLDER_INBOX.
+	 */
+	public static final String DEFAULT_EMAIL_FOLDER_TRASH = "Trash";
+	/**
+	 * The constant DEFAULT_EMAIL_FOLDER_INBOX.
+	 */
+	public static final String DEFAULT_EMAIL_FOLDER_SENT = "Sent";
+	/**
+	 * The constant DEFAULT_ENCODING.
+	 */
 	public static final String DEFAULT_ENCODING = "UTF-8";
+	/**
+	 * The constant CHARSET_CP850.
+	 */
+	public static final String CHARSET_CP850 = "Cp850";
+	/**
+	 * The constant CHARSET_GBK.
+	 */
+	public static final String CHARSET_GBK = "GBK";
+	/**
+	 * The constant DEFAULT_LOCALE.
+	 */
 	public static final Locale DEFAULT_LOCALE = Locale.getDefault();
-	public static final String DEFAULT_LANGUAGE = 
+	/**
+	 * The constant DEFAULT_LANGUAGE.
+	 */
+	public static final String DEFAULT_LANGUAGE =
 			System.getProperty("user.language")	+ "_" + System.getProperty("user.country");
+	/**
+	 * The constant DEFAULT_SYSTEM_CHARSET.
+	 */
 	public static final String DEFAULT_SYSTEM_CHARSET = System.getProperty("file.encoding");
+	/**
+	 * The constant DEFAULT_SPLIT_SEPARATOR.
+	 */
 	public static final String DEFAULT_SPLIT_SEPARATOR = ",";
+	/**
+	 * The constant DEFAULT_PAGE_SEPARATOR.
+	 */
 	public static final String DEFAULT_PAGE_SEPARATOR = File.separator;
+	/**
+	 * The constant DEFAULT_URL_SEPARATOR.
+	 */
 	public static final String DEFAULT_URL_SEPARATOR = "/";
+	/**
+	 * The constant DEFAULT_JAR_PAGE_SEPARATOR.
+	 */
 	public static final String DEFAULT_JAR_PAGE_SEPARATOR = "\\";
+	/**
+	 * The constant DEFAULT_ZIP_PAGE_SEPARATOR.
+	 */
 	public static final String DEFAULT_ZIP_PAGE_SEPARATOR = "/";
 
+	/**
+	 * The constant WEB_INF_FOLDER.
+	 */
 	public static final String WEB_INF_FOLDER = Globals.DEFAULT_PAGE_SEPARATOR + "WEB-INF";
 
+	/**
+	 * The constant DEFAULT_DOWNLOAD_CONFIGURE.
+	 */
 	public static final String DEFAULT_DOWNLOAD_CONFIGURE = "nervousync_download.conf";
-	
+
+	/**
+	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_TEXT.
+	 */
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_TEXT = "text/plain";
+	/**
+	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_HTML.
+	 */
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_HTML = "text/html";
+	/**
+	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART.
+	 */
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART = "multipart/*";
+	/**
+	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822.
+	 */
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
 
+	/**
+	 * The constant NERVOUSYNC_STATUS_FALSE.
+	 */
 	public static final int NERVOUSYNC_STATUS_FALSE = 0;
+	/**
+	 * The constant NERVOUSYNC_STATUS_TRUE.
+	 */
 	public static final int NERVOUSYNC_STATUS_TRUE = 1;
-	
+
+	/**
+	 * The constant INITIALIZE_INT_VALUE.
+	 */
 	public static final int INITIALIZE_INT_VALUE = 0;
 
+	/**
+	 * The constant SNMP_VERSION_1.
+	 */
 	/* SNMP Version Code Define */
 	public static final int SNMP_VERSION_1 = 0;
+	/**
+	 * The constant SNMP_VERSION_2C.
+	 */
 	public static final int SNMP_VERSION_2C = 1;
+	/**
+	 * The constant SNMP_VERSION_3.
+	 */
 	public static final int SNMP_VERSION_3 = 2;
 }

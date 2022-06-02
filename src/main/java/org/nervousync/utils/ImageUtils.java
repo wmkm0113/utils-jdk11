@@ -57,8 +57,8 @@ public final class ImageUtils {
 	 * @param imagePath		image file path
 	 * @return	image width value
 	 */
-	public static int imageWidth(String imagePath) {
-		if (FileUtils.isExists(imagePath) && FileUtils.isPicture(imagePath)) {
+	public static int imageWidth(final String imagePath) {
+		if (FileUtils.isExists(imagePath) && FileUtils.imageFile(imagePath)) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getWidth(null);
@@ -76,8 +76,8 @@ public final class ImageUtils {
 	 * @param imagePath		image file path
 	 * @return	image height value
 	 */
-	public static int imageHeight(String imagePath) {
-		if (FileUtils.isExists(imagePath) && FileUtils.isPicture(imagePath)) {
+	public static int imageHeight(final String imagePath) {
+		if (FileUtils.isExists(imagePath) && FileUtils.imageFile(imagePath)) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getHeight(null);
@@ -95,7 +95,7 @@ public final class ImageUtils {
 	 * @param imagePath		image file path
 	 * @return  image ratio
 	 */
-	public static double imageRatio(String imagePath) {
+	public static double imageRatio(final String imagePath) {
 		double imageHeight = ImageUtils.imageHeight(imagePath);
 		double imageWidth = ImageUtils.imageHeight(imagePath);
 
@@ -113,7 +113,7 @@ public final class ImageUtils {
 	 * @param cutOptions		cut options
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	public static boolean cutImage(String origPath, String destPath, CutOptions cutOptions) {
+	public static boolean cutImage(final String origPath, final String destPath, final CutOptions cutOptions) {
 		if (origPath != null && FileUtils.isExists(origPath) && cutOptions != null) {
 			if (cutOptions.getPositionX() + cutOptions.getCutWidth() > ImageUtils.imageWidth(origPath)) {
 				LOGGER.error("Width is out of original file");
@@ -154,7 +154,7 @@ public final class ImageUtils {
 	 * @param ratio			resize ratio
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	public static boolean resizeByRatio(String origPath, String destPath, double ratio) {
+	public static boolean resizeByRatio(final String origPath, final String destPath, final double ratio) {
 		return ImageUtils.resizeByRatio(origPath, destPath, ratio, null);
 	}
 
@@ -167,9 +167,9 @@ public final class ImageUtils {
 	 * @see MarkOptions
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	public static boolean resizeByRatio(String origPath, String destPath, double ratio, 
-			MarkOptions markOptions) {
-		if (FileUtils.isExists(origPath) && FileUtils.isPicture(origPath) && ratio > 0) {
+	public static boolean resizeByRatio(final String origPath, final String destPath, final double ratio,
+	                                    final MarkOptions markOptions) {
+		if (FileUtils.isExists(origPath) && FileUtils.imageFile(origPath) && ratio > 0) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(origPath));
 				
@@ -199,8 +199,8 @@ public final class ImageUtils {
 	 * @param targetHeight		target height	(if -1 height will auto set by width ratio)
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	public static boolean resizeTo(String origPath, String destPath, 
-			int targetWidth, int targetHeight) {
+	public static boolean resizeTo(final String origPath, final String destPath,
+	                               final int targetWidth, final int targetHeight) {
 		return ImageUtils.resizeTo(origPath, destPath, targetWidth, targetHeight, null);
 	}
 	
@@ -214,9 +214,9 @@ public final class ImageUtils {
 	 * @see MarkOptions
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	public static boolean resizeTo(String origPath, String destPath, 
-			int targetWidth, int targetHeight, MarkOptions markOptions) {
-		if (FileUtils.isExists(origPath) && FileUtils.isPicture(origPath) 
+	public static boolean resizeTo(final String origPath, final String destPath,
+	                               final int targetWidth, final int targetHeight, final MarkOptions markOptions) {
+		if (FileUtils.isExists(origPath) && FileUtils.imageFile(origPath)
 				&& (targetWidth > 0 || targetHeight > 0)) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(origPath));
@@ -224,19 +224,24 @@ public final class ImageUtils {
 				int origWidth = srcImage.getWidth(null);
 				int origHeight = srcImage.getHeight(null);
 
+				int resizeWidth;
 				if (targetWidth == Globals.DEFAULT_VALUE_INT) {
 					double ratio = targetHeight * 1.0 / origHeight;
-					targetWidth = Double.valueOf(ratio * origWidth).intValue();
+					resizeWidth = Double.valueOf(ratio * origWidth).intValue();
+				} else {
+					resizeWidth = targetWidth;
 				}
 
+				int resizeHeight;
 				if (targetHeight == Globals.DEFAULT_VALUE_INT) {
 					double ratio = targetWidth * 1.0 / origWidth;
-					targetHeight = Double.valueOf(ratio * origHeight).intValue();
+					resizeHeight = Double.valueOf(ratio * origHeight).intValue();
+				} else {
+					resizeHeight = targetHeight;
 				}
 
-				return ImageIO.write(processImage(srcImage, targetWidth, targetHeight, markOptions),
-						StringUtils.getFilenameExtension(destPath),
-						FileUtils.getFile(destPath));
+				return ImageIO.write(processImage(srcImage, resizeWidth, resizeHeight, markOptions),
+						StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Resize picture error! ", e);
@@ -253,7 +258,7 @@ public final class ImageUtils {
 	 * @param markOptions       mark options
 	 * @return                  operate result
 	 */
-	public static boolean markImage(String filePath, String targetPath, MarkOptions markOptions) {
+	public static boolean markImage(final String filePath, final String targetPath, final MarkOptions markOptions) {
 		int imageWidth = ImageUtils.imageWidth(filePath);
 		int imageHeight = ImageUtils.imageHeight(filePath);
 		try {
@@ -276,7 +281,7 @@ public final class ImageUtils {
 	 * @param destPath			target picture file path
 	 * @return                  Hamming result
 	 */
-	public static int dHashHamming(String origPath, String destPath) {
+	public static int dHashHamming(final String origPath, final String destPath) {
 		String origHash = ImageUtils.dHash(origPath);
 		String destHash = ImageUtils.dHash(destPath);
 		int diff = 0;
@@ -292,7 +297,7 @@ public final class ImageUtils {
 	 * @param destPath			target picture file path
 	 * @return                  Hamming result
 	 */
-	public static int pHashHamming(String origPath, String destPath) {
+	public static int pHashHamming(final String origPath, final String destPath) {
 		String origHash = ImageUtils.pHash(origPath);
 		String destHash = ImageUtils.pHash(destPath);
 		int diff = 0;
@@ -307,7 +312,7 @@ public final class ImageUtils {
 	 * @param filePath  picture file path
 	 * @return          signature value
 	 */
-	public static String dHash(String filePath) {
+	public static String dHash(final String filePath) {
 		try {
 			return ImageUtils.dHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
@@ -323,7 +328,7 @@ public final class ImageUtils {
 	 * @param file      picture file instance
 	 * @return          signature value
 	 */
-	public static String dHash(File file) {
+	public static String dHash(final File file) {
 		try {
 			return ImageUtils.dHash(ImageIO.read(file));
 		} catch (IOException e) {
@@ -339,7 +344,7 @@ public final class ImageUtils {
 	 * @param bufferedImage     picture file with bufferedImage instance
 	 * @return                  signature value
 	 */
-	public static String dHash(BufferedImage bufferedImage) {
+	public static String dHash(final BufferedImage bufferedImage) {
 		BufferedImage prepareImage;
 		if (bufferedImage.getWidth() != 9 || bufferedImage.getHeight() != 8) {
 			prepareImage = ImageUtils.processImage(bufferedImage, 9, 8, null);
@@ -362,7 +367,7 @@ public final class ImageUtils {
 	 * @param filePath  picture file path
 	 * @return          signature value
 	 */
-	public static String pHash(String filePath) {
+	public static String pHash(final String filePath) {
 		try {
 			return ImageUtils.pHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
@@ -378,7 +383,7 @@ public final class ImageUtils {
 	 * @param file      picture file instance
 	 * @return          signature value
 	 */
-	public static String pHash(File file) {
+	public static String pHash(final File file) {
 		try {
 			return ImageUtils.pHash(ImageIO.read(file));
 		} catch (IOException e) {
@@ -394,7 +399,7 @@ public final class ImageUtils {
 	 * @param bufferedImage     picture file with bufferedImage instance
 	 * @return                  signature value
 	 */
-	public static String pHash(BufferedImage bufferedImage) {
+	public static String pHash(final BufferedImage bufferedImage) {
 		BufferedImage prepareImage;
 		if (bufferedImage.getWidth() != 8 || bufferedImage.getHeight() != 8) {
 			prepareImage = ImageUtils.processImage(bufferedImage, 8, 8, null);
@@ -427,7 +432,8 @@ public final class ImageUtils {
 	 * @param height			image height
 	 * @param markOptions		image mark options
 	 */
-	private static void markImage(Graphics2D graphics, int width, int height, MarkOptions markOptions) {
+	private static void markImage(final Graphics2D graphics, final int width, final int height,
+	                              final MarkOptions markOptions) {
 		MarkPosition markPosition = markOptions.retrievePosition(width, height);
 		
 		if (markPosition != null) {
@@ -470,8 +476,8 @@ public final class ImageUtils {
 	 * @param markOptions			image mark options
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
-	private static BufferedImage processImage(BufferedImage srcImage,
-			int targetWidth, int targetHeight, MarkOptions markOptions) {
+	private static BufferedImage processImage(final BufferedImage srcImage, final int targetWidth,
+	                                          final int targetHeight, final MarkOptions markOptions) {
 		if (srcImage != null && targetWidth > 0 && targetHeight > 0) {
 			try {
 				BufferedImage bufferedImage = 
@@ -499,7 +505,7 @@ public final class ImageUtils {
 	 * @param bufferedImage     BufferedImage instance
 	 * @return                  Gray matrix
 	 */
-	private static double[][] grayMatrix(BufferedImage bufferedImage) {
+	private static double[][] grayMatrix(final BufferedImage bufferedImage) {
 		if (bufferedImage == null) {
 			return new double[0][0];
 		}
@@ -522,7 +528,7 @@ public final class ImageUtils {
 	 * @param bufferedImage     BufferedImage instance
 	 * @return                  DCT matrix
 	 */
-	private static double[][] applyDCT(BufferedImage bufferedImage) {
+	private static double[][] applyDCT(final BufferedImage bufferedImage) {
 		if (bufferedImage == null) {
 			return new double[0][0];
 		}

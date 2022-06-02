@@ -17,9 +17,18 @@
 package org.nervousync.enumerations.net;
 
 /**
+ * The enum Ip protocol.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 27, 2017 1:31:26 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 1:31:26 PM $
  */
 public enum IPProtocol {
-	TCP, UDP
+	/**
+	 * Tcp ip protocol.
+	 */
+	TCP,
+	/**
+	 * Udp ip protocol.
+	 */
+	UDP
 }

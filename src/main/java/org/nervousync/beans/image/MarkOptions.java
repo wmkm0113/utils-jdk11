@@ -25,8 +25,9 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Image options for mark operate
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: May 1, 2018 4:11:01 PM $
+ * @version $Revision : 1.0 $ $Date: May 1, 2018 4:11:01 PM $
  */
 public final class MarkOptions {
 	
@@ -77,15 +78,16 @@ public final class MarkOptions {
 		this.fontName = fontName;
 		this.fontSize = fontSize;
 	}
-	
+
 	/**
 	 * Initialize ICON MarkOptions
-	 * @param markLocation		Mark location define
-	 * @param markPath			Mark icon file path
-	 * @param transparency		Icon transparent setting
-	 * @return					MarkOption object
+	 *
+	 * @param markLocation Mark location define
+	 * @param markPath     Mark icon file path
+	 * @param transparency Icon transparent setting
+	 * @return MarkOption object
 	 */
-	public static MarkOptions markIcon(MarkLocation markLocation, 
+	public static MarkOptions markIcon(MarkLocation markLocation,
 			String markPath, float transparency) {
 		return new MarkOptions(MarkType.ICON, markLocation, markPath, transparency, null, null, 
 				null, Globals.DEFAULT_VALUE_INT);
@@ -93,20 +95,23 @@ public final class MarkOptions {
 
 	/**
 	 * Initialize TEXT MarkOptions
-	 * @param markLocation		Mark location define
-	 * @param markText			Mark text value
-	 * @param color				Mark text color
-	 * @param fontName			Mark text font name
-	 * @param fontSize			Mark text font size
-	 * @return					MarkOption object
+	 *
+	 * @param markLocation Mark location define
+	 * @param markText     Mark text value
+	 * @param color        Mark text color
+	 * @param fontName     Mark text font name
+	 * @param fontSize     Mark text font size
+	 * @return MarkOption object
 	 */
-	public static MarkOptions markText(MarkLocation markLocation, 
+	public static MarkOptions markText(MarkLocation markLocation,
 			String markText, Color color, String fontName, int fontSize) {
 		return new MarkOptions(MarkType.TEXT, markLocation, null, Globals.DEFAULT_VALUE_FLOAT, 
 				markText, color, fontName, fontSize);
 	}
 
 	/**
+	 * Gets mark type.
+	 *
 	 * @return the markType
 	 */
 	public MarkType getMarkType() {
@@ -114,6 +119,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets mark location.
+	 *
 	 * @return the markLocation
 	 */
 	public MarkLocation getMarkLocation() {
@@ -121,6 +128,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets mark path.
+	 *
 	 * @return the markPath
 	 */
 	public String getMarkPath() {
@@ -128,6 +137,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets transparency.
+	 *
 	 * @return the transparency
 	 */
 	public float getTransparency() {
@@ -135,6 +146,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets mark text.
+	 *
 	 * @return the markText
 	 */
 	public String getMarkText() {
@@ -142,6 +155,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets color.
+	 *
 	 * @return the color
 	 */
 	public Color getColor() {
@@ -149,6 +164,8 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets font name.
+	 *
 	 * @return the fontName
 	 */
 	public String getFontName() {
@@ -156,12 +173,21 @@ public final class MarkOptions {
 	}
 
 	/**
+	 * Gets font size.
+	 *
 	 * @return the fontSize
 	 */
 	public int getFontSize() {
 		return fontSize;
 	}
-	
+
+	/**
+	 * Retrieve position mark position.
+	 *
+	 * @param width  the width
+	 * @param height the height
+	 * @return the mark position
+	 */
 	public MarkPosition retrievePosition(int width, int height) {
 		int positionX = Globals.DEFAULT_VALUE_INT;
 		int positionY = Globals.DEFAULT_VALUE_INT;
@@ -266,18 +292,29 @@ public final class MarkOptions {
 		}
 		return null;
 	}
-		
+
+	/**
+	 * The type Mark position.
+	 */
 	public static final class MarkPosition {
 		
 		private final int positionX;
 		private final int positionY;
-		
+
+		/**
+		 * Instantiates a new Mark position.
+		 *
+		 * @param positionX the position x
+		 * @param positionY the position y
+		 */
 		public MarkPosition(int positionX, int positionY) {
 			this.positionX = positionX;
 			this.positionY = positionY;
 		}
 
 		/**
+		 * Gets position x.
+		 *
 		 * @return the positionX
 		 */
 		public int getPositionX() {
@@ -285,6 +322,8 @@ public final class MarkOptions {
 		}
 
 		/**
+		 * Gets position y.
+		 *
 		 * @return the positionY
 		 */
 		public int getPositionY() {
@@ -292,13 +331,59 @@ public final class MarkOptions {
 		}
 	}
 
+	/**
+	 * The enum Mark type.
+	 */
 	public enum MarkType {
-		ICON, TEXT
+		/**
+		 * Icon mark type.
+		 */
+		ICON,
+		/**
+		 * Text mark type.
+		 */
+		TEXT
 	}
-	
+
+	/**
+	 * The enum Mark location.
+	 */
 	public enum MarkLocation {
-		LEFT_TOP, TOP, RIGHT_TOP, 
-		LEFT, CENTER, RIGHT,
-		LEFT_BOTTOM, BOTTOM, RIGHT_BOTTOM
+		/**
+		 * Left top mark location.
+		 */
+		LEFT_TOP,
+		/**
+		 * Top mark location.
+		 */
+		TOP,
+		/**
+		 * Right top mark location.
+		 */
+		RIGHT_TOP,
+		/**
+		 * Left mark location.
+		 */
+		LEFT,
+		/**
+		 * Center mark location.
+		 */
+		CENTER,
+		/**
+		 * Right mark location.
+		 */
+		RIGHT,
+		/**
+		 * Left bottom mark location.
+		 */
+		LEFT_BOTTOM,
+		/**
+		 * Bottom mark location.
+		 */
+		BOTTOM,
+		/**
+		 * Right bottom mark location.
+		 */
+		RIGHT_BOTTOM
 	}
 }

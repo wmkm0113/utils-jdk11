@@ -11,12 +11,28 @@ import org.nervousync.utils.StringUtils;
 
 import java.security.MessageDigest;
 
+/**
+ * The type Sha 3 digest provider.
+ */
 public final class SHA3DigestProviderImpl extends BaseDigestProvider {
 
+    /**
+     * Instantiates a new Sha 3 digest provider.
+     *
+     * @param algorithm the algorithm
+     * @throws CryptoException the crypto exception
+     */
     public SHA3DigestProviderImpl(String algorithm) throws CryptoException {
         super(algorithm, new byte[0]);
     }
 
+    /**
+     * Instantiates a new Sha 3 digest provider.
+     *
+     * @param algorithm the algorithm
+     * @param keyBytes  the key bytes
+     * @throws CryptoException the crypto exception
+     */
     public SHA3DigestProviderImpl(String algorithm, byte[] keyBytes) throws CryptoException {
         super(algorithm, keyBytes);
     }

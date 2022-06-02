@@ -6,6 +6,9 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+/**
+ * The type Uuid generator.
+ */
 public abstract class UUIDGenerator implements IGenerator {
 
     /**
@@ -22,6 +25,12 @@ public abstract class UUIDGenerator implements IGenerator {
         return new BigInteger(dataBytes);
     }
 
+    /**
+     * High bits long.
+     *
+     * @param randomBytes the random bytes
+     * @return the long
+     */
     protected final long highBits(byte[] randomBytes) {
         long highBits = 0L;
         for (int i = 0 ; i < 8 ; i++) {
@@ -30,6 +39,12 @@ public abstract class UUIDGenerator implements IGenerator {
         return highBits;
     }
 
+    /**
+     * High bits long.
+     *
+     * @param currentTimeMillis the current time millis
+     * @return the long
+     */
     protected final long highBits(long currentTimeMillis) {
         return ((currentTimeMillis & 0xFFFFFFFFL) << 32)
                 | ((currentTimeMillis & 0xFFFF00000000L) >> 16)
@@ -37,6 +52,12 @@ public abstract class UUIDGenerator implements IGenerator {
                 | ((currentTimeMillis & 0xFFF000000000000L) >> 48);
     }
 
+    /**
+     * Low bits long.
+     *
+     * @param dataBytes the data bytes
+     * @return the long
+     */
     protected long lowBits(byte[] dataBytes) {
         long lowBits = 0L;
         for (int index = 8 ; index < 16 ; index++) {

@@ -35,8 +35,10 @@ import org.nervousync.interceptor.beans.HandlerInterceptor;
 import net.sf.cglib.proxy.Enhancer;
 
 /**
+ * The type Object utils.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
  */
 public final class ObjectUtils {
 
@@ -52,24 +54,26 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param className		class name
-	 * @return				object instance
-	 * @throws ClassNotFoundException	if class was not found
-	 * @throws LinkageError				if class link error
+	 *
+	 * @param className class name
+	 * @return object instance
+	 * @throws ClassNotFoundException if class was not found
+	 * @throws LinkageError           if class link error
 	 */
-	public static Object newInstance(String className) 
+	public static Object newInstance(String className)
 			throws ClassNotFoundException, LinkageError {
 		return newInstance(className, null, null, null);
 	}
 
 	/**
 	 * Create a proxy object instance
-	 * @param className		class name
-	 * @param paramClasses  parameter class array
-	 * @param args			Constructor parameters
-	 * @return				object instance
-	 * @throws ClassNotFoundException	if class was not found
-	 * @throws LinkageError				if class link error
+	 *
+	 * @param className    class name
+	 * @param paramClasses parameter class array
+	 * @param args         Constructor parameters
+	 * @return object instance
+	 * @throws ClassNotFoundException if class was not found
+	 * @throws LinkageError           if class link error
 	 */
 	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args)
 			throws ClassNotFoundException, LinkageError {
@@ -78,13 +82,14 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param className		class name
-	 * @param paramClasses  parameter class array
-	 * @param args			Constructor parameters
+	 *
+	 * @param className         class name
+	 * @param paramClasses      parameter class array
+	 * @param args              Constructor parameters
 	 * @param methodInterceptor method interceptor instance
-	 * @return				object instance
-	 * @throws ClassNotFoundException	if class was not found
-	 * @throws LinkageError				if class link error
+	 * @return object instance
+	 * @throws ClassNotFoundException if class was not found
+	 * @throws LinkageError           if class link error
 	 */
 	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor)
 			throws ClassNotFoundException, LinkageError {
@@ -97,9 +102,10 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param clazz		define class
-	 * @param <T>		T
-	 * @return			object instance
+	 *
+	 * @param <T>   T
+	 * @param clazz define class
+	 * @return object instance
 	 */
 	public static <T> T newInstance(Class<T> clazz) {
 		return createProxyInstance(clazz, null, null, new HandlerInterceptor[]{});
@@ -107,10 +113,11 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param clazz		define class
+	 *
+	 * @param <T>                 T
+	 * @param clazz               define class
 	 * @param handlerInterceptors method interceptor instance array
-	 * @param <T>		T
-	 * @return			object instance
+	 * @return object instance
 	 */
 	public static <T> T createProxyInstance(Class<T> clazz, HandlerInterceptor... handlerInterceptors) {
 		return createProxyInstance(clazz, null, null, handlerInterceptors);
@@ -118,12 +125,13 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param clazz		define class
-	 * @param paramClasses  parameter class array
-	 * @param args		Constructor parameters
+	 *
+	 * @param <T>               T
+	 * @param clazz             define class
+	 * @param paramClasses      parameter class array
+	 * @param args              Constructor parameters
 	 * @param methodInterceptor method interceptor instance
-	 * @param <T>		T
-	 * @return			object instance
+	 * @return object instance
 	 */
 	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor) {
 		HandlerInterceptor[] methodInterceptors = null;
@@ -135,12 +143,13 @@ public final class ObjectUtils {
 
 	/**
 	 * Create a proxy object instance
-	 * @param clazz		define class
-	 * @param paramClasses  parameter class array
-	 * @param args		Constructor parameters
-	 * @param methodInterceptors  method interceptor instance arrays
-	 * @param <T>		T
-	 * @return			object instance
+	 *
+	 * @param <T>                T
+	 * @param clazz              define class
+	 * @param paramClasses       parameter class array
+	 * @param args               Constructor parameters
+	 * @param methodInterceptors method interceptor instance arrays
+	 * @return object instance
 	 */
 	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args,
 											HandlerInterceptor[] methodInterceptors) {
@@ -186,6 +195,7 @@ public final class ObjectUtils {
 	/**
 	 * Return whether the given throwable is a checked exception:
 	 * that is, neither a RuntimeException nor an Error.
+	 *
 	 * @param ex the throwable to check
 	 * @return whether the throwable is a checked exception
 	 * @see java.lang.Exception
@@ -199,7 +209,8 @@ public final class ObjectUtils {
 	/**
 	 * Check whether the given exception is compatible with the exceptions
 	 * declared in a throw clause.
-	 * @param ex the exception to checked
+	 *
+	 * @param ex                 the exception to checked
 	 * @param declaredExceptions the exceptions declared in the throws clause
 	 * @return whether the given exception is compatible
 	 */
@@ -220,6 +231,7 @@ public final class ObjectUtils {
 	/**
 	 * Return whether the given array is empty: that is, <code>null</code>
 	 * or of zero length.
+	 *
 	 * @param array the array to check
 	 * @return whether the given array is empty
 	 */
@@ -230,6 +242,7 @@ public final class ObjectUtils {
 	/**
 	 * Return whether the given array is empty: that is, <code>null</code>
 	 * or of zero length.
+	 *
 	 * @param object the object to check
 	 * @return whether the given array is empty
 	 */
@@ -251,8 +264,8 @@ public final class ObjectUtils {
 
 	/**
 	 * Check whether the given array contains the given element.
-	 * @param array the array to check (maybe <code>null</code>,
-	 * in which case the return value will always be <code>false</code>)
+	 *
+	 * @param array   the array to check (maybe <code>null</code>, in which case the return value will always be <code>false</code>)
 	 * @param element the element to check for
 	 * @return whether the element has been found in the given array
 	 */
@@ -271,8 +284,9 @@ public final class ObjectUtils {
 	/**
 	 * Append the given Object to the given array, returning a new array
 	 * consisting of the input array contents plus the given Object.
+	 *
 	 * @param array the array to append to (can be <code>null</code>)
-	 * @param obj the Object to append
+	 * @param obj   the Object to append
 	 * @return the new array (of the same component type; never <code>null</code>)
 	 */
 	public static Object[] addObjectToArray(Object[] array, Object obj) {
@@ -297,6 +311,7 @@ public final class ObjectUtils {
 	 * object array (if necessary of primitive wrapper objects).
 	 * <p>A <code>null</code> source value will be converted to an
 	 * empty Object array.
+	 *
 	 * @param source the (potentially primitive) array
 	 * @return the corresponding object array (never <code>null</code>)
 	 * @throws IllegalArgumentException if the parameter is not an array
@@ -323,6 +338,12 @@ public final class ObjectUtils {
 		return newArray;
 	}
 
+	/**
+	 * Retrieve simple data type data type.
+	 *
+	 * @param clazz the clazz
+	 * @return the data type
+	 */
 	public static DataType retrieveSimpleDataType(Class<?> clazz) {
 		if (clazz == null) {
 			return DataType.UNKNOWN;
@@ -366,10 +387,11 @@ public final class ObjectUtils {
 	 * <code>null</code>.
 	 * <p>Compares arrays with <code>Arrays.equals</code>, performing an equality
 	 * check based on the array elements rather than the array reference.
+	 *
 	 * @param o1 first Object to compare
 	 * @param o2 second Object to compare
 	 * @return whether the given objects are equal
-	 * @see java.util.Arrays#equals
+	 * @see java.util.Arrays#equals java.util.Arrays#equals
 	 */
 	public static boolean nullSafeEquals(Object o1, Object o2) {
 		if (o1 == o2) {
@@ -419,17 +441,18 @@ public final class ObjectUtils {
 	 * this method will delegate to any of the <code>nullSafeHashCode</code>
 	 * methods for arrays in this class. If the object is <code>null</code>,
 	 * this method returns 0.
-	 * @param obj		check object
-	 * @see #nullSafeHashCode(Object[])
-	 * @see #nullSafeHashCode(boolean[])
-	 * @see #nullSafeHashCode(byte[])
-	 * @see #nullSafeHashCode(char[])
-	 * @see #nullSafeHashCode(double[])
-	 * @see #nullSafeHashCode(float[])
-	 * @see #nullSafeHashCode(int[])
-	 * @see #nullSafeHashCode(long[])
-	 * @see #nullSafeHashCode(short[])
+	 *
+	 * @param obj check object
 	 * @return object hash code
+	 * @see #nullSafeHashCode(Object[]) #nullSafeHashCode(Object[])
+	 * @see #nullSafeHashCode(boolean[]) #nullSafeHashCode(boolean[])
+	 * @see #nullSafeHashCode(byte[]) #nullSafeHashCode(byte[])
+	 * @see #nullSafeHashCode(char[]) #nullSafeHashCode(char[])
+	 * @see #nullSafeHashCode(double[]) #nullSafeHashCode(double[])
+	 * @see #nullSafeHashCode(float[]) #nullSafeHashCode(float[])
+	 * @see #nullSafeHashCode(int[]) #nullSafeHashCode(int[])
+	 * @see #nullSafeHashCode(long[]) #nullSafeHashCode(long[])
+	 * @see #nullSafeHashCode(short[]) #nullSafeHashCode(short[])
 	 */
 	public static int nullSafeHashCode(Object obj) {
 		if (obj == null) {
@@ -470,8 +493,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(Object[] array) {
 		if (array == null) {
@@ -488,8 +512,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(boolean[] array) {
 		if (array == null) {
@@ -505,8 +530,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(byte[] array) {
 		if (array == null) {
@@ -522,8 +548,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(char[] array) {
 		if (array == null) {
@@ -539,8 +566,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(double[] array) {
 		if (array == null) {
@@ -556,8 +584,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(float[] array) {
 		if (array == null) {
@@ -573,8 +602,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(int[] array) {
 		if (array == null) {
@@ -590,8 +620,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(long[] array) {
 		if (array == null) {
@@ -607,8 +638,9 @@ public final class ObjectUtils {
 	/**
 	 * Return a hash code based on the contents of the specified array.
 	 * If <code>array</code> is <code>null</code>, this method returns 0.
-	 * @param array	  specified array
-	 * @return 	hash code result
+	 *
+	 * @param array specified array
+	 * @return hash code result
 	 */
 	public static int nullSafeHashCode(short[] array) {
 		if (array == null) {
@@ -623,9 +655,10 @@ public final class ObjectUtils {
 
 	/**
 	 * Return the same value as <code>{@link Boolean#hashCode()}</code>.
-	 * @see Boolean#hashCode()
-	 * @param bool	  boolean value
-	 * @return 	hash code result
+	 *
+	 * @param bool boolean value
+	 * @return hash code result
+	 * @see Boolean#hashCode() Boolean#hashCode()
 	 */
 	public static int hashCode(boolean bool) {
 		return bool ? 1231 : 1237;
@@ -633,9 +666,10 @@ public final class ObjectUtils {
 
 	/**
 	 * Return the same value as <code>{@link Double#hashCode()}</code>.
-	 * @see Double#hashCode()
-	 * @param dbl	  double value
-	 * @return 	hash code result
+	 *
+	 * @param dbl double value
+	 * @return hash code result
+	 * @see Double#hashCode() Double#hashCode()
 	 */
 	public static int hashCode(double dbl) {
 		return hashCode(Double.doubleToLongBits(dbl));
@@ -643,9 +677,10 @@ public final class ObjectUtils {
 
 	/**
 	 * Return the same value as <code>{@link Float#hashCode()}</code>.
-	 * @see Float#hashCode()
-	 * @param flt	  float value
-	 * @return 	hash code result
+	 *
+	 * @param flt float value
+	 * @return hash code result
+	 * @see Float#hashCode() Float#hashCode()
 	 */
 	public static int hashCode(float flt) {
 		return Float.floatToIntBits(flt);
@@ -653,9 +688,10 @@ public final class ObjectUtils {
 
 	/**
 	 * Return the same value as <code>{@link Long#hashCode()}</code>.
-	 * @see Long#hashCode()
-	 * @param lng	  long value
-	 * @return 	hash code result
+	 *
+	 * @param lng long value
+	 * @return hash code result
+	 * @see Long#hashCode() Long#hashCode()
 	 */
 	public static int hashCode(long lng) {
 		return (int) (lng ^ (lng >>> 32));
@@ -668,9 +704,9 @@ public final class ObjectUtils {
 
 	/**
 	 * Return a String representation of an object's overall identity.
+	 *
 	 * @param obj the object (maybe <code>null</code>)
-	 * @return the object's identity as String representation,
-	 * or an empty String if the object was <code>null</code>
+	 * @return the object's identity as String representation, or an empty String if the object was <code>null</code>
 	 */
 	public static String identityToString(Object obj) {
 		if (obj == null) {
@@ -681,6 +717,7 @@ public final class ObjectUtils {
 
 	/**
 	 * Return a hex String form of an object's identity hash code.
+	 *
 	 * @param obj the object
 	 * @return the object's identity code in hex notation
 	 */
@@ -693,9 +730,10 @@ public final class ObjectUtils {
 	 * not <code>null</code>; otherwise returns an empty String.
 	 * <p>Differs from {@link #nullSafeToString(Object)} in that it returns
 	 * an empty String rather than "null" for a <code>null</code> value.
+	 *
 	 * @param obj the object to build a display String for
 	 * @return a display String representation of <code>obj</code>
-	 * @see #nullSafeToString(Object)
+	 * @see #nullSafeToString(Object) #nullSafeToString(Object)
 	 */
 	public static String getDisplayString(Object obj) {
 		if (obj == null) {
@@ -707,6 +745,7 @@ public final class ObjectUtils {
 	/**
 	 * Determine the class name for the given object.
 	 * <p>Returns <code>"null"</code> if <code>obj</code> is <code>null</code>.
+	 *
 	 * @param obj the object to introspect (maybe <code>null</code>)
 	 * @return the corresponding class name
 	 */
@@ -718,6 +757,7 @@ public final class ObjectUtils {
 	 * Return a String representation of the specified Object.
 	 * <p>Builds a String representation of the contents in case of an array.
 	 * Returns <code>"null"</code> if <code>obj</code> is <code>null</code>.
+	 *
 	 * @param obj the object to build a String representation for
 	 * @return a String representation of <code>obj</code>
 	 */
@@ -775,6 +815,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -796,6 +837,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -817,6 +859,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -838,6 +881,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -859,6 +903,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -880,6 +925,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -901,6 +947,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -922,6 +969,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */
@@ -943,6 +991,7 @@ public final class ObjectUtils {
 	 * enclosed in curly braces (<code>"{}"</code>). Adjacent elements are separated
 	 * by the characters <code>", "</code> (a comma followed by a space). Returns
 	 * <code>"null"</code> if <code>array</code> is <code>null</code>.
+	 *
 	 * @param array the array to build a String representation for
 	 * @return a String representation of <code>array</code>
 	 */

@@ -30,13 +30,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.KeyPair;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -55,11 +55,9 @@ import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
-import org.nervousync.beans.files.FileExtensionInfo;
 import org.nervousync.beans.xml.files.SegmentationFile;
 import org.nervousync.beans.xml.files.SegmentationItem;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.MIMETypes;
 import org.nervousync.zip.ZipFile;
 
 /**
@@ -122,134 +120,42 @@ public final class FileUtils {
 	 * Line break character
 	 */
 	public static final String NEWLINE_CHARACTER = "\n";
+	/**
+	 * The constant MIME_TYPE_TEXT.
+	 */
+	public static final String MIME_TYPE_TEXT = "text/plain";
+	/**
+	 * The constant MIME_TYPE_TEXT_XML.
+	 */
+	public static final String MIME_TYPE_TEXT_XML = "text/xml";
+	/**
+	 * The constant MIME_TYPE_TEXT_YAML.
+	 */
+	public static final String MIME_TYPE_TEXT_YAML = "text/yaml";
+	/**
+	 * The constant MIME_TYPE_BINARY.
+	 */
+	public static final String MIME_TYPE_BINARY = "application/octet-stream";
+	/**
+	 * The constant MIME_TYPE_XML.
+	 */
+	public static final String MIME_TYPE_XML = "application/xml";
+	/**
+	 * The constant MIME_TYPE_JSON.
+	 */
+	public static final String MIME_TYPE_JSON = "application/json";
 
 	/**
-	 * Registered identified map
+	 * The constant MIME_TYPE_YAML.
 	 */
-	private static final Hashtable<String, FileExtensionInfo> REGISTER_IDENTIFIED_MAP = new Hashtable<>();
-
-	/**
-	 * Define file type code for picture
-	 */
-	public static final int FILE_TYPE_PIC 				= 0;
-	/**
-	 * Define file type code for audio
-	 */
-	public static final int FILE_TYPE_AUDIO 			= 1;
-	/**
-	 * Define file type code for video
-	 */
-	public static final int FILE_TYPE_VIDEO 			= 2;
-	/**
-	 * Define file type code for jar
-	 */
-	public static final int FILE_TYPE_JAVA_PACKAGE 		= 3;
-	/**
-	 * Define file type code for java
-	 */
-	public static final int FILE_TYPE_JAVA_FILE 		= 4;
-	/**
-	 * Define file type code for java class
-	 */
-	public static final int FILE_TYPE_JAVA_CLASS 		= 5;
-	/**
-	 * Define file type code for properties
-	 */
-	public static final int FILE_TYPE_JAVA_RESOURCE 	= 6;
-	/**
-	 * Define file type code for compress
-	 */
-	public static final int FILE_TYPE_COMPRESS 			= 7;
-	/**
-	 * Define file type code for document
-	 */
-	public static final int FILE_TYPE_DOCUMENT 			= 8;
-	/**
-	 * Define file type code for xml
-	 */
-	public static final int FILE_TYPE_XML 				= 9;
-	/**
-	 * Define file type code for xml
-	 */
-	public static final int FILE_TYPE_JSON 				= 10;
-	/**
-	 * Define file type code for access database
-	 */
-	public static final int FILE_TYPE_DATABASE_FILE 	= 11;
-	/**
-	 * Define file type code for sql
-	 */
-	public static final int FILE_TYPE_DATABASE_SQL 		= 12;
-	/**
-	 * Define file type code for Outlook email configure
-	 */
-	public static final int FILE_TYPE_EMAIL_CONF 		= 13;
-	/**
-	 * Define file type code for eml
-	 */
-	public static final int FILE_TYPE_EMAIL_DOCUMENT 	= 14;
-	/**
-	 * Define file type code for html
-	 */
-	public static final int FILE_TYPE_WEB_HTML 			= 15;
-	/**
-	 * Define file type code for javascript
-	 */
-	public static final int FILE_TYPE_WEB_JS 			= 16;
-	/**
-	 * Define file type code for css
-	 */
-	public static final int FILE_TYPE_WEB_CSS 			= 17;
-	/**
-	 * Define file type code for unknown
-	 */
-	public static final int FILE_TYPE_UNKNOWN 			= 18;
+	public static final String MIME_TYPE_YAML = "application/x-yaml";
 
 	private FileUtils() {
 	}
 
 	static {
-		FileUtils.registerFileType();
 		//  Register SMB protocol handler for using java.net.URL class with "smb://"
 		Config.registerSmbURLHandler();
-	}
-
-	/**
-	 * Register user define file type
-	 *
-	 * @param extensionName  file extension name
-	 * @param identifiedCode file identified code
-	 * @param fileType       file type code
-	 * @param printing       file is ready for printing
-	 */
-	public static void registerFileType(String extensionName, String identifiedCode,
-	                                    int fileType, boolean printing) {
-		FileUtils.checkRegisterFileType(extensionName);
-		extensionName = extensionName.toLowerCase();
-		FileUtils.REGISTER_IDENTIFIED_MAP.put(extensionName,
-				new FileExtensionInfo(extensionName, identifiedCode, null, fileType, printing));
-	}
-
-	/**
-	 * Register user define file type
-	 *
-	 * @param extensionName  file extension name
-	 * @param identifiedCode file identified code
-	 * @param mimeType       file mime type
-	 * @param fileType       file type code
-	 * @param printing       file is ready for printing
-	 */
-	public static void registerFileType(String extensionName, String identifiedCode, String mimeType,
-	                                    int fileType, boolean printing) {
-		FileUtils.checkRegisterFileType(extensionName);
-		extensionName = extensionName.toLowerCase();
-
-		if (mimeType == null) {
-			mimeType = MIMETypes.MIME_TYPE_BINARY;
-		}
-
-		FileUtils.REGISTER_IDENTIFIED_MAP.put(extensionName,
-				new FileExtensionInfo(extensionName, identifiedCode, mimeType, fileType, printing));
 	}
 
 	/**
@@ -259,8 +165,8 @@ public final class FileUtils {
 	 * @param folderPath folder path
 	 * @return Match result
 	 */
-	public static boolean matchFolder(String entryPath, String folderPath) {
-		if (entryPath == null || folderPath == null) {
+	public static boolean matchFolder(final String entryPath, final String folderPath) {
+		if (StringUtils.isEmpty(entryPath) || StringUtils.isEmpty(folderPath)) {
 			return Boolean.FALSE;
 		}
 
@@ -276,7 +182,7 @@ public final class FileUtils {
 	 * @param ignoreCase ignore character case
 	 * @return Match result
 	 */
-	public static boolean matchFilePath(String origPath, String destPath, boolean ignoreCase) {
+	public static boolean matchFilePath(final String origPath, final String destPath, final boolean ignoreCase) {
 		if (origPath == null || destPath == null) {
 			return Boolean.FALSE;
 		}
@@ -292,138 +198,23 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Check the resource location is compressed jar file
-	 *
-	 * @param resourceLocation resource location
-	 * @return check status
-	 * @throws FileNotFoundException resource location file was not exists
-	 */
-	public static boolean isJarFile(String resourceLocation) throws FileNotFoundException {
-		if (resourceLocation == null) {
-			throw new FileNotFoundException("The resource location is null!");
-		}
-
-		if (FileUtils.retrieveFileType(StringUtils.getFilenameExtension(resourceLocation))
-				== FileUtils.FILE_TYPE_JAVA_PACKAGE) {
-			return FileUtils.validateFileType(resourceLocation);
-		}
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Retrieve exists file type code
-	 *
-	 * @param extensionName extension name
-	 * @return found file type code or #FILE_TYPE_UNKNOWN for not found or file identify code check error
-	 */
-	public static int retrieveFileType(String extensionName) {
-		if (extensionName != null) {
-			extensionName = extensionName.toLowerCase();
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-			if (fileExtensionInfo != null) {
-				return fileExtensionInfo.getFileType();
-			}
-		}
-
-		return FileUtils.FILE_TYPE_UNKNOWN;
-	}
-
-	/**
-	 * Retrieve data type int.
-	 *
-	 * @param dataBytes the data bytes
-	 * @return the int
-	 */
-	public static int retrieveDataType(byte[] dataBytes) {
-		String identifiedCode = ConvertUtils.byteToHex(dataBytes);
-		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDENTIFIED_MAP.values()) {
-			if (identifiedCode.startsWith(fileExtensionInfo.getIdentifiedCode())) {
-				return fileExtensionInfo.getFileType();
-			}
-		}
-		return FileUtils.FILE_TYPE_UNKNOWN;
-	}
-
-	/**
 	 * Retrieve MIMEType string
 	 *
 	 * @param extensionName extension name
 	 * @return MIMEType string
 	 */
-	public static String retrieveMimeType(String extensionName) {
-		if (extensionName != null) {
-			extensionName = extensionName.toLowerCase();
-			FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-			if (fileExtensionInfo != null) {
-				return fileExtensionInfo.getMimeType();
-			}
+	public static String retrieveMimeType(final String extensionName) {
+		if (StringUtils.notBlank(extensionName)) {
+			String extName = extensionName.startsWith(".") ? extensionName : "." + extensionName;
+			return Optional.ofNullable(URLConnection.getFileNameMap().getContentTypeFor(extName))
+					.orElse(MIME_TYPE_BINARY);
 		}
 
-		return MIMETypes.MIME_TYPE_BINARY;
+		return MIME_TYPE_BINARY;
 	}
 
-	/**
-	 * Validate resource file with identify code
-	 *
-	 * @param resourceLocation resource location
-	 * @return validate result
-	 */
-	public static boolean validateFileType(String resourceLocation) {
-		if (resourceLocation == null) {
-			return Boolean.FALSE;
-		}
-
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation);
-		extensionName = extensionName.toLowerCase();
-		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName.toLowerCase());
-		if (fileExtensionInfo != null) {
-			byte[] fileTypeByte = FileUtils.readFileBytes(resourceLocation, 0,
-					fileExtensionInfo.getIdentifiedCode().length() / 2);
-			String fileType = ConvertUtils.byteToHex(fileTypeByte);
-			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
-		}
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Identified file type
-	 *
-	 * @param extensionName extension name
-	 * @param fileContent   File data as byte arrays
-	 * @return identified result
-	 */
-	public static boolean validateFileType(String extensionName, byte[] fileContent) {
-		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName.toLowerCase());
-		if (fileExtensionInfo != null) {
-			int identifiedLength = fileExtensionInfo.getIdentifiedCode().length() / 2;
-			if (fileContent.length < identifiedLength) {
-				return Boolean.FALSE;
-			}
-			byte[] fileTypeByte = new byte[identifiedLength];
-
-			System.arraycopy(fileContent, 0, fileTypeByte, 0, identifiedLength);
-
-			String fileType = ConvertUtils.byteToHex(fileTypeByte);
-			return fileType.equalsIgnoreCase(fileExtensionInfo.getIdentifiedCode());
-		}
-
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Retrieve file extension name with file identified code
-	 *
-	 * @param identifiedByteCode identified code
-	 * @return matched file extension name
-	 */
-	public static String identifiedFileType(byte[] identifiedByteCode) {
-		String identifiedCode = ConvertUtils.byteToHex(identifiedByteCode);
-		for (FileExtensionInfo fileExtensionInfo : FileUtils.REGISTER_IDENTIFIED_MAP.values()) {
-			if (identifiedCode.startsWith(fileExtensionInfo.getIdentifiedCode())) {
-				return fileExtensionInfo.getExtensionName();
-			}
-		}
-		return null;
+	public static boolean imageFile(final String fileLocation) {
+		return retrieveMimeType(StringUtils.getFilenameExtension(fileLocation)).contains("image");
 	}
 
 	/**
@@ -434,7 +225,7 @@ public final class FileUtils {
 	 * @return true when location qualifies as a URL, Boolean.FALSE for others
 	 * @see java.net.URL
 	 */
-	public static boolean isUrl(String resourceLocation) {
+	public static boolean isUrl(final String resourceLocation) {
 		if (!FileUtils.isExists(resourceLocation)) {
 			return Boolean.FALSE;
 		}
@@ -456,7 +247,7 @@ public final class FileUtils {
 	 * @return a corresponding URL object
 	 * @throws FileNotFoundException if the resource cannot be resolved to a URL
 	 */
-	public static URL getURL(String resourceLocation) throws FileNotFoundException {
+	public static URL getURL(final String resourceLocation) throws FileNotFoundException {
 		if (resourceLocation == null) {
 			throw new IllegalArgumentException("Resource location must not be null");
 		}
@@ -547,20 +338,6 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Open Samba file input stream
-	 *
-	 * @param resourceLocation resource location
-	 * @return input stream
-	 * @throws IOException when opening input stream error
-	 */
-	public static InputStream loadSMBFile(String resourceLocation) throws IOException {
-		if (resourceLocation == null || !resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
-			throw new IOException("SMB file path error! ");
-		}
-		return new SmbFileInputStream(resourceLocation, new BaseContext(new PropertyConfiguration(new Properties())));
-	}
-
-	/**
 	 * Load resource and convert to java.io.InputStream used <code>Globals.DEFAULT_ENCODING</code>
 	 *
 	 * @param resourceLocation resource location
@@ -568,21 +345,46 @@ public final class FileUtils {
 	 * @throws IOException when opening input stream error
 	 */
 	public static InputStream loadFile(String resourceLocation) throws IOException {
+		if (StringUtils.isEmpty(resourceLocation)) {
+			throw new IOException("Resource location is null! ");
+		}
 		//	Convert resource location to input stream
-		InputStream inputStream = FileUtils.class.getResourceAsStream(resourceLocation);
+		InputStream inputStream;
 
-		if (inputStream == null) {
-			try {
-				inputStream = FileUtils.getURL(resourceLocation).openStream();
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Open file input stream error! ", e);
+		if (resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
+			inputStream = new SmbFileInputStream(resourceLocation,
+					new BaseContext(new PropertyConfiguration(new Properties())));
+		} else {
+			inputStream = FileUtils.class.getResourceAsStream(resourceLocation);
+			if (inputStream == null) {
+				try {
+					inputStream = FileUtils.getURL(resourceLocation).openStream();
+				} catch (Exception e) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Open file input stream error! ", e);
+					}
+					throw new IOException(e);
 				}
-				throw new IOException(e);
 			}
 		}
-
 		return inputStream;
+	}
+
+	public static InputStream loadFile(final String smbLocation, final Properties properties) throws IOException {
+		return loadFile(smbLocation, properties, null);
+	}
+
+	public static InputStream loadFile(final String smbLocation,
+	                                   final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) throws IOException {
+		return loadFile(smbLocation, null, ntlmPasswordAuthenticator);
+	}
+
+	public static InputStream loadFile(final String smbLocation, final Properties properties,
+	                                   final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) throws IOException {
+		if (StringUtils.isEmpty(smbLocation) || !smbLocation.startsWith(SAMBA_URL_PREFIX)) {
+			throw new IOException("Location is not a valid smb location! ");
+		}
+		return new SmbFileInputStream(smbLocation, generateContext(properties, ntlmPasswordAuthenticator));
 	}
 
 	/**
@@ -595,7 +397,7 @@ public final class FileUtils {
 	 * @return a corresponding File object
 	 * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
 	 */
-	public static File getFile(String resourceLocation) throws FileNotFoundException {
+	public static File getFile(final String resourceLocation) throws FileNotFoundException {
 		if (resourceLocation == null) {
 			throw new IllegalArgumentException("Resource location must not be null");
 		}
@@ -642,8 +444,7 @@ public final class FileUtils {
 	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
 	 * @return the file
 	 */
-	public static SmbFile getFile(final String filePath,
-	                              final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
+	public static SmbFile getFile(final String filePath, final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
 		if (StringUtils.isEmpty(filePath)) {
 			return null;
 		}
@@ -657,11 +458,31 @@ public final class FileUtils {
 	/**
 	 * Gets file.
 	 *
+	 * @param filePath                  the file path
+	 * @param properties                the properties
+	 * @param ntlmPasswordAuthenticator the ntlm password authenticator
+	 * @return the file
+	 */
+	public static SmbFile getFile(final String filePath, final Properties properties,
+	                              final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
+		if (StringUtils.isEmpty(filePath)) {
+			return null;
+		}
+		try {
+			return new SmbFile(filePath, generateContext(properties, ntlmPasswordAuthenticator));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Gets file.
+	 *
 	 * @param filePath    the file path
 	 * @param cifsContext the cifs context
 	 * @return the file
 	 */
-	public static SmbFile getFile(final String filePath, final CIFSContext cifsContext) {
+	private static SmbFile getFile(final String filePath, final CIFSContext cifsContext) {
 		if (StringUtils.isEmpty(filePath)) {
 			return null;
 		}
@@ -1069,7 +890,7 @@ public final class FileUtils {
 	 * @param url the URL to convert into a URI instance
 	 * @return the URI instance
 	 * @throws URISyntaxException if the URL wasn't a valid URI
-	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()
+	 * @see java.net.URL#toURI() java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()java.net.URL#toURI()
 	 */
 	public static URI toURI(URL url) throws URISyntaxException {
 		return FileUtils.toURI(url.toString());
@@ -1807,7 +1628,7 @@ public final class FileUtils {
 				int readLength;
 				byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 				while ((readLength = inputStream.read(readBuffer, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_BUFFER_SIZE)) != Globals.DEFAULT_VALUE_INT) {
-					outputStream.write(readBuffer, 0, readLength);
+					outputStream.write(readBuffer, Globals.INITIALIZE_INT_VALUE, readLength);
 				}
 				outputStream.flush();
 				return Boolean.TRUE;
@@ -1818,7 +1639,8 @@ public final class FileUtils {
 			FileOutputStream fileOutputStream = null;
 			try {
 				File destFile = FileUtils.getFile(filePath);
-				if (destFile.mkdirs()) {
+				File folder = destFile.getParentFile();
+				if (folder.exists() || folder.mkdirs()) {
 					fileOutputStream = new FileOutputStream(destFile);
 					int readLength;
 					byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
@@ -2803,94 +2625,6 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Check current file type is compress file
-	 *
-	 * @param resourceLocation Resource location
-	 * @return Check result
-	 */
-	public static boolean isCompressFile(String resourceLocation) {
-		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Boolean.FALSE;
-		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
-
-		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-		if (fileExtensionInfo != null) {
-			return fileExtensionInfo.isCompressFile();
-		}
-
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Check current file type is ready for printing
-	 *
-	 * @param resourceLocation Resource location
-	 * @return Check result
-	 */
-	public static boolean isPrintable(String resourceLocation) {
-		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Boolean.FALSE;
-		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
-
-		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-		if (fileExtensionInfo != null) {
-			return fileExtensionInfo.isPrintable();
-		}
-
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Check current file type is a picture file
-	 *
-	 * @param resourceLocation Resource location
-	 * @return Check result
-	 */
-	public static boolean isPicture(String resourceLocation) {
-		if (!FileUtils.validateFileType(resourceLocation)) {
-			return Boolean.FALSE;
-		}
-		String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
-
-		FileExtensionInfo fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-		if (fileExtensionInfo != null) {
-			return fileExtensionInfo.isPicture();
-		}
-
-		return Boolean.FALSE;
-	}
-
-	/**
-	 * Check current file type is a picture file
-	 *
-	 * @param fileContent the file content
-	 * @return Check result
-	 */
-	public static boolean isPicture(byte[] fileContent) {
-		return FileUtils.REGISTER_IDENTIFIED_MAP.values()
-				.stream()
-				.filter(FileExtensionInfo::isPicture)
-				.anyMatch(fileExtensionInfo -> validateFileType(fileExtensionInfo.getExtensionName(), fileContent));
-	}
-
-	/**
-	 * Retrieve extension info optional.
-	 *
-	 * @param resourceLocation the resource location
-	 * @return the optional
-	 */
-	public static Optional<FileExtensionInfo> retrieveExtensionInfo(String resourceLocation) {
-		FileExtensionInfo fileExtensionInfo = null;
-		if (FileUtils.validateFileType(resourceLocation)) {
-			String extensionName = StringUtils.getFilenameExtension(resourceLocation).toLowerCase();
-			fileExtensionInfo = FileUtils.REGISTER_IDENTIFIED_MAP.get(extensionName);
-		}
-		return Optional.ofNullable(fileExtensionInfo);
-	}
-
-	/**
 	 * Check current file is exists
 	 *
 	 * @param filePath File path
@@ -3175,11 +2909,10 @@ public final class FileUtils {
 				FileUtils.removeFile(savePath);
 				return Boolean.FALSE;
 			}
+			return Boolean.TRUE;
 		} catch (Exception e) {
 			return Boolean.FALSE;
 		}
-
-		return FileUtils.validateFileType(savePath);
 	}
 
 	/**
@@ -3207,10 +2940,6 @@ public final class FileUtils {
 											   final String domain, final String userName, final String passWord) {
 		if (!FileUtils.isExists(filePath, smbAuthenticator(domain, userName, passWord))) {
 			return null;
-		}
-
-		if (!FileUtils.validateFileType(filePath)) {
-			LOGGER.warn("Validate file type error! Maybe invalid");
 		}
 
 		List<SegmentationItem> segmentationItemList = new ArrayList<>();
@@ -3315,45 +3044,6 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Generate file data.
-	 *
-	 * @param folderPath the folder path
-	 * @param targetPath the target path
-	 * @throws IOException the io exception
-	 */
-	public static void generateFileData(String folderPath, String targetPath) throws IOException {
-		List<String> fileList = FileUtils.listFiles(folderPath);
-		byte[] intBuffer = new byte[4];
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, fileList.size());
-		try (RandomAccessFile randomAccessFile = new RandomAccessFile(targetPath, Globals.WRITE_MODE)) {
-			randomAccessFile.write(intBuffer);
-			fileList.forEach(filePath ->
-					Optional.ofNullable(StringUtils.fileToObject(filePath, FileExtensionInfo.class))
-							.ifPresent(fileExtensionInfo -> {
-								try {
-									randomAccessFile.write(fileExtensionInfo.convertToByteArray());
-								} catch (IOException e) {
-									if (LOGGER.isDebugEnabled()) {
-										LOGGER.debug("Write data item error! ", e);
-									}
-								}
-							}));
-		} catch (FileNotFoundException e) {
-			LOGGER.error("Generate file data error! ", e);
-		}
-	}
-
-	private static void checkRegisterFileType(String extensionName) {
-		if (extensionName == null) {
-			return;
-		}
-		extensionName = extensionName.toLowerCase();
-		if (FileUtils.REGISTER_IDENTIFIED_MAP.containsKey(extensionName.toLowerCase())) {
-			LOGGER.warn("Override file type define! Ext name: " + extensionName);
-		}
-	}
-
-	/**
 	 * Replace page separator to "|"
 	 * @param path      file path
 	 * @return          replaced file path
@@ -3385,57 +3075,6 @@ public final class FileUtils {
 			}
 		}
 		return Boolean.FALSE;
-	}
-
-	/**
-	 * Register default file type value
-	 */
-	private static void registerFileType() {
-		InputStream inputStream;
-
-		inputStream = FileUtils.class.getClassLoader().getResourceAsStream("org/nervousync/datas/File.dat");
-		byte[] bytes = IOUtils.readBytes(inputStream);
-		IOUtils.closeStream(inputStream);
-
-		if (bytes == null || bytes.length == 0) {
-			return;
-		}
-
-		List<FileExtensionInfo> extensionInfoList = new ArrayList<>();
-		byte[] readBuffer;
-		byte[] intBuffer = new byte[4];
-		System.arraycopy(bytes, 0, intBuffer, 0, 4);
-		int dataCount = RawUtils.readInt(intBuffer, RawUtils.Endian.LITTLE);
-		int srcPos = 4;
-		LOGGER.info("File identified information count: {}", dataCount);
-		for (int i = 0 ; i < dataCount ; i++) {
-			byte[] indexData = new byte[6];
-			System.arraycopy(bytes, srcPos, indexData, 0, indexData.length);
-			srcPos += 6;
-
-			int fileType = indexData[0];
-			boolean printing = ((int)indexData[1]) == 1;
-			int dataLength = RawUtils.readInt(indexData, 2, RawUtils.Endian.LITTLE);
-
-			readBuffer = new byte[dataLength];
-			System.arraycopy(bytes, srcPos, readBuffer, 0, dataLength);
-			srcPos += dataLength;
-			try {
-				String contentInfo = new String(readBuffer, Globals.DEFAULT_ENCODING);
-				extensionInfoList.add(new FileExtensionInfo(fileType, printing, contentInfo));
-			} catch (UnsupportedEncodingException e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Charset does not supported! ", e);
-				}
-			}
-		}
-
-		for (FileExtensionInfo fileExtensionInfo : extensionInfoList) {
-			if (REGISTER_IDENTIFIED_MAP.containsKey(fileExtensionInfo.getExtensionName())) {
-				LOGGER.warn("Override file extension info, extension name: " + fileExtensionInfo.getExtensionName());
-			}
-			REGISTER_IDENTIFIED_MAP.put(fileExtensionInfo.getExtensionName(), fileExtensionInfo);
-		}
 	}
 
 	/**
@@ -3490,6 +3129,9 @@ public final class FileUtils {
 
 	private static final class DirectoryFileFilter implements FileFilter {
 
+		/**
+		 * Instantiates a new Directory file filter.
+		 */
 		DirectoryFileFilter() {
 		}
 		public boolean accept(File pathname) {

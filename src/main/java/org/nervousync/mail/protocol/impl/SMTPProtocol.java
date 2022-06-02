@@ -21,8 +21,9 @@ import org.nervousync.mail.protocol.BaseProtocol;
 
 /**
  * Implement SMTP protocol
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:10:30 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 8:10:30 PM $
  */
 public final class SMTPProtocol extends BaseProtocol implements SendOperator {
 
@@ -31,6 +32,9 @@ public final class SMTPProtocol extends BaseProtocol implements SendOperator {
 	 */
 	private static final long serialVersionUID = -5226459745420272131L;
 
+	/**
+	 * Instantiates a new Smtp protocol.
+	 */
 	public SMTPProtocol() {
 		this.hostParam = "mail.smtp.host";
 		this.portParam = "mail.smtp.port";

@@ -42,13 +42,16 @@ import org.slf4j.LoggerFactory;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
  */
-public final class HttpResponseContent implements Serializable {
+public final class ResponseInfo implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1427305383899073910L;
-	
+
+	/**
+	 * Logger
+	 */
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
@@ -143,7 +146,13 @@ public final class HttpResponseContent implements Serializable {
 		return responseContent == null ? new byte[0] : responseContent.clone();
 	}
 
-	public HttpResponseContent(HttpResponse.ResponseInfo responseInfo, InputStream inputStream) {
+	/**
+	 * Instantiates a new Http response content.
+	 *
+	 * @param responseInfo the response info
+	 * @param inputStream  the input stream
+	 */
+	public ResponseInfo(HttpResponse.ResponseInfo responseInfo, InputStream inputStream) {
 		this.statusCode = responseInfo.statusCode();
 		responseInfo.headers().map().forEach((key, values) -> {
 			if (key != null && values != null && !values.isEmpty()) {
@@ -176,7 +185,7 @@ public final class HttpResponseContent implements Serializable {
 	 *
 	 * @param urlConnection the url connection
 	 */
-	public HttpResponseContent(HttpURLConnection urlConnection) {
+	public ResponseInfo(HttpURLConnection urlConnection) {
 		InputStream inputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		

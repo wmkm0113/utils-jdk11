@@ -18,9 +18,22 @@
 package org.nervousync.enumerations.ip;
 
 /**
+ * The enum Ip type.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $Date: 2018-09-21 18:25
+ * @version $Revision : 1.0 $Date: 2018-09-21 18:25
  */
 public enum IPType {
-	IPv4, IPv6, Unknown
+	/**
+	 * Pv 4 ip type.
+	 */
+	IPv4,
+	/**
+	 * Pv 6 ip type.
+	 */
+	IPv6,
+	/**
+	 * Unknown ip type.
+	 */
+	Unknown
 }

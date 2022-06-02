@@ -26,8 +26,10 @@ import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.ZipFile;
 
 /**
+ * The type Inflater input stream.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 1:06:01 PM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 1:06:01 PM $
  */
 public class InflaterInputStream extends PartInputStream {
 
@@ -36,7 +38,19 @@ public class InflaterInputStream extends PartInputStream {
 	private final byte[] oneByteBuffer = new byte[1];
 	private long writeBytes;
 	private final long originalSize;
-	
+
+	/**
+	 * Instantiates a new Inflater input stream.
+	 *
+	 * @param zipFile            the zip file
+	 * @param currentIndex       the current index
+	 * @param seekPosition       the seek position
+	 * @param length             the length
+	 * @param originalSize       the original size
+	 * @param decryptor          the decryptor
+	 * @param isAESEncryptedFile the is aes encrypted file
+	 * @throws IOException the io exception
+	 */
 	public InflaterInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition, final long length,
 	                           final long originalSize, final Decryptor decryptor, final boolean isAESEncryptedFile)
 			throws IOException {

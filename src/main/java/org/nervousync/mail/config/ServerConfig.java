@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE_2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,26 +28,47 @@ import java.util.Arrays;
 /**
  * The type Server config.
  */
-@XmlType(name = "server-config")
-@XmlRootElement(name = "server-config")
+@XmlType(name = "server_config")
+@XmlRootElement(name = "server_config")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class ServerConfig extends BeanObject {
 
     private static final long serialVersionUID = -1768113760096890529L;
 
-    @XmlElement(name = "host-name")
+    /**
+     * Host name
+     */
+    @XmlElement(name = "host_name")
     private String hostName;
-    @XmlElement(name = "host-port")
+    /**
+     * Host port
+     */
+    @XmlElement(name = "host_port")
     private int hostPort;
+    /**
+     * Using SSL
+     */
     @XmlElement(name = "ssl")
     private boolean ssl;
-    @XmlElement(name = "auth-login")
+    /**
+     * Auth Login
+     */
+    @XmlElement(name = "auth_login")
     private boolean authLogin;
+    /**
+     * Protocol option
+     */
     @XmlElement(name = "protocol")
     private String protocolOption;
-    @XmlElement(name = "connection-timeout")
+    /**
+     * Connect timeout
+     */
+    @XmlElement(name = "connection_timeout")
     private int connectionTimeout = 5;
-    @XmlElement(name = "process-timeout")
+    /**
+     * Process time out
+     */
+    @XmlElement(name = "process_timeout")
     private int processTimeout = 5;
 
     /**
@@ -202,6 +223,9 @@ public final class ServerConfig extends BeanObject {
         this.processTimeout = processTimeout;
     }
 
+    /**
+     * The type Builder.
+     */
     public static final class Builder {
 
         private static final String[] SUPPORTED_PROTOCOL = new String[]{"SMTP", "POP3", "IMAP"};
@@ -214,6 +238,12 @@ public final class ServerConfig extends BeanObject {
         private int connectionTimeout = 5;
         private int processTimeout = 5;
 
+        /**
+         * Instantiates a new Builder.
+         *
+         * @param protocolOption the protocol option
+         * @throws BuilderException the builder exception
+         */
         public Builder(String protocolOption) throws BuilderException {
             if (Arrays.stream(SUPPORTED_PROTOCOL).noneMatch(protocol -> protocol.equalsIgnoreCase(protocolOption))) {
                 throw new BuilderException("Unsupported protocol option");
@@ -221,6 +251,12 @@ public final class ServerConfig extends BeanObject {
             this.protocolOption = protocolOption;
         }
 
+        /**
+         * Instantiates a new Builder.
+         *
+         * @param serverConfig the server config
+         * @throws BuilderException the builder exception
+         */
         public Builder(ServerConfig serverConfig) throws BuilderException {
             if (serverConfig == null) {
                 throw new BuilderException("Server config is null! ");
@@ -234,10 +270,23 @@ public final class ServerConfig extends BeanObject {
             this.processTimeout = serverConfig.getProcessTimeout();
         }
 
+        /**
+         * Config host builder.
+         *
+         * @param hostAddress the host address
+         * @return the builder
+         */
         public Builder configHost(String hostAddress) {
             return this.configHost(hostAddress, Globals.DEFAULT_VALUE_INT);
         }
 
+        /**
+         * Config host builder.
+         *
+         * @param hostAddress the host address
+         * @param hostPort    the host port
+         * @return the builder
+         */
         public Builder configHost(String hostAddress, int hostPort) {
             this.hostName = hostAddress;
             if (hostPort > 0) {
@@ -246,16 +295,34 @@ public final class ServerConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Use ssl builder.
+         *
+         * @param useSSL the use ssl
+         * @return the builder
+         */
         public Builder useSSL(boolean useSSL) {
             this.ssl = useSSL;
             return this;
         }
 
+        /**
+         * Auth login builder.
+         *
+         * @param authLogin the auth login
+         * @return the builder
+         */
         public Builder authLogin(boolean authLogin) {
             this.authLogin = authLogin;
             return this;
         }
 
+        /**
+         * Connection time out builder.
+         *
+         * @param connectionTimeout the connection timeout
+         * @return the builder
+         */
         public Builder connectionTimeOut(int connectionTimeout) {
             if (connectionTimeout > 0) {
                 this.connectionTimeout = connectionTimeout;
@@ -263,6 +330,12 @@ public final class ServerConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Process timeout builder.
+         *
+         * @param processTimeout the process timeout
+         * @return the builder
+         */
         public Builder processTimeout(int processTimeout) {
             if (processTimeout > 0) {
                 this.processTimeout = processTimeout;
@@ -270,6 +343,12 @@ public final class ServerConfig extends BeanObject {
             return this;
         }
 
+        /**
+         * Build server config.
+         *
+         * @return the server config
+         * @throws BuilderException the builder exception
+         */
         public ServerConfig build() throws BuilderException {
             if (StringUtils.isEmpty(this.hostName)) {
                 throw new BuilderException("Unknown server host address! ");

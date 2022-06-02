@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nervousync</groupId>
 	<artifactId>utils-jdk11</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<packaging>jar</packaging>
 	<name>Pure Java Utils</name>
 	<url>https://nervousync.org/project/gene</url>
@@ -46,18 +46,18 @@
 		<junit.platform.version>1.8.2</junit.platform.version>
 		<jakarta.activation.version>2.0.1</jakarta.activation.version>
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
-		<jakarta.webservice.version>3.0.0</jakarta.webservice.version>
-		<jakarta.xml.webservice.version>3.0.1</jakarta.xml.webservice.version>
+		<jakarta.webservice.version>3.1.0</jakarta.webservice.version>
+		<jakarta.xml.webservice.version>4.0.0</jakarta.xml.webservice.version>
 		<jakarta.xml.binding.version>3.0.2</jakarta.xml.binding.version>
-		<jakarta.xml.soap.version>2.0.1</jakarta.xml.soap.version>
-		<bcprov.version>1.70</bcprov.version>
+		<jakarta.xml.soap.version>3.0.0</jakarta.xml.soap.version>
+		<bcprov.version>1.71</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
 		<log4j.version>2.17.2</log4j.version>
 		<slf4j.version>1.7.36</slf4j.version>
-		<jackson.version>2.13.2</jackson.version>
+		<jackson.version>2.13.3</jackson.version>
 		<yaml.version>1.30</yaml.version>
 		<jersey.version>3.0.4</jersey.version>
-		<snmp4j.version>3.6.7</snmp4j.version>
+		<snmp4j.version>3.7.0</snmp4j.version>
 		<jcifs.version>2.1.29</jcifs.version>
 	</properties>
 	<dependencies>
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>jakarta.jws</groupId>
 			<artifactId>jakarta.jws-api</artifactId>
-			<version>${jakarta.webservice.version}</version>
+			<version>3.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.ws.rs</groupId>
@@ -110,6 +110,11 @@
 			</exclusions>
 		</dependency>
 		<!-- Java Mail Support -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>jakarta.mail</artifactId>
+			<version>${jakarta.mail.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sun.activation</groupId>
 			<artifactId>jakarta.activation</artifactId>
@@ -160,12 +165,17 @@
 		<!-- Security Support -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
+			<artifactId>bcprov-jdk18on</artifactId>
 			<version>${bcprov.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>${bcprov.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcjmail-jdk18on</artifactId>
 			<version>${bcprov.version}</version>
 		</dependency>
 		<!-- CGLIB -->
@@ -257,7 +267,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.2.2</version>
+			<version>${jackson.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
@@ -328,7 +338,7 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>3.0.1</version>
+			<version>4.0.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.sun.activation</groupId>
@@ -542,6 +552,7 @@
 						</executions>
 						<configuration>
 							<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+							<doclint>-html</doclint>
 						</configuration>
 					</plugin>
 					<plugin>

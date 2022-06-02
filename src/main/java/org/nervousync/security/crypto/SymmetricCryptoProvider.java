@@ -13,8 +13,19 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
+/**
+ * The type Symmetric crypto provider.
+ */
 public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
 
+    /**
+     * Instantiates a new Symmetric crypto provider.
+     *
+     * @param cipherConfig the cipher config
+     * @param cryptoMode   the crypto mode
+     * @param cipherKey    the cipher key
+     * @throws CryptoException the crypto exception
+     */
     protected SymmetricCryptoProvider(CipherConfig cipherConfig, CryptoMode cryptoMode,
                                       CipherKey cipherKey) throws CryptoException {
         super(cipherConfig, cryptoMode, cipherKey);
@@ -73,6 +84,15 @@ public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
         }
     }
 
+    /**
+     * Generate key byte [ ].
+     *
+     * @param algorithm       the algorithm
+     * @param keySize         the key size
+     * @param randomAlgorithm the random algorithm
+     * @return the byte [ ]
+     * @throws CryptoException the crypto exception
+     */
     public static byte[] generateKey(String algorithm, int keySize, String randomAlgorithm) throws CryptoException {
         if (StringUtils.isEmpty(algorithm)) {
             throw new CryptoException("Unknown algorithm! ");

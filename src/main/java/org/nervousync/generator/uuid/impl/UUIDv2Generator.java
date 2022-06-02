@@ -9,15 +9,26 @@ import org.nervousync.utils.SystemUtils;
 
 import java.util.UUID;
 
+/**
+ * The type Uui dv 2 generator.
+ */
 @GeneratorProvider(IDUtils.UUIDv2)
 public final class UUIDv2Generator extends UUIDGenerator {
 
     private final UUIDTimer uuidTimer;
 
+    /**
+     * Instantiates a new Uui dv 2 generator.
+     */
     public UUIDv2Generator() {
         this.uuidTimer = new UUIDTimer();
     }
 
+    /**
+     * Config.
+     *
+     * @param synchronizer the synchronizer
+     */
     public void config(final TimeSynchronizer synchronizer) {
         this.uuidTimer.config(synchronizer);
     }

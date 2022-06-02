@@ -17,8 +17,10 @@
 package org.nervousync.zip.models.central;
 
 /**
+ * The type Zip 64 end central directory locator.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:32:41 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:32:41 PM $
  */
 public final class Zip64EndCentralDirectoryLocator {
 
@@ -27,10 +29,15 @@ public final class Zip64EndCentralDirectoryLocator {
 	private long offsetZip64EndOfCentralDirectoryRecord;
 	private int totalNumberOfDiscs;
 
+	/**
+	 * Instantiates a new Zip 64 end central directory locator.
+	 */
 	public Zip64EndCentralDirectoryLocator() {
 	}
-	
+
 	/**
+	 * Gets signature.
+	 *
 	 * @return the signature
 	 */
 	public long getSignature() {
@@ -38,6 +45,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Sets signature.
+	 *
 	 * @param signature the signature to set
 	 */
 	public void setSignature(long signature) {
@@ -45,6 +54,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Gets index of zip 64 end of central directory record.
+	 *
 	 * @return the indexOfZip64EndOfCentralDirectoryRecord
 	 */
 	public int getIndexOfZip64EndOfCentralDirectoryRecord() {
@@ -52,6 +63,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Sets index of zip 64 end of central directory record.
+	 *
 	 * @param indexOfZip64EndOfCentralDirectoryRecord the indexOfZip64EndOfCentralDirectoryRecord to set
 	 */
 	public void setIndexOfZip64EndOfCentralDirectoryRecord(int indexOfZip64EndOfCentralDirectoryRecord) {
@@ -59,6 +72,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Gets offset zip 64 end of central directory record.
+	 *
 	 * @return the offsetZip64EndOfCentralDirectoryRecord
 	 */
 	public long getOffsetZip64EndOfCentralDirectoryRecord() {
@@ -66,6 +81,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Sets offset zip 64 end of central directory record.
+	 *
 	 * @param offsetZip64EndOfCentralDirectoryRecord the offsetZip64EndOfCentralDirectoryRecord to set
 	 */
 	public void setOffsetZip64EndOfCentralDirectoryRecord(long offsetZip64EndOfCentralDirectoryRecord) {
@@ -73,6 +90,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Gets total number of discs.
+	 *
 	 * @return the totalNumberOfDiscs
 	 */
 	public int getTotalNumberOfDiscs() {
@@ -80,6 +99,8 @@ public final class Zip64EndCentralDirectoryLocator {
 	}
 
 	/**
+	 * Sets total number of discs.
+	 *
 	 * @param totalNumberOfDiscs the totalNumberOfDiscs to set
 	 */
 	public void setTotalNumberOfDiscs(int totalNumberOfDiscs) {

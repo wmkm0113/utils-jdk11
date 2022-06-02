@@ -52,30 +52,54 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * Constructor
 	 *
 	 * @param filePath target file path
-	 * @param mode     Open type(Read-Only/Read-Write)
 	 * @throws FileNotFoundException if target file was not found
 	 */
-	public NervousyncRandomAccessFile(final String filePath, final String mode) throws FileNotFoundException {
-		this(filePath, mode, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
+	public NervousyncRandomAccessFile(final String filePath) throws FileNotFoundException {
+		this(filePath, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Constructor
+	 *
+	 * @param filePath target file path
+	 * @param writable the writable
+	 * @throws FileNotFoundException if target file was not found
+	 */
+	public NervousyncRandomAccessFile(final String filePath, final boolean writable) throws FileNotFoundException {
+		this(filePath, writable, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
 	 * Constructor for open SMB file
 	 *
 	 * @param smbPath  SMB path
-	 * @param mode     Open type
 	 * @param domain   SMB Authentication Domain
 	 * @param userName SMB Authentication Username
 	 * @param passWord SMB Authentication Password
 	 * @throws FileNotFoundException if connect to SMB file error
 	 */
-	public NervousyncRandomAccessFile(final String smbPath, final String mode, final String domain,
+	public NervousyncRandomAccessFile(final String smbPath, final String domain,
+	                                  final String userName, final String passWord) throws FileNotFoundException {
+		this(smbPath, Boolean.FALSE, domain, userName, passWord);
+	}
+
+	/**
+	 * Constructor for open SMB file
+	 *
+	 * @param smbPath  SMB path
+	 * @param writable the writable
+	 * @param domain   SMB Authentication Domain
+	 * @param userName SMB Authentication Username
+	 * @param passWord SMB Authentication Password
+	 * @throws FileNotFoundException if connect to SMB file error
+	 */
+	public NervousyncRandomAccessFile(final String smbPath, final boolean writable, final String domain,
 	                                  final String userName, final String passWord) throws FileNotFoundException {
 		this.filePath = smbPath;
 		this.domain = domain;
 		this.userName = userName;
 		this.passWord = passWord;
-		this.openFile(mode);
+		this.openFile(writable ? Globals.WRITE_MODE : Globals.READ_MODE);
 	}
 
 	/**

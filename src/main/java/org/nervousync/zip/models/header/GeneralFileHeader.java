@@ -17,8 +17,10 @@
 package org.nervousync.zip.models.header;
 
 /**
+ * The type General file header.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:44:25 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:44:25 PM $
  */
 public final class GeneralFileHeader extends FileHeader {
 
@@ -31,10 +33,15 @@ public final class GeneralFileHeader extends FileHeader {
 	private String fileComment;
 	private boolean isDirectory;
 
+	/**
+	 * Instantiates a new General file header.
+	 */
 	public GeneralFileHeader() {
 	}
-	
+
 	/**
+	 * Gets made version.
+	 *
 	 * @return the madeVersion
 	 */
 	public int getMadeVersion() {
@@ -42,6 +49,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets made version.
+	 *
 	 * @param madeVersion the madeVersion to set
 	 */
 	public void setMadeVersion(int madeVersion) {
@@ -49,6 +58,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Gets file comment length.
+	 *
 	 * @return the fileCommentLength
 	 */
 	public int getFileCommentLength() {
@@ -56,6 +67,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets file comment length.
+	 *
 	 * @param fileCommentLength the fileCommentLength to set
 	 */
 	public void setFileCommentLength(int fileCommentLength) {
@@ -63,6 +76,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Gets disk number start.
+	 *
 	 * @return the diskNumberStart
 	 */
 	public int getDiskNumberStart() {
@@ -70,6 +85,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets disk number start.
+	 *
 	 * @param diskNumberStart the diskNumberStart to set
 	 */
 	public void setDiskNumberStart(int diskNumberStart) {
@@ -77,6 +94,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Get internal file attr byte [ ].
+	 *
 	 * @return the internalFileAttr
 	 */
 	public byte[] getInternalFileAttr() {
@@ -84,6 +103,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets internal file attr.
+	 *
 	 * @param internalFileAttr the internalFileAttr to set
 	 */
 	public void setInternalFileAttr(byte[] internalFileAttr) {
@@ -91,6 +112,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Get external file attr byte [ ].
+	 *
 	 * @return the externalFileAttr
 	 */
 	public byte[] getExternalFileAttr() {
@@ -98,6 +121,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets external file attr.
+	 *
 	 * @param externalFileAttr the externalFileAttr to set
 	 */
 	public void setExternalFileAttr(byte[] externalFileAttr) {
@@ -105,6 +130,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Gets offset local header.
+	 *
 	 * @return the offsetLocalHeader
 	 */
 	public long getOffsetLocalHeader() {
@@ -112,6 +139,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets offset local header.
+	 *
 	 * @param offsetLocalHeader the offsetLocalHeader to set
 	 */
 	public void setOffsetLocalHeader(long offsetLocalHeader) {
@@ -119,6 +148,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Gets file comment.
+	 *
 	 * @return the fileComment
 	 */
 	public String getFileComment() {
@@ -126,6 +157,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets file comment.
+	 *
 	 * @param fileComment the fileComment to set
 	 */
 	public void setFileComment(String fileComment) {
@@ -133,6 +166,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Is directory boolean.
+	 *
 	 * @return the isDirectory
 	 */
 	public boolean isDirectory() {
@@ -140,6 +175,8 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
+	 * Sets directory.
+	 *
 	 * @param isDirectory the isDirectory to set
 	 */
 	public void setDirectory(boolean isDirectory) {

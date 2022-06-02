@@ -21,8 +21,9 @@ import java.io.Serializable;
 
 /**
  * Location point define
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 19, 2017 1:03:40 PM $
+ * @version $Revision : 1.0 $ $Date: Dec 19, 2017 1:03:40 PM $
  */
 public final class GeoPoint implements Serializable {
 
@@ -51,32 +52,35 @@ public final class GeoPoint implements Serializable {
 		this.longitude = longitude;
 		this.latitude = latitude;
 	}
-	
+
 	/**
 	 * Define a GPS location point
-	 * @param longitude		Location longitude value
-	 * @param latitude		Location latitude value
-	 * @return				LocationPoint object
+	 *
+	 * @param longitude Location longitude value
+	 * @param latitude  Location latitude value
+	 * @return LocationPoint object
 	 */
 	public static GeoPoint gpsPoint(double longitude, double latitude) {
 		return new GeoPoint(LocationType.GPS, longitude, latitude);
 	}
-	
+
 	/**
 	 * Define a GCJ02 location point
-	 * @param longitude		Location longitude value
-	 * @param latitude		Location latitude value
-	 * @return				LocationPoint object
+	 *
+	 * @param longitude Location longitude value
+	 * @param latitude  Location latitude value
+	 * @return LocationPoint object
 	 */
 	public static GeoPoint gcj02Point(double longitude, double latitude) {
 		return new GeoPoint(LocationType.GCJ_02, longitude, latitude);
 	}
-	
+
 	/**
 	 * Define a BD09 location point
-	 * @param longitude		Location longitude value
-	 * @param latitude		Location latitude value
-	 * @return				LocationPoint object
+	 *
+	 * @param longitude Location longitude value
+	 * @param latitude  Location latitude value
+	 * @return LocationPoint object
 	 */
 	public static GeoPoint bd09Point(double longitude, double latitude) {
 		return new GeoPoint(LocationType.BD_09, longitude, latitude);
@@ -84,15 +88,18 @@ public final class GeoPoint implements Serializable {
 
 	/**
 	 * Define a DELTA location point
-	 * @param longitude		Location longitude value
-	 * @param latitude		Location latitude value
-	 * @return				LocationPoint object
+	 *
+	 * @param longitude Location longitude value
+	 * @param latitude  Location latitude value
+	 * @return LocationPoint object
 	 */
 	public static GeoPoint deltaPoint(double longitude, double latitude) {
 		return new GeoPoint(LocationType.DELTA, longitude, latitude);
 	}
-	
+
 	/**
+	 * Gets location type.
+	 *
 	 * @return the locationType
 	 */
 	public LocationType getLocationType() {
@@ -100,6 +107,8 @@ public final class GeoPoint implements Serializable {
 	}
 
 	/**
+	 * Gets longitude.
+	 *
 	 * @return the longitude
 	 */
 	public double getLongitude() {
@@ -107,6 +116,8 @@ public final class GeoPoint implements Serializable {
 	}
 
 	/**
+	 * Gets latitude.
+	 *
 	 * @return the latitude
 	 */
 	public double getLatitude() {
@@ -117,8 +128,26 @@ public final class GeoPoint implements Serializable {
 	public String toString() {
 		return this.latitude + "," + this.longitude;
 	}
-	
+
+	/**
+	 * The enum Location type.
+	 */
 	public enum LocationType {
-		GPS, GCJ_02, BD_09, DELTA
+		/**
+		 * Gps location type.
+		 */
+		GPS,
+		/**
+		 * Gcj 02 location type.
+		 */
+		GCJ_02,
+		/**
+		 * Bd 09 location type.
+		 */
+		BD_09,
+		/**
+		 * Delta location type.
+		 */
+		DELTA
 	}
 }

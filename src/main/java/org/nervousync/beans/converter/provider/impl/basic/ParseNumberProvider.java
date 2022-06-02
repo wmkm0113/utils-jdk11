@@ -28,11 +28,16 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
+ * The type Parse number provider.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/29/2020 10:55 PM $
+ * @version $Revision : 1.0 $ $Date: 8/29/2020 10:55 PM $
  */
 public final class ParseNumberProvider implements ConvertProvider {
 
+	/**
+	 * Instantiates a new Parse number provider.
+	 */
 	public ParseNumberProvider() {
 	}
 

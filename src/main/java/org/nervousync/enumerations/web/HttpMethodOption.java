@@ -17,9 +17,50 @@
 package org.nervousync.enumerations.web;
 
 /**
+ * The enum Http method option.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: May 22, 2015 12:12:30 PM $
+ * @version $Revision : 1.0 $ $Date: May 22, 2015 12:12:30 PM $
  */
 public enum HttpMethodOption {
-	GET, HEAD, PATCH, PUT, POST, TRACE, OPTIONS, DELETE, DEFAULT, UNKNOWN
+	/**
+	 * Get http method option.
+	 */
+	GET,
+	/**
+	 * Head http method option.
+	 */
+	HEAD,
+	/**
+	 * Patch http method option.
+	 */
+	PATCH,
+	/**
+	 * Put http method option.
+	 */
+	PUT,
+	/**
+	 * Post http method option.
+	 */
+	POST,
+	/**
+	 * Trace http method option.
+	 */
+	TRACE,
+	/**
+	 * Options http method option.
+	 */
+	OPTIONS,
+	/**
+	 * Delete http method option.
+	 */
+	DELETE,
+	/**
+	 * Default http method option.
+	 */
+	DEFAULT,
+	/**
+	 * Unknown http method option.
+	 */
+	UNKNOWN
 }

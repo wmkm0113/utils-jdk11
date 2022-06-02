@@ -17,9 +17,18 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
+ * The enum Snmp auth protocol.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 27, 2017 2:15:58 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 2:15:58 PM $
  */
 public enum SNMPAuthProtocol {
-	MD5, SHA
+	/**
+	 * Md 5 snmp auth protocol.
+	 */
+	MD5,
+	/**
+	 * Sha snmp auth protocol.
+	 */
+	SHA
 }

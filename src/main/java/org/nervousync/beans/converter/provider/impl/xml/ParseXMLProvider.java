@@ -23,11 +23,16 @@ import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**
+ * The type Parse xml provider.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 4:23 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:23 PM $
  */
 public final class ParseXMLProvider implements ConvertProvider {
 
+	/**
+	 * Instantiates a new Parse xml provider.
+	 */
 	public ParseXMLProvider() {
 	}
 

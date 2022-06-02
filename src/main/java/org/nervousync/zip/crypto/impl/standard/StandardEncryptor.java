@@ -25,14 +25,22 @@ import org.nervousync.zip.crypto.Encryptor;
 
 /**
  * Encryptor implement of standard
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 29, 2017 5:08:31 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 29, 2017 5:08:31 PM $
  */
 public final class StandardEncryptor implements Encryptor {
 
 	private final ZipCryptoEngine zipCryptoEngine;
 	private byte[] headerBytes;
-	
+
+	/**
+	 * Instantiates a new Standard encryptor.
+	 *
+	 * @param password the password
+	 * @param crc      the crc
+	 * @throws ZipException the zip exception
+	 */
 	public StandardEncryptor(char[] password, int crc) throws ZipException {
 		if (password == null || password.length <= 0) {
 			throw new ZipException("input password is null or empty in standard encipher constructor");
@@ -67,6 +75,8 @@ public final class StandardEncryptor implements Encryptor {
 	}
 
 	/**
+	 * Get header bytes byte [ ].
+	 *
 	 * @return the headerBytes
 	 */
 	public byte[] getHeaderBytes() {

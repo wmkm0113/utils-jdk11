@@ -13,11 +13,17 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * The type Uui dv 1 generator.
+ */
 @GeneratorProvider(IDUtils.UUIDv1)
 public final class UUIDv1Generator extends UUIDGenerator {
 
     private static final long INTERVAL = 0x01B21DD213814000L;
 
+    /**
+     * The constant UUID_SEQUENCE.
+     */
     public static final String UUID_SEQUENCE = "org.nervousync.uuid.UUIDSequence";
     private static final String ASSIGNED_SEQUENCES = "org.nervousync.uuid.AssignedSequences";
 

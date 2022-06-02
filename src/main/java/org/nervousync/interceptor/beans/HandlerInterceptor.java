@@ -22,11 +22,16 @@ import org.slf4j.LoggerFactory;
 import net.sf.cglib.proxy.MethodInterceptor;
 
 /**
+ * The type Handler interceptor.
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: May 7, 2014 2:46:11 PM $
+ * @version $Revision : 1.0 $ $Date: May 7, 2014 2:46:11 PM $
  */
 public abstract class HandlerInterceptor implements MethodInterceptor {
 
+	/**
+	 * The Logger.
+	 */
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 }

@@ -29,7 +29,7 @@ import org.nervousync.exceptions.zip.ZipException;
  * RAW data process utils
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 5:34:55 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 5:34:55 PM $
  */
 public final class RawUtils {
 
@@ -41,8 +41,8 @@ public final class RawUtils {
 	/**
 	 * Read boolean value from index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @return				<code>true</code> If value is 1 or <code>false</code> for otherwise
+	 * @param dataBytes Data bytes
+	 * @return <code>true</code> If value is 1 or <code>false</code> for otherwise
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static boolean readBoolean(byte[] dataBytes) throws DataInvalidException {
@@ -52,9 +52,9 @@ public final class RawUtils {
 	/**
 	 * Read boolean value from position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @return				<code>true</code> If value is 1 or <code>false</code> for otherwise
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @return <code>true</code> If value is 1 or <code>false</code> for otherwise
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static boolean readBoolean(byte[] dataBytes, int position) throws DataInvalidException {
@@ -68,8 +68,8 @@ public final class RawUtils {
 	/**
 	 * Write boolean value to data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param value			Boolean value
+	 * @param dataBytes Data bytes
+	 * @param value     Boolean value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeBoolean(byte[] dataBytes, boolean value) throws DataInvalidException {
@@ -79,9 +79,9 @@ public final class RawUtils {
 	/**
 	 * Write boolean value to target position of data bytes or do nothing if position is out of byte array length
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param value			Boolean value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param value     Boolean value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeBoolean(byte[] dataBytes, int position, boolean value) throws DataInvalidException {
@@ -95,8 +95,8 @@ public final class RawUtils {
 	/**
 	 * Read short value from index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @return				Read short value
+	 * @param dataBytes Data bytes
+	 * @return Read short value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static short readShort(byte[] dataBytes) throws DataInvalidException {
@@ -106,9 +106,9 @@ public final class RawUtils {
 	/**
 	 * Read short value from index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @return				Read short value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @return Read short value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static short readShort(byte[] dataBytes, Endian endian) throws DataInvalidException {
@@ -118,9 +118,9 @@ public final class RawUtils {
 	/**
 	 * Read short value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @return				Read short value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @return Read short value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static short readShort(byte[] dataBytes, int position) throws DataInvalidException {
@@ -130,10 +130,10 @@ public final class RawUtils {
 	/**
 	 * Read short value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @return				Read short value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @return Read short value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static short readShort(byte[] dataBytes, int position, Endian endian) throws DataInvalidException {
@@ -154,8 +154,8 @@ public final class RawUtils {
 	/**
 	 * Write short value to index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeShort(byte[] dataBytes, short value) throws DataInvalidException {
@@ -165,9 +165,9 @@ public final class RawUtils {
 	/**
 	 * Write short value to index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeShort(byte[] dataBytes, Endian endian, short value) throws DataInvalidException {
@@ -177,9 +177,9 @@ public final class RawUtils {
 	/**
 	 * Write short value to position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeShort(byte[] dataBytes, int position, short value) throws DataInvalidException {
@@ -189,10 +189,10 @@ public final class RawUtils {
 	/**
 	 * Write short value to position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeShort(byte[] dataBytes, int position, Endian endian, short value)
@@ -218,8 +218,8 @@ public final class RawUtils {
 	/**
 	 * Read int value from index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @return				Read int value
+	 * @param dataBytes Data bytes
+	 * @return Read int value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static int readInt(byte[] dataBytes) throws DataInvalidException {
@@ -229,9 +229,9 @@ public final class RawUtils {
 	/**
 	 * Read int value from index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @return				Read int value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @return Read int value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static int readInt(byte[] dataBytes, Endian endian) throws DataInvalidException {
@@ -241,9 +241,9 @@ public final class RawUtils {
 	/**
 	 * Read int value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @return				Read int value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @return Read int value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static int readInt(byte[] dataBytes, int position) throws DataInvalidException {
@@ -253,10 +253,10 @@ public final class RawUtils {
 	/**
 	 * Read int value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @return				Read int value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @return Read int value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static int readInt(byte[] dataBytes, int position, Endian endian) throws DataInvalidException {
@@ -279,8 +279,8 @@ public final class RawUtils {
 	/**
 	 * Write int value to index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeInt(byte[] dataBytes, int value) throws DataInvalidException {
@@ -290,9 +290,9 @@ public final class RawUtils {
 	/**
 	 * Write int value to index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeInt(byte[] dataBytes, Endian endian, int value) throws DataInvalidException {
@@ -302,9 +302,9 @@ public final class RawUtils {
 	/**
 	 * Write int value to position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeInt(byte[] dataBytes, int position, int value) throws DataInvalidException {
@@ -314,10 +314,10 @@ public final class RawUtils {
 	/**
 	 * Write int value to position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeInt(byte[] dataBytes, int position, Endian endian, int value) throws DataInvalidException {
@@ -358,8 +358,8 @@ public final class RawUtils {
 	/**
 	 * Read long value from index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @return				Read long value
+	 * @param dataBytes Data bytes
+	 * @return Read long value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static long readLong(byte[] dataBytes) throws DataInvalidException {
@@ -369,9 +369,9 @@ public final class RawUtils {
 	/**
 	 * Read long value from index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @return				Read long value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @return Read long value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static long readLong(byte[] dataBytes, Endian endian) throws DataInvalidException {
@@ -381,9 +381,9 @@ public final class RawUtils {
 	/**
 	 * Read long value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @return				Read long value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @return Read long value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static long readLong(byte[] dataBytes, int position) throws DataInvalidException {
@@ -393,10 +393,10 @@ public final class RawUtils {
 	/**
 	 * Read long value from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @return				Read long value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @return Read long value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static long readLong(byte[] dataBytes, int position, Endian endian) throws DataInvalidException {
@@ -440,8 +440,8 @@ public final class RawUtils {
 	/**
 	 * Write long value to index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeLong(byte[] dataBytes, long value) throws DataInvalidException {
@@ -451,9 +451,9 @@ public final class RawUtils {
 	/**
 	 * Write long value to index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeLong(byte[] dataBytes, Endian endian, long value) throws DataInvalidException {
@@ -463,9 +463,9 @@ public final class RawUtils {
 	/**
 	 * Write long value to position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeLong(byte[] dataBytes, int position, long value) throws DataInvalidException {
@@ -475,10 +475,10 @@ public final class RawUtils {
 	/**
 	 * Write long value to position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @param value 		Write value
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @param value     Write value
 	 * @throws DataInvalidException If array index out of bounds or endian is invalid
 	 */
 	public static void writeLong(byte[] dataBytes, int position, Endian endian, long value)
@@ -521,9 +521,9 @@ public final class RawUtils {
 	/**
 	 * Read string from index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param length		Data length
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param length    Data length
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static String readString(byte[] dataBytes, int length) throws DataInvalidException {
@@ -534,10 +534,10 @@ public final class RawUtils {
 	/**
 	 * Read string from index 0 of data bytes, encoding by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param length		Data length
-	 * @param encoding		String encoding
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param length    Data length
+	 * @param encoding  String encoding
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds or encoding not supported
 	 */
 	public static String readString(byte[] dataBytes, int length, String encoding) throws DataInvalidException {
@@ -548,10 +548,10 @@ public final class RawUtils {
 	/**
 	 * Read string from position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param length		Data length
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param length    Data length
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static String readString(byte[] dataBytes, int position, int length) throws DataInvalidException {
@@ -562,10 +562,10 @@ public final class RawUtils {
 	/**
 	 * Read string from index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param length		Data length
-	 * @param endian		Endian
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param length    Data length
+	 * @param endian    Endian
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid
 	 */
 	public static String readString(byte[] dataBytes, int length, Endian endian) throws DataInvalidException {
@@ -576,11 +576,11 @@ public final class RawUtils {
 	/**
 	 * Read string from index 0 of data bytes, endian and encoding by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param length		Data length
-	 * @param encoding		String encoding
-	 * @param endian		Endian
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param length    Data length
+	 * @param encoding  String encoding
+	 * @param endian    Endian
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
 	 */
 	public static String readString(byte[] dataBytes, int length, String encoding, Endian endian)
@@ -591,11 +591,11 @@ public final class RawUtils {
 	/**
 	 * Read string from position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param length		Data length
-	 * @param endian		Endian
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param length    Data length
+	 * @param endian    Endian
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid
 	 */
 	public static String readString(byte[] dataBytes, int position, int length, Endian endian)
@@ -606,12 +606,12 @@ public final class RawUtils {
 	/**
 	 * Read string from position of data bytes, endian and encoding by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param length		Data length
-	 * @param encoding		String encoding
-	 * @param endian		Endian
-	 * @return				Read string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param length    Data length
+	 * @param encoding  String encoding
+	 * @param endian    Endian
+	 * @return Read string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
 	 */
 	public static String readString(byte[] dataBytes, int position, int length, String encoding, Endian endian)
@@ -629,8 +629,8 @@ public final class RawUtils {
 	/**
 	 * Write string to index 0 of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param value			Write string
+	 * @param dataBytes Data bytes
+	 * @param value     Write string
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeString(byte[] dataBytes, String value) throws DataInvalidException {
@@ -640,9 +640,9 @@ public final class RawUtils {
 	/**
 	 * Write string to target position of data bytes
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param value			Write string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param value     Write string
 	 * @throws DataInvalidException If array index out of bounds
 	 */
 	public static void writeString(byte[] dataBytes, int position, String value) throws DataInvalidException {
@@ -652,9 +652,9 @@ public final class RawUtils {
 	/**
 	 * Write string to index 0 of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param endian		Endian
-	 * @param value			Write string
+	 * @param dataBytes Data bytes
+	 * @param endian    Endian
+	 * @param value     Write string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid
 	 */
 	public static void writeString(byte[] dataBytes, Endian endian, String value) throws DataInvalidException {
@@ -664,10 +664,10 @@ public final class RawUtils {
 	/**
 	 * Write string to target position of data bytes, endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param endian		Endian
-	 * @param value			Write string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param endian    Endian
+	 * @param value     Write string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid
 	 */
 	public static void writeString(byte[] dataBytes, int position, Endian endian, String value) throws DataInvalidException {
@@ -677,11 +677,11 @@ public final class RawUtils {
 	/**
 	 * Write string to target position of data bytes, encoding and endian by given
 	 *
-	 * @param dataBytes		Data bytes
-	 * @param position 		Position index
-	 * @param encoding		String encoding
-	 * @param endian		Endian
-	 * @param value			Write string
+	 * @param dataBytes Data bytes
+	 * @param position  Position index
+	 * @param encoding  String encoding
+	 * @param endian    Endian
+	 * @param value     Write string
 	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
 	 */
 	public static void writeString(byte[] dataBytes, int position, String encoding, Endian endian, String value)
@@ -705,18 +705,20 @@ public final class RawUtils {
 
 	/**
 	 * Convert int to byte arrays
-	 * @param value		int value
-	 * @return			Convert byte arrays
+	 *
+	 * @param value int value
+	 * @return Convert byte arrays
 	 */
 	public static byte[] intToByteArray(int value) {
 		return RawUtils.intToByteArray(value, 4);
 	}
-	
+
 	/**
 	 * Convert int value to byte arrays by given array size
-	 * @param value			int value
-	 * @param length		array length
-	 * @return				Convert byte arrays
+	 *
+	 * @param value  int value
+	 * @param length array length
+	 * @return Convert byte arrays
 	 */
 	public static byte[] intToByteArray(int value, int length) {
 		if (length < 4) {
@@ -738,8 +740,9 @@ public final class RawUtils {
 
 	/**
 	 * Convert char arrays to byte arrays
-	 * @param charArray		char arrays
-	 * @return				Convert byte arrays
+	 *
+	 * @param charArray char arrays
+	 * @return Convert byte arrays
 	 */
 	public static byte[] charArrayToByteArray(char[] charArray) {
 		if (charArray == null) {
@@ -754,12 +757,13 @@ public final class RawUtils {
 		
 		return bytes;
 	}
-	
+
 	/**
 	 * Convert bit arrays to byte
-	 * @param bitArray			bit arrays
-	 * @return					Convert byte value
-	 * @throws ZipException		bitArray is null or invalid
+	 *
+	 * @param bitArray bit arrays
+	 * @return Convert byte value
+	 * @throws ZipException bitArray is null or invalid
 	 */
 	public static byte bitArrayToByte(int[] bitArray) throws ZipException {
 		if (bitArray == null) {
@@ -781,8 +785,18 @@ public final class RawUtils {
 		return (byte)calValue;
 	}
 
+	/**
+	 * The enum Endian.
+	 */
 	public enum Endian {
-		BIG, LITTLE
+		/**
+		 * Big endian.
+		 */
+		BIG,
+		/**
+		 * Little endian.
+		 */
+		LITTLE
 	}
 
 	/**

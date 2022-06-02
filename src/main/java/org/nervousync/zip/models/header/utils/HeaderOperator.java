@@ -31,11 +31,20 @@ import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.utils.RawUtils;
 
 /**
+ * The type Header operator.
+ *
  * @author Steven Wee   <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 2, 2017 6:07:27 PM $
+ * @version $Revision : 1.0 $ $Date: Dec 2, 2017 6:07:27 PM $
  */
 public final class HeaderOperator {
 
+	/**
+	 * Retrieve salt length int.
+	 *
+	 * @param aesStrength the aes strength
+	 * @return the int
+	 * @throws ZipException the zip exception
+	 */
 	public static int retrieveSaltLength(int aesStrength) throws ZipException {
 		int saltLength;
 		switch (aesStrength) {
@@ -54,6 +63,15 @@ public final class HeaderOperator {
 		return saltLength;
 	}
 
+	/**
+	 * Write extended local header int.
+	 *
+	 * @param localFileHeader the local file header
+	 * @param outputStream    the output stream
+	 * @return the int
+	 * @throws ZipException the zip exception
+	 * @throws IOException  the io exception
+	 */
 	public static int writeExtendedLocalHeader(LocalFileHeader localFileHeader, OutputStream outputStream)
 			throws ZipException, IOException {
 		if (localFileHeader == null || outputStream == null) {
@@ -92,6 +110,13 @@ public final class HeaderOperator {
 		return extendLocationHdrBytes.length;
 	}
 
+	/**
+	 * Convert byte array list to byte array byte [ ].
+	 *
+	 * @param arrayList the array list
+	 * @return the byte [ ]
+	 * @throws ZipException the zip exception
+	 */
 	public static byte[] convertByteArrayListToByteArray(List<String> arrayList) throws ZipException {
 		if (arrayList == null) {
 			throw new ZipException("input byte array list is null, cannot convert to byte array");
@@ -110,24 +135,52 @@ public final class HeaderOperator {
 		return new byte[0];
 	}
 
+	/**
+	 * Append short to array list.
+	 *
+	 * @param value     the value
+	 * @param arrayList the array list
+	 * @throws ZipException the zip exception
+	 */
 	public static void appendShortToArrayList(short value, List<String> arrayList) throws ZipException {
 		byte[] shortBuffer = new byte[2];
 		RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, value);
 		HeaderOperator.copyByteArrayToList(shortBuffer, arrayList);
 	}
 
+	/**
+	 * Append int to array list.
+	 *
+	 * @param value     the value
+	 * @param arrayList the array list
+	 * @throws ZipException the zip exception
+	 */
 	public static void appendIntToArrayList(int value, List<String> arrayList) throws ZipException {
 		byte[] intBuffer = new byte[4];
 		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, value);
 		HeaderOperator.copyByteArrayToList(intBuffer, arrayList);
 	}
 
+	/**
+	 * Append long to array list.
+	 *
+	 * @param value     the value
+	 * @param arrayList the array list
+	 * @throws ZipException the zip exception
+	 */
 	public static void appendLongToArrayList(long value, List<String> arrayList) throws ZipException {
 		byte[] longBuffer = new byte[8];
 		RawUtils.writeLong(longBuffer, RawUtils.Endian.LITTLE, value);
 		HeaderOperator.copyByteArrayToList(longBuffer, arrayList);
 	}
 
+	/**
+	 * Copy byte array to list.
+	 *
+	 * @param byteArray the byte array
+	 * @param arrayList the array list
+	 * @throws ZipException the zip exception
+	 */
 	public static void copyByteArrayToList(byte[] byteArray, List<String> arrayList) throws ZipException {
 		if (arrayList == null || byteArray == null) {
 			throw new ZipException("one of the input parameters is null, cannot copy byte array to array list");
@@ -138,6 +191,13 @@ public final class HeaderOperator {
 		}
 	}
 
+	/**
+	 * Copy byte array to list.
+	 *
+	 * @param entryPath the entry path
+	 * @param arrayList the array list
+	 * @throws ZipException the zip exception
+	 */
 	public static void copyByteArrayToList(String entryPath, List<String> arrayList) throws ZipException {
 		copyByteArrayToList(convertCharset(entryPath), arrayList);
 	}
@@ -154,14 +214,17 @@ public final class HeaderOperator {
 			byte[] converted;
 			String charSet = StringUtils.detectCharset(string);
 			switch (charSet) {
-				case ZipConstants.CHARSET_CP850:
-					converted = string.getBytes(ZipConstants.CHARSET_CP850);
+				case Globals.CHARSET_CP850:
+					converted = string.getBytes(Globals.CHARSET_CP850);
+					break;
+				case Globals.CHARSET_GBK:
+					converted = string.getBytes(Globals.CHARSET_GBK);
 					break;
 				case Globals.DEFAULT_ENCODING:
 					converted = string.getBytes(Globals.DEFAULT_ENCODING);
 					break;
 				default:
-					converted = string.getBytes(Charset.forName(Globals.DEFAULT_ENCODING));
+					converted = string.getBytes(Globals.DEFAULT_SYSTEM_CHARSET);
 					break;
 			}
 			return converted;

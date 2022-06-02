@@ -122,9 +122,9 @@ public class CipherOutputStream extends OutputStream {
 			this.zipOptions = (ZipOptions) zipOptions.clone();
 
 			if (this.zipOptions.isSourceExternalStream()) {
-				if (this.zipOptions.getFileNameInZip() != null) {
-					if (this.zipOptions.getFileNameInZip().endsWith("/")
-							|| this.zipOptions.getFileNameInZip().endsWith("\\")) {
+				if (StringUtils.notBlank(this.zipOptions.getFileNameInZip())) {
+					if (this.zipOptions.getFileNameInZip().endsWith(ZipConstants.ZIP_FILE_SEPARATOR)
+							|| this.zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 						this.zipOptions.setEncryptFiles(Boolean.FALSE);
 						this.zipOptions.setEncryptionMethod(ZipConstants.ENC_NO_ENCRYPTION);
 						this.zipOptions.setCompressionMethod(ZipConstants.COMP_STORE);

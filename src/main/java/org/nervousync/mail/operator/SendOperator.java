@@ -21,8 +21,17 @@ import org.nervousync.mail.config.ServerConfig;
 
 import java.util.Properties;
 
+/**
+ * The interface Send operator.
+ */
 public interface SendOperator {
 
+    /**
+     * Read config properties.
+     *
+     * @param serverConfig the server config
+     * @return the properties
+     */
     Properties readConfig(ServerConfig serverConfig);
 
 }

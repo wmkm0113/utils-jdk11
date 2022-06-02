@@ -3,6 +3,9 @@ package org.nervousync.restful.converter.core;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.nervousync.utils.StringUtils;
 
+/**
+ * The type Float converter.
+ */
 public final class FloatConverter implements ParameterConverter {
 
     @Override

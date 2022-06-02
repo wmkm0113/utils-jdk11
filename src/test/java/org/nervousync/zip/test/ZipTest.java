@@ -137,16 +137,16 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	public void test060ExtractEncFile() {
-		ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip")
-				.setPassword(ZIP_PASSWORD)
-				.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc");
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip");
+		zipFile.setPassword(ZIP_PASSWORD);
+		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc");
 	}
 
 	@Test
 	public void test070ExtractAes256File() {
-		ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip")
-				.setPassword(ZIP_PASSWORD)
-				.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256");
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip");
+		zipFile.setPassword(ZIP_PASSWORD);
+		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256");
 	}
 
 	@Test

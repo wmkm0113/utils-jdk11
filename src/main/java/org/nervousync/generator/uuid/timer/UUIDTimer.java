@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The type Uuid timer.
+ */
 public final class UUIDTimer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -19,10 +22,18 @@ public final class UUIDTimer {
     private int counter = 0;
     private static final int MAX_WAIT_COUNT = 50;
 
+    /**
+     * Instantiates a new Uuid timer.
+     */
     public UUIDTimer() {
         this.config(null);
     }
 
+    /**
+     * Config.
+     *
+     * @param synchronizer the synchronizer
+     */
     public void config(final TimeSynchronizer synchronizer) {
         if (this.synchronizer == null || !this.synchronizer.equals(synchronizer)) {
             this.synchronizer = synchronizer;
@@ -44,10 +55,20 @@ public final class UUIDTimer {
         this.unsafeTimestamp = 0L;
     }
 
+    /**
+     * Clock sequence int.
+     *
+     * @return the int
+     */
     public int clockSequence() {
         return this.sequence & '\uFFFF';
     }
 
+    /**
+     * Gets timestamp.
+     *
+     * @return the timestamp
+     */
     public synchronized long getTimestamp() {
         long currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis < this.systemTimestamp) {
