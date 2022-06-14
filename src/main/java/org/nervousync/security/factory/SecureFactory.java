@@ -181,13 +181,65 @@ public final class SecureFactory {
     }
 
     /**
-     * Encrypt byte [ ].
+     * Encrypt data content
      *
-     * @param configName the config name
-     * @param dataBytes  the data bytes
+     * @param configName    the config name
+     * @param dataContent   the data bytes
      * @return the byte [ ]
      */
-    public byte[] encrypt(String configName, byte[] dataBytes) {
+    public String encrypt(final String configName, final String dataContent) {
+        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(configName) || !this.registeredConfig(configName)) {
+            return dataContent;
+        }
+        byte[] dataBytes = ConvertUtils.convertToByteArray(dataContent);
+        return Optional.ofNullable(this.registeredNodeMap.get(configName))
+                .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
+                .map(secureProvider -> {
+                    try {
+                        return StringUtils.base64Encode(secureProvider.finish(dataBytes));
+                    } catch (CryptoException e) {
+                        LOGGER.error("Encrypt data error! ");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Stack message: ", e);
+                        }
+                        return dataContent;
+                    }
+                })
+                .orElse(dataContent);
+    }
+
+    /**
+     * Decrypt byte [ ].
+     *
+     * @param configName    the config name
+     * @param dataContent   the data bytes
+     * @return the byte [ ]
+     */
+    public String decrypt(String configName, String dataContent) {
+        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(configName) || !this.registeredConfig(configName)) {
+            return dataContent;
+        }
+        byte[] encBytes = StringUtils.base64Decode(dataContent);
+        if (encBytes.length == 0) {
+            return dataContent;
+        }
+        return Optional.ofNullable(this.registeredNodeMap.get(configName))
+                .map(secureNode -> secureNode.initCryptor(Boolean.FALSE))
+                .map(secureProvider -> {
+                    try {
+                        return ConvertUtils.convertToString(secureProvider.finish(encBytes));
+                    } catch (CryptoException e) {
+                        LOGGER.error("Encrypt data error! ");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Stack message: ", e);
+                        }
+                        return dataContent;
+                    }
+                })
+                .orElse(dataContent);
+    }
+
+    private byte[] encrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
             return Optional.ofNullable(this.registeredNodeMap.get(configName))
                     .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
@@ -207,14 +259,7 @@ public final class SecureFactory {
         return dataBytes;
     }
 
-    /**
-     * Decrypt byte [ ].
-     *
-     * @param configName the config name
-     * @param dataBytes  the data bytes
-     * @return the byte [ ]
-     */
-    public byte[] decrypt(String configName, byte[] dataBytes) {
+    private byte[] decrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
             return Optional.ofNullable(this.registeredNodeMap.get(configName))
                     .map(secureNode -> secureNode.initCryptor(Boolean.FALSE))
@@ -422,24 +467,6 @@ public final class SecureFactory {
          */
         public boolean isInitialized() {
             return initialized;
-        }
-
-        /**
-         * Gets secure algorithm.
-         *
-         * @return the secure algorithm
-         */
-        public SecureAlgorithm getSecureAlgorithm() {
-            return secureAlgorithm;
-        }
-
-        /**
-         * Get key bytes byte [ ].
-         *
-         * @return the byte [ ]
-         */
-        public byte[] getKeyBytes() {
-            return keyBytes;
         }
     }
 

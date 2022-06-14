@@ -5,8 +5,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
-import org.nervousync.utils.ConvertUtils;
-import org.nervousync.utils.StringUtils;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class FactoryTest extends BaseTest {
@@ -27,9 +25,8 @@ public final class FactoryTest extends BaseTest {
 
     @Test
     public void test020Crypto() {
-        String encResult = StringUtils.base64Encode(SecureFactory.getInstance().encrypt("TestConfig", ConvertUtils.convertToByteArray("TestString中文测试")));
+        String encResult = SecureFactory.getInstance().encrypt("TestConfig", "TestString中文测试");
         this.logger.info("Encrypt result: {}", encResult);
-        byte[] decryptResult = SecureFactory.getInstance().decrypt("TestConfig", StringUtils.base64Decode(encResult));
-        this.logger.info("Decrypt result: {}", ConvertUtils.convertToString(decryptResult));
+        this.logger.info("Decrypt result: {}", SecureFactory.getInstance().decrypt("TestConfig", encResult));
     }
 }

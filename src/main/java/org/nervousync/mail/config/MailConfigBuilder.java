@@ -21,7 +21,6 @@ import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.security.factory.SecureFactory;
-import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
 
@@ -91,8 +90,7 @@ public final class MailConfigBuilder {
 		SecureFactory secureFactory = SecureFactory.getInstance();
 		if (StringUtils.notBlank(passWord) && StringUtils.notBlank(this.secureName)
 				&& secureFactory.registeredConfig(this.secureName)) {
-			byte[] encBytes = secureFactory.encrypt(this.secureName, ConvertUtils.convertToByteArray(passWord));
-			this.passWord = StringUtils.base64Encode(encBytes);
+			this.passWord = secureFactory.encrypt(this.secureName, passWord);
 		} else {
 			this.passWord = passWord;
 		}

@@ -148,6 +148,18 @@ public final class MailUtils {
 					: null;
 		}
 
+		private Session createSession(final Properties properties) {
+			Session session;
+			if (StringUtils.isEmpty(this.secureName)) {
+				session = Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+			} else {
+				session = Session.getDefaultInstance(properties,
+						new DefaultAuthenticator(this.userName,
+								SecureFactory.getInstance().decrypt(this.secureName, this.passWord)));
+			}
+			return session;
+		}
+
 		/**
 		 * Send mail boolean.
 		 *
@@ -164,8 +176,7 @@ public final class MailUtils {
 				if (StringUtils.notBlank(this.userName)) {
 					properties.setProperty("mail.smtp.from", this.userName);
 				}
-				Session session =
-						Session.getInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+				Session session = createSession(properties);
 				session.setDebug(this.logger.isDebugEnabled());
 				if (StringUtils.isEmpty(mailObject.getSendAddress())) {
 					mailObject.setSendAddress(this.userName);
@@ -273,9 +284,11 @@ public final class MailUtils {
 					return Collections.emptyList();
 				}
 
+				int totalCount = folder.getMessageCount();
 				List<String> mailList = new ArrayList<>();
-				for (Message message :
-						folder.getMessages(Integer.max(1, begin), Integer.min(folder.getMessageCount(), end))) {
+				int start = Math.max(1, begin);
+				int stop = (end < 0) ? totalCount : Math.min(totalCount, end);
+				for (Message message : folder.getMessages(start, stop)) {
 					mailList.add(this.receiveOperator.readUID(folder, message));
 				}
 				return mailList;
@@ -494,16 +507,8 @@ public final class MailUtils {
 		 */
 		private Store connect() throws MessagingException {
 			Properties properties = this.receiveOperator.readConfig(this.receiveConfig);
-			Session session;
-			if (StringUtils.isEmpty(this.secureName)) {
-				session = Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
-			} else {
-				session = Session.getDefaultInstance(properties,
-						new DefaultAuthenticator(this.userName,
-								ConvertUtils.convertToString(
-										SecureFactory.getInstance().decrypt(this.secureName,
-												StringUtils.base64Decode(this.passWord)))));
-			}
+			Session session = createSession(properties);
+			session.setDebug(this.logger.isDebugEnabled());
 
 			Store store = session.getStore(properties.getProperty("mail.store.protocol"));
 
