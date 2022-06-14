@@ -26,6 +26,7 @@ import org.nervousync.beans.converter.provider.impl.basic.ParseNumberProvider;
 import org.nervousync.beans.converter.provider.impl.xml.EncodeXMLProvider;
 import org.nervousync.beans.converter.provider.impl.xml.ParseXMLProvider;
 import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.ObjectUtils;
@@ -51,7 +52,7 @@ public final class BeanConfig implements Serializable {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final transient Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * Java bean class name
@@ -237,7 +238,7 @@ public final class BeanConfig implements Serializable {
 					} else if (List.class.isAssignableFrom(value.getClass())) {
 						List<Object> valueList = new ArrayList<>();
 						((List<?>)value).stream()
-								.filter(item -> item instanceof Map)
+								.filter(Map.class::isInstance)
 								.forEach(item ->
 										valueList.add(this.parseBean((Map<?, ?>) item, fieldConfig.getParamClass())));
 						args = valueList;
@@ -371,9 +372,9 @@ public final class BeanConfig implements Serializable {
 		private final boolean array;
 		private final Class<?> fieldType;
 		private final Class<?> paramClass;
-		private final Method methodGet;
-		private final Method methodSet;
-		private final List<ConvertProvider> converters;
+		private final transient Method methodGet;
+		private final transient Method methodSet;
+		private final transient List<ConvertProvider> converters;
 
 		/**
 		 * Instantiates a new Field config.
@@ -396,8 +397,7 @@ public final class BeanConfig implements Serializable {
 			this.methodSet = methodSet;
 			if (dataConverters.length == 0) {
 				this.converters = new ArrayList<>();
-				DataType dataType = ObjectUtils.retrieveSimpleDataType(fieldType);
-				switch (dataType) {
+				switch (ObjectUtils.retrieveSimpleDataType(fieldType)) {
 					case BINARY:
 						this.converters.add(new EncodeBase64Provider());
 						this.converters.add(new ParseBase64Provider());
@@ -416,7 +416,8 @@ public final class BeanConfig implements Serializable {
 						this.converters.add(new EncodeJSONProvider());
 						this.converters.add(new EncodeXMLProvider());
 						break;
-					case UNKNOWN:
+					default:
+						this.converters.add(new ParseNumberProvider());
 						this.converters.add(new EncodeBase64Provider());
 						this.converters.add(new ParseBase64Provider());
 						this.converters.add(new EncodeJSONProvider());
@@ -433,15 +434,6 @@ public final class BeanConfig implements Serializable {
 					}
 				}
 			}
-		}
-
-		/**
-		 * Gets the value of serialVersionUID
-		 *
-		 * @return the value of serialVersionUID
-		 */
-		public static long getSerialVersionUID() {
-			return serialVersionUID;
 		}
 
 		/**

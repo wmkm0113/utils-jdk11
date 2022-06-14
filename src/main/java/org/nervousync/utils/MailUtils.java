@@ -53,17 +53,17 @@ import org.bouncycastle.mail.smime.SMIMESignedParser;
 import org.bouncycastle.mail.smime.SMIMEUtil;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.nervousync.exceptions.builder.BuilderException;
+import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.mail.MailObject;
 import org.nervousync.mail.authenticator.DefaultAuthenticator;
 import org.nervousync.mail.config.MailConfig;
 import org.nervousync.mail.operator.ReceiveOperator;
 import org.nervousync.mail.operator.SendOperator;
-import org.nervousync.mail.config.ServerConfig;
 import org.nervousync.mail.protocol.impl.IMAPProtocol;
 import org.nervousync.mail.protocol.impl.POP3Protocol;
 import org.nervousync.mail.protocol.impl.SMTPProtocol;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.security.factory.SecureFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,53 +84,12 @@ public final class MailUtils {
 	 * @param mailConfig Mail config
 	 * @return Optional instance of generated mail agent or empty Option instance if mail config is invalid
 	 */
-	public static Optional<Agent> mailAgent(final MailConfig mailConfig) {
+	public static Agent mailAgent(final MailConfig mailConfig) {
 		if (mailConfig == null || StringUtils.isEmpty(mailConfig.getUserName())
 				|| StringUtils.isEmpty(mailConfig.getPassWord())) {
-			return Optional.empty();
+			return null;
 		}
-		return Optional.of(new Agent(mailConfig));
-	}
-
-	/**
-	 * Generate mail server config builder instance by given server config
-	 *
-	 * @param serverConfig Server config
-	 * @return Mail server config builder instance
-	 * @throws BuilderException Builder Exception
-	 */
-	public static ServerConfig.Builder builder(final ServerConfig serverConfig) throws BuilderException {
-		return new ServerConfig.Builder(serverConfig);
-	}
-
-	/**
-	 * Generate a new SMTP server config builder
-	 *
-	 * @return Generated config builder
-	 * @throws BuilderException Builder Exception
-	 */
-	public static ServerConfig.Builder SMTPBuilder() throws BuilderException {
-		return new ServerConfig.Builder("SMTP");
-	}
-
-	/**
-	 * Generate a new POP3 server config builder
-	 *
-	 * @return Generated config builder
-	 * @throws BuilderException Builder Exception
-	 */
-	public static ServerConfig.Builder POP3Builder() throws BuilderException {
-		return new ServerConfig.Builder("POP3");
-	}
-
-	/**
-	 * Generate a new IMAP server config builder
-	 *
-	 * @return Generated config builder
-	 * @throws BuilderException Builder Exception
-	 */
-	public static ServerConfig.Builder IMAPBuilder() throws BuilderException {
-		return new ServerConfig.Builder("IMAP");
+		return new Agent(mailConfig);
 	}
 
 	/**
@@ -140,38 +99,39 @@ public final class MailUtils {
 
 		private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+		private final String secureName;
 		private final String userName;
 		private final String passWord;
-		private final ServerConfig sendConfig;
+		private final MailConfig.ServerConfig sendConfig;
 		private final SendOperator sendOperator;
-		private final ServerConfig receiveConfig;
+		private final MailConfig.ServerConfig receiveConfig;
 		private final ReceiveOperator receiveOperator;
 		private final String storagePath;
 		private final X509Certificate x509Certificate;
 		private final PrivateKey privateKey;
 
 		private Agent(final MailConfig mailConfig) {
+			this.secureName = mailConfig.getSecureName();
 			this.userName = mailConfig.getUserName().toLowerCase();
 			this.passWord = mailConfig.getPassWord();
 			if (mailConfig.getSendConfig() == null
-					|| !"SMTP".equalsIgnoreCase(mailConfig.getSendConfig().getProtocolOption())) {
+					|| !MailProtocol.SMTP.equals(mailConfig.getSendConfig().getProtocolOption())) {
 				this.sendConfig = null;
 				this.sendOperator = null;
 			} else {
 				this.sendConfig = mailConfig.getSendConfig();
 				this.sendOperator = new SMTPProtocol();
 			}
-			if (mailConfig.getReceiveConfig() == null
-					|| StringUtils.isEmpty(mailConfig.getReceiveConfig().getProtocolOption())) {
+			if (mailConfig.getReceiveConfig() == null) {
 				this.receiveConfig = null;
 				this.receiveOperator = null;
 			} else {
 				this.receiveConfig = mailConfig.getReceiveConfig();
-				switch (this.receiveConfig.getProtocolOption().toUpperCase()) {
-					case "IMAP":
+				switch (this.receiveConfig.getProtocolOption()) {
+					case IMAP:
 						this.receiveOperator = new IMAPProtocol();
 						break;
-					case "POP3":
+					case POP3:
 						this.receiveOperator = new POP3Protocol();
 						break;
 					default:
@@ -534,8 +494,16 @@ public final class MailUtils {
 		 */
 		private Store connect() throws MessagingException {
 			Properties properties = this.receiveOperator.readConfig(this.receiveConfig);
-			Session session =
-					Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+			Session session;
+			if (StringUtils.isEmpty(this.secureName)) {
+				session = Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+			} else {
+				session = Session.getDefaultInstance(properties,
+						new DefaultAuthenticator(this.userName,
+								ConvertUtils.convertToString(
+										SecureFactory.getInstance().decrypt(this.secureName,
+												StringUtils.base64Decode(this.passWord)))));
+			}
 
 			Store store = session.getStore(properties.getProperty("mail.store.protocol"));
 
@@ -561,13 +529,13 @@ public final class MailUtils {
 				org.bouncycastle.util.Store<?> certificates = signedParser.getCertificates();
 				for (SignerInformation signerInformation : signedParser.getSignerInfos().getSigners()) {
 					Collection<?> certCollection = certificates.getMatches(signerInformation.getSID());
-					X509Certificate x509Certificate =
+					X509Certificate certificate =
 							new JcaX509CertificateConverter().setProvider("BC")
 									.getCertificate((X509CertificateHolder) certCollection.iterator().next());
 
 					try {
 						SignerInformationVerifier signerInformationVerifier =
-								new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(x509Certificate);
+								new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certificate);
 						return signerInformation.verify(signerInformationVerifier);
 					} catch (Exception e) {
 						if (this.logger.isDebugEnabled()) {
@@ -601,7 +569,7 @@ public final class MailUtils {
 					return Optional.empty();
 				}
 				Arrays.stream(allRecipients)
-						.filter(address -> address instanceof InternetAddress)
+						.filter(InternetAddress.class::isInstance)
 						.forEach(address -> receiveList.add(((InternetAddress)address).getAddress().toLowerCase()));
 				if (!receiveList.contains(this.userName)) {
 					throw new MessagingException("Current account not in receive list! ");

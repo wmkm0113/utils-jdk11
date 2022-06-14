@@ -26,17 +26,23 @@ import org.nervousync.commons.core.Globals;
  */
 public final class AESExtraDataRecord {
 
-	private long signature = Globals.DEFAULT_VALUE_LONG;
-	private int dataSize = Globals.DEFAULT_VALUE_INT;
-	private int versionNumber = Globals.DEFAULT_VALUE_INT;
-	private String vendorID = null;
-	private int aesStrength = Globals.DEFAULT_VALUE_INT;
-	private int compressionMethod = Globals.DEFAULT_VALUE_INT;
+	private long signature;
+	private int dataSize;
+	private int versionNumber;
+	private String vendorID;
+	private int aesStrength;
+	private int compressionMethod;
 
 	/**
 	 * Instantiates a new Aes extra data record.
 	 */
 	public AESExtraDataRecord() {
+		this.signature = Globals.DEFAULT_VALUE_LONG;
+		this.dataSize = Globals.DEFAULT_VALUE_INT;
+		this.versionNumber = Globals.DEFAULT_VALUE_INT;
+		this.vendorID = null;
+		this.aesStrength = Globals.DEFAULT_VALUE_INT;
+		this.compressionMethod = Globals.DEFAULT_VALUE_INT;
 	}
 
 	/**

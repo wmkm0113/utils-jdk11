@@ -71,18 +71,18 @@ public abstract class BaseCryptoProvider extends SecureProvider {
             ivParameterSpec = new IvParameterSpec(ivContent);
         }
         try {
-            Cipher cipher = Cipher.getInstance(this.cipherConfig.toString(), "BC");
+            Cipher cipherInstance = Cipher.getInstance(this.cipherConfig.toString(), "BC");
             switch (this.cryptoMode) {
                 case ENCRYPT:
-                    cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
+                    cipherInstance.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
                     break;
                 case DECRYPT:
-                    cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
+                    cipherInstance.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
                     break;
                 default:
                     throw new CryptoException("Unsupported crypto mode! ");
             }
-            return cipher;
+            return cipherInstance;
         } catch (Exception e) {
             throw new CryptoException(e);
         }

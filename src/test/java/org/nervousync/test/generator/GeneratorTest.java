@@ -1,4 +1,4 @@
-package org.nervousync.generator.test;
+package org.nervousync.test.generator;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;

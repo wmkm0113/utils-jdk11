@@ -50,55 +50,6 @@ public final class Globals {
 	 * The constant DEFAULT_TIME_OUT.
 	 */
 	public static final int DEFAULT_TIME_OUT = 0;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_SINGLE_THREAD.
-	 */
-	public static final int DEFAULT_DOWNLOAD_SINGLE_THREAD = 1;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_THREAD_COUNT.
-	 */
-	public static final int DEFAULT_DOWNLOAD_THREAD_COUNT = 5;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_BLOCK_SIZE.
-	 */
-	public static final int DEFAULT_DOWNLOAD_BLOCK_SIZE = 512;
-
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_WAITING.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_WAITING = 0;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_PROCESSING.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_PROCESSING = 1;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_PAUSE.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_PAUSE = 2;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_FAILED.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_FAILED = 3;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_FINISHED.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_FINISHED = 4;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_DELETE.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_DELETE = 5;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_VALIDATE_FAILED.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_VALIDATE_FAILED = 6;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_CANCEL.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_CANCEL = 7;
-	/**
-	 * The constant DEFAULT_DOWNLOAD_STATUS_RETRY.
-	 */
-	public static final int DEFAULT_DOWNLOAD_STATUS_RETRY = 8;
 
 	/**
 	 * The constant DEFAULT_VALUE_INT.
@@ -206,11 +157,6 @@ public final class Globals {
 	 */
 	public static final Locale DEFAULT_LOCALE = Locale.getDefault();
 	/**
-	 * The constant DEFAULT_LANGUAGE.
-	 */
-	public static final String DEFAULT_LANGUAGE =
-			System.getProperty("user.language")	+ "_" + System.getProperty("user.country");
-	/**
 	 * The constant DEFAULT_SYSTEM_CHARSET.
 	 */
 	public static final String DEFAULT_SYSTEM_CHARSET = System.getProperty("file.encoding");
@@ -239,11 +185,6 @@ public final class Globals {
 	 * The constant WEB_INF_FOLDER.
 	 */
 	public static final String WEB_INF_FOLDER = Globals.DEFAULT_PAGE_SEPARATOR + "WEB-INF";
-
-	/**
-	 * The constant DEFAULT_DOWNLOAD_CONFIGURE.
-	 */
-	public static final String DEFAULT_DOWNLOAD_CONFIGURE = "nervousync_download.conf";
 
 	/**
 	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_TEXT.
@@ -276,17 +217,6 @@ public final class Globals {
 	 */
 	public static final int INITIALIZE_INT_VALUE = 0;
 
-	/**
-	 * The constant SNMP_VERSION_1.
-	 */
-	/* SNMP Version Code Define */
-	public static final int SNMP_VERSION_1 = 0;
-	/**
-	 * The constant SNMP_VERSION_2C.
-	 */
-	public static final int SNMP_VERSION_2C = 1;
-	/**
-	 * The constant SNMP_VERSION_3.
-	 */
-	public static final int SNMP_VERSION_3 = 2;
+	private Globals() {
+	}
 }

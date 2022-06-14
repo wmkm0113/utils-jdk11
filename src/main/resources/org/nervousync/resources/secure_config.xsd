@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="https://gene.nervousync.org/secure/config" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://gene.nervousync.org/secure/config" elementFormDefault="qualified" version="1.0">
+    <xsd:element name="secure_config">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="secure_algorithm">
+                    <xsd:annotation>
+                        <xsd:documentation>Secure algorithm</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="RSA1024" />
+                            <xsd:enumeration value="RSA2048" />
+                            <xsd:enumeration value="SM2" />
+                            <xsd:enumeration value="AES128" />
+                            <xsd:enumeration value="AES192" />
+                            <xsd:enumeration value="AES256" />
+                            <xsd:enumeration value="DES" />
+                            <xsd:enumeration value="TRIPLE_DES" />
+                            <xsd:enumeration value="SM4" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:element>
+                <xsd:element name="secure_key" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>Secure key data bytes, base64 encoded.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

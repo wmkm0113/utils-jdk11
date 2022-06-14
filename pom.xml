@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nervousync</groupId>
 	<artifactId>utils-jdk11</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<packaging>jar</packaging>
 	<name>Pure Java Utils</name>
-	<url>https://nervousync.org/project/gene</url>
+	<url>https://gene.nervousync.org/index.shtml</url>
 	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
 		<url>https://github.com/Nervousync/Gene/issues</url>

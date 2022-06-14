@@ -1,9 +1,6 @@
 package org.nervousync.zip.test;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.zip.ZipOptions;
@@ -71,36 +68,36 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	public void test000CreateZipFromList() throws ZipException, FileNotFoundException {
-		ZipFile.createZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFile.zip",
-				ZipOptions.newOptions(), FileUtils.listFiles(COMPRESS_FOLDER).toArray(new String[0]));
+		Assert.assertNotNull(ZipFile.createZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFile.zip",
+				ZipOptions.newOptions(), FileUtils.listFiles(COMPRESS_FOLDER).toArray(new String[0])));
 		this.logger.info("Create Zip File Success! ");
 	}
 
 	@Test
 	public void test005CreateZipFromFolder() throws ZipException {
-		ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFolder.zip",
-				ZipOptions.newOptions(), COMPRESS_FOLDER);
+		Assert.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFolder.zip",
+				ZipOptions.newOptions(), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
 	}
 
 	@Test
 	public void test010CreateEncFile() {
-		ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip",
-				ZipOptions.standardEncryptOptions(ZIP_PASSWORD), COMPRESS_FOLDER);
+		Assert.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip",
+				ZipOptions.standardEncryptOptions(ZIP_PASSWORD), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
 	}
 
 	@Test
 	public void test020CreateAes256File() {
-		ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip",
-				ZipOptions.aesEncryptOptions(ZIP_PASSWORD, 256), COMPRESS_FOLDER);
+		Assert.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip",
+				ZipOptions.aesEncryptOptions(ZIP_PASSWORD, 256), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
 	}
 
 	@Test
 	public void test030CreateSplitFile() {
-		ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip",
-				ZipOptions.newOptions(), Boolean.TRUE, 1024 * 1024L, COMPRESS_FOLDER);
+		Assert.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip",
+				ZipOptions.newOptions(), Boolean.TRUE, 1024 * 1024L, COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
 	}
 
@@ -109,15 +106,17 @@ public final class ZipTest extends BaseTest {
 		ZipOptions zipOptions = ZipOptions.newOptions();
 		//  Setting character encoding "GBK" if comment content contains CJK character for compatible the compress software (ex: 7-Zip)
 		zipOptions.setCharsetEncoding("GBK");
-		ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip",
-						zipOptions, Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, COMPRESS_FOLDER)
-				.setComment("Comment 中文测试");
+		ZipFile zipFile = ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip",
+						zipOptions, Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, COMPRESS_FOLDER);
+		Assert.assertNotNull(zipFile);
+		zipFile.setComment("Comment 中文测试");
 		this.logger.info("Create Comment Zip File Success! ");
 	}
 
 	@Test
 	public void test045ZipEntryTest() {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFile.zip");
+		Assert.assertNotNull(zipFile);
 		List<String> entryList = zipFile.entryList();
 		for (int i = 0 ; i < entryList.size() ; i++) {
 			String entryPath = entryList.get(i);
@@ -131,13 +130,15 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	public void test050ExtractFile() {
-		ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFolder.zip")
-				.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demo");
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFolder.zip");
+		Assert.assertNotNull(zipFile);
+		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demo");
 	}
 
 	@Test
 	public void test060ExtractEncFile() {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip");
+		Assert.assertNotNull(zipFile);
 		zipFile.setPassword(ZIP_PASSWORD);
 		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc");
 	}
@@ -145,26 +146,30 @@ public final class ZipTest extends BaseTest {
 	@Test
 	public void test070ExtractAes256File() {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip");
+		Assert.assertNotNull(zipFile);
 		zipFile.setPassword(ZIP_PASSWORD);
 		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256");
 	}
 
 	@Test
 	public void test080ExtractSplitFile() {
-		ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip")
-				.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit");
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip");
+		Assert.assertNotNull(zipFile);
+		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit");
 	}
 
 	@Test
 	public void test090MergeSplitFile() {
-		ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip")
-				.mergeSplitFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoMerge.zip");
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip");
+		Assert.assertNotNull(zipFile);
+		zipFile.mergeSplitFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoMerge.zip");
 	}
 
 	@Test
 	public void test100ReadComment() {
-		this.logger.info("Read comment: {} ",
-				ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip").getComment("GBK"));
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip");
+		Assert.assertNotNull(zipFile);
+		this.logger.info("Read comment: {} ", zipFile.getComment("GBK"));
 	}
 
 	/**
@@ -176,8 +181,9 @@ public final class ZipTest extends BaseTest {
 				.ifPresent(url -> {
 					String basePath = StringUtils.replace(url.getPath(), "/", Globals.DEFAULT_PAGE_SEPARATOR);
 					basePath = basePath.substring(1, basePath.length() - 1);
-					ZipFile.openZipFile(basePath + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001")
-							.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip");
+					ZipFile zipFile = ZipFile.openZipFile(basePath + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001");
+					Assert.assertNotNull(zipFile);
+					zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip");
 				});
 	}
 }

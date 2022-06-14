@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.security.Security;
 import java.util.*;
 
-import org.nervousync.mail.config.ServerConfig;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.mail.config.MailConfig;
 
 /**
  * JavaMail base protocol
@@ -37,6 +37,8 @@ public abstract class BaseProtocol implements Serializable {
 	private static final long serialVersionUID = 6441571927997267674L;
 
 	private static final String SSL_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
+	private static final String MAIL_STORE_PROTOCOL = "mail.store.protocol";
+	private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
 
 	/**
 	 * Connection timeout parameter name
@@ -67,7 +69,7 @@ public abstract class BaseProtocol implements Serializable {
 	 * @param serverConfig      the server config
 	 * @return java.util.Properties for JavaMail using
 	 */
-	public final Properties readConfig(ServerConfig serverConfig) {
+	public final Properties readConfig(final MailConfig.ServerConfig serverConfig) {
 		Properties properties = new Properties();
 
 		properties.setProperty(this.hostParam, serverConfig.getHostName());
@@ -88,9 +90,9 @@ public abstract class BaseProtocol implements Serializable {
 			Security.addProvider(Security.getProvider("SunJSSE"));
 		}
 
-		switch (serverConfig.getProtocolOption().toUpperCase()) {
-			case "IMAP":
-				properties.setProperty("mail.store.protocol", "imap");
+		switch (serverConfig.getProtocolOption()) {
+			case IMAP:
+				properties.setProperty(MAIL_STORE_PROTOCOL, "imap");
 
 				if (serverConfig.isAuthLogin()) {
 					properties.setProperty("mail.imap.auth.plain.disable", "true");
@@ -98,40 +100,40 @@ public abstract class BaseProtocol implements Serializable {
 				}
 
 				if (serverConfig.isSsl()) {
-					properties.setProperty("mail.store.protocol", "imaps");
+					properties.setProperty(MAIL_STORE_PROTOCOL, "imaps");
 					properties.setProperty("mail.imap.socketFactory.class", SSL_FACTORY_CLASS);
-					if (port != 0) {
+					if (port != Globals.DEFAULT_VALUE_INT) {
 						properties.setProperty("mail.imap.socketFactory.port", Integer.toString(port));
 					}
 					properties.setProperty("mail.imap.starttls.Enable", "true");
 				}
 				break;
-			case "SMTP":
-				properties.setProperty("mail.store.protocol", "smtp");
-				properties.setProperty("mail.transport.protocol", "smtp");
+			case SMTP:
+				properties.setProperty(MAIL_STORE_PROTOCOL, "smtp");
+				properties.setProperty(MAIL_TRANSPORT_PROTOCOL, "smtp");
 
 				if (serverConfig.isAuthLogin()) {
 					properties.setProperty("mail.smtp.auth", "true");
 				}
 
 				if (serverConfig.isSsl()) {
-					properties.setProperty("mail.store.protocol", "smtps");
+					properties.setProperty(MAIL_STORE_PROTOCOL, "smtps");
 					properties.setProperty("mail.smtp.ssl.enable", "true");
 					properties.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY_CLASS);
 					properties.setProperty("mail.smtp.socketFactory.fallback", "false");
-					if (port != 0) {
+					if (port != Globals.DEFAULT_VALUE_INT) {
 						properties.setProperty("mail.smtp.socketFactory.port", Integer.toString(port));
 					}
 					properties.setProperty("mail.smtp.starttls.Enable", "true");
 				}
 				break;
-			case "POP3":
-				properties.setProperty("mail.store.protocol", "pop3");
-				properties.setProperty("mail.transport.protocol", "pop3");
+			case POP3:
+				properties.setProperty(MAIL_STORE_PROTOCOL, "pop3");
+				properties.setProperty(MAIL_TRANSPORT_PROTOCOL, "pop3");
 
 				if (serverConfig.isSsl()) {
-					properties.setProperty("mail.store.protocol", "pop3s");
-					properties.setProperty("mail.transport.protocol", "pop3s");
+					properties.setProperty(MAIL_STORE_PROTOCOL, "pop3s");
+					properties.setProperty(MAIL_TRANSPORT_PROTOCOL, "pop3s");
 					properties.setProperty("mail.pop3.socketFactory.class", SSL_FACTORY_CLASS);
 					if (port != 0) {
 						properties.setProperty("mail.pop3.socketFactory.port", Integer.toString(port));

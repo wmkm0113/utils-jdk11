@@ -14,31 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.nervousync.mail.config;
 
 import jakarta.xml.bind.annotation.*;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.RegexGlobals;
-import org.nervousync.exceptions.builder.BuilderException;
-import org.nervousync.utils.FileUtils;
-import org.nervousync.utils.StringUtils;
-
-import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
+import org.nervousync.enumerations.mail.MailProtocol;
 
 /**
  * The type Mail config.
  */
-@XmlType(name = "mail-config")
-@XmlRootElement(name = "mail-config")
+@XmlType(name = "mail_config", namespace = "https://gene.nervousync.org/mail/configure")
+@XmlRootElement(name = "mail_config", namespace = "https://gene.nervousync.org/mail/configure")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class MailConfig extends BeanObject {
 
     private static final long serialVersionUID = -506685998495058905L;
 
+    /**
+     * Secure name
+     */
+    @XmlElement(name = "secure_name")
+    private String secureName;
     /**
      * Mail account username
      */
@@ -52,48 +49,48 @@ public final class MailConfig extends BeanObject {
     /**
      * Mail send server config
      */
-    @XmlElement(name = "send-config")
+    @XmlElement(name = "send_config")
     private ServerConfig sendConfig;
     /**
      * Mail receive server config
      */
-    @XmlElement(name = "receive-config")
+    @XmlElement(name = "receive_config")
     private ServerConfig receiveConfig;
     /**
      * Attaches file storage path
      */
-    @XmlElement(name = "storage-path")
+    @XmlElement(name = "storage_path")
     private String storagePath;
     @XmlElement
     private String certificate;
-    @XmlElement(name = "private-key")
+    @XmlElement(name = "private_key")
     private String privateKey;
 
     /**
      * Instantiates a new Mail config.
      */
     public MailConfig() {
-    }
-
-    private MailConfig(final String userName, final String passWord,
-                       final ServerConfig sendConfig, final ServerConfig receiveConfig,
-                       final String storagePath, final String certificate, final String privateKey) {
-        this.userName = userName;
-        this.passWord = passWord;
-        this.sendConfig = sendConfig;
-        this.receiveConfig = receiveConfig;
-        this.storagePath = storagePath;
-        this.certificate = certificate;
-        this.privateKey = privateKey;
+        this.secureName = Globals.DEFAULT_VALUE_STRING;
+        this.certificate = Globals.DEFAULT_VALUE_STRING;
+        this.privateKey = Globals.DEFAULT_VALUE_STRING;
     }
 
     /**
-     * Gets serial version uid.
+     * Gets secure name.
      *
-     * @return the serial version uid
+     * @return the secure name
      */
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public String getSecureName() {
+        return secureName;
+    }
+
+    /**
+     * Sets secure name.
+     *
+     * @param secureName the secure name
+     */
+    public void setSecureName(String secureName) {
+        this.secureName = secureName;
     }
 
     /**
@@ -222,125 +219,196 @@ public final class MailConfig extends BeanObject {
         this.privateKey = privateKey;
     }
 
+    @XmlType(name = "server_config", namespace = "https://gene.nervousync.org/mail/configure")
+    @XmlRootElement(name = "server_config", namespace = "https://gene.nervousync.org/mail/configure")
+    @XmlAccessorType(XmlAccessType.NONE)
+    public static final class ServerConfig extends BeanObject {
+
+        private static final long serialVersionUID = -1768113760096890529L;
+
+        /**
+         * Host name
+         */
+        @XmlElement(name = "host_name")
+        private String hostName;
+        /**
+         * Host port
+         */
+        @XmlElement(name = "host_port")
+        private int hostPort;
+        /**
+         * Using SSL
+         */
+        @XmlElement(name = "ssl")
+        private boolean ssl;
+        /**
+         * Auth Login
+         */
+        @XmlElement(name = "auth_login")
+        private boolean authLogin;
+        /**
+         * Protocol option
+         */
+        @XmlElement(name = "protocol")
+        private MailProtocol protocolOption;
+        /**
+         * Connect timeout
+         */
+        @XmlElement(name = "connection_timeout")
+        private int connectionTimeout = 5;
+        /**
+         * Process time out
+         */
+        @XmlElement(name = "process_timeout")
+        private int processTimeout = 5;
+
+        /**
+         * Instantiates a new Server config.
+         */
+        public ServerConfig() {
+            this.hostName = Globals.DEFAULT_VALUE_STRING;
+        }
+
+        /**
+         * Gets serial version uid.
+         *
+         * @return the serial version uid
+         */
+        public static long getSerialVersionUID() {
+            return serialVersionUID;
+        }
+
+        /**
+         * Gets host name.
+         *
+         * @return the host name
+         */
+        public String getHostName() {
+            return hostName;
+        }
+
+        /**
+         * Sets host name.
+         *
+         * @param hostName the host name
+         */
+        public void setHostName(String hostName) {
+            this.hostName = hostName;
+        }
+
+        /**
+         * Gets host port.
+         *
+         * @return the host port
+         */
+        public int getHostPort() {
+            return hostPort;
+        }
+
+        /**
+         * Sets host port.
+         *
+         * @param hostPort the host port
+         */
+        public void setHostPort(int hostPort) {
+            this.hostPort = hostPort;
+        }
+
+        /**
+         * Is ssl boolean.
+         *
+         * @return the boolean
+         */
+        public boolean isSsl() {
+            return ssl;
+        }
+
+        /**
+         * Sets ssl.
+         *
+         * @param ssl the ssl
+         */
+        public void setSsl(boolean ssl) {
+            this.ssl = ssl;
+        }
+
+        /**
+         * Is auth login boolean.
+         *
+         * @return the boolean
+         */
+        public boolean isAuthLogin() {
+            return authLogin;
+        }
+
+        /**
+         * Sets auth login.
+         *
+         * @param authLogin the auth login
+         */
+        public void setAuthLogin(boolean authLogin) {
+            this.authLogin = authLogin;
+        }
+
+        /**
+         * Gets protocol option.
+         *
+         * @return the protocol option
+         */
+        public MailProtocol getProtocolOption() {
+            return protocolOption;
+        }
+
+        /**
+         * Sets protocol option.
+         *
+         * @param protocolOption the protocol option
+         */
+        public void setProtocolOption(MailProtocol protocolOption) {
+            this.protocolOption = protocolOption;
+        }
+
+        /**
+         * Gets connection timeout.
+         *
+         * @return the connection timeout
+         */
+        public int getConnectionTimeout() {
+            return connectionTimeout;
+        }
+
+        /**
+         * Sets connection timeout.
+         *
+         * @param connectionTimeout the connection timeout
+         */
+        public void setConnectionTimeout(int connectionTimeout) {
+            this.connectionTimeout = connectionTimeout;
+        }
+
+        /**
+         * Gets process timeout.
+         *
+         * @return the process timeout
+         */
+        public int getProcessTimeout() {
+            return processTimeout;
+        }
+
+        /**
+         * Sets process timeout.
+         *
+         * @param processTimeout the process timeout
+         */
+        public void setProcessTimeout(int processTimeout) {
+            this.processTimeout = processTimeout;
+        }
+    }
+
     /**
      * The type Builder.
      */
     public static final class Builder {
 
-        private String userName;
-        private String passWord;
-        private ServerConfig sendConfig;
-        private ServerConfig receiveConfig;
-        private String storagePath;
-        private String certificate;
-        private String privateKey;
-
-        /**
-         * Instantiates a new Builder.
-         */
-        public Builder() {
-        }
-
-        /**
-         * Instantiates a new Builder.
-         *
-         * @param mailConfig the mail config
-         */
-        public Builder(MailConfig mailConfig) {
-            if (mailConfig != null) {
-                this.userName = mailConfig.getUserName();
-                this.passWord = mailConfig.getPassWord();
-                this.sendConfig = mailConfig.getSendConfig();
-                this.receiveConfig = mailConfig.getReceiveConfig();
-                this.storagePath = mailConfig.getStoragePath();
-                this.certificate = mailConfig.getCertificate();
-                this.privateKey = mailConfig.getPrivateKey();
-            }
-        }
-
-        /**
-         * Authentication builder.
-         *
-         * @param userName the username
-         * @param passWord the password
-         * @return the builder
-         * @throws BuilderException the builder exception
-         */
-        public Builder authentication(String userName, String passWord) throws BuilderException {
-            if (!StringUtils.matches(userName, RegexGlobals.EMAIL_ADDRESS)) {
-                throw new BuilderException("Invalid username");
-            }
-            this.userName = userName;
-            this.passWord = passWord;
-            return this;
-        }
-
-        /**
-         * Send config builder.
-         *
-         * @param sendConfig send config
-         * @return the builder
-         */
-        public Builder sendConfig(ServerConfig sendConfig) {
-            if (sendConfig != null) {
-                this.sendConfig = sendConfig;
-            }
-            return this;
-        }
-
-        /**
-         * Receive config builder.
-         *
-         * @param receiveConfig receive config
-         * @return the builder
-         */
-        public Builder receiveConfig(ServerConfig receiveConfig) {
-            if (receiveConfig != null) {
-                this.receiveConfig = receiveConfig;
-            }
-            return this;
-        }
-
-        /**
-         * Storage path builder.
-         *
-         * @param storagePath the storage path
-         * @return the builder
-         * @throws BuilderException the builder exception
-         */
-        public Builder storagePath(String storagePath) throws BuilderException {
-            if (StringUtils.isEmpty(storagePath) || !FileUtils.isExists(storagePath)) {
-                throw new BuilderException("Storage path not exists! ");
-            }
-            this.storagePath = storagePath;
-            return this;
-        }
-
-        public Builder signer(final X509Certificate x509Certificate, final PrivateKey privateKey) {
-            if (x509Certificate != null && privateKey != null) {
-                try {
-                    this.certificate = StringUtils.base64Encode(x509Certificate.getEncoded());
-                    this.privateKey = StringUtils.base64Encode(privateKey.getEncoded());
-                } catch (CertificateEncodingException e) {
-                    this.certificate = Globals.DEFAULT_VALUE_STRING;
-                    this.privateKey = Globals.DEFAULT_VALUE_STRING;
-                }
-            }
-            return this;
-        }
-
-        /**
-         * Build mail config.
-         *
-         * @return the mail config
-         * @throws BuilderException the builder exception
-         */
-        public MailConfig build() throws BuilderException {
-            if (this.sendConfig == null && this.receiveConfig == null) {
-                throw new BuilderException("Unknown server config! ");
-            }
-            return new MailConfig(this.userName, this.passWord, this.sendConfig, this.receiveConfig,
-                    this.storagePath, this.certificate, this.privateKey);
-        }
     }
 }

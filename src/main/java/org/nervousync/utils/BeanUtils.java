@@ -16,7 +16,7 @@
  */
 package org.nervousync.utils;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.nervousync.beans.converter.config.BeanConfig;
@@ -33,7 +33,7 @@ public final class BeanUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanUtils.class);
 
-	private static final Hashtable<String, BeanConfig> BEAN_CONFIG_MAP = new Hashtable<>();
+	private static final Map<String, BeanConfig> BEAN_CONFIG_MAP = new HashMap<>();
 
 	private BeanUtils() {
 	}
@@ -92,7 +92,7 @@ public final class BeanUtils {
 	 * @param dest           the target bean
 	 * @param convertMapping field mapping
 	 */
-	public static void copyProperties(Object orig, Object dest, final Hashtable<String, String> convertMapping) {
+	public static void copyProperties(Object orig, Object dest, final Map<String, String> convertMapping) {
 		String origClass = retrieveClassName(orig.getClass());
 		String destClass = retrieveClassName(dest.getClass());
 		BeanUtils.checkRegister(origClass);

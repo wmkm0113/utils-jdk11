@@ -60,6 +60,9 @@ public final class CertificateUtils {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+    private CertificateUtils() {
+    }
+
     /**
      * <h3 class="en">Generate KeyPair using given algorithm/secure random algorithm/key size</h3>
      * <h3 class="zhs">根据给定的算法、安全随机数算法、密钥长度生成密钥对</h3>

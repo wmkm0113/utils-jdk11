@@ -57,36 +57,40 @@ public abstract class AsymmetricCryptoProvider extends BaseCryptoProvider {
                 }
                 break;
             default:
-                throw new CryptoException("Unknown crypto mode! ");
+                throw new CryptoException("Crypto mode invalid! ");
         }
     }
 
     @Override
     public final byte[] finish(byte[] dataBytes, int position, int length) throws CryptoException {
+        byte[] result;
         switch (this.cryptoMode) {
             case ENCRYPT:
             case DECRYPT:
                 try {
-                    return this.cipher.doFinal(dataBytes, position, length);
+                    result = this.cipher.doFinal(dataBytes, position, length);
                 } catch (IllegalBlockSizeException | BadPaddingException e) {
                     throw new CryptoException(e);
                 } finally {
                     this.reset();
                 }
+                break;
             case SIGNATURE:
                 try {
                     this.signature.update(dataBytes);
-                    return this.signature.sign();
+                    result = this.signature.sign();
                 } catch (SignatureException e) {
                     throw new CryptoException(e);
                 } finally {
                     this.reset();
                 }
+                break;
             case VERIFY:
                 throw new CryptoException("Finish method was not support in verify mode, execute verify method instead!");
             default:
                 throw new CryptoException("Unknown crypto mode! ");
         }
+        return result;
     }
 
     @Override
@@ -132,18 +136,18 @@ public abstract class AsymmetricCryptoProvider extends BaseCryptoProvider {
 
     private Signature initSignature() throws CryptoException {
         try {
-            Signature signature = Signature.getInstance(this.cipherConfig.getAlgorithm());
+            Signature signInstance = Signature.getInstance(this.cipherConfig.getAlgorithm());
             switch (this.cryptoMode) {
                 case SIGNATURE:
-                    signature.initSign((PrivateKey) this.key);
+                    signInstance.initSign((PrivateKey) this.key);
                     break;
                 case VERIFY:
-                    signature.initVerify((PublicKey) this.key);
+                    signInstance.initVerify((PublicKey) this.key);
                     break;
                 default:
                     throw new CryptoException("Unknown crypto mode! ");
             }
-            return signature;
+            return signInstance;
         } catch (NoSuchAlgorithmException | InvalidKeyException | ClassCastException e) {
             throw new CryptoException(e);
         }

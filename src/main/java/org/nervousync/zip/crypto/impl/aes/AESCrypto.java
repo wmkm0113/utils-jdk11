@@ -16,6 +16,7 @@
  */
 package org.nervousync.zip.crypto.impl.aes;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -273,20 +274,13 @@ public class AESCrypto {
 
 		byte[] intTmpBytes = new byte[source.length + 4];
 		System.arraycopy(source, 0, intTmpBytes, 0, source.length);
-		INT(intTmpBytes, source.length, blockIndex);
+		RawUtils.writeInt(intTmpBytes, source.length, blockIndex);
 
 		for (int i = 0 ; i < 1000 ; i++) {
 			intTmpBytes = baseDigestProvider.finish(intTmpBytes);
 			XOR(tempBytes, intTmpBytes);
 		}
 		System.arraycopy(tempBytes, 0, dest, offset, length);
-	}
-
-	private static void INT(byte[] dest, int offset, int value) {
-		dest[offset] = (byte)(value / (Math.pow(256, 3)));
-		dest[offset + 1] = (byte)(value / (Math.pow(256, 2)));
-		dest[offset + 2] = (byte)(value / (Math.pow(256, 1)));
-		dest[offset + 3] = (byte)value;
 	}
 
 	private static void XOR(byte[] dest, byte[] source) {
@@ -332,7 +326,7 @@ public class AESCrypto {
 
 		this.saltBytes = new byte[this.saltLength];
 		for (int i = 0 ; i < rounds ; i++) {
-			Random random = new Random();
+			Random random = new SecureRandom();
 			int temp = random.nextInt();
 			this.saltBytes[i * 4] = (byte)(temp >> 24);
 			this.saltBytes[1 + i * 4] = (byte)(temp >> 16);

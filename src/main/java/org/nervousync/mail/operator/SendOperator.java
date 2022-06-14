@@ -17,7 +17,7 @@
 
 package org.nervousync.mail.operator;
 
-import org.nervousync.mail.config.ServerConfig;
+import org.nervousync.mail.config.MailConfig;
 
 import java.util.Properties;
 
@@ -32,6 +32,6 @@ public interface SendOperator {
      * @param serverConfig the server config
      * @return the properties
      */
-    Properties readConfig(ServerConfig serverConfig);
+    Properties readConfig(final MailConfig.ServerConfig serverConfig);
 
 }

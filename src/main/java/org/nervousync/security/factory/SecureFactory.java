@@ -25,7 +25,7 @@ public final class SecureFactory {
     private static final String SECURE_CERTIFICATE_ALIAS = "NSYC";
     private static final String SECURE_CERTIFICATE_PASSWORD = "ns0528AO";
 
-    private final static SecureFactory INSTANCE = new SecureFactory();
+    private static final SecureFactory INSTANCE = new SecureFactory();
 
     private SecureNode factoryNode = null;
     private final Map<String, SecureNode> registeredNodeMap;
@@ -101,7 +101,7 @@ public final class SecureFactory {
         byte[] encBytes = INSTANCE.initKey(keyBytes, Boolean.TRUE);
 
         SecureConfig secureConfig = new SecureConfig();
-        secureConfig.setSecureAlgorithm(secureAlgorithm.toString());
+        secureConfig.setSecureAlgorithm(secureAlgorithm);
         secureConfig.setSecureKey(StringUtils.base64Encode(encBytes));
         return Optional.of(secureConfig);
     }
@@ -158,6 +158,29 @@ public final class SecureFactory {
     }
 
     /**
+     * Re-encrypt password data.
+     *
+     * @param dataContent   Original password data.
+     * @param originalName  Original secure name.
+     * @param secureName    New secure name.
+     * @return      Re-encrypt password data
+     */
+    public String update(final String dataContent, final String originalName, final String secureName) {
+        if (StringUtils.isEmpty(dataContent)) {
+            return dataContent;
+        }
+
+        byte[] dataBytes = StringUtils.notBlank(originalName)
+                ? this.decrypt(originalName, StringUtils.base64Decode(dataContent))
+                : ConvertUtils.convertToByteArray(dataContent);
+        if (StringUtils.isEmpty(secureName)) {
+            return ConvertUtils.convertToString(dataBytes);
+        } else {
+            return StringUtils.base64Encode(this.encrypt(secureName, dataBytes));
+        }
+    }
+
+    /**
      * Encrypt byte [ ].
      *
      * @param configName the config name
@@ -166,16 +189,20 @@ public final class SecureFactory {
      */
     public byte[] encrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            if (this.registeredNodeMap.containsKey(configName)) {
-                try {
-                    return this.registeredNodeMap.get(configName).initCryptor(Boolean.TRUE).finish(dataBytes);
-                } catch (CryptoException e) {
-                    LOGGER.error("Encrypt data error! ");
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Stack message: ", e);
-                    }
-                }
-            }
+            return Optional.ofNullable(this.registeredNodeMap.get(configName))
+                    .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
+                    .map(secureProvider -> {
+                        try {
+                            return secureProvider.finish(dataBytes);
+                        } catch (CryptoException e) {
+                            LOGGER.error("Encrypt data error! ");
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("Stack message: ", e);
+                            }
+                            return dataBytes;
+                        }
+                    })
+                    .orElse(dataBytes);
         }
         return dataBytes;
     }
@@ -189,16 +216,20 @@ public final class SecureFactory {
      */
     public byte[] decrypt(String configName, byte[] dataBytes) {
         if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            if (this.registeredNodeMap.containsKey(configName)) {
-                try {
-                    return this.registeredNodeMap.get(configName).initCryptor(Boolean.FALSE).finish(dataBytes);
-                } catch (CryptoException e) {
-                    LOGGER.error("Decrypt data error! ");
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Stack message: ", e);
-                    }
-                }
-            }
+            return Optional.ofNullable(this.registeredNodeMap.get(configName))
+                    .map(secureNode -> secureNode.initCryptor(Boolean.FALSE))
+                    .map(secureProvider -> {
+                        try {
+                            return secureProvider.finish(dataBytes);
+                        } catch (CryptoException e) {
+                            LOGGER.error("Encrypt data error! ");
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("Stack message: ", e);
+                            }
+                            return dataBytes;
+                        }
+                    })
+                    .orElse(dataBytes);
         }
         return dataBytes;
     }
@@ -319,7 +350,7 @@ public final class SecureFactory {
             }
 
             try {
-                return Optional.of(new SecureNode(SecureAlgorithm.valueOf(secureConfig.getSecureAlgorithm()),
+                return Optional.of(new SecureNode(secureConfig.getSecureAlgorithm(),
                         INSTANCE.initKey(StringUtils.base64Decode(secureConfig.getSecureKey()), Boolean.FALSE)));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
@@ -332,7 +363,7 @@ public final class SecureFactory {
             }
 
             try {
-                return Optional.of(new SecureNode(SecureAlgorithm.valueOf(secureConfig.getSecureAlgorithm()),
+                return Optional.of(new SecureNode(secureConfig.getSecureAlgorithm(),
                         StringUtils.base64Decode(secureConfig.getSecureKey())));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();

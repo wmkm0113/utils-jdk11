@@ -11,12 +11,6 @@ import org.nervousync.utils.StringUtils;
  */
 public final class BeanObjectConverter implements ParameterConverter {
 
-	/**
-	 * Instantiates a new Bean object converter.
-	 */
-	public BeanObjectConverter() {
-	}
-
 	@Override
 	public boolean match(Class<?> targetClass) {
 		return targetClass != null && BeanObject.class.isAssignableFrom(targetClass);

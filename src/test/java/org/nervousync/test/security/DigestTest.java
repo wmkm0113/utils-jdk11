@@ -1,4 +1,4 @@
-package org.nervousync.security.test;
+package org.nervousync.test.security;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;

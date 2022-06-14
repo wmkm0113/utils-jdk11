@@ -1375,7 +1375,7 @@ public final class ZipFile implements Cloneable {
 		if (this.splitArchive) {
 			throw new ZipException("Unsupported updating split/spanned zip file! ");
 		}
-		
+
 		SplitOutputStream outputStream = null;
 		NervousyncRandomAccessFile input = null;
 		boolean success = Boolean.FALSE;
@@ -1386,11 +1386,11 @@ public final class ZipFile implements Cloneable {
 			if (indexOfHeader < 0) {
 				throw new ZipException("File header not found in zip entity, cannot remove file!");
 			}
-			
+
 			while (FileUtils.isExists(tempFileName)) {
 				tempFileName = this.filePath + System.currentTimeMillis() % 1000L;
 			}
-			
+
 			try {
 				outputStream = new SplitOutputStream(tempFileName);
 			} catch (FileNotFoundException e) {
@@ -1402,20 +1402,20 @@ public final class ZipFile implements Cloneable {
 			if (!this.readLocalFileHeader(input, generalFileHeader).verifyPassword(input)) {
 				throw new ZipException("Wrong password or Unsupported encryption method!");
 			}
-			
+
 			long offsetLocalFileHeader = generalFileHeader.getOffsetLocalHeader();
-			if (generalFileHeader.getZip64ExtendInfo() != null 
+			if (generalFileHeader.getZip64ExtendInfo() != null
 					&& generalFileHeader.getZip64ExtendInfo().getOffsetLocalHeader() != Globals.DEFAULT_VALUE_LONG) {
 				offsetLocalFileHeader = generalFileHeader.getZip64ExtendInfo().getOffsetLocalHeader();
 			}
-			
+
 			long offsetStartCentralDirectory = this.endCentralDirectoryRecord.getOffsetOfStartOfCentralDirectory();
 			if (this.zip64Format && this.zip64EndCentralDirectoryRecord != null) {
 				offsetStartCentralDirectory = this.zip64EndCentralDirectoryRecord.getOffsetStartCenDirWRTStartDiskNo();
 			}
-			
+
 			long offsetEndOfCompressedFile = Globals.DEFAULT_VALUE_LONG;
-			
+
 			List<GeneralFileHeader> fileHeaders = this.centralDirectory.getFileHeaders();
 			if (indexOfHeader == fileHeaders.size() - 1) {
 				offsetEndOfCompressedFile = offsetStartCentralDirectory - 1;
@@ -1423,17 +1423,17 @@ public final class ZipFile implements Cloneable {
 				GeneralFileHeader nextFileHeader = fileHeaders.get(indexOfHeader + 1);
 				if (nextFileHeader != null) {
 					offsetEndOfCompressedFile = nextFileHeader.getOffsetLocalHeader() - 1;
-					if (nextFileHeader.getZip64ExtendInfo() != null 
+					if (nextFileHeader.getZip64ExtendInfo() != null
 							&& nextFileHeader.getZip64ExtendInfo().getOffsetLocalHeader() != Globals.DEFAULT_VALUE_LONG) {
 						offsetEndOfCompressedFile = nextFileHeader.getZip64ExtendInfo().getOffsetLocalHeader() - 1;
 					}
 				}
 			}
-			
+
 			if (offsetLocalFileHeader < 0L || offsetEndOfCompressedFile < 0L) {
 				throw new ZipException("invalid offset for start and end of local file, cannot remove file");
 			}
-			
+
 			if (indexOfHeader == 0) {
 				if (this.centralDirectory.getFileHeaders().size() > 1) {
 					this.copyFile(input, outputStream, offsetEndOfCompressedFile + 1L, offsetStartCentralDirectory);
@@ -1444,31 +1444,27 @@ public final class ZipFile implements Cloneable {
 				this.copyFile(input, outputStream, 0, offsetLocalFileHeader);
 				this.copyFile(input, outputStream, offsetEndOfCompressedFile + 1L, offsetStartCentralDirectory);
 			}
-			
+
 			this.endCentralDirectoryRecord.setOffsetOfStartOfCentralDirectory(outputStream.getFilePointer());
 			this.endCentralDirectoryRecord.setTotalOfEntriesInCentralDirectory(this.endCentralDirectoryRecord.getTotalOfEntriesInCentralDirectory() - 1);
 			this.endCentralDirectoryRecord.setTotalOfEntriesInCentralDirectoryOnThisDisk(this.endCentralDirectoryRecord.getTotalOfEntriesInCentralDirectoryOnThisDisk() - 1);
-			
+
 			this.centralDirectory.getFileHeaders().remove(indexOfHeader);
-			
-			for (int i = indexOfHeader ; i < this.centralDirectory.getFileHeaders().size() ; i++) {
+
+			for (int i = indexOfHeader; i < this.centralDirectory.getFileHeaders().size(); i++) {
 				long offsetLocalHeader = this.centralDirectory.getFileHeaders().get(i).getOffsetLocalHeader();
 				if (this.centralDirectory.getFileHeaders().get(i).getZip64ExtendInfo() != null
 						&& this.centralDirectory.getFileHeaders().get(i).getZip64ExtendInfo().getOffsetLocalHeader() != Globals.DEFAULT_VALUE_LONG) {
 					offsetLocalHeader = this.centralDirectory.getFileHeaders().get(i).getZip64ExtendInfo().getOffsetLocalHeader();
 				}
-				
+
 				this.centralDirectory.getFileHeaders().get(i).setOffsetLocalHeader(offsetLocalHeader - (offsetEndOfCompressedFile - offsetLocalFileHeader) - 1);
 			}
-			
+
 			this.finalizeZipFile(outputStream);
 			success = true;
-		} catch (ZipException|IOException e) {
-			if (e instanceof ZipException) {
-				throw (ZipException)e;
-			} else {
-				throw new ZipException(e);
-			}
+		} catch (IOException e) {
+			throw new ZipException(e);
 		} finally {
 			IOUtils.closeStream(input);
 			IOUtils.closeStream(outputStream);

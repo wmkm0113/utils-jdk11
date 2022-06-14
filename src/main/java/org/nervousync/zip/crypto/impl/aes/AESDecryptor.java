@@ -70,21 +70,19 @@ public final class AESDecryptor extends AESCrypto implements Decryptor {
 		}
   
 		try {
-			for (int i = start ; i < (start + len) ; i += ZipConstants.AES_BLOCK_SIZE) {
-				this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ? 
+			for (int i = start; i < (start + len); i += ZipConstants.AES_BLOCK_SIZE) {
+				this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
 						ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
-				
+
 				this.macBasedPRF.append(buff, i, this.loopCount);
 				super.processData(buff, i);
 			}
-			
+
 			return len;
+		} catch (ZipException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof ZipException) {
-				throw (ZipException)e;
-			} else {
-				throw new ZipException(e);
-			}
+			throw new ZipException(e);
 		}
 	}
 

@@ -140,7 +140,7 @@ public class BeanObject implements Serializable {
 	public String toXML(boolean outputFragment, boolean formattedOutput, String encoding) throws XmlException {
 		StringWriter stringWriter = null;
 
-		try{
+		try {
 			if (encoding == null) {
 				encoding = Globals.DEFAULT_ENCODING;
 			}
@@ -155,6 +155,7 @@ public class BeanObject implements Serializable {
 			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 
 			marshaller.marshal(this, streamWriter);
+
 			streamWriter.flush();
 			streamWriter.close();
 
@@ -192,15 +193,15 @@ public class BeanObject implements Serializable {
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		if (this == o) {
-			return true;
+			return Boolean.TRUE;
 		}
 
 		if (!o.getClass().equals(this.getClass())) {
-			return false;
+			return Boolean.FALSE;
 		}
 
 		Field[] fields = this.getClass().getDeclaredFields();
@@ -215,13 +216,13 @@ public class BeanObject implements Serializable {
 				Object destValue = ReflectionUtils.getFieldValue(field, o);
 
 				if (!Objects.equals(origValue, destValue)) {
-					return false;
+					return Boolean.FALSE;
 				}
 			}
 		} catch (Exception e) {
-			return false;
+			return Boolean.FALSE;
 		}
-		return true;
+		return Boolean.TRUE;
 	}
 
 	@Override

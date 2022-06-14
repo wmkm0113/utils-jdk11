@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- * TOTP(Time-based One-time Password Algorithm) Utility
+ * OTP(One-time Password Algorithm) Utility
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 2019-06-04 10:47 $
@@ -93,7 +93,7 @@ public final class OTPUtils {
 										  final int authCode, final int syncCount) {
 		for (int i = -12 ; i <= 12 ; i++) {
 			long fixedTime = i * 60 * 60 * 1000L;
-			if (validateTOTPCode(calcType, authCode, randomKey, fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE)) {
+			if (validateTOTPCode(authCode, calcType, randomKey, fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE)) {
 				return fixedTime;
 			}
 		}
@@ -249,8 +249,8 @@ public final class OTPUtils {
 	 * @return validate result
 	 */
 	public static boolean validateTOTPCode(final int authCode, final String randomKey, final long fixedTime) {
-		return validateTOTPCode(CalcType.HmacSHA1, authCode, randomKey,
-				fixedTime, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
+		return validateTOTPCode(authCode, CalcType.HmacSHA1, randomKey, fixedTime,
+				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 	}
 
 	/**
@@ -263,9 +263,9 @@ public final class OTPUtils {
 	 * @return validate result
 	 */
 	public static boolean validateTOTPCode(final int authCode, final String randomKey,
-										   final long fixedTime, final int fixWindow) {
-		return validateTOTPCode(CalcType.HmacSHA1, authCode, randomKey,
-				fixedTime, Globals.DEFAULT_VALUE_INT, fixWindow);
+	                                       final long fixedTime, final int fixWindow) {
+		return validateTOTPCode(authCode, CalcType.HmacSHA1, randomKey, fixedTime,
+				Globals.DEFAULT_VALUE_INT, fixWindow);
 	}
 
 	/**
@@ -279,7 +279,7 @@ public final class OTPUtils {
 	 * @param fixWindow fix window
 	 * @return validate result
 	 */
-	public static boolean validateTOTPCode(final CalcType calcType, final int authCode, final String randomKey,
+	public static boolean validateTOTPCode(final int authCode, final CalcType calcType, final String randomKey,
 										   final long fixedTime, final int syncCount, final int fixWindow) {
 		if (authCode > Globals.INITIALIZE_INT_VALUE) {
 			int minWindow = fixWindow < 0 ? (-1 * DEFAULT_WINDOW_SIZE) : (-1 * fixWindow);

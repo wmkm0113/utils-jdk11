@@ -30,36 +30,11 @@ public class BuilderException extends Exception {
     private static final long serialVersionUID = -156775157749202954L;
 
     /**
-     * Creates a new instance of CachedException without detail message.
-     */
-    public BuilderException() {
-    }
-
-    /**
      * Constructs an instance of CachedException with the specified detail message.
      *
      * @param errorMessage The detail message.
      */
     public BuilderException(String errorMessage) {
         super(errorMessage);
-    }
-
-    /**
-     * Creates an instance of CachedException with nested exception
-     *
-     * @param e Nested exception
-     */
-    public BuilderException(Exception e) {
-        super(e);
-    }
-
-    /**
-     * Instantiates a new Builder exception.
-     *
-     * @param errorMessage the error message
-     * @param e            the e
-     */
-    public BuilderException(String errorMessage, Exception e) {
-        super(errorMessage, e);
     }
 }

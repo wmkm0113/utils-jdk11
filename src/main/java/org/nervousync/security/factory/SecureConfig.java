@@ -18,19 +18,20 @@ import jakarta.xml.bind.annotation.*;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 12/12/2020 11:05 PM $
  */
-@XmlRootElement(name = "secure-config")
+@XmlType(name = "secure_config", namespace = "https://gene.nervousync.org/secure/configure")
+@XmlRootElement(name = "secure_config", namespace = "https://gene.nervousync.org/secure/configure")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class SecureConfig extends BeanObject {
 
     /**
      * Secure using algorithm
      */
-    @XmlElement(name = "secure-algorithm")
-    private String secureAlgorithm = null;
+    @XmlElement(name = "secure_algorithm")
+    private SecureFactory.SecureAlgorithm secureAlgorithm = null;
     /**
      * Secure initialize key
      */
-    @XmlElement(name = "secure-key")
+    @XmlElement(name = "secure_key")
     private String secureKey = null;
 
     /**
@@ -44,7 +45,7 @@ public final class SecureConfig extends BeanObject {
      *
      * @return the secure algorithm
      */
-    public String getSecureAlgorithm() {
+    public SecureFactory.SecureAlgorithm getSecureAlgorithm() {
         return secureAlgorithm;
     }
 
@@ -53,7 +54,7 @@ public final class SecureConfig extends BeanObject {
      *
      * @param secureAlgorithm the secure algorithm
      */
-    public void setSecureAlgorithm(String secureAlgorithm) {
+    public void setSecureAlgorithm(SecureFactory.SecureAlgorithm secureAlgorithm) {
         this.secureAlgorithm = secureAlgorithm;
     }
 

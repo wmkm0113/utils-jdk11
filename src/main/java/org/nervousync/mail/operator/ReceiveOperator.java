@@ -20,7 +20,7 @@ package org.nervousync.mail.operator;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.nervousync.mail.config.ServerConfig;
+import org.nervousync.mail.config.MailConfig;
 
 import java.util.List;
 import java.util.Properties;
@@ -38,7 +38,7 @@ public interface ReceiveOperator {
      * @return the string
      * @throws MessagingException the messaging exception
      */
-    String readUID(Folder folder, Message message) throws MessagingException;
+    String readUID(final Folder folder, final Message message) throws MessagingException;
 
     /**
      * Read message.
@@ -48,7 +48,7 @@ public interface ReceiveOperator {
      * @return the message
      * @throws MessagingException the messaging exception
      */
-    Message readMessage(Folder folder, String uid) throws MessagingException;
+    Message readMessage(final Folder folder, final String uid) throws MessagingException;
 
     /**
      * Read messages list.
@@ -58,7 +58,7 @@ public interface ReceiveOperator {
      * @return the list
      * @throws MessagingException the messaging exception
      */
-    List<Message> readMessages(Folder folder, String... uidArrays) throws MessagingException;
+    List<Message> readMessages(final Folder folder, final String... uidArrays) throws MessagingException;
 
     /**
      * Read config properties.
@@ -66,6 +66,6 @@ public interface ReceiveOperator {
      * @param serverConfig the server config
      * @return the properties
      */
-    Properties readConfig(ServerConfig serverConfig);
+    Properties readConfig(final MailConfig.ServerConfig serverConfig);
 
 }

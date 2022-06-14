@@ -19,7 +19,6 @@ package org.nervousync.mail;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.nervousync.commons.core.Globals;
 
