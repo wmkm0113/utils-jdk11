@@ -1,4 +1,4 @@
-package org.nervousync.zip.test;
+package org.nervousync.test.zip;
 
 import org.junit.*;
 import org.junit.runners.MethodSorters;

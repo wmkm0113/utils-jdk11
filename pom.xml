@@ -5,9 +5,9 @@
 	<artifactId>utils-jdk11</artifactId>
 	<version>1.0.3</version>
 	<packaging>jar</packaging>
-	<name>Pure Java Utils</name>
+	<name>Nervousync Java Utility Collections</name>
 	<url>https://gene.nervousync.org/index.shtml</url>
-	<description>Java Utils collections, development by Nervousync Studio (NSYC)</description>
+	<description>Java utility collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
 		<url>https://github.com/Nervousync/Gene/issues</url>
 		<system>Github Issues</system>
@@ -48,7 +48,7 @@
 		<jakarta.mail.version>2.0.1</jakarta.mail.version>
 		<jakarta.webservice.version>3.1.0</jakarta.webservice.version>
 		<jakarta.xml.webservice.version>4.0.0</jakarta.xml.webservice.version>
-		<jakarta.xml.binding.version>3.0.2</jakarta.xml.binding.version>
+		<jakarta.xml.binding.version>4.0.0</jakarta.xml.binding.version>
 		<jakarta.xml.soap.version>3.0.0</jakarta.xml.soap.version>
 		<bcprov.version>1.71</bcprov.version>
 		<cglib.version>3.3.0</cglib.version>
@@ -58,7 +58,7 @@
 		<yaml.version>1.30</yaml.version>
 		<jersey.version>3.0.4</jersey.version>
 		<snmp4j.version>3.7.0</snmp4j.version>
-		<jcifs.version>2.1.29</jcifs.version>
+		<jcifs.version>2.1.31</jcifs.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -408,63 +408,6 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-	<build>
-		<defaultGoal>compile</defaultGoal>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>*.dat</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>false</filtering>
-			</testResource>
-		</testResources>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-scm-plugin</artifactId>
-					<version>${maven.scm.version}</version>
-					<configuration>
-						<connectionType>developerConnection</connectionType>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven.compiler.version}</version>
-					<configuration>
-						<source>${maven.compiler.source}</source>
-						<target>${maven.compiler.target}</target>
-						<encoding>UTF-8</encoding>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>${maven.jar.version}</version>
-					<configuration>
-						<archive>
-							<manifest>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							</manifest>
-							<manifestEntries>
-								<Built-By>Nervousync Studio</Built-By>
-								<Class-Path>.</Class-Path>
-							</manifestEntries>
-						</archive>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -501,10 +444,12 @@
 									<manifest>
 										<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 										<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+										<addClasspath>true</addClasspath>
 									</manifest>
 									<manifestEntries>
-										<Built-By>Nervousync Studio</Built-By>
-										<Class-Path>.</Class-Path>
+										<Built-By>${project.organization.name}</Built-By>
+										<Build-Jdk>${java.vm.name} ${java.vendor.version} (${java.runtime.version})</Build-Jdk>
+										<Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
 									</manifestEntries>
 								</archive>
 							</configuration>
@@ -519,7 +464,7 @@
 						<configuration>
 							<encoding>UTF-8</encoding>
 							<nonFilteredFileExtensions>
-								<nonFilteredFileExtension>dat</nonFilteredFileExtension>
+								<nonFilteredFileExtension>xsd</nonFilteredFileExtension>
 							</nonFilteredFileExtensions>
 						</configuration>
 					</plugin>

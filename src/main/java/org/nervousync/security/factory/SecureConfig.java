@@ -18,8 +18,8 @@ import jakarta.xml.bind.annotation.*;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 12/12/2020 11:05 PM $
  */
-@XmlType(name = "secure_config", namespace = "https://gene.nervousync.org/secure/configure")
-@XmlRootElement(name = "secure_config", namespace = "https://gene.nervousync.org/secure/configure")
+@XmlType(name = "secure_config", namespace = "https://nervousync.org/schemas/secure")
+@XmlRootElement(name = "secure_config", namespace = "https://nervousync.org/schemas/secure")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class SecureConfig extends BeanObject {
 

@@ -24,8 +24,8 @@ import org.nervousync.enumerations.mail.MailProtocol;
 /**
  * The type Mail config.
  */
-@XmlType(name = "mail_config", namespace = "https://gene.nervousync.org/mail/configure")
-@XmlRootElement(name = "mail_config", namespace = "https://gene.nervousync.org/mail/configure")
+@XmlType(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
+@XmlRootElement(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class MailConfig extends BeanObject {
 
@@ -219,8 +219,8 @@ public final class MailConfig extends BeanObject {
         this.privateKey = privateKey;
     }
 
-    @XmlType(name = "server_config", namespace = "https://gene.nervousync.org/mail/configure")
-    @XmlRootElement(name = "server_config", namespace = "https://gene.nervousync.org/mail/configure")
+    @XmlType(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
+    @XmlRootElement(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
     @XmlAccessorType(XmlAccessType.NONE)
     public static final class ServerConfig extends BeanObject {
 
@@ -403,12 +403,5 @@ public final class MailConfig extends BeanObject {
         public void setProcessTimeout(int processTimeout) {
             this.processTimeout = processTimeout;
         }
-    }
-
-    /**
-     * The type Builder.
-     */
-    public static final class Builder {
-
     }
 }

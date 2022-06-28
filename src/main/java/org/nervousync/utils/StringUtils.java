@@ -16,10 +16,7 @@
  */
 package org.nervousync.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -33,7 +30,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import jakarta.xml.bind.JAXB;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.exceptions.zip.ZipException;
 import org.slf4j.Logger;
@@ -47,6 +46,11 @@ import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.huffman.HuffmanNode;
 import org.nervousync.huffman.HuffmanObject;
 import org.nervousync.huffman.HuffmanTree;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * The type String utils.
@@ -1605,23 +1609,50 @@ public final class StringUtils {
 	 *
 	 * @param <T>       Template
 	 * @param string    Parsed string
+	 * @param beanClass Target bean class
+	 * @param schemaPath Schema file path
+	 * @return Converted object
+	 */
+	public static <T> T stringToObject(final String string, final Class<T> beanClass, final String schemaPath) {
+		return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass, schemaPath);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
 	 * @param encoding  String encoding
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> T stringToObject(String string, String encoding, Class<T> beanClass) {
+	public static <T> T stringToObject(String string, final String encoding, Class<T> beanClass) {
+		return stringToObject(string, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param encoding  String encoding
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T stringToObject(final String string, final String encoding,
+	                                   final Class<T> beanClass, final String schemaPath) {
 		if (StringUtils.isEmpty(string)) {
 			LOGGER.error("Can't parse empty string");
 			return null;
 		}
 
 		if (string.startsWith("<")) {
-			return stringToObject(string, StringType.XML, encoding, beanClass);
+			return stringToObject(string, StringType.XML, encoding, beanClass, schemaPath);
 		}
 		if (string.startsWith("{") || string.startsWith("[")) {
-			return stringToObject(string, StringType.JSON, encoding, beanClass);
+			return stringToObject(string, StringType.JSON, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
 		}
-		return stringToObject(string, StringType.YAML, encoding, beanClass);
+		return stringToObject(string, StringType.YAML, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
@@ -1664,6 +1695,19 @@ public final class StringUtils {
 	 * @return Converted object
 	 */
 	public static <T> T fileToObject(String filePath, Class<T> beanClass) {
+		return fileToObject(filePath, beanClass, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Parse file content to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param filePath  File path
+	 * @param beanClass Target bean class
+	 * @param schemaPath Schema file path
+	 * @return Converted object
+	 */
+	public static <T> T fileToObject(String filePath, Class<T> beanClass, final String schemaPath) {
 		if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
 			LOGGER.error("Can't found file: {}", filePath);
 			return null;
@@ -1672,44 +1716,17 @@ public final class StringUtils {
 		try (InputStream inputStream = FileUtils.loadFile(filePath)) {
 			switch (extName.toLowerCase()) {
 				case "json":
-					return parseStream(inputStream, StringType.JSON, beanClass);
+					return parseStream(inputStream, StringType.JSON, beanClass, Globals.DEFAULT_VALUE_STRING);
 				case "xml":
-					return parseStream(inputStream, StringType.XML, beanClass);
+					return parseStream(inputStream, StringType.XML, beanClass, schemaPath);
 				case "yml":
 				case "yaml":
-					return parseStream(inputStream, StringType.YAML, beanClass);
+					return parseStream(inputStream, StringType.YAML, beanClass, Globals.DEFAULT_VALUE_STRING);
 				default:
 					return null;
 			}
 		} catch (IOException e) {
 			LOGGER.error("Parse file error! ");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-		}
-		return null;
-	}
-
-	private static <T> T stringToObject(String string, StringType stringType, String encoding, Class<T> beanClass) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
-		}
-
-		if (StringType.SIMPLE.equals(stringType)) {
-			try {
-				return parseSimpleData(string, beanClass);
-			} catch (ParseException e) {
-				LOGGER.error("Parse simple error! ");
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Stack message: ", e);
-				}
-			}
-		}
-		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
-		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
-			return parseStream(inputStream, stringType, beanClass);
-		} catch (IOException e) {
-			LOGGER.error("Parse string error! ");
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Stack message: ", e);
 			}
@@ -1724,13 +1741,24 @@ public final class StringUtils {
 	 * @param inputStream the input stream
 	 * @param stringType  the string type
 	 * @param beanClass   the bean class
+	 * @param schemaPath Schema file path
 	 * @return the t
 	 * @throws IOException the io exception
 	 */
 	public static <T> T parseStream(final InputStream inputStream, final StringType stringType,
-	                                 final Class<T> beanClass) throws IOException {
+	                                 final Class<T> beanClass, final String schemaPath) throws IOException {
 		if (StringType.XML.equals(stringType)) {
-			return JAXB.unmarshal(inputStream, beanClass);
+			try {
+				Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
+				if (StringUtils.notBlank(schemaPath) && FileUtils.isExists(schemaPath)) {
+					Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+							.newSchema(FileUtils.getFile(schemaPath));
+					unmarshaller.setSchema(schema);
+				}
+				return beanClass.cast(unmarshaller.unmarshal(inputStream));
+			} catch (JAXBException | SAXException e) {
+				return null;
+			}
 		} else {
 			ObjectMapper objectMapper;
 			switch (stringType) {
@@ -1746,13 +1774,6 @@ public final class StringUtils {
 			}
 			return objectMapper.readValue(inputStream, beanClass);
 		}
-	}
-
-	private static <T> List<T> parseStream(final InputStream inputStream,
-	                                 final Class<T> beanClass) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
-		return objectMapper.readValue(inputStream, javaType);
 	}
 
 	/**
@@ -2361,6 +2382,41 @@ public final class StringUtils {
 				break;
 		}
 		return Boolean.FALSE;
+	}
+
+	private static <T> T stringToObject(final String string, final StringType stringType, final String encoding,
+	                                    final Class<T> beanClass, final String schemaPath) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Parse string: {} use encoding: {} to bean: {}", string, encoding, beanClass.getName());
+		}
+
+		if (StringType.SIMPLE.equals(stringType)) {
+			try {
+				return parseSimpleData(string, beanClass);
+			} catch (ParseException e) {
+				LOGGER.error("Parse simple error! ");
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Stack message: ", e);
+				}
+			}
+		}
+		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
+		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
+			return parseStream(inputStream, stringType, beanClass, schemaPath);
+		} catch (IOException e) {
+			LOGGER.error("Parse string error! ");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Stack message: ", e);
+			}
+		}
+		return null;
+	}
+
+	private static <T> List<T> parseStream(final InputStream inputStream,
+	                                       final Class<T> beanClass) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
+		return objectMapper.readValue(inputStream, javaType);
 	}
 
 	private static String prepareRegexTemplate(String template, String placeHolder) {

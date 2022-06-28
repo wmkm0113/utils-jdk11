@@ -1654,7 +1654,7 @@ public final class RequestUtils {
 			HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
 			return HttpResponse.BodySubscribers.mapping(upstream, inputStream -> () -> {
 				try {
-					return StringUtils.parseStream(inputStream, this.dataType, targetClass);
+					return StringUtils.parseStream(inputStream, this.dataType, targetClass, Globals.DEFAULT_VALUE_STRING);
 				} catch (IOException e) {
 					return null;
 				}

@@ -26,7 +26,6 @@ import org.nervousync.beans.converter.provider.impl.basic.ParseNumberProvider;
 import org.nervousync.beans.converter.provider.impl.xml.EncodeXMLProvider;
 import org.nervousync.beans.converter.provider.impl.xml.ParseXMLProvider;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.ObjectUtils;

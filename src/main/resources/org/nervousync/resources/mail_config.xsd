@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xsd:schema xmlns="https://gene.nervousync.org/mail/configure" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="https://gene.nervousync.org/mail/configure" elementFormDefault="qualified" version="1.0">
+<xsd:schema xmlns="https://nervousync.org/schemas/mail" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://nervousync.org/schemas/mail" elementFormDefault="qualified" version="1.0">
     <xsd:complexType name="mail_server">
         <xsd:all>
             <xsd:element name="host_name" type="xsd:string">
@@ -91,4 +91,5 @@
             </xsd:element>
         </xsd:all>
     </xsd:complexType>
+    <xsd:element name="mail_config" type="mail_config" />
 </xsd:schema>

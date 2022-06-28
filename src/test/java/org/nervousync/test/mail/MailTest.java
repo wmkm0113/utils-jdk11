@@ -66,7 +66,10 @@ public final class MailTest {
                 .storagePath(PROPERTIES.getProperty("config.storagePath"))
                 .signer(x509Certificate, keyPair.getPrivate())
                 .build();
-        LOGGER.info("Mail Config: {}", MAIL_CONFIG.toXML());
+        String xmlContent = MAIL_CONFIG.toXML();
+        LOGGER.info("Mail Config: {}", xmlContent);
+        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, Globals.DEFAULT_ENCODING, MailConfig.class, "D:\\JavaProjects\\JDK11\\Gene\\src\\main\\resources\\org\\nervousync\\resources\\mail_config.xsd");
+        Assert.assertNotNull(parseConfig);
     }
 
     @Test
