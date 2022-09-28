@@ -14,32 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.converter.provider;
+
+package org.nervousync.beans.converter.impl.blob;
+
+import org.nervousync.beans.converter.DataConverter;
+import org.nervousync.utils.ConvertUtils;
+import org.nervousync.utils.StringUtils;
 
 /**
- * Interface for java bean convert
+ * The type Parse base 64 provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: 8/15/2020 3:17 PM $
+ * @version $Revision : 1.0 $ $Date: 8/25/2020 2:56 PM $
  */
-public interface ConvertProvider {
+public final class Base64DataConverter extends DataConverter {
 
-	/**
-	 * Match the given data type
-	 *
-	 * @param dataType	Data type
-	 * @return			Match result
-	 */
-	boolean checkType(Class<?> dataType);
+	@Override
+	public String encode(Object object) {
+		return StringUtils.base64Encode(ConvertUtils.convertToByteArray(object));
+	}
 
-	/**
-	 * Convert given object to target class type
-	 *
-	 * @param origObj		Original data object
-	 * @param targetClass	Target class type
-	 * @param <T>			Target template class
-	 * @return				Converted object
-	 */
-	<T> T convert(Object origObj, Class<T> targetClass);
-
+	@Override
+	public <T> T decode(final String string, Class<T> targetClass) {
+		byte[] object = StringUtils.base64Decode(string);
+		if (targetClass.isInstance(object)) {
+			return targetClass.cast(object);
+		}
+		return null;
+	}
 }

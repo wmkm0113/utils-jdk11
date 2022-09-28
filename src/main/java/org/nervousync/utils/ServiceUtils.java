@@ -1,16 +1,28 @@
+/*
+ * Copyright 2022 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.nervousync.utils;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.client.*;
 import jakarta.ws.rs.core.*;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.HandlerResolver;
-import net.sf.cglib.proxy.MethodProxy;
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.http.HttpStatus;
 import org.nervousync.enumerations.web.HttpMethodOption;
-import org.nervousync.interceptor.beans.HandlerInterceptor;
 import org.nervousync.restful.converter.ParameterConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -156,7 +169,7 @@ public final class ServiceUtils {
                 .findFirst();
     }
 
-    private static final class RestfulInterceptor extends HandlerInterceptor {
+    private static final class RestfulInterceptor implements InvocationHandler {
 
         private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -178,7 +191,7 @@ public final class ServiceUtils {
         }
 
         @Override
-        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        public Object invoke(final Object o, final Method method, final Object[] objects) throws Throwable {
             HttpMethodOption methodOption = RequestUtils.httpMethodOption(method);
             if (HttpMethodOption.UNKNOWN.equals(methodOption) || !method.isAnnotationPresent(Path.class)) {
                 throw new Exception("Unknown method! ");
@@ -384,25 +397,25 @@ public final class ServiceUtils {
 
                 switch (methodOption) {
                     case PUT:
-                        operateResult = (response.getStatus() == HttpStatus.SC_CREATED
-                                || response.getStatus() == HttpStatus.SC_NO_CONTENT
-                                || response.getStatus() == HttpStatus.SC_OK);
+                        operateResult = (response.getStatus() == HttpServletResponse.SC_CREATED
+                                || response.getStatus() == HttpServletResponse.SC_NO_CONTENT
+                                || response.getStatus() == HttpServletResponse.SC_OK);
                         break;
                     case POST:
-                        operateResult = (response.getStatus() == HttpStatus.SC_CREATED
-                                || response.getStatus() == HttpStatus.SC_OK);
+                        operateResult = (response.getStatus() == HttpServletResponse.SC_CREATED
+                                || response.getStatus() == HttpServletResponse.SC_OK);
                         break;
                     case PATCH:
                     case DELETE:
-                        operateResult = (response.getStatus() == HttpStatus.SC_NO_CONTENT);
+                        operateResult = (response.getStatus() == HttpServletResponse.SC_NO_CONTENT);
                         break;
                     default:
-                        operateResult = (response.getStatus() == HttpStatus.SC_OK);
+                        operateResult = (response.getStatus() == HttpServletResponse.SC_OK);
                         break;
                 }
 
                 if (operateResult) {
-                    if (response.getStatus() == HttpStatus.SC_NO_CONTENT) {
+                    if (response.getStatus() == HttpServletResponse.SC_NO_CONTENT) {
                         return null;
                     }
 
@@ -448,18 +461,18 @@ public final class ServiceUtils {
                 } else {
                     String errorMsg = response.readEntity(String.class);
                     if (this.logger.isDebugEnabled()) {
-                        if (response.getStatus() == HttpStatus.SC_BAD_REQUEST) {
+                        if (response.getStatus() == HttpServletResponse.SC_BAD_REQUEST) {
                             errorMsg += "Send request data error!";
                         } else if (HttpMethodOption.GET.equals(methodOption)
-                                && response.getStatus() == HttpStatus.SC_NOT_FOUND) {
+                                && response.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
                             errorMsg += "Not found data! ";
-                        } else if (response.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+                        } else if (response.getStatus() == HttpServletResponse.SC_UNAUTHORIZED) {
                             errorMsg += "Unauthenticated error! ";
-                        } else if (response.getStatus() == HttpStatus.SC_FORBIDDEN) {
+                        } else if (response.getStatus() == HttpServletResponse.SC_FORBIDDEN) {
                             errorMsg += "Request forbidden! ";
-                        } else if (response.getStatus() == HttpStatus.SC_BAD_GATEWAY
-                                || response.getStatus() == HttpStatus.SC_SERVICE_UNAVAILABLE
-                                || response.getStatus() == HttpStatus.SC_GATEWAY_TIMEOUT) {
+                        } else if (response.getStatus() == HttpServletResponse.SC_BAD_GATEWAY
+                                || response.getStatus() == HttpServletResponse.SC_SERVICE_UNAVAILABLE
+                                || response.getStatus() == HttpServletResponse.SC_GATEWAY_TIMEOUT) {
                             errorMsg += "Request forbidden! ";
                         } else {
                             errorMsg += Globals.DEFAULT_VALUE_STRING;

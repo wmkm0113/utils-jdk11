@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsd:schema xmlns="https://nervousync.org/schemas/mail" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="https://nervousync.org/schemas/mail" elementFormDefault="qualified" version="1.0">
-    <xsd:complexType name="mail_server">
+    <xsd:complexType name="server_config">
         <xsd:all>
             <xsd:element name="host_name" type="xsd:string">
                 <xsd:annotation>
@@ -64,12 +64,12 @@
                     <xsd:documentation>Mail account password</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="send_config" type="mail_server">
+            <xsd:element name="send_config" type="server_config">
                 <xsd:annotation>
                     <xsd:documentation>Send server config</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="receive_config" type="mail_server">
+            <xsd:element name="receive_config" type="server_config">
                 <xsd:annotation>
                     <xsd:documentation>Receive server config</xsd:documentation>
                 </xsd:annotation>

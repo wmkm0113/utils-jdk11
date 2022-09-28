@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -42,7 +40,7 @@ public final class StandardEncryptor implements Encryptor {
 	 * @throws ZipException the zip exception
 	 */
 	public StandardEncryptor(char[] password, int crc) throws ZipException {
-		if (password == null || password.length <= 0) {
+		if (password == null || password.length == 0) {
 			throw new ZipException("input password is null or empty in standard encipher constructor");
 		}
 		
@@ -84,7 +82,7 @@ public final class StandardEncryptor implements Encryptor {
 	}
 
 	private void init(char[] password, int crc) throws ZipException {
-		if (password == null || password.length <= 0) {
+		if (password == null || password.length == 0) {
 			throw new ZipException("input password is null or empty in standard encipher constructor");
 		}
 		

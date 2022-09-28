@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2018 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -66,9 +64,9 @@ public final class MarkOptions {
 	 */
 	private final int fontSize;
 	
-	private MarkOptions(MarkType markType, MarkLocation markLocation, 
-			String markPath, float transparency, String markText, 
-			Color color, String fontName, int fontSize) {
+	private MarkOptions(final MarkType markType, final MarkLocation markLocation, final String markPath,
+	                    final float transparency, final String markText,
+	                    final Color color, final String fontName, final int fontSize) {
 		this.markType = markType;
 		this.markLocation = markLocation;
 		this.markPath = markPath;
@@ -87,8 +85,8 @@ public final class MarkOptions {
 	 * @param transparency Icon transparent setting
 	 * @return MarkOption object
 	 */
-	public static MarkOptions markIcon(MarkLocation markLocation,
-			String markPath, float transparency) {
+	public static MarkOptions markIcon(final MarkLocation markLocation, final String markPath,
+	                                   final float transparency) {
 		return new MarkOptions(MarkType.ICON, markLocation, markPath, transparency, null, null, 
 				null, Globals.DEFAULT_VALUE_INT);
 	}
@@ -103,8 +101,8 @@ public final class MarkOptions {
 	 * @param fontSize     Mark text font size
 	 * @return MarkOption object
 	 */
-	public static MarkOptions markText(MarkLocation markLocation,
-			String markText, Color color, String fontName, int fontSize) {
+	public static MarkOptions markText(final MarkLocation markLocation, final String markText,
+	                                   final Color color, final String fontName, final int fontSize) {
 		return new MarkOptions(MarkType.TEXT, markLocation, null, Globals.DEFAULT_VALUE_FLOAT, 
 				markText, color, fontName, fontSize);
 	}

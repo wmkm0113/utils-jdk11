@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2018 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,6 +13,8 @@
  * limitations under the License.
  */
 package org.nervousync.beans.image;
+
+import org.nervousync.commons.core.Globals;
 
 /**
  * Images options of cut operate
@@ -39,19 +39,7 @@ public final class CutOptions {
 	 * Cut height
 	 */
 	private final int cutHeight;
-	
-	/**
-	 * Initialize cut options using default position X and Y
-	 * @param cutWidth		Cut width
-	 * @param cutHeight		Cut height
-	 */
-	public CutOptions(int cutWidth, int cutHeight) {
-		this.positionX = 0;
-		this.positionY = 0;
-		this.cutWidth = cutWidth;
-		this.cutHeight = cutHeight;
-	}
-	
+
 	/**
 	 * Initialize cut options with given position X and Y
 	 * @param positionX			Cut begin position X
@@ -59,11 +47,20 @@ public final class CutOptions {
 	 * @param cutWidth			Cut width
 	 * @param cutHeight			Cut height
 	 */
-	public CutOptions(int positionX, int positionY, int cutWidth, int cutHeight) {
-		this.positionX = positionX;
-		this.positionY = positionY;
+	private CutOptions(final int positionX, final int positionY, final int cutWidth, final int cutHeight) {
+		this.positionX = positionX < 0 ? Globals.INITIALIZE_INT_VALUE : positionX;
+		this.positionY = positionY < 0 ? Globals.INITIALIZE_INT_VALUE : positionY;
 		this.cutWidth = cutWidth;
 		this.cutHeight = cutHeight;
+	}
+
+	public static CutOptions newInstance(final int cutWidth, final int cutHeight) {
+		return newInstance(Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, cutWidth, cutHeight);
+	}
+
+	public static CutOptions newInstance(final int positionX, final int positionY,
+	                                     final int cutWidth, final int cutHeight) {
+		return new CutOptions(positionX, positionY, cutWidth, cutHeight);
 	}
 
 	/**

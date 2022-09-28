@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -36,11 +34,10 @@ public final class LocationUtils {
 	 * @return              distance
 	 * @throws LocationConvertException     convert point to GPS failed
 	 */
-	public static double calcDistance(GeoPoint beginPoint, GeoPoint endPoint)
+	public static double calcDistance(final GeoPoint beginPoint, final GeoPoint endPoint)
 			throws LocationConvertException {
-		GeoPoint beginGPSPoint = convertToGPS(beginPoint);
-		GeoPoint endGPSPoint = convertToGPS(endPoint);
-
+		GeoPoint beginGPSPoint = anyToGPS(beginPoint);
+		GeoPoint endGPSPoint = anyToGPS(endPoint);
 		double tmpX = (endGPSPoint.getLongitude() - beginGPSPoint.getLongitude()) * Math.PI * EARTH_R
 				* Math.cos(((beginGPSPoint.getLatitude() + endGPSPoint.getLatitude()) / 2) * Math.PI / 180) / 180;
 		double tmpY = (endGPSPoint.getLatitude() - beginGPSPoint.getLatitude()) * Math.PI * EARTH_R / 180;
@@ -54,19 +51,18 @@ public final class LocationUtils {
 	 * @return					convert location point object
 	 * @throws LocationConvertException  location type is invalid
 	 */
-	public static GeoPoint convertToGPS(GeoPoint currentPoint) throws LocationConvertException {
+	public static GeoPoint anyToGPS(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
 			throw new LocationConvertException("Current point is null");
 		}
-		
 		switch (currentPoint.getLocationType()) {
 		case GPS:
 			return currentPoint;
 		case GCJ_02:
-			return convertGCJ02ToGPS(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return GCJ02ToGPS(currentPoint.getLongitude(), currentPoint.getLatitude());
 		case BD_09:
-			GeoPoint gcjPoint = convertBD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
-			return convertGCJ02ToGPS(gcjPoint.getLongitude(), gcjPoint.getLatitude());
+			GeoPoint gcjPoint = BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return GCJ02ToGPS(gcjPoint.getLongitude(), gcjPoint.getLatitude());
 			default:
 				throw new LocationConvertException("Location type does not supported");
 		}
@@ -78,18 +74,17 @@ public final class LocationUtils {
 	 * @return					convert location point object
 	 * @throws LocationConvertException  location type is invalid
 	 */
-	public static GeoPoint convertToGCJ02(GeoPoint currentPoint) throws LocationConvertException {
+	public static GeoPoint anyToGCJ02(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
 			throw new LocationConvertException("Current point is null");
 		}
-		
 		switch (currentPoint.getLocationType()) {
 		case GPS:
-			return convertGPSToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return GPSToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 		case GCJ_02:
 			return currentPoint;
 		case BD_09:
-			return convertBD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 			default:
 				throw new LocationConvertException("Location type does not supported");
 		}
@@ -101,17 +96,16 @@ public final class LocationUtils {
 	 * @return					convert location point object
 	 * @throws LocationConvertException  location type is invalid
 	 */
-	public static GeoPoint convertToBD09(GeoPoint currentPoint) throws LocationConvertException {
+	public static GeoPoint anyToBD09(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
 			throw new LocationConvertException("Current point is null");
 		}
-		
 		switch (currentPoint.getLocationType()) {
 		case GPS:
-			GeoPoint gcjPoint = convertGPSToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
-			return convertGCJ02ToBD09(gcjPoint.getLongitude(), gcjPoint.getLatitude());
+			GeoPoint gcjPoint = GPSToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return GCJ02ToBD09(gcjPoint.getLongitude(), gcjPoint.getLatitude());
 		case GCJ_02:
-			return convertGCJ02ToBD09(currentPoint.getLongitude(), currentPoint.getLatitude());
+			return GCJ02ToBD09(currentPoint.getLongitude(), currentPoint.getLatitude());
 		case BD_09:
 			return currentPoint;
 			default:
@@ -125,7 +119,7 @@ public final class LocationUtils {
 	 * @param latitude      latitude value of GCJ02
 	 * @return              Location point
 	 */
-	private static GeoPoint convertGCJ02ToBD09(double longitude, double latitude) {
+	private static GeoPoint GCJ02ToBD09(final double longitude, final double latitude) {
 		double fixValue = Math.sqrt(Math.pow(longitude, 2) + Math.pow(latitude, 2)) + 0.00002 * Math.sin(latitude * X_PI);
 		double fixTemp = Math.atan2(latitude, longitude) + 0.000003 * Math.cos(longitude * X_PI);
 		double bdLat = fixValue * Math.sin(fixTemp) + 0.006;
@@ -139,7 +133,7 @@ public final class LocationUtils {
 	 * @param latitude      latitude value of BD09
 	 * @return              Location point
 	 */
-	private static GeoPoint convertBD09ToGCJ02(double longitude, double latitude) {
+	private static GeoPoint BD09ToGCJ02(final double longitude, final double latitude) {
 		double fixValue = Math.sqrt(Math.pow(longitude - 0.0065, 2) + Math.pow(latitude - 0.006, 2)) 
 				- 0.00002 * Math.sin((latitude - 0.006) * X_PI);
 		double fixTemp = Math.atan2(latitude - 0.006, longitude - 0.0065) 
@@ -155,7 +149,7 @@ public final class LocationUtils {
 	 * @param latitude      latitude value of GCJ02
 	 * @return              Location point
 	 */
-	private static GeoPoint convertGCJ02ToGPS(double longitude, double latitude) {
+	private static GeoPoint GCJ02ToGPS(final double longitude, final double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
 			return GeoPoint.gpsPoint(longitude, latitude);
 		} else {
@@ -171,8 +165,8 @@ public final class LocationUtils {
 	 * @param latitude      latitude value of GPS
 	 * @return              Location point
 	 */
-	private static GeoPoint convertGPSToGCJ02(double longitude, double latitude) {
-		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
+	private static GeoPoint GPSToGCJ02(final double longitude, final double latitude) {
+		if ((longitude < 72.004 || longitude > 137.8347) && (latitude < 0.8293 || latitude > 55.8271)) {
 			return GeoPoint.gcj02Point(longitude, latitude);
 		}
 		GeoPoint deltaPoint = deltaPoint(longitude, latitude);
@@ -180,7 +174,7 @@ public final class LocationUtils {
 				latitude + deltaPoint.getLatitude());
 	}
 	
-	private static GeoPoint deltaPoint(double longitude, double latitude) {
+	private static GeoPoint deltaPoint(final double longitude, final double latitude) {
 		double transformLatitude = latitude / 180.0 * Math.PI;
 		double magic = 1 - EARTH_EE * Math.pow(Math.sin(transformLatitude), 2);
 		double magicSqrt = Math.sqrt(magic);
@@ -191,29 +185,31 @@ public final class LocationUtils {
 		return GeoPoint.deltaPoint(fixedLongitude, fixedLatitude);
 	}
 	
-	private static double transformLatitude(double longitude, double latitude) {
+	private static double transformLatitude(final double longitude, final double latitude) {
 		double transformLatitude = -100.0 + 2.0 * longitude + 3.0 * latitude + 0.2 * Math.pow(latitude, 2);
 		transformLatitude += 0.1 * longitude * latitude + 0.2 * Math.sqrt(Math.abs(longitude));
 		transformLatitude += calcFirst(longitude);
 		transformLatitude += calcLast(latitude);
-		transformLatitude += (160.0 * Math.sin(latitude / 12.0 * Math.PI) + 320.0 * Math.sin(latitude * Math.PI / 30.0)) * 2.0 / 3.0;
+		transformLatitude +=
+				(160.0 * Math.sin(latitude / 12.0 * Math.PI) + 320.0 * Math.sin(latitude * Math.PI / 30.0)) * 2.0 / 3.0;
 		return transformLatitude;
 	}
 	
-	private static double transformLongitude(double longitude, double latitude) {
+	private static double transformLongitude(final double longitude, final double latitude) {
 		double transformLongitude = 300.0 + longitude + 2.0 * latitude + 0.1 * Math.pow(longitude, 2);
 		transformLongitude += 0.1 * longitude * latitude + 0.1 * Math.sqrt(Math.abs(longitude));
 		transformLongitude += calcFirst(longitude);
 		transformLongitude += calcLast(longitude);
-		transformLongitude += (150.0 * Math.sin(longitude / 12.0 * Math.PI) + 300.0 * Math.sin(longitude * Math.PI / 30.0)) * 2.0 / 3.0;
+		transformLongitude +=
+				(150.0 * Math.sin(longitude / 12.0 * Math.PI) + 300.0 * Math.sin(longitude * Math.PI / 30.0)) * 2.0 / 3.0;
 		return transformLongitude;
 	}
 
-	private static double calcFirst(double value) {
+	private static double calcFirst(final double value) {
 		return (20.0 * Math.sin(6.0 * value * Math.PI) + 20.0 * Math.sin(2.0 * value * Math.PI)) * 2.0 / 3.0;
 	}
 
-	private static double calcLast(double value) {
+	private static double calcLast(final double value) {
 		return (20.0 * Math.sin(value * Math.PI) + 40.0 * Math.sin(value / 3.0 * Math.PI)) * 2.0 / 3.0;
 	}
 }

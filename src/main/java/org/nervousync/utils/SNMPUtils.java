@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,11 +16,13 @@ package org.nervousync.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.nervousync.commons.core.Globals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.CommunityTarget;
@@ -74,13 +74,14 @@ public final class SNMPUtils {
 	private static final OctetString AUTH_PRIV = new OctetString("privUser");
 	
 	private final IPProtocol protocol;
-	private int period = 5;
+	private final long period;
 	private final List<TargetHost> existsHosts;
 	private final ScheduledExecutorService scheduledExecutorService;
 	private Snmp snmp = null;
 	
-	private SNMPUtils(IPProtocol protocol, int serverCount) throws IOException {
+	private SNMPUtils(final IPProtocol protocol, final int serverCount, final long period) throws IOException {
 		this.protocol = protocol;
+		this.period = Math.max(period, 1000L);
 		this.existsHosts = new ArrayList<>(serverCount);
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(serverCount);
 		switch (this.protocol) {
@@ -103,8 +104,19 @@ public final class SNMPUtils {
 	 * @param serverCount the server count
 	 * @return the boolean
 	 */
-	public static boolean initialize(int serverCount) {
-		return SNMPUtils.initialize(IPProtocol.UDP, serverCount);
+	public static boolean initialize(final int serverCount) {
+		return SNMPUtils.initialize(serverCount, Globals.DEFAULT_VALUE_LONG);
+	}
+
+	/**
+	 * Initialize boolean.
+	 *
+	 * @param serverCount the server count
+	 * @param period      read data period
+	 * @return the boolean
+	 */
+	public static boolean initialize(final int serverCount, final long period) {
+		return SNMPUtils.initialize(IPProtocol.UDP, serverCount, period);
 	}
 
 	/**
@@ -112,19 +124,20 @@ public final class SNMPUtils {
 	 *
 	 * @param protocol    the protocol
 	 * @param serverCount the server count
+	 * @param period      read data period
 	 * @return the boolean
 	 */
-	public static boolean initialize(IPProtocol protocol, int serverCount) {
+	public static boolean initialize(final IPProtocol protocol, final int serverCount, final long period) {
 		if (SNMPUtils.INSTANCE != null) {
-			return true;
+			return Boolean.TRUE;
 		}
 		try {
 			synchronized (SNMPUtils.class) {
 				if (SNMPUtils.INSTANCE == null) {
-					SNMPUtils.INSTANCE = new SNMPUtils(protocol, serverCount);
+					SNMPUtils.INSTANCE = new SNMPUtils(protocol, serverCount, period);
 				}
 			}
-			return true;
+			return Boolean.TRUE;
 		} catch (IOException e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Initialize instance error! ", e);
@@ -147,46 +160,28 @@ public final class SNMPUtils {
 	 *
 	 * @param identifiedKey    the identified key
 	 * @param targetHost       the target host
-	 * @param pduList          the pdu list
+	 * @param pduArray         the pdu array
 	 * @param snmpDataOperator the snmp data operator
 	 * @return the boolean
 	 */
-	public boolean addMonitor(String identifiedKey, TargetHost targetHost,
-			List<PDU> pduList, SNMPDataOperator snmpDataOperator) {
+	public boolean addMonitor(final String identifiedKey, final TargetHost targetHost,
+	                          final SNMPDataOperator snmpDataOperator, final PDU... pduArray) {
 		if (this.existsHosts.contains(targetHost)) {
-			return true;
+			return Boolean.TRUE;
 		}
 		
 		try {
 			this.existsHosts.add(targetHost);
 			this.scheduledExecutorService.scheduleAtFixedRate(
-					new SNMPProcessor(identifiedKey, targetHost, pduList, snmpDataOperator), 
-					0L, this.period, TimeUnit.SECONDS);
-			return true;
+					new SNMPProcessor(identifiedKey, targetHost, snmpDataOperator, pduArray),
+					0L, this.period, TimeUnit.MILLISECONDS);
+			return Boolean.TRUE;
 		} catch (ProcessorConfigException e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Add monitor target host error! ", e);
 			}
 			return Boolean.FALSE;
 		}
-	}
-
-	/**
-	 * Gets period.
-	 *
-	 * @return the period
-	 */
-	public int getPeriod() {
-		return period;
-	}
-
-	/**
-	 * Sets period.
-	 *
-	 * @param period the period to set
-	 */
-	public void setPeriod(int period) {
-		this.period = period;
 	}
 
 	/**
@@ -199,7 +194,7 @@ public final class SNMPUtils {
 		this.snmp.close();
 	}
 
-	private List<VariableBinding> retrieveData(Target<Address> target, PDU pdu) {
+	private List<VariableBinding> retrieveData(final Target<Address> target, final PDU pdu) {
 		if (this.snmp != null) {
 			try {
 				ResponseEvent<Address> responseEvent = this.snmp.send(pdu, target);
@@ -223,7 +218,7 @@ public final class SNMPUtils {
 
 		private final String identifiedKey;
 		private final Target<Address> target;
-		private final List<PDU> pduList;
+		private final PDU[] pduArray;
 		private final SNMPDataOperator snmpDataOperator;
 
 		/**
@@ -231,41 +226,33 @@ public final class SNMPUtils {
 		 *
 		 * @param identifiedKey    the identified key
 		 * @param targetHost       the target host
-		 * @param pduList          the pdu list
+		 * @param pduArray         the pdu array
 		 * @param snmpDataOperator the snmp data operator
 		 * @throws ProcessorConfigException the processor config exception
 		 */
-		public SNMPProcessor(String identifiedKey, TargetHost targetHost, List<PDU> pduList,
-				SNMPDataOperator snmpDataOperator) throws ProcessorConfigException {
-			if (identifiedKey == null || targetHost == null || pduList == null 
-					|| pduList.isEmpty() || snmpDataOperator == null) {
+		public SNMPProcessor(final String identifiedKey, final TargetHost targetHost,
+		                     final SNMPDataOperator snmpDataOperator, final PDU... pduArray) throws ProcessorConfigException {
+			if (identifiedKey == null || targetHost == null || pduArray == null
+					|| pduArray.length == 0 || snmpDataOperator == null) {
 				throw new ProcessorConfigException("Argument invalid");
 			}
 			this.identifiedKey = identifiedKey;
 			this.target = SNMPUtils.getInstance().generateTarget(targetHost);
-			this.pduList = pduList;
+			this.pduArray = pduArray;
 			this.snmpDataOperator = snmpDataOperator;
 		}
 		
 		@Override
 		public void run() {
 			SNMPData snmpData = new SNMPData();
-			
 			snmpData.setIdentifiedKey(this.identifiedKey);
-			for (PDU pdu : this.pduList) {
-				List<VariableBinding> returnList =
-						SNMPUtils.getInstance().retrieveData(this.target, pdu);
-				for (VariableBinding variableBinding : returnList) {
-					snmpData.addData(variableBinding.getOid().toString(),
-							variableBinding.getVariable().toString());
-				}
-			}
-			
+			Arrays.asList(this.pduArray).forEach(pdu ->
+					SNMPUtils.getInstance().retrieveData(this.target, pdu).forEach(snmpData::addData));
 			this.snmpDataOperator.operateData(snmpData);
 		}
 	}
 
-	private OID retrieveAuthProtocol(SNMPAuthProtocol snmpAuthProtocol) {
+	private OID retrieveAuthProtocol(final SNMPAuthProtocol snmpAuthProtocol) {
 		switch (snmpAuthProtocol) {
 			case MD5:
 				return AuthMD5.ID;
@@ -275,7 +262,7 @@ public final class SNMPUtils {
 		return null;
 	}
 	
-	private Target<Address> generateTarget(TargetHost targetHost) {
+	private Target<Address> generateTarget(final TargetHost targetHost) {
 		if (targetHost == null) {
 			return null;
 		}

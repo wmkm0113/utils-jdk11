@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,8 +26,8 @@ import java.util.List;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Jun 9, 2015 9:43:23 AM $
  */
-@XmlType(name = "segment_file")
-@XmlRootElement(name = "segment_file")
+@XmlType(name = "segment_file", namespace = "https://nervousync.org/schemas/file/segment")
+@XmlRootElement(name = "segment_file", namespace = "https://nervousync.org/schemas/file/segment")
 @XmlAccessorType(XmlAccessType.NONE)
 public class SegmentationFile extends BeanObject {
 
@@ -56,12 +54,12 @@ public class SegmentationFile extends BeanObject {
 	/**
 	 * Item identified value of MD5
 	 */
-	@XmlElement(name = "md5")
+	@XmlElement(name = "signature_md5")
 	private String md5;
 	/**
 	 * Item identified value of SHA256
 	 */
-	@XmlElement(name = "sha")
+	@XmlElement(name = "signature_sha")
 	private String sha;
 	/**
 	 * Item data info

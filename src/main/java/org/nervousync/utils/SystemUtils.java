@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -74,91 +72,24 @@ public final class SystemUtils {
 	 * The constant USER_DIR.
 	 */
 	public static final String USER_DIR = System.getProperty("user.dir");
-	
+
+	public static final int MAJOR_VERSION;
+
 	private static final String IDENTIFIED_KEY = SystemUtils.generateIdentifiedKey();
 
-	/**
-	 * Constant identifying the 1.4.x JVM (J2SE 1.4).
-	 */
-	public static final int JAVA_1_4 = 1;
-
-	/**
-	 * Constant identifying the 1.5 JVM (Java 5).
-	 */
-	public static final int JAVA_1_5 = 2;
-
-	/**
-	 * Constant identifying the 1.6 JVM (Java 6).
-	 */
-	public static final int JAVA_1_6 = 3;
-
-	/**
-	 * Constant identifying the 1.7 JVM (Java 7).
-	 */
-	public static final int JAVA_1_7 = 4;
-
-	/**
-	 * Constant identifying the 1.8 JVM (Java 8).
-	 */
-	public static final int JAVA_1_8 = 5;
-
-	/**
-	 * Constant identifying the 9 JVM (Java 9).
-	 */
-	public static final int JAVA_9 = 6;
-
-	/**
-	 * Constant identifying the 10 JVM (Java 10).
-	 */
-	public static final int JAVA_10 = 7;
-
-	/**
-	 * Constant identifying the 11 JVM (Java 11).
-	 */
-	public static final int JAVA_11 = 8;
-
-	/**
-	 * Constant identifying the 12 JVM (Java 12).
-	 */
-	public static final int JAVA_12 = 9;
-
-	/**
-	 * Constant identifying the 13 JVM (Java 13).
-	 */
-	public static final int JAVA_13 = 10;
-
-	/**
-	 * Constant identifying the 14 JVM (Java 14).
-	 */
-	public static final int JAVA_14 = 11;
-
-	private static final int MAJOR_VERSION;
-
 	static {
-		// version String should look like "1.4.2_10"
-		if (JAVA_VERSION.startsWith("14.")) {
-			MAJOR_VERSION = JAVA_14;
-		} else if (JAVA_VERSION.startsWith("13.")) {
-			MAJOR_VERSION = JAVA_13;
-		} else if (JAVA_VERSION.startsWith("12.")) {
-			MAJOR_VERSION = JAVA_12;
-		} else if (JAVA_VERSION.startsWith("11.")) {
-			MAJOR_VERSION = JAVA_11;
-		} else if (JAVA_VERSION.startsWith("10.")) {
-			MAJOR_VERSION = JAVA_10;
-		} else if (JAVA_VERSION.startsWith("9.")) {
-			MAJOR_VERSION = JAVA_9;
-		} else if (JAVA_VERSION.startsWith("1.8.")) {
-			MAJOR_VERSION = JAVA_1_8;
+		if (JAVA_VERSION.startsWith("1.8.")) {
+			MAJOR_VERSION = 8;
 		} else if (JAVA_VERSION.startsWith("1.7.")) {
-			MAJOR_VERSION = JAVA_1_7;
+			MAJOR_VERSION = 7;
 		} else if (JAVA_VERSION.startsWith("1.6.")) {
-			MAJOR_VERSION = JAVA_1_6;
+			MAJOR_VERSION = 6;
 		} else if (JAVA_VERSION.startsWith("1.5.")) {
-			MAJOR_VERSION = JAVA_1_5;
+			MAJOR_VERSION = 5;
+		} else if (JAVA_VERSION.startsWith("1.")) {
+			MAJOR_VERSION = Globals.DEFAULT_VALUE_INT;
 		} else {
-			// else leave 1.4 as default (it's either 1.4 or unknown)
-			MAJOR_VERSION = JAVA_1_4;
+			MAJOR_VERSION = Integer.parseInt(JAVA_VERSION.substring(0, JAVA_VERSION.indexOf(".")));
 		}
 	}
 
@@ -334,123 +265,6 @@ public final class SystemUtils {
 	 */
 	public static boolean isOpenVMS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("openvms") > 0;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least Java 1.4.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 1.4
-	 * @see #JAVA_1_4 #JAVA_1_4
-	 */
-	public static boolean isAtLeastJava1_4() {
-		return MAJOR_VERSION >= JAVA_14;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 1.5 (Java 5).
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 1.5
-	 */
-	public static boolean isAtLeastJava1_5() {
-		return MAJOR_VERSION >= JAVA_1_5;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 1.6 (Java 6).
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 1.6
-	 */
-	public static boolean isAtLeastJava1_6() {
-		return MAJOR_VERSION >= JAVA_1_6;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 1.7 (Java 7).
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 1.7
-	 */
-	public static boolean isAtLeastJava1_7() {
-		return MAJOR_VERSION >= JAVA_1_7;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 1.8 (Java 8).
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 1.8
-	 */
-	public static boolean isAtLeastJava1_8() {
-		return MAJOR_VERSION >= JAVA_1_8;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 9.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 9
-	 * @see #JAVA_9 #JAVA_9
-	 * @see #JAVA_10 #JAVA_10
-	 */
-	public static boolean isAtLeastJava9() {
-		return MAJOR_VERSION >= JAVA_9;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 10.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 10
-	 * @see #JAVA_10 #JAVA_10
-	 */
-	public static boolean isAtLeastJava10() {
-		return MAJOR_VERSION >= JAVA_10;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 11.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 11
-	 * @see #JAVA_11 #JAVA_11
-	 */
-	public static boolean isAtLeastJava11() {
-		return MAJOR_VERSION >= JAVA_11;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 12.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 12
-	 * @see #JAVA_12 #JAVA_12
-	 */
-	public static boolean isAtLeastJava12() {
-		return MAJOR_VERSION >= JAVA_12;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 13.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 13
-	 * @see #JAVA_13 #JAVA_13
-	 */
-	public static boolean isAtLeastJava13() {
-		return MAJOR_VERSION >= JAVA_13;
-	}
-
-	/**
-	 * Convenience method to determine if the current JVM is at least
-	 * Java 14.
-	 *
-	 * @return <code>true</code> if the current JVM is at least Java 14
-	 * @see #JAVA_14 #JAVA_14
-	 */
-	public static boolean isAtLeastJava14() {
-		return MAJOR_VERSION >= JAVA_14;
 	}
 
 	/**

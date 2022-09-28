@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.converter.provider.impl.basic;
+package org.nervousync.beans.converter.impl.basic;
 
-import org.nervousync.beans.converter.provider.ConvertProvider;
+import org.nervousync.beans.converter.DataConverter;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.ReflectionUtils;
+import org.nervousync.utils.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,37 +34,29 @@ import java.math.BigInteger;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 8/29/2020 10:55 PM $
  */
-public final class ParseNumberProvider implements ConvertProvider {
-
-	/**
-	 * Instantiates a new Parse number provider.
-	 */
-	public ParseNumberProvider() {
-	}
+public final class NumberDataConverter extends DataConverter {
 
 	@Override
-	public boolean checkType(Class<?> dataType) {
-		DataType currentType = ObjectUtils.retrieveSimpleDataType(dataType);
-		return DataType.NUMBER.equals(currentType) || DataType.STRING.equals(currentType)
-				|| BigInteger.class.equals(dataType) || BigDecimal.class.equals(dataType);
+	public String encode(final Object object) {
+		return object.toString();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T convert(Object origObj, Class<T> targetClass) {
-		if (origObj != null && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
+	public <T> T decode(final String string, final Class<T> targetClass) {
+		if (StringUtils.notBlank(string) && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
 			if (targetClass.equals(BigInteger.class)) {
-				return targetClass.cast(new BigInteger(origObj.toString()));
+				return targetClass.cast(new BigInteger(string));
 			}
 			if (targetClass.equals(BigDecimal.class)) {
-				return targetClass.cast(new BigDecimal(origObj.toString()));
+				return targetClass.cast(new BigDecimal(string));
 			}
-			String string = origObj.toString();
+			String stringValue = string;
 			if (targetClass.equals(Integer.class) || targetClass.equals(int.class)
 					|| targetClass.equals(Short.class) || targetClass.equals(short.class)
 					|| targetClass.equals(Long.class) || targetClass.equals(long.class)) {
 				if (string.contains(".")) {
-					string = string.substring(0, string.indexOf("."));
+					stringValue = stringValue.substring(0, stringValue.indexOf("."));
 				}
 			}
 
@@ -71,14 +64,14 @@ public final class ParseNumberProvider implements ConvertProvider {
 					"valueOf", new Class[]{String.class});
 			if (method != null) {
 				try {
-					Object object = method.invoke(null, string);
+					Object object = method.invoke(null, stringValue);
 					if (targetClass.isPrimitive()) {
 						String className = targetClass.getName();
 						String methodName = className + "Value";
 						Method convertMethod = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
 								methodName, new Class[]{});
 						if (convertMethod != null) {
-							return (T) convertMethod.invoke(object, new Object[0]);
+							return (T) convertMethod.invoke(object);
 						}
 					} else {
 						return targetClass.cast(object);

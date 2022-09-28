@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,8 +14,7 @@
  */
 package org.nervousync.utils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -30,9 +27,6 @@ import jakarta.xml.bind.annotation.XmlType;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.xml.DataType;
-import org.nervousync.interceptor.beans.HandlerInterceptor;
-
-import net.sf.cglib.proxy.Enhancer;
 
 /**
  * The type Object utils.
@@ -46,58 +40,9 @@ public final class ObjectUtils {
 	private static final String NULL_STRING = "null";
 	private static final String ARRAY_START = "{";
 	private static final String ARRAY_END = "}";
-	private static final String EMPTY_ARRAY = ARRAY_START + ARRAY_END;
 	private static final String ARRAY_ELEMENT_SEPARATOR = ", ";
 	
 	private ObjectUtils() {
-	}
-
-	/**
-	 * Create a proxy object instance
-	 *
-	 * @param className class name
-	 * @return object instance
-	 * @throws ClassNotFoundException if class was not found
-	 * @throws LinkageError           if class link error
-	 */
-	public static Object newInstance(String className)
-			throws ClassNotFoundException, LinkageError {
-		return newInstance(className, null, null, null);
-	}
-
-	/**
-	 * Create a proxy object instance
-	 *
-	 * @param className    class name
-	 * @param paramClasses parameter class array
-	 * @param args         Constructor parameters
-	 * @return object instance
-	 * @throws ClassNotFoundException if class was not found
-	 * @throws LinkageError           if class link error
-	 */
-	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args)
-			throws ClassNotFoundException, LinkageError {
-		return newInstance(className, paramClasses, args, null);
-	}
-
-	/**
-	 * Create a proxy object instance
-	 *
-	 * @param className         class name
-	 * @param paramClasses      parameter class array
-	 * @param args              Constructor parameters
-	 * @param methodInterceptor method interceptor instance
-	 * @return object instance
-	 * @throws ClassNotFoundException if class was not found
-	 * @throws LinkageError           if class link error
-	 */
-	public static Object newInstance(String className, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor)
-			throws ClassNotFoundException, LinkageError {
-		HandlerInterceptor[] methodInterceptors = null;
-		if (methodInterceptor != null) {
-			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
-		}
-		return createProxyInstance(ClassUtils.forName(className), paramClasses, args, methodInterceptors);
 	}
 
 	/**
@@ -108,19 +53,18 @@ public final class ObjectUtils {
 	 * @return object instance
 	 */
 	public static <T> T newInstance(Class<T> clazz) {
-		return createProxyInstance(clazz, null, null, new HandlerInterceptor[]{});
+		return createProxyInstance(clazz, clazz.getInterfaces(), null);
 	}
 
 	/**
 	 * Create a proxy object instance
 	 *
-	 * @param <T>                 T
-	 * @param clazz               define class
-	 * @param handlerInterceptors method interceptor instance array
+	 * @param <T>   T
+	 * @param clazz define class
 	 * @return object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, HandlerInterceptor... handlerInterceptors) {
-		return createProxyInstance(clazz, null, null, handlerInterceptors);
+	public static <T> T newInstance(Class<T> clazz, Class<?>[] interfaceClasses) {
+		return createProxyInstance(clazz, interfaceClasses, null);
 	}
 
 	/**
@@ -128,17 +72,12 @@ public final class ObjectUtils {
 	 *
 	 * @param <T>               T
 	 * @param clazz             define class
-	 * @param paramClasses      parameter class array
-	 * @param args              Constructor parameters
 	 * @param methodInterceptor method interceptor instance
 	 * @return object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args, HandlerInterceptor methodInterceptor) {
-		HandlerInterceptor[] methodInterceptors = null;
-		if (methodInterceptor != null) {
-			methodInterceptors = new HandlerInterceptor[]{methodInterceptor};
-		}
-		return createProxyInstance(clazz, paramClasses, args, methodInterceptors);
+	public static <T> T createProxyInstance(Class<T> clazz, InvocationHandler methodInterceptor) {
+		return createProxyInstance(clazz, clazz.isInterface() ? new Class[]{clazz} : clazz.getInterfaces(),
+				methodInterceptor);
 	}
 
 	/**
@@ -146,41 +85,21 @@ public final class ObjectUtils {
 	 *
 	 * @param <T>                T
 	 * @param clazz              define class
-	 * @param paramClasses       parameter class array
-	 * @param args               Constructor parameters
-	 * @param methodInterceptors method interceptor instance arrays
+	 * @param invocationHandler  method invocation handler instance
 	 * @return object instance
 	 */
-	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] paramClasses, Object[] args,
-											HandlerInterceptor[] methodInterceptors) {
+	public static <T> T createProxyInstance(Class<T> clazz, Class<?>[] interfaceClasses, InvocationHandler invocationHandler) {
 		if (clazz == null) {
 			return null;
 		}
 
 		Object object;
 
-		if (methodInterceptors != null && methodInterceptors.length > 0) {
-			Enhancer enhancer = new Enhancer();
-			enhancer.setSuperclass(clazz);
-
-			if (methodInterceptors.length == 1) {
-				enhancer.setCallback(methodInterceptors[0]);
-			} else {
-				enhancer.setCallbacks(methodInterceptors);
-			}
-
-			if (args == null || args.length == 0) {
-				object = enhancer.create();
-			} else {
-				object = enhancer.create(paramClasses, args);
-			}
+		if (invocationHandler != null) {
+			object = Proxy.newProxyInstance(clazz.getClassLoader(), interfaceClasses, invocationHandler);
 		} else {
 			try {
-				if (args == null || args.length == 0) {
-					object = clazz.getDeclaredConstructor().newInstance();
-				} else {
-					object = clazz.getDeclaredConstructor(paramClasses).newInstance(args);
-				}
+				object = clazz.getDeclaredConstructor().newInstance();
 			} catch (SecurityException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				object = null;
 			}

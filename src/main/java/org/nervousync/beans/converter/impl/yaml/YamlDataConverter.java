@@ -15,37 +15,36 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.provider.impl.xml;
+package org.nervousync.beans.converter.impl.yaml;
 
-import org.nervousync.beans.converter.provider.ConvertProvider;
+import org.nervousync.beans.converter.DataConverter;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**
- * The type Parse xml provider.
+ * The type Encode xml provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/15/2020 4:23 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:34 PM $
  */
-public final class ParseXMLProvider implements ConvertProvider {
+public final class YamlDataConverter extends DataConverter {
 
-	/**
-	 * Instantiates a new Parse xml provider.
-	 */
-	public ParseXMLProvider() {
+	@Override
+	public String encode(final Object object) {
+		if (object == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+		if (object instanceof BeanObject) {
+			return ((BeanObject) object).toFormattedYaml();
+		}
+		return StringUtils.objectToString(object, StringUtils.StringType.YAML, Boolean.FALSE);
 	}
 
 	@Override
-	public boolean checkType(Class<?> dataType) {
-		return String.class.equals(dataType);
-	}
-
-	@Override
-	public <T> T convert(Object origObj, Class<T> targetClass) {
-		if ((origObj instanceof String) && targetClass != null
-				&& BeanObject.class.isAssignableFrom(targetClass)) {
-			return StringUtils.stringToObject((String)origObj, Globals.DEFAULT_ENCODING, targetClass);
+	public <T> T decode(final String string, final Class<T> targetClass) {
+		if (StringUtils.notBlank(string) && BeanObject.class.isAssignableFrom(targetClass)) {
+			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
 		}
 		return null;
 	}

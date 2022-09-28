@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.nervousync.utils.DateTimeUtils;
+import org.snmp4j.smi.VariableBinding;
 
 /**
  * Reading data maps of SNMP datas
@@ -88,12 +87,11 @@ public final class SNMPData implements Serializable {
 	/**
 	 * Add data.
 	 *
-	 * @param oid   the oid
-	 * @param value the value
+	 * @param variableBinding the oid
 	 */
-	public void addData(String oid, String value) {
-		if (!this.dataMap.containsKey(oid)) {
-			this.dataMap.put(oid, value);
+	public void addData(VariableBinding variableBinding) {
+		if (!this.dataMap.containsKey(variableBinding.getOid().toString())) {
+			this.dataMap.put(variableBinding.getOid().toString(), variableBinding.getVariable().toString());
 		}
 	}
 

@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -34,12 +32,7 @@ import org.nervousync.commons.http.proxy.ProxyInfo;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:04:17 AM $
  */
-public final class RequestInfo implements Serializable {
-	
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7350946565537957232L;
+public final class RequestInfo {
 
 	/**
 	 * Http method define
@@ -110,11 +103,11 @@ public final class RequestInfo implements Serializable {
 	 * @param parameters       Send parameter information of request
 	 * @param uploadParams      Send multipart files of request
 	 */
-	private RequestInfo(HttpMethodOption httpMethodOption, ProxyInfo proxyInfo, List<TrustCert> trustTrustCerts,
-	                    String passPhrase, String userAgent, String requestUrl, String charset,
-	                    String contentType, int timeOut, byte[] postDatas, List<SimpleHeader> headers,
-	                    List<CookieEntity> cookieList, Map<String, String[]> parameters,
-	                    Map<String, File> uploadParams) {
+	private RequestInfo(final HttpMethodOption httpMethodOption, final ProxyInfo proxyInfo,
+	                    final List<TrustCert> trustTrustCerts, final String passPhrase, final String userAgent,
+	                    final String requestUrl, final String charset, final String contentType, final int timeOut,
+	                    final byte[] postDatas, final List<SimpleHeader> headers, final List<CookieEntity> cookieList,
+	                    final Map<String, String[]> parameters, final Map<String, File> uploadParams) {
 		this.httpMethodOption = httpMethodOption;
 		this.proxyInfo = proxyInfo;
 		this.trustTrustCerts = trustTrustCerts;
@@ -137,17 +130,8 @@ public final class RequestInfo implements Serializable {
 	 * @param httpMethodOption the http method option
 	 * @return the request builder
 	 */
-	public static RequestBuilder builder(HttpMethodOption httpMethodOption) {
+	public static RequestBuilder builder(final HttpMethodOption httpMethodOption) {
 		return new RequestBuilder(httpMethodOption);
-	}
-
-	/**
-	 * Gets serial version uid.
-	 *
-	 * @return the serial version uid
-	 */
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
 	}
 
 	/**
@@ -350,7 +334,7 @@ public final class RequestInfo implements Serializable {
 		 */
 		private final List<CookieEntity> cookieList = new ArrayList<>();
 
-		private RequestBuilder(HttpMethodOption httpMethodOption) {
+		private RequestBuilder(final HttpMethodOption httpMethodOption) {
 			this.httpMethodOption = httpMethodOption;
 		}
 
@@ -372,7 +356,7 @@ public final class RequestInfo implements Serializable {
 		 * @param proxyAddress Proxy server address
 		 * @return Proxy info instance
 		 */
-		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress) {
+		public RequestBuilder configProxy(final Proxy.Type proxyType, final String proxyAddress) {
 			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress);
 			return this;
 		}
@@ -385,7 +369,7 @@ public final class RequestInfo implements Serializable {
 		 * @param proxyPort    Proxy server port
 		 * @return Proxy info instance
 		 */
-		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress, int proxyPort) {
+		public RequestBuilder configProxy(final Proxy.Type proxyType, final String proxyAddress, final int proxyPort) {
 			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress, proxyPort);
 			return this;
 		}
@@ -400,8 +384,8 @@ public final class RequestInfo implements Serializable {
 		 * @param password     Proxy server password
 		 * @return Proxy info instance
 		 */
-		public RequestBuilder configProxyInfo(Proxy.Type proxyType, String proxyAddress,
-		                                      int proxyPort, String userName, String password) {
+		public RequestBuilder configProxy(final Proxy.Type proxyType, final String proxyAddress, final int proxyPort,
+		                                  final String userName, final String password) {
 			this.proxyInfo = ProxyInfo.newInstance(proxyType, proxyAddress, proxyPort, userName, password);
 			return this;
 		}
@@ -413,7 +397,7 @@ public final class RequestInfo implements Serializable {
 		 * @param certPassword the cert password
 		 * @return the cert info
 		 */
-		public RequestBuilder addTrustCertificate(String certPath, String certPassword) {
+		public RequestBuilder addTrustCertificate(final String certPath, final String certPassword) {
 			this.trustTrustCerts.add(TrustCert.newInstance(certPath, certPassword));
 			return this;
 		}
@@ -425,7 +409,7 @@ public final class RequestInfo implements Serializable {
 		 * @param certPassword the cert password
 		 * @return the cert info
 		 */
-		public RequestBuilder addTrustCertificate(byte[] certContent, String certPassword) {
+		public RequestBuilder addTrustCertificate(final byte[] certContent, final String certPassword) {
 			this.trustTrustCerts.add(TrustCert.newInstance(certContent, certPassword));
 			return this;
 		}
@@ -436,7 +420,7 @@ public final class RequestInfo implements Serializable {
 		 * @param passPhrase the pass phrase
 		 * @return the request builder
 		 */
-		public RequestBuilder passPhrase(String passPhrase) {
+		public RequestBuilder passPhrase(final String passPhrase) {
 			this.passPhrase = passPhrase;
 			return this;
 		}
@@ -447,7 +431,7 @@ public final class RequestInfo implements Serializable {
 		 * @param userAgent the user agent
 		 * @return the request builder
 		 */
-		public RequestBuilder userAgent(String userAgent) {
+		public RequestBuilder userAgent(final String userAgent) {
 			this.userAgent = userAgent;
 			return this;
 		}
@@ -458,7 +442,7 @@ public final class RequestInfo implements Serializable {
 		 * @param requestUrl the request url
 		 * @return the request builder
 		 */
-		public RequestBuilder requestUrl(String requestUrl) {
+		public RequestBuilder requestUrl(final String requestUrl) {
 			this.requestUrl = requestUrl;
 			return this;
 		}
@@ -469,7 +453,7 @@ public final class RequestInfo implements Serializable {
 		 * @param charset the charset
 		 * @return the request builder
 		 */
-		public RequestBuilder charset(String charset) {
+		public RequestBuilder charset(final String charset) {
 			this.passPhrase = charset;
 			return this;
 		}
@@ -480,7 +464,7 @@ public final class RequestInfo implements Serializable {
 		 * @param contentType the content type
 		 * @return the request builder
 		 */
-		public RequestBuilder contentType(String contentType) {
+		public RequestBuilder contentType(final String contentType) {
 			this.contentType = contentType;
 			return this;
 		}
@@ -491,7 +475,7 @@ public final class RequestInfo implements Serializable {
 		 * @param timeOut the time-out
 		 * @return the request builder
 		 */
-		public RequestBuilder timeOut(int timeOut) {
+		public RequestBuilder timeOut(final int timeOut) {
 			this.timeOut = timeOut;
 			return this;
 		}
@@ -502,7 +486,7 @@ public final class RequestInfo implements Serializable {
 		 * @param postDatas the post datas
 		 * @return the request builder
 		 */
-		public RequestBuilder postDatas(byte[] postDatas) {
+		public RequestBuilder postDatas(final byte[] postDatas) {
 			this.postDatas = postDatas;
 			return this;
 		}
@@ -514,7 +498,7 @@ public final class RequestInfo implements Serializable {
 		 * @param headerValue the header value
 		 * @return the request builder
 		 */
-		public RequestBuilder addHeader(String headerName, String headerValue) {
+		public RequestBuilder addHeader(final String headerName, final String headerValue) {
 			this.headers.add(new SimpleHeader(headerName, headerValue));
 			return this;
 		}
@@ -526,7 +510,7 @@ public final class RequestInfo implements Serializable {
 		 * @param parameterValues the parameter values
 		 * @return the request builder
 		 */
-		public RequestBuilder addParameter(String parameterName, String[] parameterValues) {
+		public RequestBuilder addParameter(final String parameterName, final String[] parameterValues) {
 			this.parameters.put(parameterName, parameterValues);
 			return this;
 		}
@@ -538,7 +522,7 @@ public final class RequestInfo implements Serializable {
 		 * @param parameterValue the parameter value
 		 * @return the request builder
 		 */
-		public RequestBuilder addUploadParam(String parameterName, File parameterValue) {
+		public RequestBuilder addUploadParam(final String parameterName, final File parameterValue) {
 			this.uploadParams.put(parameterName, parameterValue);
 			return this;
 		}
@@ -546,11 +530,11 @@ public final class RequestInfo implements Serializable {
 		/**
 		 * Add cookies request builder.
 		 *
-		 * @param cookieEntity the cookie entity
+		 * @param cookieEntities the cookie entity array
 		 * @return the request builder
 		 */
-		public RequestBuilder addCookies(CookieEntity cookieEntity) {
-			this.cookieList.add(cookieEntity);
+		public RequestBuilder addCookies(final CookieEntity... cookieEntities) {
+			this.cookieList.addAll(Arrays.asList(cookieEntities));
 			return this;
 		}
 
@@ -560,7 +544,7 @@ public final class RequestInfo implements Serializable {
 		 * @param responseCookieValue the response cookie value
 		 * @return the request builder
 		 */
-		public RequestBuilder addCookies(String responseCookieValue) {
+		public RequestBuilder addCookies(final String responseCookieValue) {
 			this.cookieList.add(new CookieEntity(responseCookieValue));
 			return this;
 		}

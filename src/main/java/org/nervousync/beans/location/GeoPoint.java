@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -46,8 +44,7 @@ public final class GeoPoint implements Serializable {
 	 */
 	private final double latitude;
 	
-	private GeoPoint(LocationType locationType,
-					 double longitude, double latitude) {
+	private GeoPoint(final LocationType locationType, final double longitude, final double latitude) {
 		this.locationType = locationType;
 		this.longitude = longitude;
 		this.latitude = latitude;
@@ -60,7 +57,7 @@ public final class GeoPoint implements Serializable {
 	 * @param latitude  Location latitude value
 	 * @return LocationPoint object
 	 */
-	public static GeoPoint gpsPoint(double longitude, double latitude) {
+	public static GeoPoint gpsPoint(final double longitude, final double latitude) {
 		return new GeoPoint(LocationType.GPS, longitude, latitude);
 	}
 
@@ -71,7 +68,7 @@ public final class GeoPoint implements Serializable {
 	 * @param latitude  Location latitude value
 	 * @return LocationPoint object
 	 */
-	public static GeoPoint gcj02Point(double longitude, double latitude) {
+	public static GeoPoint gcj02Point(final double longitude, final double latitude) {
 		return new GeoPoint(LocationType.GCJ_02, longitude, latitude);
 	}
 
@@ -82,7 +79,7 @@ public final class GeoPoint implements Serializable {
 	 * @param latitude  Location latitude value
 	 * @return LocationPoint object
 	 */
-	public static GeoPoint bd09Point(double longitude, double latitude) {
+	public static GeoPoint bd09Point(final double longitude, final double latitude) {
 		return new GeoPoint(LocationType.BD_09, longitude, latitude);
 	}
 
@@ -93,7 +90,7 @@ public final class GeoPoint implements Serializable {
 	 * @param latitude  Location latitude value
 	 * @return LocationPoint object
 	 */
-	public static GeoPoint deltaPoint(double longitude, double latitude) {
+	public static GeoPoint deltaPoint(final double longitude, final double latitude) {
 		return new GeoPoint(LocationType.DELTA, longitude, latitude);
 	}
 

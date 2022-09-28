@@ -90,7 +90,7 @@ public final class ZipTest extends BaseTest {
 	@Test
 	public void test020CreateAes256File() {
 		Assert.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip",
-				ZipOptions.aesEncryptOptions(ZIP_PASSWORD, 256), COMPRESS_FOLDER));
+				ZipOptions.aesEncryptOptions(ZIP_PASSWORD), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
 	}
 

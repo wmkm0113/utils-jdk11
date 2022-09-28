@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,7 +26,7 @@ import org.nervousync.enumerations.snmp.auth.SNMPPrivProtocol;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Oct 25, 2017 9:47:36 PM $
  */
-public class TargetHost implements Serializable {
+public final class TargetHost implements Serializable {
 
 	/**
 	 * 
@@ -40,11 +38,23 @@ public class TargetHost implements Serializable {
 	/**
 	 * Host ip address
 	 */
-	private String ipAddress;
+	private final String ipAddress;
 	/**
 	 * Community name
 	 */
-	private String community;
+	private final String community;
+	/**
+	 * SNMP port, default is 161
+	 */
+	private final int port;
+	/**
+	 * Retries setting
+	 */
+	private final int retries;
+	/**
+	 * Timeout setting
+	 */
+	private final long timeOut;
 	/**
 	 * SNMP authentication type
 	 */
@@ -69,39 +79,6 @@ public class TargetHost implements Serializable {
 	 * SNMP version define
 	 */
 	private SNMPVersion version = SNMPVersion.VERSION2C;
-	/**
-	 * SNMP port, default is 161
-	 */
-	private int port = DEFAULT_SNMP_PORT;
-	/**
-	 * Retries setting
-	 */
-	private int retries = 1;
-	/**
-	 * Timeout setting
-	 */
-	private long timeOut = 1000L;
-	
-	/**
-	 * Constructor for TargetHost
-	 * @param ipAddress		Target ip address
-	 * @param community		Community name
-	 */
-	public TargetHost(String ipAddress, String community) {
-		this.ipAddress = ipAddress;
-		this.community = community;
-	}
-
-	/**
-	 * Constructor for TargetHost
-	 * @param ipAddress		Target ip address of host
-	 * @param community		Community name
-	 * @param port			Port of host
-	 */
-	public TargetHost(String ipAddress, String community, int port) {
-		this(ipAddress, community);
-		this.port = port;
-	}
 
 	/**
 	 * Constructor for TargetHost
@@ -111,13 +88,75 @@ public class TargetHost implements Serializable {
 	 * @param retries		Retries setting
 	 * @param timeOut		timeout setting
 	 */
-	public TargetHost(String ipAddress, String community, 
-			int port, int retries, long timeOut) {
-		this(ipAddress, community, port);
-		this.retries = retries;
-		this.timeOut = timeOut;
+	private TargetHost(final String ipAddress, final String community,
+	                   final int port, final int retries, final long timeOut) {
+		this.ipAddress = ipAddress;
+		this.community = community;
+		this.port = port <= 0 ? DEFAULT_SNMP_PORT : port;
+		this.retries = retries <= 0 ? 1 : retries;
+		this.timeOut = timeOut <= 0L ? 1000L : timeOut;
 	}
-	
+
+	public static TargetHost local() {
+		return local("public", DEFAULT_SNMP_PORT, 1, 1000L);
+	}
+
+	public static TargetHost local(final String community) {
+		return local(community, DEFAULT_SNMP_PORT, 1, 1000L);
+	}
+
+	public static TargetHost local(final String community, final int port) {
+		return local(community, port, 1, 1000L);
+	}
+
+	public static TargetHost local(final String community, final int port, final int retries, final long timeOut) {
+		return new TargetHost("127.0.0.1", community, port, retries, timeOut);
+	}
+
+	/**
+	 * @param ipAddress		Target ip address
+	 *
+	 * @return  TargetHost instance
+	 */
+	public static TargetHost remote(final String ipAddress) {
+		return remote(ipAddress, "public");
+	}
+
+	/**
+	 * @param ipAddress		Target ip address
+	 * @param community		Community name
+	 *
+	 * @return  TargetHost instance
+	 */
+	public static TargetHost remote(final String ipAddress, final String community) {
+		return remote(ipAddress, community, DEFAULT_SNMP_PORT, 1, 1000L);
+	}
+
+	/**
+	 * @param ipAddress		Target ip address of host
+	 * @param community		Community name
+	 * @param port			Port of host
+	 *
+	 * @return  TargetHost instance
+	 */
+	public static TargetHost remote(final String ipAddress, final String community, final int port) {
+		return remote(ipAddress, community, port, 1, 1000L);
+	}
+
+	/**
+	 * @param ipAddress		Target ip address of host
+	 * @param community		Community name
+	 * @param port			Port of host
+	 * @param retries		Retries setting
+	 * @param timeOut		timeout setting
+	 *
+	 * @return  TargetHost instance
+	 */
+	public static TargetHost remote(final String ipAddress, final String community,
+	                                     final int port, final int retries, final long timeOut) {
+		return new TargetHost(ipAddress, community, port, retries, timeOut);
+	}
+
 	/**
 	 * @return the ipAddress
 	 */
@@ -126,24 +165,10 @@ public class TargetHost implements Serializable {
 	}
 
 	/**
-	 * @param ipAddress the ipAddress to set
-	 */
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
-	}
-
-	/**
 	 * @return the community
 	 */
 	public String getCommunity() {
 		return community;
-	}
-
-	/**
-	 * @param community the community to set
-	 */
-	public void setCommunity(String community) {
-		this.community = community;
 	}
 
 	/**
@@ -191,7 +216,7 @@ public class TargetHost implements Serializable {
 	/**
 	 * @param version the version to set
 	 */
-	public void setVersion(SNMPVersion version) {
+	public void setVersion(final SNMPVersion version) {
 		this.version = version;
 	}
 
@@ -203,24 +228,10 @@ public class TargetHost implements Serializable {
 	}
 
 	/**
-	 * @param port the port to set
-	 */
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	/**
 	 * @return the retries
 	 */
 	public int getRetries() {
 		return retries;
-	}
-
-	/**
-	 * @param retries the retries to set
-	 */
-	public void setRetries(int retries) {
-		this.retries = retries;
 	}
 
 	/**
@@ -231,19 +242,12 @@ public class TargetHost implements Serializable {
 	}
 
 	/**
-	 * @param timeOut the timeOut to set
-	 */
-	public void setTimeOut(long timeOut) {
-		this.timeOut = timeOut;
-	}
-
-	/**
 	 * Setting for authentication with SNMPAuthType.AUTH_NOPRIV
 	 * @param authProtocol		Authentication protocol 
 	 * @see SNMPAuthProtocol
 	 * @param authPassword		Authentication password
 	 */
-	public void authNoPriv(SNMPAuthProtocol authProtocol, String authPassword) {
+	public void authNoPriv(final SNMPAuthProtocol authProtocol, final String authPassword) {
 		this.auth = SNMPAuthType.AUTH_NOPRIV;
 		this.authProtocol = authProtocol;
 		this.authPassword = authPassword;
@@ -258,8 +262,8 @@ public class TargetHost implements Serializable {
 	 * @see SNMPPrivProtocol
 	 * @param privPassword		PrivPassword
 	 */
-	public void authWithPriv(SNMPAuthProtocol authProtocol, String authPassword, 
-			SNMPPrivProtocol privProtocol, String privPassword) {
+	public void authWithPriv(final SNMPAuthProtocol authProtocol, final String authPassword,
+	                         final SNMPPrivProtocol privProtocol, final String privPassword) {
 		this.auth = SNMPAuthType.AUTH_PRIV;
 		this.authProtocol = authProtocol;
 		this.authPassword = authPassword;

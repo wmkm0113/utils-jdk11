@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -14,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.nervousync.beans.core;
 
 import jakarta.xml.bind.JAXBContext;
@@ -71,7 +68,7 @@ public class BeanObject implements Serializable {
 	 * @return the string
 	 */
 	public String toFormattedJson() {
-		return StringUtils.objectToString(this, StringUtils.StringType.JSON, true);
+		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.TRUE);
 	}
 
 	/**
@@ -89,7 +86,7 @@ public class BeanObject implements Serializable {
 	 * @return the string
 	 */
 	public String toFormattedYaml() {
-		return StringUtils.objectToString(this, StringUtils.StringType.YAML, true);
+		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.TRUE);
 	}
 
 	/**
@@ -99,7 +96,7 @@ public class BeanObject implements Serializable {
 	 * @throws XmlException the xml exception
 	 */
 	public String toXML() throws XmlException {
-		return this.toXML(true);
+		return this.toXML(Boolean.TRUE);
 	}
 
 	/**
@@ -110,8 +107,8 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(boolean formattedOutput) throws XmlException {
-		return this.toXML(true, formattedOutput, Globals.DEFAULT_ENCODING);
+	public String toXML(final boolean formattedOutput) throws XmlException {
+		return this.toXML(Boolean.TRUE, formattedOutput);
 	}
 
 	/**
@@ -123,7 +120,7 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(boolean outputFragment, boolean formattedOutput) throws XmlException {
+	public String toXML(final boolean outputFragment, final boolean formattedOutput) throws XmlException {
 		return this.toXML(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
 	}
 
@@ -137,13 +134,12 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(boolean outputFragment, boolean formattedOutput, String encoding) throws XmlException {
+	public String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding)
+			throws XmlException {
 		StringWriter stringWriter = null;
 
 		try {
-			if (encoding == null) {
-				encoding = Globals.DEFAULT_ENCODING;
-			}
+			String characterEncoding = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
 			stringWriter = new StringWriter();
 			XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(stringWriter);
 			CDataStreamWriter streamWriter = new CDataStreamWriter(xmlWriter);
@@ -151,7 +147,7 @@ public class BeanObject implements Serializable {
 			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass());
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
-			marshaller.setProperty(Marshaller.JAXB_ENCODING, encoding);
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, characterEncoding);
 			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 
 			marshaller.marshal(this, streamWriter);
@@ -161,7 +157,7 @@ public class BeanObject implements Serializable {
 
 			if (formattedOutput) {
 				Transformer transformer = TransformerFactory.newInstance().newTransformer();
-				transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+				transformer.setOutputProperty(OutputKeys.ENCODING, characterEncoding);
 				transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
@@ -173,9 +169,9 @@ public class BeanObject implements Serializable {
 			}
 			if (outputFragment) {
 				if (formattedOutput) {
-					return StringUtils.replace(FRAGMENT, "{}", encoding) + "\n" + stringWriter;
+					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + "\n" + stringWriter;
 				} else {
-					return StringUtils.replace(FRAGMENT, "{}", encoding) + stringWriter;
+					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + stringWriter;
 				}
 			} else {
 				return stringWriter.toString();
@@ -191,7 +187,7 @@ public class BeanObject implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (o == null) {
 			return Boolean.FALSE;
 		}
@@ -252,7 +248,7 @@ public class BeanObject implements Serializable {
 		 *
 		 * @param xmlStreamWriter the xml stream writer
 		 */
-		CDataStreamWriter(XMLStreamWriter xmlStreamWriter) {
+		CDataStreamWriter(final XMLStreamWriter xmlStreamWriter) {
 			this.xmlStreamWriter = xmlStreamWriter;
 		}
 
@@ -265,7 +261,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeStartElement(String localName) throws XMLStreamException {
+		public void writeStartElement(final String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(localName);
 		}
 
@@ -278,7 +274,7 @@ public class BeanObject implements Serializable {
 		 *                            javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
 		@Override
-		public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+		public void writeStartElement(final String namespaceURI, final String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(namespaceURI, localName);
 		}
 
@@ -291,7 +287,8 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+		public void writeStartElement(final String prefix, final String localName, final String namespaceURI)
+				throws XMLStreamException {
 			this.xmlStreamWriter.writeStartElement(prefix, localName, namespaceURI);
 		}
 
@@ -304,7 +301,7 @@ public class BeanObject implements Serializable {
 		 *                            javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
 		@Override
-		public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
+		public void writeEmptyElement(final String namespaceURI, final String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(namespaceURI, localName);
 		}
 
@@ -317,7 +314,8 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+		public void writeEmptyElement(final String prefix, final String localName, final String namespaceURI)
+				throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(prefix, localName, namespaceURI);
 		}
 
@@ -328,7 +326,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeEmptyElement(String localName) throws XMLStreamException {
+		public void writeEmptyElement(final String localName) throws XMLStreamException {
 			this.xmlStreamWriter.writeEmptyElement(localName);
 		}
 
@@ -386,7 +384,7 @@ public class BeanObject implements Serializable {
 		 *                               javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
 		@Override
-		public void writeAttribute(String localName, String value) throws XMLStreamException {
+		public void writeAttribute(final String localName, final String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(localName, value);
 		}
 
@@ -402,7 +400,8 @@ public class BeanObject implements Serializable {
 		 *                               javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
 		@Override
-		public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
+		public void writeAttribute(final String prefix, final String namespaceURI,
+		                           final String localName, final String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(prefix, namespaceURI, localName, value);
 		}
 
@@ -417,7 +416,8 @@ public class BeanObject implements Serializable {
 		 *                               javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
 		@Override
-		public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
+		public void writeAttribute(final String namespaceURI, final String localName, final String value)
+				throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(namespaceURI, localName, value);
 		}
 
@@ -432,7 +432,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
+		public void writeNamespace(final String prefix, final String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeNamespace(prefix, namespaceURI);
 		}
 
@@ -444,7 +444,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
+		public void writeDefaultNamespace(final String namespaceURI) throws XMLStreamException {
 			this.xmlStreamWriter.writeDefaultNamespace(namespaceURI);
 		}
 
@@ -455,7 +455,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeComment(String data) throws XMLStreamException {
+		public void writeComment(final String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeComment(data);
 		}
 
@@ -466,7 +466,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeProcessingInstruction(String target) throws XMLStreamException {
+		public void writeProcessingInstruction(final String target) throws XMLStreamException {
 			this.xmlStreamWriter.writeProcessingInstruction(target);
 		}
 
@@ -478,7 +478,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
+		public void writeProcessingInstruction(final String target, final String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeProcessingInstruction(target, data);
 		}
 
@@ -489,7 +489,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeCData(String data) throws XMLStreamException {
+		public void writeCData(final String data) throws XMLStreamException {
 			this.xmlStreamWriter.writeCData(data);
 		}
 
@@ -501,7 +501,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeDTD(String dtd) throws XMLStreamException {
+		public void writeDTD(final String dtd) throws XMLStreamException {
 			this.xmlStreamWriter.writeDTD(dtd);
 		}
 
@@ -512,7 +512,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeEntityRef(String name) throws XMLStreamException {
+		public void writeEntityRef(final String name) throws XMLStreamException {
 			this.xmlStreamWriter.writeEntityRef(name);
 		}
 
@@ -534,7 +534,7 @@ public class BeanObject implements Serializable {
 		 *                            of the underlying stream
 		 */
 		@Override
-		public void writeStartDocument(String version) throws XMLStreamException {
+		public void writeStartDocument(final String version) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartDocument(version);
 		}
 
@@ -550,7 +550,7 @@ public class BeanObject implements Serializable {
 		 *                            of the underlying stream
 		 */
 		@Override
-		public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+		public void writeStartDocument(final String encoding, final String version) throws XMLStreamException {
 			this.xmlStreamWriter.writeStartDocument(encoding, version);
 		}
 
@@ -561,7 +561,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeCharacters(String text) throws XMLStreamException {
+		public void writeCharacters(final String text) throws XMLStreamException {
 			if (text.startsWith(CDataAdapter.CDATA_BEGIN) && text.endsWith(CDataAdapter.CDATA_END)) {
 				this.writeCData(text.substring(CDataAdapter.CDATA_BEGIN.length(),
 						text.length() - CDataAdapter.CDATA_END.length()));
@@ -579,7 +579,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
+		public void writeCharacters(final char[] text, final int start, final int len) throws XMLStreamException {
 			this.writeCharacters(new String(text, start, len));
 		}
 
@@ -591,7 +591,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public String getPrefix(String uri) throws XMLStreamException {
+		public String getPrefix(final String uri) throws XMLStreamException {
 			return this.xmlStreamWriter.getPrefix(uri);
 		}
 
@@ -606,7 +606,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void setPrefix(String prefix, String uri) throws XMLStreamException {
+		public void setPrefix(final String prefix, final String uri) throws XMLStreamException {
 			this.xmlStreamWriter.setPrefix(prefix, uri);
 		}
 
@@ -621,7 +621,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void setDefaultNamespace(String uri) throws XMLStreamException {
+		public void setDefaultNamespace(final String uri) throws XMLStreamException {
 			this.xmlStreamWriter.setDefaultNamespace(uri);
 		}
 
@@ -641,7 +641,7 @@ public class BeanObject implements Serializable {
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
-		public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
+		public void setNamespaceContext(final NamespaceContext context) throws XMLStreamException {
 			this.xmlStreamWriter.setNamespaceContext(context);
 		}
 
@@ -664,7 +664,7 @@ public class BeanObject implements Serializable {
 		 * @throws NullPointerException     if the name is null
 		 */
 		@Override
-		public Object getProperty(String name) throws IllegalArgumentException {
+		public Object getProperty(final String name) throws IllegalArgumentException {
 			return this.xmlStreamWriter.getProperty(name);
 		}
 	}

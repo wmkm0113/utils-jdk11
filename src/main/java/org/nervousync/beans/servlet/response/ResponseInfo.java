@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -42,12 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
  */
-public final class ResponseInfo implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1427305383899073910L;
+public final class ResponseInfo {
 
 	/**
 	 * Logger
@@ -152,7 +145,7 @@ public final class ResponseInfo implements Serializable {
 	 * @param responseInfo the response info
 	 * @param inputStream  the input stream
 	 */
-	public ResponseInfo(HttpResponse.ResponseInfo responseInfo, InputStream inputStream) {
+	public ResponseInfo(final HttpResponse.ResponseInfo responseInfo, final InputStream inputStream) {
 		this.statusCode = responseInfo.statusCode();
 		responseInfo.headers().map().forEach((key, values) -> {
 			if (key != null && values != null && !values.isEmpty()) {
@@ -185,7 +178,7 @@ public final class ResponseInfo implements Serializable {
 	 *
 	 * @param urlConnection the url connection
 	 */
-	public ResponseInfo(HttpURLConnection urlConnection) {
+	public ResponseInfo(final HttpURLConnection urlConnection) {
 		InputStream inputStream = null;
 		ByteArrayOutputStream byteArrayOutputStream = null;
 		
@@ -276,7 +269,7 @@ public final class ResponseInfo implements Serializable {
 	 * @throws XmlException                 the xml exception
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public <T> T parseXml(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+	public <T> T parseXml(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
 		return StringUtils.stringToObject(this.parseString(), this.charset, clazz);
 	}
 
@@ -289,7 +282,7 @@ public final class ResponseInfo implements Serializable {
 	 * @throws XmlException                 the xml exception
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public <T> T parseJson(Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+	public <T> T parseJson(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
 		return StringUtils.stringToObject(this.parseString(this.charset), this.charset, clazz);
 	}
 
@@ -332,14 +325,12 @@ public final class ResponseInfo implements Serializable {
 	/**
 	 * Parse string string.
 	 *
-	 * @param charsetName the charset name
+	 * @param encoding the charset encoding
 	 * @return the string
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public String parseString(String charsetName) throws UnsupportedEncodingException {
-		if (StringUtils.isEmpty(charsetName)) {
-			charsetName = Globals.DEFAULT_ENCODING;
-		}
+	public String parseString(final String encoding) throws UnsupportedEncodingException {
+		String charsetName = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
 		String string = new String(this.getResponseContent(), charsetName);
 		while (string.charAt(string.length() - 1) == '\n') {
 			string = string.substring(0, string.length() - 1);
@@ -357,7 +348,7 @@ public final class ResponseInfo implements Serializable {
 	 * @return the file
 	 * @throws FileNotFoundException the io exception
 	 */
-	public File parseFile(String savePath) throws FileNotFoundException {
+	public File parseFile(final String savePath) throws FileNotFoundException {
 		return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
 	}
 
@@ -367,7 +358,7 @@ public final class ResponseInfo implements Serializable {
 	 * @param headerName the header name
 	 * @return the header
 	 */
-	public String getHeader(String headerName) {
+	public String getHeader(final String headerName) {
 		return this.headerMaps.get(headerName.toUpperCase());
 	}
 
@@ -378,16 +369,13 @@ public final class ResponseInfo implements Serializable {
 	 */
 	public List<SimpleHeader> headerList() {
 		List<SimpleHeader> headerList = new ArrayList<>();
-		
 		for (Map.Entry<String, String> entry : this.headerMaps.entrySet()) {
 			headerList.add(new SimpleHeader(entry.getKey(), entry.getValue()));
 		}
-		
 		return headerList;
 	}
 	
-	private boolean isGZipResponse(String contentEncoding) {
-		return contentEncoding != null
-				&& contentEncoding.contains("gzip");
+	private boolean isGZipResponse(final String contentEncoding) {
+		return contentEncoding != null && contentEncoding.contains("gzip");
 	}
 }

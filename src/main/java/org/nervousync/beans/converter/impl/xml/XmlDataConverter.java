@@ -15,33 +15,37 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.provider.impl.blob;
+package org.nervousync.beans.converter.impl.xml;
 
-import org.nervousync.beans.converter.provider.ConvertProvider;
+import org.nervousync.beans.converter.DataConverter;
+import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**
- * The type Encode base 64 provider.
+ * The type Parse xml provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/25/2020 2:57 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:23 PM $
  */
-public final class EncodeBase64Provider implements ConvertProvider {
+public final class XmlDataConverter extends DataConverter {
 
-	/**
-	 * Instantiates a new Encode base 64 provider.
-	 */
-	public EncodeBase64Provider() {
+	@Override
+	public String encode(Object object) {
+		if (object == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+		if (object instanceof BeanObject) {
+			return ((BeanObject) object).toXML(Boolean.FALSE);
+		}
+		return Globals.DEFAULT_VALUE_STRING;
 	}
 
 	@Override
-	public boolean checkType(Class<?> dataType) {
-		return byte[].class.equals(dataType);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T convert(Object origObj, Class<T> targetClass) {
-		return (T) StringUtils.base64Encode((byte[])origObj);
+	public <T> T decode(final String string, final Class<T> targetClass) {
+		if (StringUtils.notBlank(string) && targetClass != null && BeanObject.class.isAssignableFrom(targetClass)) {
+			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
+		}
+		return null;
 	}
 }

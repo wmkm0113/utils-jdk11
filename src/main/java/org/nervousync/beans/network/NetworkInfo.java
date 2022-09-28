@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,7 +24,7 @@ import java.util.List;
 
 import org.nervousync.exceptions.beans.network.IPAddressException;
 import org.nervousync.exceptions.beans.network.NetworkInfoException;
-import org.nervousync.utils.StringUtils;
+import org.nervousync.utils.IPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,16 +41,6 @@ public final class NetworkInfo implements Serializable {
 	 */
 	private static final long serialVersionUID = -8060054814830700945L;
 
-	private static final String REGEX_IPv4 = "((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))";
-	private static final String REGEX_IPv6 = "^\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))" 
-			+ "|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))" 
-			+ "|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))" 
-			+ "|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))"
-			+ "|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))" 
-			+ "|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))" 
-			+ "|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))" 
-			+ "|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?\\s*$";
-	
 	/**
 	 * Is virtual adapter
 	 */
@@ -76,7 +64,7 @@ public final class NetworkInfo implements Serializable {
 	 * @param networkInterface NetworkInterface value
 	 * @throws NetworkInfoException If value of NetworkInterface is null or catch other SocketException
 	 */
-	public NetworkInfo(NetworkInterface networkInterface) throws NetworkInfoException {
+	public NetworkInfo(final NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {
 			throw new NetworkInfoException("NetworkInterface is null");
 		}
@@ -165,7 +153,7 @@ public final class NetworkInfo implements Serializable {
 	public List<IPAddressInfo> getIPv4AddressList() {
 		List<IPAddressInfo> addressList = new ArrayList<>();
 		for (IPAddressInfo ipAddressInfo : this.ipAddressList) {
-			if (NetworkInfo.isIPv4Address(ipAddressInfo.getIpAddress())) {
+			if (IPUtils.isIPv4Address(ipAddressInfo.getIpAddress())) {
 				addressList.add(ipAddressInfo);
 			}
 		}
@@ -180,7 +168,7 @@ public final class NetworkInfo implements Serializable {
 	public List<IPAddressInfo> getIPv6AddressList() {
 		List<IPAddressInfo> addressList = new ArrayList<>();
 		for (IPAddressInfo ipAddressInfo : this.ipAddressList) {
-			if (NetworkInfo.isIPv6Address(ipAddressInfo.getIpAddress())) {
+			if (IPUtils.isIPv6Address(ipAddressInfo.getIpAddress())) {
 				addressList.add(ipAddressInfo);
 			}
 		}
@@ -232,7 +220,7 @@ public final class NetworkInfo implements Serializable {
 		 * @param inetAddress InetAddress object read from interface
 		 * @throws IPAddressException Given inetAddress is null
 		 */
-		public IPAddressInfo(InetAddress inetAddress) throws IPAddressException {
+		public IPAddressInfo(final InetAddress inetAddress) throws IPAddressException {
 			if (inetAddress == null) {
 				throw new IPAddressException("InetAddress is null");
 			}
@@ -283,25 +271,5 @@ public final class NetworkInfo implements Serializable {
 		public boolean isLinkLocal() {
 			return linkLocal;
 		}
-	}
-
-	/**
-	 * Is i pv 4 address boolean.
-	 *
-	 * @param ipAddress the ip address
-	 * @return the boolean
-	 */
-	public static boolean isIPv4Address(String ipAddress) {
-		return StringUtils.matches(ipAddress, REGEX_IPv4);
-	}
-
-	/**
-	 * Is i pv 6 address boolean.
-	 *
-	 * @param ipAddress the ip address
-	 * @return the boolean
-	 */
-	public static boolean isIPv6Address(String ipAddress) {
-		return StringUtils.matches(ipAddress, REGEX_IPv6);
 	}
 }

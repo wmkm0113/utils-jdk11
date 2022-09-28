@@ -10,7 +10,7 @@
 		<Logger name="org.nervousync" level="debug" additivity="false">
 			<AppenderRef ref="Console"/>
 		</Logger>
-		<Root level="info">
+		<Root level="debug">
 			<AppenderRef ref="Console"/>
 		</Root>
 	</loggers>

@@ -15,35 +15,36 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.provider.impl.xml;
+package org.nervousync.beans.converter.impl.json;
 
-import org.nervousync.beans.converter.provider.ConvertProvider;
+import org.nervousync.beans.converter.DataConverter;
 import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.Globals;
+import org.nervousync.utils.StringUtils;
 
 /**
- * The type Encode xml provider.
+ * The type Parse json provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/15/2020 4:34 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:26 PM $
  */
-public final class EncodeXMLProvider implements ConvertProvider {
+public final class JsonDataConverter extends DataConverter {
 
-	/**
-	 * Instantiates a new Encode xml provider.
-	 */
-	public EncodeXMLProvider() {
+	@Override
+	public String encode(final Object object) {
+		if (object == null) {
+			return Globals.DEFAULT_VALUE_STRING;
+		}
+		if (object instanceof BeanObject) {
+			return ((BeanObject) object).toFormattedJson();
+		}
+		return StringUtils.objectToString(object, StringUtils.StringType.JSON, Boolean.FALSE);
 	}
 
 	@Override
-	public boolean checkType(Class<?> dataType) {
-		return BeanObject.class.isAssignableFrom(dataType);
-	}
-
-	@Override
-	public <T> T convert(Object origObj, Class<T> targetClass) {
-		if (origObj != null && BeanObject.class.isAssignableFrom(origObj.getClass())
-				&& String.class.equals(targetClass)) {
-			return targetClass.cast(origObj.toString());
+	public <T> T decode(final String string, Class<T> targetClass) {
+		if (StringUtils.notBlank(string) && targetClass != null && BeanObject.class.isAssignableFrom(targetClass)) {
+			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
 		}
 		return null;
 	}

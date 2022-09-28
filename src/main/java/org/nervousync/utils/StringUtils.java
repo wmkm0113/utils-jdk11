@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -415,7 +413,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
 		if (hasLength(str)) {
@@ -511,7 +509,7 @@ public final class StringUtils {
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
 		if (hasLength(str)) {
@@ -531,7 +529,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
-	 * @see #containsWhitespace(CharSequence)
+	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
 		return containsWhitespace((CharSequence) str);
@@ -542,7 +540,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
@@ -556,7 +554,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (hasLength(str)) {
@@ -579,7 +577,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -597,7 +595,7 @@ public final class StringUtils {
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
-	 * @see java.lang.Character#isWhitespace
+	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
 		if (hasLength(str)) {
@@ -654,7 +652,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @return check result
-	 * @see java.lang.String#startsWith
+	 * @see java.lang.String#startsWith java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
 		if (str == null || prefix == null) {
@@ -678,7 +676,7 @@ public final class StringUtils {
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @return check result
-	 * @see java.lang.String#endsWith
+	 * @see java.lang.String#endsWith java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
 		if (str == null || suffix == null) {
@@ -1300,8 +1298,8 @@ public final class StringUtils {
 	 * @param delimiters the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim()
-	 * @see #delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(String str, String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
@@ -1320,8 +1318,8 @@ public final class StringUtils {
 	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String was <code>null</code>)
 	 * @see java.util.StringTokenizer
-	 * @see java.lang.String#trim()
-	 * @see #delimitedListToStringArray
+	 * @see java.lang.String#trim() java.lang.String#trim()
+	 * @see #delimitedListToStringArray #delimitedListToStringArray
 	 */
 	public static String[] tokenizeToStringArray(
 			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
@@ -1607,9 +1605,9 @@ public final class StringUtils {
 	/**
 	 * Parse string to target bean class
 	 *
-	 * @param <T>       Template
-	 * @param string    Parsed string
-	 * @param beanClass Target bean class
+	 * @param <T>        Template
+	 * @param string     Parsed string
+	 * @param beanClass  Target bean class
 	 * @param schemaPath Schema file path
 	 * @return Converted object
 	 */
@@ -1633,10 +1631,11 @@ public final class StringUtils {
 	/**
 	 * Parse string to target bean class
 	 *
-	 * @param <T>       Template
-	 * @param string    Parsed string
-	 * @param encoding  String encoding
-	 * @param beanClass Target bean class
+	 * @param <T>        Template
+	 * @param string     Parsed string
+	 * @param encoding   String encoding
+	 * @param beanClass  Target bean class
+	 * @param schemaPath the schema path
 	 * @return Converted object
 	 */
 	public static <T> T stringToObject(final String string, final String encoding,
@@ -1676,7 +1675,7 @@ public final class StringUtils {
 
 		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
 		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
-			return parseStream(inputStream, beanClass);
+			return streamToList(inputStream, beanClass);
 		} catch (IOException e) {
 			LOGGER.error("Parse string error! ");
 			if (LOGGER.isDebugEnabled()) {
@@ -1701,9 +1700,9 @@ public final class StringUtils {
 	/**
 	 * Parse file content to target bean class
 	 *
-	 * @param <T>       Template
-	 * @param filePath  File path
-	 * @param beanClass Target bean class
+	 * @param <T>        Template
+	 * @param filePath   File path
+	 * @param beanClass  Target bean class
 	 * @param schemaPath Schema file path
 	 * @return Converted object
 	 */
@@ -1716,12 +1715,12 @@ public final class StringUtils {
 		try (InputStream inputStream = FileUtils.loadFile(filePath)) {
 			switch (extName.toLowerCase()) {
 				case "json":
-					return parseStream(inputStream, StringType.JSON, beanClass, Globals.DEFAULT_VALUE_STRING);
+					return streamToObject(inputStream, StringType.JSON, beanClass, Globals.DEFAULT_VALUE_STRING);
 				case "xml":
-					return parseStream(inputStream, StringType.XML, beanClass, schemaPath);
+					return streamToObject(inputStream, StringType.XML, beanClass, schemaPath);
 				case "yml":
 				case "yaml":
-					return parseStream(inputStream, StringType.YAML, beanClass, Globals.DEFAULT_VALUE_STRING);
+					return streamToObject(inputStream, StringType.YAML, beanClass, Globals.DEFAULT_VALUE_STRING);
 				default:
 					return null;
 			}
@@ -1741,12 +1740,12 @@ public final class StringUtils {
 	 * @param inputStream the input stream
 	 * @param stringType  the string type
 	 * @param beanClass   the bean class
-	 * @param schemaPath Schema file path
+	 * @param schemaPath  Schema file path
 	 * @return the t
 	 * @throws IOException the io exception
 	 */
-	public static <T> T parseStream(final InputStream inputStream, final StringType stringType,
-	                                 final Class<T> beanClass, final String schemaPath) throws IOException {
+	public static <T> T streamToObject(final InputStream inputStream, final StringType stringType,
+	                                   final Class<T> beanClass, final String schemaPath) throws IOException {
 		if (StringType.XML.equals(stringType)) {
 			try {
 				Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
@@ -1774,6 +1773,20 @@ public final class StringUtils {
 			}
 			return objectMapper.readValue(inputStream, beanClass);
 		}
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param inputStream the input stream
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> List<T> streamToList(final InputStream inputStream, Class<T> beanClass) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
+		return objectMapper.readValue(inputStream, javaType);
 	}
 
 	/**
@@ -1817,7 +1830,7 @@ public final class StringUtils {
 	public static int isASCII(String s) throws UnsupportedEncodingException {
 		byte[] testString = s.getBytes(Globals.DEFAULT_ENCODING);
 
-		if (testString.length > 3 || testString.length <= 0) {
+		if (testString.length > 3 || testString.length == 0) {
 			return 0;
 		} else if (testString.length == 1) {
 			return testString[0];
@@ -2004,7 +2017,7 @@ public final class StringUtils {
 	 */
 	public static String messageKey(String... strings) {
 		StringJoiner stringJoiner = new StringJoiner(".");
-		Arrays.asList(strings).forEach(stringJoiner::add);
+		Arrays.stream(strings).filter(StringUtils::notBlank).forEach(stringJoiner::add);
 		return stringJoiner.toString();
 	}
 
@@ -2036,18 +2049,31 @@ public final class StringUtils {
 	/**
 	 * Replace template string with regex
 	 *
-	 * @param str         input string
-	 * @param regex       regex message
-	 * @param template    template string
-	 * @param placeHolder the placeholder
+	 * @param str      input string
+	 * @param regex    regex message
+	 * @param template template string
 	 * @return replaced string. null for match failed
 	 */
-	public static String replaceWithRegex(String str, String regex, String template, String placeHolder) {
+	public static String replaceWithRegex(String str, String regex, String template) {
+		return replaceWithRegex(str, regex, template, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Replace template string with regex
+	 *
+	 * @param str             input string
+	 * @param regex           regex message
+	 * @param template        template string
+	 * @param substringPrefix the substring prefix
+	 * @return replaced string. null for match failed
+	 */
+	public static String replaceWithRegex(final String str, final String regex, final String template,
+	                                      final String substringPrefix) {
 		if (!matches(str, regex)) {
 			return null;
 		}
 
-		String matchesString = prepareRegexTemplate(template, placeHolder);
+		String matchResult = template;
 		Matcher matcher = Pattern.compile(regex).matcher(str);
 		if (matcher.find()) {
 			for (int i = 0; i < matcher.groupCount(); i++) {
@@ -2055,11 +2081,15 @@ public final class StringUtils {
 				String matchValue = matcher.group(index);
 				if (matchValue == null) {
 					matchValue = Globals.DEFAULT_VALUE_STRING;
+				} else {
+					if (StringUtils.notBlank(substringPrefix) && matchValue.startsWith(substringPrefix)) {
+						matchValue = matchValue.substring(substringPrefix.length());
+					}
 				}
-				matchesString = replace(matchesString, "$" + index, matchValue);
+				matchResult = replace(matchResult, "$" + index, matchValue);
 			}
 
-			return matchesString;
+			return matchResult;
 		}
 		return str;
 	}
@@ -2402,7 +2432,7 @@ public final class StringUtils {
 		}
 		String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
 		try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
-			return parseStream(inputStream, stringType, beanClass, schemaPath);
+			return streamToObject(inputStream, stringType, beanClass, schemaPath);
 		} catch (IOException e) {
 			LOGGER.error("Parse string error! ");
 			if (LOGGER.isDebugEnabled()) {
@@ -2410,32 +2440,6 @@ public final class StringUtils {
 			}
 		}
 		return null;
-	}
-
-	private static <T> List<T> parseStream(final InputStream inputStream,
-	                                       final Class<T> beanClass) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
-		return objectMapper.readValue(inputStream, javaType);
-	}
-
-	private static String prepareRegexTemplate(String template, String placeHolder) {
-		if (StringUtils.isEmpty(template)) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		if (StringUtils.isEmpty(placeHolder)) {
-			return template;
-		}
-		String preparedTemplate = template;
-		int index;
-		int count = 1;
-		while ((index = preparedTemplate.indexOf(placeHolder)) > 0) {
-			preparedTemplate = preparedTemplate.substring(0, index)
-					+ "$" + count
-					+ preparedTemplate.substring(index + placeHolder.length());
-			count++;
-		}
-		return preparedTemplate;
 	}
 
 	private static String changeFirstCharacterCase(String str, boolean capitalize) {

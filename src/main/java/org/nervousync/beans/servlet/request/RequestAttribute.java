@@ -1,10 +1,8 @@
 /*
- * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017 Nervousync Studio
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,7 +14,6 @@
  */
 package org.nervousync.beans.servlet.request;
 
-import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jun 19, 2015 8:56:50 AM $
  */
-public final class RequestAttribute implements Serializable {
+public final class RequestAttribute {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 485757973915022360L;
-	
 	/**
 	 * Current session id
 	 */
@@ -44,7 +36,7 @@ public final class RequestAttribute implements Serializable {
 	 */
 	private final Map<String, Object> attributeMap;
 
-	private RequestAttribute(HttpServletRequest request) {
+	private RequestAttribute(final HttpServletRequest request) {
 		this.sessionId = request.getSession().getId();
 		this.attributeMap = new HashMap<>();
 
@@ -61,7 +53,7 @@ public final class RequestAttribute implements Serializable {
 	 * @param request		HttpServletRequest will be parsed
 	 * @return				Object of RequestAttribute
 	 */
-	public static RequestAttribute newInstance(HttpServletRequest request) {
+	public static RequestAttribute newInstance(final HttpServletRequest request) {
 		return new RequestAttribute(request);
 	}
 
