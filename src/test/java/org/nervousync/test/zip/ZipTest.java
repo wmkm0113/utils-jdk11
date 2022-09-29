@@ -13,7 +13,6 @@ import org.nervousync.zip.ZipFile;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -57,6 +56,17 @@ public final class ZipTest extends BaseTest {
 			}
 			FileUtils.saveFile(byteArrayOutputStream.toByteArray(), randFilePath);
 		}
+
+		FileUtils.copy("src/test/resources/TestZip.zip.001",
+				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001");
+		FileUtils.copy("src/test/resources/TestZip.zip.002",
+				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.002");
+		FileUtils.copy("src/test/resources/TestZip.zip.003",
+				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.003");
+		FileUtils.copy("src/test/resources/TestZip.zip.004",
+				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.004");
+		FileUtils.copy("src/test/resources/TestZip.zip.005",
+				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.005");
 	}
 
 	@AfterClass
@@ -177,13 +187,12 @@ public final class ZipTest extends BaseTest {
 	 */
 	@Test
 	public void test110ExtractSoftwareZippedFile() {
-		Optional.ofNullable(ZipTest.class.getResource("/"))
-				.ifPresent(url -> {
-					String basePath = StringUtils.replace(url.getPath(), "/", Globals.DEFAULT_PAGE_SEPARATOR);
-					basePath = basePath.substring(1, basePath.length() - 1);
-					ZipFile zipFile = ZipFile.openZipFile(basePath + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001");
-					Assert.assertNotNull(zipFile);
-					zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip");
-				});
+		String filePath = ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001";
+		this.logger.info("Read file path: {}", filePath);
+		if (FileUtils.isExists(filePath)) {
+			ZipFile zipFile = ZipFile.openZipFile(filePath);
+			Assert.assertNotNull(zipFile);
+			zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip");
+		}
 	}
 }

@@ -9,7 +9,7 @@
 	<url>https://gene.nervousync.org/index.shtml</url>
 	<description>Java utility collections, development by Nervousync Studio (NSYC)</description>
 	<issueManagement>
-		<url>https://github.com/Nervousync/Gene/issues</url>
+		<url>https://github.com/wmkm0113/Gene/issues</url>
 		<system>Github Issues</system>
 	</issueManagement>
 	<licenses>
@@ -20,10 +20,10 @@
 		</license>
 	</licenses>
 	<scm>
-		<tag>mainline</tag>
-		<url>https://github.com/Nervousync/Gene</url>
-		<connection>scm:git:https://github.com/Nervousync/Gene.git</connection>
-		<developerConnection>scm:git:https://github.com/Nervousync/Gene.git</developerConnection>
+		<tag>v1.0.3</tag>
+		<url>https://github.com/wmkm0113/Gene</url>
+		<connection>scm:git:https://github.com/wmkm0113/Gene.git</connection>
+		<developerConnection>scm:git:https://github.com/wmkm0113/Gene.git</developerConnection>
 	</scm>
 	<organization>
 		<url>https://nervousync.org/</url>
