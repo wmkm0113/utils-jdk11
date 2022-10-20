@@ -4,15 +4,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.nervousync.generator.IGenerator;
+import org.nervousync.test.BaseTest;
 import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.IDUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public final class GeneratorTest {
-
-    private transient final Logger logger = LoggerFactory.getLogger(this.getClass());
+public final class GeneratorTest extends BaseTest {
 
     @Test
     public void test000Nano() {

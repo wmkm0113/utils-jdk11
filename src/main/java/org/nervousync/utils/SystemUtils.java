@@ -89,7 +89,9 @@ public final class SystemUtils {
 		} else if (JAVA_VERSION.startsWith("1.")) {
 			MAJOR_VERSION = Globals.DEFAULT_VALUE_INT;
 		} else {
-			MAJOR_VERSION = Integer.parseInt(JAVA_VERSION.substring(0, JAVA_VERSION.indexOf(".")));
+			MAJOR_VERSION = JAVA_VERSION.indexOf(".") > 0
+					? Integer.parseInt(JAVA_VERSION.substring(0, JAVA_VERSION.indexOf(".")))
+					: Integer.parseInt(JAVA_VERSION);
 		}
 	}
 
