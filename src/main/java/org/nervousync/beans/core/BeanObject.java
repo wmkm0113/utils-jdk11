@@ -169,7 +169,7 @@ public class BeanObject implements Serializable {
 			}
 			if (outputFragment) {
 				if (formattedOutput) {
-					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + "\n" + stringWriter;
+					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + FileUtils.LF + stringWriter;
 				} else {
 					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + stringWriter;
 				}

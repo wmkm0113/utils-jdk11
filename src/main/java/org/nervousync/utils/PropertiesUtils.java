@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +43,8 @@ public final class PropertiesUtils {
 	 * @param propertiesFilePath    Properties file path
 	 * @return                      Data hash table
 	 */
-	public static Hashtable<String, String> convertPropertiesToHashtable(String propertiesFilePath) {
-		return convertPropertiesToHashtable(propertiesFilePath, null);
+	public static Map<String, String> convertPropertiesToMap(final String propertiesFilePath) {
+		return convertPropertiesToMap(propertiesFilePath, null);
 	}
 
 	/**
@@ -56,9 +53,9 @@ public final class PropertiesUtils {
 	 * @param messageMap            Exists hash table to write data
 	 * @return                      Data hash table
 	 */
-	public static Hashtable<String, String> convertPropertiesToHashtable(String propertiesFilePath, 
-			Hashtable<String, String> messageMap) {
-		return convertPropertiesToHashtable(loadProperties(propertiesFilePath), messageMap);
+	public static Map<String, String> convertPropertiesToMap(final String propertiesFilePath,
+	                                                         Map<String, String> messageMap) {
+		return convertPropertiesToMap(loadProperties(propertiesFilePath), messageMap);
 	}
 
 	/**
@@ -66,8 +63,8 @@ public final class PropertiesUtils {
 	 * @param url    Properties file url
 	 * @return       Data hash table
 	 */
-	public static Hashtable<String, String> convertPropertiesToHashtable(URL url) {
-		return convertPropertiesToHashtable(url, null);
+	public static Map<String, String> convertPropertiesToMap(final URL url) {
+		return convertPropertiesToMap(url, null);
 	}
 
 	/**
@@ -76,8 +73,8 @@ public final class PropertiesUtils {
 	 * @param messageMap            Exists hash table to write data
 	 * @return                      Data hash table
 	 */
-	public static Hashtable<String, String> convertPropertiesToHashtable(URL url, Hashtable<String, String> messageMap) {
-		return convertPropertiesToHashtable(loadProperties(url), messageMap);
+	public static Map<String, String> convertPropertiesToMap(final URL url, Map<String, String> messageMap) {
+		return convertPropertiesToMap(loadProperties(url), messageMap);
 	}
 
 	/**
@@ -86,10 +83,10 @@ public final class PropertiesUtils {
 	 * @param messageMap        Exists hash table to write data
 	 * @return                  Data hash table
 	 */
-	public static Hashtable<String, String> convertPropertiesToHashtable(Properties properties, 
-			Hashtable<String, String> messageMap) {
+	public static Map<String, String> convertPropertiesToMap(final Properties properties,
+	                                                         Map<String, String> messageMap) {
 		if (messageMap == null) {
-			messageMap = new Hashtable<>();
+			messageMap = new HashMap<>();
 		}
 
 		if (properties != null) {
@@ -112,7 +109,7 @@ public final class PropertiesUtils {
 	 * @param propertiesContent     string data
 	 * @return                      Properties object
 	 */
-	public static Properties convertStringToProperties(String propertiesContent) {
+	public static Properties parseString(final String propertiesContent) {
 		Properties properties = new Properties();
 		InputStream inputStream;
 		if (propertiesContent != null) {
@@ -141,7 +138,7 @@ public final class PropertiesUtils {
 	 * @param propertiesFilePath    Properties file path
 	 * @return                      Properties object
 	 */
-	public static Properties loadProperties(String propertiesFilePath) {
+	public static Properties loadProperties(final String propertiesFilePath) {
 		try {
 			URL url = FileUtils.getURL(propertiesFilePath);
 			return loadProperties(url);
@@ -155,7 +152,7 @@ public final class PropertiesUtils {
 	 * @param url    Properties file URL
 	 * @return       Properties object
 	 */
-	public static Properties loadProperties(URL url) {
+	public static Properties loadProperties(final URL url) {
 		InputStream inputStream = null;
 		try {
 			String fileName = url.getFile();
@@ -192,7 +189,7 @@ public final class PropertiesUtils {
 	 * @param isXML         Data is xml
 	 * @return              Properties object
 	 */
-	public static Properties loadProperties(InputStream inputStream, boolean isXML) {
+	public static Properties loadProperties(final InputStream inputStream, final boolean isXML) {
 		Properties properties = new Properties();
 		try {
 			if (isXML) {
@@ -217,7 +214,8 @@ public final class PropertiesUtils {
 	 * @param comment               Comment string
 	 * @return                      Operate result
 	 */
-	public static boolean modifyProperties(String propertiesFilePath, Map<String, String> modifyMap, String comment) {
+	public static boolean modifyProperties(final String propertiesFilePath, final Map<String, String> modifyMap,
+	                                       final String comment) {
 		try {
 			Properties modifyProperties = loadProperties(propertiesFilePath);
 
@@ -242,7 +240,7 @@ public final class PropertiesUtils {
 	 * @param modifyMap     Data hash table
 	 * @return              Operate result
 	 */
-	public static Properties modifyProperties(Properties properties, Map<String, String> modifyMap) {
+	public static Properties modifyProperties(final Properties properties, final Map<String, String> modifyMap) {
 
 		for (Object o : properties.keySet()) {
 			String key = (String) o;
@@ -263,7 +261,8 @@ public final class PropertiesUtils {
 	 * @param comment               Comment string
 	 * @return                      Operate result
 	 */
-	private static boolean storeProperties(Properties properties, String propertiesFilePath, String comment) {
+	private static boolean storeProperties(final Properties properties, final String propertiesFilePath,
+	                                       final String comment) {
 		FileOutputStream fileOutputStream = null;
 		try {
 			String filePath = propertiesFilePath.substring(0,
@@ -300,8 +299,8 @@ public final class PropertiesUtils {
 	 * @param keyName               Key name
 	 * @return                      Retrieve value or null if not found
 	 */
-	public static String getPropertiesValue(String propertiesFilePath, String keyName) {
-		if (keyName == null) {
+	public static String getPropertiesValue(final String propertiesFilePath, final String keyName) {
+		if (StringUtils.isEmpty(keyName)) {
 			return null;
 		}
 		return loadProperties(propertiesFilePath).getProperty(keyName);

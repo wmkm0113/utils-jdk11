@@ -23,7 +23,7 @@ public final class CryptoTest extends BaseTest {
     private static final String ORIGINAL_STRING = "123456";
 
     @Test
-    public void test000AES128() throws CryptoException {
+    public void test000AES() throws CryptoException {
         byte[] aesKey = SecurityUtils.AES128Key();
         this.logger.info("AES128 Key: {}", StringUtils.base64Encode(aesKey));
         for (String cipherMode : DEFAULT_CIPHER_MODES) {
@@ -123,13 +123,19 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     public void test040RSA() throws CryptoException {
-        KeyPair keyPair = SecurityUtils.RSAKeyPair(2048);
+        //  Generate RSA certificate
+        KeyPair keyPair = SecurityUtils.RSAKeyPair();
         long currentTime = DateTimeUtils.currentTimeMillis();
         byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, (Long) IDUtils.random("Snowflake"),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SHA256withRSA");
         this.logger.info("RSA certificate: {}", StringUtils.base64Encode(pkcs5));
+        //  Testing for encrypt and decrypt data using RSA
         for (String padding : RSA_PADDINGS) {
+            if (padding.equalsIgnoreCase("OAEPWithSHA-512AndMGF1Padding")) {
+                //  Minimum key size was 2048 when padding mode is "OAEPWithSHA-512AndMGF1Padding"
+                keyPair = SecurityUtils.RSAKeyPair(2048);
+            }
             SecureProvider encryptProvider = SecurityUtils.RSAEncryptor(padding, keyPair.getPublic());
             String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
             this.logger.info("RSA/ECB/{} encrypt result: {}", padding, encResult);
@@ -138,6 +144,13 @@ public final class CryptoTest extends BaseTest {
             this.logger.info("RSA/ECB/{} decrypt result: {}", padding,
                     new String(decryptProvider.finish(), StandardCharsets.UTF_8));
         }
+        String randomString = StringUtils.randomString(128);
+        SecureProvider signProvider = SecurityUtils.RSASigner(keyPair.getPrivate());
+        byte[] signBytes = signProvider.finish(randomString);
+        this.logger.info("RSA signature string {} result: {}", randomString, StringUtils.base64Encode(signBytes));
+        SecureProvider verifyProvider = SecurityUtils.RSAVerifier(keyPair.getPublic());
+        verifyProvider.append(randomString);
+        this.logger.info("RSA signature verify result: {}", verifyProvider.verify(signBytes));
     }
 
     @Test
@@ -155,10 +168,25 @@ public final class CryptoTest extends BaseTest {
         }
         PublicKey publicKey = x509Certificate.getPublicKey();
         SecureProvider encryptProvider = SecurityUtils.SM2Encryptor(publicKey);
-        String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-        this.logger.info("SM2 encrypt result: {}", encResult);
+        //  Default mode: C1C2C3
+        byte[] mode0Bytes = encryptProvider.finish(ORIGINAL_STRING);
+        String mode0Result = StringUtils.base64Encode(mode0Bytes);
+        byte[] mode1Bytes = SecurityUtils.C1C2C3toC1C3C2(mode0Bytes);
+        String mode1Result = StringUtils.base64Encode(mode1Bytes);
+        this.logger.info("SM2 encrypt C1C2C3 result: {}", mode0Result);
+        this.logger.info("SM2 encrypt C1C3C2 result: {}", mode1Result);
         SecureProvider decryptProvider = SecurityUtils.SM2Decryptor(keyPair.getPrivate());
-        this.logger.info("SM2 decrypt result: {}",
-                new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
+        this.logger.info("SM2 decrypt C1C2C3 result: {}",
+                new String(decryptProvider.finish(StringUtils.base64Decode(mode0Result)), StandardCharsets.UTF_8));
+        this.logger.info("SM2 decrypt C1C3C2 result: {}",
+                new String(decryptProvider.finish(SecurityUtils.C1C3C2toC1C2C3(StringUtils.base64Decode(mode1Result))),
+                        StandardCharsets.UTF_8));
+        String randomString = StringUtils.randomString(128);
+        SecureProvider signProvider = SecurityUtils.SM2Signer(keyPair.getPrivate());
+        byte[] signBytes = signProvider.finish(randomString);
+        this.logger.info("SM2 signature string {} result: {}", randomString, StringUtils.base64Encode(signBytes));
+        SecureProvider verifyProvider = SecurityUtils.SM2Verifier(publicKey);
+        verifyProvider.append(randomString);
+        this.logger.info("SM2 signature verify result: {}", verifyProvider.verify(signBytes));
     }
 }

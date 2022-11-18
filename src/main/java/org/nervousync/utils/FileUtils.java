@@ -111,9 +111,19 @@ public final class FileUtils {
 	public static final String JAR_URL_SEPARATOR = "!/";
 
 	/**
-	 * Line break character
+	 * Carriage Return character
 	 */
-	public static final String NEWLINE_CHARACTER = "\n";
+	public static final char CR = '\r';
+
+	/**
+	 * Line Feed character
+	 */
+	public static final char LF = '\n';
+
+	/**
+	 * Carriage Return Line Feed character
+	 */
+	public static final String CRLF = "\r\n";
 	/**
 	 * The constant MIME_TYPE_TEXT.
 	 */

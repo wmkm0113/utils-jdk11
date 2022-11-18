@@ -181,7 +181,7 @@ public final class CertificateUtils {
      *          <span class="zhs">读取的X.509证书， 如果数据非法，则返回null</span>
      */
     public static X509Certificate x509(final byte[] certBytes) {
-        return x509(certBytes, null, Boolean.FALSE);
+        return x509(certBytes, Boolean.FALSE);
     }
 
     /**
@@ -345,7 +345,7 @@ public final class CertificateUtils {
      */
     public static X509Certificate x509(String storePath, String certAlias, String password) {
         try {
-            return x509(FileUtils.readFileBytes(storePath), certAlias, password, null, Boolean.FALSE);
+            return x509(FileUtils.readFileBytes(storePath), certAlias, password);
         } catch (IOException e) {
             return null;
         }

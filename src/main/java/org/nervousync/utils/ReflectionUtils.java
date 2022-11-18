@@ -43,7 +43,7 @@ public final class ReflectionUtils {
 	 * @param methodName method name
 	 * @return parsed field name
 	 */
-	public static String parseFieldName(String methodName) {
+	public static String fieldName(final String methodName) {
 		String fieldName = null;
 		
 		if (methodName != null) {
@@ -70,7 +70,7 @@ public final class ReflectionUtils {
 	 * @return parsed method name
 	 * @see ReflectionUtils.MethodType
 	 */
-	public static String parseMethodName(String fieldName, Class<?> fieldClass, MethodType methodType) {
+	public static String methodName(final String fieldName, final Class<?> fieldClass, final MethodType methodType) {
 		String methodName = null;
 		
 		if (fieldName != null && fieldClass != null && methodType != null) {
@@ -97,7 +97,7 @@ public final class ReflectionUtils {
 	 * @param enumClass Define class
 	 * @return enum data map
 	 */
-	public static Map<String, Object> parseEnum(Class<?> enumClass) {
+	public static Map<String, Object> parseEnum(final Class<?> enumClass) {
 		Map<String, Object> enumMap = new HashMap<>();
 		
 		if (enumClass != null && enumClass.isEnum()) {
@@ -117,7 +117,7 @@ public final class ReflectionUtils {
 	 * @param clazz Define class
 	 * @return List of field name
 	 */
-	public static List<String> getAllDeclaredFieldNames(Class<?> clazz) {
+	public static List<String> getAllDeclaredFieldNames(final Class<?> clazz) {
 		if (clazz == null) {
 			return new ArrayList<>(0);
 		}
@@ -149,7 +149,7 @@ public final class ReflectionUtils {
 	 * @param clazz the clazz
 	 * @return the all declared fields
 	 */
-	public static List<Field> getAllDeclaredFields(Class<?> clazz) {
+	public static List<Field> getAllDeclaredFields(final Class<?> clazz) {
 		if (clazz == null) {
 			return new ArrayList<>(0);
 		}
@@ -175,7 +175,7 @@ public final class ReflectionUtils {
 	 * @param name  the name of the field
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
-	public static Field findField(Class<?> clazz, String name) {
+	public static Field findField(final Class<?> clazz, final String name) {
 		return findField(clazz, name, null);
 	}
 
@@ -189,7 +189,7 @@ public final class ReflectionUtils {
 	 * @param type  the type of the field (maybe <code>null</code> if name is specified)
 	 * @return the corresponding Field object, or <code>null</code> if not found
 	 */
-	public static Field findField(Class<?> clazz, String name, Class<?> type) {
+	public static Field findField(final Class<?> clazz, final String name, final Class<?> type) {
 		if (clazz == null) {
 			throw new IllegalArgumentException("Class must not be null");
 		}
@@ -223,7 +223,7 @@ public final class ReflectionUtils {
 	 * @param target the target object on which to set the field
 	 * @param value  the value to set; may be <code>null</code>
 	 */
-	public static void setField(Field field, Object target, Object value) {
+	public static void setField(final Field field, final Object target, final Object value) {
 		try {
 			field.set(target, value);
 		}
@@ -246,7 +246,7 @@ public final class ReflectionUtils {
 	 * @param target    the target object from which to get the field
 	 * @return the field's current value
 	 */
-	public static Object getFieldValue(String fieldName, Object target) {
+	public static Object getFieldValue(final String fieldName, final Object target) {
 		if (fieldName == null || target == null) {
 			return null;
 		}
@@ -278,7 +278,7 @@ public final class ReflectionUtils {
 	 * @param target the target object from which to get the field
 	 * @return the field's current value
 	 */
-	public static Object getFieldValue(Field field, Object target) {
+	public static Object getFieldValue(final Field field, final Object target) {
 		if (field == null || target == null) {
 			return null;
 		}
@@ -300,7 +300,7 @@ public final class ReflectionUtils {
 	 * @param beanClass the bean class
 	 * @return the method
 	 */
-	public static Method retrieveGetMethod(String fieldName, Class<?> beanClass) {
+	public static Method retrieveGetMethod(final String fieldName, final Class<?> beanClass) {
 		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.GetMethod);
 	}
 
@@ -311,7 +311,7 @@ public final class ReflectionUtils {
 	 * @param beanClass the bean class
 	 * @return the method
 	 */
-	public static Method retrieveSetMethod(String fieldName, Class<?> beanClass) {
+	public static Method retrieveSetMethod(final String fieldName, final Class<?> beanClass) {
 		return ReflectionUtils.retrieveMethod(fieldName, beanClass, MethodType.SetMethod);
 	}
 
@@ -325,7 +325,7 @@ public final class ReflectionUtils {
 	 * @throws IllegalAccessException    the illegal access exception
 	 * @throws InvocationTargetException the invocation target exception
 	 */
-	public static Object executeMethod(String methodName, Object target)
+	public static Object executeMethod(final String methodName, final Object target)
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		return executeMethod(methodName, target, new Class[]{});
 	}
@@ -342,7 +342,8 @@ public final class ReflectionUtils {
 	 * @throws IllegalAccessException    the illegal access exception
 	 * @throws InvocationTargetException the invocation target exception
 	 */
-	public static Object executeMethod(String methodName, Object target, Class<?>[] paramClasses, Object... args)
+	public static Object executeMethod(final String methodName, final Object target,
+	                                   final Class<?>[] paramClasses, final Object... args)
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		Method method = ReflectionUtils.findMethod(target.getClass(), methodName, paramClasses);
 		if (method == null) {
@@ -368,7 +369,7 @@ public final class ReflectionUtils {
 	 * @throws SecurityException     the security exception
 	 * @throws NoSuchMethodException the no such method exception
 	 */
-	public static <T> Constructor<T> findConstructor(Class<T> clazz)
+	public static <T> Constructor<T> findConstructor(final Class<T> clazz)
 			throws SecurityException, NoSuchMethodException {
 		return clazz.getDeclaredConstructor();
 	}
@@ -383,7 +384,7 @@ public final class ReflectionUtils {
 	 * @throws SecurityException     the security exception
 	 * @throws NoSuchMethodException the no such method exception
 	 */
-	public static <T> Constructor<T> findConstructor(Class<T> clazz, Class<?>[] paramTypes)
+	public static <T> Constructor<T> findConstructor(final Class<T> clazz, final Class<?>[] paramTypes)
 			throws SecurityException, NoSuchMethodException {
 		return clazz.getDeclaredConstructor(paramTypes);
 	}
@@ -397,7 +398,7 @@ public final class ReflectionUtils {
 	 * @param name  the name of the method
 	 * @return the Method object, or <code>null</code> if none found
 	 */
-	public static Method findMethod(Class<?> clazz, String name) {
+	public static Method findMethod(final Class<?> clazz, final String name) {
 		return findMethod(clazz, name, new Class[0]);
 	}
 
@@ -411,7 +412,7 @@ public final class ReflectionUtils {
 	 * @param paramTypes the parameter types of the method (maybe <code>null</code> to indicate any signature)
 	 * @return the Method object, or <code>null</code> if none found
 	 */
-	public static Method findMethod(Class<?> clazz, String name, Class<?>[] paramTypes) {
+	public static Method findMethod(final Class<?> clazz, final String name, final Class<?>[] paramTypes) {
 		if (clazz == null) {
 			throw new IllegalArgumentException("Class must not be null");
 		}
@@ -442,7 +443,7 @@ public final class ReflectionUtils {
 	 * @return the invocation result, if any
 	 * @see #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
-	public static Object invokeMethod(Method method, Object target) {
+	public static Object invokeMethod(final Method method, final Object target) {
 		return invokeMethod(method, target, null);
 	}
 
@@ -457,7 +458,7 @@ public final class ReflectionUtils {
 	 * @param args   the invocation arguments (maybe <code>null</code>)
 	 * @return the invocation result, if any
 	 */
-	public static Object invokeMethod(Method method, Object target, Object[] args) {
+	public static Object invokeMethod(final Method method, final Object target, final Object[] args) {
 		try {
 			return method.invoke(target, args);
 		}
@@ -477,7 +478,7 @@ public final class ReflectionUtils {
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
 	 * @see #invokeJdbcMethod(java.lang.reflect.Method, Object, Object[])
 	 */
-	public static Object invokeJdbcMethod(Method method, Object target) throws SQLException {
+	public static Object invokeJdbcMethod(final Method method, final Object target) throws SQLException {
 		return invokeJdbcMethod(method, target, null);
 	}
 
@@ -492,7 +493,8 @@ public final class ReflectionUtils {
 	 * @throws SQLException the JDBC API SQLException to rethrow (if any)
 	 * @see #invokeMethod(Method, Object, Object[]) #invokeMethod(java.lang.reflect.Method, Object, Object[])
 	 */
-	public static Object invokeJdbcMethod(Method method, Object target, Object[] args) throws SQLException {
+	public static Object invokeJdbcMethod(final Method method, final Object target, final Object[] args)
+			throws SQLException {
 		try {
 			return method.invoke(target, args);
 		}
@@ -517,7 +519,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param ex the reflection exception to handle
 	 */
-	public static void handleReflectionException(Exception ex) {
+	public static void handleReflectionException(final Exception ex) {
 		if (ex instanceof NoSuchMethodException) {
 			throw new IllegalStateException("Method not found: " + ex.getMessage());
 		}
@@ -541,7 +543,7 @@ public final class ReflectionUtils {
 	 *
 	 * @param ex the invocation target exception to handle
 	 */
-	public static void handleInvocationTargetException(InvocationTargetException ex) {
+	public static void handleInvocationTargetException(final InvocationTargetException ex) {
 		rethrowRuntimeException(ex.getTargetException());
 	}
 
@@ -557,7 +559,7 @@ public final class ReflectionUtils {
 	 * @param ex the exception to rethrow
 	 * @throws RuntimeException the rethrown exception
 	 */
-	public static void rethrowRuntimeException(Throwable ex) {
+	public static void rethrowRuntimeException(final Throwable ex) {
 		if (ex instanceof RuntimeException) {
 			throw (RuntimeException) ex;
 		}
@@ -579,7 +581,7 @@ public final class ReflectionUtils {
 	 * @param ex the exception to rethrow
 	 * @throws Exception the rethrown exception (in case of a checked exception)
 	 */
-	public static void rethrowException(Throwable ex) throws Exception {
+	public static void rethrowException(final Throwable ex) throws Exception {
 		if (ex instanceof Exception) {
 			throw (Exception) ex;
 		}
@@ -598,7 +600,7 @@ public final class ReflectionUtils {
 	 * @param exceptionType the exception to throw
 	 * @return <code>true</code> if the exception can be thrown as-is; <code>false</code> if it needs to be wrapped
 	 */
-	public static boolean declaresException(Method method, Class<?> exceptionType) {
+	public static boolean declaresException(final Method method, final Class<?> exceptionType) {
 		if (method == null) {
 			throw new IllegalArgumentException("Method must not be null");
 		}
@@ -617,7 +619,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "public" constant.
 	 */
-	public static boolean publicMember(Member member) {
+	public static boolean publicMember(final Member member) {
 		return Optional.ofNullable(member)
 				.map(checkMember -> Modifier.isPublic(checkMember.getModifiers()))
 				.orElse(Boolean.FALSE);
@@ -629,7 +631,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "protected" constant.
 	 */
-	public static boolean protectedMember(Member member) {
+	public static boolean protectedMember(final Member member) {
 		return Optional.ofNullable(member)
 				.map(checkMember -> Modifier.isProtected(checkMember.getModifiers()))
 				.orElse(Boolean.FALSE);
@@ -641,7 +643,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "protected" constant.
 	 */
-	public static boolean privateMember(Member member) {
+	public static boolean privateMember(final Member member) {
 		return Optional.ofNullable(member)
 				.map(checkMember -> Modifier.isPrivate(checkMember.getModifiers()))
 				.orElse(Boolean.FALSE);
@@ -653,7 +655,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "static" constant.
 	 */
-	public static boolean staticMember(Member member) {
+	public static boolean staticMember(final Member member) {
 		return Optional.ofNullable(member)
 				.map(checkMember -> Modifier.isStatic(checkMember.getModifiers()))
 				.orElse(Boolean.FALSE);
@@ -665,7 +667,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is not a "static" constant.
 	 */
-	public static boolean nonStaticMember(Member member) {
+	public static boolean nonStaticMember(final Member member) {
 		return !ReflectionUtils.staticMember(member);
 	}
 
@@ -675,7 +677,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "final" constant.
 	 */
-	public static boolean finalMember(Member member) {
+	public static boolean finalMember(final Member member) {
 		return Optional.ofNullable(member)
 				.map(checkMember -> Modifier.isFinal(checkMember.getModifiers()))
 				.orElse(Boolean.FALSE);
@@ -687,7 +689,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is not a "final" constant.
 	 */
-	public static boolean nonFinalMember(Member member) {
+	public static boolean nonFinalMember(final Member member) {
 		return !ReflectionUtils.finalMember(member);
 	}
 
@@ -697,7 +699,7 @@ public final class ReflectionUtils {
 	 * @param member 	the field/method to check
 	 * @return 			is a "public static final" constant.
 	 */
-	public static boolean isPublicStaticFinal(Member member) {
+	public static boolean isPublicStaticFinal(final Member member) {
 		if (member != null) {
 			int modifiers = member.getModifiers();
 			return (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers));
@@ -713,7 +715,7 @@ public final class ReflectionUtils {
 	 * @param field the field to make accessible
 	 * @see java.lang.reflect.Field#setAccessible
 	 */
-	public static void makeAccessible(Field field) {
+	public static void makeAccessible(final Field field) {
 		if (!Modifier.isPublic(field.getModifiers()) ||
 				!Modifier.isPublic(field.getDeclaringClass().getModifiers())) {
 			field.setAccessible(true);
@@ -728,7 +730,7 @@ public final class ReflectionUtils {
 	 * @param method the method to make accessible
 	 * @see java.lang.reflect.Method#setAccessible
 	 */
-	public static void makeAccessible(Method method) {
+	public static void makeAccessible(final Method method) {
 		if (!Modifier.isPublic(method.getModifiers()) ||
 				!Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
 			method.setAccessible(true);
@@ -743,7 +745,7 @@ public final class ReflectionUtils {
 	 * @param ctor the constructor to make accessible
 	 * @see java.lang.reflect.Constructor#setAccessible
 	 */
-	public static void makeAccessible(Constructor<?> ctor) {
+	public static void makeAccessible(final Constructor<?> ctor) {
 		if (!Modifier.isPublic(ctor.getModifiers()) ||
 				!Modifier.isPublic(ctor.getDeclaringClass().getModifiers())) {
 			ctor.setAccessible(true);
@@ -762,7 +764,8 @@ public final class ReflectionUtils {
 	 * @throws IllegalArgumentException the illegal argument exception
 	 * @see #doWithMethods(Class, MethodCallback, MethodFilter) #doWithMethods(Class, MethodCallback, MethodFilter)
 	 */
-	public static void doWithMethods(Class<?> targetClass, MethodCallback mc) throws IllegalArgumentException {
+	public static void doWithMethods(Class<?> targetClass, final MethodCallback mc)
+			throws IllegalArgumentException {
 		doWithMethods(targetClass, mc, null);
 	}
 
@@ -777,7 +780,7 @@ public final class ReflectionUtils {
 	 * @param mf          the filter that determines the methods to apply the callback to
 	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public static void doWithMethods(Class<?> targetClass, MethodCallback mc, MethodFilter mf)
+	public static void doWithMethods(Class<?> targetClass, final MethodCallback mc, final MethodFilter mf)
 			throws IllegalArgumentException {
 
 		// Keep backing up the inheritance hierarchy.
@@ -807,7 +810,7 @@ public final class ReflectionUtils {
 	 * @return All declared method arrays
 	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public static Method[] getAllDeclaredMethods(Class<?> leafClass) throws IllegalArgumentException {
+	public static Method[] getAllDeclaredMethods(final Class<?> leafClass) throws IllegalArgumentException {
 		final List<Method> list = new ArrayList<>(32);
 		doWithMethods(leafClass, list::add);
 		return list.toArray(new Method[0]);
@@ -819,7 +822,7 @@ public final class ReflectionUtils {
 	 * @param method the method
 	 * @return the class
 	 */
-	public static Class<?> parseComponentType(Method method) {
+	public static Class<?> parseComponentType(final Method method) {
 		Class<?> returnClass = method.getReturnType();
 		Class<?> returnItem = null;
 
@@ -837,7 +840,7 @@ public final class ReflectionUtils {
 	 * @param field	Field instance
 	 * @return		Parsed component type or null if not a list or array
 	 */
-	public static Class<?> parseComponentType(Field field) {
+	public static Class<?> parseComponentType(final Field field) {
 		Class<?> fieldClass = field.getType();
 		Class<?> componentClass = null;
 
@@ -857,7 +860,8 @@ public final class ReflectionUtils {
 	 * @param fc          the callback to invoke for each field
 	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public static void doWithFields(Class<?> targetClass, FieldCallback fc) throws IllegalArgumentException {
+	public static void doWithFields(Class<?> targetClass, final FieldCallback fc)
+			throws IllegalArgumentException {
 		doWithFields(targetClass, fc, null);
 	}
 
@@ -870,7 +874,7 @@ public final class ReflectionUtils {
 	 * @param ff          the filter that determines the fields to apply the callback to
 	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public static void doWithFields(Class<?> targetClass, FieldCallback fc, FieldFilter ff)
+	public static void doWithFields(Class<?> targetClass, final FieldCallback fc, final FieldFilter ff)
 			throws IllegalArgumentException {
 
 		// Keep backing up the inheritance hierarchy.
@@ -927,7 +931,7 @@ public final class ReflectionUtils {
 	 * @param fieldName field name
 	 * @return Retrieve field object or null if not exists
 	 */
-	public static Field getFieldIfAvailable(Class<?> clazz, String fieldName) {
+	public static Field getFieldIfAvailable(final Class<?> clazz, final String fieldName) {
 		if (clazz == null) {
 			return null;
 		}
@@ -945,7 +949,7 @@ public final class ReflectionUtils {
 	 * @param target       target object
 	 * @param parameterMap field value map
 	 */
-	public static void setField(Object target, Map<String, ?> parameterMap) {
+	public static void setField(final Object target, final Map<String, ?> parameterMap) {
 		if (target == null || parameterMap == null) {
 			return;
 		}
@@ -973,7 +977,7 @@ public final class ReflectionUtils {
 	 * @param target    target object
 	 * @param value     field value
 	 */
-	public static void setField(String fieldName, Object target, Object value) {
+	public static void setField(final String fieldName, final Object target, final Object value) {
 		try {
 			Method setMethod = ReflectionUtils.retrieveMethod(fieldName, target.getClass(), MethodType.SetMethod);
 			if (setMethod != null) {
@@ -1161,12 +1165,13 @@ public final class ReflectionUtils {
 	 * Throws an IllegalStateException with the given exception as root cause.
 	 * @param ex the unexpected exception
 	 */
-	private static void handleUnexpectedException(Throwable ex) {
+	private static void handleUnexpectedException(final Throwable ex) {
 		// Needs to avoid the chained constructor for JDK 1.4 compatibility.
 		throw new IllegalStateException("Unexpected exception thrown", ex);
 	}
 
-	private static Method retrieveMethod(String fieldName, Class<?> targetClass, MethodType methodType) {
+	private static Method retrieveMethod(final String fieldName, final Class<?> targetClass,
+	                                     final MethodType methodType) {
 		Field field = ReflectionUtils.getFieldIfAvailable(targetClass, fieldName);
 		if (field == null) {
 			return null;
@@ -1183,7 +1188,7 @@ public final class ReflectionUtils {
 		return null;
 	}
 
-	private static String convertFieldNameToMethodName(Field field, MethodType methodType) {
+	private static String convertFieldNameToMethodName(final Field field, final MethodType methodType) {
 		StringBuilder methodName = new StringBuilder();
 		switch (methodType) {
 			case GetMethod:

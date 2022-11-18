@@ -51,9 +51,6 @@ public final class HttpEntity {
 	private static final String MIXED_CONTENT_TYPE = "multipart/mixed";
 	//	Binary content type
 	private static final String BINARY_CONTENT_TYPE = "application/octet-stream";
-	
-	//	Default end string
-	private static final String CRLF = "\r\n";
 	//	Content disposition
 	private static final String CONTENT_DISPOSITION = "form-data";
 	
@@ -179,17 +176,17 @@ public final class HttpEntity {
 			StringBuilder stringBuilder;
 			for (EntityInfo entityInfo : this.entityList) {
 				stringBuilder = new StringBuilder();
-				stringBuilder.append("--").append(this.boundary).append(CRLF);
+				stringBuilder.append("--").append(this.boundary).append(FileUtils.CRLF);
 				stringBuilder.append("Content-Disposition:" + CONTENT_DISPOSITION + ";");
 				stringBuilder.append("name=\"").append(entityInfo.getEntityName()).append("\"");
 				String value = entityInfo.getEntityValue();
 				if (entityInfo.isBinary()) {
 					stringBuilder.append(";filename=\"").append(StringUtils.getFilename(value)).append("\"");
-					stringBuilder.append(CRLF);
+					stringBuilder.append(FileUtils.CRLF);
 					stringBuilder.append("Content-Type:" + BINARY_CONTENT_TYPE);
 				}
-				stringBuilder.append(CRLF);
-				stringBuilder.append(CRLF);
+				stringBuilder.append(FileUtils.CRLF);
+				stringBuilder.append(FileUtils.CRLF);
 				
 				outputStream.write(stringBuilder.toString().getBytes(Globals.DEFAULT_ENCODING));
 				if (entityInfo.isBinary()) {
@@ -197,7 +194,7 @@ public final class HttpEntity {
 				} else {
 					outputStream.write(value.getBytes(charset));
 				}
-				outputStream.write(CRLF.getBytes(charset));
+				outputStream.write(FileUtils.CRLF.getBytes(charset));
 			}
 			outputStream.write(("--" + this.boundary).getBytes(charset));
 		} else {

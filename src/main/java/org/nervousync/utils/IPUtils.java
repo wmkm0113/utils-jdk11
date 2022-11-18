@@ -29,6 +29,10 @@ import java.math.BigInteger;
  */
 public final class IPUtils {
 
+	private static final String SPLIT_CHARACTER_IPV4 = ".";
+	private static final String SPLIT_CHARACTER_IPV6 = ":";
+	private static final String SPLIT_COMBO_CHARACTER_IPV6 = "::";
+
 	/**
 	 * Calculate IP range address
 	 *
@@ -40,7 +44,7 @@ public final class IPUtils {
 		IPRange ipRange = new IPRange();
 		String beginAddress;
 		String endAddress;
-		if (ipAddress.contains(":")) {
+		if (ipAddress.contains(SPLIT_CHARACTER_IPV6)) {
 			ipRange.setIpType(IPType.IPv6);
 			beginAddress = beginIPv6(ipAddress, cidr);
 			endAddress = endIPv6(beginAddress, cidr);
@@ -65,7 +69,7 @@ public final class IPUtils {
 	public static int NetmaskToCIDR(final String netmask) {
 		int result = 0;
 
-		String[] splitItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		String[] splitItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
 
 		for (String splitItem : splitItems) {
 			int number = Integer.parseInt(splitItem);
@@ -89,20 +93,14 @@ public final class IPUtils {
 	public static String CIDRToNetmask(final int cidr) {
 		int calcCIDR = cidr;
 		if (calcCIDR >= 0 && calcCIDR <= 32) {
-			int[] arrays = new int[]{0, 0, 0, 0};
+			String[] arrays = new String[4];
 			int index = 0;
 			while (index < 4 && calcCIDR >= 0) {
-				arrays[index] = fillBitsFromLeft(calcCIDR);
+				arrays[index] = Integer.toString(fillBitsFromLeft(calcCIDR));
 				calcCIDR -= 8;
 				index++;
 			}
-
-			StringBuilder stringBuilder = new StringBuilder();
-
-			for (int mask : arrays) {
-				stringBuilder.append(".").append(mask);
-			}
-			return stringBuilder.substring(1);
+			return String.join(SPLIT_CHARACTER_IPV4, arrays);
 		}
 		return null;
 	}
@@ -136,7 +134,7 @@ public final class IPUtils {
 	 */
 	public static String IPv4ToCompatibleIPv6(final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			return "::" + ipAddress;
+			return SPLIT_COMBO_CHARACTER_IPV6 + ipAddress;
 		}
 		return null;
 	}
@@ -148,7 +146,7 @@ public final class IPUtils {
 	 * @return Collapse IPv6 address
 	 */
 	public static String IPv4ToIPv6(final String ipAddress) {
-		return IPv4ToIPv6(ipAddress, true);
+		return IPv4ToIPv6(ipAddress, Boolean.TRUE);
 	}
 
 	/**
@@ -160,17 +158,17 @@ public final class IPUtils {
 	 */
 	public static String IPv4ToIPv6(final String ipAddress, final boolean collapse) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			StringBuilder stringBuilder;
 			if (collapse) {
-				stringBuilder = new StringBuilder(":");
+				stringBuilder = new StringBuilder(SPLIT_CHARACTER_IPV6);
 			} else {
 				stringBuilder = new StringBuilder("0000:0000:0000:0000:0000:0000");
 			}
 			int index = 0;
 			for (String addressItem : splitAddress) {
 				if (index % 2 == 0) {
-					stringBuilder.append(":");
+					stringBuilder.append(SPLIT_CHARACTER_IPV6);
 				}
 				stringBuilder.append(Integer.toHexString(Integer.parseInt(addressItem)));
 				index++;
@@ -206,7 +204,7 @@ public final class IPUtils {
 	 */
 	public static byte[] IPv4ToBytes(final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			byte[] addressBytes = new byte[4];
 
 			addressBytes[0] = (byte) Integer.parseInt(splitAddress[0]);
@@ -229,7 +227,7 @@ public final class IPUtils {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
 				|| StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
 			String ipv6Address = expandIPv6(ipAddress);
-			String[] splitAddress = StringUtils.tokenizeToStringArray(ipv6Address, ":");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipv6Address, SPLIT_CHARACTER_IPV6);
 			byte[] addressBytes = new byte[16];
 			int index = 0;
 			for (String address : splitAddress) {
@@ -251,14 +249,14 @@ public final class IPUtils {
 	 */
 	public static String expandIPv6(final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
-			int sigCount = StringUtils.countOccurrencesOf(ipAddress, ":");
+			int sigCount = StringUtils.countOccurrencesOf(ipAddress, SPLIT_CHARACTER_IPV6);
 			int expandCount = 8 - sigCount;
 			int position = 0;
 			StringBuilder stringBuilder = new StringBuilder();
 			while (true) {
-				int index = ipAddress.indexOf(":", position);
+				int index = ipAddress.indexOf(SPLIT_CHARACTER_IPV6, position);
 				if (index == Globals.DEFAULT_VALUE_INT) {
-					stringBuilder.append(":").append(ipAddress.substring(position));
+					stringBuilder.append(SPLIT_CHARACTER_IPV6).append(ipAddress.substring(position));
 					break;
 				} else {
 					if (index == position) {
@@ -267,7 +265,7 @@ public final class IPUtils {
 							expandCount--;
 						}
 					} else {
-						stringBuilder.append(":").append(ipAddress, position, index);
+						stringBuilder.append(SPLIT_CHARACTER_IPV6).append(ipAddress, position, index);
 					}
 					position = index + 1;
 				}
@@ -299,7 +297,7 @@ public final class IPUtils {
 	 */
 	public static BigInteger IPv4ToBigInteger(final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
-			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, ".");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			if (splitAddress.length == 4) {
 				long result = 0L;
 				for (int i = 0; i < splitAddress.length; i++) {
@@ -320,7 +318,7 @@ public final class IPUtils {
 	public static BigInteger IPv6ToBigInteger(final String ipAddress) {
 		String fullAddress = expandIgnore(ipAddress);
 		if (StringUtils.matches(fullAddress, RegexGlobals.IPV6_REGEX)) {
-			String[] splitAddress = StringUtils.tokenizeToStringArray(fullAddress, ":");
+			String[] splitAddress = StringUtils.tokenizeToStringArray(fullAddress, SPLIT_CHARACTER_IPV6);
 			BigInteger bigInteger = BigInteger.ZERO;
 			int index = 0;
 			for (String split : splitAddress) {
@@ -353,7 +351,7 @@ public final class IPUtils {
 		BigInteger ff = BigInteger.valueOf(0xFFL);
 
 		for (int i = 0; i < 4; i++) {
-			ipv4Address.insert(0, "." + calcInteger.and(ff));
+			ipv4Address.insert(0, SPLIT_CHARACTER_IPV4 + calcInteger.and(ff));
 			calcInteger = calcInteger.shiftRight(8);
 		}
 
@@ -372,11 +370,11 @@ public final class IPUtils {
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
 
 		for (int i = 0; i < 8; i++) {
-			ipv6Address.insert(0, ":" + calcInteger.and(ff).toString(16));
+			ipv6Address.insert(0, SPLIT_CHARACTER_IPV6 + calcInteger.and(ff).toString(16));
 			calcInteger = calcInteger.shiftRight(16);
 		}
 
-		return ipv6Address.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, "::");
+		return ipv6Address.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, SPLIT_COMBO_CHARACTER_IPV6);
 	}
 
 	/**
@@ -388,18 +386,18 @@ public final class IPUtils {
 	public static String expandIgnore(final String ipv6Address) {
 		String resultAddress = ipv6Address;
 		if (resultAddress.contains("::")) {
-			int count = StringUtils.countOccurrencesOf(resultAddress, ":");
-			resultAddress = StringUtils.replace(resultAddress, "::",
-					":0000".repeat(Math.max(0, 8 - count)) + ":");
-			if (resultAddress.startsWith(":")) {
+			int count = StringUtils.countOccurrencesOf(resultAddress, SPLIT_CHARACTER_IPV6);
+			resultAddress = StringUtils.replace(resultAddress, SPLIT_COMBO_CHARACTER_IPV6,
+					":0000".repeat(Math.max(0, 8 - count)) + SPLIT_CHARACTER_IPV6);
+			if (resultAddress.startsWith(SPLIT_CHARACTER_IPV6)) {
 				resultAddress = "0000" + resultAddress;
 			}
-			if (resultAddress.endsWith(":")) {
+			if (resultAddress.endsWith(SPLIT_CHARACTER_IPV6)) {
 				resultAddress += "0000";
 			}
 		}
 
-		String[] addressItems = StringUtils.delimitedListToStringArray(resultAddress, ":");
+		String[] addressItems = StringUtils.delimitedListToStringArray(resultAddress, SPLIT_CHARACTER_IPV6);
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String addressItem : addressItems) {
 			StringBuilder addressItemBuilder = new StringBuilder(addressItem);
@@ -407,7 +405,7 @@ public final class IPUtils {
 				addressItemBuilder.insert(0, "0");
 			}
 			addressItem = addressItemBuilder.toString();
-			stringBuilder.append(":").append(addressItem);
+			stringBuilder.append(SPLIT_CHARACTER_IPV6).append(addressItem);
 		}
 		return stringBuilder.substring(1);
 	}
@@ -420,8 +418,8 @@ public final class IPUtils {
 	 * @return Begin IP address
 	 */
 	private static String beginIPv4(final String ipAddress, final String netmask) {
-		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, ".");
-		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
 
 		StringBuilder stringBuilder = new StringBuilder();
 
@@ -432,7 +430,7 @@ public final class IPUtils {
 			if (itemValue == 0 && i == 3) {
 				beginItem++;
 			}
-			stringBuilder.append(".").append(beginItem);
+			stringBuilder.append(SPLIT_CHARACTER_IPV4).append(beginItem);
 		}
 
 		return stringBuilder.substring(1);
@@ -446,14 +444,14 @@ public final class IPUtils {
 	 * @return End IP address
 	 */
 	private static String endIPv4(final String beginIP, final String netmask) {
-		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, ".");
-		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, ".");
+		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, SPLIT_CHARACTER_IPV4);
+		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
 
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (int i = 0; i < 4; i++) {
 			int endItem = 255 - Integer.parseInt(addressItems[i]) ^ Integer.parseInt(maskItems[i]);
-			stringBuilder.append(".").append(endItem);
+			stringBuilder.append(SPLIT_CHARACTER_IPV4).append(endItem);
 		}
 
 		return stringBuilder.substring(1);
@@ -468,7 +466,7 @@ public final class IPUtils {
 	 */
 	private static String beginIPv6(final String ipAddress, final int cidr) {
 		if (cidr >= 0 && cidr <= 128) {
-			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), ":", "");
+			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), SPLIT_CHARACTER_IPV6, Globals.DEFAULT_VALUE_STRING);
 			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
 
 			while (baseIP.length() < 128) {
@@ -489,7 +487,7 @@ public final class IPUtils {
 	 */
 	private static String endIPv6(final String ipAddress, final int cidr) {
 		if (cidr >= 0 && cidr <= 128) {
-			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), ":", "");
+			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), SPLIT_CHARACTER_IPV6, Globals.DEFAULT_VALUE_STRING);
 			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
 
 			while (baseIP.length() < 128) {
@@ -533,7 +531,7 @@ public final class IPUtils {
 		int index = 0;
 		while (index < binAddress.length()) {
 			if (index % 16 == 0) {
-				binBuilder.append(":");
+				binBuilder.append(SPLIT_CHARACTER_IPV6);
 			}
 			int binInt = Integer.parseInt(binAddress.substring(index, index + 4), 2);
 			binBuilder.append(Integer.toString(binInt, 16).toUpperCase());

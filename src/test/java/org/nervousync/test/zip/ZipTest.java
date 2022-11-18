@@ -177,8 +177,10 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	public void test100ReadComment() {
-		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip");
+		//  Using GBK Encoding if comment content contains CJK character
+		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip", "GBK");
 		Assert.assertNotNull(zipFile);
+		//  Or using GBK encoding to read comment content
 		this.logger.info("Read comment: {} ", zipFile.getComment("GBK"));
 	}
 

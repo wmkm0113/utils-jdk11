@@ -65,7 +65,7 @@ public final class ServiceUtils {
      * @return Generated instance
      * @throws MalformedURLException if no protocol is specified, or an unknown protocol is found, or spec is null.
      */
-    public static <T> T SOAPClient(Class<T> serviceInterface, HandlerResolver handlerResolver)
+    public static <T> T SOAPClient(final Class<T> serviceInterface, final HandlerResolver handlerResolver)
             throws MalformedURLException {
         if (!serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
             return null;
@@ -149,7 +149,7 @@ public final class ServiceUtils {
      *
      * @param parameterConverter the parameter converter
      */
-    public static void registerConverter(ParameterConverter parameterConverter) {
+    public static void registerConverter(final ParameterConverter parameterConverter) {
         if (REGISTERED_CONVERTERS.contains(parameterConverter)) {
             LOGGER.warn("Exists converter: {}", parameterConverter.getClass().getName());
         }
@@ -162,7 +162,7 @@ public final class ServiceUtils {
      * @param targetClass the target class
      * @return the optional
      */
-    public static Optional<ParameterConverter> initConverter(Class<?> targetClass) {
+    public static Optional<ParameterConverter> initConverter(final Class<?> targetClass) {
         return REGISTERED_CONVERTERS
                 .stream()
                 .filter(parameterConverter -> parameterConverter.match(targetClass))
@@ -427,14 +427,14 @@ public final class ServiceUtils {
                     Class<?> paramClass = ReflectionUtils.parseComponentType(method);
 
                     String responseData = response.readEntity(String.class);
-                    if (responseData.endsWith("\r\n")) {
-                        responseData = responseData.substring(0, responseData.length() - "\r\n".length());
+                    if (responseData.endsWith(FileUtils.CRLF)) {
+                        responseData = responseData.substring(0, responseData.length() - FileUtils.CRLF.length());
                     }
-                    if (responseData.endsWith("\r")) {
-                        responseData = responseData.substring(0, responseData.length() - "\r".length());
+                    if (responseData.endsWith(Character.toString(FileUtils.CR))) {
+                        responseData = responseData.substring(0, responseData.length() - Character.toString(FileUtils.CR).length());
                     }
-                    if (responseData.endsWith("\n")) {
-                        responseData = responseData.substring(0, responseData.length() - "\n".length());
+                    if (responseData.endsWith(Character.toString(FileUtils.LF))) {
+                        responseData = responseData.substring(0, responseData.length() - Character.toString(FileUtils.LF).length());
                     }
 
                     switch (response.getHeaderString(HttpHeaders.CONTENT_TYPE)) {

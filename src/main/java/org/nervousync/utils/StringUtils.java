@@ -76,6 +76,9 @@ public final class StringUtils {
 	private static final String CHN_SOCIAL_CREDIT_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
 	private static final String LUHN_CODE_REGEX = "^[0-9]{1,}";
 
+	private static final List<DataType> SIMPLE_DATA_TYPES =
+			Arrays.asList(DataType.NUMBER, DataType.STRING, DataType.BOOLEAN, DataType.DATE);
+
 	private StringUtils() {
 	}
 
@@ -263,31 +266,32 @@ public final class StringUtils {
 	 * @param string Encoded base64 string
 	 * @return Decode byte arrays
 	 */
-	public static byte[] base64Decode(String string) {
-		if (string == null || string.length() == 0) {
+	public static byte[] base64Decode(final String string) {
+		if (StringUtils.isEmpty(string)) {
 			return new byte[0];
 		}
-		while (string.charAt(string.length() - 1) == PADDING) {
-			string = string.substring(0, string.length() - 1);
+		String origString = string;
+		while (origString.charAt(origString.length() - 1) == PADDING) {
+			origString = origString.substring(0, origString.length() - 1);
 		}
 
-		byte[] bytes = new byte[string.length() * 3 / 4];
+		byte[] bytes = new byte[origString.length() * 3 / 4];
 
 		int index = 0;
-		for (int i = 0; i < string.length(); i += 4) {
-			int index1 = BASE64.indexOf(string.charAt(i + 1));
-			bytes[index * 3] = (byte) (((BASE64.indexOf(string.charAt(i)) << 2) | (index1 >> 4)) & MASK_BYTE_UNSIGNED);
+		for (int i = 0; i < origString.length(); i += 4) {
+			int index1 = BASE64.indexOf(origString.charAt(i + 1));
+			bytes[index * 3] = (byte) (((BASE64.indexOf(origString.charAt(i)) << 2) | (index1 >> 4)) & MASK_BYTE_UNSIGNED);
 			if (index * 3 + 1 >= bytes.length) {
 				break;
 			}
 
-			int index2 = BASE64.indexOf(string.charAt(i + 2));
+			int index2 = BASE64.indexOf(origString.charAt(i + 2));
 			bytes[index * 3 + 1] = (byte) (((index1 << 4) | (index2 >> 2)) & MASK_BYTE_UNSIGNED);
 			if (index * 3 + 2 >= bytes.length) {
 				break;
 			}
 
-			bytes[index * 3 + 2] = (byte) (((index2 << 6) | BASE64.indexOf(string.charAt(i + 3))) & MASK_BYTE_UNSIGNED);
+			bytes[index * 3 + 2] = (byte) (((index2 << 6) | BASE64.indexOf(origString.charAt(i + 3))) & MASK_BYTE_UNSIGNED);
 			index++;
 		}
 
@@ -301,7 +305,7 @@ public final class StringUtils {
 	 * @param content     Given data string
 	 * @return Converted HuffmanTree object
 	 */
-	public static String encodeWithHuffman(Hashtable<String, Object> codeMapping, String content) {
+	public static String encodeWithHuffman(final Hashtable<String, Object> codeMapping, final String content) {
 		return HuffmanTree.encodeString(codeMapping, content);
 	}
 
@@ -311,7 +315,7 @@ public final class StringUtils {
 	 * @param content Given data string
 	 * @return Converted HuffmanTree object
 	 */
-	public static HuffmanObject encodeWithHuffman(String content) {
+	public static HuffmanObject encodeWithHuffman(final String content) {
 		HuffmanTree huffmanTree = new HuffmanTree();
 
 		String temp = content;
@@ -344,7 +348,7 @@ public final class StringUtils {
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is null or length 0.
 	 */
-	public static boolean isEmpty(CharSequence str) {
+	public static boolean isEmpty(final CharSequence str) {
 		return !StringUtils.hasLength(str);
 	}
 
@@ -361,7 +365,7 @@ public final class StringUtils {
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null and has length
 	 */
-	public static boolean notNull(CharSequence str) {
+	public static boolean notNull(final CharSequence str) {
 		return (str != null && str.length() > 0);
 	}
 
@@ -378,7 +382,7 @@ public final class StringUtils {
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null/blank character and has length
 	 */
-	public static boolean notBlank(String str) {
+	public static boolean notBlank(final String str) {
 		return (str != null && str.trim().length() > 0);
 	}
 
@@ -395,7 +399,7 @@ public final class StringUtils {
 	 * @param str the CharSequence to check (maybe <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not null and has length
 	 */
-	public static boolean hasLength(CharSequence str) {
+	public static boolean hasLength(final CharSequence str) {
 		return (str != null && str.length() > 0);
 	}
 
@@ -415,7 +419,7 @@ public final class StringUtils {
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static boolean hasText(CharSequence str) {
+	public static boolean hasText(final CharSequence str) {
 		if (hasLength(str)) {
 			return false;
 		}
@@ -437,7 +441,7 @@ public final class StringUtils {
 	 * @return length of the string
 	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
 	 */
-	public static int encodedStringLength(String strIn) {
+	public static int encodedStringLength(final String strIn) {
 		return encodedStringLength(strIn, detectCharset(strIn));
 	}
 
@@ -449,7 +453,7 @@ public final class StringUtils {
 	 * @return length of the string
 	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
 	 */
-	public static int encodedStringLength(String str, String charset) {
+	public static int encodedStringLength(final String str, final String charset) {
 		if (StringUtils.isEmpty(str)) {
 			return Globals.INITIALIZE_INT_VALUE;
 		}
@@ -478,7 +482,7 @@ public final class StringUtils {
 	 * @return String - charset for the String
 	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
 	 */
-	public static String detectCharset(String strIn) {
+	public static String detectCharset(final String strIn) {
 		if (StringUtils.isEmpty(strIn)) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -511,7 +515,7 @@ public final class StringUtils {
 	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static boolean containsWhitespace(CharSequence str) {
+	public static boolean containsWhitespace(final CharSequence str) {
 		if (hasLength(str)) {
 			return false;
 		}
@@ -531,7 +535,7 @@ public final class StringUtils {
 	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
 	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)
 	 */
-	public static boolean containsWhitespace(String str) {
+	public static boolean containsWhitespace(final String str) {
 		return containsWhitespace((CharSequence) str);
 	}
 
@@ -542,7 +546,7 @@ public final class StringUtils {
 	 * @return the trimmed String
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static String trimWhitespace(String str) {
+	public static String trimWhitespace(final String str) {
 		String string = StringUtils.trimLeadingWhitespace(str);
 		string = StringUtils.trimTrailingWhitespace(string);
 		return string;
@@ -556,7 +560,7 @@ public final class StringUtils {
 	 * @return the trimmed String
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static String trimAllWhitespace(String str) {
+	public static String trimAllWhitespace(final String str) {
 		if (hasLength(str)) {
 			return str;
 		}
@@ -579,7 +583,7 @@ public final class StringUtils {
 	 * @return the trimmed String
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static String trimLeadingWhitespace(String str) {
+	public static String trimLeadingWhitespace(final String str) {
 		if (hasLength(str)) {
 			return str;
 		}
@@ -597,7 +601,7 @@ public final class StringUtils {
 	 * @return the trimmed String
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
-	public static String trimTrailingWhitespace(String str) {
+	public static String trimTrailingWhitespace(final String str) {
 		if (hasLength(str)) {
 			return str;
 		}
@@ -615,7 +619,7 @@ public final class StringUtils {
 	 * @param leadingCharacter the leading character to be trimmed
 	 * @return the trimmed String
 	 */
-	public static String trimLeadingCharacter(String str, char leadingCharacter) {
+	public static String trimLeadingCharacter(final String str, final char leadingCharacter) {
 		if (hasLength(str)) {
 			return str;
 		}
@@ -633,7 +637,7 @@ public final class StringUtils {
 	 * @param trailingCharacter the trailing character to be trimmed
 	 * @return the trimmed String
 	 */
-	public static String trimTrailingCharacter(String str, char trailingCharacter) {
+	public static String trimTrailingCharacter(final String str, final char trailingCharacter) {
 		if (hasLength(str)) {
 			return str;
 		}
@@ -654,7 +658,7 @@ public final class StringUtils {
 	 * @return check result
 	 * @see java.lang.String#startsWith java.lang.String#startsWith
 	 */
-	public static boolean startsWithIgnoreCase(String str, String prefix) {
+	public static boolean startsWithIgnoreCase(final String str, final String prefix) {
 		if (str == null || prefix == null) {
 			return false;
 		}
@@ -678,7 +682,7 @@ public final class StringUtils {
 	 * @return check result
 	 * @see java.lang.String#endsWith java.lang.String#endsWith
 	 */
-	public static boolean endsWithIgnoreCase(String str, String suffix) {
+	public static boolean endsWithIgnoreCase(final String str, final String suffix) {
 		if (str == null || suffix == null) {
 			return false;
 		}
@@ -700,7 +704,7 @@ public final class StringUtils {
 	 * @param string Given string
 	 * @return Check result
 	 */
-	public static boolean containsEmoji(String string) {
+	public static boolean containsEmoji(final String string) {
 		if (string != null && string.length() > 0) {
 			int length = string.length();
 			for (int i = 0; i < length; i++) {
@@ -744,7 +748,7 @@ public final class StringUtils {
 	 * @param substring the substring to match at the given index
 	 * @return check result
 	 */
-	public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
+	public static boolean substringMatch(final CharSequence str, final int index, final CharSequence substring) {
 		for (int j = 0; j < substring.length(); j++) {
 			int i = index + j;
 			if (i >= str.length() || str.charAt(i) != substring.charAt(j)) {
@@ -761,7 +765,7 @@ public final class StringUtils {
 	 * @param sub string to search for. Return 0 if this is null.
 	 * @return count result
 	 */
-	public static int countOccurrencesOf(String str, String sub) {
+	public static int countOccurrencesOf(final String str, final String sub) {
 		if (str == null || sub == null || str.length() == 0 || sub.length() == 0) {
 			return 0;
 		}
@@ -782,7 +786,7 @@ public final class StringUtils {
 	 * @param newPattern String to insert
 	 * @return a String with the replacements
 	 */
-	public static String replace(String inString, String oldPattern, String newPattern) {
+	public static String replace(final String inString, final String oldPattern, final String newPattern) {
 		if (inString == null || oldPattern == null || newPattern == null) {
 			return "";
 		}
@@ -812,7 +816,7 @@ public final class StringUtils {
 	 * @param pattern  the pattern to delete all occurrences of
 	 * @return the resulting String
 	 */
-	public static String delete(String inString, String pattern) {
+	public static String delete(final String inString, final String pattern) {
 		return replace(inString, pattern, Globals.DEFAULT_VALUE_STRING);
 	}
 
@@ -823,7 +827,7 @@ public final class StringUtils {
 	 * @param charsToDelete a set of characters to delete. E.g. "az\n" will delete 'a's, 'z's and new lines.
 	 * @return the resulting String
 	 */
-	public static String deleteAny(String inString, String charsToDelete) {
+	public static String deleteAny(final String inString, final String charsToDelete) {
 		if (hasLength(inString) || hasLength(charsToDelete)) {
 			return inString;
 		}
@@ -843,7 +847,7 @@ public final class StringUtils {
 	 * @param str the input String (e.g. "myString")
 	 * @return the quoted String (e.g. "'myString'"), or <code>null</code> if the input was <code>null</code>
 	 */
-	public static String quote(String str) {
+	public static String quote(final String str) {
 		return (str != null ? "'" + str + "'" : null);
 	}
 
@@ -854,7 +858,7 @@ public final class StringUtils {
 	 * @param obj the input Object (e.g. "myString")
 	 * @return the quoted String (e.g. "'myString'"), or the input object as-is if not a String
 	 */
-	public static Object quoteIfString(Object obj) {
+	public static Object quoteIfString(final Object obj) {
 		return (obj instanceof String ? quote((String) obj) : obj);
 	}
 
@@ -865,7 +869,7 @@ public final class StringUtils {
 	 * @param qualifiedName the qualified name
 	 * @return qualified string
 	 */
-	public static String unqualified(String qualifiedName) {
+	public static String unqualified(final String qualifiedName) {
 		return unqualified(qualifiedName, '.');
 	}
 
@@ -877,7 +881,7 @@ public final class StringUtils {
 	 * @param separator     the separator
 	 * @return qualified string
 	 */
-	public static String unqualified(String qualifiedName, char separator) {
+	public static String unqualified(final String qualifiedName, final char separator) {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
 	}
 
@@ -889,7 +893,7 @@ public final class StringUtils {
 	 * @param str the String to capitalize, maybe <code>null</code>
 	 * @return the capitalized String, <code>null</code> if null
 	 */
-	public static String capitalize(String str) {
+	public static String capitalize(final String str) {
 		return changeFirstCharacterCase(str, true);
 	}
 
@@ -901,7 +905,7 @@ public final class StringUtils {
 	 * @param str the String to uncapitalized, maybe <code>null</code>
 	 * @return the uncapitalized String, <code>null</code> if null
 	 */
-	public static String uncapitalized(String str) {
+	public static String uncapitalized(final String str) {
 		return changeFirstCharacterCase(str, false);
 	}
 
@@ -912,13 +916,13 @@ public final class StringUtils {
 	 * @param path the file path (maybe <code>null</code>)
 	 * @return the extracted filename, or <code>null</code> if none
 	 */
-	public static String getFilename(String path) {
+	public static String getFilename(final String path) {
 		if (path == null) {
 			return null;
 		}
-		path = cleanPath(path);
-		int separatorIndex = path.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
-		return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
+		String cleanPath = cleanPath(path);
+		int separatorIndex = cleanPath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
+		return (separatorIndex != -1 ? cleanPath.substring(separatorIndex + 1) : cleanPath);
 	}
 
 	/**
@@ -928,7 +932,7 @@ public final class StringUtils {
 	 * @param path the file path (maybe <code>null</code>)
 	 * @return the extracted filename extension, or <code>null</code> if none
 	 */
-	public static String getFilenameExtension(String path) {
+	public static String getFilenameExtension(final String path) {
 		if (path == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -943,7 +947,7 @@ public final class StringUtils {
 	 * @param path the file path (maybe <code>null</code>)
 	 * @return the path with stripped filename extension, or <code>null</code> if none
 	 */
-	public static String stripFilenameExtension(String path) {
+	public static String stripFilenameExtension(final String path) {
 		if (path == null) {
 			return null;
 		}
@@ -959,7 +963,7 @@ public final class StringUtils {
 	 * @param relativePath the relative path to apply (relative to the full file path above)
 	 * @return the full file path that results from applying the relative path
 	 */
-	public static String applyRelativePath(String path, String relativePath) {
+	public static String applyRelativePath(final String path, final String relativePath) {
 		int separatorIndex = path.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
 		if (separatorIndex != -1) {
 			String newPath = path.substring(0, separatorIndex);
@@ -981,7 +985,7 @@ public final class StringUtils {
 	 * @param path the original path
 	 * @return the normalized path
 	 */
-	public static String cleanPath(String path) {
+	public static String cleanPath(final String path) {
 		String pathToUse = path;
 
 		// Strip prefix from path to analyze, to not treat it as part of the
@@ -1031,7 +1035,7 @@ public final class StringUtils {
 	 * @param path2 second path for comparison
 	 * @return whether the two paths are equivalent after normalization
 	 */
-	public static boolean pathEquals(String path1, String path2) {
+	public static boolean pathEquals(final String path1, final String path2) {
 		return cleanPath(path1).equals(cleanPath(path2));
 	}
 
@@ -1042,7 +1046,7 @@ public final class StringUtils {
 	 * @param localeString the locale string, following <code>Locale's</code> <code>toString()</code> format ("en", "en_UK", etc); also accepts spaces as separators, as an alternative to underscores
 	 * @return a corresponding <code>Locale</code> instance
 	 */
-	public static Locale parseLocaleString(String localeString) {
+	public static Locale parseLocaleString(final String localeString) {
 		if (localeString == null) {
 			return null;
 		}
@@ -1080,7 +1084,7 @@ public final class StringUtils {
 	 * @param str   the String to append
 	 * @return the new array (never <code>null</code>)
 	 */
-	public static String[] addStringToArray(String[] array, String str) {
+	public static String[] addStringToArray(final String[] array, final String str) {
 		if (ObjectUtils.isEmpty(array)) {
 			return new String[]{str};
 		}
@@ -1099,7 +1103,7 @@ public final class StringUtils {
 	 * @param array2 the second array (can be <code>null</code>)
 	 * @return the new array (<code>null</code> if both given arrays were <code>null</code>)
 	 */
-	public static String[] concatenateStringArrays(String[] array1, String[] array2) {
+	public static String[] concatenateStringArrays(final String[] array1, final String[] array2) {
 		if (ObjectUtils.isEmpty(array1)) {
 			return array2;
 		}
@@ -1123,7 +1127,7 @@ public final class StringUtils {
 	 * @param array2 the second array (can be <code>null</code>)
 	 * @return the new array (<code>null</code> if both given arrays were <code>null</code>)
 	 */
-	public static String[] mergeStringArrays(String[] array1, String[] array2) {
+	public static String[] mergeStringArrays(final String[] array1, final String[] array2) {
 		if (ObjectUtils.isEmpty(array1)) {
 			return array2;
 		}
@@ -1145,7 +1149,7 @@ public final class StringUtils {
 	 * @param array the source array
 	 * @return the sorted array (never <code>null</code>)
 	 */
-	public static String[] sortStringArray(String[] array) {
+	public static String[] sortStringArray(final String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
 			return new String[0];
 		}
@@ -1160,7 +1164,7 @@ public final class StringUtils {
 	 * @param collection the Collection to copy
 	 * @return the String array (<code>null</code> if the passed-in Collection was <code>null</code>)
 	 */
-	public static String[] toStringArray(Collection<String> collection) {
+	public static String[] toStringArray(final Collection<String> collection) {
 		if (collection == null) {
 			return new String[0];
 		}
@@ -1174,7 +1178,7 @@ public final class StringUtils {
 	 * @param enumeration the Enumeration to copy
 	 * @return the String array (<code>null</code> if the passed-in Enumeration was <code>null</code>)
 	 */
-	public static String[] toStringArray(Enumeration<String> enumeration) {
+	public static String[] toStringArray(final Enumeration<String> enumeration) {
 		if (enumeration == null) {
 			return new String[0];
 		}
@@ -1189,7 +1193,7 @@ public final class StringUtils {
 	 * @param array the original String array
 	 * @return the resulting array (of the same size) with trimmed elements
 	 */
-	public static String[] trimArrayElements(String[] array) {
+	public static String[] trimArrayElements(final String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
 			return new String[0];
 		}
@@ -1208,7 +1212,7 @@ public final class StringUtils {
 	 * @param array the String array
 	 * @return an array without duplicates, in natural sort order
 	 */
-	public static String[] removeDuplicateStrings(String[] array) {
+	public static String[] removeDuplicateStrings(final String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
 			return array;
 		}
@@ -1225,7 +1229,7 @@ public final class StringUtils {
 	 * @param delimiter to split the string up with
 	 * @return a two element array with index 0 being before the delimiter, and index 1 being after the delimiter (neither element includes the delimiter); or <code>null</code> if the delimiter wasn't found in the given input String
 	 */
-	public static String[] split(String toSplit, String delimiter) {
+	public static String[] split(final String toSplit, final String delimiter) {
 		if (hasLength(toSplit) || hasLength(delimiter)) {
 			return null;
 		}
@@ -1249,7 +1253,7 @@ public final class StringUtils {
 	 * @param delimiter to split each element using (typically the equals symbol)
 	 * @return a <code>Properties</code> instance representing the array contents, or <code>null</code> if the array to process was null or empty
 	 */
-	public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
+	public static Properties splitArrayElementsIntoProperties(final String[] array, final String delimiter) {
 		return splitArrayElementsIntoProperties(array, delimiter, null);
 	}
 
@@ -1265,8 +1269,8 @@ public final class StringUtils {
 	 * @param charsToDelete one or more characters to remove from each element prior to attempting the split operation (typically the quotation mark symbol), or <code>null</code> if no removal should occur
 	 * @return a <code>Properties</code> instance representing the array contents, or <code>null</code> if the array to process was <code>null</code> or empty
 	 */
-	public static Properties splitArrayElementsIntoProperties(
-			String[] array, String delimiter, String charsToDelete) {
+	public static Properties splitArrayElementsIntoProperties(final String[] array, final String delimiter,
+	                                                          final String charsToDelete) {
 
 		if (ObjectUtils.isEmpty(array)) {
 			return null;
@@ -1301,7 +1305,7 @@ public final class StringUtils {
 	 * @see java.lang.String#trim() java.lang.String#trim()
 	 * @see #delimitedListToStringArray #delimitedListToStringArray
 	 */
-	public static String[] tokenizeToStringArray(String str, String delimiters) {
+	public static String[] tokenizeToStringArray(final String str, final String delimiters) {
 		return tokenizeToStringArray(str, delimiters, true, true);
 	}
 
@@ -1321,8 +1325,8 @@ public final class StringUtils {
 	 * @see java.lang.String#trim() java.lang.String#trim()
 	 * @see #delimitedListToStringArray #delimitedListToStringArray
 	 */
-	public static String[] tokenizeToStringArray(
-			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
+	public static String[] tokenizeToStringArray(final String str, final String delimiters, final boolean trimTokens,
+	                                             final boolean ignoreEmptyTokens) {
 
 		if (str == null) {
 			return null;
@@ -1351,7 +1355,7 @@ public final class StringUtils {
 	 * @param delimiter the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
 	 */
-	public static String[] delimitedListToStringArray(String str, String delimiter) {
+	public static String[] delimitedListToStringArray(final String str, final String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
 	}
 
@@ -1366,7 +1370,8 @@ public final class StringUtils {
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
 	 * @return an array of the tokens in the list
 	 */
-	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
+	public static String[] delimitedListToStringArray(final String str, final String delimiter,
+	                                                  final String charsToDelete) {
 		if (str == null) {
 			return new String[0];
 		}
@@ -1399,7 +1404,7 @@ public final class StringUtils {
 	 * @param str the input String
 	 * @return an array of Strings, or the empty array in case of empty input
 	 */
-	public static String[] commaDelimitedListToStringArray(String str) {
+	public static String[] commaDelimitedListToStringArray(final String str) {
 		return delimitedListToStringArray(str, ",");
 	}
 
@@ -1410,7 +1415,7 @@ public final class StringUtils {
 	 * @param str the input String
 	 * @return a Set of String entries in the list
 	 */
-	public static Set<String> commaDelimitedListToSet(String str) {
+	public static Set<String> commaDelimitedListToSet(final String str) {
 		Set<String> set = new TreeSet<>();
 		String[] tokens = commaDelimitedListToStringArray(str);
 		Collections.addAll(set, tokens);
@@ -1427,8 +1432,8 @@ public final class StringUtils {
 	 * @param suffix    the String to end each element with
 	 * @return the delimited String
 	 */
-	public static String collectionToDelimitedString(Collection<String> coll,
-	                                                 String delimiter, String prefix, String suffix) {
+	public static String collectionToDelimitedString(final Collection<String> coll, final String delimiter,
+	                                                 final String prefix, final String suffix) {
 		if (CollectionUtils.isEmpty(coll)) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -1451,7 +1456,7 @@ public final class StringUtils {
 	 * @param delimiter the delimiter to use (probably a ",")
 	 * @return the delimited String
 	 */
-	public static String collectionToDelimitedString(Collection<String> coll, String delimiter) {
+	public static String collectionToDelimitedString(final Collection<String> coll, final String delimiter) {
 		return collectionToDelimitedString(coll, delimiter, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 
@@ -1462,7 +1467,7 @@ public final class StringUtils {
 	 * @param coll the Collection to display
 	 * @return the delimited String
 	 */
-	public static String collectionToCommaDelimitedString(Collection<String> coll) {
+	public static String collectionToCommaDelimitedString(final Collection<String> coll) {
 		return collectionToDelimitedString(coll, ",");
 	}
 
@@ -1473,7 +1478,7 @@ public final class StringUtils {
 	 * @param search the search
 	 * @return the boolean
 	 */
-	public static boolean containsIgnoreCase(String string, String search) {
+	public static boolean containsIgnoreCase(final String string, final String search) {
 		if (string == null || search == null) {
 			return false;
 		}
@@ -1497,7 +1502,7 @@ public final class StringUtils {
 	 * @param delimiter the delimiter to use (probably a ",")
 	 * @return the delimited String
 	 */
-	public static String arrayToDelimitedString(Object[] arr, String delimiter) {
+	public static String arrayToDelimitedString(final Object[] arr, final String delimiter) {
 		if (ObjectUtils.isEmpty(arr)) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -1518,7 +1523,7 @@ public final class StringUtils {
 	 * @param arr the array to display
 	 * @return the delimited String
 	 */
-	public static String arrayToCommaDelimitedString(Object[] arr) {
+	public static String arrayToCommaDelimitedString(final Object[] arr) {
 		return arrayToDelimitedString(arr, ",");
 	}
 
@@ -1528,7 +1533,7 @@ public final class StringUtils {
 	 * @param content BLOB datas
 	 * @return Convert string
 	 */
-	public static String convertContent(byte[] content) {
+	public static String convertContent(final byte[] content) {
 		if (content == null) {
 			return null;
 		}
@@ -1565,7 +1570,7 @@ public final class StringUtils {
 	 * @param formatOutput the format output
 	 * @return the string
 	 */
-	public static String objectToString(Object object, StringType stringType, boolean formatOutput) {
+	public static String objectToString(final Object object, final StringType stringType, final boolean formatOutput) {
 		ObjectMapper objectMapper;
 		switch (stringType) {
 			case JSON:
@@ -1598,7 +1603,7 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> T stringToObject(String string, Class<T> beanClass) {
+	public static <T> T stringToObject(final String string, final Class<T> beanClass) {
 		return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass);
 	}
 
@@ -1663,7 +1668,7 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> List<T> stringToList(String string, String encoding, Class<T> beanClass) {
+	public static <T> List<T> stringToList(final String string, final String encoding, final Class<T> beanClass) {
 		if (StringUtils.isEmpty(string)) {
 			LOGGER.error("Can't parse empty string");
 			return null;
@@ -1693,7 +1698,7 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> T fileToObject(String filePath, Class<T> beanClass) {
+	public static <T> T fileToObject(final String filePath, final Class<T> beanClass) {
 		return fileToObject(filePath, beanClass, Globals.DEFAULT_VALUE_STRING);
 	}
 
@@ -1706,7 +1711,7 @@ public final class StringUtils {
 	 * @param schemaPath Schema file path
 	 * @return Converted object
 	 */
-	public static <T> T fileToObject(String filePath, Class<T> beanClass, final String schemaPath) {
+	public static <T> T fileToObject(final String filePath, final Class<T> beanClass, final String schemaPath) {
 		if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
 			LOGGER.error("Can't found file: {}", filePath);
 			return null;
@@ -1783,7 +1788,7 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> List<T> streamToList(final InputStream inputStream, Class<T> beanClass) throws IOException {
+	public static <T> List<T> streamToList(final InputStream inputStream, final Class<T> beanClass) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, beanClass);
 		return objectMapper.readValue(inputStream, javaType);
@@ -1796,7 +1801,7 @@ public final class StringUtils {
 	 * @param stringType the string type
 	 * @return Convert map
 	 */
-	public static Map<String, Object> dataToMap(String data, StringType stringType) {
+	public static Map<String, Object> dataToMap(final String data, final StringType stringType) {
 		ObjectMapper objectMapper;
 		switch (stringType) {
 			case JSON:
@@ -1821,34 +1826,12 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Check given string is ASCII
-	 *
-	 * @param s String
-	 * @return check result code
-	 * @throws UnsupportedEncodingException If the named charset is not supported
-	 */
-	public static int isASCII(String s) throws UnsupportedEncodingException {
-		byte[] testString = s.getBytes(Globals.DEFAULT_ENCODING);
-
-		if (testString.length > 3 || testString.length == 0) {
-			return 0;
-		} else if (testString.length == 1) {
-			return testString[0];
-		} else if (testString.length == 3) {
-			int heightByte = 256 + testString[0];
-			int lowByte = 256 + testString[1];
-			return (256 * heightByte + lowByte) - 256 * 256;
-		}
-		return 0;
-	}
-
-	/**
 	 * Replace special XMl character with converted character in string
 	 *
 	 * @param sourceString input string
 	 * @return replaced string
 	 */
-	public static String formatTextForXML(String sourceString) {
+	public static String formatTextForXML(final String sourceString) {
 		if (sourceString == null) {
 			return null;
 		}
@@ -1889,23 +1872,23 @@ public final class StringUtils {
 	 * @param sourceString input string
 	 * @return replaced string
 	 */
-	public static String formatForText(String sourceString) {
+	public static String formatForText(final String sourceString) {
 
-		if (sourceString == null) {
-			return null;
+		if (StringUtils.isEmpty(sourceString)) {
+			return sourceString;
 		}
 
-		sourceString = replace(sourceString, "&amp;", "&");
-		sourceString = replace(sourceString, "&lt;", "<");
-		sourceString = replace(sourceString, "&gt;", ">");
-		sourceString = replace(sourceString, "&quot;", "\"");
-		sourceString = replace(sourceString, "&#39;", "'");
-		sourceString = replace(sourceString, "\\\\", "\\");
-		sourceString = replace(sourceString, "\\n", "\n");
-		sourceString = replace(sourceString, "\\r", "\r");
-		sourceString = replace(sourceString, "<br/>", "\r");
+		String replaceString = replace(sourceString, "&amp;", "&");
+		replaceString = replace(replaceString, "&lt;", "<");
+		replaceString = replace(replaceString, "&gt;", ">");
+		replaceString = replace(replaceString, "&quot;", "\"");
+		replaceString = replace(replaceString, "&#39;", "'");
+		replaceString = replace(replaceString, "\\\\", "\\");
+		replaceString = replace(replaceString, "\\n", Character.toString(FileUtils.LF));
+		replaceString = replace(replaceString, "\\r", Character.toString(FileUtils.CR));
+		replaceString = replace(replaceString, "<br/>", Character.toString(FileUtils.CR));
 
-		return sourceString;
+		return replaceString;
 	}
 
 	/**
@@ -1914,7 +1897,7 @@ public final class StringUtils {
 	 * @param sourceString input string
 	 * @return replaced string
 	 */
-	public static String textToJSON(String sourceString) {
+	public static String textToHtml(final String sourceString) {
 		int strLen;
 		StringBuilder reString = new StringBuilder();
 		strLen = sourceString.length();
@@ -1940,55 +1923,10 @@ public final class StringUtils {
 				case '\\':
 					reString.append("\\\\");
 					break;
-				case '\n':
+				case FileUtils.LF:
 					reString.append("\\n");
 					break;
-				case '\r':
-					reString.append("\\r");
-					break;
-				default:
-					reString.append(Globals.DEFAULT_VALUE_STRING).append(ch);
-			}
-		}
-		return reString.toString();
-	}
-
-	/**
-	 * Replace special HTML character with converted character in string
-	 *
-	 * @param sourceString input string
-	 * @return replaced string
-	 */
-	public static String textToHtml(String sourceString) {
-		int strLen;
-		StringBuilder reString = new StringBuilder();
-		strLen = sourceString.length();
-
-		for (int i = 0; i < strLen; i++) {
-			char ch = sourceString.charAt(i);
-			switch (ch) {
-				case '<':
-					reString.append("&lt;");
-					break;
-				case '>':
-					reString.append("&gt;");
-					break;
-				case '\"':
-					reString.append("&quot;");
-					break;
-				case '&':
-					reString.append("&amp;");
-					break;
-				case '\'':
-					reString.append("&#39;");
-					break;
-				case '\\':
-					reString.append("\\\\");
-					break;
-				case '\n':
-					reString.append("\\n");
-					break;
-				case '\r':
+				case FileUtils.CR:
 					reString.append("<br/>");
 					break;
 				default:
@@ -1999,47 +1937,13 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Get message key
-	 *
-	 * @param locale Locale instance
-	 * @param key    message key
-	 * @return Locale message key
-	 */
-	public static String messageKey(Locale locale, String key) {
-		return messageKey(localeKey(locale), key);
-	}
-
-	/**
-	 * Append localeKey and key
-	 *
-	 * @param strings the strings
-	 * @return Locale message key
-	 */
-	public static String messageKey(String... strings) {
-		StringJoiner stringJoiner = new StringJoiner(".");
-		Arrays.stream(strings).filter(StringUtils::notBlank).forEach(stringJoiner::add);
-		return stringJoiner.toString();
-	}
-
-	/**
-	 * Convert <code>Locale</code> to <code>String</code>
-	 * use toString() method. If locale is null, return Globals.DEFAULT_VALUE_STRING
-	 *
-	 * @param locale Locale instance
-	 * @return Locale key
-	 */
-	public static String localeKey(Locale locale) {
-		return locale == null ? Globals.DEFAULT_VALUE_STRING : locale.toString();
-	}
-
-	/**
 	 * Matches with regex
 	 *
 	 * @param str   input string
 	 * @param regex regex message
 	 * @return match result
 	 */
-	public static boolean matches(String str, String regex) {
+	public static boolean matches(final String str, final String regex) {
 		if (str == null || regex == null) {
 			return Boolean.FALSE;
 		}
@@ -2054,7 +1958,7 @@ public final class StringUtils {
 	 * @param template template string
 	 * @return replaced string. null for match failed
 	 */
-	public static String replaceWithRegex(String str, String regex, String template) {
+	public static String replaceWithRegex(final String str, final String regex, final String template) {
 		return replaceWithRegex(str, regex, template, Globals.DEFAULT_VALUE_STRING);
 	}
 
@@ -2100,7 +2004,7 @@ public final class StringUtils {
 	 * @param length string length
 	 * @return Random generate string
 	 */
-	public static String randomString(int length) {
+	public static String randomString(final int length) {
 		StringBuilder generateKey = new StringBuilder();
 		Random random = new Random();
 		for (int i = 0; i < length; i++) {
@@ -2115,7 +2019,7 @@ public final class StringUtils {
 	 * @param length string length
 	 * @return Random generate number string
 	 */
-	public static String randomNumber(int length) {
+	public static String randomNumber(final int length) {
 		StringBuilder generateKey = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			generateKey.append((char) (Math.random() * 10 + '0'));
@@ -2130,7 +2034,7 @@ public final class StringUtils {
 	 * @param endIndex   the end index
 	 * @return the char
 	 */
-	public static char randomIndex(int beginIndex, int endIndex) {
+	public static char randomIndex(final int beginIndex, final int endIndex) {
 		return (char) (Math.random() * (endIndex - beginIndex + 1) + beginIndex + '0');
 	}
 
@@ -2141,7 +2045,7 @@ public final class StringUtils {
 	 * @param endIndex   the end index
 	 * @return the char
 	 */
-	public static char randomChar(int beginIndex, int endIndex) {
+	public static char randomChar(final int beginIndex, final int endIndex) {
 		return (char) (Math.random() * (endIndex - beginIndex + 1) + beginIndex + 'a');
 	}
 
@@ -2151,7 +2055,7 @@ public final class StringUtils {
 	 * @param str original url address
 	 * @return escape url address
 	 */
-	public static String escape(String str) {
+	public static String escape(final String str) {
 		int length;
 		char ch;
 		StringBuilder StringBuilder = new StringBuilder();
@@ -2181,9 +2085,9 @@ public final class StringUtils {
 	 * @param str escaped url address string
 	 * @return unescape url address
 	 */
-	public static String unescape(String str) {
+	public static String unescape(final String str) {
 		if (str == null) {
-			str = Globals.DEFAULT_VALUE_STRING;
+			return Globals.DEFAULT_VALUE_STRING;
 		}
 		StringBuilder StringBuilder = new StringBuilder();
 		StringBuilder.ensureCapacity(str.length());
@@ -2221,9 +2125,8 @@ public final class StringUtils {
 	 * @param letter character
 	 * @return check result
 	 */
-	public static boolean isSpace(char letter) {
-		return (letter == 8 || letter == 9 || letter == 10 ||
-				letter == 13 || letter == 32 || letter == 160);
+	public static boolean isSpace(final char letter) {
+		return (letter == 8 || letter == 9 || letter == 10 || letter == 13 || letter == 32 || letter == 160);
 	}
 
 	/**
@@ -2232,7 +2135,7 @@ public final class StringUtils {
 	 * @param letter character
 	 * @return check result
 	 */
-	public static boolean isEnglish(char letter) {
+	public static boolean isEnglish(final char letter) {
 		return (letter > 'a' && letter < 'z') || (letter > 'A' && letter < 'Z');
 	}
 
@@ -2242,7 +2145,7 @@ public final class StringUtils {
 	 * @param letter character
 	 * @return check result
 	 */
-	public static boolean isNumber(char letter) {
+	public static boolean isNumber(final char letter) {
 		return letter >= '0' && letter <= '9';
 	}
 
@@ -2252,7 +2155,7 @@ public final class StringUtils {
 	 * @param character character
 	 * @return check result
 	 */
-	public static boolean isCJK(char character) {
+	public static boolean isCJK(final char character) {
 		UnicodeBlock unicodeBlock = UnicodeBlock.of(character);
 
 		return (unicodeBlock == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
@@ -2278,21 +2181,8 @@ public final class StringUtils {
 	 * @param typeClass type class
 	 * @return check result
 	 */
-	public static boolean simpleDataType(Class<?> typeClass) {
-		if (typeClass != null) {
-			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
-
-			switch (dataType) {
-				case NUMBER:
-				case STRING:
-				case BOOLEAN:
-				case DATE:
-					return true;
-				default:
-					break;
-			}
-		}
-		return Boolean.FALSE;
+	public static boolean simpleDataType(final Class<?> typeClass) {
+		return SIMPLE_DATA_TYPES.contains(ObjectUtils.retrieveSimpleDataType(typeClass));
 	}
 
 	/**
@@ -2304,7 +2194,7 @@ public final class StringUtils {
 	 * @return target object
 	 * @throws ParseException given string is null
 	 */
-	public static <T> T parseSimpleData(String dataValue, Class<T> typeClass) throws ParseException {
+	public static <T> T parseSimpleData(final String dataValue, final Class<T> typeClass) throws ParseException {
 		Object paramObj = null;
 		if (dataValue == null || typeClass == null || Globals.DEFAULT_VALUE_STRING.equals(dataValue)) {
 			return null;
@@ -2344,8 +2234,8 @@ public final class StringUtils {
 					paramObj = StringUtils.formatForText(dataValue).toCharArray();
 					break;
 				case BINARY:
-					dataValue = StringUtils.replace(dataValue, " ", Globals.DEFAULT_VALUE_STRING);
-					paramObj = StringUtils.base64Decode(dataValue);
+					paramObj = StringUtils.base64Decode(
+							StringUtils.replace(dataValue, " ", Globals.DEFAULT_VALUE_STRING));
 					break;
 				default:
 					paramObj = StringUtils.formatForText(dataValue);
@@ -2362,7 +2252,7 @@ public final class StringUtils {
 	 * @param codeType Code type
 	 * @return Validate result
 	 */
-	public static boolean validateCode(String code, CodeType codeType) {
+	public static boolean validateCode(final String code, final CodeType codeType) {
 		switch (codeType) {
 			case CHN_ID_Code:
 				String cardCode = code.toUpperCase();
@@ -2442,7 +2332,7 @@ public final class StringUtils {
 		return null;
 	}
 
-	private static String changeFirstCharacterCase(String str, boolean capitalize) {
+	private static String changeFirstCharacterCase(final String str, final boolean capitalize) {
 		if (str == null || str.length() == 0) {
 			return str;
 		}
