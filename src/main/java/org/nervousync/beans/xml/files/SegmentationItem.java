@@ -36,7 +36,7 @@ import java.util.Objects;
 @XmlType(name = "segment_item", namespace = "https://nervousync.org/schemas/file/segment")
 @XmlRootElement(name = "segment_item", namespace = "https://nervousync.org/schemas/file/segment")
 @XmlAccessorType(XmlAccessType.NONE)
-public class SegmentationItem extends BeanObject {
+public final class SegmentationItem extends BeanObject {
 	
 	private static final long serialVersionUID = 2993229461743423521L;
 	

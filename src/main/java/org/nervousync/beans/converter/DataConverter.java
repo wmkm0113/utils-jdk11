@@ -7,8 +7,6 @@ public abstract class DataConverter {
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public abstract String encode(Object object);
-
-	public abstract <T> T decode(String string, Class<T> targetClass);
+	public abstract <T> T convert(final Object object, final Class<T> targetClass);
 
 }

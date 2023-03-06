@@ -55,7 +55,7 @@ public final class ConvertUtils {
 	 * @param collection collection
 	 * @return Convert list
 	 */
-	public static List<Object> convertCollectionToList(Object collection) {
+	public static List<Object> collectionToList(final Object collection) {
 		List<Object> list;
 		
 		if (collection instanceof Collection) {
@@ -95,7 +95,7 @@ public final class ConvertUtils {
 	 * @param primitiveArray primitive arrays
 	 * @return Object arrays
 	 */
-	public static Object[] convertPrimitivesToObjects(Object primitiveArray) {
+	public static Object[] convertPrimitivesToObjects(final Object primitiveArray) {
 		if (!primitiveArray.getClass().isArray()) {
 			throw new IllegalArgumentException("Specified object is not array");
 		}
@@ -114,34 +114,12 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Convert hex string to byte arrays
-	 *
-	 * @param strIn Hex string
-	 * @return Convert byte arrays
-	 */
-	public static byte[] hexToByte(String strIn) {
-		if (strIn.length() % 2 != 0) {
-			return new byte[0];
-		}
-
-		byte[] arrB = strIn.getBytes(Charset.defaultCharset());
-		int iLen = arrB.length;
-
-		byte[] arrOut = new byte[iLen / 2];
-		for (int i = 0; i < iLen; i = i + 2) {
-			String strTmp = new String(arrB, i, 2, Charset.defaultCharset());
-			arrOut[i / 2] = Integer.valueOf(strTmp, 16).byteValue();
-		}
-		return arrOut;
-	}
-
-	/**
 	 * Byte to hex string.
 	 *
 	 * @param dataBytes the data bytes
 	 * @return the string
 	 */
-	public static String byteToHex(byte[] dataBytes) {
+	public static String byteToHex(final byte[] dataBytes) {
 		if (dataBytes == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -163,7 +141,7 @@ public final class ConvertUtils {
 	 * @param content Byte array to convert to string
 	 * @return string resulted from converting byte array using default encoding
 	 */
-	public static String convertToString(byte[] content) {
+	public static String convertToString(final byte[] content) {
 		return convertToString(content, Globals.DEFAULT_ENCODING);
 	}
 
@@ -174,7 +152,7 @@ public final class ConvertUtils {
 	 * @param encoding Encoding string, if <code>null</code> default is used
 	 * @return string resulted from converting byte array
 	 */
-	public static String convertToString(byte[] content, String encoding) {
+	public static String convertToString(final byte[] content, final String encoding) {
 		try {
 			return new String(content, encoding);
 		} catch (UnsupportedEncodingException ex) {
@@ -188,7 +166,7 @@ public final class ConvertUtils {
 	 * @param content String to convert to array
 	 * @return byte array resulted from converting string using default encoding
 	 */
-	public static byte[] convertToByteArray(String content) {
+	public static byte[] convertToByteArray(final String content) {
 		return convertToByteArray(content, Globals.DEFAULT_ENCODING);
 	}
 
@@ -199,7 +177,7 @@ public final class ConvertUtils {
 	 * @param encoding Encoding string, if <code>null</code> default is used
 	 * @return byte array
 	 */
-	public static byte[] convertToByteArray(String content, String encoding) {
+	public static byte[] convertToByteArray(final String content, final String encoding) {
 		try {
 			return content.getBytes(encoding);
 		} catch (UnsupportedEncodingException ex) {
@@ -213,7 +191,7 @@ public final class ConvertUtils {
 	 * @param object if <code>null</code> convert error
 	 * @return byte array
 	 */
-	public static byte[] convertToByteArray(Object object) {
+	public static byte[] convertToByteArray(final Object object) {
 		if (object instanceof String) {
 			return convertToByteArray((String)object);
 		}
@@ -248,7 +226,7 @@ public final class ConvertUtils {
 	 * @param content byte array
 	 * @return Converted object or byte array when failed
 	 */
-	public static Object convertToObject(byte[] content) {
+	public static Object convertToObject(final byte[] content) {
 		if (content.length == 0) {
 			return null;
 		}
@@ -274,7 +252,7 @@ public final class ConvertUtils {
 	 * @param dataBytes Data bytes
 	 * @return Compressed byte array
 	 */
-	public static byte[] zipByteArray(byte[] dataBytes) {
+	public static byte[] zipByteArray(final byte[] dataBytes) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		GZIPOutputStream gzipOutputStream = null;
 
@@ -300,7 +278,7 @@ public final class ConvertUtils {
 	 * @param dataBytes Compressed data bytes
 	 * @return Decompressed data bytes
 	 */
-	public static byte[] unzipByteArray(byte[] dataBytes) {
+	public static byte[] unzipByteArray(final byte[] dataBytes) {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		GZIPInputStream gzipInputStream = null;

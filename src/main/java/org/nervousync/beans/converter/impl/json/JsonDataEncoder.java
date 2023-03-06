@@ -15,30 +15,23 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.impl.blob;
+package org.nervousync.beans.converter.impl.json;
 
 import org.nervousync.beans.converter.DataConverter;
-import org.nervousync.utils.ConvertUtils;
-import org.nervousync.utils.StringUtils;
+import org.nervousync.beans.core.BeanObject;
 
 /**
- * The type Parse base 64 provider.
+ * The type Parse json provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/25/2020 2:56 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:26 PM $
  */
-public final class Base64DataConverter extends DataConverter {
+public final class JsonDataEncoder extends DataConverter {
 
 	@Override
-	public String encode(Object object) {
-		return StringUtils.base64Encode(ConvertUtils.convertToByteArray(object));
-	}
-
-	@Override
-	public <T> T decode(final String string, Class<T> targetClass) {
-		byte[] object = StringUtils.base64Decode(string);
-		if (targetClass.isInstance(object)) {
-			return targetClass.cast(object);
+	public <T> T convert(final Object object, Class<T> targetClass) {
+		if ((object instanceof BeanObject) && String.class.equals(targetClass)) {
+			return targetClass.cast(((BeanObject) object).toJson());
 		}
 		return null;
 	}

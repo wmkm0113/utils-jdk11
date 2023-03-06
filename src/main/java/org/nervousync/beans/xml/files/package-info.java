@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 @XmlSchema(namespace = "https://nervousync.org/schemas/file/segment", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/configure/file-segment-1.0.xsd")package org.nervousync.beans.xml.files;
+		location = "https://nervousync.org/schemas/configure/file-segment-1.0.xsd")
+package org.nervousync.beans.xml.files;
 
 import jakarta.xml.bind.annotation.XmlNsForm;
 import jakarta.xml.bind.annotation.XmlSchema;

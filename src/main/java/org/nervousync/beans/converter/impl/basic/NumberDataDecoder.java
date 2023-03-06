@@ -21,7 +21,6 @@ import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.ReflectionUtils;
-import org.nervousync.utils.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,28 +33,23 @@ import java.math.BigInteger;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: 8/29/2020 10:55 PM $
  */
-public final class NumberDataConverter extends DataConverter {
-
-	@Override
-	public String encode(final Object object) {
-		return object.toString();
-	}
+public final class NumberDataDecoder extends DataConverter {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T decode(final String string, final Class<T> targetClass) {
-		if (StringUtils.notBlank(string) && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
+	public <T> T convert(final Object object, final Class<T> targetClass) {
+		if ((object instanceof String) && DataType.NUMBER.equals(ObjectUtils.retrieveSimpleDataType(targetClass))) {
 			if (targetClass.equals(BigInteger.class)) {
-				return targetClass.cast(new BigInteger(string));
+				return targetClass.cast(new BigInteger((String) object));
 			}
 			if (targetClass.equals(BigDecimal.class)) {
-				return targetClass.cast(new BigDecimal(string));
+				return targetClass.cast(new BigDecimal((String) object));
 			}
-			String stringValue = string;
+			String stringValue = (String) object;
 			if (targetClass.equals(Integer.class) || targetClass.equals(int.class)
 					|| targetClass.equals(Short.class) || targetClass.equals(short.class)
 					|| targetClass.equals(Long.class) || targetClass.equals(long.class)) {
-				if (string.contains(".")) {
+				if (stringValue.contains(".")) {
 					stringValue = stringValue.substring(0, stringValue.indexOf("."));
 				}
 			}
@@ -64,17 +58,17 @@ public final class NumberDataConverter extends DataConverter {
 					"valueOf", new Class[]{String.class});
 			if (method != null) {
 				try {
-					Object object = method.invoke(null, stringValue);
+					Object targetObject = method.invoke(null, stringValue);
 					if (targetClass.isPrimitive()) {
 						String className = targetClass.getName();
 						String methodName = className + "Value";
 						Method convertMethod = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
 								methodName, new Class[]{});
 						if (convertMethod != null) {
-							return (T) convertMethod.invoke(object);
+							return (T) convertMethod.invoke(targetObject);
 						}
 					} else {
-						return targetClass.cast(object);
+						return targetClass.cast(targetObject);
 					}
 				} catch (IllegalAccessException | InvocationTargetException ignored) {
 				}

@@ -58,7 +58,7 @@ public class BeanObject implements Serializable {
 	 *
 	 * @return the string
 	 */
-	public String toJson() {
+	public final String toJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.FALSE);
 	}
 
@@ -67,7 +67,7 @@ public class BeanObject implements Serializable {
 	 *
 	 * @return the string
 	 */
-	public String toFormattedJson() {
+	public final String toFormattedJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.TRUE);
 	}
 
@@ -76,7 +76,7 @@ public class BeanObject implements Serializable {
 	 *
 	 * @return the string
 	 */
-	public String toYaml() {
+	public final String toYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.FALSE);
 	}
 
@@ -85,7 +85,7 @@ public class BeanObject implements Serializable {
 	 *
 	 * @return the string
 	 */
-	public String toFormattedYaml() {
+	public final String toFormattedYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.TRUE);
 	}
 
@@ -95,7 +95,7 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML() throws XmlException {
+	public final String toXML() throws XmlException {
 		return this.toXML(Boolean.TRUE);
 	}
 
@@ -107,7 +107,7 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(final boolean formattedOutput) throws XmlException {
+	public final String toXML(final boolean formattedOutput) throws XmlException {
 		return this.toXML(Boolean.TRUE, formattedOutput);
 	}
 
@@ -120,7 +120,7 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(final boolean outputFragment, final boolean formattedOutput) throws XmlException {
+	public final String toXML(final boolean outputFragment, final boolean formattedOutput) throws XmlException {
 		return this.toXML(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
 	}
 
@@ -134,7 +134,7 @@ public class BeanObject implements Serializable {
 	 * @return XML String
 	 * @throws XmlException the xml exception
 	 */
-	public String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding)
+	public final String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding)
 			throws XmlException {
 		StringWriter stringWriter = null;
 
@@ -187,7 +187,7 @@ public class BeanObject implements Serializable {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public final boolean equals(final Object o) {
 		if (o == null) {
 			return Boolean.FALSE;
 		}
@@ -222,7 +222,7 @@ public class BeanObject implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		Field[] fields = this.getClass().getDeclaredFields();
 
 		int result = Globals.INITIAL_HASH;

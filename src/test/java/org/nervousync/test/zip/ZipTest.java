@@ -25,7 +25,10 @@ public final class ZipTest extends BaseTest {
 	private static final String ZIP_PASSWORD = "Nervousync";
 
 	static {
-		BASE_PATH = System.getProperty("java.io.tmpdir");
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		BASE_PATH = tmpDir.endsWith(Globals.DEFAULT_PAGE_SEPARATOR)
+				? tmpDir.substring(0, tmpDir.length() - 1)
+				: tmpDir;
 	}
 
 	@BeforeClass

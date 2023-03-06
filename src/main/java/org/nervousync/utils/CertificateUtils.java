@@ -90,7 +90,7 @@ public final class CertificateUtils {
      * @return  <span class="en">Generated key pair</span>
      *          <span class="zhs">生成的密钥对</span>
      */
-    public static KeyPair KeyPair(final String algorithm, final String randomAlgorithm, final int keySize) {
+    public static KeyPair keyPair(final String algorithm, final String randomAlgorithm, final int keySize) {
         if (keySize % 128 != 0) {
             LOGGER.error("Key size is invalid");
             return null;
@@ -457,7 +457,7 @@ public final class CertificateUtils {
      */
     public static PrivateKey privateKey(byte[] storeBytes, String certAlias, String password) {
         KeyStore keyStore = loadKeyStore(storeBytes, password);
-        if (keyStore != null && CertificateUtils.checkKey(keyStore, password)) {
+        if (keyStore != null && CertificateUtils.checkKey(keyStore, certAlias)) {
             return CertificateUtils.privateKey(keyStore, certAlias, password);
         }
         return null;
@@ -478,7 +478,7 @@ public final class CertificateUtils {
      */
     public static PrivateKey privateKey(String storePath, String certAlias, String password) {
         KeyStore keyStore = loadKeyStore(storePath, password);
-        if (keyStore != null && CertificateUtils.checkKey(keyStore, password)) {
+        if (keyStore != null && CertificateUtils.checkKey(keyStore, certAlias)) {
             return CertificateUtils.privateKey(keyStore, certAlias, password);
         }
         return null;

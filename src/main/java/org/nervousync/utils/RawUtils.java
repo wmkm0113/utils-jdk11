@@ -407,27 +407,21 @@ public final class RawUtils {
 		switch (endian) {
 			case BIG:
 				i = 0;
-				while (true) {
+				do {
 					readValue |= dataBytes[position + i] & 0xFF;
-					if (i == 7) {
-						break;
-					} else {
-						readValue <<= 8;
-						i++;
-					}
-				}
+					readValue <<= 8;
+					i++;
+				} while (i != 7);
 				break;
 			case LITTLE:
 				i = 8;
-				while (true) {
+				do {
 					i--;
-					readValue |= dataBytes[position + i] & 0xFF;
-					if (i == 0) {
-						break;
-					} else {
+					readValue |= dataBytes[i] & 0xFF;
+					if (i != 0) {
 						readValue <<= 8;
 					}
-				}
+				} while (i != 0);
 				break;
 			default:
 				throw new DataInvalidException("Unknown endian type");

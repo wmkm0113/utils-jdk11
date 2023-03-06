@@ -1,4 +1,60 @@
 Nervousync Java 工具包
+[03/06/2023]
+[更新] 重寫BeanUtils.java
+[更新] 更新Slf4j版本為2.0.5
+[更新] 更新Jackson版本為2.14.2
+[更新] 更新Yaml版本為2.0
+[更新] 更新snmp4j版本為3.7.4
+
+[11/18/2022]
+[修復] SecurityUtils中SHA224/HmacSHA224計算錯誤的問題
+[修復] C1C2C3toC1C3C2數據未修改的問題
+[修復] 定義CRLF字元為靜態變數
+[移除] CacheUtils, CacheClient, CacheManager
+[移除] StringUtils messageKey/localeKey方法
+
+[10/09/2022]
+[更新] Jakarta XML Binding版本為4.0.1
+[更新] Bcprov版本為1.72
+[更新] Slf4j版本為2.0.3
+[更新] Jackson版本為2.14.0-rc1
+[更新] Snmp4j版本為2.7.3
+
+[09/28/2022]
+[移除] Cglib依賴
+[更新] JUnit版本為5.9.0
+[更新] bcprov版本為1.71.1
+[更新] log4j版本為2.19.0
+[更新] slf4j版本為2.0.1
+[更新] jackson版本為2.13.4
+[更新] yaml版本為1.33
+[更新] jersey版本為3.0.8
+[更新] jcifs版本為2.1.32
+
+[06/28/2022]
+[增加] Add CacheUtils/CacheClient/CacheManager
+[增加] Add StartupManager/StartupLauncher
+[更新] JAXB版本為4.0.0
+[更新] JCIFS版本為2.1.31
+
+[06/14/2022]
+[增加] 郵件設定檔的定義文件（XML Schema Define）
+[增加] 安全設定檔的定義文件（XML Schema Define）
+[增加] MailConfigBuilder
+[修復] 使用安全設定保存密碼導致郵件發送失敗的問題
+[更新] Merge ServerConfig into MailConfig
+[移除] Globals中不再使用的靜態變數
+
+[06/02/2022]
+[Remove] FileExtensionInfo.java using URLConnection to find mimetype
+[增加] 增加Bcjmail-jdk18on用於支援郵件簽名
+[增加] MailUtils增加生成/驗證電子簽名的支援
+[更新] Bcprov artifactId從bcprov-jdk15on更改為bcprov-jdk18on且版本更新為1.71
+[更新] Jackson版本為2.13.3
+[更新] Snmp4j版本為3.7.0
+[修復] 合併loadSMBFile到loadFile方法中，使用者可以統一使用loadFile方法打開本地檔和SMB遠端檔
+[修復] MailUtils的recoverMails方法無效的問題
+
 [05/03/2022]
 增加Restful支援
 更新slf4j版本為1.7.36

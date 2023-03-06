@@ -22,6 +22,7 @@ import java.util.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class MailTest extends BaseTest {
 
+    private static final String MAIL_SECURE = "MailSecure";
     private static final String MAIL_SUBJECT = "Test mail";
     private static final String MAIL_CONTENT = "Test mail content";
     
@@ -31,25 +32,29 @@ public final class MailTest extends BaseTest {
     private static boolean SKIP_TEST = Boolean.FALSE;
 
     @BeforeClass
-    public static void initialize() throws BuilderException {
-        if (!FileUtils.isExists("src/test/resources/mail.xml")) {
-            SKIP_TEST = Boolean.TRUE;
+    public static void initialize() {
+        SKIP_TEST = !FileUtils.isExists("src/test/resources/mail.xml");
+    }
+
+    @Test
+    public void test000GenerateConfig() throws BuilderException {
+        if (SKIP_TEST) {
             return;
         }
         //  Configure security factory
         boolean initResult = SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
                 .map(SecureFactory::initialize)
                 .orElse(Boolean.FALSE);
-        System.out.println("Initialize SecureFactory result: " + initResult);
+        this.logger.info("Initialize SecureFactory result: {}", initResult);
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES192)
-                .ifPresent(secureConfig -> SecureFactory.getInstance().register("MailSecure", secureConfig));
+                .ifPresent(secureConfig -> SecureFactory.getInstance().register(MAIL_SECURE, secureConfig));
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
         X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), (long) IDUtils.random(IDUtils.SNOWFLAKE),
                 new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
         PROPERTIES = PropertiesUtils.loadProperties("src/test/resources/mail.xml");
         MAIL_CONFIG = MailConfigBuilder.newBuilder()
-                .secureName(PROPERTIES.getProperty("config.secureName"))
+                .secureName(MAIL_SECURE)
                 .sendConfig()
                 .mailProtocol(MailProtocol.SMTP)
                 .configHost(PROPERTIES.getProperty("config.sendAddress"),
@@ -71,14 +76,13 @@ public final class MailTest extends BaseTest {
                 .signer(x509Certificate, keyPair.getPrivate())
                 .build();
         String xmlContent = MAIL_CONFIG.toXML();
-        System.out.println("Mail Config: " + xmlContent);
-        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, Globals.DEFAULT_ENCODING, MailConfig.class,
+        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, MailConfig.class,
                 "src/main/resources/org/nervousync/resources/mail_config.xsd");
-        Assert.assertNotNull(parseConfig);
+        this.logger.info("Parse and verified config: {}", parseConfig.toFormattedJson());
     }
 
     @Test
-    public void test000FolderList() {
+    public void test010FolderList() {
         if (SKIP_TEST) {
             return;
         }
@@ -88,7 +92,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test010SendMail() {
+    public void test020SendMail() {
         if (SKIP_TEST) {
             return;
         }
@@ -118,7 +122,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test020ReceiveMail() {
+    public void test030ReceiveMail() {
         if (SKIP_TEST) {
             return;
         }
@@ -142,7 +146,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test030FlagMail() {
+    public void test040FlagMail() {
         if (SKIP_TEST) {
             return;
         }
@@ -169,7 +173,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test040RecoveryMail() {
+    public void test050RecoveryMail() {
         if (SKIP_TEST) {
             return;
         }
@@ -186,7 +190,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test050DropMail() {
+    public void test060DropMail() {
         if (SKIP_TEST) {
             return;
         }
@@ -209,7 +213,7 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test060MailCount() {
+    public void test070MailCount() {
         if (SKIP_TEST) {
             return;
         }

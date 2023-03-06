@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nervousync</groupId>
 	<artifactId>utils-jdk11</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<packaging>jar</packaging>
 	<name>Nervousync Java Utility Collections</name>
 	<url>https://gene.nervousync.org/index.shtml</url>
@@ -52,11 +52,11 @@
 		<jakarta.xml.soap.version>3.0.0</jakarta.xml.soap.version>
 		<bcprov.version>1.72</bcprov.version>
 		<log4j.version>2.19.0</log4j.version>
-		<slf4j.version>2.0.3</slf4j.version>
-		<jackson.version>2.14.0</jackson.version>
-		<yaml.version>1.33</yaml.version>
+		<slf4j.version>2.0.5</slf4j.version>
+		<jackson.version>2.14.2</jackson.version>
+		<yaml.version>2.0</yaml.version>
 		<jersey.version>3.1.0</jersey.version>
-		<snmp4j.version>3.7.3</snmp4j.version>
+		<snmp4j.version>3.7.4</snmp4j.version>
 		<jcifs.version>2.1.32</jcifs.version>
 	</properties>
 	<dependencies>

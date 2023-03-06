@@ -1,6 +1,7 @@
 package org.nervousync.annotations.beans;
 
 import org.nervousync.beans.converter.DataConverter;
+import org.nervousync.commons.core.Globals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,8 +10,12 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface FieldMapping {
+public @interface BeanProperty {
 
-	Class<? extends DataConverter> value() default DataConverter.class;
+	Class<?> beanClass();
+
+	String targetField() default Globals.DEFAULT_VALUE_STRING;
+
+	Class<? extends DataConverter> converter() default DataConverter.class;
 
 }

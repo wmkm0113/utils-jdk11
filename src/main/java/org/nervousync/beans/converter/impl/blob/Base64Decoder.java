@@ -15,36 +15,26 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.impl.yaml;
+package org.nervousync.beans.converter.impl.blob;
 
 import org.nervousync.beans.converter.DataConverter;
-import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**
- * The type Encode xml provider.
+ * The type Parse base 64 provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/15/2020 4:34 PM $
+ * @version $Revision : 1.0 $ $Date: 8/25/2020 2:56 PM $
  */
-public final class YamlDataConverter extends DataConverter {
+public final class Base64Decoder extends DataConverter {
 
 	@Override
-	public String encode(final Object object) {
-		if (object == null) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		if (object instanceof BeanObject) {
-			return ((BeanObject) object).toFormattedYaml();
-		}
-		return StringUtils.objectToString(object, StringUtils.StringType.YAML, Boolean.FALSE);
-	}
-
-	@Override
-	public <T> T decode(final String string, final Class<T> targetClass) {
-		if (StringUtils.notBlank(string) && BeanObject.class.isAssignableFrom(targetClass)) {
-			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
+	public <T> T convert(final Object object, Class<T> targetClass) {
+		if (object instanceof String) {
+			byte[] byteArray = StringUtils.base64Decode((String) object);
+			if (targetClass.isInstance(byteArray)) {
+				return targetClass.cast(byteArray);
+			}
 		}
 		return null;
 	}

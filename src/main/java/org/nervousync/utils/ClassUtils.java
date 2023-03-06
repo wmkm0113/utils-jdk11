@@ -192,6 +192,18 @@ public final class ClassUtils {
 		}
 	}
 
+	public static String origClassName(Class<?> clazz) {
+		String className = clazz.getName();
+		if (className.contains("$$")) {
+			//  Process for cglib
+			className = className.substring(0, className.indexOf("$$"));
+		} else if (className.contains("$ByteBuddy")) {
+			//  Process for ByteBuddy
+			className = className.substring(0, className.indexOf("$ByteBuddy"));
+		}
+		return className;
+	}
+
 	/**
 	 * Replacement for <code>Class.forName()</code> that also returns Class instances
 	 * for primitives (like "int") and array class names (like "String[]").

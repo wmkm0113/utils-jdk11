@@ -14,37 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.nervousync.beans.converter.impl.json;
+package org.nervousync.beans.converter.impl.basic;
 
 import org.nervousync.beans.converter.DataConverter;
-import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.utils.StringUtils;
 
 /**
- * The type Parse json provider.
+ * The type Parse number provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/15/2020 4:26 PM $
+ * @version $Revision : 1.0 $ $Date: 8/29/2020 10:55 PM $
  */
-public final class JsonDataConverter extends DataConverter {
+public final class NumberDataEncoder extends DataConverter {
 
 	@Override
-	public String encode(final Object object) {
-		if (object == null) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		if (object instanceof BeanObject) {
-			return ((BeanObject) object).toFormattedJson();
-		}
-		return StringUtils.objectToString(object, StringUtils.StringType.JSON, Boolean.FALSE);
-	}
-
-	@Override
-	public <T> T decode(final String string, Class<T> targetClass) {
-		if (StringUtils.notBlank(string) && targetClass != null && BeanObject.class.isAssignableFrom(targetClass)) {
-			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
+	public <T> T convert(final Object object, final Class<T> targetClass) {
+		if (String.class.equals(targetClass)) {
+			return targetClass.cast(object.toString());
 		}
 		return null;
 	}

@@ -15,36 +15,23 @@
  * limitations under the License.
  */
 
-package org.nervousync.beans.converter.impl.xml;
+package org.nervousync.beans.converter.impl.yaml;
 
 import org.nervousync.beans.converter.DataConverter;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.utils.StringUtils;
 
 /**
- * The type Parse xml provider.
+ * The type Encode xml provider.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 8/15/2020 4:23 PM $
+ * @version $Revision : 1.0 $ $Date: 8/15/2020 4:34 PM $
  */
-public final class XmlDataConverter extends DataConverter {
+public final class YamlDataEncoder extends DataConverter {
 
 	@Override
-	public String encode(Object object) {
-		if (object == null) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		if (object instanceof BeanObject) {
-			return ((BeanObject) object).toXML(Boolean.FALSE);
-		}
-		return Globals.DEFAULT_VALUE_STRING;
-	}
-
-	@Override
-	public <T> T decode(final String string, final Class<T> targetClass) {
-		if (StringUtils.notBlank(string) && targetClass != null && BeanObject.class.isAssignableFrom(targetClass)) {
-			return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
+	public <T> T convert(final Object object, Class<T> targetClass) {
+		if ((object instanceof BeanObject) && String.class.equals(targetClass)) {
+			return targetClass.cast(((BeanObject) object).toYaml());
 		}
 		return null;
 	}

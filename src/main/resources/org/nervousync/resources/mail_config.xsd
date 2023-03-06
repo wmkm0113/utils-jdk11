@@ -47,7 +47,8 @@
             </xsd:element>
         </xsd:all>
     </xsd:complexType>
-    <xsd:complexType name="mail_config">
+    <xsd:element name="mail_config">
+        <xsd:complexType>
         <xsd:all>
             <xsd:element name="secure_name" type="xsd:string">
                 <xsd:annotation>
@@ -90,6 +91,6 @@
                 </xsd:annotation>
             </xsd:element>
         </xsd:all>
-    </xsd:complexType>
-    <xsd:element name="mail_config" type="mail_config" />
+        </xsd:complexType>
+    </xsd:element>
 </xsd:schema>

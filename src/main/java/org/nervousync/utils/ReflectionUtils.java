@@ -168,6 +168,17 @@ public final class ReflectionUtils {
 	}
 
 	/**
+	 * Check given field name was exists field in target class
+	 *
+	 * @param clazz the class to introspect
+	 * @param name  the name of the field
+	 * @return the field object exists result
+	 */
+	public static boolean existsField(final Class<?> clazz, final String name) {
+		return findField(clazz, name) != null;
+	}
+
+	/**
 	 * Attempt to find a {@link Field field} on the supplied {@link Class} with
 	 * the supplied <code>name</code>. Searches all superclasses up to {@link Object}.
 	 *
@@ -983,173 +994,11 @@ public final class ReflectionUtils {
 			if (setMethod != null) {
 				setMethod.invoke(target, value);
 			} else {
-				Field field = getFieldIfAvailable(target.getClass(), fieldName);
-				if (field == null) {
-					return;
-				}
-				
-				Object object = null;
-				
-				if (value != null) {
-					Class<?> clazz = field.getType();
-					if (!value.getClass().equals(clazz)) {
-						int length;
-						if (value.getClass().isArray()) {
-							length = ((String[])value).length;
-						} else {
-							length = 1;
-						}
-						
-						if (clazz.isArray()) {
-							Class<?> arrayClass = clazz.getComponentType();
-							object = Array.newInstance(arrayClass, length);
-							
-							if (arrayClass.isPrimitive()) {
-								if (arrayClass.equals(int.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Integer.parseInt(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Integer.parseInt(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(double.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Double.parseDouble(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Double.parseDouble(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(float.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Float.parseFloat(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Float.parseFloat(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(long.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Long.parseLong(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Long.parseLong(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(short.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Short.parseShort(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Short.parseShort(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(boolean.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Boolean.parseBoolean(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Boolean.parseBoolean(((String[])value)[i]));
-										}
-									}
-								}
-							} else {
-								if (arrayClass.equals(String.class)) {
-									if (length == 1) {
-										Array.set(object, 0, value.toString());
-									} else {
-										object = value;
-									}
-								} else if (arrayClass.equals(Integer.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Integer.valueOf(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Integer.valueOf(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(Float.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Float.valueOf(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Float.valueOf(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(Double.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Double.valueOf(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Double.valueOf(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(Long.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Long.valueOf(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Long.valueOf(((String[])value)[i]));
-										}
-									}
-								} else if (arrayClass.equals(Boolean.class)) {
-									if (length == 1) {
-										Array.set(object, 0, Boolean.valueOf(value.toString()));
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, Boolean.valueOf(((String[])value)[i]));
-										}
-									}
-								} else {
-									if (length == 1) {
-										Array.set(object, 0, value);
-									} else {
-										for (int i = 0 ; i < length ; i++) {
-											Array.set(object, i, ((Object[])value)[i]);
-										}
-									}
-								}
-							}
-						} else if (clazz.isPrimitive()) {
-							//	Basic data type	int, double, float, long, short
-							if (clazz.equals(int.class)) {
-								object = Integer.parseInt(value.toString());
-							} else if (clazz.equals(double.class)) {
-								object = Double.parseDouble(value.toString());
-							} else if (clazz.equals(float.class)) {
-								object = Float.parseFloat(value.toString());
-							} else if (clazz.equals(long.class)) {
-								object = Long.parseLong(value.toString());
-							} else if (clazz.equals(short.class)) {
-								object = Short.parseShort(value.toString());
-							} else if (clazz.equals(boolean.class)) {
-								object = Boolean.parseBoolean(value.toString());
-							}
-						} else {
-							if (clazz.equals(Integer.class)) {
-								object = Integer.valueOf(value.toString());
-							} else if (clazz.equals(Float.class)) {
-								object = Float.valueOf(value.toString());
-							} else if (clazz.equals(Double.class)) {
-								object = Double.valueOf(value.toString());
-							} else if (clazz.equals(Long.class)) {
-								object = Long.valueOf(value.toString());
-							} else if (clazz.equals(Short.class)) {
-								object = Short.valueOf(value.toString());
-							} else if (clazz.equals(Boolean.class)) {
-								object = Boolean.valueOf(value.toString());
-							} else {
-								object = value;
-							}
-						}
-					} else {
-						object = value;
-					}
-				}
-				
-				makeAccessible(field);
-				setField(field, target, object);
+				Optional.ofNullable(getFieldIfAvailable(target.getClass(), fieldName))
+						.ifPresent(field -> {
+							makeAccessible(field);
+							setField(field, target, value);
+						});
 			}
 		} catch (Exception e) {
 			if (ReflectionUtils.LOGGER.isDebugEnabled()) {

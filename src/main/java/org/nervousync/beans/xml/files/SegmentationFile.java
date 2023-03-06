@@ -29,7 +29,7 @@ import java.util.List;
 @XmlType(name = "segment_file", namespace = "https://nervousync.org/schemas/file/segment")
 @XmlRootElement(name = "segment_file", namespace = "https://nervousync.org/schemas/file/segment")
 @XmlAccessorType(XmlAccessType.NONE)
-public class SegmentationFile extends BeanObject {
+public final class SegmentationFile extends BeanObject {
 
 	/**
 	 * 

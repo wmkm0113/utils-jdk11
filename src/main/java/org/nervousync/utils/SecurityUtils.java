@@ -1269,7 +1269,7 @@ public final class SecurityUtils implements Serializable {
 	 * @return Generated key pair
 	 */
 	public static KeyPair RSAKeyPair(final int keySize, final String randomAlgorithm) {
-		return CertificateUtils.KeyPair("RSA", randomAlgorithm, keySize);
+		return CertificateUtils.keyPair("RSA", randomAlgorithm, keySize);
 	}
 
 	/**
@@ -1340,7 +1340,7 @@ public final class SecurityUtils implements Serializable {
 	 * @return Generated key pair
 	 */
 	public static KeyPair SM2KeyPair(final String randomAlgorithm) {
-		return CertificateUtils.KeyPair("EC", randomAlgorithm, Globals.INITIALIZE_INT_VALUE);
+		return CertificateUtils.keyPair("EC", randomAlgorithm, Globals.INITIALIZE_INT_VALUE);
 	}
 
 	/**

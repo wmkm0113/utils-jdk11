@@ -1,7 +1,6 @@
 # GeneUtils
 Nervousync® Java Utilities Package
 
-[![Build Status](https://app.travis-ci.com/wmkm0113/Gene.svg?branch=mainline)](https://app.travis-ci.com/wmkm0113/Gene)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/)
 [![License](https://img.shields.io/github/license/wmkm0113/Gene.svg)](https://github.com/wmkm0113/Gene/blob/master/LICENSE)
 

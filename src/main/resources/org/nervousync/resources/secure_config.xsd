@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsd:schema xmlns="https://nervousync.org/schemas/secure" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="https://nervousync.org/schemas/secure" elementFormDefault="qualified" version="1.0">
-    <xsd:complexType name="configure">
-        <xsd:all>
+    <xsd:element name="secure_config">
+        <xsd:complexType>
+            <xsd:all>
             <xsd:element name="secure_algorithm">
                 <xsd:annotation>
                     <xsd:documentation>Secure algorithm</xsd:documentation>
@@ -26,7 +27,7 @@
                     <xsd:documentation>Secure key data bytes, base64 encoded.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-        </xsd:all>
-    </xsd:complexType>
-    <xsd:element name="secure_config" type="configure" />
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
 </xsd:schema>
