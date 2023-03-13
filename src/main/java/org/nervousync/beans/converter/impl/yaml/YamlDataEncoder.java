@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.nervousync.beans.converter.impl.yaml;
 
 import org.nervousync.beans.converter.DataConverter;

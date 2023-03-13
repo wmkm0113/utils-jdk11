@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * The type Snowflake generator.
  */
 @GeneratorProvider(IDUtils.SNOWFLAKE)
-public final class SnowflakeGenerator implements IGenerator {
+public final class SnowflakeGenerator implements IGenerator<Long> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -78,7 +80,7 @@ public final class SnowflakeGenerator implements IGenerator {
     }
 
     @Override
-    public Object random() {
+    public Long random() {
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         if (currentTime < this.lastTime) {
             throw new RuntimeException(
@@ -110,7 +112,11 @@ public final class SnowflakeGenerator implements IGenerator {
     }
 
     @Override
-    public Object random(byte[] dataBytes) {
+    public Long random(byte[] dataBytes) {
         return this.random();
+    }
+
+    @Override
+    public void destroy() {
     }
 }

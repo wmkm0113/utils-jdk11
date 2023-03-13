@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -47,7 +49,7 @@ import org.nervousync.beans.servlet.response.ResponseInfo;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.http.cookie.CookieEntity;
 import org.nervousync.commons.http.entity.HttpEntity;
-import org.nervousync.commons.http.proxy.ProxyInfo;
+import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.commons.http.security.GeneX509TrustManager;
 import org.nervousync.enumerations.web.HttpMethodOption;
 
@@ -442,12 +444,12 @@ public final class RequestUtils {
 		}
 
 		if (requestInfo.getProxyInfo() != null) {
-			ProxyInfo proxyInfo = requestInfo.getProxyInfo();
-			clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(proxyInfo.getProxyAddress(), proxyInfo.getProxyPort())));
-			if (StringUtils.notBlank(proxyInfo.getUserName())) {
-				String authentication = proxyInfo.getUserName() + ":";
-				if (StringUtils.notBlank(proxyInfo.getPassword())) {
-					authentication += proxyInfo.getPassword();
+			ProxyConfig proxyConfig = requestInfo.getProxyInfo();
+			clientBuilder.proxy(ProxySelector.of(new InetSocketAddress(proxyConfig.getProxyAddress(), proxyConfig.getProxyPort())));
+			if (StringUtils.notBlank(proxyConfig.getUserName())) {
+				String authentication = proxyConfig.getUserName() + ":";
+				if (StringUtils.notBlank(proxyConfig.getPassword())) {
+					authentication += proxyConfig.getPassword();
 				}
 
 				requestBuilder.setHeader("Proxy-Authorization",

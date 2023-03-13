@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,6 +19,7 @@ package org.nervousync.mail.config;
 import jakarta.xml.bind.annotation.*;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 
 /**
@@ -44,6 +47,8 @@ public final class MailConfig extends BeanObject {
      */
     @XmlElement(name = "password")
     private String passWord;
+    @XmlElement(name = "proxy_config", namespace = "https://nervousync.org/schemas/proxy")
+    private ProxyConfig proxyConfig = ProxyConfig.redirect();
     /**
      * Mail send server config
      */
@@ -125,6 +130,24 @@ public final class MailConfig extends BeanObject {
      */
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    /**
+     * Gets proxy config.
+     *
+     * @return the proxy config
+     */
+    public ProxyConfig getProxyConfig() {
+        return proxyConfig;
+    }
+
+    /**
+     * Sets proxy config.
+     *
+     * @param proxyConfig the proxy config
+     */
+    public void setProxyConfig(ProxyConfig proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
     /**
@@ -217,6 +240,9 @@ public final class MailConfig extends BeanObject {
         this.privateKey = privateKey;
     }
 
+    /**
+     * The type Server config.
+     */
     @XmlType(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
     @XmlRootElement(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
     @XmlAccessorType(XmlAccessType.NONE)

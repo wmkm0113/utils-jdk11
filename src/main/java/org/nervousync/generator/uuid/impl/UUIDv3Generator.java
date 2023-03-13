@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -30,12 +32,12 @@ import java.util.UUID;
 public final class UUIDv3Generator extends UUIDGenerator {
 
     @Override
-    public Object random() {
+    public String random() {
         return this.random(new byte[0]);
     }
 
     @Override
-    public Object random(byte[] dataBytes) {
+    public String random(byte[] dataBytes) {
         try {
             byte[] randomBytes = MessageDigest.getInstance("MD5").digest(dataBytes);
             randomBytes[6] &= 0x0F;     /* clear version        */

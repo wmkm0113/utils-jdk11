@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,7 +22,6 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.commons.core.zip.ZipOptions;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.ZipFile;
@@ -33,7 +34,7 @@ import org.nervousync.zip.ZipFile;
 public class DeflaterOutputStream extends CipherOutputStream {
 
 	private final Deflater deflater;
-	private final byte[] buffer = new byte[ZipConstants.BUFFER_SIZE];
+	private final byte[] buffer = new byte[Globals.BUFFER_SIZE];
 	private boolean firstBytesRead = Boolean.FALSE;
 	
 	DeflaterOutputStream(OutputStream outputStream, ZipFile zipFile) {
@@ -55,7 +56,7 @@ public class DeflaterOutputStream extends CipherOutputStream {
 	
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
-		if (this.zipOptions.getCompressionMethod() != ZipConstants.COMP_DEFLATE) {
+		if (this.zipOptions.getCompressionMethod() != Globals.COMP_DEFLATE) {
 			super.write(b, off, len);
 		} else {
 			this.deflater.setInput(b, off, len);
@@ -68,7 +69,7 @@ public class DeflaterOutputStream extends CipherOutputStream {
 	public void putNextEntry(File file, ZipOptions zipOptions) throws ZipException {
 		super.putNextEntry(file, zipOptions);
 		
-		if (zipOptions.getCompressionMethod() == ZipConstants.COMP_DEFLATE) {
+		if (zipOptions.getCompressionMethod() == Globals.COMP_DEFLATE) {
 			this.deflater.reset();
 			if ((zipOptions.getCompressionLevel() < 0 || zipOptions.getCompressionLevel() > 9) 
 					&& zipOptions.getCompressionLevel() != Globals.DEFAULT_VALUE_INT) {
@@ -79,7 +80,7 @@ public class DeflaterOutputStream extends CipherOutputStream {
 	}
 	
 	public void closeEntry() throws IOException, ZipException {
-		if (this.zipOptions.getCompressionMethod() == ZipConstants.COMP_DEFLATE) {
+		if (this.zipOptions.getCompressionMethod() == Globals.COMP_DEFLATE) {
 			if (!this.deflater.finished()) {
 				this.deflater.finish();
 				while (!this.deflater.finished()) {

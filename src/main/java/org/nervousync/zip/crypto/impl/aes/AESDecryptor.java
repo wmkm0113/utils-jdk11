@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -14,7 +16,7 @@
  */
 package org.nervousync.zip.crypto.impl.aes;
 
-import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
@@ -68,9 +70,9 @@ public final class AESDecryptor extends AESCrypto implements Decryptor {
 		}
   
 		try {
-			for (int i = start; i < (start + len); i += ZipConstants.AES_BLOCK_SIZE) {
-				this.loopCount = (i + ZipConstants.AES_BLOCK_SIZE <= (start + len)) ?
-						ZipConstants.AES_BLOCK_SIZE : ((start + len) - i);
+			for (int i = start; i < (start + len); i += Globals.AES_BLOCK_SIZE) {
+				this.loopCount = (i + Globals.AES_BLOCK_SIZE <= (start + len)) ?
+						Globals.AES_BLOCK_SIZE : ((start + len) - i);
 
 				this.macBasedPRF.append(buff, i, this.loopCount);
 				super.processData(buff, i);

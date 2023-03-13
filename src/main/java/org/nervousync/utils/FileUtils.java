@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -74,11 +76,6 @@ public final class FileUtils {
 	 * URL prefixes for loading from the file system: "file:"
 	 */
 	public static final String FILE_URL_PREFIX = "file:";
-
-	/**
-	 * URL prefixes for loading from the samba path: "smb:"
-	 */
-	public static final String SAMBA_URL_PREFIX = "smb:";
 
 	/**
 	 * URL protocol for a file in the file system: "file"
@@ -226,7 +223,7 @@ public final class FileUtils {
 	 * either a special "classpath" pseudo URL or a standard URL.
 	 *
 	 * @param resourceLocation the location String to check
-	 * @return true when location qualifies as a URL, Boolean.FALSE for others
+	 * @return <code>Boolean.TRUE</code> when location qualifies as a URL, <code>Boolean.FALSE</code> for others
 	 * @see java.net.URL
 	 */
 	public static boolean isUrl(final String resourceLocation) {
@@ -300,7 +297,7 @@ public final class FileUtils {
 		if (resourceLocation == null || resourceLocation.trim().length() == 0) {
 			return Globals.DEFAULT_VALUE_LONG;
 		}
-		if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+		if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(resourceLocation, new BaseContext(new PropertyConfiguration(properties)))) {
 				if (smbFile.exists()) {
 					return smbFile.getLastModified();
@@ -355,7 +352,7 @@ public final class FileUtils {
 		//	Convert resource location to input stream
 		InputStream inputStream;
 
-		if (resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
+		if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
 			inputStream = new SmbFileInputStream(resourceLocation,
 					new BaseContext(new PropertyConfiguration(new Properties())));
 		} else {
@@ -385,7 +382,7 @@ public final class FileUtils {
 
 	public static InputStream loadFile(final String smbLocation, final Properties properties,
 	                                   final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) throws IOException {
-		if (StringUtils.isEmpty(smbLocation) || !smbLocation.startsWith(SAMBA_URL_PREFIX)) {
+		if (StringUtils.isEmpty(smbLocation) || !smbLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
 			throw new IOException("Location is not a valid smb location! ");
 		}
 		return new SmbFileInputStream(smbLocation, generateContext(properties, ntlmPasswordAuthenticator));
@@ -779,7 +776,7 @@ public final class FileUtils {
 			return Globals.DEFAULT_VALUE_LONG;
 		}
 
-		if (resourceLocation.startsWith(SAMBA_URL_PREFIX)) {
+		if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
 			return fileSize(FileUtils.getFile(resourceLocation, cifsContext));
 		} else {
 			try {
@@ -1549,7 +1546,7 @@ public final class FileUtils {
 	 *
 	 * @param fileData file content
 	 * @param filePath write path
-	 * @return true for success and Boolean.FALSE for error
+	 * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
 	 */
 	public static boolean saveFile(final byte[] fileData, final String filePath) {
 		return FileUtils.saveFile(fileData, filePath, new Properties());
@@ -1561,14 +1558,14 @@ public final class FileUtils {
 	 * @param fileData   file content
 	 * @param filePath   write path
 	 * @param properties the properties
-	 * @return true for success and Boolean.FALSE for error
+	 * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
 	 */
 	public static boolean saveFile(final byte[] fileData, final String filePath, final Properties properties) {
 		if (StringUtils.isEmpty(filePath)) {
 			return Boolean.FALSE;
 		}
 
-		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+		if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
 			     OutputStream outputStream = new SmbFileOutputStream(smbFile)) {
 				smbFile.mkdirs();
@@ -1606,7 +1603,7 @@ public final class FileUtils {
 	 *
 	 * @param inputStream file content by input stream
 	 * @param filePath    write to file path
-	 * @return true for success and Boolean.FALSE for error
+	 * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
 	 */
 	public static boolean saveFile(InputStream inputStream, String filePath) {
 		return FileUtils.saveFile(inputStream, filePath, new Properties());
@@ -1618,14 +1615,14 @@ public final class FileUtils {
 	 * @param inputStream file content by input stream
 	 * @param filePath    write to file path
 	 * @param properties  the properties
-	 * @return true for success and Boolean.FALSE for error
+	 * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
 	 */
 	public static boolean saveFile(InputStream inputStream, String filePath, final Properties properties) {
 		if (StringUtils.isEmpty(filePath)) {
 			return Boolean.FALSE;
 		}
 
-		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+		if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
 			     OutputStream outputStream = new SmbFileOutputStream(smbFile)) {
 				smbFile.mkdirs();
@@ -1705,7 +1702,7 @@ public final class FileUtils {
 		OutputStreamWriter outputStreamWriter = null;
 		SmbFile smbFile = null;
 		try {
-			if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+			if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 				smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
 				outputStream = new SmbFileOutputStream(smbFile);
 			} else {
@@ -2253,7 +2250,7 @@ public final class FileUtils {
 			return true;
 		}
 
-		if (destPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+		if (destPath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(destPath,
 					new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties)))) {
 				smbFile.mkdirs();
@@ -2335,7 +2332,7 @@ public final class FileUtils {
 			return Boolean.FALSE;
 		}
 
-		if (resourceLocation.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+		if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(resourceLocation, cifsContext)) {
 				return smbFile.isDirectory();
 			} catch (Exception e) {
@@ -2462,7 +2459,7 @@ public final class FileUtils {
 
 		try {
 			boolean directory;
-			if (originalPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			if (originalPath.startsWith(Globals.SAMBA_PROTOCOL)) {
 				original = FileUtils.getFile(originalPath, originalContext);
 				if (original == null) {
 					return Boolean.FALSE;
@@ -2472,7 +2469,7 @@ public final class FileUtils {
 				original = FileUtils.getFile(originalPath);
 				directory = ((File) original).isDirectory();
 			}
-			if (targetPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			if (targetPath.startsWith(Globals.SAMBA_PROTOCOL)) {
 				target = FileUtils.getFile(targetPath, targetContext);
 			} else {
 				target = FileUtils.getFile(targetPath);
@@ -2515,7 +2512,7 @@ public final class FileUtils {
 	 * @return the boolean
 	 */
 	public static boolean removeDir(final String directoryPath, final CIFSContext cifsContext) {
-		if (directoryPath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+		if (directoryPath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			return FileUtils.removeDir(FileUtils.getFile(directoryPath, cifsContext));
 		} else {
 			try {
@@ -2663,7 +2660,7 @@ public final class FileUtils {
 			return Boolean.FALSE;
 		}
 
-		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+		if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = new SmbFile(filePath, generateContext(properties, ntlmPasswordAuthenticator))) {
 				return smbFile.exists();
 			} catch (Exception e) {
@@ -2804,7 +2801,7 @@ public final class FileUtils {
 			return Boolean.FALSE;
 		}
 
-		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+		if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
 				return smbFile != null && smbFile.canRead();
 			} catch (Exception e) {
@@ -2844,7 +2841,7 @@ public final class FileUtils {
 			return Boolean.FALSE;
 		}
 
-		if (filePath.startsWith(SAMBA_URL_PREFIX)) {
+		if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
 				return smbFile == null || !smbFile.exists() || smbFile.canWrite();
 			} catch (Exception e) {
@@ -2958,7 +2955,7 @@ public final class FileUtils {
 				extName = extName.toLowerCase();
 			}
 			Object fileObject;
-			if (filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+			if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 				fileObject = new SmbFile(filePath, generateContext(smbAuthenticator(domain, userName, passWord)));
 				fileInputStream = new SmbFileInputStream((SmbFile) fileObject);
 			} else {
@@ -3054,9 +3051,8 @@ public final class FileUtils {
 	 */
 	private static String replacePageSeparator(String path) {
 		String replacePath = StringUtils.replace(path, Globals.DEFAULT_PAGE_SEPARATOR, "|");
-		replacePath = StringUtils.replace(replacePath, "/", "|");
-		replacePath = StringUtils.replace(replacePath, "\\", "|");
-		replacePath = StringUtils.replace(replacePath, "\\\\", "|");
+		replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_ZIP_PAGE_SEPARATOR, "|");
+		replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_JAR_PAGE_SEPARATOR, "|");
 		if (replacePath.endsWith("|")) {
 			replacePath = replacePath.substring(0, replacePath.length() - 1);
 		}

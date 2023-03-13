@@ -10,11 +10,12 @@ import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.mail.MailObject;
 import org.nervousync.mail.config.MailConfig;
-import org.nervousync.mail.config.MailConfigBuilder;
+import org.nervousync.mail.config.builder.MailConfigBuilder;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.*;
 
+import java.net.Proxy;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -25,7 +26,7 @@ public final class MailTest extends BaseTest {
     private static final String MAIL_SECURE = "MailSecure";
     private static final String MAIL_SUBJECT = "Test mail";
     private static final String MAIL_CONTENT = "Test mail content";
-    
+
     private static Properties PROPERTIES = null;
     private static MailConfig MAIL_CONFIG = null;
 
@@ -42,34 +43,40 @@ public final class MailTest extends BaseTest {
             return;
         }
         //  Configure security factory
-        boolean initResult = SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
-                .map(SecureFactory::initialize)
-                .orElse(Boolean.FALSE);
-        this.logger.info("Initialize SecureFactory result: {}", initResult);
+        if (!SecureFactory.initialized()) {
+            boolean initResult = SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
+                    .map(SecureFactory::initialize)
+                    .orElse(Boolean.FALSE);
+            this.logger.info("Initialize SecureFactory result: {}", initResult);
+        }
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES192)
                 .ifPresent(secureConfig -> SecureFactory.getInstance().register(MAIL_SECURE, secureConfig));
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
-        X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), (long) IDUtils.random(IDUtils.SNOWFLAKE),
+        X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
         PROPERTIES = PropertiesUtils.loadProperties("src/test/resources/mail.xml");
         MAIL_CONFIG = MailConfigBuilder.newBuilder()
                 .secureName(MAIL_SECURE)
                 .sendConfig()
                 .mailProtocol(MailProtocol.SMTP)
-                .configHost(PROPERTIES.getProperty("config.sendAddress"),
-                        Integer.parseInt(PROPERTIES.getProperty("config.sendPort")))
-                .authLogin(Boolean.TRUE)
-                .useSSL(Boolean.TRUE)
+                .configHost(PROPERTIES.getProperty("config.send.address"),
+                        Integer.parseInt(PROPERTIES.getProperty("config.send.port")))
+                .authLogin(Boolean.parseBoolean(PROPERTIES.getProperty("config.send.auth")))
+                .useSSL(Boolean.parseBoolean(PROPERTIES.getProperty("config.send.ssl")))
                 .connectionTimeout(10)
                 .processTimeout(10)
                 .confirm()
+                .proxyConfig()
+                .proxyType(Proxy.Type.SOCKS)
+                .serverConfig("127.0.0.1", 1080)
+                .confirm()
                 .receiveConfig()
-                .mailProtocol(MailProtocol.valueOf(PROPERTIES.getProperty("config.receiveProtocol")))
-                .configHost(PROPERTIES.getProperty("config.receiveAddress"),
-                        Integer.parseInt(PROPERTIES.getProperty("config.receivePort")))
-                .authLogin(Boolean.TRUE)
-                .useSSL(Boolean.TRUE)
+                .mailProtocol(MailProtocol.valueOf(PROPERTIES.getProperty("config.receive.protocol")))
+                .configHost(PROPERTIES.getProperty("config.receive.address"),
+                        Integer.parseInt(PROPERTIES.getProperty("config.receive.port")))
+                .authLogin(Boolean.parseBoolean(PROPERTIES.getProperty("config.receive.auth")))
+                .useSSL(Boolean.parseBoolean(PROPERTIES.getProperty("config.receive.ssl")))
                 .confirm()
                 .authentication(PROPERTIES.getProperty("config.userName"), PROPERTIES.getProperty("config.passWord"))
                 .storagePath(PROPERTIES.getProperty("config.storagePath"))
@@ -128,7 +135,9 @@ public final class MailTest extends BaseTest {
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
         Assert.assertNotNull(mailAgent);
-        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX).stream().filter(uid ->
+        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+                .stream()
+                .filter(uid ->
                         mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
@@ -152,7 +161,9 @@ public final class MailTest extends BaseTest {
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
         Assert.assertNotNull(mailAgent);
-        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX).stream().filter(uid ->
+        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+                .stream()
+                .filter(uid ->
                         mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
@@ -179,14 +190,15 @@ public final class MailTest extends BaseTest {
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
         Assert.assertNotNull(mailAgent);
-        List<String> mailList = mailAgent.mailList("已删除邮件");
-        mailList.stream().filter(uid ->
-                        mailAgent.readMail("已删除邮件", uid)
+        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_TRASH)
+                .stream()
+                .filter(uid ->
+                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
                         this.logger.info("Recovery mail uid {} result: {}", uid,
-                                mailAgent.recoverMails("已删除邮件", uid)));
+                                mailAgent.recoverMails(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)));
     }
 
     @Test
@@ -196,20 +208,22 @@ public final class MailTest extends BaseTest {
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
         Assert.assertNotNull(mailAgent);
-        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX).stream().filter(uid ->
+        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+                .stream()
+                .filter(uid ->
                         mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
                         this.logger.info("Delete mail result: {}",
                                 mailAgent.deleteMails(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)));
-        mailAgent.mailList("已删除邮件").stream().filter(uid ->
-                        mailAgent.readMail("已删除邮件", uid)
+        mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_TRASH).stream().filter(uid ->
+                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
                         this.logger.info("Drop mail uid: {} result: {}", uid,
-                                mailAgent.deleteMails("已删除邮件", uid)));
+                                mailAgent.deleteMails(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)));
     }
 
     @Test

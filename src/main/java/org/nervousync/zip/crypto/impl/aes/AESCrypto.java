@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,7 +20,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.security.SecureProvider;
 import org.nervousync.security.digest.BaseDigestProvider;
@@ -125,21 +127,21 @@ public class AESCrypto {
 	 * @param aesStrength AES key strength
 	 */
 	void preInit(int aesStrength) {
-		this.iv = new byte[ZipConstants.AES_BLOCK_SIZE];
-		this.countBlock = new byte[ZipConstants.AES_BLOCK_SIZE];
+		this.iv = new byte[Globals.AES_BLOCK_SIZE];
+		this.countBlock = new byte[Globals.AES_BLOCK_SIZE];
 		
 		switch (aesStrength) {
-			case ZipConstants.AES_STRENGTH_128:
+			case Globals.AES_STRENGTH_128:
 				this.keyLength = 16;
 				this.macLength = 16;
 				this.saltLength = 8;
 				break;
-			case ZipConstants.AES_STRENGTH_192:
+			case Globals.AES_STRENGTH_192:
 				this.keyLength = 24;
 				this.macLength = 24;
 				this.saltLength = 12;
 				break;
-			case ZipConstants.AES_STRENGTH_256:
+			case Globals.AES_STRENGTH_256:
 				this.keyLength = 32;
 				this.macLength = 32;
 				this.saltLength = 16;
@@ -293,20 +295,20 @@ public class AESCrypto {
 	 */
 	private void initCrypto(char[] password) throws CryptoException {
 		byte[] keyBytes = this.deriveKey(this.saltBytes, password, 
-				this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH);
+				this.keyLength + this.macLength + Globals.PASSWORD_VERIFIER_LENGTH);
 		
-		if (keyBytes.length != (this.keyLength + this.macLength + ZipConstants.PASSWORD_VERIFIER_LENGTH)) {
+		if (keyBytes.length != (this.keyLength + this.macLength + Globals.PASSWORD_VERIFIER_LENGTH)) {
 			throw new ZipException("Invalid derived key!");
 		}
 
 		byte[] aesKey = new byte[this.keyLength];
 		byte[] macKey = new byte[this.macLength];
-		this.derivedPasswordVerifier = new byte[ZipConstants.PASSWORD_VERIFIER_LENGTH];
+		this.derivedPasswordVerifier = new byte[Globals.PASSWORD_VERIFIER_LENGTH];
 		
 		System.arraycopy(keyBytes, 0, aesKey, 0, this.keyLength);
 		System.arraycopy(keyBytes, this.keyLength, macKey, 0, this.macLength);
 		System.arraycopy(keyBytes, (this.keyLength + this.macLength), 
-				this.derivedPasswordVerifier, 0, ZipConstants.PASSWORD_VERIFIER_LENGTH);
+				this.derivedPasswordVerifier, 0, Globals.PASSWORD_VERIFIER_LENGTH);
 		
 		this.aesEngine = new AESEngine(aesKey);
 		this.macBasedPRF = SecurityUtils.HmacSHA1(macKey);

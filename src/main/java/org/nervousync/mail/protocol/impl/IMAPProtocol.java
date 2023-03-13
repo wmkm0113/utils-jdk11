@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -14,11 +16,12 @@
  */
 package org.nervousync.mail.protocol.impl;
 
-import com.sun.mail.imap.IMAPFolder;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.eclipse.angus.mail.imap.IMAPFolder;
 import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.mail.operator.ReceiveOperator;
 import org.nervousync.mail.operator.SendOperator;
 import org.nervousync.mail.protocol.BaseProtocol;
@@ -43,7 +46,8 @@ public final class IMAPProtocol extends BaseProtocol implements SendOperator, Re
 	/**
 	 * Instantiates a new Imap protocol.
 	 */
-	public IMAPProtocol() {
+	public IMAPProtocol(final String secureName, final ProxyConfig proxyConfig) {
+		super(secureName, proxyConfig);
 		this.hostParam = "mail.imap.host";
 		this.portParam = "mail.imap.port";
 		this.connectionTimeoutParam = "mail.imap.connectiontimeout";

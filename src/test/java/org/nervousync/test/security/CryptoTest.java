@@ -126,7 +126,7 @@ public final class CryptoTest extends BaseTest {
         //  Generate RSA certificate
         KeyPair keyPair = SecurityUtils.RSAKeyPair();
         long currentTime = DateTimeUtils.currentTimeMillis();
-        byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, (Long) IDUtils.random("Snowflake"),
+        byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SHA256withRSA");
         this.logger.info("RSA certificate: {}", StringUtils.base64Encode(pkcs5));
@@ -157,7 +157,7 @@ public final class CryptoTest extends BaseTest {
     public void test050SM2() throws CryptoException {
         KeyPair keyPair = SecurityUtils.SM2KeyPair();
         long currentTime = DateTimeUtils.currentTimeMillis();
-        byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, (Long) IDUtils.random("Snowflake"),
+        byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SM3withSM2");
         this.logger.info("SM2 certificate: {}", StringUtils.base64Encode(pkcs5));

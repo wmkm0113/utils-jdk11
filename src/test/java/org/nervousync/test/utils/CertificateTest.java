@@ -52,7 +52,7 @@ public final class CertificateTest extends BaseTest {
                         ? Globals.DEFAULT_VALUE_STRING
                         : StringUtils.base64Encode(readCertificate.getEncoded()));
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
-        byte[] pkcs12Bytes = CertificateUtils.PKCS12(keyPair, (Long) IDUtils.random("Snowflake"),
+        byte[] pkcs12Bytes = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", SIGN_KEY, "SHA256withRSA");
         FileUtils.saveFile(pkcs12Bytes, BASE_PATH + STORE_PATH);
@@ -88,7 +88,7 @@ public final class CertificateTest extends BaseTest {
 
     private static X509Certificate generateCertificate(final KeyPair keyPair) {
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
-        return CertificateUtils.x509(keyPair.getPublic(), (long) IDUtils.random(IDUtils.SNOWFLAKE),
+        return CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert",
                 (SIGN_KEY == null) ? keyPair.getPrivate() : SIGN_KEY, "SHA1withRSA");
     }

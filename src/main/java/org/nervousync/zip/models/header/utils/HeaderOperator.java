@@ -1,8 +1,26 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.utils.StringUtils;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
@@ -46,13 +63,13 @@ public final class HeaderOperator {
 	public static int retrieveSaltLength(int aesStrength) throws ZipException {
 		int saltLength;
 		switch (aesStrength) {
-			case ZipConstants.AES_STRENGTH_128:
+			case Globals.AES_STRENGTH_128:
 				saltLength = 8;
 				break;
-			case ZipConstants.AES_STRENGTH_192:
+			case Globals.AES_STRENGTH_192:
 				saltLength = 12;
 				break;
-			case ZipConstants.AES_STRENGTH_256:
+			case Globals.AES_STRENGTH_256:
 				saltLength = 16;
 				break;
 			default:
@@ -80,7 +97,7 @@ public final class HeaderOperator {
 		byte[] intBuffer = new byte[4];
 
 		// Extended local file header signature
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) ZipConstants.EXTSIG);
+		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) Globals.EXTSIG);
 		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// CRC

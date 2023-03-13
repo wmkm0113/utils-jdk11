@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,14 +19,14 @@ package org.nervousync.generator;
 /**
  * The interface Generator.
  */
-public interface IGenerator {
+public interface IGenerator<T> {
 
     /**
      * Random object.
      *
      * @return the object
      */
-    Object random();
+    T random();
 
     /**
      * Random object.
@@ -32,6 +34,10 @@ public interface IGenerator {
      * @param dataBytes the data bytes
      * @return the object
      */
-    Object random(byte[] dataBytes);
+    T random(byte[] dataBytes);
 
+    /**
+     * Destroy generator
+     */
+    void destroy();
 }

@@ -1,8 +1,10 @@
 /*
- * Copyright 2018 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -70,33 +72,39 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	/**
 	 * Constructor for open SMB file
 	 *
-	 * @param smbPath  SMB path
+	 * @param filePath SMB path
 	 * @param domain   SMB Authentication Domain
 	 * @param userName SMB Authentication Username
 	 * @param passWord SMB Authentication Password
 	 * @throws FileNotFoundException if connect to SMB file error
 	 */
-	public NervousyncRandomAccessFile(final String smbPath, final String domain,
+	public NervousyncRandomAccessFile(final String filePath, final String domain,
 	                                  final String userName, final String passWord) throws FileNotFoundException {
-		this(smbPath, Boolean.FALSE, domain, userName, passWord);
+		this(filePath, Boolean.FALSE, domain, userName, passWord);
 	}
 
 	/**
 	 * Constructor for open SMB file
 	 *
-	 * @param smbPath  SMB path
+	 * @param filePath SMB path
 	 * @param writable the writable
 	 * @param domain   SMB Authentication Domain
 	 * @param userName SMB Authentication Username
 	 * @param passWord SMB Authentication Password
 	 * @throws FileNotFoundException if connect to SMB file error
 	 */
-	public NervousyncRandomAccessFile(final String smbPath, final boolean writable, final String domain,
+	public NervousyncRandomAccessFile(final String filePath, final boolean writable, final String domain,
 	                                  final String userName, final String passWord) throws FileNotFoundException {
-		this.filePath = smbPath;
-		this.domain = domain;
-		this.userName = userName;
-		this.passWord = passWord;
+		this.filePath = filePath;
+		if (this.filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+			this.domain = domain;
+			this.userName = userName;
+			this.passWord = passWord;
+		} else {
+			this.domain = Globals.DEFAULT_VALUE_STRING;
+			this.userName = Globals.DEFAULT_VALUE_STRING;
+			this.passWord = Globals.DEFAULT_VALUE_STRING;
+		}
 		this.openFile(writable ? Globals.WRITE_MODE : Globals.READ_MODE);
 	}
 
@@ -576,7 +584,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @throws FileNotFoundException	if target file was not found
 	 */
 	private void openFile(String mode) throws FileNotFoundException {
-		if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
+		if (this.filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			try {
 				this.originObject = FileUtils.getFile(this.filePath,
 						FileUtils.smbAuthenticator(this.domain, this.userName, this.passWord));

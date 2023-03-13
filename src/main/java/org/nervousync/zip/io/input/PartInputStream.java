@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.exceptions.zip.ZipException;
@@ -40,7 +41,7 @@ public class PartInputStream extends InputStream {
 	private final long length;
 	private final Decryptor decryptor;
 	private final byte[] oneByteBuffer = new byte[1];
-	private final byte[] aesBlockBuffer = new byte[ZipConstants.AES_BLOCK_SIZE];
+	private final byte[] aesBlockBuffer = new byte[Globals.AES_BLOCK_SIZE];
 	private int aesBytesReturned = 0;
 	private final boolean isAESEncryptedFile;
 
@@ -198,16 +199,16 @@ public class PartInputStream extends InputStream {
 				return;
 			}
 			
-			byte[] storedMac = new byte[ZipConstants.AES_AUTH_LENGTH];
+			byte[] storedMac = new byte[Globals.AES_AUTH_LENGTH];
 			int readLength = this.input.read(storedMac);
 			
-			if (readLength != ZipConstants.AES_AUTH_LENGTH) {
+			if (readLength != Globals.AES_AUTH_LENGTH) {
 				if (this.zipFile.isSplitArchive()) {
 					this.input.close();
 					this.currentIndex++;
 					this.input = this.zipFile.openSplitFile(this.currentIndex);
 					int newReadLength = this.input.read(storedMac, 
-							readLength, ZipConstants.AES_AUTH_LENGTH - readLength);
+							readLength, Globals.AES_AUTH_LENGTH - readLength);
 					
 					readLength += newReadLength;
 				} else {
@@ -215,7 +216,7 @@ public class PartInputStream extends InputStream {
 				}
 			}
 
-			if (readLength != ZipConstants.AES_AUTH_LENGTH) {
+			if (readLength != Globals.AES_AUTH_LENGTH) {
 				throw new ZipException("Error occurred while reading stored AES authentication bytes");
 			}
 			

@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,7 +18,7 @@ package org.nervousync.zip.models.header;
 
 import java.util.List;
 
-import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.zip.models.AESExtraDataRecord;
 import org.nervousync.zip.models.ExtraDataRecord;
 import org.nervousync.zip.models.Zip64ExtendInfo;
@@ -48,7 +50,7 @@ public class FileHeader {
 	private boolean fileNameUTF8Encoded;
 	private boolean isEncrypted;
 	private boolean dataDescriptorExists;
-	private int encryptionMethod = ZipConstants.ENC_NO_ENCRYPTION;
+	private int encryptionMethod = Globals.ENC_NO_ENCRYPTION;
 
 	/**
 	 * Instantiates a new File header.

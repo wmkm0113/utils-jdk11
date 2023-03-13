@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,7 +21,6 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.impl.aes.AESCrypto;
 import org.nervousync.zip.models.header.utils.HeaderOperator;
@@ -109,7 +110,7 @@ public final class LocalFileHeader extends FileHeader {
 		}
 
 		try {
-			if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+			if (this.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 				if (this.getAesExtraDataRecord() != null) {
 					byte[] salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
 					int readLength = Globals.DEFAULT_VALUE_INT;
@@ -140,7 +141,7 @@ public final class LocalFileHeader extends FileHeader {
 					}
 				}
 				return Boolean.FALSE;
-			} else if (this.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
+			} else if (this.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
 				//	Not supported verify password of standard encrypt
 				return true;
 			} else {

@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,28 +18,10 @@ package org.nervousync.generator.uuid;
 
 import org.nervousync.generator.IGenerator;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.UUID;
-
 /**
  * The type Uuid generator.
  */
-public abstract class UUIDGenerator implements IGenerator {
-
-    /**
-     * Convert uuid to big integer.
-     *
-     * @param uuid the uuid
-     * @return the big integer
-     */
-    public static BigInteger UUIDtoBigInteger(UUID uuid) {
-        byte[] dataBytes = ByteBuffer.allocate(16)
-                .putLong(uuid.getMostSignificantBits())
-                .putLong(uuid.getLeastSignificantBits())
-                .array();
-        return new BigInteger(dataBytes);
-    }
+public abstract class UUIDGenerator implements IGenerator<String> {
 
     /**
      * High bits long.
@@ -78,5 +62,9 @@ public abstract class UUIDGenerator implements IGenerator {
             lowBits = (lowBits << 8) | (dataBytes[index] & 0xFF);
         }
         return lowBits;
+    }
+
+    @Override
+    public void destroy() {
     }
 }

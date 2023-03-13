@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.commons.io.NervousyncRandomAccessFile;
 import org.nervousync.utils.FileUtils;
@@ -37,17 +38,17 @@ public class SplitOutputStream extends OutputStream {
 	private static final long[] HEADER_SIGNATURES = new long[11];
 	
 	static {
-		HEADER_SIGNATURES[0] = ZipConstants.LOCSIG;
-		HEADER_SIGNATURES[1] = ZipConstants.EXTSIG;
-		HEADER_SIGNATURES[2] = ZipConstants.CENSIG;
-		HEADER_SIGNATURES[3] = ZipConstants.ENDSIG;
-		HEADER_SIGNATURES[4] = ZipConstants.DIGSIG;
-		HEADER_SIGNATURES[5] = ZipConstants.ARCEXTDATREC;
-		HEADER_SIGNATURES[6] = ZipConstants.SPLITSIG;
-		HEADER_SIGNATURES[7] = ZipConstants.ZIP64ENDCENDIRLOC;
-		HEADER_SIGNATURES[8] = ZipConstants.ZIP64ENDCENDIRREC;
-		HEADER_SIGNATURES[9] = ZipConstants.EXTRAFIELDZIP64LENGTH;
-		HEADER_SIGNATURES[10] = ZipConstants.AESSIG;
+		HEADER_SIGNATURES[0] = Globals.LOCSIG;
+		HEADER_SIGNATURES[1] = Globals.EXTSIG;
+		HEADER_SIGNATURES[2] = Globals.CENSIG;
+		HEADER_SIGNATURES[3] = Globals.ENDSIG;
+		HEADER_SIGNATURES[4] = Globals.DIGSIG;
+		HEADER_SIGNATURES[5] = Globals.ARCEXTDATREC;
+		HEADER_SIGNATURES[6] = Globals.SPLITSIG;
+		HEADER_SIGNATURES[7] = Globals.ZIP64ENDCENDIRLOC;
+		HEADER_SIGNATURES[8] = Globals.ZIP64ENDCENDIRREC;
+		HEADER_SIGNATURES[9] = Globals.EXTRAFIELDZIP64LENGTH;
+		HEADER_SIGNATURES[10] = Globals.AESSIG;
 	}
 	
 	private NervousyncRandomAccessFile dataOutput;
@@ -78,17 +79,18 @@ public class SplitOutputStream extends OutputStream {
 	 * @throws ZipException          the zip exception
 	 */
 	public SplitOutputStream(String savePath, long splitLength) throws FileNotFoundException, ZipException {
-		if (splitLength >= 0 && splitLength < ZipConstants.MIN_SPLIT_LENGTH) {
-			throw new ZipException("split length less than minimum allowed split length of " + ZipConstants.MIN_SPLIT_LENGTH +" Bytes");
+		if (splitLength >= 0 && splitLength < Globals.MIN_SPLIT_LENGTH) {
+			throw new ZipException("split length less than minimum allowed split length of " + Globals.MIN_SPLIT_LENGTH +" Bytes");
 		}
-		
-		if (savePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-			this.filePath = savePath.substring(0, savePath.lastIndexOf("/"));
-			this.fileName = StringUtils.stripFilenameExtension(savePath.substring(savePath.lastIndexOf("/") + 1));
+
+		int beginIndex;
+		if (savePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+			beginIndex = savePath.lastIndexOf(Globals.DEFAULT_URL_SEPARATOR);
 		} else {
-			this.filePath = savePath.substring(0, savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
-			this.fileName = StringUtils.stripFilenameExtension(savePath.substring(savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR) + 1));
+			beginIndex = savePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR);
 		}
+		this.filePath = savePath.substring(0, beginIndex);
+		this.fileName = StringUtils.stripFilenameExtension(savePath.substring(beginIndex + 1));
 		this.dataOutput = new NervousyncRandomAccessFile(savePath, Boolean.TRUE);
 		this.currentFullPath = savePath;
 		this.splitLength = splitLength;
@@ -120,8 +122,8 @@ public class SplitOutputStream extends OutputStream {
 		}
 		
 		if (this.splitLength != Globals.DEFAULT_VALUE_LONG) {
-			if (this.splitLength < ZipConstants.MIN_SPLIT_LENGTH) {
-				throw new ZipException("split length less than minimum allowed split length of " + ZipConstants.MIN_SPLIT_LENGTH +" Bytes");
+			if (this.splitLength < Globals.MIN_SPLIT_LENGTH) {
+				throw new ZipException("split length less than minimum allowed split length of " + Globals.MIN_SPLIT_LENGTH +" Bytes");
 			}
 			
 			if (this.bytesWrittenForThisPart >= this.splitLength) {
@@ -179,7 +181,7 @@ public class SplitOutputStream extends OutputStream {
 			throw new ZipException("negative buffer size for checkBuffSizeAndStartNextSplitFile");
 		}
 		
-		if (this.splitLength >= ZipConstants.MIN_SPLIT_LENGTH) {
+		if (this.splitLength >= Globals.MIN_SPLIT_LENGTH) {
 			return (this.bytesWrittenForThisPart + bufferSize <= this.splitLength);
 		} else {
 			return true;
@@ -241,8 +243,8 @@ public class SplitOutputStream extends OutputStream {
 		try {
 			String folderPath;
 			
-			if (this.filePath.startsWith(FileUtils.SAMBA_URL_PREFIX)) {
-				folderPath = this.filePath + "/";
+			if (this.filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+				folderPath = this.filePath + Globals.DEFAULT_URL_SEPARATOR;
 			} else {
 				folderPath = this.filePath + Globals.DEFAULT_PAGE_SEPARATOR;
 			}
@@ -277,7 +279,7 @@ public class SplitOutputStream extends OutputStream {
 			int signature = RawUtils.readInt(buffer, 0, RawUtils.Endian.LITTLE);
 			
 			for (long headerSignature : HEADER_SIGNATURES) {
-				if (headerSignature != ZipConstants.SPLITSIG && headerSignature == signature) {
+				if (headerSignature != Globals.SPLITSIG && headerSignature == signature) {
 					return Boolean.TRUE;
 				}
 			}

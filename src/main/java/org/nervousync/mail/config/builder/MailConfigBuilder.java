@@ -1,8 +1,10 @@
 /*
- * Copyright 2021 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -12,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.mail.config;
+package org.nervousync.mail.config.builder;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.core.RegexGlobals;
-import org.nervousync.enumerations.mail.MailProtocol;
+import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.exceptions.builder.BuilderException;
+import org.nervousync.mail.config.MailConfig;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
@@ -31,6 +34,7 @@ public final class MailConfigBuilder {
 	private String secureName;
 	private String userName;
 	private String passWord;
+	private ProxyConfig proxyConfig = ProxyConfig.redirect();
 	private MailConfig.ServerConfig sendConfig;
 	private MailConfig.ServerConfig receiveConfig;
 	private String storagePath;
@@ -66,7 +70,13 @@ public final class MailConfigBuilder {
 
 	public MailConfigBuilder secureName(final String secureName) {
 		if (StringUtils.notBlank(secureName) && SecureFactory.getInstance().registeredConfig(secureName)) {
-			this.passWord = SecureFactory.getInstance().update(this.passWord, this.secureName, secureName);
+			SecureFactory secureFactory = SecureFactory.getInstance();
+			if (StringUtils.notBlank(this.passWord)) {
+				this.passWord = secureFactory.update(this.passWord, this.secureName, secureName);
+			}
+			if (StringUtils.notBlank(this.proxyConfig.getPassword())) {
+				this.proxyConfig.setPassword(secureFactory.update(this.proxyConfig.getPassword(), this.secureName, secureName));
+			}
 			this.secureName = secureName;
 		}
 		return this;
@@ -80,7 +90,7 @@ public final class MailConfigBuilder {
 	 * @return the builder
 	 * @throws BuilderException the builder exception
 	 */
-	public MailConfigBuilder authentication(String userName, String passWord) throws BuilderException {
+	public MailConfigBuilder authentication(final String userName, final String passWord) throws BuilderException {
 		if (!StringUtils.matches(userName, RegexGlobals.EMAIL_ADDRESS)) {
 			throw new BuilderException("Invalid username");
 		}
@@ -95,12 +105,16 @@ public final class MailConfigBuilder {
 		return this;
 	}
 
-	public MailServerBuilder sendConfig() {
-		return new MailServerBuilder(this, ServerType.SEND, this.sendConfig);
+	public ProxyConfigBuilder proxyConfig() {
+		return new ProxyConfigBuilder(this, this.secureName, this.proxyConfig);
 	}
 
-	public MailServerBuilder receiveConfig() {
-		return new MailServerBuilder(this, ServerType.RECEIVE, this.sendConfig);
+	public ServerConfigBuilder sendConfig() {
+		return new ServerConfigBuilder(this, Boolean.TRUE, this.sendConfig);
+	}
+
+	public ServerConfigBuilder receiveConfig() {
+		return new ServerConfigBuilder(this, Boolean.FALSE, this.sendConfig);
 	}
 
 	/**
@@ -154,6 +168,7 @@ public final class MailConfigBuilder {
 		mailConfig.setSecureName(this.secureName);
 		mailConfig.setUserName(this.userName);
 		mailConfig.setPassWord(this.passWord);
+		mailConfig.setProxyConfig(this.proxyConfig);
 		mailConfig.setSendConfig(this.sendConfig);
 		mailConfig.setReceiveConfig(this.receiveConfig);
 		mailConfig.setStoragePath(this.storagePath);
@@ -163,168 +178,29 @@ public final class MailConfigBuilder {
 		return mailConfig;
 	}
 
+	void proxyConfig(final ProxyConfig proxyConfig) {
+		this.proxyConfig = proxyConfig;
+	}
+
 	/**
 	 * Send config builder.
 	 *
 	 * @param sendConfig send config
-	 * @return the builder
 	 */
-	private MailConfigBuilder sendConfig(MailConfig.ServerConfig sendConfig) {
+	void sendConfig(final MailConfig.ServerConfig sendConfig) {
 		if (sendConfig != null) {
 			this.sendConfig = sendConfig;
 		}
-		return this;
 	}
 
 	/**
 	 * Receive config builder.
 	 *
 	 * @param receiveConfig receive config
-	 * @return the builder
 	 */
-	private MailConfigBuilder receiveConfig(MailConfig.ServerConfig receiveConfig) {
+	void receiveConfig(final MailConfig.ServerConfig receiveConfig) {
 		if (receiveConfig != null) {
 			this.receiveConfig = receiveConfig;
 		}
-		return this;
-	}
-
-	public static final class MailServerBuilder {
-
-		private final MailConfigBuilder mailConfigBuilder;
-		private final ServerType serverType;
-		private String hostName;
-		private int hostPort = Globals.DEFAULT_VALUE_INT;
-		private boolean ssl;
-		private boolean authLogin;
-		private MailProtocol protocolOption = MailProtocol.UNKNOWN;
-		private int connectionTimeout = 5;
-		private int processTimeout = 5;
-
-		/**
-		 * Instantiates a new Builder.
-		 *
-		 * @param serverConfig the server config
-		 */
-		private MailServerBuilder(final MailConfigBuilder mailConfigBuilder, final ServerType serverType,
-		                          final MailConfig.ServerConfig serverConfig) {
-			this.mailConfigBuilder = mailConfigBuilder;
-			this.serverType = serverType;
-			if (serverConfig != null) {
-				this.hostName = serverConfig.getHostName();
-				this.hostPort = serverConfig.getHostPort();
-				this.ssl = serverConfig.isSsl();
-				this.authLogin = serverConfig.isAuthLogin();
-				this.protocolOption = serverConfig.getProtocolOption();
-				this.connectionTimeout = serverConfig.getConnectionTimeout();
-				this.processTimeout = serverConfig.getProcessTimeout();
-			}
-		}
-
-		/**
-		 * Config host builder.
-		 *
-		 * @param hostAddress the host address
-		 * @param hostPort    the host port
-		 * @return the builder
-		 */
-		public MailServerBuilder configHost(String hostAddress, int hostPort) {
-			this.hostName = hostAddress;
-			if (hostPort > 0) {
-				this.hostPort = hostPort;
-			}
-			return this;
-		}
-
-		/**
-		 * Use ssl builder.
-		 *
-		 * @param useSSL the use ssl
-		 * @return the builder
-		 */
-		public MailServerBuilder useSSL(boolean useSSL) {
-			this.ssl = useSSL;
-			return this;
-		}
-
-		/**
-		 * Auth login builder.
-		 *
-		 * @param authLogin the auth login
-		 * @return the builder
-		 */
-		public MailServerBuilder authLogin(boolean authLogin) {
-			this.authLogin = authLogin;
-			return this;
-		}
-
-		public MailServerBuilder mailProtocol(final MailProtocol protocolOption) {
-			if (!MailProtocol.UNKNOWN.equals(protocolOption)) {
-				this.protocolOption = protocolOption;
-			}
-			return this;
-		}
-
-		/**
-		 * Connection time out builder.
-		 *
-		 * @param connectionTimeout the connection timeout
-		 * @return the builder
-		 */
-		public MailServerBuilder connectionTimeout(int connectionTimeout) {
-			if (connectionTimeout > 0) {
-				this.connectionTimeout = connectionTimeout;
-			}
-			return this;
-		}
-
-		/**
-		 * Process timeout builder.
-		 *
-		 * @param processTimeout the process timeout
-		 * @return the builder
-		 */
-		public MailServerBuilder processTimeout(int processTimeout) {
-			if (processTimeout > 0) {
-				this.processTimeout = processTimeout;
-			}
-			return this;
-		}
-
-		/**
-		 * Build server config.
-		 *
-		 * @return the server config
-		 * @throws BuilderException the builder exception
-		 */
-		public MailConfigBuilder confirm() throws BuilderException {
-			if (StringUtils.isEmpty(this.hostName)) {
-				throw new BuilderException("Unknown server host address! ");
-			}
-			if (MailProtocol.UNKNOWN.equals(this.protocolOption)) {
-				throw new BuilderException("Unknown mail protocol! ");
-			}
-			MailConfig.ServerConfig serverConfig = new MailConfig.ServerConfig();
-			serverConfig.setHostName(this.hostName);
-			serverConfig.setHostPort(this.hostPort);
-			serverConfig.setSsl(this.ssl);
-			serverConfig.setAuthLogin(this.authLogin);
-			serverConfig.setProtocolOption(this.protocolOption);
-			serverConfig.setConnectionTimeout(this.connectionTimeout);
-			serverConfig.setProcessTimeout(this.processTimeout);
-
-			switch (this.serverType) {
-				case SEND:
-					return this.mailConfigBuilder.sendConfig(serverConfig);
-				case RECEIVE:
-					return this.mailConfigBuilder.receiveConfig(serverConfig);
-				default:
-					return this.mailConfigBuilder;
-			}
-		}
-	}
-	
-	private enum ServerType {
-		SEND, RECEIVE
 	}
 }

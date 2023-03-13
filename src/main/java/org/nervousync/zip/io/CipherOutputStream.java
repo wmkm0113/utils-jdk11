@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,7 +24,6 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipConstants;
 import org.nervousync.commons.core.zip.ZipOptions;
 import org.nervousync.zip.crypto.Encryptor;
 import org.nervousync.zip.crypto.impl.aes.AESEncryptor;
@@ -95,7 +96,7 @@ public class CipherOutputStream extends OutputStream {
 		this.totalWriteBytes = 0L;
 		this.bytesWrittenForThisFile = 0L;
 		this.totalReadBytes = 0L;
-		this.pendingBuffer = new byte[ZipConstants.AES_BLOCK_SIZE];
+		this.pendingBuffer = new byte[Globals.AES_BLOCK_SIZE];
 		this.pendingBufferLength = 0;
 	}
 
@@ -121,18 +122,18 @@ public class CipherOutputStream extends OutputStream {
 
 			if (this.zipOptions.isSourceExternalStream()) {
 				if (StringUtils.notBlank(this.zipOptions.getFileNameInZip())) {
-					if (this.zipOptions.getFileNameInZip().endsWith(ZipConstants.ZIP_FILE_SEPARATOR)
+					if (this.zipOptions.getFileNameInZip().endsWith(Globals.ZIP_FILE_SEPARATOR)
 							|| this.zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 						this.zipOptions.setEncryptFiles(Boolean.FALSE);
-						this.zipOptions.setEncryptionMethod(ZipConstants.ENC_NO_ENCRYPTION);
-						this.zipOptions.setCompressionMethod(ZipConstants.COMP_STORE);
+						this.zipOptions.setEncryptionMethod(Globals.ENC_NO_ENCRYPTION);
+						this.zipOptions.setCompressionMethod(Globals.COMP_STORE);
 					}
 				}
 			} else {
 				if (this.sourceFile.isDirectory()) {
 					this.zipOptions.setEncryptFiles(Boolean.FALSE);
-					this.zipOptions.setEncryptionMethod(ZipConstants.ENC_NO_ENCRYPTION);
-					this.zipOptions.setCompressionMethod(ZipConstants.COMP_STORE);
+					this.zipOptions.setEncryptionMethod(Globals.ENC_NO_ENCRYPTION);
+					this.zipOptions.setCompressionMethod(Globals.COMP_STORE);
 				}
 			}
 			
@@ -144,7 +145,7 @@ public class CipherOutputStream extends OutputStream {
 						|| this.zipFile.getCentralDirectory().getFileHeaders() == null
 						|| this.zipFile.getCentralDirectory().getFileHeaders().size() == 0) {
 					byte[] intBuffer = new byte[4];
-					RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) ZipConstants.SPLITSIG);
+					RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) Globals.SPLITSIG);
 					this.outputStream.write(intBuffer);
 					this.totalWriteBytes += 4L;
 				}
@@ -170,12 +171,12 @@ public class CipherOutputStream extends OutputStream {
 			if (this.zipOptions.isEncryptFiles()) {
 				this.initEncryptor();
 				if (this.encryptor != null) {
-					if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
+					if (this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
 						byte[] headerBytes = ((StandardEncryptor) this.encryptor).getHeaderBytes();
 						this.outputStream.write(headerBytes);
 						this.totalWriteBytes += headerBytes.length;
 						this.bytesWrittenForThisFile += headerBytes.length;
-					} else if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+					} else if (this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 						byte[] saltBytes = ((AESEncryptor) this.encryptor).getSaltBytes();
 						byte[] passwordVerifier = ((AESEncryptor) this.encryptor).getDerivedPasswordVerifier();
 						this.outputStream.write(saltBytes);
@@ -216,13 +217,13 @@ public class CipherOutputStream extends OutputStream {
 			return;
 		}
 
-		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 			if (this.pendingBufferLength != 0) {
-				if (len >= (ZipConstants.AES_BLOCK_SIZE - this.pendingBufferLength)) {
+				if (len >= (Globals.AES_BLOCK_SIZE - this.pendingBufferLength)) {
 					System.arraycopy(b, off, this.pendingBuffer, this.pendingBufferLength,
-							(ZipConstants.AES_BLOCK_SIZE - this.pendingBufferLength));
+							(Globals.AES_BLOCK_SIZE - this.pendingBufferLength));
 					this.encryptAndWrite(this.pendingBuffer, 0, this.pendingBuffer.length);
-					off = (ZipConstants.AES_BLOCK_SIZE - this.pendingBufferLength);
+					off = (Globals.AES_BLOCK_SIZE - this.pendingBufferLength);
 					len -= off;
 					this.pendingBufferLength = 0;
 				} else {
@@ -256,7 +257,7 @@ public class CipherOutputStream extends OutputStream {
 			this.pendingBufferLength = 0;
 		}
 
-		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 			if (this.encryptor instanceof AESEncryptor) {
 				this.outputStream.write(((AESEncryptor) this.encryptor).getFinalMac());
 				this.bytesWrittenForThisFile += 10;
@@ -279,7 +280,7 @@ public class CipherOutputStream extends OutputStream {
 		long crc32 = this.crc.getValue();
 
 		if (this.generalFileHeader.isEncrypted()
-				&& this.generalFileHeader.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+				&& this.generalFileHeader.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 			crc32 = 0L;
 		}
 
@@ -363,18 +364,18 @@ public class CipherOutputStream extends OutputStream {
 			}
 		}
 
-		this.zipFile.getEndCentralDirectoryRecord().setSignature(ZipConstants.ENDSIG);
+		this.zipFile.getEndCentralDirectoryRecord().setSignature(Globals.ENDSIG);
 	}
 
 	private void createGeneralFileHeaders() throws ZipException {
 		this.generalFileHeader = new GeneralFileHeader();
 
-		this.generalFileHeader.setSignature((int) ZipConstants.CENSIG);
+		this.generalFileHeader.setSignature((int) Globals.CENSIG);
 		this.generalFileHeader.setMadeVersion(20);
 		this.generalFileHeader.setExtractNeeded(20);
 
-		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
-			this.generalFileHeader.setCompressionMethod(ZipConstants.ENC_METHOD_AES);
+		if (this.zipOptions.isEncryptFiles() && this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
+			this.generalFileHeader.setCompressionMethod(Globals.ENC_METHOD_AES);
 			this.generateAESExtraDataRecord();
 		} else {
 			this.generalFileHeader.setCompressionMethod(this.zipOptions.getCompressionMethod());
@@ -430,7 +431,7 @@ public class CipherOutputStream extends OutputStream {
 		
 		boolean isDirectory;
 		if (this.zipOptions.isSourceExternalStream()) {
-			isDirectory = entryPath.endsWith(ZipConstants.ZIP_FILE_SEPARATOR) 
+			isDirectory = entryPath.endsWith(Globals.ZIP_FILE_SEPARATOR) 
 					|| entryPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR);
 		} else {
 			isDirectory = this.sourceFile.isDirectory();
@@ -443,23 +444,23 @@ public class CipherOutputStream extends OutputStream {
 		} else {
 			if (!this.zipOptions.isSourceExternalStream()) {
 				long fileSize = FileUtils.fileSize(this.sourceFile);
-				if (this.zipOptions.getCompressionMethod() == ZipConstants.COMP_STORE) {
-					if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
-						this.generalFileHeader.setCompressedSize(fileSize + ZipConstants.STD_DEC_HDR_SIZE);
-					} else if (this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_AES) {
+				if (this.zipOptions.getCompressionMethod() == Globals.COMP_STORE) {
+					if (this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
+						this.generalFileHeader.setCompressedSize(fileSize + Globals.STD_DEC_HDR_SIZE);
+					} else if (this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 						int saltLength;
 						switch (this.zipOptions.getAesKeyStrength()) {
-						case ZipConstants.AES_STRENGTH_128:
+						case Globals.AES_STRENGTH_128:
 							saltLength = 8;
 							break;
-						case ZipConstants.AES_STRENGTH_256:
+						case Globals.AES_STRENGTH_256:
 							saltLength = 16;
 							break;
 						default:
 							throw new ZipException("invalid aes key strength, cannot determine key sizes");
 						}
 						this.generalFileHeader
-								.setCompressedSize(fileSize + saltLength + ZipConstants.AES_AUTH_LENGTH + 2);
+								.setCompressedSize(fileSize + saltLength + Globals.AES_AUTH_LENGTH + 2);
 					} else {
 						this.generalFileHeader.setCompressedSize(0L);
 					}
@@ -471,7 +472,7 @@ public class CipherOutputStream extends OutputStream {
 		}
 
 		if (this.zipOptions.isEncryptFiles()
-				&& this.zipOptions.getEncryptionMethod() == ZipConstants.ENC_METHOD_STANDARD) {
+				&& this.zipOptions.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
 			this.generalFileHeader.setCrc32(this.zipOptions.getSourceFileCRC());
 		}
 
@@ -497,16 +498,16 @@ public class CipherOutputStream extends OutputStream {
 		}
 
 		AESExtraDataRecord aesExtraDataRecord = new AESExtraDataRecord();
-		aesExtraDataRecord.setSignature(ZipConstants.AESSIG);
+		aesExtraDataRecord.setSignature(Globals.AESSIG);
 		aesExtraDataRecord.setDataSize(7);
 		aesExtraDataRecord.setVendorID("AE");
 
 		aesExtraDataRecord.setVersionNumber(2);
 
-		if (this.zipOptions.getAesKeyStrength() == ZipConstants.AES_STRENGTH_128) {
-			aesExtraDataRecord.setAesStrength(ZipConstants.AES_STRENGTH_128);
-		} else if (this.zipOptions.getAesKeyStrength() == ZipConstants.AES_STRENGTH_256) {
-			aesExtraDataRecord.setAesStrength(ZipConstants.AES_STRENGTH_256);
+		if (this.zipOptions.getAesKeyStrength() == Globals.AES_STRENGTH_128) {
+			aesExtraDataRecord.setAesStrength(Globals.AES_STRENGTH_128);
+		} else if (this.zipOptions.getAesKeyStrength() == Globals.AES_STRENGTH_256) {
+			aesExtraDataRecord.setAesStrength(Globals.AES_STRENGTH_256);
 		} else {
 			throw new ZipException("invalid AES key strength, cannot generate AES Extra data record");
 		}
@@ -526,12 +527,12 @@ public class CipherOutputStream extends OutputStream {
 		}
 
 		if (file.isDirectory()) {
-			return ZipConstants.FOLDER_MODE_NONE;
+			return Globals.FOLDER_MODE_NONE;
 		} else {
 			if (!file.canWrite()) {
-				return ZipConstants.FILE_MODE_READ_ONLY;
+				return Globals.FILE_MODE_READ_ONLY;
 			} else {
-				return ZipConstants.FILE_MODE_NONE;
+				return Globals.FILE_MODE_NONE;
 			}
 		}
 	}
@@ -545,7 +546,7 @@ public class CipherOutputStream extends OutputStream {
 			generalPurposeFlag[0] = 0;
 		}
 
-		if (compressionMethod != ZipConstants.COMP_DEFLATE) {
+		if (compressionMethod != Globals.COMP_DEFLATE) {
 			generalPurposeFlag[1] = 0;
 			generalPurposeFlag[2] = 0;
 		}
@@ -562,7 +563,7 @@ public class CipherOutputStream extends OutputStream {
 
 		this.localFileHeader = new LocalFileHeader();
 
-		this.localFileHeader.setSignature((int) ZipConstants.LOCSIG);
+		this.localFileHeader.setSignature((int) Globals.LOCSIG);
 		this.localFileHeader.setExtractNeeded(this.generalFileHeader.getExtractNeeded());
 		this.localFileHeader.setCompressionMethod(this.generalFileHeader.getCompressionMethod());
 		this.localFileHeader.setLastModFileTime(this.generalFileHeader.getLastModFileTime());
@@ -580,11 +581,11 @@ public class CipherOutputStream extends OutputStream {
 	private void initEncryptor() throws ZipException {
 		if (this.zipOptions.isEncryptFiles()) {
 			switch (this.zipOptions.getEncryptionMethod()) {
-			case ZipConstants.ENC_METHOD_STANDARD:
+			case Globals.ENC_METHOD_STANDARD:
 				this.encryptor = new StandardEncryptor(this.zipOptions.getPassword(),
 						(this.localFileHeader.getLastModFileTime() & 0x0000FFFF) << 16);
 				break;
-			case ZipConstants.ENC_METHOD_AES:
+			case Globals.ENC_METHOD_AES:
 				this.encryptor = new AESEncryptor(this.zipOptions.getPassword(), this.zipOptions.getAesKeyStrength());
 				break;
 			default:
@@ -628,8 +629,8 @@ public class CipherOutputStream extends OutputStream {
 			boolean writingZip64Record = Boolean.FALSE;
 
 			long originalSize = localFileHeader.getOriginalSize();
-			if (originalSize + ZipConstants.ZIP64_EXTRA_BUFFER_SIZE >= ZipConstants.ZIP_64_LIMIT) {
-				RawUtils.writeLong(longBuffer, RawUtils.Endian.LITTLE, ZipConstants.ZIP_64_LIMIT);
+			if (originalSize + Globals.ZIP64_EXTRA_BUFFER_SIZE >= Globals.ZIP_64_LIMIT) {
+				RawUtils.writeLong(longBuffer, RawUtils.Endian.LITTLE, Globals.ZIP_64_LIMIT);
 				System.arraycopy(longBuffer, 0, intBuffer, 0, 4);
 
 				HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
@@ -671,7 +672,7 @@ public class CipherOutputStream extends OutputStream {
 			}
 
 			if (writingZip64Record) {
-				RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, (short) ZipConstants.EXTRAFIELDZIP64LENGTH);
+				RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, (short) Globals.EXTRAFIELDZIP64LENGTH);
 				HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
 				RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, (short) 16);

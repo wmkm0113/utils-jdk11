@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -1761,6 +1763,9 @@ public final class StringUtils {
 				}
 				return beanClass.cast(unmarshaller.unmarshal(inputStream));
 			} catch (JAXBException | SAXException e) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Parse error! ", e);
+				}
 				return null;
 			}
 		} else {

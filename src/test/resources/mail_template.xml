@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="config.send.address"><!-- SMTP server address --></entry>
+    <entry key="config.send.port"><!-- SMTP server port --></entry>
+    <entry key="config.send.ssl"><!-- SMTP server using ssl, value: true/false --></entry>
+    <entry key="config.send.auth"><!-- SMTP server authenticate login status, value: true/false --></entry>
+    <entry key="config.receive.protocol"><!-- Receive server protocol, value: POP3/IMAP --></entry>
+    <entry key="config.receive.address"><!-- Receive server address --></entry>
+    <entry key="config.receive.port"><!-- Receive server port --></entry>
+    <entry key="config.receive.ssl"><!-- SMTP server using ssl, value: true/false --></entry>
+    <entry key="config.receive.auth"><!-- SMTP server authenticate login status, value: true/false --></entry>
+    <entry key="config.userName"><!-- Authenticate username/email address --></entry>
+    <entry key="config.passWord"><!-- Authenticate password --></entry>
+    <entry key="config.storagePath"><!-- Attachment file storage path --></entry>
+    <entry key="mail.sender"><!-- Test mail sender address --></entry>
+    <entry key="mail.receiver"><!-- Test mail receiver address --></entry>
+</properties>

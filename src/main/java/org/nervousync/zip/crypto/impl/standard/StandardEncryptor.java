@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,7 +18,7 @@ package org.nervousync.zip.crypto.impl.standard;
 
 import java.util.Random;
 
-import org.nervousync.commons.core.zip.ZipConstants;
+import org.nervousync.commons.core.Globals;
 import org.nervousync.zip.engine.ZipCryptoEngine;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Encryptor;
@@ -45,7 +47,7 @@ public final class StandardEncryptor implements Encryptor {
 		}
 		
 		this.zipCryptoEngine = new ZipCryptoEngine();
-		this.headerBytes = new byte[ZipConstants.STD_DEC_HDR_SIZE];
+		this.headerBytes = new byte[Globals.STD_DEC_HDR_SIZE];
 		this.init(password, crc);
 	}
 	
@@ -91,18 +93,18 @@ public final class StandardEncryptor implements Encryptor {
 		
 		this.zipCryptoEngine.initKeys(password);
 		
-		this.headerBytes[ZipConstants.STD_DEC_HDR_SIZE - 1] = (byte)(crc >>> 24);
-		this.headerBytes[ZipConstants.STD_DEC_HDR_SIZE - 2] = (byte)(crc >>> 16);
+		this.headerBytes[Globals.STD_DEC_HDR_SIZE - 1] = (byte)(crc >>> 24);
+		this.headerBytes[Globals.STD_DEC_HDR_SIZE - 2] = (byte)(crc >>> 16);
 
 		this.encryptData(this.headerBytes);
 	}
 	
 	private byte[] generateRandomBytes() throws ZipException {
-		byte[] buffer = new byte[ZipConstants.STD_DEC_HDR_SIZE];
+		byte[] buffer = new byte[Globals.STD_DEC_HDR_SIZE];
 		
 		Random rand = new Random();
 		
-		for (int i = 0 ; i < ZipConstants.STD_DEC_HDR_SIZE ; i++) {
+		for (int i = 0 ; i < Globals.STD_DEC_HDR_SIZE ; i++) {
 			buffer[i] = this.encryptByte((byte)rand.nextInt(256));
 		}
 		

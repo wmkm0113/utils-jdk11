@@ -1,8 +1,10 @@
 /*
- * Copyright 2017 Nervousync Studio
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Nervousync Studio (NSYC) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -36,11 +38,11 @@ public final class ZipOptions implements Cloneable {
 	/**
 	 * Compress method
 	 */
-	private int compressionMethod = ZipConstants.COMP_DEFLATE;
+	private int compressionMethod = Globals.COMP_DEFLATE;
 	/**
 	 * Compress level
 	 */
-	private int compressionLevel = ZipConstants.DEFLATE_LEVEL_NORMAL;
+	private int compressionLevel = Globals.DEFLATE_LEVEL_NORMAL;
 	/**
 	 * Encrypt files status
 	 */
@@ -95,7 +97,7 @@ public final class ZipOptions implements Cloneable {
 	 * Default Constructor
 	 */
 	private ZipOptions() {
-		this(Boolean.FALSE, Globals.DEFAULT_VALUE_STRING, ZipConstants.ENC_NO_ENCRYPTION, ZipConstants.AES_STRENGTH_128);
+		this(Boolean.FALSE, Globals.DEFAULT_VALUE_STRING, Globals.ENC_NO_ENCRYPTION, Globals.AES_STRENGTH_128);
 	}
 	
 	/**
@@ -103,7 +105,7 @@ public final class ZipOptions implements Cloneable {
 	 * @param password  password
 	 */
 	private ZipOptions(final String password) {
-		this(Boolean.TRUE, password, ZipConstants.ENC_METHOD_STANDARD, ZipConstants.AES_STRENGTH_128);
+		this(Boolean.TRUE, password, Globals.ENC_METHOD_STANDARD, Globals.AES_STRENGTH_128);
 	}
 	
 	/**
@@ -112,7 +114,7 @@ public final class ZipOptions implements Cloneable {
 	 * @param aesKeyStrength AES key strength
 	 */
 	private ZipOptions(final String password, final int aesKeyStrength) {
-		this(Boolean.TRUE, password, ZipConstants.ENC_METHOD_AES, aesKeyStrength);
+		this(Boolean.TRUE, password, Globals.ENC_METHOD_AES, aesKeyStrength);
 	}
 
 	private ZipOptions(final boolean encryptFiles, final String password, final int encryptionMethod,
@@ -173,11 +175,11 @@ public final class ZipOptions implements Cloneable {
 
 		switch (aesKeyLength) {
 			case 128:
-				return new ZipOptions(password, ZipConstants.AES_STRENGTH_128);
+				return new ZipOptions(password, Globals.AES_STRENGTH_128);
 			case 192:
-				return new ZipOptions(password, ZipConstants.AES_STRENGTH_192);
+				return new ZipOptions(password, Globals.AES_STRENGTH_192);
 			case 256:
-				return new ZipOptions(password, ZipConstants.AES_STRENGTH_256);
+				return new ZipOptions(password, Globals.AES_STRENGTH_256);
 			default:
 				throw new ZipException("Invalid aes strength");
 		}
@@ -231,19 +233,19 @@ public final class ZipOptions implements Cloneable {
 	public void compressLevel(final CompressLevel compressLevel) {
 		switch (compressLevel) {
 			case FASTEST:
-				this.compressionLevel = ZipConstants.DEFLATE_LEVEL_FASTEST;
+				this.compressionLevel = Globals.DEFLATE_LEVEL_FASTEST;
 				break;
 			case FAST:
-				this.compressionLevel = ZipConstants.DEFLATE_LEVEL_FAST;
+				this.compressionLevel = Globals.DEFLATE_LEVEL_FAST;
 				break;
 			case NORMAL:
-				this.compressionLevel = ZipConstants.DEFLATE_LEVEL_NORMAL;
+				this.compressionLevel = Globals.DEFLATE_LEVEL_NORMAL;
 				break;
 			case MAXIMUM:
-				this.compressionLevel = ZipConstants.DEFLATE_LEVEL_MAXIMUM;
+				this.compressionLevel = Globals.DEFLATE_LEVEL_MAXIMUM;
 				break;
 			case ULTRA:
-				this.compressionLevel = ZipConstants.DEFLATE_LEVEL_ULTRA;
+				this.compressionLevel = Globals.DEFLATE_LEVEL_ULTRA;
 				break;
 			default:
 
