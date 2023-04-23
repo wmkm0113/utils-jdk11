@@ -86,7 +86,7 @@ public final class MailUtils {
      */
     public static Agent mailAgent(final MailConfig mailConfig) {
         if (mailConfig == null || StringUtils.isEmpty(mailConfig.getUserName())
-                || StringUtils.isEmpty(mailConfig.getPassWord())) {
+                || StringUtils.isEmpty(mailConfig.getPassword())) {
             return null;
         }
         return new Agent(mailConfig);
@@ -111,7 +111,7 @@ public final class MailUtils {
 
         private Agent(final MailConfig mailConfig) {
             this.userName = mailConfig.getUserName().toLowerCase();
-            this.passWord = SecureFactory.getInstance().decrypt(mailConfig.getSecureName(), mailConfig.getPassWord());
+            this.passWord = SecureFactory.getInstance().decrypt(mailConfig.getSecureName(), mailConfig.getPassword());
             if (mailConfig.getSendConfig() == null
                     || !MailProtocol.SMTP.equals(mailConfig.getSendConfig().getProtocolOption())) {
                 this.sendConfig = null;
@@ -219,7 +219,7 @@ public final class MailUtils {
          */
         public int mailCount(final String folderName) {
             if (this.receiveOperator == null) {
-                //	Not config receive server
+                //	Not configs receive server
                 return Globals.DEFAULT_VALUE_INT;
             }
             try (Store store = connect(); Folder folder = openReadOnlyFolder(store, folderName)) {
@@ -329,7 +329,7 @@ public final class MailUtils {
         }
 
         /**
-         * Read mail list.
+         * Read the mail list.
          *
          * @param folderName the folder name
          * @param uidArrays  the uid arrays

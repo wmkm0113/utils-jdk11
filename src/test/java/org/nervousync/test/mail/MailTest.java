@@ -55,7 +55,7 @@ public final class MailTest extends BaseTest {
         KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
         X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
-        PROPERTIES = PropertiesUtils.loadProperties("src/test/resources/mail.xml");
+        PROPERTIES = ConvertUtils.loadProperties("src/test/resources/mail.xml");
         MAIL_CONFIG = MailConfigBuilder.newBuilder()
                 .secureName(MAIL_SECURE)
                 .sendConfig()
@@ -81,9 +81,9 @@ public final class MailTest extends BaseTest {
                 .authentication(PROPERTIES.getProperty("config.userName"), PROPERTIES.getProperty("config.passWord"))
                 .storagePath(PROPERTIES.getProperty("config.storagePath"))
                 .signer(x509Certificate, keyPair.getPrivate())
-                .build();
+                .confirm();
         String xmlContent = MAIL_CONFIG.toXML();
-        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, MailConfig.class,
+        MailConfig parseConfig = StringUtils.xmlToObject(xmlContent, MailConfig.class,
                 "src/main/resources/org/nervousync/resources/mail_config.xsd");
         this.logger.info("Parse and verified config: {}", parseConfig.toFormattedJson());
     }

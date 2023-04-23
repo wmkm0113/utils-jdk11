@@ -101,7 +101,7 @@ public class CipherOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Put next entry.
+	 * Put the next entry.
 	 *
 	 * @param file       the file
 	 * @param zipOptions the zip options

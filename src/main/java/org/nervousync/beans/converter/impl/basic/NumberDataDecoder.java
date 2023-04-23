@@ -20,7 +20,6 @@ import org.nervousync.beans.converter.DataConverter;
 import org.nervousync.enumerations.xml.DataType;
 import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.ObjectUtils;
-import org.nervousync.utils.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,7 +53,7 @@ public final class NumberDataDecoder extends DataConverter {
 				}
 			}
 
-			Method method = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
+			Method method = ClassUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
 					"valueOf", new Class[]{String.class});
 			if (method != null) {
 				try {
@@ -62,7 +61,7 @@ public final class NumberDataDecoder extends DataConverter {
 					if (targetClass.isPrimitive()) {
 						String className = targetClass.getName();
 						String methodName = className + "Value";
-						Method convertMethod = ReflectionUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
+						Method convertMethod = ClassUtils.findMethod(ClassUtils.primitiveWrapper(targetClass),
 								methodName, new Class[]{});
 						if (convertMethod != null) {
 							return (T) convertMethod.invoke(targetObject);

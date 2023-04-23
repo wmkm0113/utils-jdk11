@@ -344,7 +344,7 @@ public final class SystemUtils {
 	}
 
 	/**
-	 * Retrieve local network adapter list
+	 * Retrieve the local network adapter list
 	 * @return      Local network adapter info list
 	 * @throws SocketException  Retrieve network interfaces error
 	 */

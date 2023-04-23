@@ -97,7 +97,7 @@ public final class ResponseInfo {
 	}
 
 	/**
-	 * Gets content type.
+	 * Gets the content type.
 	 *
 	 * @return the contentType
 	 */
@@ -272,7 +272,21 @@ public final class ResponseInfo {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public <T> T parseXml(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.stringToObject(this.parseString(), this.charset, clazz);
+		return parseXml(clazz, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Parse xml t.
+	 *
+	 * @param <T>   the type parameter
+	 * @param clazz the clazz
+	 * @param schemaPath Schema file path
+	 * @return the t
+	 * @throws XmlException                 the xml exception
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
+	public <T> T parseXml(final Class<T> clazz, final String schemaPath) throws XmlException, UnsupportedEncodingException {
+		return StringUtils.xmlToObject(this.parseString(), this.charset, clazz, schemaPath);
 	}
 
 	/**
@@ -285,7 +299,24 @@ public final class ResponseInfo {
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
 	public <T> T parseJson(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.stringToObject(this.parseString(this.charset), this.charset, clazz);
+		return StringUtils.jsonToObject(this.parseString(this.charset), this.charset, clazz);
+	}
+
+	/**
+	 * Parse json t.
+	 *
+	 * @param <T>   the type parameter
+	 * @param clazz the clazz
+	 * @return the t
+	 * @throws XmlException                 the xml exception
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
+	public <T> T parseYaml(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
+		return StringUtils.yamlToObject(this.parseString(this.charset), this.charset, clazz);
+	}
+
+	public <T> List<T> parseList(final Class<T> clazz) throws UnsupportedEncodingException {
+		return StringUtils.stringToList(this.parseString(this.charset), this.charset, clazz);
 	}
 
 	/**
@@ -294,14 +325,14 @@ public final class ResponseInfo {
 	 * @return the object
 	 * @throws XmlException the xml exception
 	 */
-	public Object parseObject() throws XmlException {
+	public <T> T parseObject(final Class<T> clazz) throws XmlException {
 		ByteArrayInputStream byteArrayInputStream = null;
 		ObjectInputStream objectInputStream = null;
 		
 		try {
 			byteArrayInputStream = new ByteArrayInputStream(this.responseContent);
 			objectInputStream = new ObjectInputStream(byteArrayInputStream);
-			return objectInputStream.readObject();
+			return clazz.cast(objectInputStream.readObject());
 		} catch (Exception e) {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Convert to object error! ", e);

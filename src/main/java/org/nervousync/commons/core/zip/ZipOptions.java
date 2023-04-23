@@ -253,7 +253,7 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
-	 * Is encrypt files boolean.
+	 * encrypt files boolean.
 	 *
 	 * @return the encryptFiles
 	 */
@@ -325,7 +325,7 @@ public final class ZipOptions implements Cloneable {
 	}
 
 	/**
-	 * Is include root folder boolean.
+	 * include root folder boolean.
 	 *
 	 * @return the includeRootFolder
 	 */

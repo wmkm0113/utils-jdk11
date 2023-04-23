@@ -54,7 +54,7 @@ public final class BeanObjectConverter implements ParameterConverter {
 	@Override
 	public Object fromString(Class<?> clazz, String value) {
 		if (BeanObject.class.isAssignableFrom(clazz)) {
-			return StringUtils.stringToObject(value, Globals.DEFAULT_ENCODING, clazz);
+			return StringUtils.stringToObject(value, clazz);
 		}
 		return null;
 	}

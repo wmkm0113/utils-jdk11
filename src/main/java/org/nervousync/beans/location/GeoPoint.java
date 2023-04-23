@@ -33,7 +33,7 @@ public final class GeoPoint implements Serializable {
 	private static final long serialVersionUID = -3501428042311016856L;
 
 	/**
-	 * Define type of location
+	 * Define the type of location
 	 * @see GeoPoint.LocationType
 	 */
 	private final LocationType locationType;
@@ -97,7 +97,7 @@ public final class GeoPoint implements Serializable {
 	}
 
 	/**
-	 * Gets location type.
+	 * Gets the location type.
 	 *
 	 * @return the locationType
 	 */

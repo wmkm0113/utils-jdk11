@@ -48,7 +48,7 @@ public class InflaterInputStream extends PartInputStream {
 	 * @param length             the length
 	 * @param originalSize       the original size
 	 * @param decryptor          the decryptor
-	 * @param isAESEncryptedFile the is aes encrypted file
+	 * @param isAESEncryptedFile is aes encrypted file
 	 * @throws IOException the io exception
 	 */
 	public InflaterInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition, final long length,

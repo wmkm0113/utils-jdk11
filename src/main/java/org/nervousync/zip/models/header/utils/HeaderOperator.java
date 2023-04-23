@@ -126,7 +126,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Convert byte array list to byte array byte [ ].
+	 * Convert the byte array list to byte array byte [ ].
 	 *
 	 * @param arrayList the array list
 	 * @return the byte [ ]
@@ -151,7 +151,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Append short to array list.
+	 * Append short to the array list.
 	 *
 	 * @param value     the value
 	 * @param arrayList the array list
@@ -164,7 +164,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Append int to array list.
+	 * Append int to the array list.
 	 *
 	 * @param value     the value
 	 * @param arrayList the array list
@@ -177,7 +177,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Append long to array list.
+	 * Append long to the array list.
 	 *
 	 * @param value     the value
 	 * @param arrayList the array list
@@ -190,7 +190,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Copy byte array to list.
+	 * Copy byte arrays to list.
 	 *
 	 * @param byteArray the byte array
 	 * @param arrayList the array list
@@ -207,7 +207,7 @@ public final class HeaderOperator {
 	}
 
 	/**
-	 * Copy byte array to list.
+	 * Copy entry byte arrays to list.
 	 *
 	 * @param entryPath the entry path
 	 * @param arrayList the array list

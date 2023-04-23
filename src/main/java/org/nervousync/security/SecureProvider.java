@@ -139,12 +139,12 @@ public abstract class SecureProvider {
     public abstract void reset() throws CryptoException;
 
     /**
-     * Convert crc result from byte array to string
+     * Convert crc result from byte arrays to string
      *
      * @param algorithm CRC algorithm
      * @param result    CRC result byte array
      * @return Converted result
-     * @throws CryptoException CRC algorithm not found
+     * @throws CryptoException CRC algorithm didn't find
      */
     public static String CRCResult(String algorithm, byte[] result) throws CryptoException {
         return SecurityUtils.crcConfig(algorithm)

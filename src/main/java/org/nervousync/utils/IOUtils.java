@@ -34,7 +34,7 @@ public final class IOUtils {
 	}
 
 	/**
-	 * Read byte[] from current input stream use default charset: UTF-8
+	 * Read byte[] from current input stream use default charset UTF-8
 	 * @param inputStream		Input stream
 	 * @return	Data by byte arrays
 	 */
@@ -65,7 +65,7 @@ public final class IOUtils {
 	}
 
 	/**
-	 * Read String content from current input stream use default charset: UTF-8
+	 * Read String content from the current input stream use default charset: UTF-8
 	 * @param inputStream		Input stream
 	 * @return File content as string
 	 */
@@ -154,7 +154,7 @@ public final class IOUtils {
 
 	/**
 	 * Close current stream
-	 * @param closeable     stream to closed
+	 * @param closeable     stream to close
 	 */
 	public static void closeStream(Closeable closeable) {
 		if (closeable != null) {

@@ -17,7 +17,7 @@
 package org.nervousync.zip.models.central;
 
 /**
- * The type Zip 64 end central directory record.
+ * The type Zip64 end central directory record.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:28:52 PM $
@@ -37,7 +37,7 @@ public final class Zip64EndCentralDirectoryRecord {
 	private byte[] extensibleDataSector;
 
 	/**
-	 * Instantiates a new Zip 64 end central directory record.
+	 * Instantiates a new Zip64 end central directory record.
 	 */
 	public Zip64EndCentralDirectoryRecord() {
 	}
@@ -79,7 +79,7 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
-	 * Gets made version.
+	 * Gets the made version.
 	 *
 	 * @return the madeVersion
 	 */
@@ -151,7 +151,7 @@ public final class Zip64EndCentralDirectoryRecord {
 	}
 
 	/**
-	 * Gets total entries in central directory on this disk.
+	 * Gets total entries in the central directory on this disk.
 	 *
 	 * @return the totalEntriesInCentralDirectoryOnThisDisk
 	 */

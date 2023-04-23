@@ -37,7 +37,7 @@ import jcifs.smb.SmbRandomAccessFile;
 public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closeable {
 	
 	/**
-	 * Operate file path
+	 * Operate the file path
 	 */
 	private final String filePath;
 	private final String domain;
@@ -120,7 +120,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	}
 
 	/**
-	 * Gets file path.
+	 * Gets the file path.
 	 *
 	 * @return the file path
 	 */
@@ -356,7 +356,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 *
 	 * @param b read buffer
 	 * @return read length
-	 * @throws IOException If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 * @throws IOException If the first byte cannot be read for any reason other than ends of current file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -373,7 +373,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 * @param off buffer offset
 	 * @param len read length
 	 * @return read length
-	 * @throws IOException If the first byte cannot be read for any reason other than end of file, or if the random access file has been closed, or if some other I/O error occurs.
+	 * @throws IOException If the first byte cannot be read for any reason other than ends of current file, or if the random access file has been closed, or if some other I/O error occurs.
 	 */
 	public int read(byte[] b, int off, int len) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {

@@ -60,23 +60,25 @@ public final class ZipTest extends BaseTest {
 			FileUtils.saveFile(byteArrayOutputStream.toByteArray(), randFilePath);
 		}
 
-		FileUtils.copy("src/test/resources/TestZip.zip.001",
+		boolean copyResult = FileUtils.copy("src/test/resources/TestZip.zip.001",
 				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001");
-		FileUtils.copy("src/test/resources/TestZip.zip.002",
+		copyResult &= FileUtils.copy("src/test/resources/TestZip.zip.002",
 				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.002");
-		FileUtils.copy("src/test/resources/TestZip.zip.003",
+		copyResult &= FileUtils.copy("src/test/resources/TestZip.zip.003",
 				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.003");
-		FileUtils.copy("src/test/resources/TestZip.zip.004",
+		copyResult &= FileUtils.copy("src/test/resources/TestZip.zip.004",
 				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.004");
-		FileUtils.copy("src/test/resources/TestZip.zip.005",
+		copyResult &= FileUtils.copy("src/test/resources/TestZip.zip.005",
 				ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.005");
+		System.out.println("Copy test split zip file result: " + copyResult);
 	}
 
 	@AfterClass
 	public static void clearTmpFiles() {
-		FileUtils.removeDir(COMPRESS_FOLDER);
-		FileUtils.removeDir(EXTRACT_FOLDER);
-		FileUtils.removeDir(ZIP_FILE_PATH);
+		boolean removeResult = FileUtils.removeDir(COMPRESS_FOLDER);
+		removeResult &= FileUtils.removeDir(EXTRACT_FOLDER);
+		removeResult &= FileUtils.removeDir(ZIP_FILE_PATH);
+		System.out.println("Remove temp file result: " + removeResult);
 	}
 
 	@Test
@@ -120,7 +122,7 @@ public final class ZipTest extends BaseTest {
 		//  Setting character encoding "GBK" if comment content contains CJK character for compatible the compress software (ex: 7-Zip)
 		zipOptions.setCharsetEncoding("GBK");
 		ZipFile zipFile = ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip",
-						zipOptions, Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, COMPRESS_FOLDER);
+				zipOptions, Boolean.FALSE, Globals.DEFAULT_VALUE_LONG, COMPRESS_FOLDER);
 		Assert.assertNotNull(zipFile);
 		zipFile.setComment("Comment 中文测试");
 		this.logger.info("Create Comment Zip File Success! ");

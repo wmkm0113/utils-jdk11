@@ -170,7 +170,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Generate random secret key using default algorithm, seed and seed size
+	 * Generate a random secret key using default algorithm, seed and seed size
 	 *
 	 * @return Random secret key
 	 */
@@ -179,7 +179,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Generate random secret key using default algorithm and seed
+	 * Generate a random secret key using default algorithm and seed
 	 *
 	 * @param size seed size
 	 * @return Random secret key
@@ -241,7 +241,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Validate auth code by given secret key and fixed time using default calculate type: HmacSHA1
+	 * Validate auth code by given secret key and fixed time using the default calculating type: HmacSHA1
 	 *
 	 * @param authCode  auth code
 	 * @param randomKey random secret key
@@ -254,7 +254,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Validate auth code by given secret key, fixed time and fix window using default calculate type: HmacSHA1
+	 * Validate auth code by given secret key, fixed time and fix windows using the default calculating type: HmacSHA1
 	 *
 	 * @param authCode  auth code
 	 * @param randomKey random secret key
@@ -295,7 +295,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Validate auth code by given secret key and fixed time using default calculate type: HmacSHA1
+	 * Validate auth code by given secret key and fixed time using the default calculating type: HmacSHA1
 	 *
 	 * @param authCode   auth code
 	 * @param randomKey  random secret key
@@ -309,7 +309,7 @@ public final class OTPUtils {
 	}
 
 	/**
-	 * Validate auth code by given secret key and fixed time using given calculate type
+	 * Validate auth code by given secret key and fixed time using the given calculating type
 	 *
 	 * @param authCode   auth code
 	 * @param calcType   the calc type

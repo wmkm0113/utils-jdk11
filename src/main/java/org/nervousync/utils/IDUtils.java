@@ -67,7 +67,7 @@ public final class IDUtils {
     private static final Map<String, IGenerator<?>> INITIALIZE_MAP = new HashMap<>();
 
     static {
-        //  Using Java SPI to loading ID generator implement classes
+        //  Using Java SPI to loading ID generator implements classes
         ServiceLoader.load(IGenerator.class)
                 .forEach(iGenerator -> {
                     Class<?> generatorClass = iGenerator.getClass();
@@ -170,7 +170,7 @@ public final class IDUtils {
     }
 
     /**
-     * Read registered generator name list
+     * Read the registered generator name list
      *
      * @return Registered generator name list
      */

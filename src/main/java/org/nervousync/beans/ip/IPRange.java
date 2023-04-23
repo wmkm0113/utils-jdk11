@@ -52,7 +52,7 @@ public final class IPRange implements Serializable {
 	}
 
 	/**
-	 * Gets ip type.
+	 * Gets the ip type.
 	 *
 	 * @return the ip type
 	 */
@@ -61,7 +61,7 @@ public final class IPRange implements Serializable {
 	}
 
 	/**
-	 * Sets ip type.
+	 * Sets the ip type.
 	 *
 	 * @param ipType the ip type
 	 */

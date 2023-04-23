@@ -50,7 +50,7 @@ public final class RawUtils {
 	}
 
 	/**
-	 * Read boolean value from position of data bytes
+	 * Read boolean value from the position of data bytes
 	 *
 	 * @param dataBytes Data bytes
 	 * @param position  Position index
@@ -532,7 +532,7 @@ public final class RawUtils {
 	 * @param length    Data length
 	 * @param encoding  String encoding
 	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds or encoding not supported
+	 * @throws DataInvalidException If array index out of bounds or encoding didn't support
 	 */
 	public static String readString(byte[] dataBytes, int length, String encoding) throws DataInvalidException {
 		return readString(dataBytes, DEFAULT_INDEX, length, encoding, Endian.BIG);

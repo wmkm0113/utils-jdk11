@@ -161,7 +161,7 @@ public final class MailObject implements Serializable {
 	}
 
 	/**
-	 * Gets content type.
+	 * Gets the content type.
 	 *
 	 * @return the contentType
 	 */

@@ -40,7 +40,7 @@ public interface ReceiveOperator {
     String readUID(final Folder folder, final Message message) throws MessagingException;
 
     /**
-     * Read message.
+     * Read the folder message.
      *
      * @param folder the folder
      * @param uid    the uid
@@ -50,7 +50,7 @@ public interface ReceiveOperator {
     Message readMessage(final Folder folder, final String uid) throws MessagingException;
 
     /**
-     * Read messages list.
+     * Read the folder messages list.
      *
      * @param folder    the folder
      * @param uidArrays the uid arrays

@@ -78,7 +78,7 @@ public final class SegmentationFile extends BeanObject {
 	}
 
 	/**
-	 * Constructor for define segmentation item
+	 * Constructor for defined segmentation item
 	 *
 	 * @param extName              File extension name
 	 * @param totalSize            File total size

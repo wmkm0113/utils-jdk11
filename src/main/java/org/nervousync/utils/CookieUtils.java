@@ -19,6 +19,9 @@ package org.nervousync.utils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.nervousync.commons.core.Globals;
+
+import java.util.Arrays;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -37,8 +40,8 @@ public final class CookieUtils {
 	 * @param response      http response
 	 * @return              Set result
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, 
-			HttpServletRequest request, HttpServletResponse response) {
+	public static boolean setCookie(String cookieName, String cookieValue,
+									HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, null, null, request, response);
 	}
 
@@ -51,8 +54,8 @@ public final class CookieUtils {
 	 * @param response      http response
 	 * @return              Set result
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, String domainName, 
-			HttpServletRequest request, HttpServletResponse response) {
+	public static boolean setCookie(String cookieName, String cookieValue, String domainName,
+									HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, domainName, null, request, response);
 	}
 
@@ -65,8 +68,8 @@ public final class CookieUtils {
 	 * @param response      http response
 	 * @return              Set result
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, Integer lifeCycle, 
-			HttpServletRequest request, HttpServletResponse response) {
+	public static boolean setCookie(String cookieName, String cookieValue, Integer lifeCycle,
+									HttpServletRequest request, HttpServletResponse response) {
 		return setCookie(cookieName, cookieValue, null, lifeCycle, request, response);
 	}
 
@@ -80,14 +83,14 @@ public final class CookieUtils {
 	 * @param response      http response
 	 * @return              Set result
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, String domainName, 
-			Integer lifeCycle, HttpServletRequest request, HttpServletResponse response) {
+	public static boolean setCookie(String cookieName, String cookieValue, String domainName,
+									Integer lifeCycle, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Cookie cookie = getCookie(cookieName, request);
-			
+
 			if (cookie == null) {
 				cookie = new Cookie(cookieName, cookieValue);
-				
+
 				cookie.setPath("/");
 				if (domainName != null) {
 					cookie.setDomain("." + domainName);
@@ -99,9 +102,9 @@ public final class CookieUtils {
 			} else {
 				cookie.setValue(cookieValue);
 			}
-			
+
 			response.addCookie(cookie);
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -115,17 +118,10 @@ public final class CookieUtils {
 	 * @return              cookie instance or null if not exists
 	 */
 	public static Cookie getCookie(String cookieName, HttpServletRequest request) {
-		Cookie[] cookies = request.getCookies();
-		
-		if (cookies != null && cookies.length > 0) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(cookieName)) {
-					return cookie;
-				}
-			}
-		}
-
-		return null;
+		return Arrays.stream(request.getCookies())
+				.filter(cookie -> cookie.getName().equalsIgnoreCase(cookieName))
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -135,21 +131,15 @@ public final class CookieUtils {
 	 * @return              cookie value or null if not exists
 	 */
 	public static String getCookieValue(String cookieName, HttpServletRequest request) {
-		Cookie[] cookies = request.getCookies();
-		
-		if (cookies != null && cookies.length > 0) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(cookieName)) {
-					return cookie.getValue();
-				}
-			}
-		}
-
-		return null;
+		return Arrays.stream(request.getCookies())
+				.filter(cookie -> cookie.getName().equalsIgnoreCase(cookieName))
+				.findFirst()
+				.map(Cookie::getValue)
+				.orElse(Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
-	 * Remove coolie
+	 * Remove cookie
 	 * @param cookieName    cookie name
 	 * @param request       http request
 	 * @param response      http response

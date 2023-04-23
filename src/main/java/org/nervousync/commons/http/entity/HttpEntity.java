@@ -103,7 +103,7 @@ public final class HttpEntity {
 	/**
 	 * Add binary parameter
 	 * @param name		Parameter name
-	 * @param value		Upload file path
+	 * @param value		The upload file path
 	 */
 	public void addBinaryEntity(String name, String value) {
 		try {

@@ -45,8 +45,9 @@ Dependency required:
 
 ### IDUtils
 **Package**: org.nervousync.utils  
-ID generator utils, register generator implements class by Java SPI. embedded generator: UUID version 1 to version 5, Snowflake and NanoID.  
-Extend generator:  
+ID generator utils, register generator implements class by Java SPI.
+Embedded generator: UUID version 1 to version 5, Snowflake and NanoID.  
+Extend generator: 
 Generator class must implement interface org.nervousync.generator.IGenerator
 and create file named: org.nervousync.generator.IGenerator save to META-INF/services
 
@@ -70,7 +71,7 @@ Read and write boolean/short/int/long/String from/to byte array by Little Endian
 ### RequestUtils
 **Package**: org.nervousync.utils
 #### IP address convert:
-IP version 4 address to compatible IP version 6 address, IP address to byte array or BigInteger,
+IP version 4 address to compatible IP version 6 address, IP address to byte arrays or BigInteger,
 byte array or BigInteger to IP address, expand compressed IP version 6 address, convert data between netmask string and cidr,
 calculate IP address range by given IP address and cidr
 #### DNS:
@@ -90,5 +91,6 @@ Asymmetric provider: RSA/SM2
 
 ### StringUtils
 **Package**: org.nervousync.utils  
-Base32/Base64 encode and decode, convert string to huffman tree object, check given string is empty, blank, contains white space or emoji,
-trim white space, validate given string by China ID Code, China Social Credit Code, Luhn Algorithm
+Base32/Base64 encode and decode,
+convert string to the huffman tree object, check given string is empty, blank, contains blank or emoji,
+trim blank space, validate given string by China ID Code, China Social Credit Code, Luhn Algorithm

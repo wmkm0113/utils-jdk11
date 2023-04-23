@@ -16,6 +16,7 @@
  */
 package org.nervousync.security.crypto;
 
+import org.nervousync.commons.core.Globals;
 import org.nervousync.security.config.CipherConfig;
 import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;
@@ -25,6 +26,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -33,6 +35,8 @@ import java.security.SecureRandom;
  * The type Symmetric crypto provider.
  */
 public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
+
+    private ByteArrayOutputStream byteArrayOutputStream;
 
     /**
      * Instantiates a new Symmetric crypto provider.
@@ -56,7 +60,7 @@ public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
         switch (this.cryptoMode) {
             case ENCRYPT:
             case DECRYPT:
-                this.cipher.update(dataBytes, position, length);
+                this.byteArrayOutputStream.write(dataBytes, position, length);
                 break;
             default:
                 throw new CryptoException("Unknown crypto mode! ");
@@ -69,7 +73,9 @@ public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
             case ENCRYPT:
             case DECRYPT:
                 try {
-                    return this.cipher.doFinal(dataBytes, position, length);
+                    this.byteArrayOutputStream.write(dataBytes, position, length);
+                    return this.cipher.doFinal(this.byteArrayOutputStream.toByteArray(), Globals.INITIALIZE_INT_VALUE,
+                            this.byteArrayOutputStream.size());
                 } catch (IllegalBlockSizeException | BadPaddingException e) {
                     throw new CryptoException(e);
                 } finally {
@@ -94,6 +100,7 @@ public abstract class SymmetricCryptoProvider extends BaseCryptoProvider {
             case ENCRYPT:
             case DECRYPT:
                 this.cipher = this.initCipher();
+                this.byteArrayOutputStream = new ByteArrayOutputStream();
                 break;
             default:
                 throw new CryptoException("Unknown crypto mode! ");

@@ -48,8 +48,6 @@ public final class ServiceUtils {
 
     private static final List<ParameterConverter> REGISTERED_CONVERTERS;
 
-    private static Client CLIENT = ClientBuilder.newClient();
-
     static {
         REGISTERED_CONVERTERS = new ArrayList<>();
         ServiceLoader.load(ParameterConverter.class).forEach(ServiceUtils::registerConverter);
@@ -134,16 +132,7 @@ public final class ServiceUtils {
         if (serviceClient.isAnnotationPresent(Path.class)) {
             servicePath += serviceClient.getAnnotation(Path.class).value();
         }
-        return ObjectUtils.createProxyInstance(serviceClient, new RestfulInterceptor(servicePath, headerMap));
-    }
-
-    /**
-     * Init client.
-     *
-     * @param configuration the configuration
-     */
-    public static void initClient(final Configuration configuration) {
-        CLIENT = (configuration == null) ? ClientBuilder.newClient() : ClientBuilder.newClient(configuration);
+        return ObjectUtils.newInstance(serviceClient, new RestfulInterceptor(servicePath, headerMap));
     }
 
     /**
@@ -199,10 +188,6 @@ public final class ServiceUtils {
                 throw new Exception("Unknown method! ");
             }
 
-            if (!void.class.equals(method.getReturnType()) && !method.isAnnotationPresent(Produces.class)) {
-                throw new Exception("Unknown response data type! ");
-            }
-
             String methodName = method.getAnnotation(Path.class).value();
             if (methodName.length() == 0) {
                 methodName = method.getName();
@@ -227,7 +212,7 @@ public final class ServiceUtils {
                     ? method.getAnnotation(Consumes.class).value()
                     : new String[0];
 
-            for (int i = 0 ; i < objects.length ; i++) {
+            for (int i = 0; i < objects.length; i++) {
                 Object paramObj = objects[i];
                 if (paramObj == null) {
                     continue;
@@ -351,15 +336,6 @@ public final class ServiceUtils {
                 }
             }
 
-            WebTarget webTarget = CLIENT.target(servicePath);
-            queryParameters.forEach(webTarget::queryParam);
-            matrixParameters.forEach(webTarget::matrixParam);
-            Invocation.Builder builder = webTarget.request(method.getAnnotation(Produces.class).value());
-            if (method.isAnnotationPresent(Consumes.class)) {
-                builder.accept(method.getAnnotation(Consumes.class).value());
-            }
-            this.headerMap.forEach(builder::header);
-
             Form form = null;
             if (HttpMethodOption.POST.equals(methodOption)
                     || HttpMethodOption.PUT.equals(methodOption)
@@ -368,33 +344,49 @@ public final class ServiceUtils {
                 formParameters.forEach(form::param);
             }
 
-            Response response = null;
-
-            try {
-                switch (methodOption) {
-                    case GET:
-                        response = builder.get();
-                        break;
-                    case PATCH:
-                        response = builder.method("PATCH",
-                                Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-                        break;
-                    case PUT:
-                        response = builder.put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-                        break;
-                    case POST:
-                        response = builder.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-                        break;
-                    case DELETE:
-                        response = builder.delete();
-                        break;
-                    case HEAD:
-                        response = builder.head();
-                        break;
-                    default:
-                        throw new ServiceException("Method not supported! ");
+            try (Client client = ClientBuilder.newClient()) {
+                WebTarget webTarget = client.target(servicePath);
+                queryParameters.forEach(webTarget::queryParam);
+                matrixParameters.forEach(webTarget::matrixParam);
+                String[] acceptTypes = method.isAnnotationPresent(Produces.class)
+                        ? method.getAnnotation(Produces.class).value()
+                        : new String[]{"*/*"};
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Accept data types: {}", String.join(",", acceptTypes));
                 }
+                Invocation.Builder builder = webTarget.request(acceptTypes);
+                if (method.isAnnotationPresent(Consumes.class)) {
+                    builder.accept(method.getAnnotation(Consumes.class).value());
+                }
+                this.headerMap.forEach(builder::header);
+                return this.execute(methodOption, builder, form, method);
+            }
+        }
 
+        private Response initResponse(final HttpMethodOption methodOption, final Invocation.Builder builder,
+                                      final Form form) throws ServiceException {
+            switch (methodOption) {
+                case GET:
+                    return builder.get();
+                case PATCH:
+                    return builder.method("PATCH",
+                            Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+                case PUT:
+                    return builder.put(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+                case POST:
+                    return builder.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+                case DELETE:
+                    return builder.delete();
+                case HEAD:
+                    return builder.head();
+                default:
+                    throw new ServiceException("Method not supported! ");
+            }
+        }
+
+        private Object execute(final HttpMethodOption methodOption, final Invocation.Builder builder,
+                               final Form form, final Method method) throws ServiceException {
+            try (Response response = this.initResponse(methodOption, builder, form)) {
                 boolean operateResult;
 
                 switch (methodOption) {
@@ -426,7 +418,7 @@ public final class ServiceUtils {
                         return null;
                     }
 
-                    Class<?> paramClass = ReflectionUtils.parseComponentType(method);
+                    Class<?> paramClass = ReflectionUtils.componentType(method);
 
                     String responseData = response.readEntity(String.class);
                     if (responseData.endsWith(FileUtils.CRLF)) {
@@ -446,12 +438,12 @@ public final class ServiceUtils {
                             } else if (List.class.isAssignableFrom(returnType)) {
                                 return parseToList(responseData, paramClass);
                             }
-                            return parseToObject(responseData, returnType);
+                            return StringUtils.stringToObject(responseData, returnType);
                         case FileUtils.MIME_TYPE_TEXT_XML:
                         case FileUtils.MIME_TYPE_XML:
                         case FileUtils.MIME_TYPE_TEXT_YAML:
                         case FileUtils.MIME_TYPE_YAML:
-                            return parseToObject(responseData, returnType);
+                            return StringUtils.stringToObject(responseData, returnType);
                         case FileUtils.MIME_TYPE_TEXT:
                             return responseData;
                         default:
@@ -488,10 +480,6 @@ public final class ServiceUtils {
                     throw e;
                 }
                 throw new ServiceException(e);
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
             }
         }
     }
@@ -600,10 +588,6 @@ public final class ServiceUtils {
         public Map<String, String> getPaths() {
             return paths;
         }
-    }
-
-    private static <T> T parseToObject(String string, Class<T> targetClass) {
-        return StringUtils.stringToObject(string, Globals.DEFAULT_ENCODING, targetClass);
     }
 
     private static <T> List<T> parseToList(String string, Class<T> targetClass) {

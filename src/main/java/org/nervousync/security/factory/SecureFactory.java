@@ -188,7 +188,7 @@ public final class SecureFactory {
 
         byte[] dataBytes = StringUtils.notBlank(originalName)
                 ? this.decrypt(originalName, StringUtils.base64Decode(dataContent))
-                : ConvertUtils.convertToByteArray(dataContent);
+                : ConvertUtils.objectToByteArray(dataContent);
         if (StringUtils.isEmpty(secureName)) {
             return ConvertUtils.convertToString(dataBytes);
         } else {
@@ -207,7 +207,7 @@ public final class SecureFactory {
         if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(configName) || !this.registeredConfig(configName)) {
             return dataContent;
         }
-        byte[] dataBytes = ConvertUtils.convertToByteArray(dataContent);
+        byte[] dataBytes = ConvertUtils.objectToByteArray(dataContent);
         return Optional.ofNullable(this.registeredNodeMap.get(configName))
                 .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
                 .map(secureProvider -> {

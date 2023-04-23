@@ -2,7 +2,56 @@
 <xsd:schema xmlns="https://nervousync.org/schemas/mail" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:proxy="https://nervousync.org/schemas/proxy"
             targetNamespace="https://nervousync.org/schemas/mail" elementFormDefault="qualified" version="1.0">
-    <xsd:import id="proxy" namespace="https://nervousync.org/schemas/proxy" schemaLocation="proxy_config.xsd" />
+    <xsd:complexType name="mail_config">
+        <xsd:all>
+            <xsd:element name="secure_name" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Protect password using secure name</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="username" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Mail account username</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="password" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Mail account password</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="proxy_config" type="proxy:proxy_config">
+                <xsd:annotation>
+                    <xsd:documentation>Proxy config</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="send_config" type="server_config">
+                <xsd:annotation>
+                    <xsd:documentation>Send server config</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="receive_config" type="server_config">
+                <xsd:annotation>
+                    <xsd:documentation>Receive server config</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="storage_path" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Receive attaches file save path</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="certificate" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Verify digital signature using certificate, base64 encoded.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="private_key" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Signature the mail using private key, base64 encoded.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
     <xsd:complexType name="server_config">
         <xsd:all>
             <xsd:element name="host_name" type="xsd:string">
@@ -49,56 +98,5 @@
             </xsd:element>
         </xsd:all>
     </xsd:complexType>
-    <xsd:element name="mail_config">
-        <xsd:complexType>
-            <xsd:all>
-                <xsd:element name="secure_name" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Protect password using secure name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="username" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Mail account username</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="password" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Mail account password</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element ref="proxy:proxy_config">
-                    <xsd:annotation>
-                        <xsd:documentation>Proxy config</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="send_config" type="server_config">
-                    <xsd:annotation>
-                        <xsd:documentation>Send server config</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="receive_config" type="server_config">
-                    <xsd:annotation>
-                        <xsd:documentation>Receive server config</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="storage_path" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Receive attaches file save path</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="certificate" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Verify digital signature using certificate, base64 encoded.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element name="private_key" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>Signature the mail using private key, base64 encoded.</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-            </xsd:all>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="mail_config" type="mail_config"/>
 </xsd:schema>

@@ -156,7 +156,7 @@ public final class StringUtils {
 
 	/**
 	 * Convert given base32 string to byte array
-	 * Note: Will return zero length array for given base64 string is null or string length is 0.
+	 * Note: Will return a zero-length array for given base64 string is null or string length is 0.
 	 * <pre>
 	 * StringUtils.base32Decode(null) = []
 	 * StringUtils.base32Decode("") = []
@@ -258,7 +258,7 @@ public final class StringUtils {
 
 	/**
 	 * Convert given base64 string to byte array
-	 * Note: Will return zero length array for given base64 string is null or string length is 0.
+	 * Note: Will return the zero-length arrays for given base64 string is null or string length is 0.
 	 * <pre>
 	 * StringUtils.base64Decode(null) = []
 	 * StringUtils.base64Decode("") = []
@@ -339,7 +339,7 @@ public final class StringUtils {
 
 	/**
 	 * Check that the given CharSequence is <code>null</code> or length 0.
-	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
+	 * Note: Will return <code>true</code> for a CharSequence that purely consists of blank.
 	 * <pre>
 	 * StringUtils.isEmpty(null) = true
 	 * StringUtils.isEmpty(Globals.DEFAULT_VALUE_STRING) = true
@@ -356,7 +356,7 @@ public final class StringUtils {
 
 	/**
 	 * Check that the given CharSequence is neither <code>null</code> nor of length 0.
-	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
+	 * Note: Will return <code>true</code> for a CharSequence that purely consists of blank.
 	 * <pre>
 	 * StringUtils.notNull(null) = false
 	 * StringUtils.notNull(Globals.DEFAULT_VALUE_STRING) = false
@@ -373,7 +373,7 @@ public final class StringUtils {
 
 	/**
 	 * Check that the given CharSequence is neither <code>null</code> nor only blank character.
-	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
+	 * Note: Will return <code>true</code> for a CharSequence that purely consists of blank.
 	 * <pre>
 	 * StringUtils.notBlank(null) = false
 	 * StringUtils.notBlank(Globals.DEFAULT_VALUE_STRING) = false
@@ -390,7 +390,7 @@ public final class StringUtils {
 
 	/**
 	 * Check that the given CharSequence is neither <code>null</code> nor of length 0.
-	 * Note: Will return <code>true</code> for a CharSequence that purely consists of whitespace.
+	 * Note: Will return <code>true</code> for a CharSequence that purely consists of blank.
 	 * <pre>
 	 * StringUtils.hasLength(null) = false
 	 * StringUtils.hasLength(Globals.DEFAULT_VALUE_STRING) = false
@@ -408,7 +408,7 @@ public final class StringUtils {
 	/**
 	 * Check whether the given CharSequence has actual text.
 	 * More specifically, returns <code>true</code> if the string not <code>null</code>,
-	 * its length is greater than 0, and it contains at least one non-whitespace character.
+	 * its length is greater than 0, and it contains at least one non-blank character.
 	 * <pre>
 	 * StringUtils.hasText(null) = false
 	 * StringUtils.hasText(Globals.DEFAULT_VALUE_STRING) = false
@@ -418,7 +418,8 @@ public final class StringUtils {
 	 * </pre>
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
-	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0, and it does not contain whitespace only
+	 * @return <code>true</code> if the CharSequence is not <code>null</code>, its length is greater than 0,
+	 * and it does not contain blank only
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(final CharSequence str) {
@@ -441,7 +442,7 @@ public final class StringUtils {
 	 *
 	 * @param strIn string
 	 * @return length of the string
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 * @throws ZipException if input string is null. In case of any other exception, this method returns default System charset
 	 */
 	public static int encodedStringLength(final String strIn) {
 		return encodedStringLength(strIn, detectCharset(strIn));
@@ -453,7 +454,7 @@ public final class StringUtils {
 	 * @param str     string
 	 * @param charset charset encoding
 	 * @return length of the string
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 * @throws ZipException if input string is null. In case of any other exception, this method returns default System charset
 	 */
 	public static int encodedStringLength(final String str, final String charset) {
 		if (StringUtils.isEmpty(str)) {
@@ -482,7 +483,7 @@ public final class StringUtils {
 	 *
 	 * @param strIn string
 	 * @return String - charset for the String
-	 * @throws ZipException if input string is null. In case of any other exception this method returns default System charset
+	 * @throws ZipException if input string is null. In case of any other exception, this method returns default System charset
 	 */
 	public static String detectCharset(final String strIn) {
 		if (StringUtils.isEmpty(strIn)) {
@@ -511,10 +512,10 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Check whether the given CharSequence contains any whitespace characters.
+	 * Check whether the given CharSequence contains any blank characters.
 	 *
 	 * @param str the CharSequence to check (maybe <code>null</code>)
-	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 whitespace character
+	 * @return <code>true</code> if the CharSequence is not empty and contains at least 1 blank character
 	 * @see java.lang.Character#isWhitespace java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(final CharSequence str) {
@@ -531,10 +532,10 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Check whether the given String contains any whitespace characters.
+	 * Check whether the given String contains any blank characters.
 	 *
 	 * @param str the String to check (maybe <code>null</code>)
-	 * @return <code>true</code> if the String is not empty and contains at least 1 whitespace character
+	 * @return <code>true</code> if the String is not empty and contains at least 1 blank character
 	 * @see #containsWhitespace(CharSequence) #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(final String str) {
@@ -542,7 +543,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim leading and trailing whitespace from the given String.
+	 * Trim leading and trailing blank from the given String.
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
@@ -555,7 +556,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim <i>all</i> whitespace from the given String:
+	 * Trim <i>all</i> blank from the given String:
 	 * leading, trailing, and in between characters.
 	 *
 	 * @param str the String to check
@@ -579,7 +580,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim leading whitespace from the given String.
+	 * Trim leading blank from the given String.
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
@@ -597,7 +598,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Trim trailing whitespace from the given String.
+	 * Trim trailing blank from the given String.
 	 *
 	 * @param str the String to check
 	 * @return the trimmed String
@@ -653,7 +654,7 @@ public final class StringUtils {
 
 	/**
 	 * Test if the given String starts with the specified prefix,
-	 * ignoring upper/lower case.
+	 * ignoring the upper/lower case.
 	 *
 	 * @param str    the String to check
 	 * @param prefix the prefix to look for
@@ -677,7 +678,7 @@ public final class StringUtils {
 
 	/**
 	 * Test if the given String ends with the specified suffix,
-	 * ignoring upper/lower case.
+	 * ignoring the upper/lower case.
 	 *
 	 * @param str    the String to check
 	 * @param suffix the suffix to look for
@@ -889,7 +890,7 @@ public final class StringUtils {
 
 	/**
 	 * Capitalize a <code>String</code>, changing the first letter to
-	 * upper case as per {@link Character#toUpperCase(char)}.
+	 * the upper case as per {@link Character#toUpperCase(char)}.
 	 * No other letters are changed.
 	 *
 	 * @param str the String to capitalize, maybe <code>null</code>
@@ -992,7 +993,7 @@ public final class StringUtils {
 
 		// Strip prefix from path to analyze, to not treat it as part of the
 		// first path element. This is necessary to correctly parse paths like
-		// "file:core/../core/io/Resource.class", where the ".." should just
+		// "file:core/../core/io/Resource.class", where the ".." Should just
 		// strip the first "core" directory while keeping the "file:" prefix.
 		int prefixIndex = pathToUse.indexOf(":");
 		String prefix = Globals.DEFAULT_VALUE_STRING;
@@ -1008,11 +1009,11 @@ public final class StringUtils {
 		for (int i = pathArray.length - 1; i >= 0; i--) {
 			if (!CURRENT_PATH.equals(pathArray[i])) {
 				if (TOP_PATH.equals(pathArray[i])) {
-					// Registering top path found.
+					// Registering the top path found.
 					tops++;
 				} else {
 					if (tops > 0) {
-						// Merging path element with corresponding to top path.
+						// Merging the path element with corresponding to the top path.
 						tops--;
 					} else {
 						// Normal path element found.
@@ -1045,7 +1046,8 @@ public final class StringUtils {
 	 * Parse the given <code>localeString</code> into a {@link Locale}.
 	 * <p>This is the inverse operation of {@link Locale#toString Locale's toString}.
 	 *
-	 * @param localeString the locale string, following <code>Locale's</code> <code>toString()</code> format ("en", "en_UK", etc); also accepts spaces as separators, as an alternative to underscores
+	 * @param localeString the locale string, following <code>Locale's</code> <code>toString()</code> format ("en", "en_UK", etc);
+	 *                     also accepts spaces as separators, as an alternative to underscore
 	 * @return a corresponding <code>Locale</code> instance
 	 */
 	public static Locale parseLocaleString(final String localeString) {
@@ -1065,7 +1067,7 @@ public final class StringUtils {
 			// There is definitely a variant, and it is everything after the country
 			// code sans the separator between the country code and the variant.
 			int endIndexOfCountryCode = localeString.indexOf(country) + country.length();
-			// Strip off any leading '_' and whitespace, what's left is the variant.
+			// Strip off any leading '_' and blank, what's left is the variant.
 			variant = trimLeadingWhitespace(localeString.substring(endIndexOfCountryCode));
 			if (variant.startsWith("_")) {
 				variant = trimLeadingCharacter(variant, '_');
@@ -1146,7 +1148,7 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Turn given source String array into sorted array.
+	 * Turn given sources String arrays into sorted arrays.
 	 *
 	 * @param array the source array
 	 * @return the sorted array (never <code>null</code>)
@@ -1369,7 +1371,8 @@ public final class StringUtils {
 	 *
 	 * @param str           the input String
 	 * @param delimiter     the delimiter between elements (this is a single delimiter, rather than a bunch individual delimiter characters)
-	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
+	 * @param charsToDelete a set of characters to delete.
+	 *                      Useful for deleting unwanted line breaks: e.g. "\r\n\f" will delete all new lines, line feeds in a String.
 	 * @return an array of the tokens in the list
 	 */
 	public static String[] delimitedListToStringArray(final String str, final String delimiter,
@@ -1559,9 +1562,10 @@ public final class StringUtils {
 		 */
 		XML,
 		/**
-		 * Simple string type, include basic type wrapper class etc.
+		 * Simple string type, include basic type wrapper class, etc.
 		 */
-		SIMPLE
+		SIMPLE,
+		RESPONSE
 	}
 
 	/**
@@ -1605,21 +1609,8 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> T stringToObject(final String string, final Class<T> beanClass) {
-		return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass);
-	}
-
-	/**
-	 * Parse string to target bean class
-	 *
-	 * @param <T>        Template
-	 * @param string     Parsed string
-	 * @param beanClass  Target bean class
-	 * @param schemaPath Schema file path
-	 * @return Converted object
-	 */
-	public static <T> T stringToObject(final String string, final Class<T> beanClass, final String schemaPath) {
-		return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass, schemaPath);
+	public static <T> T jsonToObject(final String string, final Class<T> beanClass) {
+		return jsonToObject(string, Globals.DEFAULT_ENCODING, beanClass);
 	}
 
 	/**
@@ -1631,12 +1622,50 @@ public final class StringUtils {
 	 * @param beanClass Target bean class
 	 * @return Converted object
 	 */
-	public static <T> T stringToObject(String string, final String encoding, Class<T> beanClass) {
-		return stringToObject(string, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
+	public static <T> T jsonToObject(String string, final String encoding, Class<T> beanClass) {
+		return stringToObject(string, StringType.JSON, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
 	}
 
 	/**
 	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T yamlToObject(final String string, final Class<T> beanClass) {
+		return yamlToObject(string, Globals.DEFAULT_ENCODING, beanClass);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>       Template
+	 * @param string    Parsed string
+	 * @param encoding  String encoding
+	 * @param beanClass Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T yamlToObject(String string, final String encoding, Class<T> beanClass) {
+		return stringToObject(string, StringType.YAML, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>        Template
+	 * @param string     Parsed string
+	 * @param beanClass  Target bean class
+	 * @param schemaPath Schema file path
+	 * @return Converted object
+	 */
+	public static <T> T xmlToObject(final String string, final Class<T> beanClass, final String schemaPath) {
+		return xmlToObject(string, Globals.DEFAULT_ENCODING, beanClass, schemaPath);
+	}
+
+	/**
+	 * Parse xml string to target bean class
 	 *
 	 * @param <T>        Template
 	 * @param string     Parsed string
@@ -1645,20 +1674,37 @@ public final class StringUtils {
 	 * @param schemaPath the schema path
 	 * @return Converted object
 	 */
-	public static <T> T stringToObject(final String string, final String encoding,
-	                                   final Class<T> beanClass, final String schemaPath) {
+	public static <T> T xmlToObject(final String string, final String encoding,
+									final Class<T> beanClass, final String schemaPath) {
+		return StringUtils.notBlank(string)
+				? stringToObject(string, StringType.XML, encoding, beanClass, schemaPath)
+				: null;
+	}
+
+	/**
+	 * Parse string to target bean class
+	 *
+	 * @param <T>        Template
+	 * @param string     Parsed string
+	 * @param beanClass  Target bean class
+	 * @return Converted object
+	 */
+	public static <T> T stringToObject(final String string, final Class<T> beanClass) {
 		if (StringUtils.isEmpty(string)) {
 			LOGGER.error("Can't parse empty string");
 			return null;
 		}
 
-		if (string.startsWith("<")) {
-			return stringToObject(string, StringType.XML, encoding, beanClass, schemaPath);
-		}
-		if (string.startsWith("{") || string.startsWith("[")) {
-			return stringToObject(string, StringType.JSON, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
-		}
-		return stringToObject(string, StringType.YAML, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
+        if (StringUtils.isEmpty(string)) {
+            return null;
+        }
+        if (string.startsWith("<")) {
+            return StringUtils.xmlToObject(string, Globals.DEFAULT_ENCODING, beanClass, Globals.DEFAULT_VALUE_STRING);
+        }
+        if (string.startsWith("{") || string.startsWith("[")) {
+            return StringUtils.jsonToObject(string, Globals.DEFAULT_ENCODING, beanClass);
+        }
+        return StringUtils.yamlToObject(string, Globals.DEFAULT_ENCODING, beanClass);
 	}
 
 	/**
@@ -2206,7 +2252,7 @@ public final class StringUtils {
 		}
 
 		if (BeanObject.class.isAssignableFrom(typeClass)) {
-			paramObj = stringToObject(dataValue, Globals.DEFAULT_ENCODING, typeClass);
+			paramObj = stringToObject(dataValue, typeClass);
 		} else {
 			DataType dataType = ObjectUtils.retrieveSimpleDataType(typeClass);
 
@@ -2289,18 +2335,16 @@ public final class StringUtils {
 				break;
 			case Luhn:
 				if (StringUtils.matches(code, LUHN_CODE_REGEX)) {
-					int result = 0;
-					int index = code.length() - 1;
-					while (index >= 0) {
-						int currentCode = Character.getNumericValue(code.charAt(index));
-						if (index % 2 == 0) {
+					int result = 0, length = code.length();
+					for (int i = 0 ; i < length ; i++) {
+						int currentCode = Character.getNumericValue(code.charAt(length - i - 1));
+						if (i % 2 == 1) {
 							currentCode *= 2;
 							if (currentCode > 9) {
 								currentCode -= 9;
 							}
 						}
 						result += currentCode;
-						index--;
 					}
 					return result % 10 == 0;
 				}

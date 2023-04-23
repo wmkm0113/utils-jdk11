@@ -16,6 +16,7 @@
  */
 package org.nervousync.security.crypto.impl;
 
+import org.nervousync.commons.core.Globals;
 import org.nervousync.security.config.CipherConfig;
 import org.nervousync.security.crypto.AsymmetricCryptoProvider;
 import org.nervousync.enumerations.crypto.CryptoMode;
@@ -36,8 +37,35 @@ public final class RSACryptoProviderImpl extends AsymmetricCryptoProvider {
      */
     public RSACryptoProviderImpl(CipherConfig cipherConfig, CryptoMode cryptoMode,
                                  CipherKey cipherKey) throws CryptoException {
-        super(cipherConfig, cryptoMode, cipherKey);
-//                new CipherKey(keyType, keyBytes, "RSA", randomAlgorithm, keySize,
-//                        certAlias, password, checkValidity, verifyKey));
+        super(cipherConfig, cryptoMode, cipherKey, PADDING_LENGTH(cryptoMode, cipherConfig.getPadding()));
+    }
+
+    private static int PADDING_LENGTH(final CryptoMode cryptoMode, final String padding) {
+        if (CryptoMode.ENCRYPT.equals(cryptoMode) || CryptoMode.DECRYPT.equals(cryptoMode)) {
+            switch (padding) {
+                case "PKCS1Padding":
+                    return 11;
+                case "OAEPWithMD5AndMGF1Padding":
+                    return 34;
+                case "OAEPPadding":
+                case "OAEPWithSHA-1AndMGF1Padding":
+                    return 42;
+                case "OAEPWithSHA3-224AndMGF1Padding":
+                case "OAEPWithSHA-224AndMGF1Padding":
+                    return 58;
+                case "OAEPWithSHA3-256AndMGF1Padding":
+                case "OAEPWithSHA-256AndMGF1Padding":
+                    return 66;
+                case "OAEPWithSHA3-384AndMGF1Padding":
+                case "OAEPWithSHA-384AndMGF1Padding":
+                    return 98;
+                case "OAEPWithSHA3-512AndMGF1Padding":
+                case "OAEPWithSHA-512AndMGF1Padding":
+                    return 130;
+                default:
+                    return 0;
+            }
+        }
+        return Globals.INITIALIZE_INT_VALUE;
     }
 }

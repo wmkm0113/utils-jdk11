@@ -16,22 +16,11 @@
  */
 package org.nervousync.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +41,7 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Convert collection to List
+	 * Convert the collection to List
 	 *
 	 * @param collection collection
 	 * @return Convert list
@@ -138,21 +127,21 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Converts byte array to string using default encoding
+	 * Converts byte arrays to string using default encoding
 	 *
 	 * @param content Byte array to convert to string
-	 * @return string resulted from converting byte array using default encoding
+	 * @return string resulted from converting byte arrays using default encoding
 	 */
 	public static String convertToString(final byte[] content) {
 		return convertToString(content, Globals.DEFAULT_ENCODING);
 	}
 
 	/**
-	 * Converts byte array to string according to specified encoding
+	 * Converts byte arrays to string according to specified encoding
 	 *
 	 * @param content  Byte array to convert to string
 	 * @param encoding Encoding string, if <code>null</code> default is used
-	 * @return string resulted from converting byte array
+	 * @return string resulted from converting byte arrays
 	 */
 	public static String convertToString(final byte[] content, final String encoding) {
 		try {
@@ -163,23 +152,23 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Converts string to byte array using default encoding
+	 * Converts string to byte arrays using default encoding
 	 *
 	 * @param content String to convert to array
-	 * @return byte array resulted from converting string using default encoding
+	 * @return byte arrays resulted from converting string using default encoding
 	 */
-	public static byte[] convertToByteArray(final String content) {
-		return convertToByteArray(content, Globals.DEFAULT_ENCODING);
+	public static byte[] objectToByteArray(final String content) {
+		return objectToByteArray(content, Globals.DEFAULT_ENCODING);
 	}
 
 	/**
-	 * Converts string to byte array according to specified encoding
+	 * Converts string to byte arrays according to specified encoding
 	 *
 	 * @param content  String to convert to array
 	 * @param encoding Encoding string, if <code>null</code> default is used
-	 * @return byte array
+	 * @return byte arrays
 	 */
-	public static byte[] convertToByteArray(final String content, final String encoding) {
+	public static byte[] objectToByteArray(final String content, final String encoding) {
 		try {
 			return content.getBytes(encoding);
 		} catch (UnsupportedEncodingException ex) {
@@ -188,14 +177,14 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Convert object to byte array
+	 * Convert the object to byte arrays
 	 *
 	 * @param object if <code>null</code> convert error
-	 * @return byte array
+	 * @return byte arrays
 	 */
-	public static byte[] convertToByteArray(final Object object) {
+	public static byte[] objectToByteArray(final Object object) {
 		if (object instanceof String) {
-			return convertToByteArray((String)object);
+			return objectToByteArray((String)object);
 		}
 
 		if (object instanceof byte[] || object instanceof Byte[]) {
@@ -223,12 +212,12 @@ public final class ConvertUtils {
 	}
 
 	/**
-	 * Convert byte array to Object
+	 * Convert byte arrays to Object
 	 *
-	 * @param content byte array
-	 * @return Converted object or byte array when failed
+	 * @param content byte arrays
+	 * @return Converted object or byte arrays when failed
 	 */
-	public static Object convertToObject(final byte[] content) {
+	public static Object byteArrayToObject(final byte[] content) {
 		if (content.length == 0) {
 			return null;
 		}
@@ -247,61 +236,258 @@ public final class ConvertUtils {
 			IOUtils.closeStream(byteInputStream);
 		}
 	}
+	
+	/**
+	 * Read properties file and convert data to hash table
+	 * @param propertiesFilePath    The properties file paths
+	 * @return                      Data hash table
+	 */
+	public static Map<String, String> propertiesToMap(final String propertiesFilePath) {
+		return propertiesToMap(propertiesFilePath, null);
+	}
 
 	/**
-	 * Compress given data bytes using gzip
-	 *
-	 * @param dataBytes Data bytes
-	 * @return Compressed byte array
+	 * Read properties file and write data to given hash table
+	 * @param propertiesFilePath    Properties file paths
+	 * @param messageMap            Exists hash table to write data
+	 * @return                      Data hash table
 	 */
-	public static byte[] zipByteArray(final byte[] dataBytes) {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		GZIPOutputStream gzipOutputStream = null;
+	public static Map<String, String> propertiesToMap(final String propertiesFilePath,
+	                                                         Map<String, String> messageMap) {
+		return propertiesToMap(loadProperties(propertiesFilePath), messageMap);
+	}
 
+	/**
+	 * Read properties file from URL and convert data to hash table
+	 * @param url    Properties file url
+	 * @return       Data hash table
+	 */
+	public static Map<String, String> propertiesToMap(final URL url) {
+		return propertiesToMap(url, null);
+	}
+
+	/**
+	 * Read properties file from URL and write data to given hash table
+	 * @param url                   Properties file url
+	 * @param messageMap            Exists hash table to write data
+	 * @return                      Data hash table
+	 */
+	public static Map<String, String> propertiesToMap(final URL url, Map<String, String> messageMap) {
+		return propertiesToMap(loadProperties(url), messageMap);
+	}
+
+	/**
+	 * Read data from properties' object and write to given hash table
+	 * @param properties        Properties object
+	 * @param messageMap        Exists hash table to write data
+	 * @return                  Data hash table
+	 */
+	public static Map<String, String> propertiesToMap(final Properties properties, Map<String, String> messageMap) {
+		if (messageMap == null) {
+			messageMap = new HashMap<>();
+		}
+
+		if (properties != null) {
+			Enumeration<Object> enumeration = properties.keys();
+			
+			while (enumeration.hasMoreElements()) {
+				String key = (String)enumeration.nextElement();
+				String value = properties.getProperty(key);
+				
+				messageMap.put(key, value);
+			}
+			
+		}
+		
+		return messageMap;
+	}
+
+	/**
+	 * Read properties from string
+	 * @param content     string data
+	 * @return                      Properties object
+	 */
+	public static Properties readProperties(final String content) {
+		Properties properties = new Properties();
+		InputStream inputStream;
+		if (StringUtils.notBlank(content)) {
+			inputStream = new ByteArrayInputStream(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)));
+			
+			try {
+				if (content.startsWith("<")) {
+					properties.loadFromXML(inputStream);
+				} else {
+					properties.load(inputStream);
+				}
+				
+				inputStream.close();
+				inputStream = null;
+			} catch (IOException e) {
+				properties = new Properties();
+			} finally {
+				IOUtils.closeStream(inputStream);
+			}
+		}
+		return properties;
+	}
+
+	/**
+	 * Read properties from string
+	 * @param propertiesFilePath    Properties file paths
+	 * @return                      Properties object
+	 */
+	public static Properties loadProperties(final String propertiesFilePath) {
 		try {
-			gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
-			gzipOutputStream.write(dataBytes);
-			
-			gzipOutputStream.close();
-			byteArrayOutputStream.close();
-			
-			return byteArrayOutputStream.toByteArray();
-		} catch (Exception ex) {
-			return dataBytes;
-		} finally {
-			IOUtils.closeStream(gzipOutputStream);
-			IOUtils.closeStream(byteArrayOutputStream);
+			URL url = FileUtils.getURL(propertiesFilePath);
+			return loadProperties(url);
+		} catch (Exception e) {
+			return new Properties();
 		}
 	}
 
 	/**
-	 * Decompress given data bytes which data compressed by gzip
-	 *
-	 * @param dataBytes Compressed data bytes
-	 * @return Decompressed data bytes
+	 * Read properties from URL
+	 * @param url    Properties file URL
+	 * @return       Properties object
 	 */
-	public static byte[] unzipByteArray(final byte[] dataBytes) {
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(dataBytes);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		GZIPInputStream gzipInputStream = null;
-		byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+	public static Properties loadProperties(final URL url) {
+		InputStream inputStream = null;
 		try {
-			gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-			int readLength;
-			while ((readLength = gzipInputStream.read(readBuffer)) != -1) {
-				byteArrayOutputStream.write(readBuffer, 0, readLength);
+			String fileName = url.getFile();
+			String fileExtName = StringUtils.getFilenameExtension(fileName);
+			inputStream = url.openStream();
+			if (fileExtName.equalsIgnoreCase("xml")) {
+				return loadProperties(inputStream, true);
+			} else {
+				return loadProperties(inputStream, false);
 			}
-			gzipInputStream.close();
-			byteArrayInputStream.close();
-			byteArrayOutputStream.close();
-			
-			return byteArrayOutputStream.toByteArray();
-		} catch (Exception ex) {
-			return dataBytes;
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Load properties error! ", e);
+			}
+			return new Properties();
 		} finally {
-			IOUtils.closeStream(gzipInputStream);
-			IOUtils.closeStream(byteArrayInputStream);
-			IOUtils.closeStream(byteArrayOutputStream);
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Close input stream error! ", e);
+					} else {
+						LOGGER.warn("Close input stream error! ");
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read properties from InputStream
+	 * @param inputStream   Properties input stream
+	 * @param isXML         Data is xml
+	 * @return              Properties object
+	 */
+	public static Properties loadProperties(final InputStream inputStream, final boolean isXML) {
+		Properties properties = new Properties();
+		try {
+			if (isXML) {
+				properties.loadFromXML(inputStream);
+			} else {
+				properties.load(inputStream);
+			}
+			
+			return properties;
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Load properties error! ", e);
+			}
+			return new Properties();
+		}
+	}
+
+	/**
+	 * Write given data and comment to target properties file
+	 * @param propertiesFilePath    Properties file paths
+	 * @param modifyMap             Data hash table
+	 * @param comment               Comment string
+	 * @return                      Operate result
+	 */
+	public static boolean modifyProperties(final String propertiesFilePath, final Map<String, String> modifyMap,
+	                                       final String comment) {
+		try {
+			Properties modifyProperties = loadProperties(propertiesFilePath);
+
+			modifyMap.forEach((key, value) -> {
+				if (value != null) {
+					modifyProperties.setProperty(key, value);
+				}
+			});
+
+			return storeProperties(modifyProperties, propertiesFilePath, comment);
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Modify properties error! ", e);
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Write given data to target properties object
+	 * @param properties    Properties Object
+	 * @param modifyMap     Data hash table
+	 * @return              Operate result
+	 */
+	public static Properties modifyProperties(final Properties properties, final Map<String, String> modifyMap) {
+
+		for (Object o : properties.keySet()) {
+			String key = (String) o;
+			String value = modifyMap.get(key);
+
+			if (value != null) {
+				properties.setProperty(key, value);
+			}
+		}
+		
+		return properties;
+	}
+
+	/**
+	 * Write properties' object to the target path
+	 * @param properties            Properties Object
+	 * @param propertiesFilePath    Properties file paths
+	 * @param comment               Comment string
+	 * @return                      Operate result
+	 */
+	private static boolean storeProperties(final Properties properties, final String propertiesFilePath,
+	                                       final String comment) {
+		FileOutputStream fileOutputStream = null;
+		try {
+			String filePath = propertiesFilePath.substring(0,
+					propertiesFilePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
+			FileUtils.makeDir(filePath);
+			String fileExtName = StringUtils.getFilenameExtension(propertiesFilePath);
+
+			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
+
+			switch (fileExtName.toLowerCase()) {
+				case "xml":
+					properties.storeToXML(fileOutputStream, comment, Globals.DEFAULT_ENCODING);
+					break;
+				case "properties":
+					properties.store(fileOutputStream, comment);
+					break;
+				default:
+					throw new Exception("Properties file error");
+			}
+			return true;
+		} catch (Exception e) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Save properties error! ", e);
+			}
+			return false;
+		} finally {
+			IOUtils.closeStream(fileOutputStream);
 		}
 	}
 }

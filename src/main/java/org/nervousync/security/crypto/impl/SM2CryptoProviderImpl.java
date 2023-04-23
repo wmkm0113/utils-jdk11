@@ -16,6 +16,7 @@
  */
 package org.nervousync.security.crypto.impl;
 
+import org.nervousync.commons.core.Globals;
 import org.nervousync.security.config.CipherConfig;
 import org.nervousync.security.crypto.AsymmetricCryptoProvider;
 import org.nervousync.enumerations.crypto.CryptoMode;
@@ -36,7 +37,7 @@ public final class SM2CryptoProviderImpl extends AsymmetricCryptoProvider {
      */
     public SM2CryptoProviderImpl(CipherConfig cipherConfig, CryptoMode cryptoMode,
                                  CipherKey cipherKey) throws CryptoException {
-        super(cipherConfig, cryptoMode, cipherKey);
+        super(cipherConfig, cryptoMode, cipherKey, Globals.INITIALIZE_INT_VALUE);
 //                new CipherKey(keyType, keyBytes, "EC", "SHA1PRNG", keySize,
 //                        certAlias, password, checkValidity, verifyKey));
     }

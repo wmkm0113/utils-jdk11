@@ -53,7 +53,7 @@ public class PartInputStream extends InputStream {
 	 * @param seekPosition       the seek position
 	 * @param length             the length
 	 * @param decryptor          the decryptor
-	 * @param isAESEncryptedFile the is aes encrypted file
+	 * @param isAESEncryptedFile is aes encrypted file
 	 * @throws IOException the io exception
 	 */
 	public PartInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition,

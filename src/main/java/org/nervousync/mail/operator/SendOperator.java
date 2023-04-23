@@ -21,7 +21,7 @@ import org.nervousync.mail.config.MailConfig;
 import java.util.Properties;
 
 /**
- * The interface Send operator.
+ * The interface SendOperator.
  */
 public interface SendOperator {
 

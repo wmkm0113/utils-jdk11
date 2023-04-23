@@ -178,7 +178,7 @@ public final class ZipFile implements Cloneable {
 	 * @param zipOptions Zip options
 	 * @param addFiles   List of files in zip file
 	 * @return ZipFile instance
-	 * @throws ZipException If target file was exists or add files is null or empty
+	 * @throws ZipException If the target file exists or add files is null or empty
 	 * @see ZipOptions
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions, String... addFiles) throws ZipException {
@@ -194,7 +194,7 @@ public final class ZipFile implements Cloneable {
 	 * @param splitLength  Maximum size of split file
 	 * @param addFiles     List of files in zip file
 	 * @return ZipFile instance
-	 * @throws ZipException If target file was exists or add files is null or empty
+	 * @throws ZipException If the target file was existed or add files is null or empty
 	 * @see ZipOptions
 	 */
 	public static ZipFile createZipFile(String filePath, ZipOptions zipOptions,
@@ -228,7 +228,7 @@ public final class ZipFile implements Cloneable {
 	 * @param zipOptions Zip options
 	 * @param folderPath Folder will add to zip file
 	 * @return ZipFile instance
-	 * @throws ZipException If target file was exists or folder is empty
+	 * @throws ZipException If the target file was existed or the folder is empty
 	 * @see ZipOptions
 	 */
 	public static ZipFile createZipFileFromFolder(final String filePath, final ZipOptions zipOptions,
@@ -246,7 +246,7 @@ public final class ZipFile implements Cloneable {
 	 * @param splitLength  Maximum size of split file
 	 * @param folderPath   Folder will add to zip file
 	 * @return ZipFile instance
-	 * @throws ZipException If target file was exists or folder is empty
+	 * @throws ZipException If target file was existed or folder is empty
 	 * @see ZipOptions
 	 */
 	public static ZipFile createZipFileFromFolder(String filePath, ZipOptions zipOptions,
@@ -266,7 +266,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Generate entity path
+	 * Generate the entity path
 	 *
 	 * @param file            Which file path will add to zip file
 	 * @param rootFolderInZip prefix path of zip file
@@ -332,7 +332,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Get entry path list
+	 * Get the entry path list
 	 *
 	 * @return entry path list
 	 */
@@ -341,7 +341,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Get entry path list
+	 * Get the entry path list
 	 *
 	 * @param regex the regex
 	 * @return entry path list
@@ -378,7 +378,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Read entry length
 	 *
-	 * @param entryPath Check entry path
+	 * @param entryPath Check the entry path
 	 * @return Entry length
 	 * @throws ZipException file list is empty or zipOptions is null
 	 */
@@ -392,7 +392,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Read entry data bytes
 	 *
-	 * @param entryPath Check entry path
+	 * @param entryPath Check the entry path
 	 * @return entry data bytes
 	 * @throws ZipException file list is empty or zipOptions is null
 	 */
@@ -403,7 +403,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Read entry data bytes
 	 *
-	 * @param entryPath  Check entry path
+	 * @param entryPath  Check the entry path
 	 * @param position   the position
 	 * @param readLength the read length
 	 * @return entry data bytes
@@ -420,7 +420,7 @@ public final class ZipFile implements Cloneable {
 	/**
 	 * Open input stream by given entry path
 	 *
-	 * @param entryPath Zip entry path
+	 * @param entryPath The zip entry path
 	 * @return Opened input stream
 	 * @throws ZipException File is split archive
 	 */
@@ -518,7 +518,7 @@ public final class ZipFile implements Cloneable {
 	 * Add folder to zip file
 	 *
 	 * @param folderPath Target folder path will add to zip file
-	 * @throws ZipException folder path is null or folder was not exists
+	 * @throws ZipException folder path is null or folder was not existed
 	 */
 	public void addFolder(String folderPath) throws ZipException {
 		this.addFolder(folderPath, ZipOptions.newOptions(), true);
@@ -529,7 +529,7 @@ public final class ZipFile implements Cloneable {
 	 *
 	 * @param folderPath Target folder path will add to zip file
 	 * @param zipOptions Zip options
-	 * @throws ZipException folder path is null or folder was not exists or zipOptions is null
+	 * @throws ZipException folder path is null or folder was not existed, or zipOptions is null
 	 * @see ZipOptions
 	 */
 	public void addFolder(String folderPath, ZipOptions zipOptions) throws ZipException {
@@ -537,7 +537,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Extract all entries in zip file to target extract file path
+	 * Extract all entries in zip file to the target extract file path
 	 *
 	 * @param destPath Target extract file path
 	 * @throws ZipException Target path is null or file exists
@@ -547,7 +547,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Extract all entries in zip file to target extract file path
+	 * Extract all entries in zip file to the target extract file path
 	 *
 	 * @param destPath       Target extract file path
 	 * @param ignoreFileAttr Status of process file attribute
@@ -566,7 +566,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Extract entry path file to target extra file path
+	 * Extract entry path file to the target extra file path
 	 *
 	 * @param entryPath Which entry path will extract
 	 * @param destPath  Target extract file path
@@ -577,7 +577,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Extract entry path file to target extra file path
+	 * Extract entry path file to the target extra file path
 	 *
 	 * @param entryPath      Which entry path will extract
 	 * @param destPath       Target extract file path
@@ -600,7 +600,7 @@ public final class ZipFile implements Cloneable {
 	 * Remove entry folder from zip file
 	 *
 	 * @param folderPath Which entry folder will be removed
-	 * @throws ZipException Given path was not a directory
+	 * @throws ZipException Given the path was not a directory
 	 */
 	public void removeFolder(String folderPath) throws ZipException {
 		if (this.isDirectory(folderPath)) {
@@ -611,10 +611,10 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Remove entry path from zip file
+	 * Remove the entry path from zip file
 	 *
 	 * @param entryPath Which entry path will be removed
-	 * @throws ZipException given entry path is null or zip file was not exists
+	 * @throws ZipException the given entry path is null or zip file was not existed
 	 */
 	public void removeExistsEntry(String entryPath) throws ZipException {
 		this.removeExistsEntries(entryPath);
@@ -624,7 +624,7 @@ public final class ZipFile implements Cloneable {
 	 * Remove entry paths from zip file
 	 *
 	 * @param existsEntries Which entry paths will be removed
-	 * @throws ZipException given entry path is null or zip file was not exists
+	 * @throws ZipException the given entry path is null or zip file was not existed
 	 */
 	public void removeExistsEntries(String... existsEntries) throws ZipException {
 		if (existsEntries == null) {
@@ -679,7 +679,7 @@ public final class ZipFile implements Cloneable {
 	 * Setting comment
 	 *
 	 * @param comment comment information
-	 * @throws ZipException comment is null or zip file was not exists
+	 * @throws ZipException comment is null or zip file was not existed
 	 */
 	public void setComment(String comment) throws ZipException {
 		if (comment == null) {
@@ -735,7 +735,7 @@ public final class ZipFile implements Cloneable {
 	 * Read comment
 	 *
 	 * @return Read comment content
-	 * @throws ZipException zip file was not exists
+	 * @throws ZipException zip file was not existed
 	 */
 	public String getComment() throws ZipException {
 		return this.getComment(this.charsetEncoding);
@@ -774,7 +774,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Merge split files and write merge file to target output path
+	 * Merge split files and write merge file to the target output path
 	 *
 	 * @param outputPath Merge file output path
 	 * @throws ZipException Zip file was not a split file or zip file invalid
@@ -917,7 +917,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Gets local file header list.
+	 * Gets the local file header list.
 	 *
 	 * @return the localFileHeaderList
 	 */
@@ -926,7 +926,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Sets local file header list.
+	 * Sets the local file header list.
 	 *
 	 * @param localFileHeaderList the localFileHeaderList to set
 	 */
@@ -2009,7 +2009,7 @@ public final class ZipFile implements Cloneable {
 		try (NervousyncRandomAccessFile input = retrieveHeaderFile()) {
 			this.readEndOfCentralDirectoryRecord(input);
 
-			// Check and set zip64 format
+			// Check and set the zip64 format
 			this.readZip64EndCentralDirectoryLocator(input);
 
 			if (this.zip64Format) {
@@ -2443,7 +2443,7 @@ public final class ZipFile implements Cloneable {
 			// zip64 end of central dir signature
 			HeaderOperator.appendIntToArrayList((int) Globals.ZIP64ENDCENDIRREC, headerBytesList);
 
-			// size of zip64 end of central directory record
+			// size zip64 end of central directory record
 			HeaderOperator.appendLongToArrayList(44L, headerBytesList);
 
 			// version made by
@@ -2457,12 +2457,12 @@ public final class ZipFile implements Cloneable {
 				HeaderOperator.copyByteArrayToList(EMPTY_SHORT_BUFFER, headerBytesList);
 			}
 
-			// number of this disk
+			// number of these disks
 			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.endCentralDirectoryRecord.getIndexOfThisDisk());
 			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
-			// number of the disk with start of central directory
+			// number of the disks with start of central directory
 			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.endCentralDirectoryRecord.getIndexOfThisDiskStartOfCentralDirectory());
 			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
@@ -2490,8 +2490,7 @@ public final class ZipFile implements Cloneable {
 			// Size of central directory
 			HeaderOperator.appendLongToArrayList(sizeOfCentralDirectory, headerBytesList);
 
-			// offset of start of central directory with respect to the starting
-			// disk number
+			// offset start of central directory with respect to the starting disk number
 			HeaderOperator.appendLongToArrayList(offsetCentralDirectory, headerBytesList);
 		} catch (Exception e) {
 			if (e instanceof ZipException) {
@@ -2516,8 +2515,7 @@ public final class ZipFile implements Cloneable {
 			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE, (int) Globals.ZIP64ENDCENDIRLOC);
 			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
-			// number of the disk with the start of the zip64 end of central
-			// directory
+			// number of the disks with the zip64 end of central directory
 			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE,
 					this.zip64EndCentralDirectoryLocator.getIndexOfZip64EndOfCentralDirectoryRecord());
 			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
@@ -2552,17 +2550,17 @@ public final class ZipFile implements Cloneable {
 			RawUtils.writeInt(intBuffer, 0, RawUtils.Endian.LITTLE, (int) this.endCentralDirectoryRecord.getSignature());
 			HeaderOperator.copyByteArrayToList(intBuffer, headerBytesList);
 
-			// number of this disk
+			// number of these disks
 			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE,
 					(short) (this.endCentralDirectoryRecord.getIndexOfThisDisk()));
 			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
-			// number of the disk with start of central directory
+			// number of the disks with start of central directory
 			RawUtils.writeShort(shortBuffer, 0, RawUtils.Endian.LITTLE,
 					(short) (this.endCentralDirectoryRecord.getIndexOfThisDiskStartOfCentralDirectory()));
 			HeaderOperator.copyByteArrayToList(shortBuffer, headerBytesList);
 
-			// Total number of entries in central directory on this disk
+			// Total number of entries in the central directory on this disk
 			int numEntries;
 			int numEntriesOnThisDisk;
 			if (this.centralDirectory == null || this.centralDirectory.getFileHeaders() == null) {
@@ -3004,7 +3002,7 @@ public final class ZipFile implements Cloneable {
 			}
 			this.zip64EndCentralDirectoryRecord.setSignature(signature);
 
-			// Read size of zip64 end of central directory record
+			// Read the size of zip64 end of central directory record
 			System.arraycopy(readBuffer, 4, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord.setRecordSize(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
@@ -3016,7 +3014,7 @@ public final class ZipFile implements Cloneable {
 			System.arraycopy(readBuffer, 14, shortBuffer, 0, 2);
 			this.zip64EndCentralDirectoryRecord.setExtractNeeded(RawUtils.readShort(shortBuffer, 0, RawUtils.Endian.LITTLE));
 
-			// Number of this disk
+			// Number of these disks
 			System.arraycopy(readBuffer, 16, intBuffer, 0, 4);
 			this.zip64EndCentralDirectoryRecord.setIndex(RawUtils.readInt(intBuffer, 0, RawUtils.Endian.LITTLE));
 
@@ -3040,7 +3038,7 @@ public final class ZipFile implements Cloneable {
 			this.zip64EndCentralDirectoryRecord
 					.setSizeOfCentralDirectory(RawUtils.readLong(longBuffer, 0, RawUtils.Endian.LITTLE));
 
-			// Offset of start of central directory with respect to the starting
+			// Offset start of central directory with respect to the starting
 			// disk number
 			System.arraycopy(readBuffer, 48, longBuffer, 0, 8);
 			this.zip64EndCentralDirectoryRecord

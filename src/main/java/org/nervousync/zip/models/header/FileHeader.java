@@ -260,7 +260,7 @@ public class FileHeader {
 	}
 
 	/**
-	 * Gets entry path.
+	 * Gets the entry path.
 	 *
 	 * @return the entryPath
 	 */
@@ -269,7 +269,7 @@ public class FileHeader {
 	}
 
 	/**
-	 * Sets entry path.
+	 * Sets the entry path.
 	 *
 	 * @param entryPath the entryPath to set
 	 */

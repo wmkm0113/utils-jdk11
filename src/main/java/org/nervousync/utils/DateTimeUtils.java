@@ -50,7 +50,7 @@ public final class DateTimeUtils {
 	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
 	/**
 	 * Static value for date format EEE, dd MMM yyyy HH:mm:ss 'GMT'
-	 * Using for generate Response header: Last-Modified
+	 * Using for generated Response header: Last-Modified
 	 */
 	public static final String LAST_MODIFIED_DATETIME_PATTERN = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
 	/**
@@ -64,7 +64,7 @@ public final class DateTimeUtils {
 	public static final DateTimeFormatter DEFAULT_ISO8601_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601);
 	/**
-	 * Static DateTimeFormatter instance for site map
+	 * Static DateTimeFormatter instance for the site map
 	 */
 	public static final DateTimeFormatter DEFAULT_SITE_MAP_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
@@ -217,7 +217,7 @@ public final class DateTimeUtils {
 	}
 	
 	/**
-	 * Return expire day value with format "yyyyMMdd"
+	 * Return expires day value with format "yyyyMMdd"
 	 *
 	 * @param expireTime expire time
 	 * @return		expire day
@@ -228,7 +228,7 @@ public final class DateTimeUtils {
 	}
 
 	/**
-	 * Return expire day value with format "yyyyMMdd"
+	 * Return expires day value with format "yyyyMMdd"
 	 *
 	 * @param expireTime expire time
 	 * @return		expire GMT day
@@ -378,7 +378,7 @@ public final class DateTimeUtils {
 	}
 	
 	/**
-	 * Converts time in dos format to Java format
+	 * Converts the time in dos format to Java format
 	 *
 	 * @param dosTime dos time
 	 * @return time in java format
@@ -697,7 +697,7 @@ public final class DateTimeUtils {
 	}
 
 	/**
-	 * Formats given Date object according to specified locale and a given
+	 * Formats given the Date object according to specified locale and a given
 	 * pattern.
 	 *
 	 * @param date   Date object to convert

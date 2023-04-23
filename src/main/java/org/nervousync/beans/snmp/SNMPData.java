@@ -39,7 +39,7 @@ public final class SNMPData implements Serializable {
 	private static final long serialVersionUID = -9033003833049981503L;
 
 	/**
-	 * GMT time of reading datas operate.
+	 * GMT time of reading datas operates.
 	 */
 	private final long currentGMTTime;
 	/**

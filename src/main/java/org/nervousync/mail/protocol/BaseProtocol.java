@@ -64,7 +64,7 @@ public abstract class BaseProtocol implements Serializable {
     private final ProxyConfig proxyConfig;
 
     /**
-     * Constructor for define protocol type
+     * Constructor for define the protocol type
      */
     protected BaseProtocol(final String secureName, final ProxyConfig proxyConfig) {
         this.secureName = secureName;

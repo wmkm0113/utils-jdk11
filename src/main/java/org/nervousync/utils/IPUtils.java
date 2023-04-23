@@ -182,7 +182,7 @@ public final class IPUtils {
 	}
 
 	/**
-	 * Convert IP Address to byte array
+	 * Convert IP Address to byte arrays
 	 *
 	 * @param ipAddress IP Address
 	 * @return byte array
@@ -199,7 +199,7 @@ public final class IPUtils {
 	}
 
 	/**
-	 * Convert IPv4 address to byte array
+	 * Convert IPv4 address to byte arrays
 	 *
 	 * @param ipAddress IPv4 address
 	 * @return byte array length 4
@@ -220,7 +220,7 @@ public final class IPUtils {
 	}
 
 	/**
-	 * Convert IPv6 address to byte array
+	 * Convert IPv6 address to byte arrays
 	 *
 	 * @param ipAddress IPv6 address
 	 * @return byte array length 16
@@ -413,7 +413,7 @@ public final class IPUtils {
 	}
 
 	/**
-	 * Calculate IP range begin address
+	 * Calculate IP range begins address
 	 *
 	 * @param ipAddress IP address in range
 	 * @param netmask   Net mask address
@@ -460,7 +460,7 @@ public final class IPUtils {
 	}
 
 	/**
-	 * Calculate IPv6 range begin address
+	 * Calculate IPv6 range begins address
 	 *
 	 * @param ipAddress IPv6 address
 	 * @param cidr      CIDR

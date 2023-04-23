@@ -17,7 +17,7 @@
 package org.nervousync.zip.models.central;
 
 /**
- * The type Zip 64 end central directory locator.
+ * The type Zip64 end central directory locator.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:32:41 PM $
@@ -30,7 +30,7 @@ public final class Zip64EndCentralDirectoryLocator {
 	private int totalNumberOfDiscs;
 
 	/**
-	 * Instantiates a new Zip 64 end central directory locator.
+	 * Instantiates a new Zip64 end central directory locator.
 	 */
 	public Zip64EndCentralDirectoryLocator() {
 	}

@@ -42,7 +42,7 @@ public final class MarkOptions {
 	 */
 	private final MarkLocation markLocation;
 	/**
-	 * Mark image path if mark type is MarkType.ICON
+	 * Mark image path if the mark type is MarkType.ICON
 	 */
 	private final String markPath;
 	/**
@@ -50,7 +50,7 @@ public final class MarkOptions {
 	 */
 	private final float transparency;
 	/**
-	 * Mark text value if mark type is MarkType.TEXT
+	 * Mark text value if the mark type is MarkType.TEXT
 	 */
 	private final String markText;
 	/**
@@ -110,7 +110,7 @@ public final class MarkOptions {
 	}
 
 	/**
-	 * Gets mark type.
+	 * Gets the mark type.
 	 *
 	 * @return the markType
 	 */
@@ -128,7 +128,7 @@ public final class MarkOptions {
 	}
 
 	/**
-	 * Gets mark path.
+	 * Gets the mark path.
 	 *
 	 * @return the markPath
 	 */

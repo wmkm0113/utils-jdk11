@@ -18,6 +18,7 @@ package org.nervousync.beans.core;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
+import org.nervousync.annotations.beans.OutputConfig;
 import org.nervousync.commons.adapter.xml.CDataAdapter;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.xml.XmlException;
@@ -37,6 +38,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The type Bean object.
@@ -103,7 +105,7 @@ public class BeanObject implements Serializable {
 
 	/**
 	 * Convert Object to XML String
-	 * Explain all empty element
+	 * Explain all empty elements
 	 *
 	 * @param formattedOutput Formatted output
 	 * @return XML String
@@ -115,7 +117,20 @@ public class BeanObject implements Serializable {
 
 	/**
 	 * Convert Object to XML String
-	 * Explain all empty element
+	 * Explain all empty elements
+	 *
+	 * @param formattedOutput Formatted output
+	 * @param encoding        Charset encoding
+	 * @return XML String
+	 * @throws XmlException the xml exception
+	 */
+	public final String toXML(final boolean formattedOutput, final String encoding) throws XmlException {
+		return this.toXML(Boolean.TRUE, formattedOutput, encoding);
+	}
+
+	/**
+	 * Convert Object to XML String
+	 * Explain all empty elements
 	 *
 	 * @param outputFragment  Output fragment
 	 * @param formattedOutput Formatted output
@@ -128,7 +143,7 @@ public class BeanObject implements Serializable {
 
 	/**
 	 * Convert Object to XML String
-	 * Explain all empty element
+	 * Explain all empty elements
 	 *
 	 * @param outputFragment  Output fragment
 	 * @param formattedOutput Formatted output
@@ -241,6 +256,28 @@ public class BeanObject implements Serializable {
 		return result;
 	}
 
+	@Override
+	public final String toString() {
+		return Optional.ofNullable(this.getClass().getAnnotation(OutputConfig.class))
+				.map(outputConfig -> {
+					switch (outputConfig.type()) {
+						case XML:
+							return this.toXML(outputConfig.formatted(), outputConfig.encoding());
+						case JSON:
+							return outputConfig.formatted() ? this.toFormattedJson() : this.toJson();
+						case YAML:
+							return outputConfig.formatted() ? this.toFormattedYaml() : this.toYaml();
+						default:
+							return this.objectToString();
+					}
+				})
+				.orElse(this.objectToString());
+	}
+
+	public String objectToString() {
+		return super.toString();
+	}
+
 	private static final class CDataStreamWriter implements XMLStreamWriter {
 
 		private final XMLStreamWriter xmlStreamWriter;
@@ -259,7 +296,7 @@ public class BeanObject implements Serializable {
 		 * open a new scope in the internal namespace context.  Writing the
 		 * corresponding EndElement causes the scope to be closed.
 		 *
-		 * @param localName local name of the tag, may not be null
+		 * @param localName the local name of the tag may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
@@ -271,7 +308,7 @@ public class BeanObject implements Serializable {
 		 * Writes a start tag to the output
 		 *
 		 * @param namespaceURI the namespaceURI of the prefix to use, may not be null
-		 * @param localName    local name of the tag, may not be null
+		 * @param localName    the local name of the tag may not be null
 		 * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
 		 *                            javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
@@ -283,8 +320,8 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes a start tag to the output
 		 *
-		 * @param prefix       the prefix of the tag, may not be null
-		 * @param localName    local name of the tag, may not be null
+		 * @param prefix       the prefix of the tag may not be null
+		 * @param localName    the local name of the tag may not be null
 		 * @param namespaceURI the uri to bind the prefix to, may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
@@ -298,7 +335,7 @@ public class BeanObject implements Serializable {
 		 * Writes an empty element tag to the output
 		 *
 		 * @param namespaceURI the uri to bind the tag to, may not be null
-		 * @param localName    local name of the tag, may not be null
+		 * @param localName    the local name of the tag may not be null
 		 * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
 		 *                            javax.xml.stream.isRepairingNamespaces has not been set to true
 		 */
@@ -310,8 +347,8 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes an empty element tag to the output
 		 *
-		 * @param prefix       the prefix of the tag, may not be null
-		 * @param localName    local name of the tag, may not be null
+		 * @param prefix       the prefix of the tag may not be null
+		 * @param localName    the local name of the tag may not be null
 		 * @param namespaceURI the uri to bind the tag to, may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
@@ -324,7 +361,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes an empty element tag to the output
 		 *
-		 * @param localName local name of the tag, may not be null
+		 * @param localName the local name of the tag may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
@@ -403,7 +440,7 @@ public class BeanObject implements Serializable {
 		 */
 		@Override
 		public void writeAttribute(final String prefix, final String namespaceURI,
-		                           final String localName, final String value) throws XMLStreamException {
+								   final String localName, final String value) throws XMLStreamException {
 			this.xmlStreamWriter.writeAttribute(prefix, namespaceURI, localName, value);
 		}
 
@@ -464,7 +501,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes a processing instruction
 		 *
-		 * @param target the target of the processing instruction, may not be null
+		 * @param target the target of the processing instruction may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
 		@Override
@@ -475,7 +512,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes a processing instruction
 		 *
-		 * @param target the target of the processing instruction, may not be null
+		 * @param target the target of the processing instruction may not be null
 		 * @param data   the data contained in the processing instruction, may not be null
 		 * @throws XMLStreamException   XMLStreamException
 		 */
@@ -600,7 +637,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Sets the prefix the uri is bound to.  This prefix is bound
 		 * in the scope of the current START_ELEMENT / END_ELEMENT pair.
-		 * If this method is called before a START_ELEMENT has been written
+		 * If this method is called before a START_ELEMENT has been written,
 		 * the prefix is bound in the root scope.
 		 *
 		 * @param prefix the prefix to bind to the uri, may not be null
@@ -616,7 +653,7 @@ public class BeanObject implements Serializable {
 		 * Binds a URI to the default namespace
 		 * This URI is bound
 		 * in the scope of the current START_ELEMENT / END_ELEMENT pair.
-		 * If this method is called before a START_ELEMENT has been written
+		 * If this method is called before a START_ELEMENT has been written,
 		 * the uri is bound in the root scope.
 		 *
 		 * @param uri the uri to bind to the default namespace, may be null
@@ -636,7 +673,7 @@ public class BeanObject implements Serializable {
 		 * namespaces.  This method may only be called once at the start of
 		 * the document.  It does not cause the namespaces to be declared.
 		 * If a namespace URI to prefix mapping is found in the namespace
-		 * context it is treated as declared and the prefix may be used
+		 * context, it is treated as declared and the prefix may be used
 		 * by the StreamWriter.
 		 *
 		 * @param context the namespace context to use for this writer, may not be null
@@ -660,7 +697,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Get the value of a feature/property from the underlying implementation
 		 *
-		 * @param name The name of the property, may not be null
+		 * @param name The name of the property may not be null
 		 * @return The value of the property
 		 * @throws IllegalArgumentException if the property is not supported
 		 * @throws NullPointerException     if the name is null

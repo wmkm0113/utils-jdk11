@@ -40,7 +40,7 @@ public final class GeneralFileHeader extends FileHeader {
 	}
 
 	/**
-	 * Gets made version.
+	 * Gets made versions.
 	 *
 	 * @return the madeVersion
 	 */

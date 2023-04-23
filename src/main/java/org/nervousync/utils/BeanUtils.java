@@ -103,7 +103,7 @@ public final class BeanUtils {
 	 * </p>
 	 *
 	 * @param origObject    source object
-	 * @param destObjects	target object array
+	 * @param destObjects	target object arrays
 	 */
 	public static void copyTo(final Object origObject, final Object... destObjects) {
 		if (origObject == null || destObjects.length == 0) {
@@ -248,14 +248,10 @@ public final class BeanUtils {
 	}
 
 	private static PropertyMapping newInstance(final BeanProperty beanProperty) {
-		PropertyMapping propertyMapping = null;
-		Field field = ReflectionUtils.findField(beanProperty.beanClass(), beanProperty.targetField());
-		if (field != null) {
-			String fieldName = field.getName();
-			Class<?> fieldType = field.getType();
-			propertyMapping =
-					new PropertyMapping(beanProperty.beanClass(), fieldType, fieldName, beanProperty.converter());
-		}
-		return propertyMapping;
+		return Optional.ofNullable(ClassUtils.findField(beanProperty.beanClass(), beanProperty.targetField()))
+				.map(field ->
+						new PropertyMapping(beanProperty.beanClass(), field.getType(),
+								field.getName(), beanProperty.converter()))
+				.orElse(null);
 	}
 }

@@ -63,7 +63,7 @@ public class SplitOutputStream extends OutputStream {
 	 * Instantiates a new Split output stream.
 	 *
 	 * @param filePath the file path
-	 * @throws FileNotFoundException the file not found exception
+	 * @throws FileNotFoundException the file was not found exception
 	 * @throws ZipException          the zip exception
 	 */
 	public SplitOutputStream(String filePath) throws FileNotFoundException, ZipException {
@@ -75,7 +75,7 @@ public class SplitOutputStream extends OutputStream {
 	 *
 	 * @param savePath    the save path
 	 * @param splitLength the split length
-	 * @throws FileNotFoundException the file not found exception
+	 * @throws FileNotFoundException the file was not found exception
 	 * @throws ZipException          the zip exception
 	 */
 	public SplitOutputStream(String savePath, long splitLength) throws FileNotFoundException, ZipException {
@@ -199,7 +199,7 @@ public class SplitOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Gets file pointer.
+	 * Gets the file pointer.
 	 *
 	 * @return the file pointer
 	 * @throws IOException the io exception

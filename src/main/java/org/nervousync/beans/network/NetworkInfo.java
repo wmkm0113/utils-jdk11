@@ -48,7 +48,7 @@ public final class NetworkInfo implements Serializable {
 	 */
 	private final boolean virtual;
 	/**
-	 * Interface display name in system
+	 * Interface display name in the system
 	 */
 	private final String displayName;
 	/**
@@ -64,7 +64,7 @@ public final class NetworkInfo implements Serializable {
 	 * Constructor for NetworkInfo
 	 *
 	 * @param networkInterface NetworkInterface value
-	 * @throws NetworkInfoException If value of NetworkInterface is null or catch other SocketException
+	 * @throws NetworkInfoException If the value of NetworkInterface is null or catch other SocketException
 	 */
 	public NetworkInfo(final NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {
@@ -139,7 +139,7 @@ public final class NetworkInfo implements Serializable {
 	}
 
 	/**
-	 * Gets ip address list.
+	 * Gets the ip address list.
 	 *
 	 * @return the getIpAddressList
 	 */

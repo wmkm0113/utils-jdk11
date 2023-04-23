@@ -46,7 +46,7 @@ public final class MailConfig extends BeanObject {
      * Mail account password
      */
     @XmlElement(name = "password")
-    private String passWord;
+    private String password;
     @XmlElement(name = "proxy_config", namespace = "https://nervousync.org/schemas/proxy")
     private ProxyConfig proxyConfig = ProxyConfig.redirect();
     /**
@@ -60,7 +60,7 @@ public final class MailConfig extends BeanObject {
     @XmlElement(name = "receive_config")
     private ServerConfig receiveConfig;
     /**
-     * Attaches file storage path
+     * Attaches the file storage path
      */
     @XmlElement(name = "storage_path")
     private String storagePath;
@@ -119,17 +119,17 @@ public final class MailConfig extends BeanObject {
      *
      * @return the pass word
      */
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
     /**
      * Sets pass word.
      *
-     * @param passWord the pass word
+     * @param password the pass word
      */
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
@@ -187,7 +187,7 @@ public final class MailConfig extends BeanObject {
     }
 
     /**
-     * Gets storage path.
+     * Gets the storage path.
      *
      * @return the storage path
      */
@@ -196,7 +196,7 @@ public final class MailConfig extends BeanObject {
     }
 
     /**
-     * Sets storage path.
+     * Sets the storage path.
      *
      * @param storagePath the storage path
      */
@@ -375,7 +375,7 @@ public final class MailConfig extends BeanObject {
         }
 
         /**
-         * Gets protocol option.
+         * Gets the protocol option.
          *
          * @return the protocol option
          */
@@ -384,7 +384,7 @@ public final class MailConfig extends BeanObject {
         }
 
         /**
-         * Sets protocol option.
+         * Sets the protocol option.
          *
          * @param protocolOption the protocol option
          */
@@ -427,5 +427,20 @@ public final class MailConfig extends BeanObject {
         public void setProcessTimeout(int processTimeout) {
             this.processTimeout = processTimeout;
         }
+    }
+
+    public void copyProperties(final MailConfig mailConfig) {
+        if (mailConfig == null) {
+            return;
+        }
+        this.secureName = mailConfig.getSecureName();
+        this.userName = mailConfig.getUserName();
+        this.password = mailConfig.getPassword();
+        this.proxyConfig = mailConfig.getProxyConfig();
+        this.sendConfig = mailConfig.getSendConfig();
+        this.receiveConfig = mailConfig.getReceiveConfig();
+        this.storagePath = mailConfig.getStoragePath();
+        this.certificate = mailConfig.getCertificate();
+        this.privateKey = getPrivateKey();
     }
 }

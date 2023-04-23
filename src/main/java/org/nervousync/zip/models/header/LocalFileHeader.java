@@ -80,7 +80,7 @@ public final class LocalFileHeader extends FileHeader {
 	}
 
 	/**
-	 * Is write compress size in zip 64 extra record boolean.
+	 * Is writing compress size in zip 64 extra record boolean.
 	 *
 	 * @return the writeCompressSizeInZip64ExtraRecord
 	 */

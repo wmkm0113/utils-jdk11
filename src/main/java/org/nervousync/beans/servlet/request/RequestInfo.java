@@ -26,7 +26,6 @@ import org.nervousync.commons.http.cert.TrustCert;
 import org.nervousync.commons.http.cookie.CookieEntity;
 import org.nervousync.commons.http.header.SimpleHeader;
 import org.nervousync.commons.proxy.ProxyConfig;
-import org.nervousync.exceptions.builder.BuilderException;
 
 /**
  * Request information for sending by com.nervousync.utils.RequestUtils
@@ -156,7 +155,7 @@ public final class RequestInfo {
     }
 
     /**
-     * Gets cookie list.
+     * Gets the cookie list.
      *
      * @return the cookie list
      */
@@ -219,7 +218,7 @@ public final class RequestInfo {
     }
 
     /**
-     * Gets content type.
+     * Gets the content type.
      *
      * @return the content type
      */
@@ -278,7 +277,7 @@ public final class RequestInfo {
             super(requestBuilder, Globals.DEFAULT_VALUE_STRING, proxyConfig);
         }
 
-        protected void build() throws BuilderException {
+        protected void build() {
             this.parentBuilder.proxyConfig(this.proxyConfig);
         }
     }
@@ -504,7 +503,7 @@ public final class RequestInfo {
         }
 
         /**
-         * Add cookies request builder.
+         * Add cookie request builder.
          *
          * @param cookieEntities the cookie entity array
          * @return the request builder
@@ -515,7 +514,7 @@ public final class RequestInfo {
         }
 
         /**
-         * Add cookies request builder.
+         * Add cookie request builder.
          *
          * @param responseCookieValue the response cookie value
          * @return the request builder

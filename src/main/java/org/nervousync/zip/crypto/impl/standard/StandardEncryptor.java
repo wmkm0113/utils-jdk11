@@ -24,7 +24,7 @@ import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Encryptor;
 
 /**
- * Encryptor implement of standard
+ * Encryptor implement of the standard
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Nov 29, 2017 5:08:31 PM $

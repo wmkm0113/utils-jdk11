@@ -34,7 +34,7 @@ public final class Zip64ExtendInfo {
 	private int diskNumberStart = Globals.DEFAULT_VALUE_INT;
 
 	/**
-	 * Instantiates a new Zip 64 extend info.
+	 * Instantiates new Zip64 extend info.
 	 */
 	public Zip64ExtendInfo() {
 	}

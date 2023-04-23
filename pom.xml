@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nervousync</groupId>
     <artifactId>utils-jdk11</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <name>Nervousync Java Utility Collections</name>
     <url>https://gene.nervousync.org/index.shtml</url>
@@ -20,7 +20,7 @@
         </license>
     </licenses>
     <scm>
-        <tag>v1.0.5</tag>
+        <tag>v1.1.1</tag>
         <url>https://github.com/wmkm0113/Gene</url>
         <connection>scm:git:https://github.com/wmkm0113/Gene.git</connection>
         <developerConnection>scm:git:https://github.com/wmkm0113/Gene.git</developerConnection>
@@ -42,6 +42,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <junit.platform.version>1.9.2</junit.platform.version>
         <jakarta.activation.version>2.0.1</jakarta.activation.version>
@@ -516,7 +517,6 @@
                             <configuration>
                                 <source>${maven.compiler.source}</source>
                                 <target>${maven.compiler.target}</target>
-                                <encoding>UTF-8</encoding>
                             </configuration>
                         </plugin>
                         <plugin>
@@ -537,6 +537,24 @@
                                         <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                                     </manifestEntries>
                                 </archive>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>${maven.javadoc.version}</version>
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <id>attach-javadocs</id>
+                                    <goals>
+                                        <goal>jar</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                                <doclint>-html</doclint>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -566,24 +584,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven.javadoc.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
-                            <doclint>-html</doclint>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

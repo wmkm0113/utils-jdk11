@@ -18,9 +18,9 @@ import java.util.Date;
 public final class CryptoTest extends BaseTest {
 
     private static final String[] DEFAULT_CIPHER_MODES =
-            new String[] {"ECB", "CBC", "CTR", "CTS", "CFB", "OFB", /*"PCBC", "CFB8", "CFB128", "OFB8", "OFB128"*/};
-    private static final String[] DEFAULT_PADDINGS = new String[] {"PKCS5Padding", "ISO10126Padding"};
-    private static final String ORIGINAL_STRING = "123456";
+            new String[]{"ECB", "CBC", "CTR", "CTS", "CFB", "OFB", /*"PCBC", "CFB8", "CFB128", "OFB8", "OFB128"*/};
+    private static final String[] DEFAULT_PADDINGS = new String[]{"PKCS5Padding", "ISO10126Padding"};
+    private static final String ORIGINAL_STRING = "Test测试TestTest测试TestTestTest测试TestTestTestTest测试TestTestTestTestTest测试TestTestTestTestTestTest测试TestTestTestTestTestTestTest测试TestTestTestTestTest测试";
 
     @Test
     public void test000AES() throws CryptoException {
@@ -96,9 +96,9 @@ public final class CryptoTest extends BaseTest {
         }
     }
 
-    private static final String[] SM4_CIPHER_MODES = new String[] {"ECB", "CBC", "CTR", "CFB", "OFB"};
+    private static final String[] SM4_CIPHER_MODES = new String[]{"ECB", "CBC", "CTR", "CFB", "OFB"};
     private static final String[] SM4_PADDINGS =
-            new String[] {"PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"};
+            new String[]{"PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"};
 
     @Test
     public void test030SM4() throws CryptoException {
@@ -116,9 +116,10 @@ public final class CryptoTest extends BaseTest {
         }
     }
 
-    private static final String[] RSA_PADDINGS = new String[] {
+    private static final String[] RSA_PADDINGS = new String[]{
             "NoPadding", "PKCS1Padding", "OAEPWithSHA-1AndMGF1Padding",
-            "OAEPWithSHA-256AndMGF1Padding", "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding"
+            "OAEPWithSHA-224AndMGF1Padding", "OAEPWithSHA-256AndMGF1Padding", "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding",
+            "OAEPWithSHA3-224AndMGF1Padding", "OAEPWithSHA3-256AndMGF1Padding", "OAEPWithSHA3-384AndMGF1Padding", "OAEPWithSHA3-512AndMGF1Padding"
     };
 
     @Test

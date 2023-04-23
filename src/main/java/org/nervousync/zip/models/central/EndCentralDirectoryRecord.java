@@ -95,7 +95,7 @@ public final class EndCentralDirectoryRecord {
 	}
 
 	/**
-	 * Gets total of entries in central directory on this disk.
+	 * Gets total of entries in the central directory on this disk.
 	 *
 	 * @return the totalOfEntriesInCentralDirectoryOnThisDisk
 	 */

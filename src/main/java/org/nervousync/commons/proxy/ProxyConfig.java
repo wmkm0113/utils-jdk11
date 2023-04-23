@@ -77,7 +77,7 @@ public final class ProxyConfig extends BeanObject {
     }
 
     /**
-     * Gets proxy type.
+     * Gets the proxy type.
      *
      * @return the proxy type
      */
@@ -86,7 +86,7 @@ public final class ProxyConfig extends BeanObject {
     }
 
     /**
-     * Sets proxy type.
+     * Sets the proxy type.
      *
      * @param proxyType the proxy type
      */
@@ -131,18 +131,18 @@ public final class ProxyConfig extends BeanObject {
     }
 
     /**
-     * Gets user name.
+     * Gets username.
      *
-     * @return the user name
+     * @return the username
      */
     public String getUserName() {
         return userName;
     }
 
     /**
-     * Sets user name.
+     * Sets username.
      *
-     * @param userName the user name
+     * @param userName the username
      */
     public void setUserName(String userName) {
         this.userName = userName;

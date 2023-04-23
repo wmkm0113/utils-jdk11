@@ -82,7 +82,7 @@ public final class SegmentationItem extends BeanObject {
 	}
 
 	/**
-	 * Constructor for define segmentation item
+	 * Constructor for defined segmentation item
 	 *
 	 * @param position    Item position
 	 * @param dataContent Item data content

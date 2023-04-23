@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -36,7 +37,7 @@ import org.nervousync.commons.core.Globals;
 
 /**
  * Image utils
- * implements: 
+ * implements:
  * Resize image by ratio
  * Resize image to target width/height
  * Retrieve image width value
@@ -46,7 +47,7 @@ import org.nervousync.commons.core.Globals;
  * @version $Revision: 1.0 $ $Date: May 1, 2018 1:49:46 PM $
  */
 public final class ImageUtils {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImageUtils.class);
 
 	private ImageUtils() {
@@ -91,7 +92,7 @@ public final class ImageUtils {
 	}
 
 	/**
-	 * Read image ratio
+	 * Read the image ratio
 	 * @param imagePath		image file path
 	 * @return  image ratio
 	 */
@@ -105,9 +106,9 @@ public final class ImageUtils {
 
 		return imageWidth / imageHeight;
 	}
-	
+
 	/**
-	 * Cut image 
+	 * Cut image
 	 * @param origPath			original image file path
 	 * @param destPath			target output file path
 	 * @param cutOptions		cut options
@@ -126,17 +127,17 @@ public final class ImageUtils {
 
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(origPath));
-				BufferedImage bufferedImage = 
-						new BufferedImage(cutOptions.getCutWidth(), cutOptions.getCutHeight(), 
+				BufferedImage bufferedImage =
+						new BufferedImage(cutOptions.getCutWidth(), cutOptions.getCutHeight(),
 								BufferedImage.TYPE_INT_RGB);
-				
+
 				for (int i = 0 ; i < cutOptions.getCutWidth() ; i++) {
 					for (int j = 0 ; j < cutOptions.getCutHeight() ; j++) {
-						bufferedImage.setRGB(i, j, 
+						bufferedImage.setRGB(i, j,
 								srcImage.getRGB(cutOptions.getPositionX() + i, cutOptions.getPositionY() + j));
 					}
 				}
-				
+
 				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {
@@ -172,10 +173,10 @@ public final class ImageUtils {
 		if (FileUtils.isExists(origPath) && FileUtils.imageFile(origPath) && ratio > 0) {
 			try {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(origPath));
-				
+
 				int origWidth = srcImage.getWidth(null);
 				int origHeight = srcImage.getHeight(null);
-				
+
 				int targetWidth = Double.valueOf(origWidth * ratio).intValue();
 				int targetHeight = Double.valueOf(origHeight * ratio).intValue();
 
@@ -190,7 +191,7 @@ public final class ImageUtils {
 		}
 		return Boolean.FALSE;
 	}
-	
+
 	/**
 	 * Resize picture with given width and height
 	 * @param origPath			original picture file path
@@ -203,7 +204,7 @@ public final class ImageUtils {
 	                               final int targetWidth, final int targetHeight) {
 		return ImageUtils.resizeTo(origPath, destPath, targetWidth, targetHeight, null);
 	}
-	
+
 	/**
 	 * Resize picture with given width and height
 	 * @param origPath			original picture file path
@@ -262,8 +263,7 @@ public final class ImageUtils {
 		int imageWidth = ImageUtils.imageWidth(filePath);
 		int imageHeight = ImageUtils.imageHeight(filePath);
 		try {
-			BufferedImage bufferedImage =
-					new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+			BufferedImage bufferedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 			return ImageIO.write(processImage(bufferedImage, imageWidth, imageHeight, markOptions),
 					StringUtils.getFilenameExtension(targetPath),
 					FileUtils.getFile(targetPath));
@@ -424,7 +424,7 @@ public final class ImageUtils {
 		}
 		return pHash.toString();
 	}
-	
+
 	/**
 	 * Process image mark
 	 * @param graphics			target image graphics object
@@ -435,18 +435,18 @@ public final class ImageUtils {
 	private static void markImage(final Graphics2D graphics, final int width, final int height,
 	                              final MarkOptions markOptions) {
 		MarkPosition markPosition = markOptions.retrievePosition(width, height);
-		
+
 		if (markPosition != null) {
 			switch (markOptions.getMarkType()) {
 			case ICON:
 				try {
 					BufferedImage iconImg = ImageIO.read(FileUtils.getFile(markOptions.getMarkPath()));
-					if (iconImg != null && markOptions.getTransparency() >= 0 
+					if (iconImg != null && markOptions.getTransparency() >= 0
 							&& markOptions.getTransparency() <= 1) {
-						graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 
+						graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
 								markOptions.getTransparency()));
 						graphics.drawImage(iconImg, markPosition.getPositionX(), markPosition.getPositionY(), null);
-						
+
 						graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 					}
 				} catch (Exception e) {
@@ -460,16 +460,16 @@ public final class ImageUtils {
 						&& markOptions.getFontSize() > 0) {
 					graphics.setColor(markOptions.getColor());
 					graphics.setFont(new Font(markOptions.getFontName(), Font.PLAIN, markOptions.getFontSize()));
-					
+
 					graphics.drawString(markOptions.getMarkText(), markPosition.getPositionX(), markPosition.getPositionY());
 				}
 				break;
 			}
 		}
 	}
-	
+
 	/**
-	 * Process image operate
+	 * Process image operates
 	 * @param srcImage				original image object
 	 * @param targetWidth			target width
 	 * @param targetHeight			target height
@@ -480,16 +480,14 @@ public final class ImageUtils {
 	                                          final int targetHeight, final MarkOptions markOptions) {
 		if (srcImage != null && targetWidth > 0 && targetHeight > 0) {
 			try {
-				BufferedImage bufferedImage = 
-						new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+				BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
 				Graphics2D graphics = bufferedImage.createGraphics();
 				graphics.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
 
-				if (markOptions != null) {
-					markImage(graphics, targetWidth, targetHeight, markOptions);
-				}
+				Optional.ofNullable(markOptions)
+						.ifPresent(options -> markImage(graphics, targetWidth, targetHeight, options));
 				graphics.dispose();
-				
+
 				return bufferedImage;
 			} catch (Exception e) {
 				if (LOGGER.isDebugEnabled()) {

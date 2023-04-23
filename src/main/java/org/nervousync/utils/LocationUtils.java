@@ -30,7 +30,7 @@ public final class LocationUtils {
 	private static final double EARTH_EE = 0.00669342162296594323;
 
 	/**
-	 * Calc distance of begin point and end point(Unit: Kilometers)
+	 * Calc distance of beginning point and end point(Unit: Kilometers)
 	 * @param beginPoint    Begin point
 	 * @param endPoint      End point
 	 * @return              distance
