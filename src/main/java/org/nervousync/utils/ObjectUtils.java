@@ -58,7 +58,7 @@ public final class ObjectUtils {
      * @return object instance
      */
     public static <T> T newInstance(final Class<T> clazz) {
-        return newInstance(clazz, null, new Object[0]);
+        return newInstance(clazz, new Object[0]);
     }
 
     /**
@@ -68,7 +68,7 @@ public final class ObjectUtils {
      * @param clazz define class
      * @return object instance
      */
-    public static <T> T newInstance(final Class<T> clazz, final Object container, final Object[] paramValues) {
+    public static <T> T newInstance(final Class<T> clazz, final Object[] paramValues) {
         if (clazz == null) {
             return null;
         }
@@ -76,18 +76,20 @@ public final class ObjectUtils {
         try {
             if (paramValues == null || paramValues.length == 0) {
                 constructor = ClassUtils.findConstructor(clazz);
-                ReflectionUtils.makeAccessible(constructor);
-                return clazz.isMemberClass() ? constructor.newInstance(container) : constructor.newInstance();
+                if (!Modifier.isPublic(clazz.getModifiers()) || !ReflectionUtils.publicMember(constructor)) {
+                    ReflectionUtils.makeAccessible(constructor);
+                }
+                return constructor.newInstance();
             } else {
                 Class<?>[] paramTypes = new Class[paramValues.length];
                 for (int i = 0; i < paramValues.length; i++) {
                     paramTypes[i] = paramValues[i].getClass();
                 }
                 constructor = ClassUtils.findConstructor(clazz, paramTypes);
-                ReflectionUtils.makeAccessible(constructor);
-                return clazz.isMemberClass()
-                        ? constructor.newInstance(container, paramValues)
-                        : constructor.newInstance(paramValues);
+                if (!Modifier.isPublic(clazz.getModifiers()) || !ReflectionUtils.publicMember(constructor)) {
+                    ReflectionUtils.makeAccessible(constructor);
+                }
+                return constructor.newInstance(paramValues);
             }
         } catch (SecurityException | NoSuchMethodException | InstantiationException
                  | IllegalAccessException | InvocationTargetException e) {
