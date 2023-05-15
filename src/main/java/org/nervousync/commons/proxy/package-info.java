@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 @XmlSchema(namespace = "https://nervousync.org/schemas/proxy", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/configure/proxy-1.0.xsd")
+		location = "https://nervousync.org/schemas/proxy_config_1.0.xsd",
+		xmlns = @XmlNs(prefix = "proxy", namespaceURI = "https://nervousync.org/schemas/proxy")
+)
 package org.nervousync.commons.proxy;
 
+import jakarta.xml.bind.annotation.XmlNs;
 import jakarta.xml.bind.annotation.XmlNsForm;
 import jakarta.xml.bind.annotation.XmlSchema;

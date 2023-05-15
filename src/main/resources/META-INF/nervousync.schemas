@@ -1,0 +1,4 @@
+https\://nervousync.org/schemas/file_segment=org/nervousync/schemas/file_segment.xsd
+https\://nervousync.org/schemas/mail=org/nervousync/schemas/mail_config.xsd
+https\://nervousync.org/schemas/proxy=org/nervousync/schemas/proxy_config.xsd
+https\://nervousync.org/schemas/secure=org/nervousync/schemas/secure_config.xsd

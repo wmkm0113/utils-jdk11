@@ -37,8 +37,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The type Bean object.

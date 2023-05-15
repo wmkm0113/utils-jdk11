@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nervousync</groupId>
     <artifactId>utils-jdk11</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
     <packaging>jar</packaging>
     <name>Nervousync Java Utility Collections</name>
     <url>https://gene.nervousync.org/index.shtml</url>
@@ -20,7 +20,7 @@
         </license>
     </licenses>
     <scm>
-        <tag>v1.1.2</tag>
+        <tag>v1.1.3</tag>
         <url>https://github.com/wmkm0113/Gene</url>
         <connection>scm:git:https://github.com/wmkm0113/Gene.git</connection>
         <developerConnection>scm:git:https://github.com/wmkm0113/Gene.git</developerConnection>
@@ -43,9 +43,9 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <argLine>-Dfile.encoding=UTF-8</argLine>
-        <junit.jupiter.version>5.9.3</junit.jupiter.version>
-        <junit.platform.version>1.9.3</junit.platform.version>
-        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <junit.platform.version>1.9.2</junit.platform.version>
+        <jakarta.activation.version>2.1.2</jakarta.activation.version>
         <jakarta.mail.version>2.1.1</jakarta.mail.version>
         <angus.version>2.0.1</angus.version>
         <jakarta.webservice.version>3.1.0</jakarta.webservice.version>
@@ -80,7 +80,7 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>5.0.0</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <!-- Java WebService -->
         <dependency>
@@ -112,17 +112,34 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>${jakarta.activation.version}</version>
+        </dependency>
         <!-- Jakarta Mail Support -->
         <dependency>
             <groupId>jakarta.mail</groupId>
             <artifactId>jakarta.mail-api</artifactId>
             <version>${jakarta.mail.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.angus</groupId>
             <artifactId>angus-mail</artifactId>
             <version>${angus.version}</version>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.angus</groupId>

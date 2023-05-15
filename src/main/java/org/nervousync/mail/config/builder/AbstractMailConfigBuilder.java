@@ -8,6 +8,7 @@ import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.mail.config.MailConfig;
+import org.nervousync.security.factory.SecureConfig;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
@@ -43,6 +44,28 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
                         this.mailConfig.setProxyConfig(proxyConfig);
                     });
             this.mailConfig.setSecureName(secureName);
+        }
+        return this;
+    }
+
+    public AbstractMailConfigBuilder<T> secureConfig(final String secureName, final SecureConfig secureConfig) {
+        if (StringUtils.notBlank(secureName) && secureConfig != null) {
+            SecureFactory secureFactory = SecureFactory.getInstance();
+            if (StringUtils.notBlank(this.mailConfig.getPassword())) {
+                String newPassword;
+                if (secureFactory.registeredConfig(secureName)) {
+                    secureFactory.register(Globals.DEFAULT_TEMPLATE_SECURE_NAME, secureConfig);
+                    newPassword = secureFactory.update(this.mailConfig.getPassword(), this.mailConfig.getSecureName(),
+                            Globals.DEFAULT_TEMPLATE_SECURE_NAME);
+                    secureFactory.deregister(Globals.DEFAULT_TEMPLATE_SECURE_NAME);
+                } else {
+                    newPassword =
+                            secureFactory.encrypt(this.mailConfig.getPassword(), secureName);
+                }
+                this.mailConfig.setPassword(newPassword);
+            }
+            secureFactory.register(secureName, secureConfig);
+            this.mailConfig.setSecureConfig(secureConfig);
         }
         return this;
     }

@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 @XmlSchema(namespace = "https://nervousync.org/schemas/mail", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/configure/mail-1.0.xsd",
+		location = "https://nervousync.org/schemas/mail_config_1.0.xsd",
 		xmlns = {
-				@XmlNs(prefix = "", namespaceURI = "https://nervousync.org/schemas/mail"),
-				@XmlNs(prefix = "proxy", namespaceURI = "https://nervousync.org/schemas/proxy")
+				@XmlNs(prefix = "mail", namespaceURI = "https://nervousync.org/schemas/mail"),
+				@XmlNs(prefix = "proxy", namespaceURI = "https://nervousync.org/schemas/proxy"),
+				@XmlNs(prefix = "secure", namespaceURI = "https://nervousync.org/schemas/secure")
 		})
 package org.nervousync.mail.config;
 

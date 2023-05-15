@@ -185,6 +185,7 @@ public final class Globals {
 	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822.
 	 */
 	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
+	public static final String DEFAULT_TEMPLATE_SECURE_NAME = "Secure_Tmp";
 
 	/**
 	 * The constant NERVOUSYNC_STATUS_FALSE.

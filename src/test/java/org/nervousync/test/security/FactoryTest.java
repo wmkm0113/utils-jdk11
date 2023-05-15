@@ -17,7 +17,7 @@ public final class FactoryTest extends BaseTest {
                 .ifPresent(secureConfig -> {
                     SecureConfig parseConfig =
                             StringUtils.xmlToObject(secureConfig.toXML(Boolean.TRUE), SecureConfig.class,
-                                    "src/main/resources/org/nervousync/resources/secure_config.xsd");
+                                    "https://nervousync.org/schemas/secure");
                     this.logger.info("Parsed config: {}", parseConfig.toXML(Boolean.TRUE));
                 });
     }

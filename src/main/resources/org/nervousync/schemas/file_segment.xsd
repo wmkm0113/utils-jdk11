@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xsd:schema xmlns="https://nervousync.org/schemas/file/segment" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="https://nervousync.org/schemas/file/segment" elementFormDefault="qualified" version="1.0">
+<xsd:schema xmlns="https://nervousync.org/schemas/file_segment" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://nervousync.org/schemas/file_segment" elementFormDefault="qualified" version="1.0">
     <xsd:complexType name="segment_item">
         <xsd:all>
             <xsd:element name="position" type="xsd:long">

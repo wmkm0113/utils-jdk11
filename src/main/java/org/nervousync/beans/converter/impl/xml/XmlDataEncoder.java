@@ -30,7 +30,7 @@ public final class XmlDataEncoder extends DataConverter {
 	@Override
 	public <T> T convert(final Object object, Class<T> targetClass) {
 		if ((object instanceof BeanObject) && String.class.equals(targetClass)) {
-			return targetClass.cast(((BeanObject) object).toXML(Boolean.FALSE));
+			return targetClass.cast(((BeanObject) object).toXML());
 		}
 		return null;
 	}

@@ -405,9 +405,9 @@ public final class FileUtils {
         if (resourceLocation.startsWith(CLASSPATH_URL_PREFIX)) {
             String path = resourceLocation.substring(CLASSPATH_URL_PREFIX.length());
             String description = "class path resource [" + path + "]";
-            URL url = ClassUtils.getDefaultClassLoader().getResource(path);
-            if (url != null) {
-                return getFile(url, description);
+            try {
+                return getFile(FileUtils.getURL(resourceLocation), description);
+            } catch (FileNotFoundException ignored) {
             }
         }
 
@@ -730,7 +730,11 @@ public final class FileUtils {
      * @throws IOException if an I/O error occurs
      */
     public static byte[] readFileBytes(final String resourceLocation) throws IOException {
-        return FileUtils.readFileBytes(FileUtils.getFile(resourceLocation));
+        try (InputStream inputStream = FileUtils.getURL(resourceLocation).openStream()) {
+            return IOUtils.readBytes(inputStream);
+        } catch (FileNotFoundException e) {
+            throw new IOException(e);
+        }
     }
 
     /**

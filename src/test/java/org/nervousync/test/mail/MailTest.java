@@ -11,6 +11,7 @@ import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.mail.MailObject;
 import org.nervousync.mail.config.MailConfig;
 import org.nervousync.mail.config.builder.MailConfigBuilder;
+import org.nervousync.security.factory.SecureConfig;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.*;
@@ -49,8 +50,9 @@ public final class MailTest extends BaseTest {
                     .orElse(Boolean.FALSE);
             this.logger.info("Initialize SecureFactory result: {}", initResult);
         }
-        SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES192)
-                .ifPresent(secureConfig -> SecureFactory.getInstance().register(MAIL_SECURE, secureConfig));
+        SecureConfig secureConfig = SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES192)
+                .filter(config -> SecureFactory.getInstance().register(MAIL_SECURE, config))
+                .orElse(null);
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
         X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
@@ -58,6 +60,7 @@ public final class MailTest extends BaseTest {
         PROPERTIES = ConvertUtils.loadProperties("src/test/resources/mail.xml");
         MAIL_CONFIG = MailConfigBuilder.newBuilder()
                 .secureName(MAIL_SECURE)
+                .secureConfig(MAIL_SECURE, secureConfig)
                 .sendConfig()
                 .mailProtocol(MailProtocol.SMTP)
                 .configHost(PROPERTIES.getProperty("config.send.address"),
@@ -83,8 +86,7 @@ public final class MailTest extends BaseTest {
                 .signer(x509Certificate, keyPair.getPrivate())
                 .confirm();
         String xmlContent = MAIL_CONFIG.toXML();
-        MailConfig parseConfig = StringUtils.xmlToObject(xmlContent, MailConfig.class,
-                "src/main/resources/org/nervousync/resources/mail_config.xsd");
+        MailConfig parseConfig = StringUtils.xmlToObject(xmlContent, MailConfig.class, "https://nervousync.org/schemas/mail", "https://nervousync.org/schemas/proxy");
         this.logger.info("Parse and verified config: {}", parseConfig.toFormattedJson());
     }
 

@@ -21,6 +21,7 @@ import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.commons.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
+import org.nervousync.security.factory.SecureConfig;
 
 /**
  * The type Mail config.
@@ -37,6 +38,8 @@ public final class MailConfig extends BeanObject {
      */
     @XmlElement(name = "secure_name")
     private String secureName;
+    @XmlElement(name = "secure_config", namespace = "https://nervousync.org/schemas/secure")
+    private SecureConfig secureConfig;
     /**
      * Mail account username
      */
@@ -94,6 +97,24 @@ public final class MailConfig extends BeanObject {
      */
     public void setSecureName(String secureName) {
         this.secureName = secureName;
+    }
+
+    /**
+     * Gets secure config.
+     *
+     * @return the secure config
+     */
+    public SecureConfig getSecureConfig() {
+        return secureConfig;
+    }
+
+    /**
+     * Sets secure config.
+     *
+     * @param secureConfig the secure config
+     */
+    public void setSecureConfig(SecureConfig secureConfig) {
+        this.secureConfig = secureConfig;
     }
 
     /**
@@ -429,6 +450,11 @@ public final class MailConfig extends BeanObject {
         }
     }
 
+    /**
+     * Copy properties.
+     *
+     * @param mailConfig the mail config
+     */
     public void copyProperties(final MailConfig mailConfig) {
         if (mailConfig == null) {
             return;
