@@ -122,7 +122,7 @@ public class CipherOutputStream extends OutputStream {
 
 			if (this.zipOptions.isSourceExternalStream()) {
 				if (StringUtils.notBlank(this.zipOptions.getFileNameInZip())) {
-					if (this.zipOptions.getFileNameInZip().endsWith(Globals.ZIP_FILE_SEPARATOR)
+					if (this.zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_ZIP_PAGE_SEPARATOR)
 							|| this.zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 						this.zipOptions.setEncryptFiles(Boolean.FALSE);
 						this.zipOptions.setEncryptionMethod(Globals.ENC_NO_ENCRYPTION);
@@ -431,7 +431,7 @@ public class CipherOutputStream extends OutputStream {
 		
 		boolean isDirectory;
 		if (this.zipOptions.isSourceExternalStream()) {
-			isDirectory = entryPath.endsWith(Globals.ZIP_FILE_SEPARATOR) 
+			isDirectory = entryPath.endsWith(Globals.DEFAULT_ZIP_PAGE_SEPARATOR)
 					|| entryPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR);
 		} else {
 			isDirectory = this.sourceFile.isDirectory();

@@ -629,7 +629,7 @@ public final class MailUtils {
             if (StringUtils.isEmpty(this.storagePath)) {
                 throw new IOException("Save attach file path error! ");
             }
-            if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
+            if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_MULTIPART)) {
                 Multipart multipart = (Multipart) part.getContent();
                 int count = multipart.getCount();
                 for (int i = 0; i < count; i++) {
@@ -658,7 +658,7 @@ public final class MailUtils {
                                 saveFiles.add(savePath);
                             }
                         }
-                    } else if (bodyPart.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
+                    } else if (bodyPart.isMimeType(Globals.DEFAULT_CONTENT_TYPE_MULTIPART)) {
                         saveFiles.addAll(getMailAttachment(bodyPart));
                     }
                 }
@@ -819,17 +819,17 @@ public final class MailUtils {
             throw new IOException();
         }
 
-        if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT) && (nameIndex == -1)) {
+        if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_TEXT) && (nameIndex == -1)) {
             contentBuffer.append(part.getContent().toString());
-        } else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_HTML) && (nameIndex == -1)) {
+        } else if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_HTML) && (nameIndex == -1)) {
             contentBuffer.append(part.getContent().toString());
-        } else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART)) {
+        } else if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_MULTIPART)) {
             Multipart multipart = (Multipart) part.getContent();
             int count = multipart.getCount();
             for (int i = 0; i < count; i++) {
                 getMailContent(multipart.getBodyPart(i), contentBuffer);
             }
-        } else if (part.isMimeType(Globals.DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822)) {
+        } else if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_MESSAGE_RFC822)) {
             getMailContent((Part) part.getContent(), contentBuffer);
         }
     }

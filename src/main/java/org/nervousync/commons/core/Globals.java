@@ -164,28 +164,26 @@ public final class Globals {
 	 * The constant DEFAULT_JAR_PAGE_SEPARATOR.
 	 */
 	public static final String DEFAULT_JAR_PAGE_SEPARATOR = "\\";
-	/**
-	 * The constant DEFAULT_ZIP_PAGE_SEPARATOR.
-	 */
-	public static final String DEFAULT_ZIP_PAGE_SEPARATOR = "/";
 
 	/**
-	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_TEXT.
+	 * The constant DEFAULT_CONTENT_TYPE_TEXT.
 	 */
-	public static final String DEFAULT_EMAIL_CONTENT_TYPE_TEXT = "text/plain";
+	public static final String DEFAULT_CONTENT_TYPE_TEXT = "text/plain";
 	/**
-	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_HTML.
+	 * The constant DEFAULT_CONTENT_TYPE_HTML.
 	 */
-	public static final String DEFAULT_EMAIL_CONTENT_TYPE_HTML = "text/html";
+	public static final String DEFAULT_CONTENT_TYPE_HTML = "text/html";
 	/**
-	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART.
+	 * The constant DEFAULT_CONTENT_TYPE_MULTIPART.
 	 */
-	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MULTIPART = "multipart/*";
+	public static final String DEFAULT_CONTENT_TYPE_MULTIPART = "multipart/*";
 	/**
-	 * The constant DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822.
+	 * The constant DEFAULT_CONTENT_TYPE_MESSAGE_RFC822.
 	 */
-	public static final String DEFAULT_EMAIL_CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
+	public static final String DEFAULT_CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
 	public static final String DEFAULT_TEMPLATE_SECURE_NAME = "Secure_Tmp";
+
+	public static final String DEFAULT_LOG_FILE_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "nervousync-log.log";
 
 	/**
 	 * The constant NERVOUSYNC_STATUS_FALSE.
@@ -370,15 +368,14 @@ public final class Globals {
 	 * The constant FOLDER_MODE_NONE.
 	 */
 	public static final int FOLDER_MODE_NONE = 16;
-
 	/**
-	 * The constant ZIP_FILE_SEPARATOR.
+	 * The constant DEFAULT_ZIP_PAGE_SEPARATOR.
 	 */
-	public static final String ZIP_FILE_SEPARATOR = "/";
+	public static final String DEFAULT_ZIP_PAGE_SEPARATOR = "/";
 	/**
 	 * The constant ZIP_ENTRY_SEPARATOR.
 	 */
-	public static final String ZIP_ENTRY_SEPARATOR = ":" + Globals.DEFAULT_PAGE_SEPARATOR;
+	public static final String DEFAULT_ZIP_ENTRY_SEPARATOR = ":" + Globals.DEFAULT_ZIP_PAGE_SEPARATOR;
 
 	private Globals() {
 	}

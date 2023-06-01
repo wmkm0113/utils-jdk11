@@ -257,9 +257,12 @@ public class BeanObject implements Serializable {
 
 	@Override
 	public final String toString() {
+		StringUtils.StringType stringType = Optional.ofNullable(this.getClass().getAnnotation(OutputConfig.class))
+				.map(OutputConfig::type)
+				.orElse(StringUtils.StringType.SIMPLE);
 		return Optional.ofNullable(this.getClass().getAnnotation(OutputConfig.class))
 				.map(outputConfig -> {
-					switch (outputConfig.type()) {
+					switch (stringType) {
 						case XML:
 							return this.toXML(outputConfig.formatted(), outputConfig.encoding());
 						case JSON:

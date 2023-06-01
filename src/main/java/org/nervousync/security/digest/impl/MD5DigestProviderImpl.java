@@ -29,6 +29,7 @@ import java.security.MessageDigest;
 /**
  * The type Md 5 digest provider.
  */
+@Deprecated
 public final class MD5DigestProviderImpl extends BaseDigestProvider {
 
     /**

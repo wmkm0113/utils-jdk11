@@ -16,7 +16,7 @@ public final class FactoryTest extends BaseTest {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
                 .ifPresent(secureConfig -> {
                     SecureConfig parseConfig =
-                            StringUtils.xmlToObject(secureConfig.toXML(Boolean.TRUE), SecureConfig.class,
+                            StringUtils.stringToObject(secureConfig.toXML(Boolean.TRUE), SecureConfig.class,
                                     "https://nervousync.org/schemas/secure");
                     this.logger.info("Parsed config: {}", parseConfig.toXML(Boolean.TRUE));
                 });

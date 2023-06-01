@@ -44,6 +44,11 @@ public final class RegexGlobals {
 	 */
 	public static final String XML = "<[a-zA-Z0-9]+[^>]*>(?:.|[\\r\\n])*?<\\/[a-zA-Z0-9]+>";
 
+	public static final String LUHN = "^[\\d]+$";
+
+	public static final String CHN_ID_Card = "^[1-9](\\d{17}|(\\d{16}X))$";
+	public static final String CHN_Social_Credit = "^([1-9]|A|N|Y)[\\dA-Z]{17}$";
+
 	/**
 	 * The constant IPV4_REGEX.
 	 */
@@ -56,11 +61,6 @@ public final class RegexGlobals {
 	 * The constant IPV6_COMPRESS_REGEX.
 	 */
 	public static final String IPV6_COMPRESS_REGEX = "(?ix)(?<![:.\\w])(?:(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}|(?=(?:[A-F0-9]{0,4}:){0,7}[A-F0-9]{0,4}$)(([A-F0-9]{1,4}:){1,7}|:)((:[A-F0-9]{1,4}){1,7}|:)|(?:[A-F0-9]{1,4}:){7}:|:(:[A-F0-9]{1,4}){7})(?![:.\\w])";
-
-	/**
-	 * The constant LOCAL_FILE_PATH_REGEX.
-	 */
-	public static final String LOCAL_FILE_PATH_REGEX = "^(\\/.*)|(([a-zA-Z]{1}\\:\\\\).*)$";
 
 	/**
 	 * The constant PHONE_NUMBER.

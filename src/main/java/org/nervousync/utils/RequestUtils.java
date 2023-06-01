@@ -18,7 +18,6 @@ package org.nervousync.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
-import org.nervousync.annotations.beans.OutputConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -361,22 +360,11 @@ public final class RequestUtils {
                         if (ResponseInfo.class.equals(targetClass)) {
                             return targetClass.cast(responseInfo);
                         }
-                        Class<?> entityClass = ClassUtils.componentType(targetClass);
-                        OutputConfig outputConfig = entityClass.getAnnotation(OutputConfig.class);
-                        if (outputConfig == null) {
-                            return responseInfo.parseObject(targetClass);
-                        }
-                        boolean isArray = targetClass.isArray() || ClassUtils.isAssignable(targetClass, Collection.class);
                         try {
-                            switch (outputConfig.type()) {
-                                case JSON:
-                                    return isArray ? targetClass.cast(responseInfo.parseList(entityClass)) : responseInfo.parseJson(targetClass);
-                                case XML:
-                                    return responseInfo.parseXml(targetClass);
-                                case YAML:
-                                    return isArray ? targetClass.cast(responseInfo.parseList(entityClass)) : responseInfo.parseYaml(targetClass);
-                                default:
-                                    return responseInfo.parseObject(targetClass);
+                            if (targetClass.isArray() || ClassUtils.isAssignable(targetClass, Collection.class)) {
+                                return targetClass.cast(responseInfo.parseList(ClassUtils.componentType(targetClass)));
+                            } else {
+                                return responseInfo.parseObject(targetClass);
                             }
                         } catch (UnsupportedEncodingException e) {
                             if (LOGGER.isDebugEnabled()) {

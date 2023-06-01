@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nervousync</groupId>
     <artifactId>utils-jdk11</artifactId>
-    <version>1.1.3</version>
+    <version>1.1.4</version>
     <packaging>jar</packaging>
     <name>Nervousync Java Utility Collections</name>
     <url>https://gene.nervousync.org/index.shtml</url>
@@ -20,7 +20,7 @@
         </license>
     </licenses>
     <scm>
-        <tag>v1.1.3</tag>
+        <tag>v1.1.4</tag>
         <url>https://github.com/wmkm0113/Gene</url>
         <connection>scm:git:https://github.com/wmkm0113/Gene.git</connection>
         <developerConnection>scm:git:https://github.com/wmkm0113/Gene.git</developerConnection>
@@ -58,7 +58,7 @@
         <slf4j.version>2.0.7</slf4j.version>
         <jackson.version>2.15.0</jackson.version>
         <yaml.version>2.0</yaml.version>
-        <jersey.version>3.1.1</jersey.version>
+        <jersey.version>3.1.2</jersey.version>
         <hk2.version>3.0.4</hk2.version>
         <snmp4j.version>3.7.7</snmp4j.version>
         <jcifs.version>2.1.34</jcifs.version>
@@ -80,14 +80,9 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>5.0.0</version>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <!-- Java WebService -->
-        <dependency>
-            <groupId>jakarta.jws</groupId>
-            <artifactId>jakarta.jws-api</artifactId>
-            <version>3.0.0</version>
-        </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
@@ -131,13 +126,17 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-mail</artifactId>
+            <artifactId>angus-core</artifactId>
             <version>${angus.version}</version>
             <scope>runtime</scope>
             <exclusions>
                 <exclusion>
                     <groupId>jakarta.activation</groupId>
                     <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.mail</groupId>
+                    <artifactId>jakarta.mail-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -213,7 +212,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
             <version>${log4j.version}</version>
             <exclusions>
                 <exclusion>
@@ -234,18 +233,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
-        </dependency>
-        <!-- Reload4j is a drop-in replacement for log4j version 1.2.7 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-reload4j</artifactId>
-            <version>${slf4j.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -494,10 +481,6 @@
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

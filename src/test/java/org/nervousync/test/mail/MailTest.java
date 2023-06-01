@@ -86,7 +86,7 @@ public final class MailTest extends BaseTest {
                 .signer(x509Certificate, keyPair.getPrivate())
                 .confirm();
         String xmlContent = MAIL_CONFIG.toXML();
-        MailConfig parseConfig = StringUtils.xmlToObject(xmlContent, MailConfig.class, "https://nervousync.org/schemas/mail", "https://nervousync.org/schemas/proxy");
+        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, MailConfig.class, "https://nervousync.org/schemas/mail", "https://nervousync.org/schemas/proxy");
         this.logger.info("Parse and verified config: {}", parseConfig.toFormattedJson());
     }
 

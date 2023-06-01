@@ -22,6 +22,7 @@ public final class DigestTest extends BaseTest {
     }
 
     @Test
+    @Deprecated
     public void test010MD5() throws CryptoException {
         SecureProvider secureProvider = SecurityUtils.MD5();
         this.logger.info("MD5 value: {} (Provider)", ConvertUtils.byteToHex(secureProvider.finish("123456")));

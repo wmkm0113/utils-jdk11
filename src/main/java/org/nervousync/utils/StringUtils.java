@@ -19,9 +19,6 @@ package org.nervousync.utils;
 import java.io.*;
 import java.lang.Character.UnicodeBlock;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -37,6 +34,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import org.nervousync.beans.core.BeanObject;
+import org.nervousync.commons.core.RegexGlobals;
 import org.nervousync.exceptions.zip.ZipException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,11 +81,8 @@ public final class StringUtils {
     private static final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     private static final String AUTHORIZATION_CODE_ITEMS = "23456789ABCEFGHJKLMNPQRSTUVWXYZ";
 
-    private static final String CHN_ID_CARD_REGEX = "^[1-9]([0-9]{17}|([0-9]{16}X))$";
     private static final String CHN_ID_CARD_CODE = "0123456789X";
-    private static final String CHN_SOCIAL_CREDIT_REGEX = "^[1-9|A|N|Y][0-9A-Z]{17}$";
     private static final String CHN_SOCIAL_CREDIT_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
-    private static final String LUHN_CODE_REGEX = "^[0-9]{1,}";
 
     private static final List<DataType> SIMPLE_DATA_TYPES =
             Arrays.asList(DataType.NUMBER, DataType.STRING, DataType.BOOLEAN, DataType.DATE);
@@ -370,6 +365,80 @@ public final class StringUtils {
 
         huffmanTree.build();
         return huffmanTree.encodeString(content);
+    }
+
+    /**
+     * Check that the given string is MD5 value,
+     * because MD5 was deprecated at version 1.1.4, this method will be removed at version 2.0.0
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    @Deprecated
+    public static boolean isMD5(final String string) {
+        return StringUtils.notBlank(string) && StringUtils.matches(string.toLowerCase(), RegexGlobals.MD5_VALUE);
+    }
+
+    /**
+     * Check that the given string is UUID value
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isUUID(final String string) {
+        return StringUtils.notBlank(string) && StringUtils.matches(string.toLowerCase(), RegexGlobals.UUID);
+    }
+
+    /**
+     * Check that the given string is xml string
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isXML(final String string) {
+        return StringUtils.notBlank(string) && StringUtils.matches(string, RegexGlobals.XML);
+    }
+
+    /**
+     * Check that the given string is bank card number(Luhn algorithm)
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isLuhn(final String string) {
+        return StringUtils.validateCode(string, CodeType.Luhn);
+    }
+
+    /**
+     * Check that the given string is China social credit code
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isChnSocialCredit(final String string) {
+        return StringUtils.validateCode(string, CodeType.CHN_Social_Code);
+    }
+
+    /**
+     * Check that the given string is China ID
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isChnId(final String string) {
+        return StringUtils.validateCode(string, CodeType.CHN_ID_Code);
+    }
+
+    /**
+     * Check that the given string is phone number support country code start with 00 or +
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isPhoneNumber(final String string) {
+        return StringUtils.notBlank(string) && StringUtils.matches(string, RegexGlobals.PHONE_NUMBER);
+    }
+
+    /**
+     * Check that the given string is e-mail address
+     * @param string    the given string to check
+     * @return  <code>true</code> if matched or <code>false</code> not match
+     */
+    public static boolean isEMail(final String string) {
+        return StringUtils.notBlank(string) && StringUtils.matches(string, RegexGlobals.EMAIL_ADDRESS);
     }
 
     /**
@@ -1502,7 +1571,7 @@ public final class StringUtils {
 
     /**
      * Convenience method to return a Collection as a CSV String.
-     * E.g. useful for <code>toString()</code> implementations.
+     * E.g., useful for <code>toString()</code> implementations.
      *
      * @param coll the Collection to display
      * @return the delimited String
@@ -1558,7 +1627,7 @@ public final class StringUtils {
 
     /**
      * Convenience method to return a String array as a CSV String.
-     * E.g. useful for <code>toString()</code> implementations.
+     * E.g., useful for <code>toString()</code> implementations.
      *
      * @param arr the array to display
      * @return the delimited String
@@ -1599,8 +1668,7 @@ public final class StringUtils {
         /**
          * Simple string type, include basic type wrapper class, etc.
          */
-        SIMPLE,
-        RESPONSE
+        SIMPLE
     }
 
     /**
@@ -1637,83 +1705,16 @@ public final class StringUtils {
     }
 
     /**
-     * Parse string to target bean class
-     *
-     * @param <T>       Template
-     * @param string    Parsed string
-     * @param beanClass Target bean class
-     * @return Converted object
-     */
-    public static <T> T jsonToObject(final String string, final Class<T> beanClass) {
-        return jsonToObject(string, Globals.DEFAULT_ENCODING, beanClass);
-    }
-
-    /**
-     * Parse string to target bean class
-     *
-     * @param <T>       Template
-     * @param string    Parsed string
-     * @param encoding  String encoding
-     * @param beanClass Target bean class
-     * @return Converted object
-     */
-    public static <T> T jsonToObject(String string, final String encoding, Class<T> beanClass) {
-        return stringToObject(string, StringType.JSON, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
-    }
-
-    /**
-     * Parse string to target bean class
-     *
-     * @param <T>       Template
-     * @param string    Parsed string
-     * @param beanClass Target bean class
-     * @return Converted object
-     */
-    public static <T> T yamlToObject(final String string, final Class<T> beanClass) {
-        return yamlToObject(string, Globals.DEFAULT_ENCODING, beanClass);
-    }
-
-    /**
-     * Parse string to target bean class
-     *
-     * @param <T>       Template
-     * @param string    Parsed string
-     * @param encoding  String encoding
-     * @param beanClass Target bean class
-     * @return Converted object
-     */
-    public static <T> T yamlToObject(String string, final String encoding, Class<T> beanClass) {
-        return stringToObject(string, StringType.YAML, encoding, beanClass, Globals.DEFAULT_VALUE_STRING);
-    }
-
-    /**
-     * Parse string to target bean class
-     *
-     * @param <T>        Template
-     * @param string     Parsed string
-     * @param beanClass  Target bean class
-     * @param schemaPath Schema file path
-     * @return Converted object
-     */
-    public static <T> T xmlToObject(final String string, final Class<T> beanClass, final String... schemaPath) {
-        return xmlToObject(string, Globals.DEFAULT_ENCODING, beanClass, schemaPath);
-    }
-
-    /**
      * Parse xml string to target bean class
      *
      * @param <T>        Template
      * @param string     Parsed string
-     * @param encoding   String encoding
      * @param beanClass  Target bean class
-     * @param schemaPath the schema path
+     * @param schemaPaths the schema path
      * @return Converted object
      */
-    public static <T> T xmlToObject(final String string, final String encoding,
-                                    final Class<T> beanClass, final String... schemaPath) {
-        return StringUtils.notBlank(string)
-                ? stringToObject(string, StringType.XML, encoding, beanClass, schemaPath)
-                : null;
+    public static <T> T stringToObject(final String string, final Class<T> beanClass, final String... schemaPaths) {
+        return stringToObject(string, Globals.DEFAULT_ENCODING, beanClass, schemaPaths);
     }
 
     /**
@@ -1724,22 +1725,19 @@ public final class StringUtils {
      * @param beanClass Target bean class
      * @return Converted object
      */
-    public static <T> T stringToObject(final String string, final Class<T> beanClass) {
+    public static <T> T stringToObject(final String string, final String encoding,
+                                       final Class<T> beanClass, final String... schemaPaths) {
         if (StringUtils.isEmpty(string)) {
             LOGGER.error("Can't parse empty string");
             return null;
         }
-
-        if (StringUtils.isEmpty(string)) {
-            return null;
-        }
         if (string.startsWith("<")) {
-            return StringUtils.xmlToObject(string, Globals.DEFAULT_ENCODING, beanClass, Globals.DEFAULT_VALUE_STRING);
+            return stringToObject(string, StringType.XML, encoding, beanClass, schemaPaths);
         }
-        if (string.startsWith("{") || string.startsWith("[")) {
-            return StringUtils.jsonToObject(string, Globals.DEFAULT_ENCODING, beanClass);
+        if (string.startsWith("{")) {
+            return stringToObject(string, StringType.JSON, encoding, beanClass, schemaPaths);
         }
-        return StringUtils.yamlToObject(string, Globals.DEFAULT_ENCODING, beanClass);
+        return stringToObject(string, StringType.YAML, encoding, beanClass, schemaPaths);
     }
 
     /**
@@ -1769,32 +1767,20 @@ public final class StringUtils {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Stack message: ", e);
             }
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
     }
 
     /**
      * Parse file content to target bean class
      *
-     * @param <T>       Template
-     * @param filePath  File path
-     * @param beanClass Target bean class
+     * @param <T>         Template
+     * @param filePath    File path
+     * @param beanClass   Target bean class
+     * @param schemaPaths Schema file paths
      * @return Converted object
      */
-    public static <T> T fileToObject(final String filePath, final Class<T> beanClass) {
-        return fileToObject(filePath, beanClass, Globals.DEFAULT_VALUE_STRING);
-    }
-
-    /**
-     * Parse file content to target bean class
-     *
-     * @param <T>        Template
-     * @param filePath   File path
-     * @param beanClass  Target bean class
-     * @param schemaPath Schema file path
-     * @return Converted object
-     */
-    public static <T> T fileToObject(final String filePath, final Class<T> beanClass, final String schemaPath) {
+    public static <T> T fileToObject(final String filePath, final Class<T> beanClass, final String... schemaPaths) {
         if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
             LOGGER.error("Can't found file: {}", filePath);
             return null;
@@ -1805,7 +1791,7 @@ public final class StringUtils {
                 case "json":
                     return streamToObject(inputStream, StringType.JSON, beanClass, Globals.DEFAULT_VALUE_STRING);
                 case "xml":
-                    return streamToObject(inputStream, StringType.XML, beanClass, schemaPath);
+                    return streamToObject(inputStream, StringType.XML, beanClass, schemaPaths);
                 case "yml":
                 case "yaml":
                     return streamToObject(inputStream, StringType.YAML, beanClass, Globals.DEFAULT_VALUE_STRING);
@@ -1849,7 +1835,7 @@ public final class StringUtils {
                             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
                             docFactory.setNamespaceAware(Boolean.TRUE);
                             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                            for (int i = 0 ; i < schemaPath.length ; i++) {
+                            for (int i = 0; i < schemaPath.length; i++) {
                                 String locationPath = SCHEMA_MAPPING.getOrDefault(schemaPath[i], schemaPath[i]);
                                 Document document = docBuilder.parse(FileUtils.getFile(locationPath));
                                 sources[i] = new DOMSource(document, locationPath);
@@ -2053,7 +2039,7 @@ public final class StringUtils {
      * @return match result
      */
     public static boolean matches(final String str, final String regex) {
-        if (str == null || regex == null) {
+        if (StringUtils.isEmpty(str) || StringUtils.isEmpty(regex)) {
             return Boolean.FALSE;
         }
         return str.matches(regex);
@@ -2362,10 +2348,13 @@ public final class StringUtils {
      * @return Validate result
      */
     public static boolean validateCode(final String code, final CodeType codeType) {
+        if (StringUtils.isEmpty(code)) {
+            return Boolean.FALSE;
+        }
         switch (codeType) {
             case CHN_ID_Code:
                 String cardCode = code.toUpperCase();
-                if (StringUtils.matches(cardCode, CHN_ID_CARD_REGEX)) {
+                if (StringUtils.matches(cardCode, RegexGlobals.CHN_ID_Card)) {
                     int validateCode = CHN_ID_CARD_CODE.indexOf(cardCode.charAt(17));
                     if (validateCode != -1) {
                         int sigma = 0;
@@ -2378,7 +2367,7 @@ public final class StringUtils {
                 break;
             case CHN_Social_Code:
                 String creditCode = code.toUpperCase();
-                if (StringUtils.matches(creditCode, CHN_SOCIAL_CREDIT_REGEX)) {
+                if (StringUtils.matches(creditCode, RegexGlobals.CHN_Social_Credit)) {
                     int validateCode = CHN_SOCIAL_CREDIT_CODE.indexOf(creditCode.charAt(17));
                     if (validateCode != -1) {
                         int sigma = 0;
@@ -2392,7 +2381,7 @@ public final class StringUtils {
                 }
                 break;
             case Luhn:
-                if (StringUtils.matches(code, LUHN_CODE_REGEX)) {
+                if (StringUtils.matches(code, RegexGlobals.LUHN)) {
                     int result = 0, length = code.length();
                     for (int i = 0; i < length; i++) {
                         int currentCode = Character.getNumericValue(code.charAt(length - i - 1));

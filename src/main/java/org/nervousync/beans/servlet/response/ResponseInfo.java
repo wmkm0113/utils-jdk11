@@ -44,371 +44,328 @@ import org.slf4j.LoggerFactory;
  */
 public final class ResponseInfo {
 
-	/**
-	 * Logger
-	 */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	/**
-	 * Response status code
-	 */
-	private int statusCode;
-	/**
-	 * Header Maps
-	 */
-	private final Map<String, String> headerMaps = new HashMap<>();
-	/**
-	 * Response content type
-	 */
-	private String contentType;
-	/**
-	 * Response charset encoding
-	 */
-	private String charset = null;
-	/**
-	 * Value of response header which header name is "identified"
-	 */
-	private String identifiedCode;
-	/**
-	 * Response content length
-	 */
-	private int contentLength;
-	/**
-	 * Response content data array
-	 */
-	private byte[] responseContent;
+    /**
+     * Logger
+     */
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	/**
-	 * Gets status code.
-	 *
-	 * @return the statusCode
-	 */
-	public int getStatusCode() {
-		return statusCode;
-	}
+    /**
+     * Response status code
+     */
+    private int statusCode;
+    /**
+     * Header Maps
+     */
+    private final Map<String, String> headerMaps = new HashMap<>();
+    /**
+     * Response content type
+     */
+    private String contentType;
+    /**
+     * Response charset encoding
+     */
+    private String charset = null;
+    /**
+     * Value of response header which header name is "identified"
+     */
+    private String identifiedCode;
+    /**
+     * Response content length
+     */
+    private int contentLength;
+    /**
+     * Response content data array
+     */
+    private byte[] responseContent;
 
-	/**
-	 * Gets the value of headerMaps.
-	 *
-	 * @return the value of headerMaps
-	 */
-	public Map<String, String> getHeaderMaps() {
-		return headerMaps;
-	}
+    /**
+     * Gets status code.
+     *
+     * @return the statusCode
+     */
+    public int getStatusCode() {
+        return statusCode;
+    }
 
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the contentType
-	 */
-	public String getContentType() {
-		return contentType;
-	}
+    /**
+     * Gets the value of headerMaps.
+     *
+     * @return the value of headerMaps
+     */
+    public Map<String, String> getHeaderMaps() {
+        return headerMaps;
+    }
 
-	/**
-	 * Gets charset.
-	 *
-	 * @return the charset
-	 */
-	public String getCharset() {
-		return charset;
-	}
+    /**
+     * Gets the content type.
+     *
+     * @return the contentType
+     */
+    public String getContentType() {
+        return contentType;
+    }
 
-	/**
-	 * Gets identified code.
-	 *
-	 * @return the identifiedCode
-	 */
-	public String getIdentifiedCode() {
-		return identifiedCode;
-	}
+    /**
+     * Gets charset.
+     *
+     * @return the charset
+     */
+    public String getCharset() {
+        return charset;
+    }
 
-	/**
-	 * Gets content length.
-	 *
-	 * @return the contentLength
-	 */
-	public int getContentLength() {
-		return contentLength;
-	}
+    /**
+     * Gets identified code.
+     *
+     * @return the identifiedCode
+     */
+    public String getIdentifiedCode() {
+        return identifiedCode;
+    }
 
-	/**
-	 * Get response content byte [ ].
-	 *
-	 * @return the responseContent
-	 */
-	public byte[] getResponseContent() {
-		return responseContent == null ? new byte[0] : responseContent.clone();
-	}
+    /**
+     * Gets content length.
+     *
+     * @return the contentLength
+     */
+    public int getContentLength() {
+        return contentLength;
+    }
 
-	/**
-	 * Instantiates a new Http response content.
-	 *
-	 * @param responseInfo the response info
-	 * @param inputStream  the input stream
-	 */
-	public ResponseInfo(final HttpResponse.ResponseInfo responseInfo, final InputStream inputStream) {
-		this.statusCode = responseInfo.statusCode();
-		responseInfo.headers().map().forEach((key, values) -> {
-			if (key != null && values != null && !values.isEmpty()) {
-				StringBuilder stringBuilder = new StringBuilder();
-				for (String headerValue : values) {
-					stringBuilder.append(" ").append(headerValue);
-				}
-				this.headerMaps.put(key.toUpperCase(), stringBuilder.substring(1));
-			}
-		});
-		this.contentType = this.headerMaps.get("CONTENT-TYPE");
-		if (this.contentType != null
-				&& this.contentType.contains("charset=")) {
-			this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
-			if (this.contentType.contains("\"")) {
-				this.charset = this.charset.substring(0, this.charset.indexOf("\""));
-			}
-			this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-			if (this.charset.contains(";")) {
-				this.charset = this.charset.substring(0, this.charset.indexOf(";"));
-			}
-		}
-		this.identifiedCode = this.headerMaps.get("IDENTIFIED");
-		this.responseContent = IOUtils.readBytes(inputStream);
-		this.contentLength = this.responseContent.length;
-	}
+    /**
+     * Get response content byte [ ].
+     *
+     * @return the responseContent
+     */
+    public byte[] getResponseContent() {
+        return responseContent == null ? new byte[0] : responseContent.clone();
+    }
 
-	/**
-	 * Instantiates a new Http response content.
-	 *
-	 * @param urlConnection the url connection
-	 */
-	public ResponseInfo(final HttpURLConnection urlConnection) {
-		InputStream inputStream = null;
-		ByteArrayOutputStream byteArrayOutputStream = null;
-		
-		try {
-			this.statusCode = urlConnection.getResponseCode();
-			this.contentLength = urlConnection.getContentLength();
-			if (this.statusCode == HttpsURLConnection.HTTP_OK) {
-				this.contentType = urlConnection.getContentType();
-				if (this.contentType != null 
-						&& this.contentType.contains("charset=")) {
-					this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
-					if (this.contentType.contains("\"")) {
-						this.charset = this.charset.substring(0, this.charset.indexOf("\""));
-					}
-					this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-					if (this.charset.contains(";")) {
-						this.charset = this.charset.substring(0, this.charset.indexOf(";"));
-					}
-				}
-				
-				if (this.isGZipResponse(urlConnection.getContentEncoding())) {
-					inputStream = new GZIPInputStream(urlConnection.getInputStream());
-				} else {
-					inputStream = urlConnection.getInputStream();
-				}
-			} else {
-				inputStream = urlConnection.getErrorStream();
-			}
-			
-			Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
-			if (headerFields != null && !headerFields.isEmpty()) {
-				for (Map.Entry<String, List<String>> entry : headerFields.entrySet()) {
-					List<String> headerValues = entry.getValue();
-					if (entry.getKey() != null && headerValues != null && !headerValues.isEmpty()) {
-						StringBuilder stringBuilder = new StringBuilder();
-						for (String headerValue : headerValues) {
-							stringBuilder.append(" ").append(headerValue);
-						}
-						this.headerMaps.put(entry.getKey().toUpperCase(), stringBuilder.substring(1));
-					}
-				}
-			}
+    /**
+     * Instantiates a new Http response content.
+     *
+     * @param responseInfo the response info
+     * @param inputStream  the input stream
+     */
+    public ResponseInfo(final HttpResponse.ResponseInfo responseInfo, final InputStream inputStream) {
+        this.statusCode = responseInfo.statusCode();
+        responseInfo.headers().map().forEach((key, values) -> {
+            if (key != null && values != null && !values.isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String headerValue : values) {
+                    stringBuilder.append(" ").append(headerValue);
+                }
+                this.headerMaps.put(key.toUpperCase(), stringBuilder.substring(1));
+            }
+        });
+        this.contentType = this.headerMaps.get("CONTENT-TYPE");
+        if (this.contentType != null
+                && this.contentType.contains("charset=")) {
+            this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
+            if (this.contentType.contains("\"")) {
+                this.charset = this.charset.substring(0, this.charset.indexOf("\""));
+            }
+            this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
+            if (this.charset.contains(";")) {
+                this.charset = this.charset.substring(0, this.charset.indexOf(";"));
+            }
+        }
+        this.identifiedCode = this.headerMaps.get("IDENTIFIED");
+        this.responseContent = IOUtils.readBytes(inputStream);
+        this.contentLength = this.responseContent.length;
+    }
 
-			byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
-			
-			byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-			
-			if (inputStream != null) {
-				int readLength;
-				while ((readLength = inputStream.read(buffer)) != -1) {
-					byteArrayOutputStream.write(buffer, 0, readLength);
-				}
-			}
+    /**
+     * Instantiates a new Http response content.
+     *
+     * @param urlConnection the url connection
+     */
+    public ResponseInfo(final HttpURLConnection urlConnection) {
+        InputStream inputStream = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
 
-			this.responseContent = byteArrayOutputStream.toByteArray();
-			
-			if (this.charset == null) {
-				String tempContent = new String(this.responseContent, Globals.DEFAULT_ENCODING);
-				if (tempContent.contains("charset=")) {
-					this.charset = tempContent.substring(tempContent.indexOf("charset="));
-					this.charset = this.charset.substring(0, this.charset.indexOf("\""));
-					this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
-					if (this.charset.contains(";")) {
-						this.charset = this.charset.substring(0, this.charset.indexOf(";"));
-					}
-				} else {
-					this.charset = Globals.DEFAULT_ENCODING;
-				}
-			}
-			
-			this.identifiedCode = urlConnection.getHeaderField("identified");
-		} catch (IOException e) {
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Read response data error! ", e);
-			}
-		} finally {
-			IOUtils.closeStream(inputStream);
-			IOUtils.closeStream(byteArrayOutputStream);
-		}
-	}
+        try {
+            this.statusCode = urlConnection.getResponseCode();
+            this.contentLength = urlConnection.getContentLength();
+            if (this.statusCode == HttpsURLConnection.HTTP_OK) {
+                this.contentType = urlConnection.getContentType();
+                if (this.contentType != null
+                        && this.contentType.contains("charset=")) {
+                    this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
+                    if (this.contentType.contains("\"")) {
+                        this.charset = this.charset.substring(0, this.charset.indexOf("\""));
+                    }
+                    this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
+                    if (this.charset.contains(";")) {
+                        this.charset = this.charset.substring(0, this.charset.indexOf(";"));
+                    }
+                }
 
-	/**
-	 * Parse xml t.
-	 *
-	 * @param <T>   the type parameter
-	 * @param clazz the clazz
-	 * @return the t
-	 * @throws XmlException                 the xml exception
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public <T> T parseXml(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return parseXml(clazz, Globals.DEFAULT_VALUE_STRING);
-	}
+                if (this.isGZipResponse(urlConnection.getContentEncoding())) {
+                    inputStream = new GZIPInputStream(urlConnection.getInputStream());
+                } else {
+                    inputStream = urlConnection.getInputStream();
+                }
+            } else {
+                inputStream = urlConnection.getErrorStream();
+            }
 
-	/**
-	 * Parse xml t.
-	 *
-	 * @param <T>   the type parameter
-	 * @param clazz the clazz
-	 * @param schemaPath Schema file path
-	 * @return the t
-	 * @throws XmlException                 the xml exception
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public <T> T parseXml(final Class<T> clazz, final String schemaPath) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.xmlToObject(this.parseString(), this.charset, clazz, schemaPath);
-	}
+            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+            if (headerFields != null && !headerFields.isEmpty()) {
+                for (Map.Entry<String, List<String>> entry : headerFields.entrySet()) {
+                    List<String> headerValues = entry.getValue();
+                    if (entry.getKey() != null && headerValues != null && !headerValues.isEmpty()) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (String headerValue : headerValues) {
+                            stringBuilder.append(" ").append(headerValue);
+                        }
+                        this.headerMaps.put(entry.getKey().toUpperCase(), stringBuilder.substring(1));
+                    }
+                }
+            }
 
-	/**
-	 * Parse json t.
-	 *
-	 * @param <T>   the type parameter
-	 * @param clazz the clazz
-	 * @return the t
-	 * @throws XmlException                 the xml exception
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public <T> T parseJson(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.jsonToObject(this.parseString(this.charset), this.charset, clazz);
-	}
+            byteArrayOutputStream = new ByteArrayOutputStream(Globals.DEFAULT_BUFFER_SIZE);
 
-	/**
-	 * Parse json t.
-	 *
-	 * @param <T>   the type parameter
-	 * @param clazz the clazz
-	 * @return the t
-	 * @throws XmlException                 the xml exception
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public <T> T parseYaml(final Class<T> clazz) throws XmlException, UnsupportedEncodingException {
-		return StringUtils.yamlToObject(this.parseString(this.charset), this.charset, clazz);
-	}
+            byte[] buffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 
-	public <T> List<T> parseList(final Class<T> clazz) throws UnsupportedEncodingException {
-		return StringUtils.stringToList(this.parseString(this.charset), this.charset, clazz);
-	}
+            if (inputStream != null) {
+                int readLength;
+                while ((readLength = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, readLength);
+                }
+            }
 
-	/**
-	 * Parse object object.
-	 *
-	 * @return the object
-	 * @throws XmlException the xml exception
-	 */
-	public <T> T parseObject(final Class<T> clazz) throws XmlException {
-		ByteArrayInputStream byteArrayInputStream = null;
-		ObjectInputStream objectInputStream = null;
-		
-		try {
-			byteArrayInputStream = new ByteArrayInputStream(this.responseContent);
-			objectInputStream = new ObjectInputStream(byteArrayInputStream);
-			return clazz.cast(objectInputStream.readObject());
-		} catch (Exception e) {
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Convert to object error! ", e);
-			}
-			
-			return null;
-		} finally {
-			IOUtils.closeStream(byteArrayInputStream);
-			IOUtils.closeStream(objectInputStream);
-		}
-	}
+            this.responseContent = byteArrayOutputStream.toByteArray();
 
-	/**
-	 * Parse string string.
-	 *
-	 * @return the string
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public String parseString() throws UnsupportedEncodingException {
-		return this.parseString(this.charset);
-	}
+            if (this.charset == null) {
+                String tempContent = new String(this.responseContent, Globals.DEFAULT_ENCODING);
+                if (tempContent.contains("charset=")) {
+                    this.charset = tempContent.substring(tempContent.indexOf("charset="));
+                    this.charset = this.charset.substring(0, this.charset.indexOf("\""));
+                    this.charset = this.charset.substring(this.charset.indexOf("=") + 1);
+                    if (this.charset.contains(";")) {
+                        this.charset = this.charset.substring(0, this.charset.indexOf(";"));
+                    }
+                } else {
+                    this.charset = Globals.DEFAULT_ENCODING;
+                }
+            }
 
-	/**
-	 * Parse string string.
-	 *
-	 * @param encoding the charset encoding
-	 * @return the string
-	 * @throws UnsupportedEncodingException the unsupported encoding exception
-	 */
-	public String parseString(final String encoding) throws UnsupportedEncodingException {
-		String charsetName = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
-		String string = new String(this.getResponseContent(), charsetName);
-		while (string.charAt(string.length() - 1) == '\n') {
-			string = string.substring(0, string.length() - 1);
-		}
-		while (string.charAt(string.length() - 1) == '\r') {
-			string = string.substring(0, string.length() - 1);
-		}
-		return string;
-	}
+            this.identifiedCode = urlConnection.getHeaderField("identified");
+        } catch (IOException e) {
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Read response data error! ", e);
+            }
+        } finally {
+            IOUtils.closeStream(inputStream);
+            IOUtils.closeStream(byteArrayOutputStream);
+        }
+    }
 
-	/**
-	 * Parse file.
-	 *
-	 * @param savePath the save path
-	 * @return the file
-	 * @throws FileNotFoundException the io exception
-	 */
-	public File parseFile(final String savePath) throws FileNotFoundException {
-		return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
-	}
+    public <T> List<T> parseList(final Class<T> clazz) throws UnsupportedEncodingException {
+        return StringUtils.stringToList(this.parseString(this.charset), this.charset, clazz);
+    }
 
-	/**
-	 * Gets header.
-	 *
-	 * @param headerName the header name
-	 * @return the header
-	 */
-	public String getHeader(final String headerName) {
-		return this.headerMaps.get(headerName.toUpperCase());
-	}
+    /**
+     * Parse object object.
+     *
+     * @return the object
+     * @throws XmlException the xml exception
+     */
+    public <T> T parseObject(final Class<T> clazz) throws XmlException {
+        if (StringUtils.notBlank(this.contentType)
+                && (this.contentType.toLowerCase().contains("xml")
+                        || this.contentType.toLowerCase().contains("json")
+                        || this.contentType.toLowerCase().contains("yaml")
+                        || this.contentType.toLowerCase().contains("yml"))) {
+            return StringUtils.stringToObject(this.parseString(), clazz);
+        }
+        ByteArrayInputStream byteArrayInputStream = null;
+        ObjectInputStream objectInputStream = null;
 
-	/**
-	 * Header list.
-	 *
-	 * @return the list
-	 */
-	public List<SimpleHeader> headerList() {
-		List<SimpleHeader> headerList = new ArrayList<>();
-		for (Map.Entry<String, String> entry : this.headerMaps.entrySet()) {
-			headerList.add(new SimpleHeader(entry.getKey(), entry.getValue()));
-		}
-		return headerList;
-	}
-	
-	private boolean isGZipResponse(final String contentEncoding) {
-		return contentEncoding != null && contentEncoding.contains("gzip");
-	}
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(this.responseContent);
+            objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            return clazz.cast(objectInputStream.readObject());
+        } catch (Exception e) {
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Convert to object error! ", e);
+            }
+
+            return null;
+        } finally {
+            IOUtils.closeStream(byteArrayInputStream);
+            IOUtils.closeStream(objectInputStream);
+        }
+    }
+
+    /**
+     * Parse string string.
+     *
+     * @return the string
+     */
+    public String parseString() {
+        return this.parseString(this.charset);
+    }
+
+    /**
+     * Parse string string.
+     *
+     * @param encoding the charset encoding
+     * @return the string
+     */
+    public String parseString(final String encoding) {
+        String charsetName = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
+        try {
+            String string = new String(this.getResponseContent(), charsetName);
+            while (string.charAt(string.length() - 1) == '\n') {
+                string = string.substring(0, string.length() - 1);
+            }
+            while (string.charAt(string.length() - 1) == '\r') {
+                string = string.substring(0, string.length() - 1);
+            }
+            return string;
+        } catch (UnsupportedEncodingException e) {
+            this.logger.error("Read response content error! ", e);
+            return Globals.DEFAULT_VALUE_STRING;
+        }
+    }
+
+    /**
+     * Parse file.
+     *
+     * @param savePath the save path
+     * @return the file
+     * @throws FileNotFoundException the io exception
+     */
+    public File parseFile(final String savePath) throws FileNotFoundException {
+        return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
+    }
+
+    /**
+     * Gets header.
+     *
+     * @param headerName the header name
+     * @return the header
+     */
+    public String getHeader(final String headerName) {
+        return this.headerMaps.get(headerName.toUpperCase());
+    }
+
+    /**
+     * Header list.
+     *
+     * @return the list
+     */
+    public List<SimpleHeader> headerList() {
+        List<SimpleHeader> headerList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : this.headerMaps.entrySet()) {
+            headerList.add(new SimpleHeader(entry.getKey(), entry.getValue()));
+        }
+        return headerList;
+    }
+
+    private boolean isGZipResponse(final String contentEncoding) {
+        return contentEncoding != null && contentEncoding.contains("gzip");
+    }
 }

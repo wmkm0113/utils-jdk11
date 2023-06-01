@@ -145,7 +145,7 @@ public final class ClassUtils {
 
 	/**
 	 * Override the thread context ClassLoader with the environment's bean ClassLoader
-	 * if necessary, i.e. if the bean ClassLoader is not equivalent to the thread
+	 * if necessary, i.e., if the bean ClassLoader is not equivalent to the thread
 	 * context ClassLoader already.
 	 *
 	 * @param classLoaderToUse the actual ClassLoader to use for the thread context
@@ -275,7 +275,7 @@ public final class ClassUtils {
 
 	/**
 	 * Check whether the given class is cache-safe in the given context,
-	 * i.e. whether it is loaded by the given ClassLoader or a parent of it.
+	 * i.e., whether it is loaded by the given ClassLoader or a parent of it.
 	 *
 	 * @param clazz       the class to analyze
 	 * @param classLoader the ClassLoader to potentially cache metadata in
@@ -702,7 +702,7 @@ public final class ClassUtils {
 	 * Return all interfaces that the given instance implements as arrays,
 	 * including ones implemented by superclasses.
 	 *
-	 * @param instance the instance to analyse for interfaces
+	 * @param instance the instance to analyze for interfaces
 	 * @return all interfaces that the given instance implements as arrays
 	 */
 	public static Class<?>[] getAllInterfaces(final Object instance) {
@@ -717,7 +717,7 @@ public final class ClassUtils {
 	 * including ones implemented by superclasses.
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 *
-	 * @param clazz the class to analyse for interfaces
+	 * @param clazz the class to analyze for interfaces
 	 * @return all interfaces that the given object implements as arrays
 	 */
 	public static Class<?>[] getAllInterfacesForClass(final Class<?> clazz) {
@@ -729,7 +729,7 @@ public final class ClassUtils {
 	 * including ones implemented by superclasses.
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 *
-	 * @param clazz       the class to analyse for interfaces
+	 * @param clazz       the class to analyze for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in (maybe <code>null</code> when accepting all declared interfaces)
 	 * @return all interfaces that the given object implements as arrays
 	 */

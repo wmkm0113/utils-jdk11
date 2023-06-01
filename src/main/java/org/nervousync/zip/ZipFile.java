@@ -299,14 +299,14 @@ public final class ZipFile implements Cloneable {
 			
 			if (tmpFile.isDirectory()) {
 				tmpFileName = StringUtils.replace(tmpFileName, Globals.DEFAULT_PAGE_SEPARATOR, 
-						Globals.ZIP_FILE_SEPARATOR);
-				if (!tmpFileName.endsWith(Globals.ZIP_FILE_SEPARATOR)) {
-					tmpFileName += Globals.ZIP_FILE_SEPARATOR;
+						Globals.DEFAULT_ZIP_PAGE_SEPARATOR);
+				if (!tmpFileName.endsWith(Globals.DEFAULT_ZIP_PAGE_SEPARATOR)) {
+					tmpFileName += Globals.DEFAULT_ZIP_PAGE_SEPARATOR;
 				}
 			} else {
 				String bkFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf(tmpFile.getName()));
 				bkFileName = StringUtils.replace(bkFileName, Globals.DEFAULT_PAGE_SEPARATOR, 
-						Globals.ZIP_FILE_SEPARATOR);
+						Globals.DEFAULT_ZIP_PAGE_SEPARATOR);
 				tmpFileName = bkFileName + tmpFile.getName();
 			}
 			
@@ -314,7 +314,7 @@ public final class ZipFile implements Cloneable {
 		} else {
 			File relFile = new File(file);
 			if (relFile.isDirectory()) {
-				fileName = relFile.getName() + Globals.ZIP_FILE_SEPARATOR;
+				fileName = relFile.getName() + Globals.DEFAULT_ZIP_PAGE_SEPARATOR;
 			} else {
 				fileName = getFileNameFromFilePath(relFile);
 			}
@@ -361,7 +361,7 @@ public final class ZipFile implements Cloneable {
 	}
 
 	/**
-	 * Check the given entry path is exists
+	 * Check the given entry path is existed
 	 *
 	 * @param entryPath entry path
 	 * @return check result
@@ -1105,7 +1105,7 @@ public final class ZipFile implements Cloneable {
 
 			outputStream.putNextEntry(null, zipOptions);
 			
-			if (!zipOptions.getFileNameInZip().endsWith(Globals.ZIP_FILE_SEPARATOR) 
+			if (!zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_ZIP_PAGE_SEPARATOR) 
 					&& !zipOptions.getFileNameInZip().endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 				while ((readLength = inputStream.read(readBuffer)) != Globals.DEFAULT_VALUE_INT) {
 					outputStream.write(readBuffer, 0, readLength);
@@ -1834,7 +1834,7 @@ public final class ZipFile implements Cloneable {
 			}
 			
 			String fullPath = folderPath + fileName;
-			fullPath = StringUtils.replace(fullPath, Globals.ZIP_FILE_SEPARATOR, Globals.DEFAULT_PAGE_SEPARATOR);
+			fullPath = StringUtils.replace(fullPath, Globals.DEFAULT_ZIP_PAGE_SEPARATOR, Globals.DEFAULT_PAGE_SEPARATOR);
 			FileUtils.makeDir(fullPath.substring(0, fullPath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR)));
 			return new FileOutputStream(FileUtils.getFile(fullPath));
 		} catch (FileNotFoundException e) {
@@ -2163,9 +2163,9 @@ public final class ZipFile implements Cloneable {
 
 				String entryPath = new String(fileNameBuffer, this.charsetEncoding);
 
-				if (entryPath.contains(Globals.ZIP_ENTRY_SEPARATOR)) {
-					entryPath = entryPath.substring(entryPath.indexOf(Globals.ZIP_ENTRY_SEPARATOR) 
-							+ Globals.ZIP_ENTRY_SEPARATOR.length());
+				if (entryPath.contains(Globals.DEFAULT_ZIP_ENTRY_SEPARATOR)) {
+					entryPath = entryPath.substring(entryPath.indexOf(Globals.DEFAULT_ZIP_ENTRY_SEPARATOR)
+							+ Globals.DEFAULT_ZIP_ENTRY_SEPARATOR.length());
 				}
 
 				localFileHeader.setEntryPath(entryPath);
@@ -2901,13 +2901,13 @@ public final class ZipFile implements Cloneable {
 
 					String entryPath = new String(fileNameBuffer, this.charsetEncoding);
 
-					if (entryPath.contains(Globals.ZIP_ENTRY_SEPARATOR)) {
-						entryPath = entryPath.substring(entryPath.indexOf(Globals.ZIP_ENTRY_SEPARATOR) 
-								+ Globals.ZIP_ENTRY_SEPARATOR.length());
+					if (entryPath.contains(Globals.DEFAULT_ZIP_ENTRY_SEPARATOR)) {
+						entryPath = entryPath.substring(entryPath.indexOf(Globals.DEFAULT_ZIP_ENTRY_SEPARATOR)
+								+ Globals.DEFAULT_ZIP_ENTRY_SEPARATOR.length());
 					}
 					
 					fileHeader.setEntryPath(entryPath);
-					if (entryPath.endsWith(Globals.ZIP_FILE_SEPARATOR) 
+					if (entryPath.endsWith(Globals.DEFAULT_ZIP_PAGE_SEPARATOR) 
 							|| entryPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
 						fileHeader.setDirectory(true);
 					} else {

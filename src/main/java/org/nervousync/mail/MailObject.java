@@ -54,7 +54,7 @@ public final class MailObject implements Serializable {
 	/**
 	 * Mail content type
 	 */
-	private String contentType = Globals.DEFAULT_EMAIL_CONTENT_TYPE_TEXT;
+	private String contentType = Globals.DEFAULT_CONTENT_TYPE_TEXT;
 	/**
 	 * Sender e-mail address
 	 */

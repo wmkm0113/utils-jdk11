@@ -138,6 +138,7 @@ public final class SecurityUtils implements Serializable {
      * @return Initialized provider
      * @throws CryptoException Cipher transformation didn't find
      */
+    @Deprecated
     public static SecureProvider MD5() throws CryptoException {
         return new MD5DigestProviderImpl();
     }
@@ -148,6 +149,7 @@ public final class SecurityUtils implements Serializable {
      * @param source Input source
      * @return Calculate result or zero-length arrays if processes have error
      */
+    @Deprecated
     public static byte[] MD5(final Object source) {
         try {
             return digest(source, MD5());
@@ -166,6 +168,7 @@ public final class SecurityUtils implements Serializable {
      * @return Initialized provider
      * @throws CryptoException Cipher transformation isn't found
      */
+    @Deprecated
     public static SecureProvider HmacMD5(byte[] keyBytes) throws CryptoException {
         return new MD5DigestProviderImpl(keyBytes);
     }
@@ -177,6 +180,7 @@ public final class SecurityUtils implements Serializable {
      * @param source   Input source
      * @return Calculate result or zero-length arrays if processes have error
      */
+    @Deprecated
     public static byte[] HmacMD5(final byte[] keyBytes, final Object source) {
         try {
             return digest(source, HmacMD5(keyBytes));

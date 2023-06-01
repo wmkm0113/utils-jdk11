@@ -390,7 +390,7 @@ public final class FileUtils {
 
     /**
      * Resolve the given resource location to a <code>java.io.File</code>,
-     * i.e. to a file in the file system.
+     * i.e., to a file in the file system.
      * <p>Does not check whether the fil actually exists; simply returns
      * the File that the given location would correspond to.
      *
@@ -496,7 +496,7 @@ public final class FileUtils {
 
     /**
      * Resolve the given resource URL to a <code>java.io.File</code>,
-     * i.e. to a file in the file system.
+     * i.e., to a file in the file system.
      *
      * @param resourceUrl the resource URL to resolve
      * @return a corresponding File object
@@ -508,7 +508,7 @@ public final class FileUtils {
 
     /**
      * Resolve the given resource URL to a <code>java.io.File</code>,
-     * i.e. to a file in the file system.
+     * i.e., to a file in the file system.
      *
      * @param resourceUrl the resource URL to resolve
      * @param description a description of the original resource that the URL was created for (for example, a class path location)
@@ -535,7 +535,7 @@ public final class FileUtils {
 
     /**
      * Resolve the given resource URI to a <code>java.io.File</code>,
-     * i.e. to a file in the file system.
+     * i.e., to a file in the file system.
      *
      * @param resourceUri the resource URI to resolve
      * @return a corresponding File object
@@ -547,7 +547,7 @@ public final class FileUtils {
 
     /**
      * Resolve the given resource URI to a <code>java.io.File</code>,
-     * i.e. to a file in the file system.
+     * i.e., to a file in the file system.
      *
      * @param resourceUri the resource URI to resolve
      * @param description a description of the original resource that the URI was created for (for example, a class path location)
@@ -2650,7 +2650,7 @@ public final class FileUtils {
     }
 
     /**
-     * Check the current file is exists
+     * Check the current file is existed
      *
      * @param filePath File path
      * @return Check result
@@ -2660,7 +2660,7 @@ public final class FileUtils {
     }
 
     /**
-     * Check the current file is exists
+     * Check the current file is existed
      *
      * @param filePath                  File path
      * @param ntlmPasswordAuthenticator the ntlm password authenticator
@@ -2671,7 +2671,7 @@ public final class FileUtils {
     }
 
     /**
-     * Check the current file is exists
+     * Check the current file is existed
      *
      * @param filePath                  File path
      * @param properties                the properties
