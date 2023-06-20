@@ -1,18 +1,17 @@
 package org.nervousync.test.utils;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.RequestUtils;
 
 import java.util.Optional;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class RequestTest extends BaseTest {
 
     @Test
-    public void test000Method() {
+    @Order(0)
+    public void httpMethod() {
         this.logger.info("Http method: {}", RequestUtils.httpMethodOption("get"));
         this.logger.info("Http method: {}", RequestUtils.httpMethodOption("post"));
         this.logger.info("Http method: {}", RequestUtils.httpMethodOption("put"));
@@ -23,18 +22,21 @@ public final class RequestTest extends BaseTest {
     }
 
     @Test
-    public void test010DNS() {
+    @Order(10)
+    public void DNS() {
         this.logger.info("Resolve www.baidu.com ip addresses: {}", RequestUtils.resolveDomain("www.baidu.com"));
     }
 
     @Test
-    public void test020SSL() {
+    @Order(20)
+    public void SSL() {
         Optional.ofNullable(RequestUtils.serverCertificate("https://www.baidu.com"))
                 .ifPresent(certificate -> this.logger.info("Read certificate: {}", certificate));
     }
 
     @Test
-    public void test030ContentLength() {
+    @Order(30)
+    public void contentLength() {
         this.logger.info("Read content length: {}", RequestUtils.contentLength("https://www.baidu.com"));
     }
 }

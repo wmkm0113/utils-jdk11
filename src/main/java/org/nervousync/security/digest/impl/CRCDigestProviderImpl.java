@@ -21,6 +21,7 @@ import org.nervousync.security.config.CRCConfig;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.utils.RawUtils;
 
+import java.nio.ByteOrder;
 import java.util.*;
 
 /**
@@ -119,7 +120,7 @@ public final class CRCDigestProviderImpl extends SecureProvider {
         }
 
         byte[] result = new byte[8];
-        RawUtils.writeLong(result, RawUtils.Endian.LITTLE, this.crc);
+        RawUtils.writeLong(result, ByteOrder.LITTLE_ENDIAN, this.crc);
         this.reset();
         return result;
     }
@@ -129,7 +130,7 @@ public final class CRCDigestProviderImpl extends SecureProvider {
         if (signature == null || signature.length != 8) {
             return Boolean.FALSE;
         }
-        return this.crc == RawUtils.readLong(signature, RawUtils.Endian.LITTLE);
+        return this.crc == RawUtils.readLong(signature, ByteOrder.LITTLE_ENDIAN);
     }
 
     @Override

@@ -1,8 +1,7 @@
 package org.nervousync.test.utils;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.beans.network.NetworkInfo;
 import org.nervousync.exceptions.beans.network.NetworkInfoException;
 import org.nervousync.test.BaseTest;
@@ -12,11 +11,11 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class SystemTest extends BaseTest {
 
 	@Test
-	public void test000SystemInfo() {
+    @Order(0)
+	public void systemInfo() {
 		this.logger.info("System name: {}, version: {}, user name: {}, user home: {}, workspace: {}, identify Key: {}",
 				SystemUtils.OPERATE_SYSTEM_NAME, SystemUtils.OPERATE_SYSTEM_VERSION, SystemUtils.USER_NAME,
 				SystemUtils.USER_HOME, SystemUtils.USER_DIR, SystemUtils.identifiedKey());
@@ -32,7 +31,8 @@ public final class SystemTest extends BaseTest {
 	}
 
 	@Test
-	public void test010NetworkInfo() throws SocketException, NetworkInfoException {
+    @Order(10)
+	public void networkInfo() throws SocketException, NetworkInfoException {
 		Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
 		do {
 			NetworkInfo networkInfo = new NetworkInfo(enumeration.nextElement());

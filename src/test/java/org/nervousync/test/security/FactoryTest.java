@@ -1,18 +1,17 @@
 package org.nervousync.test.security;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.security.factory.SecureConfig;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.StringUtils;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class FactoryTest extends BaseTest {
 
     @Test
-    public void test000Schema() {
+    @Order(0)
+    public void schema() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
                 .ifPresent(secureConfig -> {
                     SecureConfig parseConfig =
@@ -23,21 +22,24 @@ public final class FactoryTest extends BaseTest {
     }
 
     @Test
-    public void test010Initialize() {
+    @Order(10)
+    public void initialize() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.RSA1024)
                 .ifPresent(secureConfig ->
                         this.logger.info("Initialize result: {}", SecureFactory.initialize(secureConfig)));
     }
 
     @Test
-    public void test020Config() {
+    @Order(20)
+    public void config() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES128)
                 .ifPresent(secureConfig -> this.logger.info("Config result: {}",
                         SecureFactory.getInstance().register("TestConfig", secureConfig)));
     }
 
     @Test
-    public void test030Crypto() {
+    @Order(30)
+    public void crypto() {
         String encResult = SecureFactory.getInstance().encrypt("TestConfig", "TestString中文测试");
         this.logger.info("Encrypt result: {}", encResult);
         this.logger.info("Decrypt result: {}", SecureFactory.getInstance().decrypt("TestConfig", encResult));

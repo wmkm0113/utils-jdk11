@@ -35,6 +35,7 @@ package org.nervousync.zip.models.header.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,11 +98,11 @@ public final class HeaderOperator {
 		byte[] intBuffer = new byte[4];
 
 		// Extended local file header signature
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) Globals.EXTSIG);
+		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) Globals.EXTSIG);
 		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// CRC
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) localFileHeader.getCrc32());
+		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) localFileHeader.getCrc32());
 		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// Compressed size
@@ -109,7 +110,7 @@ public final class HeaderOperator {
 		if (compressedSize > Integer.MAX_VALUE) {
 			compressedSize = Integer.MAX_VALUE;
 		}
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) compressedSize);
+		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) compressedSize);
 		copyByteArrayToList(intBuffer, byteArrayList);
 
 		// Original size
@@ -117,7 +118,7 @@ public final class HeaderOperator {
 		if (originalSize > Integer.MAX_VALUE) {
 			originalSize = Integer.MAX_VALUE;
 		}
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, (int) originalSize);
+		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) originalSize);
 		copyByteArrayToList(intBuffer, byteArrayList);
 
 		byte[] extendLocationHdrBytes = convertByteArrayListToByteArray(byteArrayList);
@@ -159,7 +160,7 @@ public final class HeaderOperator {
 	 */
 	public static void appendShortToArrayList(short value, List<String> arrayList) throws ZipException {
 		byte[] shortBuffer = new byte[2];
-		RawUtils.writeShort(shortBuffer, RawUtils.Endian.LITTLE, value);
+		RawUtils.writeShort(shortBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(shortBuffer, arrayList);
 	}
 
@@ -172,7 +173,7 @@ public final class HeaderOperator {
 	 */
 	public static void appendIntToArrayList(int value, List<String> arrayList) throws ZipException {
 		byte[] intBuffer = new byte[4];
-		RawUtils.writeInt(intBuffer, RawUtils.Endian.LITTLE, value);
+		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(intBuffer, arrayList);
 	}
 
@@ -185,7 +186,7 @@ public final class HeaderOperator {
 	 */
 	public static void appendLongToArrayList(long value, List<String> arrayList) throws ZipException {
 		byte[] longBuffer = new byte[8];
-		RawUtils.writeLong(longBuffer, RawUtils.Endian.LITTLE, value);
+		RawUtils.writeLong(longBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(longBuffer, arrayList);
 	}
 

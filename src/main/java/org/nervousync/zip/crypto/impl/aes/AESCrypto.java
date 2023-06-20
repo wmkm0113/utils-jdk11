@@ -16,6 +16,7 @@
  */
 package org.nervousync.zip.crypto.impl.aes;
 
+import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
@@ -195,7 +196,8 @@ public class AESCrypto {
 	 * @param index the index
 	 */
 	void processData(byte[] buff, int index) {
-		this.iv = RawUtils.intToByteArray(this.nonce, 16);
+		this.iv = new byte[16];
+		RawUtils.writeInt(this.iv, ByteOrder.LITTLE_ENDIAN, this.nonce);
 		this.aesEngine.processBlock(this.iv, this.countBlock);
 
 		for (int j = 0 ; j < this.loopCount ; j++) {

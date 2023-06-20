@@ -54,11 +54,6 @@ public final class SegmentationFile extends BeanObject {
 	@XmlElement(name = "ext_name")
 	private String extName;
 	/**
-	 * Item identified value of MD5
-	 */
-	@XmlElement(name = "signature_md5")
-	private String md5;
-	/**
 	 * Item identified value of SHA256
 	 */
 	@XmlElement(name = "signature_sha")
@@ -83,16 +78,14 @@ public final class SegmentationFile extends BeanObject {
 	 * @param extName              File extension name
 	 * @param totalSize            File total size
 	 * @param blockSize            Item block size
-	 * @param md5                  File MD5
 	 * @param sha                  File SHA256
 	 * @param segmentationItemList Block item list
 	 */
-	public SegmentationFile(String extName, long totalSize, int blockSize, String md5, String sha,
+	public SegmentationFile(String extName, long totalSize, int blockSize, String sha,
 	                        List<SegmentationItem> segmentationItemList) {
 		this.extName = extName;
 		this.totalSize = totalSize;
 		this.blockSize = blockSize;
-		this.md5 = md5;
 		this.sha = sha;
 		this.segmentationItemList = segmentationItemList;
 	}
@@ -122,15 +115,6 @@ public final class SegmentationFile extends BeanObject {
 	 */
 	public String getExtName() {
 		return extName;
-	}
-
-	/**
-	 * Gets md 5.
-	 *
-	 * @return the md 5
-	 */
-	public String getMd5() {
-		return md5;
 	}
 
 	/**

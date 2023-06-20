@@ -82,7 +82,7 @@ public abstract class BaseCryptoProvider extends SecureProvider {
         IvParameterSpec ivParameterSpec = null;
         if (ivLength > 0) {
             byte[] ivContent = new byte[ivLength];
-            System.arraycopy(SecurityUtils.MD5(this.cipherKey.getKeyBytes()),
+            System.arraycopy(SecurityUtils.SHA256(this.cipherKey.getKeyBytes()),
                     0, ivContent, 0, ivContent.length);
             ivParameterSpec = new IvParameterSpec(ivContent);
         }

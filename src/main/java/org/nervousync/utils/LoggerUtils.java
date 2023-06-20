@@ -16,14 +16,13 @@ import java.util.*;
  */
 public final class LoggerUtils {
 
-
     /**
      * Update logger configure.
      *
      * @param rootLevel the root level
      */
     public static void initLoggerConfigure(final Level rootLevel) {
-        initLoggerConfigure(Globals.DEFAULT_VALUE_STRING, rootLevel);
+        initLoggerConfigure(rootLevel, new PackageLogger[0]);
     }
 
     /**
@@ -106,14 +105,13 @@ public final class LoggerUtils {
                     AppenderComponentBuilder appenderComponentBuilder =
                             configurationBuilder.newAppender(appenderConfigure.getAppenderName(),
                                     appenderConfigure.getAppenderPlugin());
-                    if (appenderConfigure.getAppenderAttributes() != null) {
-                        appenderConfigure.getAppenderAttributes().forEach(appenderComponentBuilder::addAttribute);
-                    }
-                    if (appenderConfigure.getAppenderComponents() != null) {
-                        appenderConfigure.getAppenderComponents()
-                                .forEach(componentConfigure ->
-                                        initComponentConfig(appenderComponentBuilder, componentConfigure));
-                    }
+                    Optional.ofNullable(appenderConfigure.getAppenderAttributes())
+                            .ifPresent(appenderAttributes ->
+                                    appenderAttributes.forEach(appenderComponentBuilder::addAttribute));
+                    Optional.ofNullable(appenderConfigure.getAppenderComponents())
+                            .ifPresent(appenderComponents ->
+                                    appenderComponents.forEach(componentConfigure ->
+                                            initComponentConfig(appenderComponentBuilder, componentConfigure)));
                     if (appenderConfigure.getPatternLayoutConfigure() == null) {
                         layoutComponentBuilder.ifPresent(appenderComponentBuilder::add);
                     } else {
@@ -134,6 +132,7 @@ public final class LoggerUtils {
                                     LoggerComponentBuilder loggerComponentBuilder =
                                             configurationBuilder.newLogger(loggerConfigure.getPackageName(),
                                                     loggerConfigure.getLoggerLevel());
+                                    loggerComponentBuilder.addAttribute("additivity", Boolean.FALSE);
                                     loggerConfigure.getAppenderNames().forEach(appenderName ->
                                             loggerComponentBuilder.add(configurationBuilder.newAppenderRef(appenderName)));
                                     configurationBuilder.add(loggerComponentBuilder);
@@ -190,10 +189,10 @@ public final class LoggerUtils {
             Arrays.stream(packageLoggers)
                     .filter(packageLogger -> StringUtils.notBlank(packageLogger.getPackageName()))
                     .forEach(packageLogger -> {
-                LoggerConfigure loggerConfigure = new LoggerConfigure(packageLogger);
-                loggerConfigure.setAppenderNames(appenderNames);
-                loggerConfigures.add(loggerConfigure);
-            });
+                        LoggerConfigure loggerConfigure = new LoggerConfigure(packageLogger);
+                        loggerConfigure.setAppenderNames(appenderNames);
+                        loggerConfigures.add(loggerConfigure);
+                    });
             logConfig.setLoggerConfigures(loggerConfigures);
         }
         return logConfig;

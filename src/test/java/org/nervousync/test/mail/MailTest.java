@@ -1,10 +1,9 @@
 package org.nervousync.test.mail;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
@@ -21,7 +20,6 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class MailTest extends BaseTest {
 
     private static final String MAIL_SECURE = "MailSecure";
@@ -33,13 +31,14 @@ public final class MailTest extends BaseTest {
 
     private static boolean SKIP_TEST = Boolean.FALSE;
 
-    @BeforeClass
+    @BeforeAll
     public static void initialize() {
         SKIP_TEST = !FileUtils.isExists("src/test/resources/mail.xml");
     }
 
     @Test
-    public void test000GenerateConfig() throws BuilderException {
+	@Order(0)
+    public void generateConfig() throws BuilderException {
         if (SKIP_TEST) {
             return;
         }
@@ -91,22 +90,24 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test010FolderList() {
+	@Order(10)
+    public void folderList() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         mailAgent.folderList().forEach(this.logger::info);
     }
 
     @Test
-    public void test020SendMail() {
+	@Order(20)
+    public void sendMail() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         this.logger.info("Mail count: {}", mailAgent.mailCount());
         MailObject mailObject = new MailObject();
         Optional.ofNullable(PROPERTIES.getProperty("mail.sender")).ifPresent(mailObject::setSendAddress);
@@ -131,12 +132,13 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test030ReceiveMail() {
+	@Order(30)
+    public void receiveMail() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
@@ -157,12 +159,13 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test040FlagMail() {
+	@Order(40)
+    public void flagMail() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
@@ -186,12 +189,13 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test050RecoveryMail() {
+	@Order(50)
+    public void recoveryMail() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_TRASH)
                 .stream()
                 .filter(uid ->
@@ -204,12 +208,13 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test060DropMail() {
+	@Order(60)
+    public void dropMail() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
@@ -229,12 +234,13 @@ public final class MailTest extends BaseTest {
     }
 
     @Test
-    public void test070MailCount() {
+	@Order(70)
+    public void mailCount() {
         if (SKIP_TEST) {
             return;
         }
         MailUtils.Agent mailAgent = MailUtils.mailAgent(MAIL_CONFIG);
-        Assert.assertNotNull(mailAgent);
+        Assertions.assertNotNull(mailAgent);
         this.logger.info("INBOX Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_INBOX));
         this.logger.info("SPAM Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_SPAM));
         this.logger.info("DRAFTS Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_DRAFTS));

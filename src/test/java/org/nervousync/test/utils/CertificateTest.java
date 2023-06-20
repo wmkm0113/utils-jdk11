@@ -1,9 +1,8 @@
 package org.nervousync.test.utils;
 
-import org.junit.AfterClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.commons.core.Globals;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.*;
@@ -17,7 +16,6 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Date;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class CertificateTest extends BaseTest {
 
     private static final String STORE_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "store";
@@ -33,13 +31,14 @@ public final class CertificateTest extends BaseTest {
         SIGN_KEY = keyPair.getPrivate();
     }
 
-    @AfterClass
+    @AfterAll
     public static void clearFile() {
         FileUtils.removeFile(BASE_PATH + STORE_PATH);
     }
 
     @Test
-    public void test000GenerateCertificate() throws CertificateEncodingException {
+    @Order(0)
+    public void generateCertificate() throws CertificateEncodingException {
         this.logger.info("Signature Private exponent: {}", ((RSAPrivateKey) SIGN_KEY).getPrivateExponent().toString());
         this.logger.info("Signature Modulus: {}", ((RSAPrivateKey) SIGN_KEY).getModulus().toString());
         KeyPair keyPair = SecurityUtils.RSAKeyPair();
@@ -59,7 +58,8 @@ public final class CertificateTest extends BaseTest {
     }
 
     @Test
-    public void test010ReadKeyFromFile() throws CertificateEncodingException, IOException {
+    @Order(10)
+    public void readKeyFromFile() throws CertificateEncodingException, IOException {
         PrivateKey privateKey =
                 CertificateUtils.privateKey(FileUtils.readFileBytes(BASE_PATH + STORE_PATH),
                         "CERT", "changeit");

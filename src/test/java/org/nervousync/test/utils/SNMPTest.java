@@ -1,8 +1,7 @@
 package org.nervousync.test.utils;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.beans.snmp.SNMPData;
 import org.nervousync.beans.snmp.TargetHost;
 import org.nervousync.commons.snmp.SNMPDataOperator;
@@ -19,16 +18,17 @@ import org.snmp4j.smi.VariableBinding;
 import java.io.IOException;
 import java.util.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class SNMPTest extends BaseTest {
 
 	@Test
-	public void test000Initialize() {
+    @Order(0)
+	public void initialize() {
 		this.logger.info("Initialize result: {}", SNMPUtils.initialize(1, 2000L));
 	}
 
 	@Test
-	public void test010AddMonitor() {
+    @Order(10)
+	public void addMonitor() {
 		//  Please config snmpd to enable current oid can read
 		PDU getPDU = new PDU();
 		getPDU.setType(PDU.GET);
@@ -51,12 +51,14 @@ public final class SNMPTest extends BaseTest {
 	}
 
 	@Test
-	public void test020RunningMonitor() throws InterruptedException {
+    @Order(20)
+	public void runningMonitor() throws InterruptedException {
 		Thread.sleep(10000L);
 	}
 
 	@Test
-	public void test030Destroy() throws IOException {
+    @Order(30)
+	public void destroy() throws IOException {
 		SNMPUtils.getInstance().destroy();
 	}
 

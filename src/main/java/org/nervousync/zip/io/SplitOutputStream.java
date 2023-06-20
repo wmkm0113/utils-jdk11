@@ -19,6 +19,7 @@ package org.nervousync.zip.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteOrder;
 
 import org.nervousync.commons.core.Globals;
 import org.nervousync.exceptions.zip.ZipException;
@@ -276,7 +277,7 @@ public class SplitOutputStream extends OutputStream {
 	
 	private boolean isHeaderData(byte[] buffer) {
 		if (buffer != null && buffer.length >= 4) {
-			int signature = RawUtils.readInt(buffer, 0, RawUtils.Endian.LITTLE);
+			int signature = RawUtils.readInt(buffer, 0, ByteOrder.LITTLE_ENDIAN);
 			
 			for (long headerSignature : HEADER_SIGNATURES) {
 				if (headerSignature != Globals.SPLITSIG && headerSignature == signature) {

@@ -53,11 +53,6 @@ public final class SegmentationItem extends BeanObject {
 	@XmlElement(name = "block_size")
 	private long blockSize;
 	/**
-	 * Item identified value of MD5
-	 */
-	@XmlElement(name = "signature_md5")
-	private String md5;
-	/**
 	 * Item identified value of SHA256
 	 */
 	@XmlElement(name = "signature_sha")
@@ -88,7 +83,6 @@ public final class SegmentationItem extends BeanObject {
 	 * @param dataContent Item data content
 	 */
 	public SegmentationItem(long position, byte[] dataContent) {
-		this.md5 = ConvertUtils.byteToHex(SecurityUtils.MD5(dataContent));
 		this.sha = ConvertUtils.byteToHex(SecurityUtils.SHA256(dataContent));
 		this.position = position;
 		this.blockSize = dataContent.length;
@@ -112,15 +106,6 @@ public final class SegmentationItem extends BeanObject {
 	 */
 	public long getBlockSize() {
 		return blockSize;
-	}
-
-	/**
-	 * Gets md 5.
-	 *
-	 * @return the md5
-	 */
-	public String getMd5() {
-		return md5;
 	}
 
 	/**
@@ -159,7 +144,6 @@ public final class SegmentationItem extends BeanObject {
 		byte[] dataContent = StringUtils.base64Decode(this.dataInfo);
 		try {
 			return dataContent.length == this.blockSize
-					&& Objects.equals(ConvertUtils.byteToHex(SecurityUtils.MD5(dataContent)), this.md5)
 					&& Objects.equals(ConvertUtils.byteToHex(SecurityUtils.SHA256(dataContent)), this.sha);
 		} catch (Exception e) {
 			return Boolean.FALSE;

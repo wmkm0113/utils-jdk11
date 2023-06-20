@@ -3004,9 +3004,7 @@ public final class FileUtils {
             }
 
             return new SegmentationFile(extName, fileSize, blockSize,
-                    ConvertUtils.byteToHex(SecurityUtils.MD5(fileObject)),
-                    ConvertUtils.byteToHex(SecurityUtils.SHA256(fileObject)),
-                    segmentationItemList);
+                    ConvertUtils.byteToHex(SecurityUtils.SHA256(fileObject)), segmentationItemList);
         } catch (FileNotFoundException e) {
             LOGGER.error("Target file not exists! ");
             if (LOGGER.isDebugEnabled()) {

@@ -21,6 +21,7 @@ import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.SecurityUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -149,7 +150,7 @@ public abstract class SecureProvider {
     public static String CRCResult(String algorithm, byte[] result) throws CryptoException {
         return SecurityUtils.crcConfig(algorithm)
                 .map(crcConfig -> {
-                    long crc = RawUtils.readLong(result, RawUtils.Endian.LITTLE);
+                    long crc = RawUtils.readLong(result, ByteOrder.LITTLE_ENDIAN);
                     StringBuilder stringBuilder = new StringBuilder(Long.toString(crc, 16));
                     while (stringBuilder.length() < crcConfig.getOutLength()) {
                         stringBuilder.insert(0, "0");

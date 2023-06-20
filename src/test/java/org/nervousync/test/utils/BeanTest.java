@@ -4,9 +4,8 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.annotations.beans.BeanProperty;
 import org.nervousync.annotations.beans.Mappings;
 import org.nervousync.beans.converter.impl.basic.BooleanDataDecoder;
@@ -30,11 +29,11 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class BeanTest extends BaseTest {
 
 	@Test
-	public void test000CopyTest() {
+    @Order(0)
+	public void copyTest() {
 		GenericBean genericBean = new GenericBean();
 		BeanUtils.copyTo(generateGeneric(), genericBean);
 		this.logger.info("Copied generic result: {}",
@@ -46,7 +45,8 @@ public final class BeanTest extends BaseTest {
 	}
 
 	@Test
-	public void test010BeanCopyToTest() {
+    @Order(10)
+	public void beanCopyToTest() {
 		BeanTwo beanTwo = new BeanTwo();
 		BeanThree beanThree = new BeanThree();
 		BeanFour beanFour = new BeanFour();
@@ -63,7 +63,8 @@ public final class BeanTest extends BaseTest {
 	}
 
 	@Test
-	public void test020BeanCopyFromTest() {
+    @Order(20)
+	public void beanCopyFromTest() {
 		BeanOne beanOne = new BeanOne();
 		BeanUtils.copyFrom(beanOne, generateBeanTwo(), generateBeanThree(), generateBeanFour(), generateBeanFive());
 		this.logger.info("Copied result: {}",
@@ -73,7 +74,8 @@ public final class BeanTest extends BaseTest {
 	}
 
 	@Test
-	public void test030BeanCopyPropertiesTest() {
+    @Order(30)
+	public void beanCopyPropertiesTest() {
 		Map<String, Object> dataMap = new HashMap<>();
 		dataMap.put("innerName", "Map name");
 		dataMap.put("innerCode", 227);
@@ -84,7 +86,8 @@ public final class BeanTest extends BaseTest {
 	}
 
 	@Test
-	public void test040RemoveConfig() {
+    @Order(40)
+	public void removeConfig() {
 		BeanUtils.removeBeanConfig(BeanOne.class, BeanTwo.class, BeanThree.class, BeanFour.class, BeanFive.class);
 	}
 

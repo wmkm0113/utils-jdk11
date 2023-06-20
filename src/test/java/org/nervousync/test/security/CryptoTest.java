@@ -1,8 +1,7 @@
 package org.nervousync.test.security;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.nervousync.security.SecureProvider;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.test.BaseTest;
@@ -14,7 +13,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class CryptoTest extends BaseTest {
 
     private static final String[] DEFAULT_CIPHER_MODES =
@@ -23,7 +21,8 @@ public final class CryptoTest extends BaseTest {
     private static final String ORIGINAL_STRING = "Test测试TestTest测试TestTestTest测试TestTestTestTest测试TestTestTestTestTest测试TestTestTestTestTestTest测试TestTestTestTestTestTestTest测试TestTestTestTestTest测试";
 
     @Test
-    public void test000AES() throws CryptoException {
+    @Order(0)
+    public void AES() throws CryptoException {
         byte[] aesKey = SecurityUtils.AES128Key();
         this.logger.info("AES128 Key: {}", StringUtils.base64Encode(aesKey));
         for (String cipherMode : DEFAULT_CIPHER_MODES) {
@@ -65,7 +64,8 @@ public final class CryptoTest extends BaseTest {
     }
 
     @Test
-    public void test010DES() throws CryptoException {
+    @Order(10)
+    public void DES() throws CryptoException {
         byte[] desKey = SecurityUtils.DESKey();
         this.logger.info("DES Key: {}", StringUtils.base64Encode(desKey));
         for (String cipherMode : DEFAULT_CIPHER_MODES) {
@@ -81,7 +81,8 @@ public final class CryptoTest extends BaseTest {
     }
 
     @Test
-    public void test020TripleDES() throws CryptoException {
+    @Order(20)
+    public void tripleDES() throws CryptoException {
         byte[] desKey = SecurityUtils.TripleDESKey();
         this.logger.info("TripleDES Key: {}", StringUtils.base64Encode(desKey));
         for (String cipherMode : DEFAULT_CIPHER_MODES) {
@@ -101,7 +102,8 @@ public final class CryptoTest extends BaseTest {
             new String[]{"PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"};
 
     @Test
-    public void test030SM4() throws CryptoException {
+    @Order(30)
+    public void SM4() throws CryptoException {
         byte[] sm4Key = SecurityUtils.SM4Key();
         this.logger.info("SM4 Key: {}", StringUtils.base64Encode(sm4Key));
         for (String cipherMode : SM4_CIPHER_MODES) {
@@ -123,7 +125,8 @@ public final class CryptoTest extends BaseTest {
     };
 
     @Test
-    public void test040RSA() throws CryptoException {
+    @Order(40)
+    public void RSA() throws CryptoException {
         //  Generate RSA certificate
         KeyPair keyPair = SecurityUtils.RSAKeyPair();
         long currentTime = DateTimeUtils.currentTimeMillis();
@@ -155,7 +158,8 @@ public final class CryptoTest extends BaseTest {
     }
 
     @Test
-    public void test050SM2() throws CryptoException {
+    @Order(50)
+    public void SM2() throws CryptoException {
         KeyPair keyPair = SecurityUtils.SM2KeyPair();
         long currentTime = DateTimeUtils.currentTimeMillis();
         byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
