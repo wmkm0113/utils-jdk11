@@ -326,7 +326,7 @@ public final class CollectionUtils {
 	 * <h3 class="zh-CN">检查给定的集合是否包含相同的元素实例。</h3>
 	 *
 	 * @param source 		<span class="en">the source Collection</span>
-	 *                      <span class="zhs>源集合</span>
+	 *                      <span class="zh-CN">源集合</span>
 	 * @param candidates 	<span class="en">the candidates to search for</span>
 	 *                      <span class="zh-CN">要搜索的候选元素</span>
 	 *
@@ -344,7 +344,7 @@ public final class CollectionUtils {
 	 * <h3 class="zh-CN">寻找给定的集合包含的第一个相同的元素实例。</h3>
 	 *
 	 * @param source 		<span class="en">the source Collection</span>
-	 *                      <span class="zhs>源集合</span>
+	 *                      <span class="zh-CN">源集合</span>
 	 * @param candidates 	<span class="en">the candidates to search for</span>
 	 *                      <span class="zh-CN">要搜索的候选元素</span>
 	 *

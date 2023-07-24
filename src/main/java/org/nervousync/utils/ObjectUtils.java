@@ -124,7 +124,7 @@ public final class ObjectUtils {
      * @param <T>                   <span class="en">define class</span>
      *                              <span class="zh-CN">定义类</span>
      * @param clazz                 <span class="en">define class</span>
-     *                              <span class="zh-CN">定义类</span
+     *                              <span class="zh-CN">定义类</span>
      * @param methodInterceptor     <span class="en">method interceptor instance</span>
      *                              <span class="zh-CN">方法拦截器实例</span>
      *

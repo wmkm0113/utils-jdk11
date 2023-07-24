@@ -58,7 +58,7 @@ libraryDependencies += "org.nervousync" % "utils-jdk11" % "${version}" % "provid
 ## Internationalize Support:
 4 Steps to add i18n support:
 ### 1. Create declaration and resource files
-Create nervous.i18n file in META-INF
+Create nervousync.i18n file in META-INF
 ```
 bundle={Your bundle string}
 languages={language string using ',' split}
@@ -97,9 +97,9 @@ Usage: See org.nervousync.test.zip.ZipTest
 ## Utilities List
 ### BeanUtils
 **Package**: org.nervousync.utils  
-* Copy object fields value from the source object to target object, based field name
-* Copy object fields value from the source object array to target object, based annotation: BeanProperty
-* Copy object fields value from the source object to target object arrays, based annotation: BeanProperty
+* Copy object fields value from the source object to the target object, based field name
+* Copy object fields value from the source object array to the target object, based annotation: BeanProperty
+* Copy object fields value from the source object to the target object arrays, based annotation: BeanProperty
 
 ### CertificateUtils
 **Package**: org.nervousync.utils  
@@ -116,10 +116,10 @@ Usage: See org.nervousync.test.zip.ZipTest
 * Check collection contains target element
 * Check two collection contains the same element
 * Check collection contains unique element
-* Convert object to array list
+* Convert the object to an array list
 * Merge array to list
 * Merge properties to map
-* Find the first match element of collection
+* Find the first match element of collections
 
 ### ConvertUtils
 **Package**: org.nervousync.utils
@@ -164,7 +164,7 @@ and create file named: org.nervousync.generator.IGenerator save to META-INF/serv
 ### LocationUtils
 **Package**: org.nervousync.utils  
 * Convert GeoPoint at WGS84(GPS)/GCJ02/BD09
-* Calculate distance of two given geography point. (Unit: Kilometers)
+* Calculate the distance of two given geography point. (Unit: Kilometers)
 
 ### LoggerUtils
 **Package**: org.nervousync.utils  
@@ -192,14 +192,14 @@ and create file named: org.nervousync.generator.IGenerator save to META-INF/serv
 **Package**: org.nervousync.utils  
 * Read properties from string/file path/URL instance/input stream
 * Modify properties file
-* Storage properties instance to target file path
+* Storage properties instance to the target file path
 
 ### RawUtils
 **Package**: org.nervousync.utils  
 * Read boolean/short/int/long/String from binary data bytes
 * Write boolean/short/int/long/String into binary data bytes
-* Convert char array to binary data bytes
-* Convert bit array to byte
+* Convert the char array to binary data bytes
+* Convert the bit array to byte
 
 ### RequestUtils
 **Package**: org.nervousync.utils
@@ -230,7 +230,7 @@ and create file named: org.nervousync.generator.IGenerator save to META-INF/serv
 **Package**: org.nervousync.utils  
 * Encode byte arrays using Base32/Base64
 * Decode Base32/Base64 string to byte arrays
-* Encode string to Huffman tree
+* Encode string to a Huffman tree
 * Trim given string
 * Match given string is MD5 value/UUID/phone number/e-mail address etc.
 * Check given string is empty/notNull/notEmpty/contains string etc.

@@ -427,7 +427,7 @@ public final class ReflectionUtils {
      *     Thrown exceptions are handled via a call to <code>ReflectionUtils#handleReflectionException(Exception)</code>.
      * </span>
 	 * <h3 class="zh-CN">使用提供的参数针对提供的目标对象调用指定的方法</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     调用静态方法时，目标对象可以为 <code>null</code>。
      *     抛出的异常是通过调用 <code>ReflectionUtils#handleReflectionException(Exception)</code> 来处理的。
      * </span>
@@ -472,7 +472,7 @@ public final class ReflectionUtils {
      *     Thrown exceptions are handled via a call to <code>ReflectionUtils#handleReflectionException(Exception)</code>.
      * </span>
 	 * <h3 class="zh-CN">对提供的目标对象调用指定的方法 method（不带任何参数）。</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     调用静态方法时，目标对象可以为 <code>null</code>。
      *     抛出的异常是通过调用 <code>ReflectionUtils#handleReflectionException(Exception)</code> 来处理的。
      * </span>
@@ -497,7 +497,7 @@ public final class ReflectionUtils {
      *     Thrown exceptions are handled via a call to <code>ReflectionUtils#handleReflectionException(Exception)</code>.
      * </span>
 	 * <h3 class="zh-CN">使用提供的参数针对提供的目标对象调用指定的方法</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     调用静态方法时，目标对象可以为 <code>null</code>。
      *     抛出的异常是通过调用 <code>ReflectionUtils#handleReflectionException(Exception)</code> 来处理的。
      * </span>
@@ -531,7 +531,7 @@ public final class ReflectionUtils {
      *     Throw an IllegalStateException with an appropriate message else.
      * </span>
 	 * <h3 class="zh-CN">处理给定的反射异常。</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
 	 *     仅当目标方法预计不会引发已检查异常时才应调用。
      *     如果出现具有此类根本原因的 InspirationTargetException，则抛出基础 RuntimeException 或 Error。
      *     抛出 IllegalStateException 并附加适当的消息。
@@ -563,7 +563,7 @@ public final class ReflectionUtils {
      *     Throws an IllegalStateException else.
      * </span>
 	 * <h3 class="zh-CN">处理给定的调用异常。</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     仅当目标方法预计不会引发已检查异常时才应调用。
      *     如果出现此类根本原因，则抛出底层 RuntimeException 或 Error。
      *     否则抛出 IllegalStateException。
@@ -585,7 +585,7 @@ public final class ReflectionUtils {
 	 *     otherwise, throws an <code>IllegalStateException</code>.
      * </span>
 	 * <h3 class="zh-CN">重新抛出给定的参数 ex</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     这可能是 <code>InvocationTargetException</code> 的<em>目标异常</em>。
 	 *     仅当目标方法预计不会引发已检查异常时才应调用。
 	 *     如果适用，重新抛出底层异常转换为 <code>RuntimeException</code> 或 <code>Error</code>；
@@ -617,7 +617,7 @@ public final class ReflectionUtils {
 	 *     otherwise, throws an <code>IllegalStateException</code>.
      * </span>
 	 * <h3 class="zh-CN">重新抛出给定的参数 ex</h3>
-     * <span class="zhs>
+     * <span class="zh-CN">
      *     这可能是 <code>InvocationTargetException</code> 的<em>目标异常</em>。
 	 *     仅当目标方法预计不会引发已检查异常时才应调用。
 	 *     如果适用，重新抛出底层异常转换为 <code>Exception</code> 或 <code>Error</code>；
