@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.nervousync.beans.snmp.SNMPData;
 import org.nervousync.beans.snmp.TargetHost;
 import org.nervousync.commons.snmp.SNMPDataOperator;
+import org.nervousync.enumerations.net.IPProtocol;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.SNMPUtils;
@@ -47,7 +48,7 @@ public final class SNMPTest extends BaseTest {
 		walkPDU.addOID(new VariableBinding(new OID(".1.3.6.1.4.1.2021.9.1.6")));
 		this.logger.info("Add monitor result: {}",
 				SNMPUtils.getInstance().addMonitor(StringUtils.randomString(16),
-						TargetHost.remote("192.168.166.51"), new OutputOperator(), getPDU, walkPDU));
+						TargetHost.remote(IPProtocol.UDP, "192.168.166.51"), new OutputOperator(), getPDU, walkPDU));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public final class SNMPTest extends BaseTest {
 	@Test
     @Order(30)
 	public void destroy() throws IOException {
-		SNMPUtils.getInstance().destroy();
+		SNMPUtils.destroy();
 	}
 
 	private static final class OutputOperator implements SNMPDataOperator {

@@ -19,133 +19,77 @@ package org.nervousync.beans.servlet.response;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.nervousync.exceptions.xml.XmlException;
-import org.nervousync.commons.http.header.SimpleHeader;
+import org.nervousync.http.header.SimpleHeader;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.IOUtils;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
+import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Response content of request
+ * <h2 class="en">Response information define</h2>
+ * <h2 class="zh-CN">网络响应信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 PM $
+ * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 $
  */
 public final class ResponseInfo {
-
     /**
-     * Logger
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
      */
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
     /**
-     * Response status code
+	 * <span class="en">Response HTTP status code</span>
+	 * <span class="zh-CN">响应的HTTP状态代码</span>
      */
     private int statusCode;
     /**
-     * Header Maps
+	 * <span class="en">Response header information map</span>
+	 * <span class="zh-CN">响应头信息映射表</span>
      */
     private final Map<String, String> headerMaps = new HashMap<>();
     /**
-     * Response content type
+	 * <span class="en">String value for http response header "Content-Type"</span>
+	 * <span class="zh-CN">响应头"Content-Type"的字符串值</span>
      */
     private String contentType;
     /**
-     * Response charset encoding
+	 * <span class="en">Character encoding for http response data</span>
+	 * <span class="zh-CN">响应数据使用的编码集</span>
      */
     private String charset = null;
     /**
-     * Value of response header which header name is "identified"
+	 * <span class="en">String value of response header "identified"</span>
+	 * <span class="zh-CN">响应头"identified"的字符串值</span>
      */
     private String identifiedCode;
     /**
-     * Response content length
+	 * <span class="en">Response content length</span>
+	 * <span class="zh-CN">响应数据的长度</span>
      */
     private int contentLength;
     /**
-     * Response content data array
+	 * <span class="en">Response content binary data bytes</span>
+	 * <span class="zh-CN">响应数据的二进制字节数组</span>
      */
     private byte[] responseContent;
-
     /**
-     * Gets status code.
+     * <h3 class="en">Constructor for ResponseInfo</h3>
+     * <span class="en">Parse response information from HttpResponse.ResponseInfo and ResponseBody input stream</span>
+     * <h3 class="zh-CN">ResponseInfo的构造函数</h3>
+     * <span class="zh-CN">从HttpResponse.ResponseInfo实例对象和响应体输入数据流中解析响应数据</span>
      *
-     * @return the statusCode
-     */
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    /**
-     * Gets the value of headerMaps.
-     *
-     * @return the value of headerMaps
-     */
-    public Map<String, String> getHeaderMaps() {
-        return headerMaps;
-    }
-
-    /**
-     * Gets the content type.
-     *
-     * @return the contentType
-     */
-    public String getContentType() {
-        return contentType;
-    }
-
-    /**
-     * Gets charset.
-     *
-     * @return the charset
-     */
-    public String getCharset() {
-        return charset;
-    }
-
-    /**
-     * Gets identified code.
-     *
-     * @return the identifiedCode
-     */
-    public String getIdentifiedCode() {
-        return identifiedCode;
-    }
-
-    /**
-     * Gets content length.
-     *
-     * @return the contentLength
-     */
-    public int getContentLength() {
-        return contentLength;
-    }
-
-    /**
-     * Get response content byte [ ].
-     *
-     * @return the responseContent
-     */
-    public byte[] getResponseContent() {
-        return responseContent == null ? new byte[0] : responseContent.clone();
-    }
-
-    /**
-     * Instantiates a new Http response content.
-     *
-     * @param responseInfo the response info
-     * @param inputStream  the input stream
+     * @param responseInfo  <span class="en">Instance of HttpResponse.ResponseInfo</span>
+     *                      <span class="zh-CN">HttpResponse.ResponseInfo实例对象</span>
+     * @see java.net.http.HttpResponse.ResponseInfo
+     * @param inputStream   <span class="en">ResponseBody input stream</span>
+     *                      <span class="zh-CN">响应体输入数据流</span>
      */
     public ResponseInfo(final HttpResponse.ResponseInfo responseInfo, final InputStream inputStream) {
         this.statusCode = responseInfo.statusCode();
@@ -159,8 +103,7 @@ public final class ResponseInfo {
             }
         });
         this.contentType = this.headerMaps.get("CONTENT-TYPE");
-        if (this.contentType != null
-                && this.contentType.contains("charset=")) {
+        if (this.contentType != null && this.contentType.contains("charset=")) {
             this.charset = this.contentType.substring(this.contentType.indexOf("charset="));
             if (this.contentType.contains("\"")) {
                 this.charset = this.charset.substring(0, this.charset.indexOf("\""));
@@ -171,14 +114,31 @@ public final class ResponseInfo {
             }
         }
         this.identifiedCode = this.headerMaps.get("IDENTIFIED");
-        this.responseContent = IOUtils.readBytes(inputStream);
+        GZIPInputStream gzipInputStream = null;
+        try {
+            if (this.headerMaps.getOrDefault("CONTENT-ENCODING", Globals.DEFAULT_VALUE_STRING).contains("gzip")) {
+                gzipInputStream = new GZIPInputStream(inputStream);
+                this.responseContent = IOUtils.readBytes(gzipInputStream);
+            } else {
+                this.responseContent = IOUtils.readBytes(inputStream);
+            }
+        } catch (IOException e) {
+            this.responseContent = new byte[0];
+        } finally {
+            IOUtils.closeStream(gzipInputStream);
+            IOUtils.closeStream(inputStream);
+        }
         this.contentLength = this.responseContent.length;
     }
-
     /**
-     * Instantiates a new Http response content.
+     * <h3 class="en">Constructor for ResponseInfo</h3>
+     * <span class="en">Parse response information from HttpURLConnection instance</span>
+     * <h3 class="zh-CN">ResponseInfo的构造函数</h3>
+     * <span class="zh-CN">从HttpURLConnection实例对象解析响应数据</span>
      *
-     * @param urlConnection the url connection
+     * @param urlConnection     <span class="en">Instance of HttpURLConnection</span>
+     *                          <span class="zh-CN">HttpURLConnection实例对象</span>
+     * @see java.net.HttpURLConnection
      */
     public ResponseInfo(final HttpURLConnection urlConnection) {
         InputStream inputStream = null;
@@ -201,10 +161,11 @@ public final class ResponseInfo {
                     }
                 }
 
-                if (this.isGZipResponse(urlConnection.getContentEncoding())) {
-                    inputStream = new GZIPInputStream(urlConnection.getInputStream());
-                } else {
-                    inputStream = urlConnection.getInputStream();
+                inputStream = urlConnection.getInputStream();
+                if (Optional.ofNullable(urlConnection.getContentEncoding())
+                        .map(contentEncoding -> contentEncoding.toLowerCase().contains("gzip"))
+                        .orElse(Boolean.FALSE)) {
+                    inputStream = new GZIPInputStream(inputStream);
                 }
             } else {
                 inputStream = urlConnection.getErrorStream();
@@ -254,25 +215,90 @@ public final class ResponseInfo {
             this.identifiedCode = urlConnection.getHeaderField("identified");
         } catch (IOException e) {
             if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Read response data error! ", e);
+                this.logger.debug("Utils", "Response_Data_Error", e);
             }
         } finally {
             IOUtils.closeStream(inputStream);
             IOUtils.closeStream(byteArrayOutputStream);
         }
     }
-
-    public <T> List<T> parseList(final Class<T> clazz) throws UnsupportedEncodingException {
-        return StringUtils.stringToList(this.parseString(this.charset), this.charset, clazz);
-    }
-
     /**
-     * Parse object object.
-     *
-     * @return the object
-     * @throws XmlException the xml exception
+	 * <h3 class="en">Getter method for response HTTP status code</h3>
+	 * <h3 class="zh-CN">响应的HTTP状态代码的Getter方法</h3>
      */
-    public <T> T parseObject(final Class<T> clazz) throws XmlException {
+    public int getStatusCode() {
+        return statusCode;
+    }
+    /**
+	 * <h3 class="en">Getter method for response header map</h3>
+	 * <h3 class="zh-CN">响应头信息映射表的Getter方法</h3>
+     */
+    public Map<String, String> getHeaderMaps() {
+        return headerMaps;
+    }
+    /**
+	 * <h3 class="en">Getter method for response content type</h3>
+	 * <h3 class="zh-CN">响应头"Content-Type"字符串值的Getter方法</h3>
+     */
+    public String getContentType() {
+        return contentType;
+    }
+    /**
+	 * <h3 class="en">Getter method for response character encoding</h3>
+	 * <h3 class="zh-CN">响应数据使用的编码集的Getter方法</h3>
+     */
+    public String getCharset() {
+        return charset;
+    }
+    /**
+	 * <h3 class="en">Getter method for string value of response header "identified"</h3>
+	 * <h3 class="zh-CN">响应头"identified"字符串值的Getter方法</h3>
+     */
+    public String getIdentifiedCode() {
+        return identifiedCode;
+    }
+    /**
+	 * <h3 class="en">Getter method for response content length</h3>
+	 * <h3 class="zh-CN">响应数据的长度的Getter方法</h3>
+     */
+    public int getContentLength() {
+        return contentLength;
+    }
+    /**
+	 * <h3 class="en">Getter method for response content binary data bytes</h3>
+	 * <h3 class="zh-CN">响应数据的二进制字节数组的Getter方法</h3>
+     */
+    public byte[] getResponseContent() {
+        return responseContent == null ? new byte[0] : responseContent.clone();
+    }
+    /**
+	 * <h3 class="en">Parse response data to the instance list of given class type</h3>
+	 * <h3 class="zh-CN">转换响应数据为指定类型的对象列表</h3>
+     *
+     * @param clazz     <span class="en">Class type</span>
+     *                  <span class="zh-CN">数据对象类</span>
+     * @param <T>       <span class="en">Template type of list</span>
+     *                  <span class="zh-CN">列表的参数化类型</span>
+     *
+     * @return  <span class="en">instance list of given class type, or empty list if has error</span>
+     *          <span class="zh-CN">数据对象列表，当有异常时返回空列表</span>
+     */
+    public <T> List<T> parseList(final Class<T> clazz) {
+        return StringUtils.stringToList(this.parseString(), this.charset, clazz);
+    }
+    /**
+	 * <h3 class="en">Parse response data to the instance of given class type</h3>
+	 * <h3 class="zh-CN">转换响应数据为指定类型的对象</h3>
+     *
+     * @param clazz     <span class="en">Class type</span>
+     *                  <span class="zh-CN">数据对象类</span>
+     * @param <T>       <span class="en">Template type of list</span>
+     *                  <span class="zh-CN">列表的参数化类型</span>
+     *
+     * @return  <span class="en">instance of given class type, or null if has error</span>
+     *          <span class="zh-CN">转换后的数据实例对象，当有异常时返回null</span>
+     */
+    public <T> T parseObject(final Class<T> clazz) {
         if (StringUtils.notBlank(this.contentType)
                 && (this.contentType.toLowerCase().contains("xml")
                         || this.contentType.toLowerCase().contains("json")
@@ -289,33 +315,23 @@ public final class ResponseInfo {
             return clazz.cast(objectInputStream.readObject());
         } catch (Exception e) {
             if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Convert to object error! ", e);
+                this.logger.debug("Utils", "Convert_Object_Error", e);
             }
-
             return null;
         } finally {
             IOUtils.closeStream(byteArrayInputStream);
             IOUtils.closeStream(objectInputStream);
         }
     }
-
     /**
-     * Parse string string.
+	 * <h3 class="en">Parse response data to string</h3>
+	 * <h3 class="zh-CN">转换响应数据为字符串</h3>
      *
-     * @return the string
+     * @return  <span class="en">String value of response data or empty string if an UnsupportedEncodingException occurs</span>
+     *          <span class="zh-CN">响应数据字符串，当有UnsupportedEncodingException异常时返回空字符串</span>
      */
     public String parseString() {
-        return this.parseString(this.charset);
-    }
-
-    /**
-     * Parse string string.
-     *
-     * @param encoding the charset encoding
-     * @return the string
-     */
-    public String parseString(final String encoding) {
-        String charsetName = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
+        String charsetName = StringUtils.isEmpty(this.charset) ? Globals.DEFAULT_ENCODING : this.charset;
         try {
             String string = new String(this.getResponseContent(), charsetName);
             while (string.charAt(string.length() - 1) == '\n') {
@@ -326,36 +342,45 @@ public final class ResponseInfo {
             }
             return string;
         } catch (UnsupportedEncodingException e) {
-            this.logger.error("Read response content error! ", e);
+            this.logger.error("Utils", "Response_Data_Error", e);
             return Globals.DEFAULT_VALUE_STRING;
         }
     }
-
     /**
-     * Parse file.
+	 * <h3 class="en">Parse response data to local file and save to target path</h3>
+	 * <h3 class="zh-CN">转换响应数据为文件，并写入数据到目标地址</h3>
      *
-     * @param savePath the save path
-     * @return the file
-     * @throws FileNotFoundException the io exception
+     * @param savePath  <span class="en">Target save path</span>
+     *                  <span class="zh-CN">目标地址</span>
+     *
+     * @return  <span class="en">Instance of java.io.File</span>
+     *          <span class="zh-CN">java.io.File实例对象</span>
+     * @throws FileNotFoundException
+	 * <span class="en">If an error occurs when save binary data to target path</span>
+	 * <span class="zh-CN">当写入数据到目标地址时捕获异常</span>
      */
     public File parseFile(final String savePath) throws FileNotFoundException {
         return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
     }
-
     /**
-     * Gets header.
+	 * <h3 class="en">Retrieve response header value by given header name</h3>
+	 * <h3 class="zh-CN">根据给定的响应头键值读取对应的数据值</h3>
      *
-     * @param headerName the header name
-     * @return the header
+     * @param headerName    <span class="en">Response header name</span>
+     *                      <span class="zh-CN">响应头键值</span>
+     *
+     * @return  <span class="en">Response header value or empty string if header name not exists</span>
+     *          <span class="zh-CN">响应头数据值，如果数据不存在则返回空字符串</span>
      */
     public String getHeader(final String headerName) {
-        return this.headerMaps.get(headerName.toUpperCase());
+        return this.headerMaps.getOrDefault(headerName.toUpperCase(), Globals.DEFAULT_VALUE_STRING);
     }
-
     /**
-     * Header list.
+	 * <h3 class="en">Retrieve response header list</h3>
+	 * <h3 class="zh-CN">获取响应头数据列表</h3>
      *
-     * @return the list
+     * @return  <span class="en">Response header list. Convert key-value to SimpleHeader instance</span>
+     *          <span class="zh-CN">响应头数据列表，转换键-值为SimpleHeader实例对象</span>
      */
     public List<SimpleHeader> headerList() {
         List<SimpleHeader> headerList = new ArrayList<>();
@@ -363,9 +388,5 @@ public final class ResponseInfo {
             headerList.add(new SimpleHeader(entry.getKey(), entry.getValue()));
         }
         return headerList;
-    }
-
-    private boolean isGZipResponse(final String contentEncoding) {
-        return contentEncoding != null && contentEncoding.contains("gzip");
     }
 }

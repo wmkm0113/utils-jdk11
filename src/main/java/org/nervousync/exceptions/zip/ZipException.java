@@ -16,72 +16,90 @@
  */
 package org.nervousync.exceptions.zip;
 
-import org.nervousync.utils.ObjectUtils;
+import org.nervousync.commons.Globals;
+import org.nervousync.exceptions.AbstractException;
 
 /**
- * The type Zip exception.
+ * <h2 class="en">Zip Exception</h2>
+ * <h2 class="zh-CN">ZIP异常</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Nov 22, 2017 4:08:31 PM $
  */
-public class ZipException extends RuntimeException {
-
+public final class ZipException extends AbstractException {
 	/**
-	 * 
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -4262795571663295796L;
-
 	/**
-	 * Instantiates a new Zip exception.
-	 */
-	public ZipException() {
-		super();
-	}
-
-	/**
-	 * Instantiates a new Zip exception.
+	 * <h3 class="en">Constructor method for ZipException</h3>
+	 * <span class="en">Create a new ZipException with the specified message.</span>
+	 * <h3 class="zh-CN">ZipException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息创建ZipException实例对象。</span>
 	 *
-	 * @param cause the cause
+	 * @param msg 	<span class="en">The specified message</span>
+	 *              <span class="zh-CN">特定的信息</span>
 	 */
-	public ZipException(Throwable cause) {
-		super(cause);
+//	 * @param errorCode 	<span class="en">Error identified code</span>
+//     *                      <span class="zh-CN">错误识别代码</span>
+	public ZipException(final String msg) {
+		super(Globals.DEFAULT_VALUE_INT, "", msg);
 	}
-
 	/**
-	 * Create a new ZipException with the specified message.
+	 * <h3 class="en">Constructor method for ZipException</h3>
+	 * <span class="en">Create a new ZipException with the specified message.</span>
+	 * <h3 class="zh-CN">ZipException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息创建ZipException实例对象。</span>
 	 *
-	 * @param msg the detail message
+	 * @param msg 		<span class="en">The specified message</span>
+	 *              	<span class="zh-CN">特定的信息</span>
+	 * @param cause 	<span class="en">The root cause</span>
+	 *              	<span class="zh-CN">异常信息对象实例</span>
 	 */
-	public ZipException(String msg) {
-		super(msg);
+//	 * @param errorCode 	<span class="en">Error identified code</span>
+//     *                      <span class="zh-CN">错误识别代码</span>
+	public ZipException(final String msg, final Throwable cause) {
+		super(Globals.DEFAULT_VALUE_INT, "", msg, cause);
 	}
-
 	/**
-	 * Create a new ZipException with the specified message
-	 * and root cause.
+	 * <h3 class="en">Constructor method for ZipException</h3>
+	 * <span class="en">Create a new ZipException with the specified message.</span>
+	 * <h3 class="zh-CN">ZipException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息创建ZipException实例对象。</span>
 	 *
-	 * @param msg   the detail message
-	 * @param cause the root cause
+	 * @param errorCode 	<span class="en">Error identified code</span>
+     *                      <span class="zh-CN">错误识别代码</span>
+     * @param bundle        <span class="en">Resource bundle name</span>
+     *                      <span class="zh-CN">资源包名</span>
+     * @param messageKey    <span class="en">Message identify key</span>
+     *                      <span class="zh-CN">信息识别键值</span>
+     * @param collections   <span class="en">given parameters of information formatter</span>
+     *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	public ZipException(String msg, Throwable cause) {
-		super(msg, cause);
+	public ZipException(final long errorCode, final String bundle, final String messageKey,
+						final Object... collections) {
+		super(errorCode, bundle, messageKey, collections);
 	}
-
-
-	public boolean equals(Object other) {
-		if (this == other) {
-			return Boolean.TRUE;
-		}
-		if (other instanceof ZipException) {
-			ZipException otherBe = (ZipException) other;
-			return (getMessage().equals(otherBe.getMessage()) &&
-					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
-		}
-		
-		return Boolean.FALSE;
-	}
-
-	public int hashCode() {
-		return getMessage().hashCode();
+	/**
+	 * <h3 class="en">Constructor method for ZipException</h3>
+	 * <span class="en">Create a new ZipException with the specified message and root cause.</span>
+	 * <h3 class="zh-CN">ZipException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息以及异常信息对象实例创建ZipException实例对象。</span>
+	 *
+	 * @param errorCode 	<span class="en">Error identified code</span>
+     *                      <span class="zh-CN">错误识别代码</span>
+     * @param bundle        <span class="en">Resource bundle name</span>
+     *                      <span class="zh-CN">资源包名</span>
+     * @param messageKey    <span class="en">Message identify key</span>
+     *                      <span class="zh-CN">信息识别键值</span>
+	 * @param cause 		<span class="en">The root cause</span>
+	 *              		<span class="zh-CN">异常信息对象实例</span>
+     * @param collections   <span class="en">given parameters of information formatter</span>
+     *                      <span class="zh-CN">用于资源信息格式化的参数</span>
+	 */
+	public ZipException(final long errorCode, final String bundle, final String messageKey,
+						final Throwable cause, final Object... collections) {
+		super(errorCode, bundle, messageKey, cause, collections);
 	}
 }

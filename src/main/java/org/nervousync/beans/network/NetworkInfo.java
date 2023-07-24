@@ -23,54 +23,63 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
-import org.nervousync.exceptions.beans.network.IPAddressException;
+import jakarta.annotation.Nonnull;
 import org.nervousync.exceptions.beans.network.NetworkInfoException;
 import org.nervousync.utils.IPUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * System interface network information
+ * <h2 class="en">System NetworkInterface information define</h2>
+ * <h2 class="zh-CN">系统网卡信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:53:10 AM $
+ * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:53:10 $
  */
 public final class NetworkInfo implements Serializable {
-
 	/**
-	 * 
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -8060054814830700945L;
-
 	/**
-	 * Is virtual adapter
+	 * <span class="en">Current network interface is virtual interface</span>
+	 * <span class="zh-CN">当前网络接口是虚拟接口</span>
 	 */
 	private final boolean virtual;
 	/**
-	 * Interface display name in the system
+	 * <span class="en">Display name of current network interface</span>
+	 * <span class="zh-CN">当前网络接口的显示名称</span>
 	 */
 	private final String displayName;
 	/**
-	 * Interface adapter physical address
+	 * <span class="en">MAC address of current network interface</span>
+	 * <span class="zh-CN">当前网络接口的物理地址</span>
 	 */
 	private String macAddress = "";
 	/**
-	 * IP address list of interface configured
+	 * <span class="en">IP address list of current network interface</span>
+	 * <span class="zh-CN">当前网络接口绑定的IP地址列表</span>
 	 */
 	private final List<IPAddressInfo> ipAddressList = new ArrayList<>();
 
 	/**
-	 * Constructor for NetworkInfo
+     * <h2 class="en">Constructor for NetworkInfo</h2>
+     * <span class="en">Read network interface information from java.net.NetworkInterface instance</span>
+     * <h2 class="zh-CN">NetworkInfo的构造函数</h2>
+     * <span class="zh-CN">从java.net.NetworkInterface对象实例中读取网络接口相关信息</span>
 	 *
-	 * @param networkInterface NetworkInterface value
-	 * @throws NetworkInfoException If the value of NetworkInterface is null or catch other SocketException
+     * @param networkInterface 	<span class="en">Instance of java.net.NetworkInterface</span>
+     *                			<span class="zh-CN">java.net.NetworkInterface对象实例</span>
+	 *
+	 * @throws NetworkInfoException
+	 * <span class="en">If the value of NetworkInterface is null or an I/O error occurs</span>
+	 * <span class="zh-CN">当参数networkInterface为空或捕获I/O异常</span>
 	 */
 	public NetworkInfo(final NetworkInterface networkInterface) throws NetworkInfoException {
 		if (networkInterface == null) {
-			throw new NetworkInfoException("NetworkInterface is null");
+			throw new NetworkInfoException(0x0000001A0001L, "Utils", "Null_Network_Interface_Error");
 		}
-		Logger logger = LoggerFactory.getLogger(this.getClass());
 		try {
 			if (networkInterface.isUp() && !networkInterface.isVirtual()) {
 				byte[] macAddress = networkInterface.getHardwareAddress();
@@ -88,69 +97,64 @@ public final class NetworkInfo implements Serializable {
 				}
 			}
 		} catch (SocketException e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Retrieve network info error! ", e);
-			}
-			throw new NetworkInfoException("Retrieve network info error! ", e);
+			throw new NetworkInfoException(0x0000001A0002L, "Utils", "Retrieve_Network_Interface_Error", e);
 		}
-
 		this.virtual = networkInterface.isVirtual();
-		
 		this.displayName = networkInterface.getDisplayName();
 		Enumeration<InetAddress> enumeration = networkInterface.getInetAddresses();
-		
 		while (enumeration.hasMoreElements()) {
-			try {
-				IPAddressInfo ipAddressInfo = new IPAddressInfo(enumeration.nextElement());
-				this.ipAddressList.add(ipAddressInfo);
-			} catch (IPAddressException e) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Read IP Address Info Error! ", e);
-				}
-			}
+			Optional.ofNullable(enumeration.nextElement())
+					.map(IPAddressInfo::new)
+					.ifPresent(this.ipAddressList::add);
 		}
 	}
-
 	/**
-	 * Is virtual boolean.
+	 * <h3 class="en">Getter method for field virtual</h3>
+	 * <h3 class="zh-CN">虚拟接口状态的Getter方法</h3>
 	 *
-	 * @return the virtual
+	 * @return    <span class="en">Virtual status</span>
+	 *            <span class="zh-CN">虚拟接口状态</span>
 	 */
 	public boolean isVirtual() {
 		return virtual;
 	}
-
 	/**
-	 * Gets display name.
+	 * <h3 class="en">Getter method for display name</h3>
+	 * <h3 class="zh-CN">显示名称的Getter方法</h3>
 	 *
-	 * @return the displayName
+	 * @return    <span class="en">Display name of current network interface</span>
+	 *            <span class="zh-CN">当前网络接口的显示名称</span>
 	 */
 	public String getDisplayName() {
 		return displayName;
 	}
 
 	/**
-	 * Gets mac address.
+	 * <h3 class="en">Getter method for MAC address</h3>
+	 * <h3 class="zh-CN">网卡物理地址的Getter方法</h3>
 	 *
-	 * @return the macAddress
+	 * @return 	<span class="en">MAC address of current network interface</span>
+	 * 			<span class="zh-CN">当前网络接口的物理地址</span>
 	 */
 	public String getMacAddress() {
 		return macAddress;
 	}
-
 	/**
-	 * Gets the ip address list.
+	 * <h3 class="en">Getter method for IP address list</h3>
+	 * <h3 class="zh-CN">网卡IP地址列表的Getter方法</h3>
 	 *
-	 * @return the getIpAddressList
+	 * @return 	<span class="en">IP address list of current network interface</span>
+	 * 			<span class="zh-CN">当前网络接口绑定的IP地址列表</span>
 	 */
 	public List<IPAddressInfo> getIpAddressList() {
 		return ipAddressList;
 	}
-
 	/**
-	 * Gets i pv 4 address list.
+	 * <h3 class="en">Getter method for IPv4 address list</h3>
+	 * <h3 class="zh-CN">网卡IPv4地址列表的Getter方法</h3>
 	 *
-	 * @return the IPv4 address list
+	 * @return 	<span class="en">IPv4 address list of current network interface</span>
+	 * 			<span class="zh-CN">当前网络接口绑定的IPv4地址列表</span>
 	 */
 	public List<IPAddressInfo> getIPv4AddressList() {
 		List<IPAddressInfo> addressList = new ArrayList<>();
@@ -161,11 +165,12 @@ public final class NetworkInfo implements Serializable {
 		}
 		return addressList;
 	}
-
 	/**
-	 * Gets i pv 6 address list.
+	 * <h3 class="en">Getter method for IPv6 address list</h3>
+	 * <h3 class="zh-CN">网卡IPv6地址列表的Getter方法</h3>
 	 *
-	 * @return the IPv6 address list
+	 * @return 	<span class="en">IPv6 address list of current network interface</span>
+	 * 			<span class="zh-CN">当前网络接口绑定的IPv6地址列表</span>
 	 */
 	public List<IPAddressInfo> getIPv6AddressList() {
 		List<IPAddressInfo> addressList = new ArrayList<>();
@@ -176,57 +181,49 @@ public final class NetworkInfo implements Serializable {
 		}
 		return addressList;
 	}
-
 	/**
-	 * Gets serial version uid.
-	 *
-	 * @return the serialVersionUID
-	 */
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
-
-	/**
-	 * Configured ip address information
+	 * <h3 class="en">IP address information define</h3>
+	 * <h3 class="zh-CN">IP地址信息定义</h3>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision : 1.0 $ $Date: Jul 2, 2018 $
+	 * @version $Revision : 1.0 $ $Date: Jul 2, 2018 09:22:28 $
 	 */
 	public static final class IPAddressInfo implements Serializable {
-
 		/**
-		 * 
+		 * <span class="en">Serial version UID</span>
+		 * <span class="zh-CN">序列化UID</span>
 		 */
 		private static final long serialVersionUID = -2882813548945783456L;
-		
 		/**
-		 * IP address, supported IPv4 and IPv6
+		 * <span class="en">IP address string, supported IPv4 and IPv6</span>
+		 * <span class="zh-CN">IP地址字符串，支持IPv4和IPv6</span>
 		 */
 		private final String ipAddress;
 		/**
-		 * Is site local address
+		 * <span class="en">SiteLocal address flag</span>
+		 * <span class="zh-CN">私网地址标识</span>
 		 */
 		private final boolean local;
 		/**
-		 * Is loop back address
+		 * <span class="en">Loop address flag</span>
+		 * <span class="zh-CN">回环地址标识</span>
 		 */
 		private final boolean loop;
 		/**
-		 * Is link local status
+		 * <span class="en">LinkLocal address flag</span>
+		 * <span class="zh-CN">链路地址标识</span>
 		 */
 		private final boolean linkLocal;
-
 		/**
-		 * Constructor
+		 * <h2 class="en">Constructor for IPAddressInfo</h2>
+		 * <span class="en">Read IP address information from java.net.InetAddress instance</span>
+		 * <h2 class="zh-CN">IPAddressInfo的构造函数</h2>
+		 * <span class="zh-CN">从java.net.InetAddress对象实例中读取IP地址相关信息</span>
 		 *
-		 * @param inetAddress InetAddress object read from interface
-		 * @throws IPAddressException Given inetAddress is null
+		 * @param inetAddress 	<span class="en">Instance of java.net.InetAddress</span>
+		 *                      <span class="zh-CN">java.net.InetAddress对象实例</span>
 		 */
-		public IPAddressInfo(final InetAddress inetAddress) throws IPAddressException {
-			if (inetAddress == null) {
-				throw new IPAddressException("InetAddress is null");
-			}
-
+		public IPAddressInfo(@Nonnull final InetAddress inetAddress) {
 			String ipAddress = inetAddress.getHostAddress();
 			if (ipAddress.indexOf("%") > 0) {
 				this.ipAddress = ipAddress.substring(0, ipAddress.indexOf("%"));
@@ -237,38 +234,42 @@ public final class NetworkInfo implements Serializable {
 			this.loop = inetAddress.isLoopbackAddress();
 			this.linkLocal = inetAddress.isLinkLocalAddress();
 		}
-
 		/**
-		 * Gets ip address.
+		 * <h3 class="en">Getter method for IP address string</h3>
+		 * <h3 class="zh-CN">IP地址字符串的Getter方法</h3>
 		 *
-		 * @return the ipAddress
+		 * @return 	<span class="en">IP address string, supported IPv4 and IPv6</span>
+		 * 			<span class="zh-CN">IP地址字符串，支持IPv4和IPv6</span>
 		 */
 		public String getIpAddress() {
 			return ipAddress;
 		}
-
 		/**
-		 * Is local boolean.
+		 * <h3 class="en">Getter method for site local flag</h3>
+		 * <h3 class="zh-CN">私网地址标识的Getter方法</h3>
 		 *
-		 * @return the local
+		 * @return 	<span class="en">SiteLocal address flag</span>
+		 * 			<span class="zh-CN">私网地址标识</span>
 		 */
 		public boolean isLocal() {
 			return local;
 		}
-
 		/**
-		 * Is loop boolean.
+		 * <h3 class="en">Getter method for loop address flag</h3>
+		 * <h3 class="zh-CN">回环地址标识的Getter方法</h3>
 		 *
-		 * @return the loop
+		 * @return 	<span class="en">Loop address flag</span>
+		 * 			<span class="zh-CN">回环地址标识</span>
 		 */
 		public boolean isLoop() {
 			return loop;
 		}
-
 		/**
-		 * Is link local boolean.
+		 * <h3 class="en">Getter method for link local flag</h3>
+		 * <h3 class="zh-CN">链路地址标识的Getter方法</h3>
 		 *
-		 * @return the linkLocal
+		 * @return 	<span class="en">LinkLocal address flag</span>
+		 * 			<span class="zh-CN">链路地址标识</span>
 		 */
 		public boolean isLinkLocal() {
 			return linkLocal;

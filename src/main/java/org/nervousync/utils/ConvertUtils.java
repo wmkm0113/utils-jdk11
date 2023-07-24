@@ -17,104 +17,61 @@
 package org.nervousync.utils;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
- * The type Convert utils.
+ * <h2 class="en">Data convert utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Convert data bytes to hex string</ul>
+ *     <ul>Convert data bytes to string</ul>
+ *     <ul>Convert data bytes to Object</ul>
+ *     <ul>Convert any to data bytes</ul>
+ *     <ul>Convert properties to data map</ul>
+ * </span>
+ * <h2 class="zh-CN">数据转换工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>转换字节数组为十六进制字符串</ul>
+ *     <ul>转换字节数组为字符串</ul>
+ *     <ul>转换字节数组为实例对象</ul>
+ *     <ul>转换任意实例对象为字节数组</ul>
+ *     <ul>转换属性信息为数据映射表</ul>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 12, 2010 3:12:05 PM $
+ * @version $Revision : 1.0 $ $Date: Jan 12, 2010 15:12:05 $
  */
 public final class ConvertUtils {
-
-	private final static Logger LOGGER = LoggerFactory.getLogger(ConvertUtils.class);
-
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+	private final static LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(ConvertUtils.class);
+	/**
+	 * <h3 class="en">Private constructor for ConvertUtils</h3>
+	 * <h3 class="zh-CN">数据转换工具集的私有构造方法</h3>
+	 */
 	private ConvertUtils() {
 	}
-
 	/**
-	 * Convert the collection to List
+	 * <h3 class="en">Convert data byte array to hex string</h3>
+	 * <h3 class="zh-CN">转换二进制数组为十六进制字符串</h3>
 	 *
-	 * @param collection collection
-	 * @return Convert list
-	 */
-	public static List<Object> collectionToList(final Object collection) {
-		List<Object> list;
-		
-		if (collection instanceof Collection) {
-			list = new ArrayList<>((Collection<?>)collection);
-		} else if (collection instanceof Enumeration) {
-			list = new ArrayList<>();
-			Enumeration<?> enumeration = (Enumeration<?>)collection;
-			while(enumeration.hasMoreElements()) {
-				list.add(enumeration.nextElement());
-			}
-		} else if (collection instanceof Iterator) {
-			list = new ArrayList<>();
-			Iterator<?> iterator = (Iterator<?>)collection;
-			while(iterator.hasNext()) {
-				list.add(iterator.next());
-			}
-		} else if (collection instanceof Map) {
-			list = new ArrayList<>(((Map<?, ?>) collection).entrySet());
-		} else if (collection instanceof String) {
-			list = Arrays.asList(convertPrimitivesToObjects(((String) collection).toCharArray()));
-		} else if (collection instanceof Object[]) {
-			list = Arrays.asList((Object[]) collection);
-		} else if (collection.getClass().isArray()) {
-			list = Arrays.asList(convertPrimitivesToObjects(collection));
-		} else {
-			// type is not supported
-			throw new IllegalArgumentException("Class '" + collection.getClass().getName()
-					+ "' is not convertible to java.util.List");
-		}
-
-		return list;
-	}
-
-	/**
-	 * Convert primitives to object arrays
+	 * @param dataBytes 	<span class="en">the original data byte array</span>
+	 *                      <span class="zh-CN">原始二进制数组</span>
 	 *
-	 * @param primitiveArray primitive arrays
-	 * @return Object arrays
+	 * @return 	<span class="en">Converted hex string</span>
+	 * 			<span class="zh-CN">转换后的十六进制字符串</span>
 	 */
-	public static Object[] convertPrimitivesToObjects(final Object primitiveArray) {
-		if (!primitiveArray.getClass().isArray()) {
-			throw new IllegalArgumentException("Specified object is not array");
-		}
-
-		if (primitiveArray instanceof Object[]) {
-			throw new IllegalArgumentException("Specified object is not primitive array");
-		}
-
-		int length = Array.getLength(primitiveArray);
-		Object[] result = new Object[length];
-		for (int i = 0; i < length; i++) {
-			result[i] = Array.get(primitiveArray, i);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Byte to hex string.
-	 *
-	 * @param dataBytes the data bytes
-	 * @return the string
-	 */
-	public static String byteToHex(final byte[] dataBytes) {
+	public static String toHex(final byte[] dataBytes) {
 		if (dataBytes == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
-
 		StringBuilder stringBuilder = new StringBuilder();
 		for (byte b : dataBytes) {
 			String tmp = Integer.toHexString(b & 0xFF);
@@ -125,66 +82,86 @@ public final class ConvertUtils {
 		}
 		return stringBuilder.toString();
 	}
-
 	/**
-	 * Converts byte arrays to string using default encoding
+	 * <h3 class="en">Convert data byte array to string using default encoding: UTF-8</h3>
+	 * <h3 class="zh-CN">转换二进制数组为字符串，使用默认编码集：UTF-8</h3>
 	 *
-	 * @param content Byte array to convert to string
-	 * @return string resulted from converting byte arrays using default encoding
+	 * @param dataBytes 	<span class="en">the original data byte array</span>
+	 *                      <span class="zh-CN">原始二进制数组</span>
+	 *
+	 * @return 	<span class="en">Converted string</span>
+	 * 			<span class="zh-CN">转换后的字符串</span>
 	 */
-	public static String convertToString(final byte[] content) {
-		return convertToString(content, Globals.DEFAULT_ENCODING);
+	public static String toString(final byte[] dataBytes) {
+		return toString(dataBytes, Globals.DEFAULT_ENCODING);
 	}
-
 	/**
-	 * Converts byte arrays to string according to specified encoding
+	 * <h3 class="en">Convert data byte array to string using given encoding</h3>
+	 * <h3 class="zh-CN">转换二进制数组为字符串，使用给定的编码集</h3>
 	 *
-	 * @param content  Byte array to convert to string
-	 * @param encoding Encoding string, if <code>null</code> default is used
-	 * @return string resulted from converting byte arrays
+	 * @param dataBytes 	<span class="en">the original data byte array</span>
+	 *                      <span class="zh-CN">原始二进制数组</span>
+	 * @param encoding 		<span class="en">the charset encoding</span>
+	 *                      <span class="zh-CN">字符集</span>
+	 *
+	 * @return 	<span class="en">Converted string</span>
+	 * 			<span class="zh-CN">转换后的字符串</span>
 	 */
-	public static String convertToString(final byte[] content, final String encoding) {
+	public static String toString(final byte[] dataBytes, final String encoding) {
 		try {
-			return new String(content, encoding);
+			return new String(dataBytes, encoding);
 		} catch (UnsupportedEncodingException ex) {
-			return new String(content, Charset.defaultCharset());
+			return new String(dataBytes, Charset.defaultCharset());
 		}
 	}
-
 	/**
-	 * Converts string to byte arrays using default encoding
+	 * <h3 class="en">Convert given string to data byte array using default encoding: UTF-8</h3>
+	 * <h3 class="zh-CN">转换字符串为二进制数组，使用默认编码集：UTF-8</h3>
 	 *
-	 * @param content String to convert to array
-	 * @return byte arrays resulted from converting string using default encoding
+	 * @param content 	<span class="en">the original string</span>
+	 *                  <span class="zh-CN">原始字符串</span>
+	 *
+	 * @return 	<span class="en">Converted data byte array</span>
+	 * 			<span class="zh-CN">转换后的二进制数组</span>
 	 */
-	public static byte[] objectToByteArray(final String content) {
-		return objectToByteArray(content, Globals.DEFAULT_ENCODING);
+	public static byte[] toByteArray(final String content) {
+		return toByteArray(content, Globals.DEFAULT_ENCODING);
 	}
-
 	/**
-	 * Converts string to byte arrays according to specified encoding
+	 * <h3 class="en">Convert string to data byte array using given encoding</h3>
+	 * <h3 class="zh-CN">转换字符串为二进制数组，使用给定的编码集</h3>
 	 *
-	 * @param content  String to convert to array
-	 * @param encoding Encoding string, if <code>null</code> default is used
-	 * @return byte arrays
+	 * @param content 		<span class="en">the original string</span>
+	 *                  	<span class="zh-CN">原始字符串</span>
+	 * @param encoding 		<span class="en">the charset encoding</span>
+	 *                      <span class="zh-CN">字符集</span>
+	 *
+	 * @return 	<span class="en">Converted data byte array</span>
+	 * 			<span class="zh-CN">转换后的二进制数组</span>
 	 */
-	public static byte[] objectToByteArray(final String content, final String encoding) {
+	public static byte[] toByteArray(final String content, final String encoding) {
 		try {
 			return content.getBytes(encoding);
 		} catch (UnsupportedEncodingException ex) {
 			return content.getBytes(Charset.defaultCharset());
 		}
 	}
-
 	/**
-	 * Convert the object to byte arrays
+	 * <h3 class="en">Convert given object instance to data byte array</h3>
+	 * <h3 class="zh-CN">转换实例对象为二进制数组</h3>
 	 *
-	 * @param object if <code>null</code> convert error
-	 * @return byte arrays
+	 * @param object 	<span class="en">the object instance</span>
+	 *                  <span class="zh-CN">换实例对象</span>
+	 *
+	 * @return 	<span class="en">Converted data byte array</span>
+	 * 			<span class="zh-CN">转换后的二进制数组</span>
 	 */
-	public static byte[] objectToByteArray(final Object object) {
+	public static byte[] toByteArray(final Object object) {
+		if (object == null) {
+			return new byte[0];
+		}
 		if (object instanceof String) {
-			return objectToByteArray((String)object);
+			return toByteArray((String)object);
 		}
 
 		if (object instanceof byte[] || object instanceof Byte[]) {
@@ -200,8 +177,9 @@ public final class ConvertUtils {
 			objectOutputStream.writeObject(object);
 			return outputStream.toByteArray();
 		} catch (Exception e) {
-			if (ConvertUtils.LOGGER.isDebugEnabled()) {
-				ConvertUtils.LOGGER.debug("Convert object to byte[] error! ", e);
+			LOGGER.error("Utils", "Convert_Object_To_Array_Error");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 		} finally {
 			IOUtils.closeStream(objectOutputStream);
@@ -210,284 +188,121 @@ public final class ConvertUtils {
 		
 		return new byte[0];
 	}
-
 	/**
-	 * Convert byte arrays to Object
+	 * <h3 class="en">Convert given data byte array instance to object instance</h3>
+	 * <h3 class="zh-CN">转换二进制数组为实例对象</h3>
 	 *
-	 * @param content byte arrays
-	 * @return Converted object or byte arrays when failed
+	 * @param dataBytes 	<span class="en">the original data byte array</span>
+	 *                      <span class="zh-CN">原始二进制数组</span>
+	 *
+	 * @return 	<span class="en">Converted object instance</span>
+	 * 			<span class="zh-CN">转换后的实例对象</span>
 	 */
-	public static Object byteArrayToObject(final byte[] content) {
-		if (content.length == 0) {
+	public static Object toObject(final byte[] dataBytes) {
+		if (dataBytes.length == 0) {
 			return null;
 		}
 		
 		ByteArrayInputStream byteInputStream = null;
 		ObjectInputStream objectInputStream = null;
 		try {
-			byteInputStream = new ByteArrayInputStream(content);
+			byteInputStream = new ByteArrayInputStream(dataBytes);
 			objectInputStream = new ObjectInputStream(byteInputStream);
 			
 			return objectInputStream.readObject();
 		} catch (Exception e) {
-			return content;
+			return dataBytes;
 		} finally {
 			IOUtils.closeStream(objectInputStream);
 			IOUtils.closeStream(byteInputStream);
 		}
 	}
-	
 	/**
-	 * Read properties file and convert data to hash table
-	 * @param propertiesFilePath    The properties file paths
-	 * @return                      Data hash table
+	 * <h3 class="en">Read properties file and convert data to hash map</h3>
+	 * <h3 class="zh-CN">读取属性文件并转换数据为哈希表</h3>
+	 *
+	 * @param propertiesFilePath    <span class="en">The properties file path</span>
+	 *                              <span class="zh-CN">属性文件地址</span>
+	 *
+	 * @return 	<span class="en">Data hash map</span>
+	 * 			<span class="zh-CN">数据哈希表</span>
 	 */
-	public static Map<String, String> propertiesToMap(final String propertiesFilePath) {
-		return propertiesToMap(propertiesFilePath, null);
+	public static Map<String, String> toMap(final String propertiesFilePath) {
+		return toMap(propertiesFilePath, null);
 	}
-
 	/**
-	 * Read properties file and write data to given hash table
-	 * @param propertiesFilePath    Properties file paths
-	 * @param messageMap            Exists hash table to write data
-	 * @return                      Data hash table
+	 * <h3 class="en">Read properties file and merge data with given hash map</h3>
+	 * <h3 class="zh-CN">读取属性文件并将数据与给定的哈希表合并</h3>
+	 *
+	 * @param propertiesFilePath    <span class="en">The properties file path</span>
+	 *                              <span class="zh-CN">属性文件地址</span>
+	 * @param messageMap            <span class="en">The merged data hash map</span>
+	 *                              <span class="zh-CN">要合并的数据哈希表</span>
+	 *
+	 * @return 	<span class="en">Merged data hash map</span>
+	 * 			<span class="zh-CN">合并后的数据哈希表</span>
 	 */
-	public static Map<String, String> propertiesToMap(final String propertiesFilePath,
-	                                                         Map<String, String> messageMap) {
-		return propertiesToMap(loadProperties(propertiesFilePath), messageMap);
+	public static Map<String, String> toMap(final String propertiesFilePath, final Map<String, String> messageMap) {
+		return toMap(PropertiesUtils.loadProperties(propertiesFilePath), messageMap);
 	}
-
 	/**
-	 * Read properties file from URL and convert data to hash table
-	 * @param url    Properties file url
-	 * @return       Data hash table
+	 * <h3 class="en">Read properties file from URL instance and convert data to hash map</h3>
+	 * <h3 class="zh-CN">从URL实例对象读取属性文件并转换数据为哈希表</h3>
+	 *
+	 * @param url    <span class="en">The url instance of properties file</span>
+	 *               <span class="zh-CN">属性文件的URL实例对象</span>
+	 *
+	 * @return 	<span class="en">Data hash map</span>
+	 * 			<span class="zh-CN">数据哈希表</span>
 	 */
-	public static Map<String, String> propertiesToMap(final URL url) {
-		return propertiesToMap(url, null);
+	public static Map<String, String> toMap(final URL url) {
+		return toMap(url, null);
 	}
-
 	/**
-	 * Read properties file from URL and write data to given hash table
-	 * @param url                   Properties file url
-	 * @param messageMap            Exists hash table to write data
-	 * @return                      Data hash table
+	 * <h3 class="en">Read properties file from URL instance and merge data with given hash map</h3>
+	 * <h3 class="zh-CN">从URL实例对象读取属性文件并将数据与给定的哈希表合并</h3>
+	 *
+	 * @param url    		<span class="en">The url instance of properties file</span>
+	 *               		<span class="zh-CN">属性文件的URL实例对象</span>
+	 * @param messageMap    <span class="en">The merged data hash map</span>
+	 *                      <span class="zh-CN">要合并的数据哈希表</span>
+	 *
+	 * @return 	<span class="en">Merged data hash map</span>
+	 * 			<span class="zh-CN">合并后的数据哈希表</span>
 	 */
-	public static Map<String, String> propertiesToMap(final URL url, Map<String, String> messageMap) {
-		return propertiesToMap(loadProperties(url), messageMap);
+	public static Map<String, String> toMap(final URL url, Map<String, String> messageMap) {
+		return toMap(PropertiesUtils.loadProperties(url), messageMap);
 	}
-
 	/**
-	 * Read data from properties' object and write to given hash table
-	 * @param properties        Properties object
-	 * @param messageMap        Exists hash table to write data
-	 * @return                  Data hash table
+	 * <h3 class="en">Convert properties instance to hash map and merge data with given hash map</h3>
+	 * <h3 class="zh-CN">转换属性实例对象为哈希表并将数据与给定的哈希表合并</h3>
+	 *
+	 * @param properties    <span class="en">The properties instance</span>
+	 *               		<span class="zh-CN">属性实例对象</span>
+	 *
+	 * @return 	<span class="en">Merged data hash map</span>
+	 * 			<span class="zh-CN">合并后的数据哈希表</span>
 	 */
-	public static Map<String, String> propertiesToMap(final Properties properties, Map<String, String> messageMap) {
-		if (messageMap == null) {
-			messageMap = new HashMap<>();
-		}
-
+	public static Map<String, String> toMap(final Properties properties) {
+		return toMap(properties, null);
+	}
+	/**
+	 * <h3 class="en">Convert properties instance to hash map and merge data with given hash map</h3>
+	 * <h3 class="zh-CN">转换属性实例对象为哈希表并将数据与给定的哈希表合并</h3>
+	 *
+	 * @param properties    <span class="en">The properties instance</span>
+	 *               		<span class="zh-CN">属性实例对象</span>
+	 * @param messageMap    <span class="en">The merged data hash map</span>
+	 *                      <span class="zh-CN">要合并的数据哈希表</span>
+	 *
+	 * @return 	<span class="en">Merged data hash map</span>
+	 * 			<span class="zh-CN">合并后的数据哈希表</span>
+	 */
+	public static Map<String, String> toMap(final Properties properties, final Map<String, String> messageMap) {
+		final Map<String, String> dataMap = (messageMap == null) ? new HashMap<>() : messageMap;
 		if (properties != null) {
-			Enumeration<Object> enumeration = properties.keys();
-			
-			while (enumeration.hasMoreElements()) {
-				String key = (String)enumeration.nextElement();
-				String value = properties.getProperty(key);
-				
-				messageMap.put(key, value);
-			}
-			
+			properties.forEach((key, value) -> dataMap.put((String) key, (String) value));
 		}
-		
-		return messageMap;
-	}
-
-	/**
-	 * Read properties from string
-	 * @param content     string data
-	 * @return                      Properties object
-	 */
-	public static Properties readProperties(final String content) {
-		Properties properties = new Properties();
-		InputStream inputStream;
-		if (StringUtils.notBlank(content)) {
-			inputStream = new ByteArrayInputStream(content.getBytes(Charset.forName(Globals.DEFAULT_ENCODING)));
-			
-			try {
-				if (content.startsWith("<")) {
-					properties.loadFromXML(inputStream);
-				} else {
-					properties.load(inputStream);
-				}
-				
-				inputStream.close();
-				inputStream = null;
-			} catch (IOException e) {
-				properties = new Properties();
-			} finally {
-				IOUtils.closeStream(inputStream);
-			}
-		}
-		return properties;
-	}
-
-	/**
-	 * Read properties from string
-	 * @param propertiesFilePath    Properties file paths
-	 * @return                      Properties object
-	 */
-	public static Properties loadProperties(final String propertiesFilePath) {
-		try {
-			URL url = FileUtils.getURL(propertiesFilePath);
-			return loadProperties(url);
-		} catch (Exception e) {
-			return new Properties();
-		}
-	}
-
-	/**
-	 * Read properties from URL
-	 * @param url    Properties file URL
-	 * @return       Properties object
-	 */
-	public static Properties loadProperties(final URL url) {
-		InputStream inputStream = null;
-		try {
-			String fileName = url.getFile();
-			String fileExtName = StringUtils.getFilenameExtension(fileName);
-			inputStream = url.openStream();
-			if (fileExtName.equalsIgnoreCase("xml")) {
-				return loadProperties(inputStream, true);
-			} else {
-				return loadProperties(inputStream, false);
-			}
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Load properties error! ", e);
-			}
-			return new Properties();
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Close input stream error! ", e);
-					} else {
-						LOGGER.warn("Close input stream error! ");
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Read properties from InputStream
-	 * @param inputStream   Properties input stream
-	 * @param isXML         Data is xml
-	 * @return              Properties object
-	 */
-	public static Properties loadProperties(final InputStream inputStream, final boolean isXML) {
-		Properties properties = new Properties();
-		try {
-			if (isXML) {
-				properties.loadFromXML(inputStream);
-			} else {
-				properties.load(inputStream);
-			}
-			
-			return properties;
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Load properties error! ", e);
-			}
-			return new Properties();
-		}
-	}
-
-	/**
-	 * Write given data and comment to target properties file
-	 * @param propertiesFilePath    Properties file paths
-	 * @param modifyMap             Data hash table
-	 * @param comment               Comment string
-	 * @return                      Operate result
-	 */
-	public static boolean modifyProperties(final String propertiesFilePath, final Map<String, String> modifyMap,
-	                                       final String comment) {
-		try {
-			Properties modifyProperties = loadProperties(propertiesFilePath);
-
-			modifyMap.forEach((key, value) -> {
-				if (value != null) {
-					modifyProperties.setProperty(key, value);
-				}
-			});
-
-			return storeProperties(modifyProperties, propertiesFilePath, comment);
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Modify properties error! ", e);
-			}
-			return false;
-		}
-	}
-
-	/**
-	 * Write given data to target properties object
-	 * @param properties    Properties Object
-	 * @param modifyMap     Data hash table
-	 * @return              Operate result
-	 */
-	public static Properties modifyProperties(final Properties properties, final Map<String, String> modifyMap) {
-
-		for (Object o : properties.keySet()) {
-			String key = (String) o;
-			String value = modifyMap.get(key);
-
-			if (value != null) {
-				properties.setProperty(key, value);
-			}
-		}
-		
-		return properties;
-	}
-
-	/**
-	 * Write properties' object to the target path
-	 * @param properties            Properties Object
-	 * @param propertiesFilePath    Properties file paths
-	 * @param comment               Comment string
-	 * @return                      Operate result
-	 */
-	private static boolean storeProperties(final Properties properties, final String propertiesFilePath,
-	                                       final String comment) {
-		FileOutputStream fileOutputStream = null;
-		try {
-			String filePath = propertiesFilePath.substring(0,
-					propertiesFilePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
-			FileUtils.makeDir(filePath);
-			String fileExtName = StringUtils.getFilenameExtension(propertiesFilePath);
-
-			fileOutputStream = new FileOutputStream(propertiesFilePath, false);
-
-			switch (fileExtName.toLowerCase()) {
-				case "xml":
-					properties.storeToXML(fileOutputStream, comment, Globals.DEFAULT_ENCODING);
-					break;
-				case "properties":
-					properties.store(fileOutputStream, comment);
-					break;
-				default:
-					throw new Exception("Properties file error");
-			}
-			return true;
-		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Save properties error! ", e);
-			}
-			return false;
-		} finally {
-			IOUtils.closeStream(fileOutputStream);
-		}
+		return dataMap;
 	}
 }

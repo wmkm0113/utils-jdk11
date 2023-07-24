@@ -17,54 +17,49 @@
 package org.nervousync.commons.adapter.xml;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.nervousync.utils.StringUtils;
 
 /**
- * The type C data adapter.
+ * <h2 class="en">CData adapter</h2>
+ * <h2 class="zh-CN">CDATA数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: 2018-10-15 14:09
+ * @version $Revision : 1.0 $Date: Oct 15, 2018 14:09:27 $
  */
 public final class CDataAdapter extends XmlAdapter<String, String> {
-
 	/**
-	 * The constant CDATA_BEGIN.
+     * <span class="en">Begin string of CDATA</span>
+     * <span class="zh-CN">CDATA起始字符串</span>
 	 */
 	public static final String CDATA_BEGIN = "<![CDATA[";
 	/**
-	 * The constant CDATA_END.
+     * <span class="en">End string of CDATA</span>
+     * <span class="zh-CN">CDATA终止字符串</span>
 	 */
 	public static final String CDATA_END = "]]>";
-	
-	/**
-	 * Convert a value type to a bound type.
-	 *
-	 * @param v The value to be converted. Can be null.
-	 */
+    /**
+     * @see XmlAdapter#unmarshal(Object)
+     */
 	@Override
 	public String unmarshal(String v) {
-		if (v == null) {
+		if (StringUtils.isEmpty(v)) {
 			return "";
 		}
-		
 		String dataValue = v;
 		if (dataValue.startsWith(CDATA_BEGIN)) {
 			dataValue = dataValue.substring(CDATA_BEGIN.length());
 		}
-		
 		if (dataValue.endsWith(CDATA_END)) {
 			dataValue = dataValue.substring(0, dataValue.length() - CDATA_END.length());
 		}
 		return dataValue;
 	}
-	
-	/**
-	 * Convert a bound type to a value type.
-	 *
-	 * @param v The value to be converted. Can be null.
-	 */
+    /**
+     * @see XmlAdapter#marshal(Object)
+     */
 	@Override
 	public String marshal(String v) {
-		if (v == null) {
+		if (StringUtils.isEmpty(v)) {
 			return CDATA_BEGIN + CDATA_END;
 		} else {
 			return CDATA_BEGIN + v + CDATA_END;

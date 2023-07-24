@@ -16,22 +16,21 @@
  */
 package org.nervousync.annotations.launcher;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.nervousync.commons.Globals;
+
+import java.lang.annotation.*;
 
 /**
  * <h3 class="en">Annotation class for startup launcher class</h3>
  * <h3 class="zh-CN">启动器类的标注</h3>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 06/28/2022 3:25 PM $
+ * @version $Revision : 1.0 $ $Date: Jun 28, 2022 15:25:33 $
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Launcher {
-
 	/**
 	 * <span class="en">Launcher sort code. Sort type: DESC</span>
 	 * <span class="zh-CN">启动器排序代码，排序类型：倒叙</span>
@@ -39,6 +38,6 @@ public @interface Launcher {
 	 * @return  <span class="en">Sort code</span>
 	 *          <span class="zh-CN">排序代码</span>
 	 */
-	int value();
+	int value() default Globals.DEFAULT_VALUE_INT;
 
 }

@@ -40,7 +40,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
+import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.utils.StringUtils;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
@@ -89,7 +90,7 @@ public final class HeaderOperator {
 	 * @throws IOException  the io exception
 	 */
 	public static int writeExtendedLocalHeader(LocalFileHeader localFileHeader, OutputStream outputStream)
-			throws ZipException, IOException {
+			throws ZipException, DataInvalidException, IOException {
 		if (localFileHeader == null || outputStream == null) {
 			throw new ZipException("input parameters is null, cannot write extended local header");
 		}
@@ -158,7 +159,8 @@ public final class HeaderOperator {
 	 * @param arrayList the array list
 	 * @throws ZipException the zip exception
 	 */
-	public static void appendShortToArrayList(short value, List<String> arrayList) throws ZipException {
+	public static void appendShortToArrayList(short value, List<String> arrayList)
+			throws ZipException, DataInvalidException {
 		byte[] shortBuffer = new byte[2];
 		RawUtils.writeShort(shortBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(shortBuffer, arrayList);
@@ -171,7 +173,8 @@ public final class HeaderOperator {
 	 * @param arrayList the array list
 	 * @throws ZipException the zip exception
 	 */
-	public static void appendIntToArrayList(int value, List<String> arrayList) throws ZipException {
+	public static void appendIntToArrayList(int value, List<String> arrayList)
+			throws ZipException, DataInvalidException {
 		byte[] intBuffer = new byte[4];
 		RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(intBuffer, arrayList);
@@ -184,7 +187,8 @@ public final class HeaderOperator {
 	 * @param arrayList the array list
 	 * @throws ZipException the zip exception
 	 */
-	public static void appendLongToArrayList(long value, List<String> arrayList) throws ZipException {
+	public static void appendLongToArrayList(long value, List<String> arrayList)
+			throws ZipException, DataInvalidException {
 		byte[] longBuffer = new byte[8];
 		RawUtils.writeLong(longBuffer, ByteOrder.LITTLE_ENDIAN, value);
 		HeaderOperator.copyByteArrayToList(longBuffer, arrayList);
@@ -247,7 +251,7 @@ public final class HeaderOperator {
 		} catch (UnsupportedEncodingException err) {
 			return string.getBytes(Charset.defaultCharset());
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new ZipException("", e);
 		}
 	}
 }

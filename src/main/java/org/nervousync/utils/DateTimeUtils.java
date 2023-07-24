@@ -19,298 +19,384 @@ package org.nervousync.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.*;
+import java.time.chrono.ChronoZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
- * Date time utils
+ * <h2 class="en">Date time utilities</h2>
+ * <h2 class="zh-CN">日期时间工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:15:20 AM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:15:20 $
  */
 public final class DateTimeUtils {
 
 	/**
-	 * Static value for date format yyyy/MM/dd
+	 * <span class="en">Static value for date format yyyy/MM/dd</span>
+	 * <span class="zh-CN">日期格式 yyyy/MM/dd 的静态值</span>
 	 */
 	public static final String DEFAULT_DATE_PATTERN = "yyyy/MM/dd";
 	/**
-	 * Static value for date format yyyy-MM-dd'T'HH:mm:ss
+	 * <span class="en">Static value for date format yyyy-MM-dd'T'HH:mm:ss</span>
+	 * <span class="zh-CN">日期格式 yyyy-MM-dd'T'HH:mm:ss 的静态值</span>
 	 */
 	public static final String DEFAULT_DATETIME_PATTERN_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss";
 	/**
-	 * Static value for date format EEE, dd MMM yyyy HH:mm:ss 'GMT'
-	 * Using for generated Response header: Last-Modified
+	 * <span class="en">Static value for date format EEE, dd MMM yyyy HH:mm:ss 'GMT'. Using for generated Response header: Last-Modified</span>
+	 * <span class="zh-CN">日期格式 EEE, dd MMM yyyy HH:mm:ss 'GMT' 的静态值。用于生成的响应头：Last-Modified</span>
 	 */
 	public static final String LAST_MODIFIED_DATETIME_PATTERN = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
 	/**
-	 * Static value for date format EEE, dd-MMM-yyyy HH:mm:ss 'GMT'
+	 * <span class="en">Static value for date format EEE, dd-MMM-yyyy HH:mm:ss 'GMT'</span>
+	 * <span class="zh-CN">日期格式 EEE, dd-MMM-yyyy HH:mm:ss 'GMT' 的静态值</span>
 	 */
 	public static final String COOKIE_DATETIME_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss 'GMT'";
 
 	/**
-	 * Static DateTimeFormatter instance for date format yyyy/MM/dd
+	 * <span class="en">Static DateTimeFormatter instance for date format yyyy/MM/dd</span>
+	 * <span class="zh-CN">静态DateTimeFormatter实例，使用的日期格式：yyyy/MM/dd</span>
 	 */
 	public static final DateTimeFormatter DEFAULT_ISO8601_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601);
 	/**
-	 * Static DateTimeFormatter instance for the site map
+	 * <span class="en">Static DateTimeFormatter instance for the site map date format</span>
+	 * <span class="zh-CN">静态DateTimeFormatter实例，使用SiteMap的日期格式</span>
 	 */
 	public static final DateTimeFormatter DEFAULT_SITE_MAP_PATTERN =
 			DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	/**
-	 * Static DateTimeFormatter instance for date format yyyyMMdd
+	 * <span class="en">Static DateTimeFormatter instance for date format yyyyMMdd</span>
+	 * <span class="zh-CN">静态DateTimeFormatter实例，使用的日期格式：yyyyMMdd</span>
 	 */
 	public static final DateTimeFormatter DEFAULT_INT_PATTERN = DateTimeFormatter.ofPattern("yyyyMMdd");
 	/**
-	 * Static DateTimeFormatter instance for date format HHmmssSSS
+	 * <span class="en">Static DateTimeFormatter instance for date format HHmmssSSS</span>
+	 * <span class="zh-CN">静态DateTimeFormatter实例，使用的日期格式：HHmmssSSS</span>
 	 */
 	public static final DateTimeFormatter DEFAULT_TIME_PATTERN = DateTimeFormatter.ofPattern("HHmmssSSS");
 	/**
-	 * Static DateTimeFormatter instance for date format yyyyMMddHHmm
+	 * <span class="en">Static DateTimeFormatter instance for date format yyyyMMddHHmm</span>
+	 * <span class="zh-CN">静态DateTimeFormatter实例，使用的日期格式：yyyyMMddHHmm</span>
 	 */
 	public static final DateTimeFormatter DEFAULT_LONG_PATTERN = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-
 	/**
-	 * Current UTC Clock Instance
+	 * <span class="en">Current UTC Clock Instance</span>
+	 * <span class="zh-CN">当前UTC时钟实例对象</span>
+	 *
 	 */
 	private static final UTCClock UTC_CLOCK = new UTCClock();
-
+	/**
+	 * <h3 class="en">Private constructor for DateTimeUtils</h3>
+	 * <h3 class="zh-CN">日期时间工具集的私有构造方法</h3>
+	 */
 	private DateTimeUtils() {
 	}
-	
 	/**
-	 * Formats given date according to string with ISO8601 format
+	 * <h3 class="en">Formats given date according to string with ISO8601 format</h3>
+	 * <h3 class="zh-CN">使用ISO8601标准格式化给定的日期实例对象</h3>
 	 *
-	 * @param date date instance
-	 * @return formatted result by ISO8601
+	 * @param date 	<span class="en">date instance</span>
+	 *              <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDateForSiteMap(Date date) {
+	public static String formatDateForSiteMap(final Date date) {
 		if (date == null) {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 		return formatDate(date, DEFAULT_SITE_MAP_PATTERN);
 	}
-	
 	/**
-	 * Parses given string according to <code>java.util.Date</code> with ISO8601 format
+	 * <h3 class="en">Parses given string according to <code>java.util.Date</code> with ISO8601 format</h3>
+	 * <h3 class="zh-CN">使用ISO8601标准解析给定日期字符串为日期实例对象</h3>
 	 *
-	 * @param string String value with ISO8601 format
-	 * @return Date object
-	 * @throws ParseException given string is null
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">If parameter string is null or empty string</span>
+	 * <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
 	 */
-	public static Date parseSiteMapDate(String string) throws ParseException {
+	public static Date parseSiteMapDate(final String string) throws ParseException {
 		return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
 	}
-
 	/**
-	 * Formats given date according to string with vCard format
+	 * <h3 class="en">Formats current GMT datetime according to string with vCard format</h3>
+	 * <h3 class="zh-CN">使用vCard标准格式化当前的GMT时间</h3>
 	 *
-	 * @return formatted result by ISO8601 and ending character is 'Z'
+	 * @return 	<span class="en">formatted date time string and ending character is 'Z'</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串并以字符'Z'结尾</span>
 	 */
 	public static String formatGMTDateForVCard() {
 		return ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("+00:00"))
 				.format(DateTimeFormatter.ofPattern(DEFAULT_DATETIME_PATTERN_ISO8601 + "'Z'"));
 	}
-
 	/**
-	 * Formats given date according to string with vCard format
+	 * <h3 class="en">Formats given date according to string with vCard format</h3>
+	 * <h3 class="zh-CN">使用vCard标准格式化给定的日期实例对象</h3>
 	 *
-	 * @param date date instance
-	 * @return formatted result by ISO8601 and ending character is 'Z'
+	 * @param date 	<span class="en">date instance</span>
+	 *              <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string and ending character is 'Z'</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串并以字符'Z'结尾</span>
 	 */
-	public static String formatDateForVCard(Date date) {
+	public static String formatDateForVCard(final Date date) {
 		if (date == null) {
 			return null;
 		}
 		return formatDate(date, DEFAULT_ISO8601_PATTERN) + "Z";
 	}
-	
 	/**
-	 * Parses given cookie expire string according to java.util.Date
+	 * <h3 class="en">Parses given GMT date time string according to <code>java.util.Date</code></h3>
+	 * <h3 class="zh-CN">解析给定的GMT日期字符串为日期实例对象</h3>
 	 *
-	 * @param string string will be parsed
-	 * @return Date object
-	 * @throws ParseException given string is null
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">If parameter string is null or empty string</span>
+	 * <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
 	 */
-	public static Date parseGMTDate(String string) throws ParseException {
+	public static Date parseGMTDate(final String string) throws ParseException {
 		return parseDate(string, COOKIE_DATETIME_PATTERN);
 	}
-	
 	/**
-	 * Parses given string according to format style
+	 * <h3 class="en">Parses given string according to <code>java.util.Date</code> using given date time format</h3>
+	 * <h3 class="zh-CN">使用给定的日期时间格式解析给定的日期字符串为日期实例对象</h3>
 	 *
-	 * @param string string will be parsed
-	 * @param format Date format
-	 * @return Date object
-	 * @throws ParseException given string is null or format was not matched
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param format 	<span class="en">date time format</span>
+	 *                  <span class="zh-CN">日期时间格式</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">If parameter string is null or empty string</span>
+	 * <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
 	 */
-	public static Date parseDate(String string, String format) throws ParseException {
+	public static Date parseDate(final String string, final String format) throws ParseException {
 		if (string == null || string.length() == 0) {
 			throw new ParseException("Date string is null", 0);
 		}
-		
-		if (format == null) {
-			format = DEFAULT_DATE_PATTERN;
-		}
-
-		return Date.from(LocalDate.parse(string, DateTimeFormatter.ofPattern(format))
+		String datetimeFormat = StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format;
+		return Date.from(LocalDate.parse(string, DateTimeFormatter.ofPattern(datetimeFormat))
 				.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
-
 	/**
-	 * Last modified string.
+	 * <h3 class="en">Formats given date according to string with last modify format</h3>
+	 * <h3 class="zh-CN">使用Last-Modify标准格式化给定的日期实例对象</h3>
 	 *
-	 * @param date the date
-	 * @return the string
+	 * @param date 	<span class="en">date instance</span>
+	 *              <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String lastModified(Date date) {
+	public static String lastModified(final Date date) {
 		return formatDate(date, DateTimeFormatter.ofPattern(LAST_MODIFIED_DATETIME_PATTERN));
 	}
-
 	/**
-	 * Last modified string.
+	 * <h3 class="en">Formats given date according to string with last modify format</h3>
+	 * <h3 class="zh-CN">使用Last-Modify标准格式化给定的日期实例对象</h3>
 	 *
-	 * @param timeMilliseconds the time milliseconds
-	 * @return the string
+	 * @param timeMilliseconds 	<span class="en">date time milliseconds</span>
+	 *              			<span class="zh-CN">日期时间的毫秒数</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String lastModified(long timeMilliseconds) {
+	public static String lastModified(final long timeMilliseconds) {
 		return formatDate(new Date(timeMilliseconds), DateTimeFormatter.ofPattern(LAST_MODIFIED_DATETIME_PATTERN));
 	}
-
 	/**
-	 * Formats given date according to system style
+	 * <h3 class="en">Formats given date according to string with system format</h3>
+	 * <h3 class="zh-CN">使用系统格式化给定的日期实例对象</h3>
 	 *
-	 * @param date date instance
-	 * @return formatted result by system default format
+	 * @param date 	<span class="en">date instance</span>
+	 *              <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDate(Date date) {
+	public static String formatDate(final Date date) {
 		return formatDate(date, DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL));
 	}
-	
 	/**
-	 * Return current day value with format "yyyyMMdd"
+	 * <h3 class="en">Formats current date according to int with "yyyyMMdd" format</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化当前日期时间为数字</h3>
 	 *
-	 * @return current day
+	 * @return 	<span class="en">formatted date time int value</span>
+	 * 			<span class="zh-CN">格式化后的日期时间数字格式</span>
 	 */
 	public static int currentDate() {
 		return Integer.parseInt(LocalDate.now().format(DEFAULT_INT_PATTERN));
 	}
-
 	/**
-	 * Return current GMT day value with format "yyyyMMdd"
+	 * <h3 class="en">Formats current UTC date according to int with "yyyyMMdd" format</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化当前日期时间为数字</h3>
 	 *
-	 * @return current GMT day
+	 * @return 	<span class="en">formatted UTC date time int value</span>
+	 * 			<span class="zh-CN">格式化后的UTC日期时间数字格式</span>
 	 */
 	public static int currentUTCDate() {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis()), DEFAULT_INT_PATTERN));
 	}
-	
 	/**
-	 * Return expires day value with format "yyyyMMdd"
+	 * <h3 class="en">Format and calculate date according to int with "yyyyMMdd" format by given expire time</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化并计算过期日期时间为数字</h3>
 	 *
-	 * @param expireTime expire time
-	 * @return		expire day
+	 * @param expireTime 	<span class="en">Expire time milliseconds</span>
+	 *                      <span class="zh-CN">过期时间的毫秒数</span>
+	 *
+	 * @return 	<span class="en">formatted and calculated date time int value</span>
+	 * 			<span class="zh-CN">格式化并计算后的日期时间数字格式</span>
 	 */
-	public static int expireDay(long expireTime) {
+	public static int expireDay(final long expireTime) {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentTimeMillis() + expireTime), 
 				DEFAULT_INT_PATTERN));
 	}
-
 	/**
-	 * Return expires day value with format "yyyyMMdd"
+	 * <h3 class="en">Format and calculate UTC date according to int with "yyyyMMdd" format by given expire time</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化并计算过期UTC日期时间为数字</h3>
 	 *
-	 * @param expireTime expire time
-	 * @return		expire GMT day
+	 * @param expireTime 	<span class="en">Expire time milliseconds</span>
+	 *                      <span class="zh-CN">过期时间的毫秒数</span>
+	 *
+	 * @return 	<span class="en">formatted and calculated UTC date time int value</span>
+	 * 			<span class="zh-CN">格式化并计算后的UTC日期时间数字格式</span>
 	 */
 	public static int expireUTCDay(long expireTime) {
 		return Integer.parseInt(DateTimeUtils.formatDate(new Date(currentUTCTimeMillis() + expireTime),
 				DEFAULT_INT_PATTERN));
 	}
-
 	/**
-	 * Calc expire time millis by given month count
+	 * <h3 class="en">Format and calculate date according to int with "yyyyMMdd" format by given month count</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化并计算过期日期时间为数字</h3>
 	 *
-	 * @param monthCount month count
-	 * @return expire time millis
+	 * @param monthCount 	<span class="en">Expire month count</span>
+	 *                      <span class="zh-CN">过期月份计数</span>
+	 *
+	 * @return 	<span class="en">formatted and calculated date time int value</span>
+	 * 			<span class="zh-CN">格式化并计算后的日期时间数字格式</span>
 	 */
 	public static long expireMonth(int monthCount) {
 		return currentTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
 	}
-
 	/**
-	 * Calc expire UTC time millis by given month count
+	 * <h3 class="en">Format and calculate UTC date according to int with "yyyyMMdd" format by given month count</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMdd"格式化并计算过期UTC日期时间为数字</h3>
 	 *
-	 * @param monthCount month count
-	 * @return expire UTC time millis
+	 * @param monthCount 	<span class="en">Expire month count</span>
+	 *                      <span class="zh-CN">过期月份计数</span>
+	 *
+	 * @return 	<span class="en">formatted and calculated UTC date time int value</span>
+	 * 			<span class="zh-CN">格式化并计算后的UTC日期时间数字格式</span>
 	 */
 	public static long expireUTCMonth(int monthCount) {
 		return currentUTCTimeMillis() + (expireDayCount(monthCount) * 24 * 60 * 60 * 1000L);
 	}
-
 	/**
-	 * Current Year
+	 * <h3 class="en">Formats current date according to int with "yyyyMMddHHmm" format</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMddHHmm"格式化当前日期时间为数字</h3>
 	 *
-	 * @return Current Year
+	 * @return 	<span class="en">formatted date time int value</span>
+	 * 			<span class="zh-CN">格式化后的日期时间数字格式</span>
+	 */
+	public static long currentTime() {
+		return Long.parseLong(formatDate(new Date(currentTimeMillis()), DEFAULT_LONG_PATTERN));
+	}
+	/**
+	 * <h3 class="en">Formats current UTC date according to int with "yyyyMMddHHmm" format</h3>
+	 * <h3 class="zh-CN">使用"yyyyMMddHHmm"格式化当前UTC日期时间为数字</h3>
+	 *
+	 * @return 	<span class="en">formatted date time int value</span>
+	 * 			<span class="zh-CN">格式化后的日期时间数字格式</span>
+	 */
+	public static long currentUTCTime() {
+		return Long.parseLong(formatDate(new Date(currentUTCTimeMillis()), DEFAULT_LONG_PATTERN));
+	}
+	/**
+	 * <h3 class="en">Read current year number</h3>
+	 * <h3 class="zh-CN">读取当前年份</h3>
+	 *
+	 * @return 	<span class="en">Current Year</span>
+	 * 			<span class="zh-CN">当前年份</span>
 	 */
 	public static int currentYear() {
 		return Calendar.getInstance().get(Calendar.YEAR);
 	}
-
 	/**
-	 * Current Month
+	 * <h3 class="en">Read current month number</h3>
+	 * <h3 class="zh-CN">读取当前月份</h3>
 	 *
-	 * @return Current Month
+	 * @return 	<span class="en">Current month</span>
+	 * 			<span class="zh-CN">当前月份</span>
 	 */
 	public static int currentMonth() {
 		return Calendar.getInstance().get(Calendar.MONTH) + 1;
 	}
-
 	/**
-	 * Current Day
+	 * <h3 class="en">Read current day number</h3>
+	 * <h3 class="zh-CN">读取当前日期</h3>
 	 *
-	 * @return Current Day
+	 * @return 	<span class="en">Current day</span>
+	 * 			<span class="zh-CN">当前日期</span>
 	 */
 	public static int currentDay() {
 		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 	}
-
 	/**
-	 * Current Hour
+	 * <h3 class="en">Read current year hour</h3>
+	 * <h3 class="zh-CN">读取当前小时</h3>
 	 *
-	 * @return Current Hour
+	 * @return 	<span class="en">Current hour</span>
+	 * 			<span class="zh-CN">当前小时</span>
 	 */
 	public static int currentHour() {
 		return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 	}
-
 	/**
-	 * Current Minute
+	 * <h3 class="en">Read current year minute</h3>
+	 * <h3 class="zh-CN">读取当前分钟</h3>
 	 *
-	 * @return Current Minute
+	 * @return 	<span class="en">Current minute</span>
+	 * 			<span class="zh-CN">当前分钟</span>
 	 */
 	public static int currentMinute() {
 		return Calendar.getInstance().get(Calendar.MINUTE);
 	}
-
 	/**
-	 * Days count of given year and month
+	 * <h3 class="en">Calculate days count of given year and month</h3>
+	 * <h3 class="zh-CN">计算给定的年份和月份有多少天</h3>
 	 *
-	 * @param year  year
-	 * @param month month
-	 * @return Days count
+	 * @param year 		<span class="en">Given year</span>
+	 *                  <span class="zh-CN">给定的年份</span>
+	 * @param month 	<span class="en">Given month</span>
+	 *                  <span class="zh-CN">给定的月份</span>
+	 *
+	 * @return 	<span class="en">Day count</span>
+	 * 			<span class="zh-CN">天数</span>
 	 */
-	public static int getDaysOfMonth(int year, int month) {
+	public static int getDaysOfMonth(final int year, final int month) {
 		Calendar calendar = Calendar.getInstance();
 		switch (month) {
 			case 1:
@@ -354,14 +440,17 @@ public final class DateTimeUtils {
 		}
 		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 	}
-	
 	/**
-	 * Converts input time from Java to DOS format
+	 * <h3 class="en">Converts input time from Java to DOS format</h3>
+	 * <h3 class="zh-CN">转换给定的Java日期为DOS日期</h3>
 	 *
-	 * @param time time value
-	 * @return time in DOS format
+	 * @param time 	<span class="en">Given time value</span>
+	 *              <span class="zh-CN">给定的时间值</span>
+	 *
+	 * @return 	<span class="en">time in DOS format</span>
+	 * 			<span class="zh-CN">DOS格式的日期</span>
 	 */
-	public static long toDosTime(long time) {
+	public static long toDosTime(final long time) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		
@@ -376,14 +465,17 @@ public final class DateTimeUtils {
 				| cal.get(Calendar.MINUTE) << 5
 				| cal.get(Calendar.SECOND) >> 1;
 	}
-	
 	/**
-	 * Converts the time in dos format to Java format
+	 * <h3 class="en">Converts input time from DOS to Java format</h3>
+	 * <h3 class="zh-CN">转换给定的DOS日期为Java日期</h3>
 	 *
-	 * @param dosTime dos time
-	 * @return time in java format
+	 * @param dosTime 	<span class="en">Given time value</span>
+	 *              	<span class="zh-CN">给定的时间值</span>
+	 *
+	 * @return 	<span class="en">time in Java format</span>
+	 * 			<span class="zh-CN">Java格式的日期</span>
 	 */
-	public static long dosToJavaTme(long dosTime) {
+	public static long dosToJavaTime(final long dosTime) {
 		int month;
 		switch ((int)((dosTime >> 21) & 0x0F)) {
 			case 1:
@@ -425,7 +517,6 @@ public final class DateTimeUtils {
 			default:
 				return Globals.DEFAULT_VALUE_LONG;
 		}
-
 		Calendar calendar = Calendar.getInstance();
 		calendar.set((int)(((dosTime >> 25) & 0x7F) + 1980), month,
 				(int)((dosTime >> 16) & 0x1F),
@@ -435,342 +526,424 @@ public final class DateTimeUtils {
 		calendar.clear(Calendar.MILLISECOND);
 	    return calendar.getTimeInMillis();
 	}
-
 	/**
-	 * Return current time in milliseconds.
+	 * <h3 class="en">Retrieve current time in milliseconds.</h3>
+	 * <h3 class="zh-CN">读取当前时间与1970-01-01差值的毫秒数</h3>
 	 *
-	 * @return current time in milliseconds.
-	 */
-	public static long currentTime() {
-		return Long.parseLong(formatDate(new Date(currentTimeMillis()), DEFAULT_LONG_PATTERN));
-	}
-
-	/**
-	 * Return current time in milliseconds.
-	 *
-	 * @return current time in milliseconds.
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的值</span>
 	 */
 	public static long currentTimeMillis() {
 		return UTC_CLOCK.currentTimeMillis();
 	}
-
 	/**
-	 * Returns the GMT time in milliseconds.
+	 * <h3 class="en">Retrieve current UTC time in milliseconds.</h3>
+	 * <h3 class="zh-CN">读取当前UTC时间与1970-01-01差值的毫秒数</h3>
 	 *
-	 * @return current GMT time in milliseconds.
-	 */
-	public static long currentUTCTime() {
-		return Long.parseLong(formatDate(new Date(currentUTCTimeMillis()), DEFAULT_LONG_PATTERN));
-	}
-
-	/**
-	 * Returns the GMT time in milliseconds.
-	 *
-	 * @return current GMT time in milliseconds.
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的值</span>
 	 */
 	public static long currentUTCTimeMillis() {
 		return UTC_CLOCK.currentUTCTimeMillis();
 	}
-
 	/**
-	 * Formats given date according to format style
+	 * <h3 class="en">Formats given date according to string with given DateTimeFormatter instance</h3>
+	 * <h3 class="zh-CN">使用给定的日期时间格式化实例对象将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date              Date instance
-	 * @param dateTimeFormatter Datetime formatter
-	 * @return Format date value as string
+	 * @param date 					<span class="en">date instance</span>
+	 *              				<span class="zh-CN">日期实例对象</span>
+	 * @param dateTimeFormatter 	<span class="en">DateTimeFormatter instance</span>
+	 *              				<span class="zh-CN">日期时间格式化实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter) {
+	public static String formatDate(final Date date, final DateTimeFormatter dateTimeFormatter) {
 		return DateTimeUtils.formatDate(date, dateTimeFormatter, TimeZone.getDefault());
 	}
-	
 	/**
-	 * Formats given date according to format style
+	 * <h3 class="en">Formats given date according and time zone to string with given DateTimeFormatter instance</h3>
+	 * <h3 class="zh-CN">使用给定的日期时间格式化实例对象和时区将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date              Date instance
-	 * @param dateTimeFormatter Datetime formatter
-	 * @param timeZone          Time zone
-	 * @return Time value of String
+	 * @param date 					<span class="en">date instance</span>
+	 *              				<span class="zh-CN">日期实例对象</span>
+	 * @param dateTimeFormatter 	<span class="en">DateTimeFormatter instance</span>
+	 *              				<span class="zh-CN">日期时间格式化实例对象</span>
+	 * @param timeZone 				<span class="en">Timezone instance</span>
+	 *              				<span class="zh-CN">时区实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDate(Date date, DateTimeFormatter dateTimeFormatter, TimeZone timeZone) {
-		if (date == null) {
-			date = new Date();
-		}
-
-		return date.toInstant().atZone(timeZone.toZoneId()).toLocalDateTime()
+	public static String formatDate(final Date date, final DateTimeFormatter dateTimeFormatter,
+									final TimeZone timeZone) {
+		Date useDate = (date == null) ? new Date() : date;
+		return useDate.toInstant().atZone(timeZone.toZoneId()).toLocalDateTime()
 				.format(dateTimeFormatter);
 	}
-	
 	/**
-	 * Formats given date according to specified locale and date style
+	 * <h3 class="en">Formats given date according to string with given locale instance and date style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期风格代码将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date      Date to convert
-	 * @param locale    Locale to use for formatting date
-	 * @param dateStyle Date style
-	 * @return String representation of date according to given locale and date style
-	 * @see java.text.DateFormat
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param dateStyle <span class="en">date style code</span>
+	 *              	<span class="zh-CN">日期风格代码</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDate(Date date, Locale locale, int dateStyle) {
-		DateFormat formatter = DateFormat.getDateInstance(dateStyle, locale);
-		return formatter.format(date);
+	public static String formatDate(final Date date, final Locale locale, final int dateStyle) {
+		return DateFormat.getDateInstance(dateStyle, locale).format(date);
 	}
-
 	/**
-	 * Formats given date according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Formats given date according to string with given locale instance using date style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期风格代码<code>DateFormat.MEDIUM</code>将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date   Date to convert
-	 * @param locale Locale to use for formatting date
-	 * @return String representation of date according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDate(Date date, Locale locale) {
+	public static String formatDate(final Date date, final Locale locale) {
 		return formatDate(date, locale, DateFormat.MEDIUM);
 	}
-
 	/**
-	 * Parses given string according to specified locale and date style
+	 * <h3 class="en">Parse given string according to date with given locale instance and date style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期风格代码将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source    Source string to parse date from
-	 * @param locale    Locale to use for parsing date
-	 * @param dateStyle Date style
-	 * @return Date object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and style
-	 * @see java.text.DateFormat
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param dateStyle <span class="en">date style code</span>
+	 *              	<span class="zh-CN">日期风格代码</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseDate(String source, Locale locale, int dateStyle) throws ParseException {
-		DateFormat formatter = DateFormat.getDateInstance(dateStyle, locale);
-		return formatter.parse(source);
+	public static Date parseDate(final String string, final Locale locale, final int dateStyle) throws ParseException {
+		return DateFormat.getDateInstance(dateStyle, locale).parse(string);
 	}
-
 	/**
-	 * Parses given string according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Parse given string according to date with given locale instance and date style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期风格<code>DateFormat.MEDIUM</code>将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source Source string to parse date from
-	 * @param locale Locale to use for parsing date
-	 * @return Date object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseDate(String source, Locale locale) throws ParseException {
-		return parseDate(source, locale, DateFormat.MEDIUM);
+	public static Date parseDate(final String string, final Locale locale) throws ParseException {
+		return parseDate(string, locale, DateFormat.MEDIUM);
 	}
-
-
 	/**
-	 * Formats given time according to specified locale and time style
+	 * <h3 class="en">Formats given date according to string with given locale instance and time style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和时间风格代码将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param time      Time to convert
-	 * @param locale    Locale to use for formatting time
-	 * @param timeStyle Time style
-	 * @return String representation of time according to given locale and time style
-	 * @see java.text.DateFormat
+	 * @param time 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param timeStyle <span class="en">time style code</span>
+	 *              	<span class="zh-CN">时间风格代码</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatTime(Date time, Locale locale, int timeStyle) {
+	public static String formatTime(final Date time, final Locale locale, final int timeStyle) {
 		DateFormat formatter = DateFormat.getTimeInstance(timeStyle, locale);
 		return formatter.format(time);
 	}
-
 	/**
-	 * Formats given time according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Formats given date according to string with given locale instance using time style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和时间风格代码<code>DateFormat.MEDIUM</code>将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param time   Time to convert
-	 * @param locale Locale to use for formatting time
-	 * @return String representation of time according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param time 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatTime(Date time, Locale locale) {
+	public static String formatTime(final Date time, final Locale locale) {
 		return formatTime(time, locale, DateFormat.MEDIUM);
 	}
-	
 	/**
-	 * Parses given string according to specified locale and time style
+	 * <h3 class="en">Parse given string according to date with given locale instance and time style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期风格代码将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source    Source string to parse time from
-	 * @param locale    Locale to use for parsing time
-	 * @param timeStyle Time style
-	 * @return Time object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and style
-	 * @see java.text.DateFormat
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param timeStyle <span class="en">time style code</span>
+	 *              	<span class="zh-CN">时间风格代码</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseTime(String source, Locale locale, int timeStyle) throws ParseException {
-		DateFormat formatter = DateFormat.getTimeInstance(timeStyle, locale);
-		return formatter.parse(source);
+	public static Date parseTime(final String string, final Locale locale, final int timeStyle) throws ParseException {
+		return DateFormat.getTimeInstance(timeStyle, locale).parse(string);
 	}
-
 	/**
-	 * Parses given string according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Parse given string according to date with given locale instance and time style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和时间风格<code>DateFormat.MEDIUM</code>将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source Source string to parse time from
-	 * @param locale Locale to use for parsing time
-	 * @return Time object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseTime(String source, Locale locale) throws ParseException {
-		return parseTime(source, locale, DateFormat.MEDIUM);
+	public static Date parseTime(final String string, final Locale locale) throws ParseException {
+		return parseTime(string, locale, DateFormat.MEDIUM);
 	}
-
 	/**
-	 * Formats given date and time according to specified locale and date style
+	 * <h3 class="en">Formats given date according to string with given locale instance, date style code and time style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象、日期风格代码和时间风格代码将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date	  Date object to convert
-	 * @param locale	Locale to use for formatting date and time
-	 * @param dateStyle Date style
-	 * @param timeStyle Time style
-	 * @return String representation of date and time according to given locale and date style
-	 * @see java.text.DateFormat
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param dateStyle <span class="en">date style code</span>
+	 *              	<span class="zh-CN">日期风格代码</span>
+	 * @param timeStyle <span class="en">time style code</span>
+	 *              	<span class="zh-CN">时间风格代码</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDateTime(Date date, Locale locale, int dateStyle, int timeStyle) {
-		DateFormat formatter = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
-		return formatter.format(date);
+	public static String formatDateTime(final Date date, final Locale locale, final int dateStyle, final int timeStyle) {
+		return DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale).format(date);
 	}
-
 	/**
-	 * Formats given date and time according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Formats given date according to string with given locale instance using date style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期、时间风格代码<code>DateFormat.MEDIUM</code>将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date   Date object to convert
-	 * @param locale Locale to use for formatting date and time
-	 * @return String representation of date and time according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDateTime(Date date, Locale locale) {
+	public static String formatDateTime(final Date date, final Locale locale) {
 		return formatDateTime(date, locale, DateFormat.MEDIUM, DateFormat.MEDIUM);
 	}
-
 	/**
-	 * Formats given date and time according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Formats given date according to string with system locale instance using date style <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用系统地区实例对象和日期、时间风格代码<code>DateFormat.MEDIUM</code>将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date   Date object to convert
-	 * @return String representation of date and time according to <code>Globals.DEFAULT_LOCALE</code> and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String formatDateTime(Date date) {
+	public static String formatDateTime(final Date date) {
 		return formatDateTime(date, Globals.DEFAULT_LOCALE);
 	}
-
 	/**
-	 * Parses given string according to specified locale and date and time styles
+	 * <h3 class="en">Parse given string according to date with given locale instance, date style code and time style code</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象、日期风格代码和时间风格代码将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source	Source string to parse date and time from
-	 * @param locale	Locale to use for parsing date and time
-	 * @param dateStyle Date style
-	 * @param timeStyle Time style
-	 * @return Date object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and style
-	 * @see java.text.DateFormat
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param dateStyle <span class="en">date style code</span>
+	 *              	<span class="zh-CN">日期风格代码</span>
+	 * @param timeStyle <span class="en">time style code</span>
+	 *              	<span class="zh-CN">时间风格代码</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseDateTime(String source, Locale locale, int dateStyle, int timeStyle) throws ParseException {
-		DateFormat formatter = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
-		return formatter.parse(source);
+	public static Date parseDateTime(final String string, final Locale locale, final int dateStyle, final int timeStyle)
+			throws ParseException {
+		return DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale).parse(string);
 	}
-
 	/**
-	 * Parses given string according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Parse given string according to date with given locale instance, date style and time style using <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和日期时间风格<code>DateFormat.MEDIUM</code>将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source Source string to parse date and time from
-	 * @param locale Locale to use for parsing date and time
-	 * @return Date object corresponding to representation given in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseDateTime(String source, Locale locale) throws ParseException {
-		return parseDateTime(source, locale, DateFormat.MEDIUM, DateFormat.MEDIUM);
+	public static Date parseDateTime(final String string, final Locale locale) throws ParseException {
+		return parseDateTime(string, locale, DateFormat.MEDIUM, DateFormat.MEDIUM);
 	}
-
 	/**
-	 * Parses given string according to specified locale and <code>DateFormat.MEDIUM</code> style
+	 * <h3 class="en">Parse given string according to date with system locale instance, date style and time style using <code>DateFormat.MEDIUM</code></h3>
+	 * <h3 class="zh-CN">使用系统地区实例对象和日期时间风格<code>DateFormat.MEDIUM</code>将给定的字符串转换为日期实例对象</h3>
 	 *
-	 * @param source Source string to parse date and time from
-	 * @return Date object corresponding to <code>Globals.DEFAULT_LOCALE</code> in source string
-	 * @throws ParseException if given string could not be properly parsed according to given locale and <code>DateFormat.MEDIUM</code> style
-	 * @see java.text.DateFormat
-	 * @see java.text.DateFormat#MEDIUM
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws ParseException
+	 * <span class="en">if given string could not be properly parsed according to given locale and style</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的区域设置和样式正确解析</span>
 	 */
-	public static Date parseDateTime(String source) throws ParseException {
-		return parseDateTime(source, Globals.DEFAULT_LOCALE);
+	public static Date parseDateTime(final String string) throws ParseException {
+		return parseDateTime(string, Globals.DEFAULT_LOCALE);
 	}
-
 	/**
-	 * Formats given the Date object according to specified locale and a given
-	 * pattern.
+	 * <h3 class="en">Formats given date according to string with given locale instance and date pattern string</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和格式代码将给定的日期实例对象转换为字符串</h3>
 	 *
-	 * @param date   Date object to convert
-	 * @param locale Locale to use for formatting
-	 * @param pattern Pattern to use
-	 * @return String representation of date and time according to given locale and <code>DateFormat.MEDIUM</code> style
+	 * @param date 		<span class="en">date instance</span>
+	 *              	<span class="zh-CN">日期实例对象</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param pattern 	<span class="en">Pattern string</span>
+	 *              	<span class="zh-CN">格式字符串</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String format(Date date, Locale locale, String pattern) {
-		LocalDateTime localDateTime;
-		if (date == null) {
-			localDateTime = LocalDateTime.now();
-		} else {
-			localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	public static String format(final Date date, final Locale locale, final String pattern) {
+		return Optional.ofNullable(date)
+				.map(Date::toInstant)
+				.map(instant -> instant.atZone(ZoneId.systemDefault()))
+				.map(ZonedDateTime::toLocalDateTime)
+				.map(localDateTime -> localDateTime.format(DateTimeFormatter.ofPattern(pattern, locale)))
+				.orElse(LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern, locale)));
+	}
+	/**
+	 * <h3 class="en">Parse given string according to date with given locale instance and date pattern string</h3>
+	 * <h3 class="zh-CN">使用给定的地区实例对象和格式代码将给定的字符串转换为日期实例对象</h3>
+	 *
+	 * @param string 	<span class="en">formatted date time string</span>
+	 *                  <span class="zh-CN">格式化的日期时间字符串</span>
+	 * @param locale    <span class="en">locale instance</span>
+	 *              	<span class="zh-CN">地区实例对象</span>
+	 * @param pattern 	<span class="en">Pattern string</span>
+	 *              	<span class="zh-CN">格式字符串</span>
+	 *
+	 * @return 	<span class="en">date instance</span>
+	 *          <span class="zh-CN">日期实例对象</span>
+	 *
+	 * @throws DateTimeParseException
+	 * <span class="en">if given string could not be properly parsed according to given pattern string</span>
+	 * <span class="zh-CN">如果给定的字符串无法根据给定的格式字符串正确解析</span>
+	 */
+	public static Date parse(final String string, final Locale locale, final String pattern)
+			throws DateTimeParseException {
+		if (StringUtils.isEmpty(string)) {
+			return null;
 		}
-		return localDateTime.format(DateTimeFormatter.ofPattern(pattern, locale));
+		return Optional.of(LocalDateTime.parse(string, DateTimeFormatter.ofPattern(pattern, locale)))
+				.map(localDateTime -> localDateTime.atZone(ZoneId.systemDefault()))
+				.map(ChronoZonedDateTime::toInstant)
+				.map(Date::from)
+				.orElse(null);
 	}
-
 	/**
-	 * Parses given string according to specified locale and a given pattern.
+	 * <h3 class="en">Check current year is leap year</h3>
+	 * <h3 class="zh-CN">检查当前年份是否为闰年</h3>
 	 *
-	 * @param source Source string to parse date and time from
-	 * @param locale Locale to use for parsing date and time
-	 * @param pattern Pattern to use
-	 * @return Date object corresponding to representation given in source
-	 * string
-	 */
-	public static Date parse(String source, Locale locale, String pattern) {
-		return Date.from(LocalDateTime.parse(source, DateTimeFormatter.ofPattern(pattern, locale))
-				.atZone(ZoneId.systemDefault()).toInstant());
-	}
-	
-	/**
-	 * Check current year is leap year
-	 * @return		check result
+	 * @return 	<span class="en">check result</span>
+	 * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isLeapYear() {
 		return LocalDate.now().isLeapYear();
 	}
-
 	/**
-	 * Check given year is leap year
-	 * @param year 	given year
+	 * <h3 class="en">Check given year is leap year</h3>
+	 * <h3 class="zh-CN">检查给定的年份是否为闰年</h3>
 	 *
-	 * @return		check result
+	 * @param year 		<span class="en">which year will check</span>
+	 * 					<span class="zh-CN">将要检查的年份</span>
+	 *
+	 * @return 	<span class="en">check result</span>
+	 * 			<span class="zh-CN">检查结果</span>
 	 */
-	public static boolean isLeapYear(int year) {
-		return ((year%400==0) || (year%100!=0) && (year%4==0));
+	public static boolean isLeapYear(final int year) {
+		return (year % 400 == 0) || ((year % 100 != 0) && (year % 4 == 0));
 	}
-
 	/**
-	 * Get current month first day
-	 * @param format        Date format
-	 * @return              Formatted date string
+	 * <h3 class="en">Retrieve first day of current month and format to string using given pattern</h3>
+	 * <h3 class="zh-CN">读取当前月份的第一天并使用给定的格式字符串将日期转换为格式化的字符串</h3>
+	 *
+	 * @param pattern 	<span class="en">Pattern string</span>
+	 *              	<span class="zh-CN">格式字符串</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String getCurrentMonthFirstDay(String format) {
+	public static String getCurrentMonthFirstDay(final String pattern) {
 		return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())
-				.format(DateTimeFormatter.ofPattern(format));
+				.format(DateTimeFormatter.ofPattern(pattern));
 	}
-
 	/**
-	 * Get current month last day
-	 * @param format        Date format
-	 * @return              Formatted date string
+	 * <h3 class="en">Retrieve last day of current month and format to string using given pattern</h3>
+	 * <h3 class="zh-CN">读取当前月份的最后一天并使用给定的格式字符串将日期转换为格式化的字符串</h3>
+	 *
+	 * @param pattern 	<span class="en">Pattern string</span>
+	 *              	<span class="zh-CN">格式字符串</span>
+	 *
+	 * @return 	<span class="en">formatted date time string</span>
+	 * 			<span class="zh-CN">格式化后的日期时间字符串</span>
 	 */
-	public static String getCurrentMonthLastDay(String format) {
+	public static String getCurrentMonthLastDay(final String pattern) {
 		return LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth())
-				.format(DateTimeFormatter.ofPattern(format));
+				.format(DateTimeFormatter.ofPattern(pattern));
 	}
-
 	/**
-	 * Calc expire days count
-	 * @param monthCount    month count
-	 * @return              days count
+	 * <h3 class="en">Calculate days count of given month count from current day</h3>
+	 * <h3 class="zh-CN">根据给定的月数计算当前日期往后月数有多少天</h3>
+	 *
+	 * @param monthCount 	<span class="en">Expire month count</span>
+	 *                      <span class="zh-CN">过期月份计数</span>
+	 *
+	 * @return 		<span class="en">Calculated day count</span>
+	 *              <span class="zh-CN">计算的天数结果</span>
 	 */
 	private static int expireDayCount(int monthCount) {
 		int dayCount = Globals.INITIALIZE_INT_VALUE;
@@ -782,10 +955,12 @@ public final class DateTimeUtils {
 		}
 		return dayCount;
 	}
-
 	/**
-	 * Get default time zone string
-	 * @return      time zone string
+	 * <h3 class="en">Get default time zone string</h3>
+	 * <h3 class="zh-CN">读取默认的时区并转换为字符串</h3>
+	 *
+	 * @return 	<span class="en">formatted time zone string</span>
+	 * 			<span class="zh-CN">格式化后的时区字符串</span>
 	 */
 	private static String getTimeZone() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -797,47 +972,62 @@ public final class DateTimeUtils {
 		stringBuilder.append(zoneCode < 10 ? "0" : "").append(zoneCode).append(":00");
 		return stringBuilder.toString();
 	}
-
 	/**
-	 * UTC Clock
+	 * <h2 class="en">UTC Clock</h2>
+	 * <h2 class="zh-CN">UTC时钟</h2>
+	 *
+	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+	 * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:46:19 $
 	 */
 	private static final class UTCClock {
-
+		/**
+		 * <span class="en">Current local time milliseconds</span>
+		 * <span class="zh-CN">当前本地时间的毫秒数</span>
+		 */
 		private final AtomicLong currentLocalTime = new AtomicLong(System.currentTimeMillis());
+		/**
+		 * <span class="en">Current UTC time milliseconds</span>
+		 * <span class="zh-CN">当前UTC时间的毫秒数</span>
+		 */
 		private final AtomicLong currentUTCTime =
 				new AtomicLong(System.currentTimeMillis() - TimeZone.getDefault().getRawOffset());
-
 		/**
-		 * Instantiates a new Utc clock.
+		 * <h3 class="en">Constructor method for UTC clock</h3>
+		 * <h3 class="zh-CN">UTC时钟的构造方法</h3>
 		 */
 		public UTCClock() {
 			ScheduledThreadPoolExecutor threadPoolExecutor =
 					new ScheduledThreadPoolExecutor(1, r -> {
 						Thread thread = new Thread(r);
-						thread.setDaemon(true);
+						thread.setDaemon(Boolean.TRUE);
 						return thread;
 					});
 			threadPoolExecutor.scheduleAtFixedRate(this::readTime, 0L, 1L, TimeUnit.MILLISECONDS);
 		}
-
 		/**
-		 * Current time millis long.
+		 * <h3 class="en">Read current local time milliseconds</h3>
+		 * <h3 class="zh-CN">读取当前本地时间的毫秒数</h3>
 		 *
-		 * @return the long
+		 * @return 	<span class="en">Current local time milliseconds</span>
+		 * 			<span class="zh-CN">当前本地时间的毫秒数</span>
 		 */
 		public long currentTimeMillis() {
 			return this.currentLocalTime.get();
 		}
-
 		/**
-		 * Current utc time millis long.
+		 * <h3 class="en">Read current UTC time milliseconds</h3>
+		 * <h3 class="zh-CN">读取当前UTC时间的毫秒数</h3>
 		 *
-		 * @return the long
+		 * @return 	<span class="en">Current UTC time milliseconds</span>
+		 * 			<span class="zh-CN">当前UTC时间的毫秒数</span>
 		 */
 		public long currentUTCTimeMillis() {
 			return this.currentUTCTime.get();
 		}
-
+		/**
+		 * <h3 class="en">Schedule method for read current local time and UTC time</h3>
+		 * <h3 class="zh-CN">调度方法用于读取当前本地时间和UTC时间</h3>
+		 */
 		private void readTime() {
 			long currentTime = System.currentTimeMillis();
 			this.currentLocalTime.set(currentTime);

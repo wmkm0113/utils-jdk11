@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -42,8 +41,7 @@ import jcifs.CIFSContext;
 import jcifs.CIFSException;
 import jcifs.Config;
 import jcifs.smb.NtlmPasswordAuthenticator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.exceptions.zip.ZipException;
 
 import jcifs.config.PropertyConfiguration;
 import jcifs.context.BaseContext;
@@ -51,158 +49,190 @@ import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
 
-import org.nervousync.beans.xml.files.SegmentationFile;
-import org.nervousync.beans.xml.files.SegmentationItem;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.beans.xml.files.SegmentationInfo;
+import org.nervousync.beans.xml.files.SegmentationBlock;
+import org.nervousync.commons.Globals;
 import org.nervousync.zip.ZipFile;
 
 /**
- * File operate utils
- * support zip/unzip Files Folders
+ * <h2 class="en">File operate utilities</h2>
+ * <h2 class="zh-CN">文件操作工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:08:14 AM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:08:14 $
  */
 public final class FileUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(FileUtils.class);
 
     /**
-     * URL prefixes for loading from the class path: "classpath:"
+     * <span class="en">URL prefixes for loading from the class path: "classpath:"</span>
+     * <span class="zh-CN">用于从类路径加载的 URL 前缀：“classpath:”</span>
      */
     public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
     /**
-     * URL prefixes for loading from the file system: "file:"
+     * <span class="en">URL prefixes for loading from the file system: "file:"</span>
+     * <span class="zh-CN">用于从文件系统加载的 URL 前缀：“file:”</span>
      */
     public static final String FILE_URL_PREFIX = "file:";
 
     /**
-     * URL protocol for a file in the file system: "file"
+     * <span class="en">URL protocol for a file in the file system: "file"</span>
+     * <span class="zh-CN">文件系统中文件的 URL 协议：“file”</span>
      */
     public static final String URL_PROTOCOL_FILE = "file";
 
     /**
-     * URL protocol for an entry from a jar file: "jar"
+     * <span class="en">URL protocol for an entry from a jar file: "jar"</span>
+     * <span class="zh-CN">jar 文件中条目的 URL 协议：“jar”</span>
      */
     public static final String URL_PROTOCOL_JAR = "jar";
 
     /**
-     * URL protocol for an entry from a zip file: "zip"
+     * <span class="en">URL protocol for an entry from a zip file: "zip"</span>
+     * <span class="zh-CN">zip 文件中条目的 URL 协议：“zip”</span>
      */
     public static final String URL_PROTOCOL_ZIP = "zip";
 
     /**
-     * URL protocol for an entry from a WebSphere jar file: "wsjar"
+     * <span class="en">URL protocol for an entry from a WebSphere jar file: "wsjar"</span>
+     * <span class="zh-CN">WebSphere jar 文件中条目的 URL 协议：“wsjar”</span>
      */
     public static final String URL_PROTOCOL_WSJAR = "wsjar";
 
     /**
-     * URL protocol for an entry from an OC4J jar file: "code-source"
+     * <span class="en">URL protocol for an entry from an OC4J jar file: "code-source"</span>
+     * <span class="zh-CN">OC4J jar 文件中条目的 URL 协议：“code-source”</span>
      */
     public static final String URL_PROTOCOL_CODE_SOURCE = "code-source";
 
     /**
-     * Separator between JAR URL and the path within the JAR
+     * <span class="en">Separator between JAR URL and the path within the JAR</span>
+     * <span class="zh-CN">JAR URL 和 JAR 内路径之间的分隔符</span>
      */
     public static final String JAR_URL_SEPARATOR = "!/";
 
     /**
-     * Carriage Return character
+     * <span class="en">Carriage Return character</span>
+     * <span class="zh-CN">回车符</span>
      */
     public static final char CR = '\r';
 
     /**
-     * Line Feed character
+     * <span class="en">Line Feed character</span>
+     * <span class="zh-CN">换行符</span>
      */
     public static final char LF = '\n';
 
     /**
-     * Carriage Return Line Feed character
+     * <span class="en">Carriage Return Line Feed character</span>
+     * <span class="zh-CN">回车换行符</span>
      */
     public static final String CRLF = "\r\n";
     /**
-     * The constant MIME_TYPE_TEXT.
+     * <span class="en">The constant value of mime type: MIME_TYPE_TEXT.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_TEXT。</span>
      */
     public static final String MIME_TYPE_TEXT = "text/plain";
     /**
-     * The constant MIME_TYPE_TEXT_XML.
+     * <span class="en">The constant value of mime type: MIME_TYPE_TEXT_XML.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_TEXT_XML.</span>
      */
     public static final String MIME_TYPE_TEXT_XML = "text/xml";
     /**
-     * The constant MIME_TYPE_TEXT_YAML.
+     * <span class="en">The constant value of mime type: MIME_TYPE_TEXT_YAML.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_TEXT_YAML.</span>
      */
     public static final String MIME_TYPE_TEXT_YAML = "text/yaml";
     /**
-     * The constant MIME_TYPE_BINARY.
+     * <span class="en">The constant value of mime type: MIME_TYPE_BINARY.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_BINARY.</span>
      */
     public static final String MIME_TYPE_BINARY = "application/octet-stream";
     /**
-     * The constant MIME_TYPE_XML.
+     * <span class="en">The constant value of mime type: MIME_TYPE_XML.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_XML.</span>
      */
     public static final String MIME_TYPE_XML = "application/xml";
     /**
-     * The constant MIME_TYPE_JSON.
+     * <span class="en">The constant value of mime type: MIME_TYPE_JSON.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_JSON.</span>
      */
     public static final String MIME_TYPE_JSON = "application/json";
 
     /**
-     * The constant MIME_TYPE_YAML.
+     * <span class="en">The constant value of mime type: MIME_TYPE_YAML.</span>
+     * <span class="zh-CN">mime类型常量值：MIME_TYPE_YAML.</span>
      */
     public static final String MIME_TYPE_YAML = "application/x-yaml";
-
+    /**
+     * <h3 class="en">Private constructor for BeanUtils</h3>
+     * <h3 class="zh-CN">JavaBean工具集的私有构造函数</h3>
+     */
     private FileUtils() {
     }
-
     static {
         //  Register SMB protocol handler for using java.net.URL class with "smb://"
         Config.registerSmbURLHandler();
     }
-
     /**
-     * Match the folder path in the entry path
+     * <h3 class="en">Match the folder path in the entry path</h3>
+     * <h3 class="zh-CN">匹配入口路径中的文件夹路径</h3>
      *
-     * @param entryPath  entry path
-     * @param folderPath folder path
-     * @return Match result
+     * @param entryPath     <span class="en">entry path</span>
+	 *              		<span class="zh-CN">入口路径</span>
+     * @param folderPath    <span class="en">folder path</span>
+	 *              		<span class="zh-CN">文件夹路径</span>
+     *
+	 * @return 	<span class="en">Match result</span>
+	 * 			<span class="zh-CN">匹配结果</span>
      */
     public static boolean matchFolder(final String entryPath, final String folderPath) {
         if (StringUtils.isEmpty(entryPath) || StringUtils.isEmpty(folderPath)) {
             return Boolean.FALSE;
         }
-
         String convertFolderPath = FileUtils.replacePageSeparator(folderPath) + "|";
         return FileUtils.replacePageSeparator(entryPath).startsWith(convertFolderPath);
     }
-
     /**
-     * Match two paths were same
+     * <h3 class="en">Match the original path is same as the destination path</h3>
+     * <h3 class="zh-CN">比较原始路径是否与目标路径一致</h3>
      *
-     * @param origPath   orig path
-     * @param destPath   dest path
-     * @param ignoreCase ignore the character case
-     * @return Match result
+     * @param origPath      <span class="en">original path</span>
+	 *              		<span class="zh-CN">原始路径</span>
+     * @param destPath      <span class="en">destination path</span>
+	 *              		<span class="zh-CN">目标路径</span>
+     * @param ignoreCase    <span class="en">ignore the character case</span>
+	 *              		<span class="zh-CN">忽略大小写</span>
+     *
+	 * @return 	<span class="en">Match result</span>
+	 * 			<span class="zh-CN">匹配结果</span>
      */
     public static boolean matchFilePath(final String origPath, final String destPath, final boolean ignoreCase) {
         if (origPath == null || destPath == null) {
             return Boolean.FALSE;
         }
-
         String origConvert = FileUtils.replacePageSeparator(origPath);
         String destConvert = FileUtils.replacePageSeparator(destPath);
-
         if (ignoreCase) {
             return origConvert.equalsIgnoreCase(destConvert);
         } else {
             return origConvert.equals(destConvert);
         }
     }
-
     /**
-     * Retrieve MIMEType string
+     * <h3 class="en">Retrieve MIMEType string</h3>
+     * <h3 class="zh-CN">检索 MIME 类型字符串</h3>
      *
-     * @param extensionName extension name
-     * @return MIMEType string
+     * @param extensionName <span class="en">File extension name</span>
+	 *              		<span class="zh-CN">文件扩展名</span>
+     *
+	 * @return 	<span class="en">MIMEType string</span>
+	 * 			<span class="zh-CN">MIME类型字符串</span>
      */
     public static String mimeType(final String extensionName) {
         if (StringUtils.notBlank(extensionName)) {
@@ -216,20 +246,20 @@ public final class FileUtils {
     public static boolean imageFile(final String fileLocation) {
         return mimeType(StringUtils.getFilenameExtension(fileLocation)).contains("image");
     }
-
     /**
-     * Return whether the given resource location is a URL:
-     * either a special "classpath" pseudo URL or a standard URL.
+     * <h3 class="en">Return whether the given resource location is a URL: either a special "classpath" pseudo URL or a standard URL.</h3>
+     * <h3 class="zh-CN">返回给定的资源位置是否是 URL：特殊的“类路径”伪 URL 或标准 URL。</h3>
      *
-     * @param resourceLocation the location String to check
-     * @return <code>Boolean.TRUE</code> when location qualifies as a URL, <code>Boolean.FALSE</code> for others
-     * @see java.net.URL
+     * @param resourceLocation  <span class="en">the location String to check</span>
+     *                          <span class="zh-CN">要检查的位置字符串</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> when location qualifies as a URL, <code>Boolean.FALSE</code> for others</span>
+     *          <span class="zh-CN">当位置符合 URL 条件时 <code>Boolean.TRUE</code>，对于其他条件则 <code>Boolean.FALSE</code></span>
      */
     public static boolean isUrl(final String resourceLocation) {
         if (!FileUtils.isExists(resourceLocation)) {
             return Boolean.FALSE;
         }
-
         try {
             new URL(resourceLocation);
             return Boolean.TRUE;
@@ -237,15 +267,24 @@ public final class FileUtils {
             return Boolean.FALSE;
         }
     }
-
     /**
-     * Resolve the given resource location to a <code>java.net.URL</code>.
-     * <p>Does not check whether the URL actually exists; simply returns
-     * the URL that the given location would correspond to.
+     * <h3 class="en">Resolve the given resource location to a <code>java.net.URL</code>.</h3>
+     * <span class="en">
+     *     Does not check whether the URL actually exists; simply returns
+     *     the URL that the given location would correspond to.
+     * </span>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>java.net.URL</code>。</h3>
+     * <span class="zh-CN">不检查URL是否真实存在；只是返回给定位置对应的 URL。</span>
      *
-     * @param resourceLocation the resource location to resolve: either a "classpath:" pseudo URL, a "file:" URL, or a plain file path
-     * @return a corresponding URL object
-     * @throws FileNotFoundException if the resource cannot be resolved to a URL
+     * @param resourceLocation  <span class="en">the resource location to resolve: either a "classpath:" pseudo URL, a "file:" URL, or a plain file path</span>
+     *                          <span class="zh-CN">要解析的资源位置：“classpath:”伪 URL、“file:”URL 或纯文件路</span>
+     *
+     * @return  <span class="en">a corresponding URL object</span>
+     *          <span class="zh-CN">对应的URL对象</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a URL</span>
+     * <span class="zh-CN">如果资源无法解析为 URL</span>
      */
     public static URL getURL(final String resourceLocation) throws FileNotFoundException {
         if (resourceLocation == null) {
@@ -274,23 +313,30 @@ public final class FileUtils {
             }
         }
     }
-
     /**
-     * Read file last modified time
+     * <h3 class="en">Read file last modified time</h3>
+     * <h3 class="zh-CN">读取文件最后修改时间</h3>
      *
-     * @param resourceLocation resource location
-     * @return last modified time with the long type if file exists
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     *
+     * @return  <span class="en">last modified time with the long type if file exists</span>
+     *          <span class="zh-CN">如果文件存在，则最后修改时间为 long 类型</span>
      */
     public static long lastModify(final String resourceLocation) {
         return FileUtils.lastModify(resourceLocation, new Properties());
     }
-
     /**
-     * Read file last modified time
+     * <h3 class="en">Read file last modified time</h3>
+     * <h3 class="zh-CN">读取文件最后修改时间</h3>
      *
-     * @param resourceLocation resource location
-     * @param properties       the properties
-     * @return last modified time with the long type if file exists
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en">last modified time with the long type if file exists</span>
+     *          <span class="zh-CN">如果文件存在，则最后修改时间为 long 类型</span>
      */
     public static long lastModify(final String resourceLocation, final Properties properties) {
         if (resourceLocation == null || resourceLocation.trim().length() == 0) {
@@ -303,7 +349,7 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Read file last modify error! ", e);
+                    LOGGER.debug("Utils", "Last_Modify_Read_File_Error", e);
                 }
             }
         } else {
@@ -314,19 +360,23 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Read file last modify error! ", e);
+                    LOGGER.debug("Utils", "Last_Modify_Read_File_Error", e);
                 }
             }
         }
         return Globals.DEFAULT_VALUE_LONG;
     }
-
     /**
-     * Read file last modified time
+     * <h3 class="en">Read file last modified time</h3>
+     * <h3 class="zh-CN">读取文件最后修改时间</h3>
      *
-     * @param resourceLocation resource location
-     * @param properties       the properties
-     * @return last modified time with <code>java.util.Date</code> type if file exists or null for others
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en">last modified time with the <code>java.util.Date</code> type if file exists or <code>null</code> for others</span>
+     *          <span class="zh-CN">如果文件存在，则最后修改时间为<code>java.util.Date</code>类型，其他情况返回<code>null</code></span>
      */
     public static Date modifyDate(final String resourceLocation, final Properties properties) {
         long lastModify = FileUtils.lastModify(resourceLocation, properties);
@@ -336,13 +386,19 @@ public final class FileUtils {
             return null;
         }
     }
-
     /**
-     * Load resource and convert to java.io.InputStream used <code>Globals.DEFAULT_ENCODING</code>
+     * <h3 class="en">Load resource and convert to <code>java.io.InputStream</code> used <code>Globals.DEFAULT_ENCODING</code></h3>
+     * <h3 class="zh-CN">使用 Globals.DEFAULT_ENCODING 加载资源并转换为 <code>java.io.InputStream</code></h3>
      *
-     * @param resourceLocation resource location
-     * @return <code>java.io.InputStream</code>
-     * @throws IOException when opening input stream error
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     *
+     * @return  <span class="en"><code>java.io.InputStream</code> instance</span>
+     *          <span class="zh-CN"><code>java.io.InputStream</code>实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">when opening input stream error</span>
+     * <span class="zh-CN">打开输入流时出错</span>
      */
     public static InputStream loadFile(final String resourceLocation) throws IOException {
         if (StringUtils.isEmpty(resourceLocation)) {
@@ -361,7 +417,7 @@ public final class FileUtils {
                     inputStream = FileUtils.getURL(resourceLocation).openStream();
                 } catch (Exception e) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Open file input stream error! ", e);
+                        LOGGER.debug("Utils", "Input_Stream_Open_Error", e);
                     }
                     throw new IOException(e);
                 }
@@ -369,16 +425,63 @@ public final class FileUtils {
         }
         return inputStream;
     }
-
+    /**
+     * <h3 class="en">Load resource from samba server and convert to <code>java.io.InputStream</code></h3>
+     * <h3 class="zh-CN">从samba服务器加载资源并转换为 <code>java.io.InputStream</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>java.io.InputStream</code> instance</span>
+     *          <span class="zh-CN"><code>java.io.InputStream</code>实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">when opening input stream error</span>
+     * <span class="zh-CN">打开输入流时出错</span>
+     */
     public static InputStream loadFile(final String smbLocation, final Properties properties) throws IOException {
         return loadFile(smbLocation, properties, null);
     }
-
+    /**
+     * <h3 class="en">Load resource from samba server and convert to <code>java.io.InputStream</code></h3>
+     * <h3 class="zh-CN">从samba服务器加载资源并转换为 <code>java.io.InputStream</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param authenticator     <span class="en">Authenticator instance</span>
+     *                          <span class="zh-CN">身份验证器实例</span>
+     *
+     * @return  <span class="en"><code>java.io.InputStream</code> instance</span>
+     *          <span class="zh-CN"><code>java.io.InputStream</code>实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">when opening input stream error</span>
+     * <span class="zh-CN">打开输入流时出错</span>
+     */
     public static InputStream loadFile(final String smbLocation, final NtlmPasswordAuthenticator authenticator)
             throws IOException {
         return loadFile(smbLocation, null, authenticator);
     }
-
+    /**
+     * <h3 class="en">Load resource from samba server and convert to <code>java.io.InputStream</code></h3>
+     * <h3 class="zh-CN">从samba服务器加载资源并转换为 <code>java.io.InputStream</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     * @param authenticator     <span class="en">Authenticator instance</span>
+     *                          <span class="zh-CN">身份验证器实例</span>
+     *
+     * @return  <span class="en"><code>java.io.InputStream</code> instance</span>
+     *          <span class="zh-CN"><code>java.io.InputStream</code>实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">when opening input stream error</span>
+     * <span class="zh-CN">打开输入流时出错</span>
+     */
     public static InputStream loadFile(final String smbLocation, final Properties properties,
                                        final NtlmPasswordAuthenticator authenticator)
             throws IOException {
@@ -387,16 +490,94 @@ public final class FileUtils {
         }
         return new SmbFileInputStream(smbLocation, generateContext(properties, authenticator));
     }
-
     /**
-     * Resolve the given resource location to a <code>java.io.File</code>,
-     * i.e., to a file in the file system.
-     * <p>Does not check whether the fil actually exists; simply returns
-     * the File that the given location would correspond to.
+     * <h3 class="en">Resolve the given resource location to a <code>jcifs.smb.SmbFile</code></h3>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>jcifs.smb.SmbFile</code></h3>
      *
-     * @param resourceLocation the resource location to resolve: either a "classpath:" pseudo URL, a "file:" URL, or a plain file path
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en">a corresponding <code>jcifs.smb.SmbFile</code> object or <code>null</code> if an error occurs</span>
+     *          <span class="zh-CN">对应的<code>jcifs.smb.SmbFile</code>对象，如果出现异常则返回<code>null</code></span>
+     */
+    public static SmbFile getFile(final String smbLocation, final Properties properties) {
+        if (StringUtils.isEmpty(smbLocation)) {
+            return null;
+        }
+        try {
+            return new SmbFile(smbLocation, generateContext(properties, null));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    /**
+     * <h3 class="en">Resolve the given resource location to a <code>jcifs.smb.SmbFile</code></h3>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>jcifs.smb.SmbFile</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param authenticator     <span class="en">Authenticator instance</span>
+     *                          <span class="zh-CN">身份验证器实例</span>
+     *
+     * @return  <span class="en">a corresponding <code>jcifs.smb.SmbFile</code> object or <code>null</code> if an error occurs</span>
+     *          <span class="zh-CN">对应的<code>jcifs.smb.SmbFile</code>对象，如果出现异常则返回<code>null</code></span>
+     */
+    public static SmbFile getFile(final String smbLocation, final NtlmPasswordAuthenticator authenticator) {
+        if (StringUtils.isEmpty(smbLocation)) {
+            return null;
+        }
+        try {
+            return new SmbFile(smbLocation, generateContext(null, authenticator));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    /**
+     * <h3 class="en">Resolve the given resource location to a <code>jcifs.smb.SmbFile</code></h3>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>jcifs.smb.SmbFile</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     * @param authenticator     <span class="en">Authenticator instance</span>
+     *                          <span class="zh-CN">身份验证器实例</span>
+     *
+     * @return  <span class="en">a corresponding <code>jcifs.smb.SmbFile</code> object or <code>null</code> if an error occurs</span>
+     *          <span class="zh-CN">对应的<code>jcifs.smb.SmbFile</code>对象，如果出现异常则返回<code>null</code></span>
+     */
+    public static SmbFile getFile(final String smbLocation, final Properties properties,
+                                  final NtlmPasswordAuthenticator authenticator) {
+        if (StringUtils.isEmpty(smbLocation)) {
+            return null;
+        }
+        try {
+            return new SmbFile(smbLocation, generateContext(properties, authenticator));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    /**
+     * <h3 class="en">Resolve the given resource location to a <code>java.io.File</code></h3>
+     * <span class="en">
+     *     i.e., to a file in the file system.
+     *     Does not check whether the fil actually exists;
+     *     simply returns the File that the given location would correspond to.
+     * </span>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>java.io.File</code></h3>
+     * <span class="zh-CN">即文件系统中的文件。不检查fil是否确实存在；只是返回给定位置对应的文件。</span>
+     *
+     * @param resourceLocation  <span class="en">the resource location to resolve: either a "classpath:" pseudo URL, a "file:" URL, or a plain file path</span>
+     *                          <span class="zh-CN">要解析的资源位置：“classpath:”伪 URL、“file:”URL 或纯文件路</span>
+     *
+     * @return  <span class="en">a corresponding <code>java.io.File</code> object</span>
+     *          <span class="zh-CN">对应的<code>java.io.File</code>对象</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static File getFile(final String resourceLocation) throws FileNotFoundException {
         if (resourceLocation == null) {
@@ -410,7 +591,6 @@ public final class FileUtils {
             } catch (FileNotFoundException ignored) {
             }
         }
-
         try {
             // try URL
             return getFile(new URL(resourceLocation));
@@ -419,101 +599,38 @@ public final class FileUtils {
             return new File(resourceLocation);
         }
     }
-
     /**
-     * Gets file.
+     * <h3 class="en">Resolve the given resource URL to a <code>java.io.File</code>, i.e., to a file in the file system.</h3>
+     * <h3 class="zh-CN">将给定的资源 URL 解析为 java.io.File，即文件系统中的文件。</h3>
      *
-     * @param filePath   the file path
-     * @param properties the properties
-     * @return the file
-     */
-    public static SmbFile getFile(final String filePath, final Properties properties) {
-        if (StringUtils.isEmpty(filePath)) {
-            return null;
-        }
-        try {
-            return new SmbFile(filePath, generateContext(properties, null));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets file.
+     * @param resourceUrl   <span class="en">the resource URL to resolve</span>
+     *                      <span class="zh-CN">要解析的资源 URL</span>
      *
-     * @param filePath      the file path
-     * @param authenticator the ntlm password authenticator
-     * @return the file
-     */
-    public static SmbFile getFile(final String filePath, final NtlmPasswordAuthenticator authenticator) {
-        if (StringUtils.isEmpty(filePath)) {
-            return null;
-        }
-        try {
-            return new SmbFile(filePath, generateContext(null, authenticator));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets file.
+     * @return  <span class="en">a corresponding <code>java.io.File</code> object</span>
+     *          <span class="zh-CN">对应的<code>java.io.File</code>对象</span>
      *
-     * @param filePath      the file path
-     * @param properties    the properties
-     * @param authenticator the ntlm password authenticator
-     * @return the file
-     */
-    public static SmbFile getFile(final String filePath, final Properties properties,
-                                  final NtlmPasswordAuthenticator authenticator) {
-        if (StringUtils.isEmpty(filePath)) {
-            return null;
-        }
-        try {
-            return new SmbFile(filePath, generateContext(properties, authenticator));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets file.
-     *
-     * @param filePath    the file path
-     * @param cifsContext the cifs context
-     * @return the file
-     */
-    private static SmbFile getFile(final String filePath, final CIFSContext cifsContext) {
-        if (StringUtils.isEmpty(filePath)) {
-            return null;
-        }
-        try {
-            return new SmbFile(filePath, cifsContext);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Resolve the given resource URL to a <code>java.io.File</code>,
-     * i.e., to a file in the file system.
-     *
-     * @param resourceUrl the resource URL to resolve
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL can't be resolved to a file in the file system
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
     public static File getFile(final URL resourceUrl) throws FileNotFoundException {
         return getFile(resourceUrl, "URL");
     }
-
     /**
-     * Resolve the given resource URL to a <code>java.io.File</code>,
-     * i.e., to a file in the file system.
+     * <h3 class="en">Resolve the given resource URL to a <code>java.io.File</code>, i.e., to a file in the file system.</h3>
+     * <h3 class="zh-CN">将给定的资源 URL 解析为 java.io.File，即文件系统中的文件。</h3>
      *
-     * @param resourceUrl the resource URL to resolve
-     * @param description a description of the original resource that the URL was created for (for example, a class path location)
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL can't be resolved to a file in the file system
+     * @param resourceUrl   <span class="en">the resource URL to resolve</span>
+     *                      <span class="zh-CN">要解析的资源 URL</span>
+     * @param description   <span class="en">a description of the original resource that the URL was created for (for example, a class path location)</span>
+     *                      <span class="zh-CN">为其创建 URL 的原始资源的描述（例如，类路径位置）</span>
+     *
+     * @return  <span class="en">a corresponding <code>java.io.File</code> object</span>
+     *          <span class="zh-CN">对应的<code>java.io.File</code>对象</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
     public static File getFile(final URL resourceUrl, final String description) throws FileNotFoundException {
         if (resourceUrl == null) {
@@ -524,7 +641,6 @@ public final class FileUtils {
                     description + " cannot be resolved to absolute file path " +
                             "because it does not reside in the file system: " + resourceUrl);
         }
-
         try {
             return new File(toURI(resourceUrl).getSchemeSpecificPart());
         } catch (URISyntaxException ex) {
@@ -532,27 +648,38 @@ public final class FileUtils {
             return new File(resourceUrl.getFile());
         }
     }
-
     /**
-     * Resolve the given resource URI to a <code>java.io.File</code>,
-     * i.e., to a file in the file system.
+     * <h3 class="en">Resolve the given resource URI to a <code>java.io.File</code>, i.e., to a file in the file system.</h3>
+     * <h3 class="zh-CN">将给定的资源 URI 解析为 java.io.File，即文件系统中的文件。</h3>
      *
-     * @param resourceUri the resource URI to resolve
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL can't be resolved to a file in the file system
+     * @param resourceUri   <span class="en">the resource URI to resolve</span>
+     *                      <span class="zh-CN">要解析的资源 URI</span>
+     *
+     * @return  <span class="en">a corresponding <code>java.io.File</code> object</span>
+     *          <span class="zh-CN">对应的<code>java.io.File</code>对象</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
     public static File getFile(final URI resourceUri) throws FileNotFoundException {
         return getFile(resourceUri, "URI");
     }
-
     /**
-     * Resolve the given resource URI to a <code>java.io.File</code>,
-     * i.e., to a file in the file system.
+     * <h3 class="en">Resolve the given resource URI to a <code>java.io.File</code>, i.e., to a file in the file system.</h3>
+     * <h3 class="zh-CN">将给定的资源 URI 解析为 java.io.File，即文件系统中的文件。</h3>
      *
-     * @param resourceUri the resource URI to resolve
-     * @param description a description of the original resource that the URI was created for (for example, a class path location)
-     * @return a corresponding File object
-     * @throws FileNotFoundException if the URL can't be resolved to a file in the file system
+     * @param resourceUri   <span class="en">the resource URI to resolve</span>
+     *                      <span class="zh-CN">要解析的资源 URI</span>
+     * @param description   <span class="en">a description of the original resource that the URL was created for (for example, a class path location)</span>
+     *                      <span class="zh-CN">为其创建 URL 的原始资源的描述（例如，类路径位置）</span>
+     *
+     * @return  <span class="en">a corresponding <code>java.io.File</code> object</span>
+     *          <span class="zh-CN">对应的<code>java.io.File</code>对象</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
     public static File getFile(final URI resourceUri, final String description) throws FileNotFoundException {
         if (resourceUri == null) {
@@ -564,12 +691,15 @@ public final class FileUtils {
         }
         return new File(resourceUri.getSchemeSpecificPart());
     }
-
     /**
-     * List jar entry list.
+     * <h3 class="en">Retrieve entry path list of given file path</h3>
+     * <h3 class="zh-CN">检索给定文件路径的条目路径列表</h3>
      *
-     * @param filePath the file path
-     * @return the list
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     *
+     * @return  <span class="en">entry path list</span>
+     *          <span class="zh-CN">条目路径列表</span>
      */
     public static List<String> listJarEntry(final String filePath) {
         List<String> entryList = new ArrayList<>();
@@ -583,173 +713,143 @@ public final class FileUtils {
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Load jar entry content error! ", e);
+                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
             }
         }
-
         return entryList;
     }
-
     /**
-     * Read jar entry info string.
+     * <h3 class="en">Read jar entry information content</h3>
+     * <h3 class="zh-CN">读取jar文件条目资源内容</h3>
      *
-     * @param filePath  the file path
-     * @param entryPath the entry path
-     * @return the string
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     * @param entryPath <span class="en">the entry path</span>
+     *                  <span class="zh-CN">条目资源路径</span>
+     *
+     * @return  <span class="en">entry information content</span>
+     *          <span class="zh-CN">条目资源路径文件内容</span>
      */
     public static String readJarEntryInfo(final String filePath, final String entryPath) {
-        String entryContent = null;
-        InputStream inputStream = null;
-        InputStreamReader inputStreamReader = null;
-
-        try {
-            JarFile jarFile = new JarFile(getFile(filePath));
-
+        try (JarFile jarFile = new JarFile(getFile(filePath))) {
             JarEntry packageEntry = jarFile.getJarEntry(entryPath);
-
             if (packageEntry != null) {
-                inputStream = jarFile.getInputStream(packageEntry);
-                inputStreamReader = new InputStreamReader(inputStream, Globals.DEFAULT_ENCODING);
-
-                char[] readBuffer = new char[Globals.DEFAULT_BUFFER_SIZE];
-                int readLength;
-                StringBuilder returnValue = new StringBuilder();
-
-                while (((readLength = inputStreamReader.read(readBuffer)) > -1)) {
-                    returnValue.append(readBuffer, 0, readLength);
-                }
-
-                entryContent = returnValue.toString();
+                return IOUtils.readContent(jarFile.getInputStream(packageEntry));
             }
-
-            jarFile.close();
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Load jar entry content error! ", e);
+                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
             }
-        } finally {
-            IOUtils.closeStream(inputStreamReader);
-            IOUtils.closeStream(inputStream);
         }
-
-        return entryContent;
+        return Globals.DEFAULT_VALUE_STRING;
     }
-
     /**
-     * Read entry content from jar file
+     * <h3 class="en">Read jar entry content as byte arrays</h3>
+     * <h3 class="zh-CN">读取jar文件条目资源内容的字节数组</h3>
      *
-     * @param filePath  jar file location
-     * @param entryPath read the entry path
-     * @return entry content or zero length array if not exists
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     * @param entryPath <span class="en">the entry path</span>
+     *                  <span class="zh-CN">条目资源路径</span>
+     *
+     * @return  <span class="en">entry content or zero length array if not exists</span>
+     *          <span class="zh-CN">条目内容或零长度数组（如果不存在）</span>
      */
     public static byte[] readJarEntryBytes(final String filePath, final String entryPath) {
         return FileUtils.readJarEntryBytes(filePath, entryPath, 0, Globals.DEFAULT_VALUE_INT);
     }
-
     /**
-     * Read entry content from jar file
+     * <h3 class="en">Read jar entry content as byte arrays</h3>
+     * <h3 class="zh-CN">读取jar文件条目资源内容的字节数组</h3>
      *
-     * @param filePath  jar file location
-     * @param entryPath read the entry path
-     * @param offset    read offset
-     * @param length    read length
-     * @return entry content or zero length array if not exists
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     * @param entryPath <span class="en">the entry path</span>
+     *                  <span class="zh-CN">条目资源路径</span>
+     * @param offset    <span class="en">read offset</span>
+     *                  <span class="zh-CN">读取起始偏移量</span>
+     * @param length    <span class="en">read length</span>
+     *                  <span class="zh-CN">读取数据长度</span>
+     *
+     * @return  <span class="en">entry content or zero length array if not exists</span>
+     *          <span class="zh-CN">条目内容或零长度数组（如果不存在）</span>
      */
     public static byte[] readJarEntryBytes(final String filePath, final String entryPath,
                                            final int offset, final int length) {
-        JarFile jarFile = null;
-        InputStream inputStream = null;
-        ByteArrayOutputStream byteArrayOutputStream = null;
-
-        try {
-            jarFile = new JarFile(getFile(filePath));
-
+        try (JarFile jarFile = new JarFile(getFile(filePath))) {
             JarEntry packageEntry = jarFile.getJarEntry(entryPath);
-
             if (packageEntry != null) {
-                inputStream = jarFile.getInputStream(packageEntry);
-                byteArrayOutputStream = new ByteArrayOutputStream();
-
-                byte[] buffer;
-                int readLength = 0;
-                int position = Math.max(offset, Globals.INITIALIZE_INT_VALUE);
-                int limitLength = Math.min(length, inputStream.available());
-                do {
-                    int itemLength = Math.min((limitLength - readLength), Globals.DEFAULT_BUFFER_SIZE);
-                    buffer = new byte[itemLength];
-                    int currentLength = inputStream.read(buffer, position + readLength, itemLength);
-                    if (currentLength == itemLength) {
-                        byteArrayOutputStream.write(buffer, 0, buffer.length);
-                    } else if (currentLength == Globals.DEFAULT_VALUE_INT) {
-                        break;
-                    }
-                    readLength += itemLength;
-                } while (readLength != limitLength);
-
-                return byteArrayOutputStream.toByteArray();
+                return IOUtils.readBytes(jarFile.getInputStream(packageEntry), offset, length);
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Load jar entry content error! ", e);
+                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
             }
-        } finally {
-            IOUtils.closeStream(inputStream);
-            IOUtils.closeStream(byteArrayOutputStream);
-            IOUtils.closeStream(jarFile);
         }
         return new byte[0];
     }
-
     /**
-     * Read resource content
+     * <h3 class="en">Read file instance content as byte arrays</h3>
+     * <h3 class="zh-CN">读取文件实例对象内容的字节数组</h3>
      *
-     * @param file object
-     * @return File data by byte arrays
-     * @throws IOException if an I/O error occurs
+     * @param file  <span class="en">the file instance</span>
+     *              <span class="zh-CN">文件实例对象</span>
+     *
+     * @return  <span class="en">file content or zero length array if not exists</span>
+     *          <span class="zh-CN">文件内容或零长度数组（如果不存在）</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
-    public static byte[] readFileBytes(final File file) throws IOException {
+    public static byte[] readFileBytes(final File file) throws FileNotFoundException {
         if (file == null || !file.exists()) {
-            throw new IOException("File not found");
+            throw new FileNotFoundException("File not found");
         }
-
-        byte[] content;
-        try {
-            content = IOUtils.readBytes(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            content = new byte[0];
-        }
-
-        return content;
+        return IOUtils.readBytes(new FileInputStream(file));
     }
-
     /**
-     * Read resource content
+     * <h3 class="en">Read content of given file path as byte arrays</h3>
+     * <h3 class="zh-CN">读取给定文件地址的文件内容为字节数组</h3>
      *
-     * @param resourceLocation Resource location
-     * @return File data by byte arrays
-     * @throws IOException if an I/O error occurs
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     *
+     * @return  <span class="en">file content or zero length array if not exists</span>
+     *          <span class="zh-CN">文件内容或零长度数组（如果不存在）</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the URL cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
-    public static byte[] readFileBytes(final String resourceLocation) throws IOException {
-        try (InputStream inputStream = FileUtils.getURL(resourceLocation).openStream()) {
-            return IOUtils.readBytes(inputStream);
-        } catch (FileNotFoundException e) {
-            throw new IOException(e);
+    public static byte[] readFileBytes(final String resourceLocation) throws FileNotFoundException {
+        if (StringUtils.containsIgnoreCase(resourceLocation, JAR_URL_SEPARATOR)) {
+            int index = resourceLocation.indexOf(JAR_URL_SEPARATOR);
+            String filePath = resourceLocation.substring(0, index);
+            String entryPath = resourceLocation.substring(index + JAR_URL_SEPARATOR.length());
+            return FileUtils.readJarEntryBytes(filePath, entryPath);
         }
+        return readFileBytes(FileUtils.getFile(resourceLocation));
     }
-
     /**
-     * Read resource content info in defined length
+     * <h3 class="en">Read part content of given file path as byte arrays</h3>
+     * <h3 class="zh-CN">读取给定文件地址的部分文件内容为字节数组</h3>
      *
-     * @param resourceLocation resource location
-     * @param position         start point
-     * @param length           read length
-     * @return File data by byte arrays
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     * @param offset            <span class="en">read offset</span>
+     *                          <span class="zh-CN">读取起始偏移量</span>
+     * @param length            <span class="en">read length</span>
+     *                          <span class="zh-CN">读取数据长度</span>
+     *
+     * @return  <span class="en">file content or zero length array if not exists</span>
+     *          <span class="zh-CN">文件内容或零长度数组（如果不存在）</span>
      */
-    public static byte[] readFileBytes(final String resourceLocation, final long position, final int length) {
+    public static byte[] readFileBytes(final String resourceLocation, final long offset, final int length) {
         byte[] readByte = new byte[length];
 
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(resourceLocation, "r")) {
-            randomAccessFile.seek(position);
+            randomAccessFile.seek(offset);
             randomAccessFile.read(readByte);
         } catch (Exception e) {
             readByte = new byte[0];
@@ -757,23 +857,30 @@ public final class FileUtils {
 
         return readByte;
     }
-
     /**
-     * Retrieve resource location size
+     * <h3 class="en">Retrieve content size of given file path</h3>
+     * <h3 class="zh-CN">读取给定文件地址的文件大小</h3>
      *
-     * @param resourceLocation resource location
-     * @return File size
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     *
+     * @return  <span class="en">File size</span>
+     *          <span class="zh-CN">文件大小</span>
      */
     public static long fileSize(final String resourceLocation) {
         return FileUtils.fileSize(resourceLocation, null);
     }
-
     /**
-     * Retrieve resource location size
+     * <h3 class="en">Retrieve content size of given file path</h3>
+     * <h3 class="zh-CN">读取给定文件地址的文件大小</h3>
      *
-     * @param resourceLocation resource location
-     * @param cifsContext      the cifs context
-     * @return File size
+     * @param resourceLocation  <span class="en">the location String</span>
+     *                          <span class="zh-CN">位置字符串</span>
+     * @param cifsContext       <span class="en">the cifs context</span>
+     *                          <span class="zh-CN">CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en">File size</span>
+     *          <span class="zh-CN">文件大小</span>
      */
     public static long fileSize(final String resourceLocation, final CIFSContext cifsContext) {
         if (resourceLocation == null) {
@@ -790,18 +897,20 @@ public final class FileUtils {
             }
         }
     }
-
     /**
-     * File size long.
+     * <h3 class="en">Retrieve content size of given file instance</h3>
+     * <h3 class="zh-CN">读取给定文件实例对象的文件大小</h3>
      *
-     * @param fileObject the file object
-     * @return the long
+     * @param fileObject    <span class="en">the file object</span>
+     *                      <span class="zh-CN">文件实例对象</span>
+     *
+     * @return  <span class="en">File size</span>
+     *          <span class="zh-CN">文件大小</span>
      */
     public static long fileSize(final Object fileObject) {
         if (fileObject == null) {
             return Globals.DEFAULT_VALUE_LONG;
         }
-
         long fileSize = 0L;
         if (fileObject instanceof SmbFile) {
             try {
@@ -819,7 +928,7 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Read file size error! ", e);
+                    LOGGER.debug("Utils", "Size_Read_File_Error", e);
                 }
                 return Globals.DEFAULT_VALUE_LONG;
             }
@@ -839,16 +948,24 @@ public final class FileUtils {
         }
         return fileSize;
     }
-
     /**
-     * Determine whether the given URL points to a resource in a jar file,
-     * that is, has protocol "jar", "zip", "wsjar" or "code-source".
-     * <p>"zip" and "wsjar" are used by BEA WebLogic Server and IBM WebSphere, respectively,
-     * but can be treated like jar files.
-     * The same applies to "code-source" URLs on Oracle OC4J, except that the path contains a jar separator.
+     * <h3 class="en">Determine whether the given URL points to a resource in a jar file, that is, has protocol "jar", "zip", "wsjar" or "code-source".</h3>
+     * <span class="en">
+     *     "zip" and "wsjar" are used by BEA WebLogic Server and IBM WebSphere, respectively,
+     *     but can be treated like jar files.
+     *     The same applies to "code-source" URLs on Oracle OC4J, except that the path contains a jar separator.
+     * </span>
+     * <h3 class="zh-CN">确定给定的 URL 是否指向 jar 文件中的资源，即具有协议“jar”、“zip”、“wsjar”或“code-source”。</h3>
+     * <span class="zh-CN">
+     *     “zip”和“wsjar”分别由 BEA WebLogic Server 和 IBM WebSphere 使用，
+     *     但可以像 jar 文件一样对待。这同样适用于 Oracle OC4J 上的“代码源”URL，只不过路径包含 jar 分隔符。
+     * </span>
      *
-     * @param url the URL to check
-     * @return whether the URL has been identified as a JAR URL
+     * @param url   <span class="en">the URL to check</span>
+     *              <span class="zh-CN">要检查的资源 URL</span>
+     *
+     * @return  <span class="en">whether the URL has been identified as a JAR URL</span>
+     *          <span class="zh-CN">URL是否已被识别为JAR URL</span>
      */
     public static boolean isJarURL(final URL url) {
         String protocol = url.getProtocol();
@@ -857,14 +974,19 @@ public final class FileUtils {
                 URL_PROTOCOL_WSJAR.equals(protocol) ||
                 (URL_PROTOCOL_CODE_SOURCE.equals(protocol) && url.getPath().contains(JAR_URL_SEPARATOR)));
     }
-
     /**
-     * Extract the URL for the actual jar file from the given URL
-     * (which may point to a resource in a jar file or to a jar file itself).
+     * <h3 class="en">Extract the URL for the actual jar file from the given URL (which may point to a resource in a jar file or to a jar file itself).</h3>
+     * <h3 class="zh-CN">从给定的 URL（可能指向 jar 文件中的资源或 jar 文件本身）中提取实际 jar 文件的 URL。</h3>
      *
-     * @param jarUrl the original URL
-     * @return the URL for the actual jar file
-     * @throws MalformedURLException if no valid jar file URL could be extracted
+     * @param jarUrl    <span class="en">the original URL</span>
+     *                  <span class="zh-CN">原始 URL</span>
+     *
+     * @return  <span class="en">whether the URL has been identified as a JAR URL</span>
+     *          <span class="zh-CN">实际 jar 文件的 URL</span>
+     *
+     * @throws MalformedURLException
+     * <span class="en">if no valid jar file URL could be extracted</span>
+     * <span class="zh-CN">如果无法提取有效的 jar 文件 URL</span>
      */
     public static URL extractJarFileURL(final URL jarUrl) throws MalformedURLException {
         String urlFile = jarUrl.getFile();
@@ -885,57 +1007,58 @@ public final class FileUtils {
             return jarUrl;
         }
     }
-
     /**
-     * Create a URI instance for the given URL,
-     * replacing spaces with "%20" quotes first.
-     * <p>Furthermore, this method works on JDK 1.4 as well,
-     * in contrast to the <code>URL.toURI()</code> method.
-     *
-     * @param url the URL to convert into a URI instance
-     * @return the URI instance
-     * @throws URISyntaxException if the URL was not a valid URI
+     * <h3 class="en">Create a URI instance for the given URL</h3>
+     * <span class="en">
+     *     replacing spaces with "%20" quotes first.
+     *     Furthermore, this method works on JDK 1.4 as well,
+     *     in contrast to the <code>URL.toURI()</code> method.
+     * </span>
+     * <h3 class="zh-CN">为给定 URL 创建 URI 实例</h3>
+     * <span class="zh-CN">首先用“%20”引号替换空格。此外，与 <code>URL.toURI()</code> 方法相比，此方法也适用于 JDK 1.4。</span>
      * @see java.net.URL#toURI() java.net.URL#toURI()
+     *
+     * @param url   <span class="en">the URL to convert into a URI instance</span>
+     *              <span class="zh-CN">要转换为 URI 实例的 URL</span>
+     *
+     * @return  <span class="en">the URI instance</span>
+     *          <span class="zh-CN">URI 实例</span>
+     *
+     * @throws URISyntaxException
+     * <span class="en">if the URL was not a valid URI</span>
+     * <span class="zh-CN">如果 URL 不是有效的 URI</span>
      */
     public static URI toURI(final URL url) throws URISyntaxException {
         return FileUtils.toURI(url.toString());
     }
-
     /**
-     * Create a URI instance for the given location String,
-     * replacing spaces with "%20" quotes first.
+     * <h3 class="en">Create a URI instance for the given location String</h3>
+     * <span class="en">replacing spaces with "%20" quotes first.</span>
+     * <h3 class="zh-CN">为给定位置字符串创建 URI 实例</h3>
+     * <span class="zh-CN">首先用“%20”引号替换空格。</span>
      *
-     * @param location the location String to convert into a URI instance
-     * @return the URI instance
-     * @throws URISyntaxException if the location wasn't a valid URI
+     * @param location  <span class="en">the location String to convert into a URI instance</span>
+     *                  <span class="zh-CN">要转换为 URI 实例的位置字符串</span>
+     *
+     * @return  <span class="en">the URI instance</span>
+     *          <span class="zh-CN">URI 实例</span>
+     *
+     * @throws URISyntaxException
+     * <span class="en">if the location wasn't a valid URI</span>
+     * <span class="zh-CN">如果该位置不是有效的 URI</span>
      */
     public static URI toURI(final String location) throws URISyntaxException {
         return new URI(StringUtils.replace(location, " ", "%20"));
     }
-
-    private static final class JarPath {
-        private final String filePath;
-        private final String entryPath;
-
-        JarPath(final String filePath, final String entryPath) {
-            this.filePath = filePath;
-            this.entryPath = entryPath;
-        }
-
-        public String getFilePath() {
-            return filePath;
-        }
-
-        public String getEntryPath() {
-            return entryPath;
-        }
-    }
-
     /**
-     * List jar entry
+     * <h3 class="en">Retrieve entry path list of given URI instance</h3>
+     * <h3 class="zh-CN">检索给定URI实例对象的条目路径列表</h3>
      *
-     * @param uri Jar file URI
-     * @return List of entry names
+     * @param uri   <span class="en">Jar file URI instance</span>
+     *              <span class="zh-CN">Jar 文件 URI 实例</span>
+     *
+     * @return  <span class="en">entry path list</span>
+     *          <span class="zh-CN">条目路径列表</span>
      */
     public static List<String> listJarEntry(final URI uri) {
         return Optional.ofNullable(uri)
@@ -973,7 +1096,7 @@ public final class FileUtils {
                         }
                     } catch (Exception e) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("List jar entry error! ", e);
+                            LOGGER.debug("Utils", "Entry_List_Error", e);
                         }
                     } finally {
                         IOUtils.closeStream(jarFile);
@@ -982,39 +1105,60 @@ public final class FileUtils {
                 })
                 .orElse(Collections.emptyList());
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder path</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表</h3>
      *
-     * @param filePath parent file path
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath  <span class="en">the folder path</span>
+     *                  <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath));
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder path</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表</h3>
      *
-     * @param filePath        parent file path
-     * @param readHiddenFiles List include hidden files
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath          <span class="en">the folder path</span>
+     *                          <span class="zh-CN">文件夹路径</span>
+     * @param readHiddenFiles   <span class="en">List include hidden files</span>
+     *                          <span class="zh-CN">包含隐藏文件</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final boolean readHiddenFiles)
             throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), readHiddenFiles);
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder path</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表</h3>
      *
-     * @param filePath           parent file path
-     * @param readHiddenFiles    List include hidden files
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final boolean readHiddenFiles,
                                          final boolean iterateChildFolder) throws FileNotFoundException {
@@ -1022,117 +1166,173 @@ public final class FileUtils {
     }
 
     /**
-     * List child files
+     * <h3 class="en">List files of given folder path</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表</h3>
      *
-     * @param filePath           parent file path
-     * @param readHiddenFiles    List include hidden files
-     * @param includeRootFolder  List include directories
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final boolean readHiddenFiles,
                                          final boolean includeRootFolder, final boolean iterateChildFolder)
             throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), readHiddenFiles, includeRootFolder, iterateChildFolder);
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表</h3>
      *
-     * @param file parent file object
-     * @return list of the child file path
+     * @param file  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file) {
         return FileUtils.listFiles(file, null);
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表</h3>
      *
-     * @param file            parent file object
-     * @param readHiddenFiles List include hidden files
-     * @return list of the child file path
+     * @param file              <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                          <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param readHiddenFiles   <span class="en">List include hidden files</span>
+     *                          <span class="zh-CN">包含隐藏文件</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final boolean readHiddenFiles) {
         return FileUtils.listFiles(file, null, readHiddenFiles);
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表</h3>
      *
-     * @param file               parent file object
-     * @param readHiddenFiles    List include hidden files
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final boolean readHiddenFiles,
                                          final boolean iterateChildFolder) {
         return FileUtils.listFiles(file, null, readHiddenFiles, iterateChildFolder);
     }
-
     /**
-     * List child files
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表</h3>
      *
-     * @param file               parent file object
-     * @param readHiddenFiles    List include hidden files
-     * @param includeRootFolder  List include directories
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final boolean readHiddenFiles,
                                          final boolean includeRootFolder, final boolean iterateChildFolder) {
         return FileUtils.listFiles(file, null, readHiddenFiles, includeRootFolder, iterateChildFolder);
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder path by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath parent file path
-     * @param filter   file name filter
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final FilenameFilter filter)
             throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), filter);
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder path by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath        parent file path
-     * @param filter          file name filter
-     * @param readHiddenFiles List include hidden files
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final FilenameFilter filter,
                                          final boolean readHiddenFiles) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), filter, readHiddenFiles);
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder path by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath           parent file path
-     * @param filter             file name filter
-     * @param readHiddenFiles    List include hidden files
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFiles(final String filePath, final FilenameFilter filter, final boolean readHiddenFiles,
                                          final boolean iterateChildFolder) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), filter, readHiddenFiles, iterateChildFolder);
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param file   parent file object
-     * @param filter file name filter
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final FilenameFilter filter) {
         List<String> returnList = new ArrayList<>();
@@ -1140,14 +1340,19 @@ public final class FileUtils {
                 Boolean.FALSE, Boolean.TRUE);
         return returnList;
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param file            parent file object
-     * @param filter          file name filter
-     * @param readHiddenFiles List include hidden files
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final FilenameFilter filter, final boolean readHiddenFiles) {
         List<String> returnList = new ArrayList<>();
@@ -1155,15 +1360,21 @@ public final class FileUtils {
                 Boolean.FALSE, Boolean.TRUE);
         return returnList;
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param file              parent file object
-     * @param filter            file name filter
-     * @param readHiddenFiles   List include hidden files
-     * @param includeRootFolder List include directories
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final FilenameFilter filter,
                                          final boolean readHiddenFiles, final boolean includeRootFolder) {
@@ -1171,16 +1382,23 @@ public final class FileUtils {
         FileUtils.listFiles(file, filter, returnList, readHiddenFiles, includeRootFolder, Boolean.TRUE);
         return returnList;
     }
-
     /**
-     * List child files by file name filter
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param file               parent file object
-     * @param filter             file name filter
-     * @param readHiddenFiles    List include hidden files
-     * @param includeRootFolder  List include directories
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the child file path
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listFiles(final File file, final FilenameFilter filter, final boolean readHiddenFiles,
                                          final boolean includeRootFolder, final boolean iterateChildFolder) {
@@ -1188,102 +1406,149 @@ public final class FileUtils {
         FileUtils.listFiles(file, filter, returnList, readHiddenFiles, includeRootFolder, iterateChildFolder);
         return returnList;
     }
-
     /**
-     * List child files and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中</h3>
      *
-     * @param filePath parent file path
-     * @param fileList current child file list
-     * @throws IOException the io exception
+     * @param filePath  <span class="en">the folder path</span>
+     *                  <span class="zh-CN">文件夹路径</span>
+     * @param fileList  <span class="en">current child file list</span>
+     *                  <span class="zh-CN">名称列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
-    public static void listFiles(final String filePath, final List<String> fileList) throws IOException {
-        FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, Boolean.TRUE,
-                Boolean.FALSE, Boolean.TRUE);
+    public static void listFiles(final String filePath, final List<String> fileList) throws FileNotFoundException {
+        FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE);
     }
-
     /**
-     * List child files and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中</h3>
      *
-     * @param filePath        parent file path
-     * @param fileList        current child file list
-     * @param readHiddenFiles List include hidden files
-     * @throws IOException the io exception
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileList              <span class="en">current child file list</span>
+     *                              <span class="zh-CN">名称列表</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final List<String> fileList, final boolean readHiddenFiles)
-            throws IOException {
+            throws FileNotFoundException {
         FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
                 Boolean.FALSE, Boolean.TRUE);
     }
-
     /**
-     * List child files and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中</h3>
      *
-     * @param filePath           parent file path
-     * @param fileList           current child file list
-     * @param readHiddenFiles    List include hidden files
-     * @param iterateChildFolder to iterate child folder
-     * @throws IOException the io exception
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileList              <span class="en">current child file list</span>
+     *                              <span class="zh-CN">名称列表</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final List<String> fileList, final boolean readHiddenFiles,
-                                 final boolean iterateChildFolder) throws IOException {
+                                 final boolean iterateChildFolder) throws FileNotFoundException {
         FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
                 Boolean.FALSE, iterateChildFolder);
     }
-
     /**
-     * List child files and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中</h3>
      *
-     * @param filePath           parent file path
-     * @param fileList           current child file list
-     * @param readHiddenFiles    List include hidden files
-     * @param includeRootFolder  List include directories
-     * @param iterateChildFolder to iterate child folder
-     * @throws IOException the io exception
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileList              <span class="en">current child file list</span>
+     *                              <span class="zh-CN">名称列表</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final List<String> fileList, final boolean readHiddenFiles,
-                                 final boolean includeRootFolder, final boolean iterateChildFolder) throws IOException {
+                                 final boolean includeRootFolder, final boolean iterateChildFolder)
+            throws FileNotFoundException {
         FileUtils.listFiles(FileUtils.getFile(filePath), null, fileList, readHiddenFiles,
                 includeRootFolder, iterateChildFolder);
     }
-
     /**
-     * List child files by file name filter and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath parent file path
-     * @param filter   file name filter
-     * @param fileList current child file list
-     * @throws IOException the io exception
+     * @param filePath  <span class="en">the folder path</span>
+     *                  <span class="zh-CN">文件夹路径</span>
+     * @param filter    <span class="en">file name filter instance</span>
+     *                  <span class="zh-CN">文件名过滤器实例</span>
+     * @param fileList  <span class="en">current child file list</span>
+     *                  <span class="zh-CN">名称列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final FilenameFilter filter, final List<String> fileList)
             throws IOException {
         FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, Boolean.TRUE,
                 Boolean.FALSE, Boolean.TRUE);
     }
-
     /**
-     * List child files by file name filter and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath          parent file path
-     * @param filter            file name filter
-     * @param fileList          current child file list
-     * @param includeRootFolder include root folder
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param fileList              <span class="en">current child file list</span>
+     *                              <span class="zh-CN">名称列表</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final FilenameFilter filter, final List<String> fileList,
                                  final boolean includeRootFolder) throws FileNotFoundException {
         FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, Boolean.TRUE,
                 includeRootFolder, Boolean.TRUE);
     }
-
     /**
-     * List child files by file name filter and append the file path to the current list
+     * <h3 class="en">List files of given folder path and add to given name list by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表并添加到给定的名称列表中，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath           parent file path
-     * @param filter             file name filter
-     * @param fileList           current child file list
-     * @param includeRootFolder  include root folder
-     * @param iterateChildFolder to iterate child folder
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath  <span class="en">the folder path</span>
+     *                  <span class="zh-CN">文件夹路径</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param fileList  <span class="en">current child file list</span>
+     *                  <span class="zh-CN">名称列表</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static void listFiles(final String filePath, final FilenameFilter filter, final List<String> fileList,
                                  final boolean includeRootFolder, final boolean iterateChildFolder)
@@ -1291,16 +1556,22 @@ public final class FileUtils {
         FileUtils.listFiles(FileUtils.getFile(filePath), filter, fileList, Boolean.TRUE,
                 includeRootFolder, iterateChildFolder);
     }
-
     /**
-     * List child files by file name filter and append the file path to the current list
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance and add to given name list by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表并添加到给定的名称列表中，使用给定的文件名过滤器实例</h3>
      *
-     * @param file               parent file object
-     * @param filter             file name filter
-     * @param fileList           current child file list
-     * @param readHiddenFiles    include hidden file
-     * @param includeRootFolder  include root folder
-     * @param iterateChildFolder to iterate child folder
+     * @param file                  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param filter                <span class="en">file name filter instance</span>
+     *                              <span class="zh-CN">文件名过滤器实例</span>
+     * @param fileList  <span class="en">current child file list</span>
+     *                  <span class="zh-CN">名称列表</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
      */
     public static void listFiles(final File file, final FilenameFilter filter, List<String> fileList,
                                  final boolean readHiddenFiles, final boolean includeRootFolder,
@@ -1336,223 +1607,314 @@ public final class FileUtils {
             }
         }
     }
-
     /**
-     * List child directory
+     * <h3 class="en">List child folder of given folder path and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的子文件夹列表并添加到给定的名称列表中</h3>
      *
-     * @param filePath parent path
-     * @return list of the child directory path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath  <span class="en">the folder path</span>
+     *                  <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listDirectory(final String filePath) throws FileNotFoundException {
         List<String> directoryList = new ArrayList<>();
         FileUtils.listDirectory(FileUtils.getFile(filePath), directoryList);
         return directoryList;
     }
-
     /**
-     * List child directory
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance by given file name filter instance</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param directory parent directory object
-     * @return list of the child directory path
+     * @param directory     <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                      <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
      */
     public static List<String> listDirectory(final File directory) {
         List<String> directoryList = new ArrayList<>();
         FileUtils.listDirectory(directory, directoryList);
         return directoryList;
     }
-
     /**
-     * List child directory and append to the current directory list
+     * <h3 class="en">List child folder of given folder <code>java.io.File</code> instance and add to given name list</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象内的子文件夹列表并添加到给定的名称列表中</h3>
      *
-     * @param file          parent directory object
-     * @param directoryList current directory list
+     * @param file              <span class="en">the folder <code>java.io.File</code> instance</span>
+     *                          <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     * @param directoryList     <span class="en">current child directory list</span>
+     *                          <span class="zh-CN">子文件夹列表</span>
      */
     public static void listDirectory(final File file, final List<String> directoryList) {
         if (file == null || !file.isDirectory() || directoryList == null) {
             return;
         }
-
-        FileFilter fileFilter = new DirectoryFileFilter();
-
-        File[] directories = file.listFiles(fileFilter);
-
-        if (directories != null) {
-            for (File directory : directories) {
-                directoryList.add(directory.getAbsolutePath());
-                FileUtils.listDirectory(directory, directoryList);
-            }
-        }
+        Optional.ofNullable(file.listFiles(new DirectoryFileFilter()))
+                .map(Arrays::asList)
+                .ifPresent(directories -> directories.forEach(directory -> {
+                    directoryList.add(directory.getAbsolutePath());
+                    FileUtils.listDirectory(directory, directoryList);
+                }));
     }
-
     /**
-     * List child files and filter by extension name
+     * <h3 class="en">List files of given folder path and filter file name by given file extension name</h3>
+     * <h3 class="zh-CN">读取给定文件夹中指定扩展名的文件列表</h3>
      *
-     * @param filePath    parent file path
-     * @param fileExtName extension name
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath      <span class="en">the folder path</span>
+     *                      <span class="zh-CN">文件夹路径</span>
+     * @param fileExtName   <span class="en">file extension name</span>
+     *                      <span class="zh-CN">文件扩展名</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listExtNameFiles(final String filePath, final String fileExtName)
             throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName));
     }
-
     /**
-     * List child files and filter by extension name
+     * <h3 class="en">List files of given folder path and filter file name by given file extension name</h3>
+     * <h3 class="zh-CN">读取给定文件夹中指定扩展名的文件列表</h3>
      *
-     * @param filePath           parent file path
-     * @param fileExtName        extension name
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileExtName           <span class="en">file extension name</span>
+     *                              <span class="zh-CN">文件扩展名</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listExtNameFiles(final String filePath, final String fileExtName,
                                                 final boolean iterateChildFolder) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName),
                 Boolean.FALSE, Boolean.FALSE, iterateChildFolder);
     }
-
     /**
-     * List child files and filter by extension name
+     * <h3 class="en">List files of given folder path and filter file name by given file extension name</h3>
+     * <h3 class="zh-CN">读取给定文件夹中指定扩展名的文件列表</h3>
      *
-     * @param filePath           parent file path
-     * @param fileExtName        extension name
-     * @param readHiddenFile     the read hidden file
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileExtName           <span class="en">file extension name</span>
+     *                              <span class="zh-CN">文件扩展名</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listExtNameFiles(final String filePath, final String fileExtName,
-                                                final boolean readHiddenFile, final boolean iterateChildFolder)
+                                                final boolean readHiddenFiles, final boolean iterateChildFolder)
             throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(fileExtName),
-                readHiddenFile, Boolean.FALSE, iterateChildFolder);
+                readHiddenFiles, Boolean.FALSE, iterateChildFolder);
     }
-
     /**
-     * List child files by filter extension name is .class
+     * <h3 class="en">List files of given folder path and filter file extension name is "class"</h3>
+     * <h3 class="zh-CN">读取给定文件夹中的".class"文件列表</h3>
      *
-     * @param filePath parent file path
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath      <span class="en">the folder path</span>
+     *                      <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listClassesFiles(final String filePath) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter("class"));
     }
-
     /**
-     * List child files by filter extension name is .class
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance and filter file extension name is "class"</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象中的".class"文件列表</h3>
      *
-     * @param file parent file object
-     * @return list of the file path
+     * @param file  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
      */
     public static List<String> listClassesFiles(final File file) {
         return FileUtils.listFiles(file, new FilenameExtensionFilter("class"));
     }
-
     /**
-     * List child files by filter extension name is .jar
+     * <h3 class="en">List files of given folder path and filter file extension name is "jar"</h3>
+     * <h3 class="zh-CN">读取给定文件夹中的".jar"文件列表</h3>
      *
-     * @param filePath parent file path
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath      <span class="en">the folder path</span>
+     *                      <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listJarFiles(final String filePath) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_JAR));
     }
-
     /**
-     * List child files by filter extension name is .jar
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance and filter file extension name is "jar"</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象中的".jar"文件列表</h3>
      *
-     * @param file parent file object
-     * @return list of the file path
+     * @param file  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
      */
     public static List<String> listJarFiles(final File file) {
         return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_JAR));
     }
-
     /**
-     * List child files by filter extension name is .zip
+     * <h3 class="en">List files of given folder path and filter file extension name is "zip"</h3>
+     * <h3 class="zh-CN">读取给定文件夹中的".zip"文件列表</h3>
      *
-     * @param filePath parent file path
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath      <span class="en">the folder path</span>
+     *                      <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listZipFiles(final String filePath) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_ZIP));
     }
-
     /**
-     * List child files by filter extension name is .zip
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance and filter file extension name is "zip"</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象中的".zip"文件列表</h3>
      *
-     * @param file parent file object
-     * @return list of the file path
+     * @param file  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
      */
     public static List<String> listZipFiles(final File file) {
         return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_ZIP));
     }
-
     /**
-     * List child files by filter extension name is .wsjar
+     * <h3 class="en">List files of given folder path and filter file extension name is "wsjar"</h3>
+     * <h3 class="zh-CN">读取给定文件夹中的".wsjar"文件列表</h3>
      *
-     * @param filePath parent file path
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath      <span class="en">the folder path</span>
+     *                      <span class="zh-CN">文件夹路径</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listWebSphereJarFiles(final String filePath) throws FileNotFoundException {
         return FileUtils.listFiles(FileUtils.getFile(filePath), new FilenameExtensionFilter(URL_PROTOCOL_WSJAR));
     }
-
     /**
-     * List child files by filter extension name is .wsjar
+     * <h3 class="en">List files of given folder <code>java.io.File</code> instance and filter file extension name is "wsjar"</h3>
+     * <h3 class="zh-CN">读取给定文件夹<code>java.io.File</code>实例对象中的".wsjar"文件列表</h3>
      *
-     * @param file parent file object
-     * @return list of the file path
+     * @param file  <span class="en">the folder <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN">文件夹<code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en">list of the found file path</span>
+     *          <span class="zh-CN">找到的文件路径列表</span>
      */
     public static List<String> listWebSphereJarFiles(final File file) {
         return FileUtils.listFiles(file, new FilenameExtensionFilter(URL_PROTOCOL_WSJAR));
     }
-
     /**
-     * List files, filter by file name regex string
+     * <h3 class="en">List files of given folder path, file path filter by given regex string</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath      folder path
-     * @param fileNameRegex file name regex
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileNameRegex         <span class="en">file name filter regex string</span>
+     *                              <span class="zh-CN">文件名匹配的正则表达式字符串</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFilesByRegex(final String filePath, final String fileNameRegex)
             throws FileNotFoundException {
         return FileUtils.listFilesByRegex(filePath, fileNameRegex, Boolean.TRUE,
                 Boolean.FALSE, Boolean.TRUE);
     }
-
     /**
-     * List files, filter by file name regex string
+     * <h3 class="en">List files of given folder path, file path filter by given regex string</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath           folder path
-     * @param fileNameRegex      file name regex
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileNameRegex         <span class="en">file name filter regex string</span>
+     *                              <span class="zh-CN">文件名匹配的正则表达式字符串</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFilesByRegex(final String filePath, final String fileNameRegex,
                                                 final boolean iterateChildFolder) throws FileNotFoundException {
         return FileUtils.listFilesByRegex(filePath, fileNameRegex, Boolean.TRUE,
                 Boolean.FALSE, iterateChildFolder);
     }
-
     /**
-     * List files, filter by file name regex string
+     * <h3 class="en">List files of given folder path, file path filter by given regex string</h3>
+     * <h3 class="zh-CN">读取给定文件夹内的文件列表，使用给定的文件名过滤器实例</h3>
      *
-     * @param filePath           folder path
-     * @param fileNameRegex      file name regex
-     * @param readHiddenFiles    include hidden file
-     * @param includeRootFolder  include root folder
-     * @param iterateChildFolder to iterate child folder
-     * @return list of the file path
-     * @throws FileNotFoundException if the resource cannot be resolved to a file in the file system
+     * @param filePath              <span class="en">the folder path</span>
+     *                              <span class="zh-CN">文件夹路径</span>
+     * @param fileNameRegex         <span class="en">file name filter regex string</span>
+     *                              <span class="zh-CN">文件名匹配的正则表达式字符串</span>
+     * @param readHiddenFiles       <span class="en">List include hidden files</span>
+     *                              <span class="zh-CN">包含隐藏文件</span>
+     * @param includeRootFolder     <span class="en">to include root folder</span>
+     *                              <span class="zh-CN">包含根文件夹路径</span>
+     * @param iterateChildFolder    <span class="en">to iterate child folder</span>
+     *                              <span class="zh-CN">迭代子文件夹</span>
+     *
+     * @return  <span class="en">list of the child file path</span>
+     *          <span class="zh-CN">子文件路径列表</span>
+     *
+     * @throws FileNotFoundException
+     * <span class="en">if the resource cannot be resolved to a file in the file system</span>
+     * <span class="zh-CN">如果资源无法解析为文件系统中的文件</span>
      */
     public static List<String> listFilesByRegex(final String filePath, final String fileNameRegex,
                                                 final boolean readHiddenFiles, final boolean includeRootFolder,
@@ -1562,25 +1924,34 @@ public final class FileUtils {
                 fileList, readHiddenFiles, includeRootFolder, iterateChildFolder);
         return fileList;
     }
-
     /**
-     * Write file content to the local file path
+     * <h3 class="en">Write data bytes to target file path</h3>
+     * <h3 class="zh-CN">写入字节数组到目标文件路径</h3>
      *
-     * @param fileData file content
-     * @param filePath write path
-     * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
+     * @param fileData  <span class="en">file content data bytes</span>
+     *                  <span class="zh-CN">文件内容字节数组</span>
+     * @param filePath  <span class="en">target file path</span>
+     *                  <span class="zh-CN">目标文件路径</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final byte[] fileData, final String filePath) {
         return FileUtils.saveFile(fileData, filePath, new Properties());
     }
-
     /**
-     * Write file content to the local file path
+     * <h3 class="en">Write data bytes to target file path</h3>
+     * <h3 class="zh-CN">写入字节数组到目标文件路径</h3>
      *
-     * @param fileData   file content
-     * @param filePath   write path
-     * @param properties the properties
-     * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
+     * @param fileData      <span class="en">file content data bytes</span>
+     *                      <span class="zh-CN">文件内容字节数组</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     * @param properties    <span class="en">the properties configure of samba</span>
+     *                      <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final byte[] fileData, final String filePath, final Properties properties) {
         if (StringUtils.isEmpty(filePath)) {
@@ -1609,9 +1980,9 @@ public final class FileUtils {
                     return Boolean.TRUE;
                 }
             } catch (IOException e) {
-                LOGGER.error("Save file to storage error! ");
+                LOGGER.error("Utils", "Target_Save_File_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stack trace message: ", e);
+                    LOGGER.debug("Utils", "Stack_Message_Error", e);
                 }
             } finally {
                 IOUtils.closeStream(fileOutputStream);
@@ -1619,105 +1990,121 @@ public final class FileUtils {
             return Boolean.FALSE;
         }
     }
-
     /**
-     * Write input stream content to the file path
+     * <h3 class="en">Write data from input stream to target file path</h3>
+     * <h3 class="zh-CN">从输入流中读取数据并写入到目标文件路径</h3>
      *
-     * @param inputStream file content by input stream
-     * @param filePath    write to the file path
-     * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
+	 * @param inputStream 	<span class="en">input stream instance</span>
+	 *                      <span class="zh-CN">输入流实例对象</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final InputStream inputStream, final String filePath) {
         return FileUtils.saveFile(inputStream, filePath, new Properties());
     }
-
     /**
-     * Write input stream content to the file path
+     * <h3 class="en">Write data from input stream to target file path</h3>
+     * <h3 class="zh-CN">从输入流中读取数据并写入到目标文件路径</h3>
      *
-     * @param inputStream file content by input stream
-     * @param filePath    write to the file path
-     * @param properties  the properties
-     * @return <code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error
+	 * @param inputStream 	<span class="en">input stream instance</span>
+	 *                      <span class="zh-CN">输入流实例对象</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     * @param properties    <span class="en">the properties configure of samba</span>
+     *                      <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final InputStream inputStream, final String filePath, final Properties properties) {
         if (StringUtils.isEmpty(filePath)) {
             return Boolean.FALSE;
         }
 
-        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
-                 OutputStream outputStream = new SmbFileOutputStream(smbFile)) {
-                smbFile.mkdirs();
-                int readLength;
-                byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-                while ((readLength = inputStream.read(readBuffer, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_BUFFER_SIZE)) != Globals.DEFAULT_VALUE_INT) {
-                    outputStream.write(readBuffer, Globals.INITIALIZE_INT_VALUE, readLength);
-                }
-                outputStream.flush();
-                return Boolean.TRUE;
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        } else {
-            FileOutputStream fileOutputStream = null;
-            try {
+        OutputStream outputStream = null;
+        SmbFile smbFile = null;
+        try {
+            if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+                smbFile = new SmbFile(filePath, new BaseContext(new PropertyConfiguration(properties)));
+                    smbFile.mkdirs();
+                    outputStream = new SmbFileOutputStream(smbFile);
+            } else {
                 File destFile = FileUtils.getFile(filePath);
                 File folder = destFile.getParentFile();
                 if (folder.exists() || folder.mkdirs()) {
-                    fileOutputStream = new FileOutputStream(destFile);
-                    int readLength;
-                    byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-                    while ((readLength =
-                            inputStream.read(readBuffer, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_BUFFER_SIZE))
-                            != Globals.DEFAULT_VALUE_INT) {
-                        fileOutputStream.write(readBuffer, 0, readLength);
-                    }
-                    fileOutputStream.flush();
-                    return Boolean.TRUE;
+                    outputStream = new FileOutputStream(destFile);
                 }
-            } catch (IOException e) {
-                LOGGER.error("Save file to storage error! ");
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stack trace message: ", e);
-                }
-            } finally {
-                IOUtils.closeStream(fileOutputStream);
             }
-            return Boolean.FALSE;
+            if (outputStream != null) {
+                long copiedLength = IOUtils.copyStream(inputStream, outputStream, Boolean.FALSE);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Utils", "Copy_length_File_Debug", copiedLength);
+                }
+                return Boolean.TRUE;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Utils", "Target_Save_File_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+        } finally {
+            IOUtils.closeStream(outputStream);
+            if (smbFile != null) {
+                smbFile.close();
+            }
         }
+        return Boolean.FALSE;
     }
-
     /**
-     * Save String to File use default charset: UTF-8
+     * <h3 class="en">Write content to target file path, use default charset: UTF-8</h3>
+     * <h3 class="zh-CN">写入文件内容到目标文件路径，使用UTF-8编码</h3>
      *
-     * @param filePath write to the file path
-     * @param content  File content
-     * @return Save result
+     * @param content       <span class="en">file content string</span>
+     *                      <span class="zh-CN">文件内容字符串</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final String filePath, final String content) {
         return FileUtils.saveFile(filePath, new Properties(), content, Globals.DEFAULT_ENCODING);
     }
-
     /**
-     * Save String to File use default charset: UTF-8
+     * <h3 class="en">Write content to target file path, use default charset: UTF-8</h3>
+     * <h3 class="zh-CN">写入文件内容到目标文件路径，使用UTF-8编码</h3>
      *
-     * @param filePath   write to the file path
-     * @param properties the properties
-     * @param content    File content
-     * @return Save result
+     * @param content       <span class="en">file content string</span>
+     *                      <span class="zh-CN">文件内容字符串</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     * @param properties    <span class="en">the properties configure of samba</span>
+     *                      <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final String filePath, final Properties properties, final String content) {
         return FileUtils.saveFile(filePath, properties, content, Globals.DEFAULT_ENCODING);
     }
-
     /**
-     * Save String to File
+     * <h3 class="en">Write content to target file path</h3>
+     * <h3 class="zh-CN">写入文件内容到目标文件路径</h3>
      *
-     * @param filePath   write to the file path
-     * @param properties the properties
-     * @param content    File content
-     * @param encoding   Charset encoding
-     * @return Save result
+     * @param content       <span class="en">file content string</span>
+     *                      <span class="zh-CN">文件内容字符串</span>
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     * @param properties    <span class="en">the properties configure of samba</span>
+     *                      <span class="zh-CN">访问samba的配置信息</span>
+     * @param encoding      <span class="en">Charset encoding</span>
+     *                      <span class="zh-CN">字符集编码</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean saveFile(final String filePath, final Properties properties,
                                    final String content, final String encoding) {
@@ -1739,6 +2126,10 @@ public final class FileUtils {
             outputStreamWriter.flush();
             return Boolean.TRUE;
         } catch (Exception e) {
+            LOGGER.error("Utils", "Target_Save_File_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
             return Boolean.FALSE;
         } finally {
             IOUtils.closeStream(printWriter);
@@ -1749,23 +2140,30 @@ public final class FileUtils {
             }
         }
     }
-
     /**
-     * Read File to String use default charset: UTF-8
+     * <h3 class="en">Read content from target file path, use default charset: UTF-8</h3>
+     * <h3 class="zh-CN">从目标文件路径读取文件内容，使用UTF-8编码</h3>
      *
-     * @param filePath File path
-     * @return File content as string
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     *
+     * @return  <span class="en">File content as string</span>
+     *          <span class="zh-CN">文件内容字符串</span>
      */
     public static String readFile(final String filePath) {
         return FileUtils.readFile(filePath, Globals.DEFAULT_ENCODING);
     }
-
     /**
-     * Read File to String
+     * <h3 class="en">Read content from target file path</h3>
+     * <h3 class="zh-CN">从目标文件路径读取文件内容</h3>
      *
-     * @param filePath File path
-     * @param encoding Charset encoding
-     * @return File content as string
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     * @param encoding      <span class="en">Charset encoding</span>
+     *                      <span class="zh-CN">字符集编码</span>
+     *
+     * @return  <span class="en">File content as string</span>
+     *          <span class="zh-CN">文件内容字符串</span>
      */
     public static String readFile(final String filePath, final String encoding) {
         try {
@@ -1774,12 +2172,15 @@ public final class FileUtils {
             return "";
         }
     }
-
     /**
-     * Remove File by current file path
+     * <h3 class="en">Remove target file</h3>
+     * <h3 class="zh-CN">删除目标文件</h3>
      *
-     * @param filePath File path
-     * @return Remove result
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean removeFile(final String filePath) {
         try {
@@ -1788,26 +2189,35 @@ public final class FileUtils {
             return Boolean.TRUE;
         }
     }
-
     /**
-     * Remove file boolean.
+     * <h3 class="en">Remove target file</h3>
+     * <h3 class="zh-CN">删除目标文件</h3>
      *
-     * @param filePath the file path
-     * @param domain   the domain
-     * @param userName the username
-     * @param passWord the password
-     * @return the boolean
+     * @param filePath      <span class="en">target file path</span>
+     *                      <span class="zh-CN">目标文件路径</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean removeFile(final String filePath, final String domain,
                                      final String userName, final String passWord) {
         return FileUtils.removeFile(FileUtils.getFile(filePath, smbAuthenticator(domain, userName, passWord)));
     }
-
     /**
-     * Remove File by current file object
+     * <h3 class="en">Remove target file</h3>
+     * <h3 class="zh-CN">删除目标文件</h3>
      *
-     * @param file File instance
-     * @return Remove result
+     * @param file  <span class="en">the <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN"><code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean removeFile(final File file) {
         if (file == null) {
@@ -1823,12 +2233,15 @@ public final class FileUtils {
         }
         return Boolean.TRUE;
     }
-
     /**
-     * Remove File by current file object
+     * <h3 class="en">Remove target file</h3>
+     * <h3 class="zh-CN">删除目标文件</h3>
      *
-     * @param smbFile SMB file instance
-     * @return Remove result
+     * @param smbFile   <span class="en">the samba file instance</span>
+     *                  <span class="zh-CN">samba文件实例对象</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean removeFile(final SmbFile smbFile) {
         if (smbFile == null) {
@@ -1845,111 +2258,156 @@ public final class FileUtils {
             }
             return Boolean.TRUE;
         } catch (Exception e) {
+            LOGGER.error("Utils", "Remove_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Remove smb file error! ", e);
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base path to target path</h3>
+     * <h3 class="zh-CN">从原文件地址移动到目标文件地址</h3>
      *
-     * @param basePath   Original path
-     * @param moveToPath Target path
-     * @return Move result
+     * @param originalPath  <span class="en">Original path</span>
+     *                      <span class="zh-CN">原文件地址</span>
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final String moveToPath) {
-        return FileUtils.moveFile(basePath, moveToPath, Boolean.FALSE);
+    public static boolean moveFile(final String originalPath, final String targetPath) {
+        return FileUtils.moveFile(originalPath, targetPath, Boolean.FALSE);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base path to target path</h3>
+     * <h3 class="zh-CN">从原文件地址移动到目标文件地址</h3>
      *
-     * @param basePath   Original path
-     * @param moveToPath Target path
-     * @param override   the override
-     * @return Move result
+     * @param originalPath  <span class="en">Original path</span>
+     *                      <span class="zh-CN">原文件地址</span>
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件地址</span>
+     * @param override      <span class="en">Override target if exists</span>
+     *                      <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final String moveToPath, final boolean override) {
-        return FileUtils.moveFile(basePath, null, moveToPath, null, override);
+    public static boolean moveFile(final String originalPath, final String targetPath, final boolean override) {
+        return FileUtils.moveFile(originalPath, null, targetPath, null, override);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from samba path to target path</h3>
+     * <h3 class="zh-CN">从原samba文件地址移动到目标文件地址</h3>
      *
-     * @param basePath        Original path
-     * @param originalContext the original context
-     * @param moveToPath      Target path
-     * @return Move result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the cifs context</span>
+     *                          <span class="zh-CN">CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final CIFSContext originalContext, final String moveToPath) {
-        return FileUtils.moveFile(basePath, originalContext, moveToPath, null, Boolean.FALSE);
+    public static boolean moveFile(final String originalPath, final CIFSContext originalContext, final String targetPath) {
+        return FileUtils.moveFile(originalPath, originalContext, targetPath, null, Boolean.FALSE);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from samba path to target path</h3>
+     * <h3 class="zh-CN">从原samba文件地址移动到目标文件地址</h3>
      *
-     * @param basePath        Original path
-     * @param originalContext the original context
-     * @param moveToPath      Target path
-     * @param override        the override
-     * @return Move result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final CIFSContext originalContext,
-                                   final String moveToPath, final boolean override) {
-        return FileUtils.moveFile(basePath, originalContext, moveToPath, null, override);
+    public static boolean moveFile(final String originalPath, final CIFSContext originalContext,
+                                   final String targetPath, final boolean override) {
+        return FileUtils.moveFile(originalPath, originalContext, targetPath, null, override);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base path to target samba path</h3>
+     * <h3 class="zh-CN">从原文件地址移动到目标samba文件地址</h3>
      *
-     * @param basePath      Original path
-     * @param moveToPath    Target path
-     * @param targetContext the target context
-     * @return Move result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final String moveToPath, final CIFSContext targetContext) {
-        return FileUtils.moveFile(basePath, null, moveToPath, targetContext, Boolean.FALSE);
+    public static boolean moveFile(final String originalPath, final String targetPath, final CIFSContext targetContext) {
+        return FileUtils.moveFile(originalPath, null, targetPath, targetContext, Boolean.FALSE);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base path to target samba path</h3>
+     * <h3 class="zh-CN">从原文件地址移动到目标samba文件地址</h3>
      *
-     * @param basePath      Original path
-     * @param moveToPath    Target path
-     * @param targetContext the target context
-     * @param override      the override
-     * @return Move result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveFile(final String basePath, final String moveToPath,
+    public static boolean moveFile(final String originalPath, final String targetPath,
                                    final CIFSContext targetContext, final boolean override) {
-        return FileUtils.moveFile(basePath, null, moveToPath, targetContext, override);
+        return FileUtils.moveFile(originalPath, null, targetPath, targetContext, override);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base samba path to target samba path</h3>
+     * <h3 class="zh-CN">从原samba文件地址移动到目标samba文件地址</h3>
      *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @return Move result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean moveFile(final String originalPath, final CIFSContext originalContext,
                                    final String targetPath, final CIFSContext targetContext) {
         return FileUtils.moveFile(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
     }
-
     /**
-     * Move file from basePath to moveToPath
+     * <h3 class="en">Move file from base samba path to target samba path</h3>
+     * <h3 class="zh-CN">从原samba文件地址移动到目标samba文件地址</h3>
      *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @param override        Override target file if exists
-     * @return Operate result
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
     public static boolean moveFile(final String originalPath, final CIFSContext originalContext,
                                    final String targetPath, final CIFSContext targetContext,
@@ -1967,15 +2425,1426 @@ public final class FileUtils {
                     return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)
                             && FileUtils.removeFile(originalPath);
                 } catch (Exception e) {
+                    LOGGER.error("Utils", "Move_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Move file error! ", e);
+                        LOGGER.debug("Utils", "Stack_Message_Error", e);
                     }
                 }
             }
         }
         return Boolean.FALSE;
     }
+    /**
+     * <h3 class="en">Move directory from samba folder to target folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件夹CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+                                  final String targetPath) {
+        return FileUtils.moveDir(originalPath, originalContext, targetPath, null, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Move directory from samba folder to target folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件夹CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+                                  final String targetPath, final boolean override) {
+        return FileUtils.moveDir(originalPath, originalContext, targetPath, null, override);
+    }
+    /**
+     * <h3 class="en">Move directory from folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件夹CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final String targetPath, final CIFSContext targetContext) {
+        return FileUtils.moveDir(originalPath, null, targetPath, targetContext, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Move directory from folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件夹CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final String targetPath,
+                                  final CIFSContext targetContext, final boolean override) {
+        return FileUtils.moveDir(originalPath, null, targetPath, targetContext, override);
+    }
+    /**
+     * <h3 class="en">Move directory from samba folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件夹CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件夹CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+                                  final String targetPath, final CIFSContext targetContext) {
+        return FileUtils.moveDir(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Move directory from samba folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalPath      <span class="en">Original folder path</span>
+     *                          <span class="zh-CN">原文件夹地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件夹CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件夹CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
+                                  final String targetPath, final CIFSContext targetContext,
+                                  final boolean override) {
+        if (StringUtils.isEmpty(originalPath) || !FileUtils.isDirectory(originalPath, originalContext)
+                || StringUtils.isEmpty(targetPath)) {
+            return Boolean.FALSE;
+        }
+        if (FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)) {
+            return FileUtils.removeDir(originalPath, originalContext);
+        }
+        return Boolean.FALSE;
+    }
+    /**
+     * <h3 class="en">Move directory from samba folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalFolder    <span class="en">the folder instance</span>
+     *                          <span class="zh-CN">文件夹实例对象</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final File originalFolder, final String targetPath, final Properties properties) {
+        return FileUtils.moveDir(originalFolder, targetPath, properties, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Move directory from samba folder to target samba folder</h3>
+     * <h3 class="zh-CN">从原samba文件夹地址移动到目标samba文件夹地址</h3>
+     *
+     * @param originalFolder    <span class="en">the folder instance</span>
+     *                          <span class="zh-CN">文件夹实例对象</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean moveDir(final File originalFolder, final String targetPath,
+                                  final Properties properties, final boolean override) {
+        if (originalFolder == null || !originalFolder.exists()) {
+            return Boolean.FALSE;
+        }
+        try {
+            FileUtils.makeDir(targetPath, properties);
 
+            boolean error = Boolean.FALSE;
+            BasicFileAttributes basicFileAttributes =
+                    Files.readAttributes(originalFolder.toPath(), BasicFileAttributes.class);
+            if (basicFileAttributes.isDirectory()) {
+                File[] childFiles = originalFolder.listFiles();
+                if (childFiles != null) {
+                    for (File tempFile : childFiles) {
+                        String childPath = targetPath + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName();
+                        BasicFileAttributes fileAttributes =
+                                Files.readAttributes(tempFile.toPath(), BasicFileAttributes.class);
+                        if (fileAttributes.isDirectory()) {
+                            error = FileUtils.moveDir(tempFile, childPath, properties, override);
+                            removeFile(tempFile);
+                        } else if (fileAttributes.isRegularFile()) {
+                            error = FileUtils.moveFile(tempFile.getAbsolutePath(), childPath, override);
+                        }
+
+                        if (!error) {
+                            return Boolean.FALSE;
+                        }
+                    }
+                }
+                return Boolean.TRUE;
+            } else if (basicFileAttributes.isRegularFile()) {
+                return FileUtils.moveFile(originalFolder.getAbsolutePath(),
+                        targetPath + Globals.DEFAULT_PAGE_SEPARATOR + originalFolder.getName(), override);
+            } else {
+                return Boolean.FALSE;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Utils", "Move_Directory_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h3 class="en">Create directory</h3>
+     * <h3 class="zh-CN">创建文件夹</h3>
+     *
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件夹地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean makeDir(final String targetPath) {
+        return FileUtils.makeDir(targetPath, new Properties());
+    }
+    /**
+     * <h3 class="en">Makes a directory</h3>
+     * <h3 class="zh-CN">创建文件夹</h3>
+     *
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件夹地址</span>
+     * @param properties    <span class="en">the properties configure of samba</span>
+     *                      <span class="zh-CN">访问samba的配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean makeDir(final String targetPath, final Properties properties) {
+        if (FileUtils.isExists(targetPath)) {
+            return Boolean.TRUE;
+        }
+
+        if (targetPath.startsWith(Globals.SAMBA_PROTOCOL)) {
+            try (SmbFile smbFile = new SmbFile(targetPath,
+                    new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties)))) {
+                smbFile.mkdirs();
+                return Boolean.TRUE;
+            } catch (Exception e) {
+                LOGGER.error("Utils", "Create_Directory_Error");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                }
+                return Boolean.FALSE;
+            }
+        } else {
+            try {
+                File destDir = FileUtils.getFile(targetPath);
+                return destDir.mkdirs();
+            } catch (FileNotFoundException e) {
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Makes a directory, including any necessary but nonexistent parent directories.</h3>
+     * <span class="en">
+     *     If a file already exists with a specified name, but it is
+     *     not a directory, then an IOException is thrown.
+     *     If the directory cannot be created (or the file already exists but is not a directory)
+     *     then an IOException is thrown.
+     * </span>
+     * <h3 class="zh-CN">创建一个目录，包括任何必要但不存在的父目录。</h3>
+     * <span class="zh-CN">
+     *     如果具有指定名称的文件已存在，但它不是目录，则抛出 IOException。如果无法创建目录（或者文件已存在但不是目录），则抛出 IOException。
+     * </span>
+     *
+     * @param directory     <span class="en">directory to create, must not be {@code null}</span>
+     *                      <span class="zh-CN">要创建的目录，不为 {@code null}</span>
+     *
+     * @throws IOException
+     * <span class="en">if the directory cannot be created or the file already exists but is not a directory</span>
+     * <span class="zh-CN">如果无法创建目录或文件已存在但不是目录</span>
+     */
+    public static void forceMakeDir(final File directory) throws IOException {
+        if (directory == null) {
+            return;
+        }
+        if (directory.exists()) {
+            if (!directory.isDirectory()) {
+                throw new IOException("File " + directory + " was exists and not a directory.");
+            }
+        } else {
+            if (!directory.mkdirs() && !directory.isDirectory()) {
+                throw new IOException("Unable to create directory" + directory);
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Makes any necessary but nonexistent parent directories for a given File.</h3>
+     * <span class="en">If the parent directory cannot be created, then an IOException is thrown.</span>
+     * <h3 class="zh-CN">为给定文件创建任何必要但不存在的父目录。</h3>
+     * <span class="zh-CN">如果无法创建父目录，则会抛出 IOException。</span>
+     *
+     * @param file  <span class="en">file with parent to create</span>
+     *              <span class="zh-CN">要创建父文件夹的实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">if the directory cannot be created or the file already exists but is not a directory</span>
+     * <span class="zh-CN">如果无法创建目录或文件已存在但不是目录</span>
+     */
+    public static void forceMakeParent(final File file) throws IOException {
+        if (file == null) {
+            return;
+        }
+        FileUtils.forceMakeDir(file.getParentFile());
+    }
+    /**
+     * <h3 class="en">Copy file from base path to target path</h3>
+     * <h3 class="zh-CN">从原文件地址复制到目标文件地址</h3>
+     *
+     * @param originalPath  <span class="en">Original path</span>
+     *                      <span class="zh-CN">原文件地址</span>
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final String targetPath) {
+        return FileUtils.copy(originalPath, null, targetPath, null, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Copy file from base path to target path</h3>
+     * <h3 class="zh-CN">从原文件地址复制到目标文件地址</h3>
+     *
+     * @param originalPath  <span class="en">Original path</span>
+     *                      <span class="zh-CN">原文件地址</span>
+     * @param targetPath    <span class="en">Target path</span>
+     *                      <span class="zh-CN">目标文件地址</span>
+     * @param override      <span class="en">Override target if exists</span>
+     *                      <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final String targetPath, final boolean override) {
+        return FileUtils.copy(originalPath, null, targetPath, null, override);
+    }
+    /**
+     * <h3 class="en">Copy file from base path to target samba path</h3>
+     * <h3 class="zh-CN">从原文件地址复制到目标samba文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final String targetPath, final CIFSContext targetContext) {
+        return FileUtils.copy(originalPath, null, targetPath, targetContext, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Copy file from base path to target samba path</h3>
+     * <h3 class="zh-CN">从原文件地址复制到目标samba文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final String targetPath,
+                               final CIFSContext targetContext, final boolean override) {
+        return FileUtils.copy(originalPath, null, targetPath, targetContext, override);
+    }
+    /**
+     * <h3 class="en">Copy file from samba path to target path</h3>
+     * <h3 class="zh-CN">从原samba文件地址复制到目标文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the cifs context</span>
+     *                          <span class="zh-CN">CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final CIFSContext originalContext, final String targetPath) {
+        return FileUtils.copy(originalPath, originalContext, targetPath, null, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Copy file from samba path to target path</h3>
+     * <h3 class="zh-CN">从原samba文件地址复制到目标文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final CIFSContext originalContext,
+                               final String targetPath, final boolean override) {
+        return FileUtils.copy(originalPath, originalContext, targetPath, null, override);
+    }
+    /**
+     * <h3 class="en">Copy file from base samba path to target samba path</h3>
+     * <h3 class="zh-CN">从原samba文件地址复制到目标samba文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final CIFSContext originalContext,
+                               final String targetPath, final CIFSContext targetContext) {
+        return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
+    }
+    /**
+     * <h3 class="en">Copy file from base samba path to target samba path</h3>
+     * <h3 class="zh-CN">从原samba文件地址复制到目标samba文件地址</h3>
+     *
+     * @param originalPath      <span class="en">Original path</span>
+     *                          <span class="zh-CN">原文件地址</span>
+     * @param originalContext   <span class="en">the original cifs context</span>
+     *                          <span class="zh-CN">原文件CIFS上下文配置信息</span>
+     * @param targetPath        <span class="en">Target path</span>
+     *                          <span class="zh-CN">目标文件地址</span>
+     * @param targetContext     <span class="en">the target cifs context</span>
+     *                          <span class="zh-CN">目标文件CIFS上下文配置信息</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean copy(final String originalPath, final CIFSContext originalContext,
+                               final String targetPath, final CIFSContext targetContext,
+                               final boolean override) {
+        if (StringUtils.isEmpty(originalPath) || StringUtils.isEmpty(targetPath)) {
+            return Boolean.FALSE;
+        }
+
+        Object original = null;
+        Object target = null;
+
+        try {
+            boolean directory;
+            if (originalPath.startsWith(Globals.SAMBA_PROTOCOL)) {
+                original = FileUtils.getFile(originalPath, originalContext);
+                if (original == null) {
+                    return Boolean.FALSE;
+                }
+                directory = ((SmbFile) original).isDirectory();
+            } else {
+                original = FileUtils.getFile(originalPath);
+                directory = ((File) original).isDirectory();
+            }
+            if (targetPath.startsWith(Globals.SAMBA_PROTOCOL)) {
+                target = FileUtils.getFile(targetPath, targetContext);
+            } else {
+                target = FileUtils.getFile(targetPath);
+            }
+            if (directory) {
+                return FileUtils.processDirectory(original, target, override);
+            } else {
+                return FileUtils.processFile(original, target, override);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Utils", "Copy_Directory_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+            return Boolean.FALSE;
+        } finally {
+            if (original instanceof SmbFile) {
+                ((SmbFile) original).close();
+            }
+            if (target instanceof SmbFile) {
+                ((SmbFile) target).close();
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Remove target directory</h3>
+     * <h3 class="zh-CN">删除目标文件夹</h3>
+     *
+     * @param directoryPath <span class="en">target directory path</span>
+     *                      <span class="zh-CN">目标文件夹路径</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean removeDir(final String directoryPath) {
+        return FileUtils.removeDir(directoryPath, null);
+    }
+    /**
+     * <h3 class="en">Remove target directory</h3>
+     * <h3 class="zh-CN">删除目标文件夹</h3>
+     *
+     * @param directoryPath <span class="en">target directory path</span>
+     *                      <span class="zh-CN">目标文件夹路径</span>
+     * @param cifsContext   <span class="en">the cifs context</span>
+     *                      <span class="zh-CN">文件夹CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    public static boolean removeDir(final String directoryPath, final CIFSContext cifsContext) {
+        if (directoryPath.startsWith(Globals.SAMBA_PROTOCOL)) {
+            return FileUtils.removeDir(FileUtils.getFile(directoryPath, cifsContext));
+        } else {
+            try {
+                return FileUtils.removeDir(FileUtils.getFile(directoryPath));
+            } catch (Exception e) {
+                LOGGER.error("Utils", "Remove_Directory_Error");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                }
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Calculate CRC value of given file path</h3>
+     * <h3 class="zh-CN">计算目标文件的CRC值</h3>
+     *
+     * @param filePath  <span class="en">file path</span>
+     *                  <span class="zh-CN">文件地址</span>
+     *
+     * @return  <span class="en">CRC value</span>
+     *          <span class="zh-CN">CRC值</span>
+     */
+    public static long calcFileCRC(final String filePath) {
+        InputStream inputStream = null;
+        try {
+            inputStream = FileUtils.loadFile(filePath);
+            if (inputStream != null) {
+                byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
+                int readLength;
+                CRC32 crc = new CRC32();
+
+                while ((readLength = inputStream.read(readBuffer)) != Globals.DEFAULT_VALUE_INT) {
+                    crc.update(readBuffer, 0, readLength);
+                }
+
+                return crc.getValue();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Utils", "CRC_Calculate_Files_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+        } finally {
+            IOUtils.closeStream(inputStream);
+        }
+
+        return Globals.DEFAULT_VALUE_LONG;
+    }
+    /**
+     * <h3 class="en">Check file path is a directory</h3>
+     * <h3 class="zh-CN">检查文件路径是文件夹</h3>
+     *
+     * @param resourceLocation  <span class="en">the location String to check</span>
+     *                          <span class="zh-CN">要检查的位置字符串</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isDirectory(final String resourceLocation) {
+        return FileUtils.isDirectory(resourceLocation, null);
+    }
+    /**
+     * <h3 class="en">Check file path is a directory</h3>
+     * <h3 class="zh-CN">检查文件路径是文件夹</h3>
+     *
+     * @param resourceLocation  <span class="en">the location String to check</span>
+     *                          <span class="zh-CN">要检查的位置字符串</span>
+     * @param cifsContext       <span class="en">the cifs context</span>
+     *                          <span class="zh-CN">文件夹CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isDirectory(final String resourceLocation, final CIFSContext cifsContext) {
+        if (StringUtils.isEmpty(resourceLocation)) {
+            return Boolean.FALSE;
+        }
+
+        if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
+            try (SmbFile smbFile = new SmbFile(resourceLocation, cifsContext)) {
+                return smbFile.isDirectory();
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        } else {
+            try {
+                File directory = FileUtils.getFile(resourceLocation);
+                return (directory.exists() && directory.isDirectory());
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Check the current file is existed</h3>
+     * <h3 class="zh-CN">检查当前文件是否存在</h3>
+     *
+     * @param filePath  <span class="en">Current file path</span>
+     *                  <span class="zh-CN">当前文件地址</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isExists(final String filePath) {
+        return isExists(filePath, null);
+    }
+    /**
+     * <h3 class="en">Check the current file is existed</h3>
+     * <h3 class="zh-CN">检查当前文件是否存在</h3>
+     *
+     * @param filePath          <span class="en">Current file path</span>
+     *                          <span class="zh-CN">当前文件地址</span>
+     * @param authenticator     <span class="en">Client authenticator instance</span>
+     *                          <span class="zh-CN">客户端身份验证器实例对象</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isExists(final String filePath, final NtlmPasswordAuthenticator authenticator) {
+        return FileUtils.isExists(filePath, null, authenticator);
+    }
+    /**
+     * <h3 class="en">Check the current file is existed</h3>
+     * <h3 class="zh-CN">检查当前文件是否存在</h3>
+     *
+     * @param filePath          <span class="en">Current file path</span>
+     *                          <span class="zh-CN">当前文件地址</span>
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     * @param authenticator     <span class="en">Client authenticator instance</span>
+     *                          <span class="zh-CN">客户端身份验证器实例对象</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isExists(final String filePath, final Properties properties,
+                                   final NtlmPasswordAuthenticator authenticator) {
+        if (StringUtils.isEmpty(filePath)) {
+            return Boolean.FALSE;
+        }
+
+        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+            try (SmbFile smbFile = new SmbFile(filePath, generateContext(properties, authenticator))) {
+                return smbFile.exists();
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        } else {
+            try {
+                File file = FileUtils.getFile(filePath);
+                return file.exists();
+            } catch (FileNotFoundException e) {
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Read data length of given entry path in given file path</h3>
+     * <h3 class="zh-CN">读取给定压缩文件中资源路径的数据长度</h3>
+     *
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     * @param entryPath <span class="en">the entry path</span>
+     *                  <span class="zh-CN">条目资源路径</span>
+     *
+     * @return  <span class="en">Read entry length</span>
+     *          <span class="zh-CN">读取的资源路径的数据长度</span>
+     */
+    public static int readEntryLength(final String filePath, final String entryPath) {
+        InputStream inputStream = null;
+        JarFile jarFile = null;
+        try {
+            if (filePath.endsWith(URL_PROTOCOL_JAR)) {
+                jarFile = new JarFile(getFile(filePath));
+                JarEntry packageEntry = jarFile.getJarEntry(entryPath);
+
+                if (packageEntry != null) {
+                    inputStream = jarFile.getInputStream(jarFile.getJarEntry(entryPath));
+                    return inputStream.available();
+                }
+            } else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
+                ZipFile zipFile = ZipFile.openZipFile(filePath);
+                return zipFile.readEntryLength(entryPath);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Utils", "Entry_Length_Load_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+        } finally {
+            IOUtils.closeStream(inputStream);
+            IOUtils.closeStream(jarFile);
+        }
+        return Globals.DEFAULT_VALUE_INT;
+    }
+    /**
+     * <h3 class="en">Check existed of given entry path in given file path</h3>
+     * <h3 class="zh-CN">检查给定压缩文件中资源路径是否存在</h3>
+     *
+     * @param filePath  <span class="en">the file path</span>
+     *                  <span class="zh-CN">给定文件路径</span>
+     * @param entryPath <span class="en">the entry path</span>
+     *                  <span class="zh-CN">条目资源路径</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean isEntryExists(final String filePath, final String entryPath) throws ZipException {
+        if (StringUtils.isEmpty(filePath) || StringUtils.isEmpty(entryPath)) {
+            return Boolean.FALSE;
+        }
+
+        if (filePath.toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
+            JarFile jarFile = null;
+            try {
+                jarFile = new JarFile(getFile(filePath));
+                return jarFile.getJarEntry(entryPath) != null;
+            } catch (Exception e) {
+                LOGGER.error("Utils", "Entry_Content_Load_Error");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                }
+            } finally {
+                if (jarFile != null) {
+                    try {
+                        jarFile.close();
+                    } catch (Exception e) {
+                        LOGGER.error("Utils", "Archive_Close_File_Error");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        }
+                    }
+                }
+            }
+        } else if (filePath.toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
+            ZipFile zipFile = ZipFile.openZipFile(filePath);
+            return zipFile.isEntryExists(entryPath);
+        }
+        return Boolean.FALSE;
+    }
+    /**
+     * <h3 class="en">Open input stream of given entry path in given file object instance</h3>
+     * <h3 class="zh-CN">打开给定压缩文件实例对象中资源路径的输入流</h3>
+     *
+     * @param fileObject    <span class="en">the file object</span>
+     *                      <span class="zh-CN">文件实例对象</span>
+     * @param entryPath     <span class="en">the entry path</span>
+     *                      <span class="zh-CN">条目资源路径</span>
+     *
+     * @return  <span class="en">input stream instance</span>
+     *          <span class="zh-CN">输入流实例对象</span>
+     *
+     * @throws IOException
+     * <span class="en">when opening input stream error</span>
+     * <span class="zh-CN">打开输入流时出错</span>
+     */
+    public static InputStream openInputStream(final Object fileObject, final String entryPath) throws IOException, ZipException {
+        if (fileObject == null || StringUtils.isEmpty(entryPath)) {
+            return null;
+        }
+
+        if (fileObject instanceof JarFile) {
+            JarEntry jarEntry = ((JarFile) fileObject).getJarEntry(entryPath);
+            if (jarEntry != null) {
+                return ((JarFile) fileObject).getInputStream(jarEntry);
+            }
+            return null;
+        }
+
+        if (fileObject instanceof ZipFile) {
+            return ((ZipFile) fileObject).entryInputStream(entryPath);
+        }
+
+        return null;
+    }
+    /**
+     * <h3 class="en">Check the current file can read</h3>
+     * <h3 class="zh-CN">检查当前文件是否可以读取</h3>
+     *
+     * @param filePath  <span class="en">the file path to check</span>
+     *                  <span class="zh-CN">要检查的路径地址</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean canRead(final String filePath) {
+        return canRead(filePath, null, null, null);
+    }
+    /**
+     * <h3 class="en">Check the current file can read</h3>
+     * <h3 class="zh-CN">检查当前文件是否可以读取</h3>
+     *
+     * @param filePath  <span class="en">the file path to check</span>
+     *                  <span class="zh-CN">要检查的路径地址</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean canRead(final String filePath, final String domain,
+                                  final String userName, final String passWord) {
+        if (StringUtils.isEmpty(filePath)) {
+            return Boolean.FALSE;
+        }
+
+        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+            try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
+                return smbFile != null && smbFile.canRead();
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        } else {
+            try {
+                File file = FileUtils.getFile(filePath);
+                return file.canRead();
+            } catch (FileNotFoundException e) {
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Check the current file can write</h3>
+     * <h3 class="zh-CN">检查当前文件是否可以写入</h3>
+     *
+     * @param filePath  <span class="en">the file path to check</span>
+     *                  <span class="zh-CN">要检查的路径地址</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean canWrite(String filePath) {
+        return canWrite(filePath, null, null, null);
+    }
+    /**
+     * <h3 class="en">Check the current file can write</h3>
+     * <h3 class="zh-CN">检查当前文件是否可以写入</h3>
+     *
+     * @param filePath  <span class="en">the file path to check</span>
+     *                  <span class="zh-CN">要检查的路径地址</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean canWrite(String filePath, String domain, String userName, String passWord) {
+        if (StringUtils.isEmpty(filePath)) {
+            return Boolean.FALSE;
+        }
+
+        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+            try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
+                return smbFile == null || !smbFile.exists() || smbFile.canWrite();
+            } catch (Exception e) {
+                return Boolean.FALSE;
+            }
+        } else {
+            try {
+                File file = FileUtils.getFile(filePath);
+                return file.canWrite();
+            } catch (FileNotFoundException e) {
+                return Boolean.FALSE;
+            }
+        }
+    }
+    /**
+     * <h3 class="en">Check the current file can execute</h3>
+     * <h3 class="zh-CN">检查当前文件是否可以执行</h3>
+     *
+     * @param filePath  <span class="en">the file path to check</span>
+     *                  <span class="zh-CN">要检查的路径地址</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
+     */
+    public static boolean canExecute(String filePath) {
+        try {
+            File file = FileUtils.getFile(filePath);
+            return file.canExecute();
+        } catch (FileNotFoundException e) {
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h3 class="en">Merge segment file data and save to target path</h3>
+     * <h3 class="zh-CN">合并分割的文件并保存到目标路径</h3>
+     *
+     * @param savePath          <span class="en">target file path</span>
+     *                          <span class="zh-CN">目标文件路径</span>
+     * @param segmentationInfo  <span class="en">Segment Data Information instance</span>
+     *                          <span class="zh-CN">分割数据信息定义实例对象</span>
+     *
+     * @return  <span class="en">Process result</span>
+     *          <span class="zh-CN">处理结果</span>
+     */
+    public static boolean mergeFile(final String savePath, final SegmentationInfo segmentationInfo) {
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(savePath, "rw")) {
+            String extName = StringUtils.getFilenameExtension(savePath);
+            if (extName.length() == 0) {
+                extName = Globals.DEFAULT_VALUE_STRING;
+            }
+            if (!segmentationInfo.getExtName().equalsIgnoreCase(extName)) {
+                LOGGER.warn("Utils", "Not_Match_Ext_Name_Files_Warn");
+            }
+            long totalSize = 0;
+            randomAccessFile.setLength(segmentationInfo.getTotalSize());
+
+            for (SegmentationBlock segmentationBlock : segmentationInfo.getBlockList()) {
+                if (segmentationBlock == null) {
+                    return Boolean.FALSE;
+                }
+
+                if (FileUtils.mergeFile(randomAccessFile, segmentationBlock)) {
+                    totalSize += segmentationBlock.getBlockSize();
+                }
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Size_Write_Files_Debug", totalSize);
+            }
+
+            if (totalSize != segmentationInfo.getTotalSize()) {
+                FileUtils.removeFile(savePath);
+                return Boolean.FALSE;
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            LOGGER.error("Utils", "Merge_Files_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h3 class="en">Segment file data by given target path</h3>
+     * <h3 class="zh-CN">将目标路径的文件分割处理</h3>
+     *
+     * @param filePath  <span class="en">target file path</span>
+     *                  <span class="zh-CN">目标文件路径</span>
+     * @param blockSize <span class="en">Segment block size</span>
+     *                  <span class="zh-CN">分割块大小</span>
+     *
+     * @return  <span class="en">Segment Data Information instance</span>
+     *          <span class="zh-CN">分割数据信息定义实例对象</span>
+     */
+    public static SegmentationInfo segmentFile(final String filePath, final int blockSize) {
+        return segmentFile(filePath, blockSize, null, null, null);
+    }
+    /**
+     * <h3 class="en">Segment file data by given target path</h3>
+     * <h3 class="zh-CN">将目标路径的文件分割处理</h3>
+     *
+     * @param filePath  <span class="en">target file path</span>
+     *                  <span class="zh-CN">目标文件路径</span>
+     * @param blockSize <span class="en">Segment block size</span>
+     *                  <span class="zh-CN">分割块大小</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+     *
+     * @return  <span class="en">Segment Data Information instance</span>
+     *          <span class="zh-CN">分割数据信息定义实例对象</span>
+     */
+    public static SegmentationInfo segmentFile(final String filePath, final int blockSize,
+                                               final String domain, final String userName, final String passWord) {
+        if (!FileUtils.isExists(filePath, smbAuthenticator(domain, userName, passWord))) {
+            return null;
+        }
+
+        List<SegmentationBlock> segmentationBlockList = new ArrayList<>();
+        InputStream fileInputStream = null;
+        ByteArrayOutputStream byteArrayOutputStream;
+
+        try {
+            String extName = StringUtils.getFilenameExtension(filePath);
+            if (extName.length() == 0) {
+                extName = Globals.DEFAULT_VALUE_STRING;
+            } else {
+                extName = extName.toLowerCase();
+            }
+            Object fileObject;
+            if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
+                fileObject = new SmbFile(filePath, generateContext(smbAuthenticator(domain, userName, passWord)));
+                fileInputStream = new SmbFileInputStream((SmbFile) fileObject);
+            } else {
+                fileObject = getFile(filePath);
+                fileInputStream = new FileInputStream((File) fileObject);
+            }
+            long fileSize = fileSize(fileObject);
+
+            byte[] readBuffer = new byte[blockSize];
+            int index = 0;
+            int readLength;
+            while ((readLength = fileInputStream.read(readBuffer)) != -1) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Utils", "Read_Block_Files_Debug", index, readLength);
+                }
+                byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
+                byteArrayOutputStream.write(readBuffer, 0, readLength);
+                SegmentationBlock segmentationBlock =
+                        new SegmentationBlock((long) index * blockSize, byteArrayOutputStream.toByteArray());
+                segmentationBlockList.add(segmentationBlock);
+                index++;
+            }
+
+            return new SegmentationInfo(extName, fileSize, blockSize,
+                    ConvertUtils.toHex(SecurityUtils.SHA256(fileObject)), segmentationBlockList);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Utils", "Not_Found_File_Error", filePath);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Utils", "Read_Files_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+        } finally {
+            IOUtils.closeStream(fileInputStream);
+        }
+
+        return null;
+    }
+    /**
+     * <h3 class="en">Generate CIFSContext instance.</h3>
+     * <h3 class="zh-CN">生成 CIFSContext 实例。</h3>
+     *
+     * @param authenticator     <span class="en">Client authenticator instance</span>
+     *                          <span class="zh-CN">客户端身份验证器实例对象</span>
+     *
+     * @return  <span class="en">Generated instance</span>
+     *          <span class="zh-CN">生成的实例对象</span>
+     *
+     * @throws CIFSException
+     * <span class="en">If CIFS properties has error</span>
+     * <span class="zh-CN">如果CIFS属性信息出现错误</span>
+     */
+    public static CIFSContext generateContext(final NtlmPasswordAuthenticator authenticator)
+            throws CIFSException {
+        return FileUtils.generateContext(null, authenticator);
+    }
+    /**
+     * <h3 class="en">Generate CIFSContext instance.</h3>
+     * <h3 class="zh-CN">生成 CIFSContext 实例。</h3>
+     *
+     * @param properties        <span class="en">the properties configure of samba</span>
+     *                          <span class="zh-CN">访问samba的配置信息</span>
+     * @param authenticator     <span class="en">Client authenticator instance</span>
+     *                          <span class="zh-CN">客户端身份验证器实例对象</span>
+     *
+     * @return  <span class="en">Generated instance</span>
+     *          <span class="zh-CN">生成的实例对象</span>
+     *
+     * @throws CIFSException
+     * <span class="en">If CIFS properties has error</span>
+     * <span class="zh-CN">如果CIFS属性信息出现错误</span>
+     */
+    public static CIFSContext generateContext(final Properties properties,
+                                              final NtlmPasswordAuthenticator authenticator)
+            throws CIFSException {
+        CIFSContext cifsContext =
+                new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties));
+        if (authenticator != null) {
+            cifsContext = cifsContext.withCredentials(authenticator);
+        }
+        return cifsContext;
+    }
+    /**
+     * <h3 class="en">Generate samba authenticator instance</h3>
+     * <h3 class="zh-CN">生成samba身份验证器</h3>
+     *
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+     *
+     * @return  <span class="en">authenticator instance</span>
+     *          <span class="zh-CN">身份验证器实例对象</span>
+     */
+    public static NtlmPasswordAuthenticator smbAuthenticator(final String domain, final String userName,
+                                                             final String passWord) {
+        return new NtlmPasswordAuthenticator(domain, userName, passWord);
+    }
+    /**
+     * <h3 class="en">Resolve the given resource location to a <code>jcifs.smb.SmbFile</code></h3>
+     * <h3 class="zh-CN">将给定资源位置解析为 <code>jcifs.smb.SmbFile</code></h3>
+     *
+     * @param smbLocation       <span class="en">the samba file location</span>
+     *                          <span class="zh-CN">samba文件位置</span>
+     * @param cifsContext       <span class="en">the cifs context</span>
+     *                          <span class="zh-CN">CIFS上下文配置信息</span>
+     *
+     * @return  <span class="en">a corresponding <code>jcifs.smb.SmbFile</code> object or <code>null</code> if an error occurs</span>
+     *          <span class="zh-CN">对应的<code>jcifs.smb.SmbFile</code>对象，如果出现异常则返回<code>null</code></span>
+     */
+    private static SmbFile getFile(final String smbLocation, final CIFSContext cifsContext) {
+        if (StringUtils.isEmpty(smbLocation)) {
+            return null;
+        }
+        try {
+            return new SmbFile(smbLocation, cifsContext);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    /**
+     * <h3 class="en">Remove target directory</h3>
+     * <h3 class="zh-CN">删除目标文件夹</h3>
+     *
+     * @param directory  <span class="en">the <code>java.io.File</code> instance</span>
+     *              <span class="zh-CN"><code>java.io.File</code>实例对象</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
+    private static boolean removeDir(final Object directory) {
+        if (directory == null) {
+            return Boolean.FALSE;
+        }
+
+        try {
+            final boolean smbFile;
+            final CIFSContext cifsContext;
+            final String basePath;
+            String[] fileList;
+            if (directory instanceof SmbFile) {
+                fileList = ((SmbFile) directory).list();
+                smbFile = Boolean.TRUE;
+                cifsContext = ((SmbFile) directory).getContext();
+                basePath = ((SmbFile) directory).getPath();
+            } else {
+                fileList = ((File) directory).list();
+                smbFile = Boolean.FALSE;
+                cifsContext = null;
+                basePath = ((File) directory).getAbsolutePath();
+            }
+            if (fileList != null) {
+                for (String filePath : fileList) {
+                    Object childFile;
+                    boolean isDirectory;
+                    if (smbFile) {
+                        childFile = new SmbFile(basePath + "/" + filePath, cifsContext);
+                        isDirectory = ((SmbFile) childFile).isDirectory();
+                    } else {
+                        childFile = new File(basePath, filePath);
+                        isDirectory = ((File) childFile).isDirectory();
+                    }
+                    if (isDirectory) {
+                        if (!FileUtils.removeDir(childFile)) {
+                            return Boolean.FALSE;
+                        }
+                    } else {
+                        if (smbFile) {
+                            ((SmbFile) childFile).delete();
+                        } else {
+                            if (!((File) childFile).delete()) {
+                                return Boolean.FALSE;
+                            }
+                        }
+                    }
+                }
+            }
+            if (directory instanceof SmbFile) {
+                ((SmbFile) directory).delete();
+                return Boolean.TRUE;
+            } else {
+                return ((File) directory).delete();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Utils", "Remove_Directory_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
+            }
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h3 class="en">Replace page separator to "|"</h3>
+     * <h3 class="zh-CN">将页面分隔符替换为“|”</h3>
+     *
+     * @param path  <span class="en">file path</span>
+	 *              <span class="zh-CN">文件路径</span>
+     *
+     * @return  <span class="en">replaced the file path</span>
+     *          <span class="zh-CN">替换后的文件路径</span>
+     */
+    private static String replacePageSeparator(String path) {
+        String replacePath = StringUtils.replace(path, Globals.DEFAULT_PAGE_SEPARATOR, "|");
+        replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_ZIP_PAGE_SEPARATOR, "|");
+        replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_JAR_PAGE_SEPARATOR, "|");
+        if (replacePath.endsWith("|")) {
+            replacePath = replacePath.substring(0, replacePath.length() - 1);
+        }
+        return replacePath;
+    }
+    /**
+     * <h3 class="en">Write segment block data and save to random access file instance</h3>
+     * <h3 class="zh-CN">将分块数据写入目标文件</h3>
+     *
+     * @param randomAccessFile  <span class="en">target file path</span>
+     *                          <span class="zh-CN">目标文件路径</span>
+     * @param segmentationBlock <span class="en">Segment Data Block</span>
+     *                          <span class="zh-CN">分块数据文件</span>
+     *
+     * @return  <span class="en">Process result</span>
+     *          <span class="zh-CN">处理结果</span>
+     */
+    private static boolean mergeFile(final RandomAccessFile randomAccessFile,
+                                     final SegmentationBlock segmentationBlock) throws IOException {
+        if (segmentationBlock == null || !segmentationBlock.securityCheck()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Utils", "Invalid_Block_Segment_Error");
+            }
+            return Boolean.FALSE;
+        }
+
+        randomAccessFile.seek(segmentationBlock.getPosition());
+        randomAccessFile.write(StringUtils.base64Decode(segmentationBlock.getDataInfo()));
+        return Boolean.TRUE;
+    }
+    /**
+     * <h2 class="en">Implements class for FileFilter by check path using regex string</h2>
+     * <h2 class="zh-CN">使用正则表达式匹配路径的FileFilter实现类</h2>
+     */
+    private static final class FilenameRegexFilter implements FilenameFilter {
+        /**
+         * <span class="en">Regex string</span>
+         * <span class="zh-CN">正则表达式</span>
+         */
+        private final String fileNameRegex;
+        /**
+         * <h3 class="en">Constructor for FilenameRegexFilter</h3>
+         * <h3 class="zh-CN">正则表达式匹配路径过滤器的构造方法</h3>
+         *
+         * @param fileNameRegex     <span class="en">Regex string</span>
+         *                          <span class="zh-CN">正则表达式</span>
+         */
+        public FilenameRegexFilter(String fileNameRegex) {
+            this.fileNameRegex = fileNameRegex;
+        }
+        /**
+         * (Non-Javadoc)
+         * @see FileFilter#accept(File)
+         */
+        public boolean accept(File dir, String name) {
+            if (this.fileNameRegex != null && dir != null && dir.isDirectory()
+                    && dir.exists() && name != null) {
+                String fileName = StringUtils.getFilename(name);
+                return StringUtils.matches(fileName, this.fileNameRegex);
+            }
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h2 class="en">Implements class for FileFilter by check file extension name</h2>
+     * <h2 class="zh-CN">检查文件扩展名的FileFilter实现类</h2>
+     */
+    private static final class FilenameExtensionFilter implements FilenameFilter {
+        /**
+         * <span class="en">Matched extension name</span>
+         * <span class="zh-CN">检查的扩展名</span>
+         */
+        private final String fileExtName;
+        /**
+         * <h3 class="en">Constructor for FilenameExtensionFilter</h3>
+         * <h3 class="zh-CN">文件扩展名过滤器的构造方法</h3>
+         *
+         * @param fileExtName   <span class="en">Matched extension name</span>
+         *                      <span class="zh-CN">检查的扩展名</span>
+         */
+        public FilenameExtensionFilter(String fileExtName) {
+            this.fileExtName = fileExtName;
+        }
+        /**
+         * (Non-Javadoc)
+         * @see FileFilter#accept(File)
+         */
+        public boolean accept(File dir, String name) {
+            if (this.fileExtName != null && dir != null && dir.isDirectory()
+                    && dir.exists() && name != null) {
+                String fileExtName = StringUtils.getFilenameExtension(name);
+                return fileExtName.equalsIgnoreCase(this.fileExtName);
+            }
+            return Boolean.FALSE;
+        }
+    }
+    /**
+     * <h2 class="en">Implements class for FileFilter by check path is directory</h2>
+     * <h2 class="zh-CN">检查路径是文件夹的FileFilter实现类</h2>
+     */
+    private static final class DirectoryFileFilter implements FileFilter {
+        /**
+         * <h3 class="en">Constructor for DirectoryFileFilter</h3>
+         * <h3 class="zh-CN">DirectoryFileFilter的构造方法</h3>
+         */
+        DirectoryFileFilter() {
+        }
+        /**
+         * (Non-Javadoc)
+         * @see FileFilter#accept(File)
+         */
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory();
+        }
+    }
+
+    /**
+     * <h2 class="en">Jar path define</h2>
+     * <h2 class="zh-CN">Jar路径定义</h2>
+     */
+    private static final class JarPath {
+        /**
+         * <span class="en">Jar file path</span>
+         * <span class="zh-CN">Jar文件路径</span>
+         */
+        private final String filePath;
+        /**
+         * <span class="en">Jar entry path</span>
+         * <span class="zh-CN">Jar资源路径</span>
+         */
+        private final String entryPath;
+        /**
+         * <h3 class="en">Constructor for JarPath</h3>
+         * <h3 class="zh-CN">Jar路径定义的构造方法</h3>
+         *
+         * @param filePath  <span class="en">Jar file path</span>
+         *                  <span class="zh-CN">Jar文件路径</span>
+         * @param entryPath <span class="en">Jar entry path</span>
+         *                  <span class="zh-CN">Jar资源路径</span>
+         */
+        JarPath(final String filePath, final String entryPath) {
+            this.filePath = filePath;
+            this.entryPath = entryPath;
+        }
+        /**
+         * <h3 class="en">Getter method for file path</h3>
+         * <h3 class="zh-CN">Jar文件路径的Getter方法</h3>
+         *
+         * @return  <span class="en">Jar file path</span>
+         *          <span class="zh-CN">Jar文件路径</span>
+         */
+        public String getFilePath() {
+            return filePath;
+        }
+        /**
+         * <h3 class="en">Getter method for entry path</h3>
+         * <h3 class="zh-CN">Jar资源路径的Getter方法</h3>
+         *
+         * @return  <span class="en">Jar entry path</span>
+         *          <span class="zh-CN">Jar资源路径</span>
+         */
+        public String getEntryPath() {
+            return entryPath;
+        }
+    }
+    /**
+     * <h3 class="en">Move file from base samba path to target samba path</h3>
+     * <h3 class="zh-CN">从原samba文件地址移动到目标samba文件地址</h3>
+     *
+     * @param originalFile      <span class="en">Original file instance</span>
+     *                          <span class="zh-CN">原文件实例对象</span>
+     * @param targetFile        <span class="en">Target file instance</span>
+     *                          <span class="zh-CN">目标文件实例对象</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
+     *
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
+     */
     private static boolean processFile(final Object originalFile, final Object targetFile, final boolean override) {
         if (originalFile == null || targetFile == null) {
             return Boolean.FALSE;
@@ -1997,8 +3866,9 @@ public final class FileUtils {
                     }
                     return Boolean.TRUE;
                 } catch (Exception e) {
+                    LOGGER.error("Utils", "Copy_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Copy file error! ", e);
+                        LOGGER.debug("Utils", "Stack_Message_Error", e);
                     }
                     return Boolean.FALSE;
                 }
@@ -2017,122 +3887,35 @@ public final class FileUtils {
                     }
                     return Boolean.TRUE;
                 } catch (Exception e) {
+                    LOGGER.error("Utils", "Copy_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Copy file error! ", e);
+                        LOGGER.debug("Utils", "Stack_Message_Error", e);
                     }
                     return Boolean.FALSE;
                 }
             }
         } catch (Exception e) {
+            LOGGER.error("Utils", "Move_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Move file error! ", e);
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
     }
-
     /**
-     * Move directory from basePath to moveToPath and ignore exists file
+     * <h3 class="en">Move file from base path to target path</h3>
+     * <h3 class="zh-CN">从原文件地址移动到目标文件地址</h3>
      *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @return Move result
-     */
-    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
-                                  final String targetPath) {
-        return FileUtils.moveDir(originalPath, originalContext, targetPath, null, Boolean.FALSE);
-    }
-
-    /**
-     * Move directory from basePath to moveToPath and ignore exists file
+     * @param originalDirectory <span class="en">Original folder instance</span>
+     *                          <span class="zh-CN">原文件夹实例对象</span>
+     * @param targetDirectory   <span class="en">Target folder instance</span>
+     *                          <span class="zh-CN">目标文件夹实例对象</span>
+     * @param override          <span class="en">Override target if exists</span>
+     *                          <span class="zh-CN">覆盖目标文件</span>
      *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param override        the override
-     * @return Move result
+     * @return  <span class="en"><code>Boolean.TRUE</code> for success and <code>Boolean.FALSE</code> for error</span>
+     *          <span class="zh-CN">成功返回<code>Boolean.TRUE</code>，失败返回<code>Boolean.FALSE</code></span>
      */
-    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
-                                  final String targetPath, final boolean override) {
-        return FileUtils.moveDir(originalPath, originalContext, targetPath, null, override);
-    }
-
-    /**
-     * Move directory from basePath to moveToPath and ignore exists file
-     *
-     * @param originalPath  the original path
-     * @param targetPath    the target path
-     * @param targetContext the target context
-     * @return Move result
-     */
-    public static boolean moveDir(final String originalPath, final String targetPath, final CIFSContext targetContext) {
-        return FileUtils.moveDir(originalPath, null, targetPath, targetContext, Boolean.FALSE);
-    }
-
-    /**
-     * Move directory from basePath to moveToPath and ignore exists file
-     *
-     * @param originalPath  the original path
-     * @param targetPath    the target path
-     * @param targetContext the target context
-     * @param override      the override
-     * @return Move result
-     */
-    public static boolean moveDir(final String originalPath, final String targetPath,
-                                  final CIFSContext targetContext, final boolean override) {
-        return FileUtils.moveDir(originalPath, null, targetPath, targetContext, override);
-    }
-
-    /**
-     * Move directory from basePath to moveToPath and ignore exists file
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @return Move result
-     */
-    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
-                                  final String targetPath, final CIFSContext targetContext) {
-        return FileUtils.moveDir(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
-    }
-
-    /**
-     * Move directory from basePath to moveToPath and override by user defined
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @param override        Override target file if it's exists
-     * @return Move result
-     */
-    public static boolean moveDir(final String originalPath, final CIFSContext originalContext,
-                                  final String targetPath, final CIFSContext targetContext,
-                                  final boolean override) {
-        if (StringUtils.isEmpty(originalPath) || !FileUtils.isDirectory(originalPath, originalContext)
-                || StringUtils.isEmpty(targetPath)) {
-            return Boolean.FALSE;
-        }
-        if (FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)) {
-            return FileUtils.removeDir(originalPath, originalContext);
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * Move directory from baseFile object to moveToPath and ignore exists file
-     *
-     * @param baseFile   Original file instance
-     * @param moveToPath Target directory
-     * @param properties the properties
-     * @return Move result
-     */
-    public static boolean moveDir(final File baseFile, final String moveToPath, final Properties properties) {
-        return FileUtils.moveDir(baseFile, moveToPath, properties, Boolean.FALSE);
-    }
-
     private static boolean processDirectory(final Object originalDirectory, final Object targetDirectory,
                                             final boolean override) {
         if (originalDirectory == null || targetDirectory == null) {
@@ -2194,972 +3977,11 @@ public final class FileUtils {
             }
             return processResult;
         } catch (Exception e) {
+            LOGGER.error("Utils", "Directory_Move_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Move directory error! ", e);
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
             }
             return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * Move dir from baseFile object to moveToPath and override by user defined
-     *
-     * @param baseFile   Original file path
-     * @param moveToPath Target path
-     * @param properties the properties
-     * @param override   Override target file
-     * @return Move result
-     */
-    public static boolean moveDir(final File baseFile, final String moveToPath,
-                                  final Properties properties, final boolean override) {
-        if (baseFile == null || !baseFile.exists()) {
-            return Boolean.FALSE;
-        }
-        try {
-            FileUtils.makeDir(moveToPath, properties);
-
-            boolean error = Boolean.FALSE;
-            BasicFileAttributes basicFileAttributes =
-                    Files.readAttributes(baseFile.toPath(), BasicFileAttributes.class);
-            if (basicFileAttributes.isDirectory()) {
-                File[] childFiles = baseFile.listFiles();
-                if (childFiles != null) {
-                    for (File tempFile : childFiles) {
-                        String childPath = moveToPath + Globals.DEFAULT_PAGE_SEPARATOR + tempFile.getName();
-                        BasicFileAttributes fileAttributes =
-                                Files.readAttributes(tempFile.toPath(), BasicFileAttributes.class);
-                        if (fileAttributes.isDirectory()) {
-                            error = FileUtils.moveDir(tempFile, childPath, properties, override);
-                            removeFile(tempFile);
-                        } else if (fileAttributes.isRegularFile()) {
-                            error = FileUtils.moveFile(tempFile.getAbsolutePath(), childPath, override);
-                        }
-
-                        if (!error) {
-                            return Boolean.FALSE;
-                        }
-                    }
-                }
-                return Boolean.TRUE;
-            } else if (basicFileAttributes.isRegularFile()) {
-                return FileUtils.moveFile(baseFile.getAbsolutePath(),
-                        moveToPath + Globals.DEFAULT_PAGE_SEPARATOR + baseFile.getName(), override);
-            } else {
-                return Boolean.FALSE;
-            }
-        } catch (Exception e) {
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * Make directory
-     *
-     * @param destPath Target directory path
-     * @return Operate result
-     */
-    public static boolean makeDir(final String destPath) {
-        return FileUtils.makeDir(destPath, new Properties());
-    }
-
-    /**
-     * Make directory
-     *
-     * @param destPath   Target directory path
-     * @param properties the properties
-     * @return Operate result
-     */
-    public static boolean makeDir(final String destPath, final Properties properties) {
-        if (FileUtils.isExists(destPath)) {
-            return Boolean.TRUE;
-        }
-
-        if (destPath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = new SmbFile(destPath,
-                    new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties)))) {
-                smbFile.mkdirs();
-                return Boolean.TRUE;
-            } catch (Exception e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Make smb file directories error! ", e);
-                }
-                return Boolean.FALSE;
-            }
-        } else {
-            try {
-                File destDir = FileUtils.getFile(destPath);
-                return destDir.mkdirs();
-            } catch (FileNotFoundException e) {
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Makes a directory, including any necessary but nonexistent parent directories.
-     * If a file already exists with a specified name, but it is
-     * not a directory, then an IOException is thrown.
-     * If the directory cannot be created (or the file already exists but is not a directory)
-     * then an IOException is thrown.
-     *
-     * @param directory directory to create, must not be {@code null}
-     * @throws IOException if the directory cannot be created or the file already exists but is not a directory
-     */
-    public static void forceMakeDir(final File directory) throws IOException {
-        if (directory == null) {
-            return;
-        }
-        if (directory.exists()) {
-            if (!directory.isDirectory()) {
-                throw new IOException("File " + directory + " was exists and not a directory.");
-            }
-        } else {
-            if (!directory.mkdirs() && !directory.isDirectory()) {
-                throw new IOException("Unable to create directory" + directory);
-            }
-        }
-    }
-
-    /**
-     * Makes any necessary but nonexistent parent directories for a given File.
-     * If the parent directory cannot be created, then an IOException is thrown.
-     *
-     * @param file file with parent to create
-     * @throws IOException if the parent directory cannot be created
-     */
-    public static void forceMakeParent(final File file) throws IOException {
-        if (file == null) {
-            return;
-        }
-        FileUtils.forceMakeDir(file.getParentFile());
-    }
-
-    /**
-     * Check filePath is existed
-     *
-     * @param resourceLocation Resource location
-     * @return Check result
-     */
-    public static boolean isDirectory(final String resourceLocation) {
-        return FileUtils.isDirectory(resourceLocation, null);
-    }
-
-    /**
-     * Check filePath is existed
-     *
-     * @param resourceLocation Resource location
-     * @param cifsContext      the cifs context
-     * @return Check result
-     */
-    public static boolean isDirectory(final String resourceLocation, final CIFSContext cifsContext) {
-        if (StringUtils.isEmpty(resourceLocation)) {
-            return Boolean.FALSE;
-        }
-
-        if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = new SmbFile(resourceLocation, cifsContext)) {
-                return smbFile.isDirectory();
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        } else {
-            try {
-                File directory = FileUtils.getFile(resourceLocation);
-                return (directory.exists() && directory.isDirectory());
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath the original path
-     * @param targetPath   the target path
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final String targetPath) {
-        return FileUtils.copy(originalPath, null, targetPath, null, Boolean.FALSE);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath the original path
-     * @param targetPath   the target path
-     * @param override     the override
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final String targetPath, final boolean override) {
-        return FileUtils.copy(originalPath, null, targetPath, null, override);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath the original path
-     * @param targetPath   the target path
-     * @param cifsContext  the cifs context
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final String targetPath, final CIFSContext cifsContext) {
-        return FileUtils.copy(originalPath, null, targetPath, cifsContext, Boolean.FALSE);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath  the original path
-     * @param targetPath    the target path
-     * @param targetContext the target context
-     * @param override      the override
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final String targetPath,
-                               final CIFSContext targetContext, final boolean override) {
-        return FileUtils.copy(originalPath, null, targetPath, targetContext, override);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final CIFSContext originalContext, final String targetPath) {
-        return FileUtils.copy(originalPath, originalContext, targetPath, null, Boolean.FALSE);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param override        the override
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final CIFSContext originalContext,
-                               final String targetPath, final boolean override) {
-        return FileUtils.copy(originalPath, originalContext, targetPath, null, override);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final CIFSContext originalContext,
-                               final String targetPath, final CIFSContext targetContext) {
-        return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, Boolean.FALSE);
-    }
-
-    /**
-     * Copy directory from baseDir to destDir
-     *
-     * @param originalPath    the original path
-     * @param originalContext the original context
-     * @param targetPath      the target path
-     * @param targetContext   the target context
-     * @param override        the override
-     * @return Operate result
-     */
-    public static boolean copy(final String originalPath, final CIFSContext originalContext,
-                               final String targetPath, final CIFSContext targetContext,
-                               final boolean override) {
-        if (StringUtils.isEmpty(originalPath) || StringUtils.isEmpty(targetPath)) {
-            return Boolean.FALSE;
-        }
-
-        Object original = null;
-        Object target = null;
-
-        try {
-            boolean directory;
-            if (originalPath.startsWith(Globals.SAMBA_PROTOCOL)) {
-                original = FileUtils.getFile(originalPath, originalContext);
-                if (original == null) {
-                    return Boolean.FALSE;
-                }
-                directory = ((SmbFile) original).isDirectory();
-            } else {
-                original = FileUtils.getFile(originalPath);
-                directory = ((File) original).isDirectory();
-            }
-            if (targetPath.startsWith(Globals.SAMBA_PROTOCOL)) {
-                target = FileUtils.getFile(targetPath, targetContext);
-            } else {
-                target = FileUtils.getFile(targetPath);
-            }
-            if (directory) {
-                return FileUtils.processDirectory(original, target, override);
-            } else {
-                return FileUtils.processFile(original, target, override);
-            }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Copy directory data error! ", e);
-            }
-            return Boolean.FALSE;
-        } finally {
-            if (original instanceof SmbFile) {
-                ((SmbFile) original).close();
-            }
-            if (target instanceof SmbFile) {
-                ((SmbFile) target).close();
-            }
-        }
-    }
-
-    /**
-     * Remove dir boolean.
-     *
-     * @param directoryPath the directory path
-     * @return the boolean
-     */
-    public static boolean removeDir(final String directoryPath) {
-        return FileUtils.removeDir(directoryPath, null);
-    }
-
-    /**
-     * Remove dir boolean.
-     *
-     * @param directoryPath the directory path
-     * @param cifsContext   the cifs context
-     * @return the boolean
-     */
-    public static boolean removeDir(final String directoryPath, final CIFSContext cifsContext) {
-        if (directoryPath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            return FileUtils.removeDir(FileUtils.getFile(directoryPath, cifsContext));
-        } else {
-            try {
-                return FileUtils.removeDir(FileUtils.getFile(directoryPath));
-            } catch (Exception e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Remove original directory error! ", e);
-                }
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Remove dir boolean.
-     *
-     * @param directory the directory
-     * @return the boolean
-     */
-    private static boolean removeDir(final Object directory) {
-        if (directory == null) {
-            return Boolean.FALSE;
-        }
-
-        try {
-            final boolean smbFile;
-            final CIFSContext cifsContext;
-            final String basePath;
-            String[] fileList;
-            if (directory instanceof SmbFile) {
-                fileList = ((SmbFile) directory).list();
-                smbFile = Boolean.TRUE;
-                cifsContext = ((SmbFile) directory).getContext();
-                basePath = ((SmbFile) directory).getPath();
-            } else {
-                fileList = ((File) directory).list();
-                smbFile = Boolean.FALSE;
-                cifsContext = null;
-                basePath = ((File) directory).getAbsolutePath();
-            }
-            if (fileList != null) {
-                for (String filePath : fileList) {
-                    Object childFile;
-                    boolean isDirectory;
-                    if (smbFile) {
-                        childFile = new SmbFile(basePath + "/" + filePath, cifsContext);
-                        isDirectory = ((SmbFile) childFile).isDirectory();
-                    } else {
-                        childFile = new File(basePath, filePath);
-                        isDirectory = ((File) childFile).isDirectory();
-                    }
-                    if (isDirectory) {
-                        if (!FileUtils.removeDir(childFile)) {
-                            return Boolean.FALSE;
-                        }
-                    } else {
-                        if (smbFile) {
-                            ((SmbFile) childFile).delete();
-                        } else {
-                            if (!((File) childFile).delete()) {
-                                return Boolean.FALSE;
-                            }
-                        }
-                    }
-                }
-            }
-            if (directory instanceof SmbFile) {
-                ((SmbFile) directory).delete();
-                return Boolean.TRUE;
-            } else {
-                return ((File) directory).delete();
-            }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Remove directory error! ", e);
-            }
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * Calculate file CRC value
-     *
-     * @param filePath file path
-     * @return CRC value
-     */
-    public static long calcFileCRC(String filePath) {
-        InputStream inputStream = null;
-        try {
-            inputStream = FileUtils.loadFile(filePath);
-            if (inputStream != null) {
-                byte[] readBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
-                int readLength;
-                CRC32 crc = new CRC32();
-
-                while ((readLength = inputStream.read(readBuffer)) != Globals.DEFAULT_VALUE_INT) {
-                    crc.update(readBuffer, 0, readLength);
-                }
-
-                return crc.getValue();
-            }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Calculate file crc error! ", e);
-            }
-        } finally {
-            IOUtils.closeStream(inputStream);
-        }
-
-        return Globals.DEFAULT_VALUE_LONG;
-    }
-
-    /**
-     * Check the current file is existed
-     *
-     * @param filePath File path
-     * @return Check result
-     */
-    public static boolean isExists(String filePath) {
-        return isExists(filePath, null);
-    }
-
-    /**
-     * Check the current file is existed
-     *
-     * @param filePath                  File path
-     * @param ntlmPasswordAuthenticator the ntlm password authenticator
-     * @return Check result
-     */
-    public static boolean isExists(final String filePath, final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
-        return FileUtils.isExists(filePath, null, ntlmPasswordAuthenticator);
-    }
-
-    /**
-     * Check the current file is existed
-     *
-     * @param filePath                  File path
-     * @param properties                the properties
-     * @param ntlmPasswordAuthenticator the ntlm password authenticator
-     * @return Check result
-     */
-    public static boolean isExists(final String filePath, final Properties properties,
-                                   final NtlmPasswordAuthenticator ntlmPasswordAuthenticator) {
-        if (StringUtils.isEmpty(filePath)) {
-            return Boolean.FALSE;
-        }
-
-        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = new SmbFile(filePath, generateContext(properties, ntlmPasswordAuthenticator))) {
-                return smbFile.exists();
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        } else {
-            try {
-                File file = FileUtils.getFile(filePath);
-                return file.exists();
-            } catch (FileNotFoundException e) {
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Read entry length
-     *
-     * @param filePath  Zip/jar file path
-     * @param entryPath Check the entry path
-     * @return Entry length
-     */
-    public static int readEntryLength(String filePath, String entryPath) {
-        InputStream inputStream = null;
-        JarFile jarFile = null;
-        try {
-            if (filePath.endsWith(URL_PROTOCOL_JAR)) {
-                jarFile = new JarFile(getFile(filePath));
-                JarEntry packageEntry = jarFile.getJarEntry(entryPath);
-
-                if (packageEntry != null) {
-                    inputStream = jarFile.getInputStream(jarFile.getJarEntry(entryPath));
-                    return inputStream.available();
-                }
-            } else if (filePath.endsWith(URL_PROTOCOL_ZIP)) {
-                ZipFile zipFile = ZipFile.openZipFile(filePath);
-                return zipFile.readEntryLength(entryPath);
-            }
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Read entry length error! ", e);
-            }
-        } finally {
-            IOUtils.closeStream(inputStream);
-            IOUtils.closeStream(jarFile);
-        }
-        return Globals.DEFAULT_VALUE_INT;
-    }
-
-    /**
-     * Check given the entry path is exists in zip/jar file
-     *
-     * @param filePath  Zip/jar file path
-     * @param entryPath Check the entry path
-     * @return Check result
-     */
-    public static boolean isEntryExists(String filePath, String entryPath) {
-        if (StringUtils.isEmpty(filePath) || StringUtils.isEmpty(entryPath)) {
-            return Boolean.FALSE;
-        }
-
-        if (filePath.toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
-            JarFile jarFile = null;
-            try {
-                jarFile = new JarFile(getFile(filePath));
-                return jarFile.getJarEntry(entryPath) != null;
-            } catch (Exception e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Load jar entry content error! ", e);
-                }
-            } finally {
-                if (jarFile != null) {
-                    try {
-                        jarFile.close();
-                    } catch (Exception e) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Close jar file error! ", e);
-                        }
-                    }
-                }
-            }
-        } else if (filePath.toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
-            ZipFile zipFile = ZipFile.openZipFile(filePath);
-            return zipFile.isEntryExists(entryPath);
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * Entry input stream.
-     *
-     * @param fileObject the file object
-     * @param entryPath  the entry path
-     * @return input stream
-     * @throws IOException the io exception
-     */
-    public static InputStream openInputStream(Object fileObject, String entryPath) throws IOException {
-        if (fileObject == null || StringUtils.isEmpty(entryPath)) {
-            return null;
-        }
-
-        if (fileObject instanceof JarFile) {
-            JarEntry jarEntry = ((JarFile) fileObject).getJarEntry(entryPath);
-            if (jarEntry != null) {
-                return ((JarFile) fileObject).getInputStream(jarEntry);
-            }
-            return null;
-        }
-
-        if (fileObject instanceof ZipFile) {
-            return ((ZipFile) fileObject).entryInputStream(entryPath);
-        }
-
-        return null;
-    }
-
-    /**
-     * Check the current file can read
-     *
-     * @param filePath File path
-     * @return Check result
-     */
-    public static boolean canRead(String filePath) {
-        return canRead(filePath, null, null, null);
-    }
-
-    /**
-     * Check the current file can read
-     *
-     * @param filePath File path
-     * @param domain   SMB domain
-     * @param userName SMB user name
-     * @param passWord SMB password
-     * @return Check result
-     */
-    public static boolean canRead(String filePath, String domain, String userName, String passWord) {
-        if (StringUtils.isEmpty(filePath)) {
-            return Boolean.FALSE;
-        }
-
-        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
-                return smbFile != null && smbFile.canRead();
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        } else {
-            try {
-                File file = FileUtils.getFile(filePath);
-                return file.canRead();
-            } catch (FileNotFoundException e) {
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Check the current file can write
-     *
-     * @param path File path
-     * @return Check result
-     */
-    public static boolean canWrite(String path) {
-        return canWrite(path, null, null, null);
-    }
-
-    /**
-     * Check the current file can write
-     *
-     * @param filePath the file path
-     * @param domain   SMB domain
-     * @param userName SMB user name
-     * @param passWord SMB password
-     * @return Check result
-     */
-    public static boolean canWrite(String filePath, String domain, String userName, String passWord) {
-        if (StringUtils.isEmpty(filePath)) {
-            return Boolean.FALSE;
-        }
-
-        if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
-            try (SmbFile smbFile = getFile(filePath, smbAuthenticator(domain, userName, passWord))) {
-                return smbFile == null || !smbFile.exists() || smbFile.canWrite();
-            } catch (Exception e) {
-                return Boolean.FALSE;
-            }
-        } else {
-            try {
-                File file = FileUtils.getFile(filePath);
-                return file.canWrite();
-            } catch (FileNotFoundException e) {
-                return Boolean.FALSE;
-            }
-        }
-    }
-
-    /**
-     * Check the current file can execute
-     *
-     * @param filePath File path
-     * @return Check result
-     */
-    public static boolean canExecute(String filePath) {
-        try {
-            File file = FileUtils.getFile(filePath);
-            return file.canExecute();
-        } catch (FileNotFoundException e) {
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * Merge file to save paths
-     *
-     * @param savePath         Target save paths
-     * @param segmentationFile Segmentation file object
-     * @return Operate result
-     */
-    public static boolean mergeFile(String savePath, SegmentationFile segmentationFile) {
-        try (RandomAccessFile randomAccessFile = new RandomAccessFile(savePath, "rw")) {
-            String extName = StringUtils.getFilenameExtension(savePath);
-            if (extName.length() == 0) {
-                extName = Globals.DEFAULT_VALUE_STRING;
-            }
-            if (!segmentationFile.getExtName().equalsIgnoreCase(extName)) {
-                LOGGER.warn("File extension name not match");
-            }
-
-            long totalSize = 0;
-            randomAccessFile.setLength(segmentationFile.getTotalSize());
-
-            for (SegmentationItem segmentationItem : segmentationFile.getSegmentationItemList()) {
-                if (segmentationItem == null) {
-                    return Boolean.FALSE;
-                }
-
-                if (FileUtils.mergeFile(randomAccessFile, segmentationItem)) {
-                    totalSize += segmentationItem.getBlockSize();
-                }
-            }
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Write file size: " + totalSize);
-            }
-
-            if (totalSize != segmentationFile.getTotalSize()) {
-                FileUtils.removeFile(savePath);
-                return Boolean.FALSE;
-            }
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * Segment file by current block size
-     *
-     * @param filePath  Which file will be split
-     * @param blockSize Block size
-     * @return List of split file
-     */
-    public static SegmentationFile segmentFile(String filePath, int blockSize) {
-        return segmentFile(filePath, blockSize, null, null, null);
-    }
-
-    /**
-     * Segment file by current block size
-     *
-     * @param filePath  Which file will be split
-     * @param blockSize Block size
-     * @param domain    SMB domain
-     * @param userName  SMB user name
-     * @param passWord  SMB password
-     * @return List of split file
-     */
-    public static SegmentationFile segmentFile(final String filePath, final int blockSize,
-                                               final String domain, final String userName, final String passWord) {
-        if (!FileUtils.isExists(filePath, smbAuthenticator(domain, userName, passWord))) {
-            return null;
-        }
-
-        List<SegmentationItem> segmentationItemList = new ArrayList<>();
-        InputStream fileInputStream = null;
-        ByteArrayOutputStream byteArrayOutputStream;
-
-        try {
-            String extName = StringUtils.getFilenameExtension(filePath);
-            if (extName.length() == 0) {
-                extName = Globals.DEFAULT_VALUE_STRING;
-            } else {
-                extName = extName.toLowerCase();
-            }
-            Object fileObject;
-            if (filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
-                fileObject = new SmbFile(filePath, generateContext(smbAuthenticator(domain, userName, passWord)));
-                fileInputStream = new SmbFileInputStream((SmbFile) fileObject);
-            } else {
-                fileObject = getFile(filePath);
-                fileInputStream = new FileInputStream((File) fileObject);
-            }
-            long fileSize = fileSize(fileObject);
-
-            byte[] readBuffer = new byte[blockSize];
-            int index = 0;
-            int readLength;
-            while ((readLength = fileInputStream.read(readBuffer)) != -1) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Read index: " + index + ", read length: " + readLength);
-                }
-                byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
-                byteArrayOutputStream.write(readBuffer, 0, readLength);
-                SegmentationItem segmentationItem =
-                        new SegmentationItem((long) index * blockSize, byteArrayOutputStream.toByteArray());
-                segmentationItemList.add(segmentationItem);
-                index++;
-            }
-
-            return new SegmentationFile(extName, fileSize, blockSize,
-                    ConvertUtils.byteToHex(SecurityUtils.SHA256(fileObject)), segmentationItemList);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Target file not exists! ");
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Stack message: ", e);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Read file data error! ");
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Stack message: ", e);
-            }
-        } finally {
-            IOUtils.closeStream(fileInputStream);
-        }
-
-        return null;
-    }
-
-    /**
-     * Generate context cifs context.
-     *
-     * @param ntlmPasswordAuthenticator the ntlm password authenticator
-     * @return the cifs context
-     * @throws CIFSException the cifs exception
-     */
-    public static CIFSContext generateContext(final NtlmPasswordAuthenticator ntlmPasswordAuthenticator)
-            throws CIFSException {
-        return FileUtils.generateContext(null, ntlmPasswordAuthenticator);
-    }
-
-    /**
-     * Generate context cifs context.
-     *
-     * @param properties                the properties
-     * @param ntlmPasswordAuthenticator the ntlm password authenticator
-     * @return the cifs context
-     * @throws CIFSException the cifs exception
-     */
-    public static CIFSContext generateContext(final Properties properties,
-                                              final NtlmPasswordAuthenticator ntlmPasswordAuthenticator)
-            throws CIFSException {
-        CIFSContext cifsContext =
-                new BaseContext(new PropertyConfiguration(properties == null ? new Properties() : properties));
-        if (ntlmPasswordAuthenticator != null) {
-            cifsContext = cifsContext.withCredentials(ntlmPasswordAuthenticator);
-        }
-        return cifsContext;
-    }
-
-    /**
-     * Smb properties properties.
-     *
-     * @param domain   the domain
-     * @param userName the username
-     * @param passWord the password
-     * @return the properties
-     */
-    public static NtlmPasswordAuthenticator smbAuthenticator(final String domain, final String userName,
-                                                             final String passWord) {
-        return new NtlmPasswordAuthenticator(domain, userName, passWord);
-    }
-
-    /**
-     * Replace page separator to "|"
-     *
-     * @param path file path
-     * @return replaced the file path
-     */
-    private static String replacePageSeparator(String path) {
-        String replacePath = StringUtils.replace(path, Globals.DEFAULT_PAGE_SEPARATOR, "|");
-        replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_ZIP_PAGE_SEPARATOR, "|");
-        replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_JAR_PAGE_SEPARATOR, "|");
-        if (replacePath.endsWith("|")) {
-            replacePath = replacePath.substring(0, replacePath.length() - 1);
-        }
-        return replacePath;
-    }
-
-    private static boolean mergeFile(RandomAccessFile randomAccessFile,
-                                     SegmentationItem segmentationItem) throws IOException {
-        if (segmentationItem == null) {
-            return Boolean.FALSE;
-        }
-
-        if (segmentationItem.securityCheck()) {
-            randomAccessFile.seek(segmentationItem.getPosition());
-            randomAccessFile.write(StringUtils.base64Decode(segmentationItem.getDataInfo()));
-            return Boolean.TRUE;
-        } else {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Segmentation file part is invalid");
-            }
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * File name filter by regex
-     */
-    private static final class FilenameRegexFilter implements FilenameFilter {
-        private final String fileNameRegex;
-
-        /**
-         * Instantiates a new Filename regex filter.
-         *
-         * @param fileNameRegex the file name regex
-         */
-        public FilenameRegexFilter(String fileNameRegex) {
-            this.fileNameRegex = fileNameRegex;
-        }
-
-        public boolean accept(File dir, String name) {
-            if (this.fileNameRegex != null && dir != null && dir.isDirectory()
-                    && dir.exists() && name != null) {
-                String fileName = StringUtils.getFilename(name);
-                return StringUtils.matches(fileName, this.fileNameRegex);
-            }
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * file extension name filter
-     */
-    private static final class FilenameExtensionFilter implements FilenameFilter {
-        private final String fileExtName;
-
-        /**
-         * Instantiates a new Filename extension filter.
-         *
-         * @param fileExtName the file ext name
-         */
-        public FilenameExtensionFilter(String fileExtName) {
-            this.fileExtName = fileExtName;
-        }
-
-        public boolean accept(File dir, String name) {
-            if (this.fileExtName != null && dir != null && dir.isDirectory()
-                    && dir.exists() && name != null) {
-                String fileExtName = StringUtils.getFilenameExtension(name);
-                return fileExtName.equalsIgnoreCase(this.fileExtName);
-            }
-            return Boolean.FALSE;
-        }
-    }
-
-    private static final class DirectoryFileFilter implements FileFilter {
-
-        /**
-         * Instantiates a new Directory file filter.
-         */
-        DirectoryFileFilter() {
-        }
-
-        public boolean accept(File pathname) {
-            return pathname.isDirectory();
         }
     }
 }

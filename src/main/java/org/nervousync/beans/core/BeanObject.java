@@ -20,11 +20,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
 import org.nervousync.annotations.beans.OutputConfig;
 import org.nervousync.commons.adapter.xml.CDataAdapter;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.exceptions.xml.XmlException;
+import org.nervousync.commons.Globals;
 import org.nervousync.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
@@ -40,118 +37,144 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * The type Bean object.
+ * <h2 class="en">Abstract class of JavaBean</h2>
+ * <span class="en">
+ *     If JavaBean class extends current abstract class, it's can easier convert object to JSON/XML/YAML string.
+ *     Default encoding is UTF-8
+ *     Convert object to XML must add annotation to class and fields, using JAXB annotation
+ *     Convert custom fields in object to JSON/YAML must add annotation to fields, using jackson annotation
+ * </span>
+ * <h2 class="zh-CN">JavaBean的抽象类</h2>
+ * <span class="zh-CN">
+ *     <p>如果JavaBean类继承此抽象类，将可以简单的转化对象为JSON/XML/YAML字符串。默认编码集为UTF-8</p>
+ *     <p>转换对象为XML时，必须使用JAXB注解对类和属性进行标注</p>
+ *     <p>转换对象中的指定属性值为JSON/YAML时，必须使用Jackson注解对属性进行标注</p>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 2021/1/6 17:10 $
+ * @version $Revision : 1.0 $ $Date: Jan 6, 2021 17:10:23 $
  */
-public class BeanObject implements Serializable {
-
-	private static final long serialVersionUID = 6900853002518080456L;
-
-	private static final String FRAGMENT = "<?xml version=\"1.0\" encoding=\"{}\"?>";
-
+@OutputConfig(type = StringUtils.StringType.XML, formatted = true)
+public abstract class BeanObject implements Serializable {
 	/**
-	 * The constant LOGGER.
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
-	protected static final Logger LOGGER = LoggerFactory.getLogger(BeanObject.class);
-
+	private static final long serialVersionUID = 6900853002518080456L;
 	/**
-	 * To json string string.
+	 * <span class="en">XML fragment template</span>
+	 * <span class="zh-CN">XML声明模板</span>
+	 */
+	private static final String FRAGMENT_TEMPLATE = "<?xml version=\"1.0\" encoding=\"{}\"?>";
+	/**
+	 * <span class="en">Logger instance</span>
+	 * <span class="zh-CN">日志对象</span>
+	 */
+	protected transient final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
+	/**
+	 * <h3 class="en">Convert current object to not formatted JSON string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的JSON字符串</h3>
 	 *
-	 * @return the string
+	 * @return 	<span class="en">Converted JSON string</span>
+	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.FALSE);
 	}
-
 	/**
-	 * To json string string.
+	 * <h3 class="en">Convert current object to formatted JSON string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为格式化的JSON字符串</h3>
 	 *
-	 * @return the string
+	 * @return 	<span class="en">Converted JSON string</span>
+	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toFormattedJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.TRUE);
 	}
-
 	/**
-	 * To json string string.
+	 * <h3 class="en">Convert current object to not formatted YAML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的YAML字符串</h3>
 	 *
-	 * @return the string
+	 * @return 	<span class="en">Converted YAML string</span>
+	 * 			<span class="zh-CN">转换后的YAML字符串</span>
 	 */
 	public final String toYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.FALSE);
 	}
-
 	/**
-	 * To json string string.
+	 * <h3 class="en">Convert current object to formatted YAML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为格式化的YAML字符串</h3>
 	 *
-	 * @return the string
+	 * @return 	<span class="en">Converted JSON string</span>
+	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toFormattedYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.TRUE);
 	}
-
 	/**
-	 * Convert Object to XML String
+	 * <h3 class="en">Convert current object to not formatted XML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的XML字符串</h3>
 	 *
-	 * @return XML String
-	 * @throws XmlException the xml exception
+	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
-	public final String toXML() throws XmlException {
-		return this.toXML(Boolean.TRUE);
+	public final String toXML() {
+		return this.toXML(Boolean.FALSE);
 	}
-
 	/**
-	 * Convert Object to XML String
-	 * Explain all empty elements
+	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param formattedOutput Formatted output
-	 * @return XML String
-	 * @throws XmlException the xml exception
+	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
-	public final String toXML(final boolean formattedOutput) throws XmlException {
+	public final String toXML(final boolean formattedOutput) {
 		return this.toXML(Boolean.TRUE, formattedOutput);
 	}
-
 	/**
-	 * Convert Object to XML String
-	 * Explain all empty elements
+	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param formattedOutput Formatted output
-	 * @param encoding        Charset encoding
-	 * @return XML String
-	 * @throws XmlException the xml exception
+	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @param encoding			<span class="en">Output string encoding</span>
+	 *                          <span class="zh-CN">输出字符串使用的字符集</span>
+	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
-	public final String toXML(final boolean formattedOutput, final String encoding) throws XmlException {
+	public final String toXML(final boolean formattedOutput, final String encoding) {
 		return this.toXML(Boolean.TRUE, formattedOutput, encoding);
 	}
-
 	/**
-	 * Convert Object to XML String
-	 * Explain all empty elements
+	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param outputFragment  Output fragment
-	 * @param formattedOutput Formatted output
-	 * @return XML String
-	 * @throws XmlException the xml exception
+	 * @param outputFragment 	<span class="en">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出的XML声明字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
-	public final String toXML(final boolean outputFragment, final boolean formattedOutput) throws XmlException {
+	public final String toXML(final boolean outputFragment, final boolean formattedOutput) {
 		return this.toXML(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
 	}
-
 	/**
-	 * Convert Object to XML String
-	 * Explain all empty elements
+	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param outputFragment  Output fragment
-	 * @param formattedOutput Formatted output
-	 * @param encoding        Charset encoding
-	 * @return XML String
-	 * @throws XmlException the xml exception
+	 * @param outputFragment 	<span class="en">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出的XML声明字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
+	 * @param encoding			<span class="en">Output string encoding</span>
+	 *                          <span class="zh-CN">输出字符串使用的字符集</span>
+	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
-	public final String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding)
-			throws XmlException {
+	public final String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding) {
 		StringWriter stringWriter = null;
 
 		try {
@@ -164,7 +187,7 @@ public class BeanObject implements Serializable {
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, characterEncoding);
-			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
 			marshaller.marshal(this, streamWriter);
 
@@ -183,103 +206,85 @@ public class BeanObject implements Serializable {
 
 				transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(stringWriter));
 			}
+
+			StringBuilder stringBuilder = new StringBuilder();
 			if (outputFragment) {
+				stringBuilder.append(StringUtils.replace(FRAGMENT_TEMPLATE, "{}", characterEncoding));
 				if (formattedOutput) {
-					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + FileUtils.LF + stringWriter;
-				} else {
-					return StringUtils.replace(FRAGMENT, "{}", characterEncoding) + stringWriter;
+					stringBuilder.append(FileUtils.LF);
 				}
-			} else {
-				return stringWriter.toString();
 			}
+			stringBuilder.append(stringWriter);
+			return stringBuilder.toString();
 		} catch (Exception e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Error stack message: ", e);
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("Utils", "Stack_Message_Error", e);
 			}
-			return null;
+			return Globals.DEFAULT_VALUE_STRING;
 		} finally {
 			IOUtils.closeStream(stringWriter);
 		}
 	}
-
+	/**
+	 * (non-javadoc)
+	 * @see Object#equals(Object)
+	 */
 	@Override
 	public final boolean equals(final Object o) {
-		if (o == null) {
+		if (o == null || !o.getClass().equals(this.getClass())) {
 			return Boolean.FALSE;
 		}
-
 		if (this == o) {
 			return Boolean.TRUE;
 		}
-
-		if (!o.getClass().equals(this.getClass())) {
-			return Boolean.FALSE;
-		}
-
-		Field[] fields = this.getClass().getDeclaredFields();
-
-		try {
-			for (Field field : fields) {
-				if (ReflectionUtils.staticMember(field)) {
-					//	Ignore static field
-					continue;
-				}
-				Object origValue = ReflectionUtils.getFieldValue(field, this);
-				Object destValue = ReflectionUtils.getFieldValue(field, o);
-
-				if (!Objects.equals(origValue, destValue)) {
-					return Boolean.FALSE;
-				}
-			}
-		} catch (Exception e) {
-			return Boolean.FALSE;
-		}
-		return Boolean.TRUE;
+		return Arrays.stream(this.getClass().getDeclaredFields())
+				.filter(field -> !ReflectionUtils.staticMember(field))
+				.allMatch(field ->
+					Objects.equals(ReflectionUtils.getFieldValue(field, this),
+							ReflectionUtils.getFieldValue(field, o)));
 	}
-
+	/**
+	 * (non-javadoc)
+	 * @see Object#hashCode()
+	 */
 	@Override
 	public final int hashCode() {
-		Field[] fields = this.getClass().getDeclaredFields();
-
-		int result = Globals.INITIAL_HASH;
-
+		int result = Globals.INITIALIZE_INT_VALUE;
 		try {
-			for (Field field : fields) {
+			for (Field field : this.getClass().getDeclaredFields()) {
 				Object origValue = ReflectionUtils.getFieldValue(field, this);
 				result = Globals.MULTIPLIER * result + (origValue != null ? origValue.hashCode() : 0);
 			}
 		} catch (Exception e) {
 			result = Globals.DEFAULT_VALUE_INT;
 		}
-
 		return result;
 	}
-
+	/**
+	 * (non-javadoc)
+	 * @see Object#toString()
+	 */
 	@Override
 	public final String toString() {
-		StringUtils.StringType stringType = Optional.ofNullable(this.getClass().getAnnotation(OutputConfig.class))
+		OutputConfig outputConfig = this.getClass().getAnnotation(OutputConfig.class);
+		StringUtils.StringType stringType = Optional.ofNullable(outputConfig)
 				.map(OutputConfig::type)
 				.orElse(StringUtils.StringType.SIMPLE);
-		return Optional.ofNullable(this.getClass().getAnnotation(OutputConfig.class))
-				.map(outputConfig -> {
-					switch (stringType) {
-						case XML:
-							return this.toXML(outputConfig.formatted(), outputConfig.encoding());
-						case JSON:
-							return outputConfig.formatted() ? this.toFormattedJson() : this.toJson();
-						case YAML:
-							return outputConfig.formatted() ? this.toFormattedYaml() : this.toYaml();
-						default:
-							return this.objectToString();
-					}
-				})
-				.orElse(this.objectToString());
+		switch (stringType) {
+			case XML:
+				return this.toXML(outputConfig.formatted(), outputConfig.encoding());
+			case JSON:
+				return outputConfig.formatted() ? this.toFormattedJson() : this.toJson();
+			case YAML:
+				return outputConfig.formatted() ? this.toFormattedYaml() : this.toYaml();
+			default:
+				return super.toString();
+		}
 	}
 
-	public String objectToString() {
-		return super.toString();
-	}
-
+	/**
+	 * Writer for output CData string
+	 */
 	private static final class CDataStreamWriter implements XMLStreamWriter {
 
 		private final XMLStreamWriter xmlStreamWriter;
@@ -465,7 +470,7 @@ public class BeanObject implements Serializable {
 		/**
 		 * Writes a namespace to the output stream
 		 * If the prefix argument to this method is the empty string,
-		 * "xmlns", or null this method will delegate to writeDefaultNamespace
+		 * "xmlns" or null this method will delegate to writeDefaultNamespace
 		 *
 		 * @param prefix       the prefix to bind this namespace to
 		 * @param namespaceURI the uri to bind the prefix to

@@ -17,7 +17,7 @@
 package org.nervousync.generator.uuid.impl;
 
 import org.nervousync.annotations.generator.GeneratorProvider;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.utils.IDUtils;
 
@@ -26,18 +26,37 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
- * The type Uui dv 3 generator.
+ * <h2 class="en">UUID version 3 generator</h2>
+ * <h2 class="zh-CN">UUID版本3生成器</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:55:12 $
  */
 @GeneratorProvider(IDUtils.UUIDv3)
 public final class UUIDv3Generator extends UUIDGenerator {
-
+    /**
+	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="zh-CN">生成ID值</h3>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random() {
-        return this.random(new byte[0]);
+    public String generate() {
+        return this.generate(new byte[0]);
     }
-
+    /**
+	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
+     *
+     * @param dataBytes     <span class="en">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random(byte[] dataBytes) {
+    public String generate(byte[] dataBytes) {
         try {
             byte[] randomBytes = MessageDigest.getInstance("MD5").digest(dataBytes);
             randomBytes[6] &= 0x0F;     /* clear version        */

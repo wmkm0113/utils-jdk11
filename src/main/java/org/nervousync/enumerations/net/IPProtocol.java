@@ -17,18 +17,21 @@
 package org.nervousync.enumerations.net;
 
 /**
- * The enum Ip protocol.
+ * <h2 class="en">IP protocol Enumerations</h2>
+ * <h2 class="zh-CN">IP协议枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 27, 2017 1:31:26 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 13:31:26 $
  */
 public enum IPProtocol {
 	/**
-	 * Tcp ip protocol.
+     * <span class="en">TCP Protocol</span>
+     * <span class="zh-CN">TCP协议</span>
 	 */
 	TCP,
 	/**
-	 * Udp ip protocol.
+     * <span class="en">UDP Protocol</span>
+     * <span class="zh-CN">UDP协议</span>
 	 */
 	UDP
 }

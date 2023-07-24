@@ -17,34 +17,64 @@
 package org.nervousync.security.config;
 
 /**
- * The type Crc config.
+ * <h2 class="en">CRC configure</h2>
+ * <h2 class="zh-CN">CRC设置</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jan 4, 2018 16:08:46 $
  */
 public final class CRCConfig {
-
-    //  CRC bit
-    private final int bit;
-    //  CRC polynomial
-    private final long polynomial;
-    //  CRC initialize value
-    private final long init;
-    //  CRC XOR out value
-    private final long xorOut;
-    //  CRC output data length
-    private final int outLength;
-    //  Reverse data bytes
-    private final boolean refIn;
-    //  Reverse CRC result before final XOR
-    private final boolean refOut;
-
     /**
-     * Instantiates a new Crc config.
+     * <span class="en">CRC bit</span>
+     * <span class="zh-CN">CRC比特位</span>
+     */
+    private final int bit;
+    /**
+     * <span class="en">CRC polynomial</span>
+     * <span class="en">CRC多项式编码</span>
+     */
+    private final long polynomial;
+    /**
+     * <span class="en">CRC initialize value</span>
+     * <span class="en">CRC初始值</span>
+     */
+    private final long init;
+    /**
+     * <span class="en">CRC XOR out value</span>
+     * <span class="en">CRC输出值异或运算</span>
+     */
+    private final long xorOut;
+    /**
+     * <span class="en">CRC output data length</span>
+     * <span class="en">CRC输出数据长度</span>
+     */
+    private final int outLength;
+    /**
+     * <span class="en">CRC reverse input data bytes</span>
+     * <span class="en">CRC反转输入字节数组</span>
+     */
+    private final boolean refIn;
+    /**
+     * <span class="en">CRC reverse output data bytes</span>
+     * <span class="en">CRC反转输出字节数组</span>
+     */
+    private final boolean refOut;
+    /**
+	 * <h3 class="en">Constructor method for CRCConfig</h3>
+	 * <h3 class="zh-CN">CRC设置的构造方法</h3>
      *
-     * @param bit        the bit
-     * @param polynomial the polynomial
-     * @param init       the init
-     * @param xorOut     the xor out
-     * @param refIn      the ref in
-     * @param refOut     the ref out
+     * @param bit           <span class="en">CRC bit</span>
+     *                      <span class="zh-CN">CRC比特位</span>
+     * @param polynomial    <span class="en">CRC polynomial</span>
+     *                      <span class="en">CRC多项式编码</span>
+     * @param init          <span class="en">CRC initialize value</span>
+     *                      <span class="en">CRC初始值</span>
+     * @param xorOut        <span class="en">CRC XOR out value</span>
+     *                      <span class="en">CRC输出值异或运算</span>
+     * @param refIn         <span class="en">CRC reverse input data bytes</span>
+     *                      <span class="en">CRC反转输入字节数组</span>
+     * @param refOut        <span class="en">CRC reverse output data bytes</span>
+     *                      <span class="en">CRC反转输出字节数组</span>
      */
     public CRCConfig(int bit, long polynomial, long init, long xorOut, boolean refIn, boolean refOut) {
         this.bit = bit;
@@ -55,65 +85,72 @@ public final class CRCConfig {
         this.refIn = refIn;
         this.refOut = refOut;
     }
-
     /**
-     * Gets the value of bit
+	 * <h3 class="en">Getter method for CRC bit</h3>
+	 * <h3 class="zh-CN">CRC比特位的Getter方法</h3>
      *
-     * @return the value of bit
+     * @return  <span class="en">CRC bit</span>
+     *          <span class="zh-CN">CRC比特位</span>
      */
     public int getBit() {
         return bit;
     }
-
     /**
-     * Gets the value of polynomial
+	 * <h3 class="en">Getter method for CRC polynomial</h3>
+	 * <h3 class="zh-CN">CRC多项式编码的Getter方法</h3>
      *
-     * @return the value of polynomial
+     * @return  <span class="en">CRC polynomial</span>
+     *          <span class="en">CRC多项式编码</span>
      */
     public long getPolynomial() {
         return polynomial;
     }
-
     /**
-     * Gets the value of init
+	 * <h3 class="en">Getter method for CRC initialize value</h3>
+	 * <h3 class="zh-CN">CRC初始值的Getter方法</h3>
      *
-     * @return the value of init
+     * @return  <span class="en">CRC initialize value</span>
+     *          <span class="en">CRC初始值</span>
      */
     public long getInit() {
         return init;
     }
-
     /**
-     * Gets the value of xorOut
+	 * <h3 class="en">Getter method for CRC XOR out value</h3>
+	 * <h3 class="zh-CN">CRC输出值异或运算的Getter方法</h3>
      *
-     * @return the value of xorOut
+     * @return  <span class="en">CRC XOR out value</span>
+     *          <span class="en">CRC输出值异或运算</span>
      */
     public long getXorOut() {
         return xorOut;
     }
-
     /**
-     * Gets the value of outLength
+	 * <h3 class="en">Getter method for CRC output data length</h3>
+	 * <h3 class="zh-CN">CRC输出数据长度的Getter方法</h3>
      *
-     * @return the value of outLength
+     * @return  <span class="en">CRC output data length</span>
+     *          <span class="en">CRC输出数据长度</span>
      */
     public int getOutLength() {
         return outLength;
     }
-
     /**
-     * Gets the value of refIn
+	 * <h3 class="en">Getter method for CRC reverse input data bytes</h3>
+	 * <h3 class="zh-CN">CRC反转输入字节数组的Getter方法</h3>
      *
-     * @return the value of refIn
+     * @return  <span class="en">CRC reverse input data bytes</span>
+     *          <span class="en">CRC反转输入字节数组</span>
      */
     public boolean isRefIn() {
         return refIn;
     }
-
     /**
-     * Gets the value of refOut
+	 * <h3 class="en">Getter method for CRC reverse output data bytes</h3>
+	 * <h3 class="zh-CN">CRC反转输出字节数组的Getter方法</h3>
      *
-     * @return the value of refOut
+     * @return  <span class="en">CRC reverse output data bytes</span>
+     *          <span class="en">CRC反转输出字节数组</span>
      */
     public boolean isRefOut() {
         return refOut;

@@ -1,8 +1,0 @@
-org.nervousync.restful.converter.core.BeanObjectConverter
-org.nervousync.restful.converter.core.BooleanConverter
-org.nervousync.restful.converter.core.CharacterConverter
-org.nervousync.restful.converter.core.DoubleConverter
-org.nervousync.restful.converter.core.FloatConverter
-org.nervousync.restful.converter.core.IntegerConverter
-org.nervousync.restful.converter.core.LongConverter
-org.nervousync.restful.converter.core.ShortConverter

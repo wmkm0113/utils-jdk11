@@ -23,11 +23,10 @@ import jakarta.ws.rs.core.*;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.HandlerResolver;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.annotations.restful.DataConverter;
+import org.nervousync.beans.converter.Adapter;
+import org.nervousync.commons.Globals;
 import org.nervousync.enumerations.web.HttpMethodOption;
-import org.nervousync.restful.converter.ParameterConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
@@ -40,30 +39,51 @@ import java.net.URLEncoder;
 import java.util.*;
 
 /**
- * The type Service utils.
+ * <h2 class="en">Service utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Generate SOAP Client instance</ul>
+ *     <ul>Generate Restful Client and process request</ul>
+ * </span>
+ * <h2 class="zh-CN">网络服务工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>生成SOAP请求客户端</ul>
+ *     <ul>生成Restful请求客户端并处理请求</ul>
+ * </span>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2020 15:52:33 $
  */
 public final class ServiceUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceUtils.class);
-
-    private static final List<ParameterConverter> REGISTERED_CONVERTERS;
-
-    static {
-        REGISTERED_CONVERTERS = new ArrayList<>();
-        ServiceLoader.load(ParameterConverter.class).forEach(ServiceUtils::registerConverter);
-    }
-
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(ServiceUtils.class);
+	/**
+	 * <h3 class="en">Private constructor for ServiceUtils</h3>
+	 * <h3 class="zh-CN">网络服务工具集的私有构造方法</h3>
+	 */
     private ServiceUtils() {
     }
-
     /**
-     * Generate SOAP client instance
+     * <h3 class="en">Generate SOAP Client instance</h3>
+     * <h3 class="zh-CN">生成SOAP请求客户端</h3>
      *
-     * @param <T>              End point interface
-     * @param serviceInterface End point interface
-     * @param handlerResolver  Handler resolver
-     * @return Generated instance
-     * @throws MalformedURLException if no protocol is specified, or an unknown protocol is found, or spec is null.
+     * @param <T>               <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     * @param serviceInterface  <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     * @param handlerResolver   <span class="en">Custom handler resolver instance</span>
+     *                          <span class="zh-CN">自定义的处理器实例对象</span>
+     *
+     * @return  <span class="en">Generated client instance</span>
+     *          <span class="zh-CN">生成的客户端实例对象</span>
+     *
+     * @throws MalformedURLException
+     * <span class="en">if no protocol is specified, or an unknown protocol is found, or spec is null.</span>
+     * <span class="zh-CN">如果没有指定协议，或者发现未知协议，或者spec为空。</span>
      */
     public static <T> T SOAPClient(final Class<T> serviceInterface, final HandlerResolver handlerResolver)
             throws MalformedURLException {
@@ -99,29 +119,40 @@ public final class ServiceUtils {
 
         return service.getPort(new QName(namespaceURI, serviceName), serviceInterface);
     }
-
     /**
-     * Generate Restful service client instance
+     * <h3 class="en">Generate Restful service client instance</h3>
+     * <h3 class="zh-CN">生成Restful请求客户端</h3>
      *
-     * @param <T>           Client interface
-     * @param targetAddress the target address
-     * @param serviceClient Client interface class
-     * @return Generated instance
+     * @param <T>               <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     * @param targetAddress     <span class="en">the target address</span>
+     *                          <span class="zh-CN">目标请求地址</span>
+     * @param serviceInterface  <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     *
+     * @return  <span class="en">Generated client instance</span>
+     *          <span class="zh-CN">生成的客户端实例对象</span>
      */
-    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceClient) {
-        return RestfulClient(targetAddress, serviceClient, null);
+    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceInterface) {
+        return RestfulClient(targetAddress, serviceInterface, null);
     }
-
     /**
-     * Generate Restful service client instance
+     * <h3 class="en">Generate Restful service client instance</h3>
+     * <h3 class="zh-CN">生成Restful请求客户端</h3>
      *
-     * @param <T>           Client interface
-     * @param targetAddress the target address
-     * @param serviceClient Client interface class
-     * @param headerMap     the header map
-     * @return Generated instance
+     * @param <T>               <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     * @param targetAddress     <span class="en">the target address</span>
+     *                          <span class="zh-CN">目标请求地址</span>
+     * @param serviceInterface  <span class="en">End point interface</span>
+     *                          <span class="zh-CN">Web服务的接口</span>
+     * @param headerMap         <span class="en">Request header information map</span>
+     *                          <span class="zh-CN">请求头部信息映射</span>
+     *
+     * @return  <span class="en">Generated client instance</span>
+     *          <span class="zh-CN">生成的客户端实例对象</span>
      */
-    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceClient,
+    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceInterface,
                                       final Map<String, String> headerMap) {
         if (StringUtils.isEmpty(targetAddress)) {
             return null;
@@ -129,49 +160,122 @@ public final class ServiceUtils {
         String servicePath = targetAddress.toLowerCase().startsWith("http")
                 ? targetAddress
                 : Globals.HTTP_PROTOCOL + targetAddress;
-        if (serviceClient.isAnnotationPresent(Path.class)) {
-            servicePath += serviceClient.getAnnotation(Path.class).value();
+        if (serviceInterface.isAnnotationPresent(Path.class)) {
+            servicePath += serviceInterface.getAnnotation(Path.class).value();
         }
-        return ObjectUtils.newInstance(serviceClient, new RestfulInterceptor(servicePath, headerMap));
+        return ObjectUtils.newInstance(serviceInterface, new RestfulInterceptor(servicePath, headerMap));
     }
-
     /**
-     * Register converter.
+     * <h3 class="en">Find annotation and generate data convert adapter</h3>
+     * <h3 class="zh-CN">寻找注解并生成数据转换适配器</h3>
      *
-     * @param parameterConverter the parameter converter
+     * @param annotations   <span class="en">Annotation instance array</span>
+     *                      <span class="zh-CN">注解实例对象数组</span>
+     *
+     * @return  <span class="en">Generated data convert adapter</span>
+     *          <span class="zh-CN">生成的数据转换适配器实例对象</span>
      */
-    public static void registerConverter(final ParameterConverter parameterConverter) {
-        if (REGISTERED_CONVERTERS.contains(parameterConverter)) {
-            LOGGER.warn("Exists converter: {}", parameterConverter.getClass().getName());
+    private static Adapter<String, Object> newConverter(final Annotation[] annotations) {
+        Adapter<String, Object> adapter = null;
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().equals(DataConverter.class)) {
+                adapter = newConverter((DataConverter) annotation);
+            }
+            if (adapter != null) {
+                break;
+            }
         }
-        REGISTERED_CONVERTERS.add(parameterConverter);
+        return adapter;
     }
-
     /**
-     * Init converter optional.
+     * <h3 class="en">Find annotation and generate data convert adapter</h3>
+     * <h3 class="zh-CN">寻找注解并生成数据转换适配器</h3>
      *
-     * @param targetClass the target class
-     * @return the optional
+     * @param dataConverter     <span class="en">DataConverter annotation instance</span>
+     *                          <span class="zh-CN">数据转换器注解实例对象</span>
+     *
+     * @return  <span class="en">Generated data convert adapter</span>
+     *          <span class="zh-CN">生成的数据转换适配器实例对象</span>
      */
-    public static Optional<ParameterConverter> initConverter(final Class<?> targetClass) {
-        return REGISTERED_CONVERTERS
-                .stream()
-                .filter(parameterConverter -> parameterConverter.match(targetClass))
-                .findFirst();
+    @SuppressWarnings("unchecked")
+    private static Adapter<String, Object> newConverter(final DataConverter dataConverter) {
+        return Optional.ofNullable(dataConverter)
+                .map(DataConverter::value)
+                .filter(converterClass ->
+                        Adapter.class.isAssignableFrom(converterClass) && !Adapter.class.equals(converterClass))
+                .map(converterClass -> (Adapter<String, Object>) ObjectUtils.newInstance(converterClass))
+                .orElse(null);
     }
-
+    /**
+     * <h3 class="en">Marshal data using given adapter</h3>
+     * <h3 class="zh-CN">使用给定适配器编组数据</h3>
+     *
+     * @param adapter   <span class="en">Data convert adapter</span>
+     *                  <span class="zh-CN">数据转换适配器实例对象</span>
+     * @param value     <span class="en">Data instance will convert</span>
+     *                  <span class="zh-CN">将被转换的数据实例对象</span>
+     *
+     * @return  <span class="en">Converted result or empty string if value is <code>null</code> or an error occurs when process marshal</span>
+     *          <span class="zh-CN">数据转换结果，如果输入数据为<code>null</code>或转换时出现异常，则返回长度为0的空字符串</span>
+     */
+    private static String marshal(final Adapter<String, Object> adapter, final Object value) {
+        if (value == null) {
+            return Globals.DEFAULT_VALUE_STRING;
+        }
+        if (adapter == null) {
+            return value.toString();
+        }
+        try {
+            return adapter.marshal(value);
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.error("Utils", "Convert_Object_Error", e);
+            }
+            return Globals.DEFAULT_VALUE_STRING;
+        }
+    }
+    /**
+     * <h3 class="en">Append parameter value to current array</h3>
+     * <h3 class="zh-CN">追加参数值到当前数组</h3>
+     *
+     * @param paramValues   <span class="en">Current array</span>
+     *                      <span class="zh-CN">当前数组</span>
+     * @param appendValue   <span class="en">Append parameter value</span>
+     *                      <span class="zh-CN">追加的参数值</span>
+     * @return  <span class="en">Append parameter value array</span>
+     *          <span class="zh-CN">追加后的参数值数组</span>
+     */
+    private static String[] appendValue(final String[] paramValues, final String appendValue) {
+        String[] newValues = Arrays.copyOf(paramValues, paramValues.length + 1);
+        newValues[paramValues.length] = Objects.requireNonNullElse(appendValue, Globals.DEFAULT_VALUE_STRING);
+        return newValues;
+    }
+    /**
+     * <h2 class="en">Restful service interceptor invocation handler</h2>
+     * <h2 class="zh-CN">Restful服务拦截器调用处理程序</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jan 13, 2020 16:28:15 $
+     */
     private static final class RestfulInterceptor implements InvocationHandler {
-
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-        private final String requestPath;
-        private final Map<String, String> headerMap;
-
         /**
-         * Instantiates a new Restful interceptor.
+         * <span class="en">Request path</span>
+         * <span class="zh-CN">请求地址</span>
+         */
+        private final String requestPath;
+        /**
+         * <span class="en">Request header information map</span>
+         * <span class="zh-CN">请求头部信息映射</span>
+         */
+        private final Map<String, String> headerMap;
+        /**
+         * <h3 class="en">Constructor for RestfulInterceptor</h3>
+         * <h3 class="zh-CN">Restful服务拦截器的构造方法</h3>
          *
-         * @param requestPath the request path
-         * @param headerMap   the header map
+         * @param requestPath   <span class="en">Request path</span>
+         *                      <span class="zh-CN">请求地址</span>
+         * @param headerMap     <span class="en">Request header information map</span>
+         *                      <span class="zh-CN">请求头部信息映射</span>
          */
         RestfulInterceptor(final String requestPath, final Map<String, String> headerMap) {
             this.requestPath = requestPath;
@@ -180,7 +284,10 @@ public final class ServiceUtils {
                 this.headerMap.putAll(headerMap);
             }
         }
-
+        /**
+         * (Non-Javadoc)
+         * @see InvocationHandler#invoke(Object, Method, Object[])
+         */
         @Override
         public Object invoke(final Object o, final Method method, final Object[] objects) throws Throwable {
             HttpMethodOption methodOption = RequestUtils.httpMethodOption(method);
@@ -217,9 +324,10 @@ public final class ServiceUtils {
                 if (paramObj == null) {
                     continue;
                 }
+                Adapter<String, Object> dataConverter = newConverter(annotations[i]);
                 if (Arrays.stream(annotations[i])
                         .anyMatch(annotation -> annotation.annotationType().equals(BeanParam.class))) {
-                    BeanParameter beanParameter = new BeanParameter(paramObj, mediaTypes);
+                    BeanParameter beanParameter = new BeanParameter(paramObj, mediaTypes, dataConverter);
                     this.headerMap.putAll(beanParameter.getHeaders());
                     for (Map.Entry<String, String> entry : beanParameter.getPaths().entrySet()) {
                         if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
@@ -243,38 +351,27 @@ public final class ServiceUtils {
                             .ifPresent(paramName -> {
                                 if (paramObj.getClass().isArray()) {
                                     Arrays.asList((Object[]) paramObj).forEach(itemValue -> {
-                                        String paramValue = initConverter(itemValue.getClass())
-                                                .map(parameterConverter ->
-                                                        parameterConverter.toString(itemValue, mediaTypes))
-                                                .orElse(itemValue.toString());
+                                        String paramValue = marshal(dataConverter, itemValue);
                                         matrixParameters.put(paramName,
                                                 appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                         paramValue));
                                     });
                                 } else if (List.class.isAssignableFrom(paramObj.getClass())) {
                                     ((List<?>) paramObj).forEach(itemValue -> {
-                                        String paramValue = initConverter(itemValue.getClass())
-                                                .map(parameterConverter ->
-                                                        parameterConverter.toString(itemValue, mediaTypes))
-                                                .orElse(itemValue.toString());
+                                        String paramValue = marshal(dataConverter, itemValue);
                                         matrixParameters.put(paramName,
                                                 appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                         paramValue));
                                     });
                                 } else {
-                                    String paramValue = initConverter(paramObj.getClass())
-                                            .map(parameterConverter ->
-                                                    parameterConverter.toString(paramObj, mediaTypes))
-                                            .orElse(paramObj.toString());
+                                    String paramValue = marshal(dataConverter, paramObj);
                                     matrixParameters.put(paramName,
                                             appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                     paramValue));
                                 }
                             });
                 } else {
-                    String paramValue = initConverter(paramObj.getClass())
-                            .map(parameterConverter -> parameterConverter.toString(paramObj, mediaTypes))
-                            .orElse(paramObj.toString());
+                    String paramValue = marshal(dataConverter, paramObj);
                     if (Arrays.stream(annotations[i])
                             .anyMatch(annotation -> annotation.annotationType().equals(QueryParam.class))) {
                         String paramName =
@@ -351,18 +448,44 @@ public final class ServiceUtils {
                 String[] acceptTypes = method.isAnnotationPresent(Produces.class)
                         ? method.getAnnotation(Produces.class).value()
                         : new String[]{"*/*"};
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Accept data types: {}", String.join(",", acceptTypes));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Accept data types: {}", String.join(",", acceptTypes));
                 }
                 Invocation.Builder builder = webTarget.request(acceptTypes);
                 if (method.isAnnotationPresent(Consumes.class)) {
                     builder.accept(method.getAnnotation(Consumes.class).value());
                 }
                 this.headerMap.forEach(builder::header);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Service request path: {}", servicePath);
+                    LOGGER.debug("Request headers: {}",
+                            StringUtils.objectToString(this.headerMap, StringUtils.StringType.JSON, Boolean.TRUE));
+                    LOGGER.debug("Request parameters: {}",
+                            StringUtils.objectToString(queryParameters, StringUtils.StringType.JSON, Boolean.TRUE));
+                    LOGGER.debug("Request matrix parameters: {}",
+                            StringUtils.objectToString(matrixParameters, StringUtils.StringType.JSON, Boolean.TRUE));
+                }
                 return this.execute(methodOption, builder, form, method);
             }
         }
-
+        /**
+         * <h3 class="en">Send request and initialize response instance</h3>
+         * <h3 class="zh-CN">发送请求并初始化响应实例对象</h3>
+         *
+         * @param methodOption  <span class="en">HTTP method option Enumerations</span>
+         *                      <span class="zh-CN">HTTP请求方法枚举</span>
+         * @param builder       <span class="en">Request builder</span>
+         *                      <span class="zh-CN">请求构建器</span>
+         * @param form          <span class="en">Form information instance</span>
+         *                      <span class="zh-CN">表单信息实例对象</span>
+         *
+         * @return  <span class="en">initialized response instance</span>
+         *          <span class="zh-CN">初始化的响应实例对象</span>
+         *
+         * @throws ServiceException
+         * <span class="en">If http method not supported</span>
+         * <span class="zh-CN">如果HTTP请求方法不支持</span>
+         */
         private Response initResponse(final HttpMethodOption methodOption, final Invocation.Builder builder,
                                       final Form form) throws ServiceException {
             switch (methodOption) {
@@ -383,12 +506,30 @@ public final class ServiceUtils {
                     throw new ServiceException("Method not supported! ");
             }
         }
-
+        /**
+         * <h3 class="en">Send request and parse response information</h3>
+         * <h3 class="zh-CN">发送请求并解析响应信息</h3>
+         *
+         * @param methodOption  <span class="en">HTTP method option Enumerations</span>
+         *                      <span class="zh-CN">HTTP请求方法枚举</span>
+         * @param builder       <span class="en">Request builder</span>
+         *                      <span class="zh-CN">请求构建器</span>
+         * @param form          <span class="en">Form information instance</span>
+         *                      <span class="zh-CN">表单信息实例对象</span>
+         * @param method        <span class="en">Invoke method instance</span>
+         *                      <span class="zh-CN">调用方法的实例对象</span>
+         *
+         * @return  <span class="en">Parsed response information</span>
+         *          <span class="zh-CN">解析的响应信息</span>
+         *
+         * @throws ServiceException
+         * <span class="en">If http method not supported, or an error occurs when send request or parse response information</span>
+         * <span class="zh-CN">如果HTTP请求方法不支持，发送请求或解析响应信息时出现异常</span>
+         */
         private Object execute(final HttpMethodOption methodOption, final Invocation.Builder builder,
                                final Form form, final Method method) throws ServiceException {
             try (Response response = this.initResponse(methodOption, builder, form)) {
                 boolean operateResult;
-
                 switch (methodOption) {
                     case PUT:
                         operateResult = (response.getStatus() == HttpServletResponse.SC_CREATED
@@ -417,8 +558,15 @@ public final class ServiceUtils {
                     if (void.class.equals(returnType)) {
                         return null;
                     }
+                    String contentType = response.getHeaderString("Content-Type");
+                    String charsetEncoding =
+                            Arrays.stream(StringUtils.tokenizeToStringArray(contentType, ";"))
+                                    .filter(string -> string.trim().toLowerCase().startsWith("charset="))
+                                    .findFirst()
+                                    .map(string -> string.substring("charset=".length()))
+                                    .orElse(Globals.DEFAULT_ENCODING);
 
-                    Class<?> paramClass = ReflectionUtils.componentType(method);
+                    Class<?> paramClass = ClassUtils.componentType(method.getReturnType());
 
                     String responseData = response.readEntity(String.class);
                     if (responseData.endsWith(FileUtils.CRLF)) {
@@ -431,30 +579,29 @@ public final class ServiceUtils {
                         responseData = responseData.substring(0, responseData.length() - Character.toString(FileUtils.LF).length());
                     }
 
+                    if (returnType.isArray()) {
+                        return Optional.ofNullable(StringUtils.stringToList(responseData, charsetEncoding, paramClass))
+                                .map(List::toArray)
+                                .orElse(new ArrayList<>().toArray());
+                    } else if (List.class.isAssignableFrom(returnType)) {
+                        return Optional.ofNullable(StringUtils.stringToList(responseData, charsetEncoding, paramClass))
+                                .orElse(new ArrayList<>());
+                    }
                     switch (response.getHeaderString(HttpHeaders.CONTENT_TYPE)) {
                         case FileUtils.MIME_TYPE_JSON:
-                            if (returnType.isArray()) {
-                                return parseToList(responseData, paramClass).toArray();
-                            } else if (List.class.isAssignableFrom(returnType)) {
-                                return parseToList(responseData, paramClass);
-                            }
-                            return StringUtils.stringToObject(responseData, returnType);
+                            return StringUtils.stringToObject(responseData, StringUtils.StringType.JSON, returnType);
                         case FileUtils.MIME_TYPE_TEXT_XML:
                         case FileUtils.MIME_TYPE_XML:
+                            return StringUtils.stringToObject(responseData, StringUtils.StringType.XML, returnType);
                         case FileUtils.MIME_TYPE_TEXT_YAML:
                         case FileUtils.MIME_TYPE_YAML:
-                            return StringUtils.stringToObject(responseData, returnType);
-                        case FileUtils.MIME_TYPE_TEXT:
-                            return responseData;
+                            return StringUtils.stringToObject(responseData, StringUtils.StringType.YAML, returnType);
                         default:
-                            final String value = responseData;
-                            return initConverter(returnType)
-                                    .map(parameterConverter -> parameterConverter.fromString(returnType, value))
-                                    .orElse(null);
+                            return responseData;
                     }
                 } else {
                     String errorMsg = response.readEntity(String.class);
-                    if (this.logger.isDebugEnabled()) {
+                    if (LOGGER.isDebugEnabled()) {
                         if (response.getStatus() == HttpServletResponse.SC_BAD_REQUEST) {
                             errorMsg += "Send request data error!";
                         } else if (HttpMethodOption.GET.equals(methodOption)
@@ -471,7 +618,7 @@ public final class ServiceUtils {
                         } else {
                             errorMsg += Globals.DEFAULT_VALUE_STRING;
                         }
-                        this.logger.debug("Response code: {}, error message: {}", response.getStatus(), errorMsg);
+                        LOGGER.debug("Utils", "Response_Message_Debug", response.getStatus(), errorMsg);
                     }
                     throw new ServiceException(errorMsg);
                 }
@@ -483,49 +630,62 @@ public final class ServiceUtils {
             }
         }
     }
-
+    /**
+     * <h2 class="en">JavaBean parameter define</h2>
+     * <h2 class="zh-CN">JavaBean参数定义</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jan 13, 2020 16:33:27 $
+     */
     private static final class BeanParameter {
-
         /**
-         * The Form parameters.
+         * <span class="en">Form parameter map</span>
+         * <span class="zh-CN">表单信息映射</span>
          */
         final Map<String, String> formParameters = new HashMap<>();
         /**
-         * The Query parameters.
+         * <span class="en">Query parameter map</span>
+         * <span class="zh-CN">查询信息映射</span>
          */
         final Map<String, String> queryParameters = new HashMap<>();
         /**
-         * The Parameters.
+         * <span class="en">Matrix parameter map</span>
+         * <span class="zh-CN">矩阵信息映射</span>
          */
         final Map<String, String[]> matrixParameters = new HashMap<>();
         /**
-         * The Headers.
+         * <span class="en">Header parameter map</span>
+         * <span class="zh-CN">请求头信息映射</span>
          */
         final Map<String, String> headers = new HashMap<>();
         /**
-         * The Paths.
+         * <span class="en">Path parameter map</span>
+         * <span class="zh-CN">请求路径信息映射</span>
          */
         final Map<String, String> paths = new HashMap<>();
-
         /**
-         * Instantiates a new Bean parameter.
+         * <h3 class="en">Constructor for BeanParameter</h3>
+         * <h3 class="zh-CN">BeanParameter的构造方法</h3>
          *
-         * @param beanObject the bean object
+         * @param beanObject    <span class="en">JavaBean parameter instance</span>
+         *                      <span class="zh-CN">JavaBean参数信息实例对象</span>
+         * @param mediaTypes    <span class="en">Request media types array</span>
+         *                      <span class="zh-CN">请求数据类型数组</span>
+         * @param adapter       <span class="en">Data convert adapter</span>
+         *                      <span class="zh-CN">数据转换适配器实例对象</span>
          */
-        BeanParameter(final Object beanObject, final String[] mediaTypes) {
-            ReflectionUtils.getAllDeclaredFields(beanObject.getClass()).forEach(field -> {
+        BeanParameter(final Object beanObject, final String[] mediaTypes, final Adapter<String, Object> adapter) {
+            ReflectionUtils.getAllDeclaredFields(beanObject.getClass(), Boolean.TRUE).forEach(field -> {
                 Object fieldValue = ReflectionUtils.getFieldValue(field, beanObject);
                 if (field.isAnnotationPresent(BeanParam.class)) {
-                    BeanParameter beanParameter = new BeanParameter(fieldValue, mediaTypes);
+                    BeanParameter beanParameter = new BeanParameter(fieldValue, mediaTypes, adapter);
                     this.formParameters.putAll(beanParameter.getFormParameters());
                     this.queryParameters.putAll(beanParameter.getQueryParameters());
                     this.matrixParameters.putAll(beanParameter.getMatrixParameters());
                     this.headers.putAll(beanParameter.getHeaders());
                     this.paths.putAll(beanParameter.getPaths());
                 } else {
-                    String stringValue = initConverter(fieldValue.getClass())
-                            .map(parameterConverter -> parameterConverter.toString(fieldValue, mediaTypes))
-                            .orElse(fieldValue.toString());
+                    String stringValue = marshal(adapter, fieldValue);
 
                     if (field.isAnnotationPresent(QueryParam.class)) {
                         this.queryParameters.put(field.getAnnotation(QueryParam.class).value(), stringValue);
@@ -543,60 +703,55 @@ public final class ServiceUtils {
                 }
             });
         }
-
         /**
-         * Gets form parameters.
+         * <h3 class="en">Getter method for form parameter map</h3>
+         * <h3 class="zh-CN">表单信息映射的Getter方法</h3>
          *
-         * @return the form parameters
+         * @return  <span class="en">Form parameter map</span>
+         *          <span class="zh-CN">表单信息映射</span>
          */
         public Map<String, String> getFormParameters() {
             return formParameters;
         }
-
         /**
-         * Gets query parameters.
+         * <h3 class="en">Getter method for query parameter map</h3>
+         * <h3 class="zh-CN">查询信息映射的Getter方法</h3>
          *
-         * @return the query parameters
+         * @return  <span class="en">Query parameter map</span>
+         *          <span class="zh-CN">查询信息映射</span>
          */
         public Map<String, String> getQueryParameters() {
             return queryParameters;
         }
-
         /**
-         * Gets matrix parameters.
+         * <h3 class="en">Getter method for matrix parameter map</h3>
+         * <h3 class="zh-CN">矩阵信息映射的Getter方法</h3>
          *
-         * @return the matrix parameters
+         * @return  <span class="en">Matrix parameter map</span>
+         *          <span class="zh-CN">矩阵信息映射</span>
          */
         public Map<String, String[]> getMatrixParameters() {
             return matrixParameters;
         }
-
         /**
-         * Gets headers.
+         * <h3 class="en">Getter method for header parameter map</h3>
+         * <h3 class="zh-CN">请求头信息映射的Getter方法</h3>
          *
-         * @return the headers
+         * @return  <span class="en">Header parameter map</span>
+         *          <span class="zh-CN">请求头信息映射</span>
          */
         public Map<String, String> getHeaders() {
             return headers;
         }
-
         /**
-         * Gets paths.
+         * <h3 class="en">Getter method for path parameter map</h3>
+         * <h3 class="zh-CN">请求路径信息映射的Getter方法</h3>
          *
-         * @return the paths
+         * @return  <span class="en">Path parameter map</span>
+         *          <span class="zh-CN">请求路径信息映射</span>
          */
         public Map<String, String> getPaths() {
             return paths;
         }
-    }
-
-    private static <T> List<T> parseToList(String string, Class<T> targetClass) {
-        return StringUtils.stringToList(string, Globals.DEFAULT_ENCODING, targetClass);
-    }
-
-    private static String[] appendValue(String[] paramValues, String appendValue) {
-        String[] newValues = Arrays.copyOf(paramValues, paramValues.length + 1);
-        newValues[paramValues.length] = Objects.requireNonNullElse(appendValue, Globals.DEFAULT_VALUE_STRING);
-        return newValues;
     }
 }

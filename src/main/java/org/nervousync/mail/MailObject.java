@@ -20,303 +20,342 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
- * Mail define
+ * <h2 class="en">E-Mail Information Define</h2>
+ * <h2 class="zh-CN">电子邮件信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2012 7:03:47 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 19:03:47 $
  */
 public final class MailObject implements Serializable {
-
 	/**
-	 * 
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -4277408041510934598L;
-	
 	/**
-	 * Identified id
+	 * <span class="en">Unified identified ID</span>
+	 * <span class="zh-CN">统一识别代码</span>
 	 */
 	private String uid;
 	/**
-	 * Mail subject
+	 * <span class="en">Mail subject information</span>
+	 * <span class="zh-CN">邮件标题信息</span>
 	 */
 	private String subject;
 	/**
-	 * Mail content
+	 * <span class="en">Mail content information</span>
+	 * <span class="zh-CN">邮件正文信息</span>
 	 */
 	private String content;
 	/**
-	 * Charset encoding
+	 * <span class="en">Mail charset encoding</span>
+	 * <span class="zh-CN">邮件字符集编码</span>
 	 */
 	private String charset = Globals.DEFAULT_ENCODING;
 	/**
-	 * Mail content type
+	 * <span class="en">Mail content type information</span>
+	 * <span class="zh-CN">邮件正文数据类型</span>
 	 */
 	private String contentType = Globals.DEFAULT_CONTENT_TYPE_TEXT;
 	/**
-	 * Sender e-mail address
+	 * <span class="en">Mail send address</span>
+	 * <span class="zh-CN">邮件发送地址</span>
 	 */
 	private String sendAddress;
 	/**
-	 * Reply e-mail address
+	 * <span class="en">Mail reply address</span>
+	 * <span class="zh-CN">邮件回复地址</span>
 	 */
 	private List<String> replyAddress;
 	/**
-	 * Send datetime
+	 * <span class="en">Mail send datetime</span>
+	 * <span class="zh-CN">邮件发送时间</span>
 	 */
 	private Date sendDate;
 	/**
-	 * Receiver e-mail address list
+	 * <span class="en">Mail receive address list</span>
+	 * <span class="zh-CN">邮件收件地址列表</span>
 	 */
 	private List<String> receiveAddress;
 	/**
-	 * CC e-mail address list
+	 * <span class="en">Mail carbon copy address list</span>
+	 * <span class="zh-CN">邮件抄送地址列表</span>
 	 */
 	private List<String> ccAddress;
 	/**
-	 * BCC e-mail address list
+	 * <span class="en">Mail blind carbon copy address list</span>
+	 * <span class="zh-CN">邮件暗抄送地址列表</span>
 	 */
 	private List<String> bccAddress;
 	/**
-	 * Attaches file list
+	 * <span class="en">Mail attachment file list</span>
+	 * <span class="zh-CN">邮件附件文件列表</span>
 	 */
 	private List<String> attachFiles;
 	/**
-	 * Mail content include file list
+	 * <span class="en">Mail include file list</span>
+	 * <span class="zh-CN">邮件包含文件列表</span>
 	 */
 	private List<String> includeFiles;
-
 	/**
-	 * Gets uid.
+	 * <h3 class="en">Getter method for unified identified ID</h3>
+	 * <h3 class="zh-CN">统一识别代码的Getter方法</h3>
 	 *
-	 * @return the uid
+	 * <span class="en">Unified identified ID</span>
+	 * <span class="zh-CN">统一识别代码</span>
 	 */
 	public String getUid() {
 		return uid;
 	}
-
 	/**
-	 * Sets uid.
+	 * <h3 class="en">Setter method for unified identified ID</h3>
+	 * <h3 class="zh-CN">统一识别代码的Setter方法</h3>
 	 *
-	 * @param uid the uid to set
+	 * @param uid 	<span class="en">Unified identified ID</span>
+	 *              <span class="zh-CN">统一识别代码</span>
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
-
 	/**
-	 * Gets subject.
+	 * <h3 class="en">Getter method for mail subject information</h3>
+	 * <h3 class="zh-CN">邮件标题信息的Getter方法</h3>
 	 *
-	 * @return the subject
+	 * @return 	<span class="en">Mail subject information</span>
+	 * 			<span class="zh-CN">邮件标题信息</span>
 	 */
 	public String getSubject() {
 		return subject;
 	}
-
 	/**
-	 * Sets subject.
+	 * <h3 class="en">Setter method for mail subject information</h3>
+	 * <h3 class="zh-CN">邮件标题信息的Setter方法</h3>
 	 *
-	 * @param subject the subject to set
+	 * @param subject 	<span class="en">Mail subject information</span>
+	 * 					<span class="zh-CN">邮件标题信息</span>
 	 */
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
-
 	/**
-	 * Gets content.
+	 * <h3 class="en">Getter method for mail content information</h3>
+	 * <h3 class="zh-CN">邮件正文信息的Getter方法</h3>
 	 *
-	 * @return the content
+	 * @return 	<span class="en">Mail content information</span>
+	 * 			<span class="zh-CN">邮件正文信息</span>
 	 */
 	public String getContent() {
 		return content;
 	}
-
 	/**
-	 * Sets content.
+	 * <h3 class="en">Setter method for mail content information</h3>
+	 * <h3 class="zh-CN">邮件正文信息的Setter方法</h3>
 	 *
-	 * @param content the content to set
+	 * @param content 	<span class="en">Mail content information</span>
+	 * 					<span class="zh-CN">邮件正文信息</span>
 	 */
 	public void setContent(String content) {
 		this.content = content;
 	}
-
 	/**
-	 * Gets charset.
+	 * <h3 class="en">Getter method for mail charset encoding</h3>
+	 * <h3 class="zh-CN">邮件字符集编码的Getter方法</h3>
 	 *
-	 * @return the charset
+	 * @return 	<span class="en">Mail charset encoding</span>
+	 * 			<span class="zh-CN">邮件字符集编码</span>
 	 */
 	public String getCharset() {
 		return charset;
 	}
-
 	/**
-	 * Sets charset.
+	 * <h3 class="en">Setter method for mail charset encoding</h3>
+	 * <h3 class="zh-CN">邮件字符集编码的Setter方法</h3>
 	 *
-	 * @param charset the charset to set
+	 * @param charset 	<span class="en">Mail charset encoding</span>
+	 *                  <span class="zh-CN">邮件字符集编码</span>
 	 */
 	public void setCharset(String charset) {
 		this.charset = charset;
 	}
-
 	/**
-	 * Gets the content type.
+	 * <h3 class="en">Getter method for mail content type information</h3>
+	 * <h3 class="zh-CN">邮件正文数据类型的Getter方法</h3>
 	 *
-	 * @return the contentType
+	 * @return 	<span class="en">Mail content type information</span>
+	 * 			<span class="zh-CN">邮件正文数据类型</span>
 	 */
 	public String getContentType() {
 		return contentType;
 	}
-
 	/**
-	 * Sets content type.
+	 * <h3 class="en">Setter method for mail content type information</h3>
+	 * <h3 class="zh-CN">邮件正文数据类型的Setter方法</h3>
 	 *
-	 * @param contentType the contentType to set
+	 * @param contentType 	<span class="en">Mail content type information</span>
+	 *                      <span class="zh-CN">邮件正文数据类型</span>
 	 */
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
-
 	/**
-	 * Gets send address.
+	 * <h3 class="en">Getter method for mail send address</h3>
+	 * <h3 class="zh-CN">邮件发送地址的Getter方法</h3>
 	 *
-	 * @return the sendAddress
+	 * @return 	<span class="en">Mail send address</span>
+	 * 			<span class="zh-CN">邮件发送地址</span>
 	 */
 	public String getSendAddress() {
 		return sendAddress;
 	}
-
 	/**
-	 * Sets send address.
+	 * <h3 class="en">Setter method for mail send address</h3>
+	 * <h3 class="zh-CN">邮件发送地址的Setter方法</h3>
 	 *
-	 * @param sendAddress the sendAddress to set
+	 * @param sendAddress 	<span class="en">Mail send address</span>
+	 *                      <span class="zh-CN">邮件发送地址</span>
 	 */
 	public void setSendAddress(String sendAddress) {
 		this.sendAddress = sendAddress;
 	}
-
 	/**
-	 * Gets reply address.
+	 * <h3 class="en">Getter method for mail reply address</h3>
+	 * <h3 class="zh-CN">邮件回复地址的Getter方法</h3>
 	 *
-	 * @return the replyAddress
+	 * @return 	<span class="en">Mail reply address</span>
+	 * 			<span class="zh-CN">邮件回复地址</span>
 	 */
 	public List<String> getReplyAddress() {
 		return replyAddress;
 	}
-
 	/**
-	 * Sets reply address.
+	 * <h3 class="en">Setter method for mail reply address</h3>
+	 * <h3 class="zh-CN">邮件回复地址的Setter方法</h3>
 	 *
-	 * @param replyAddress the replyAddress to set
+	 * @param replyAddress 	<span class="en">Mail reply address</span>
+	 *                      <span class="zh-CN">邮件回复地址</span>
 	 */
 	public void setReplyAddress(List<String> replyAddress) {
 		this.replyAddress = replyAddress;
 	}
-
 	/**
-	 * Gets send date.
+	 * <h3 class="en">Getter method for mail send datetime</h3>
+	 * <h3 class="zh-CN">邮件发送时间的Getter方法</h3>
 	 *
-	 * @return the sendDate
+	 * @return 	<span class="en">Mail send datetime</span>
+	 * 			<span class="zh-CN">邮件发送时间</span>
 	 */
 	public Date getSendDate() {
 		return sendDate == null ? null : (Date)sendDate.clone();
 	}
-
 	/**
-	 * Sets send date.
+	 * <h3 class="en">Setter method for mail send datetime</h3>
+	 * <h3 class="zh-CN">邮件发送时间的Setter方法</h3>
 	 *
-	 * @param sendDate the sendDate to set
+	 * @param sendDate 	<span class="en">Mail send datetime</span>
+	 *                  <span class="zh-CN">邮件发送时间</span>
 	 */
 	public void setSendDate(Date sendDate) {
 		this.sendDate = sendDate == null ? null : (Date)sendDate.clone();
 	}
-
 	/**
-	 * Gets receive address.
+	 * <h3 class="en">Getter method for mail receive address list</h3>
+	 * <h3 class="zh-CN">邮件收件地址列表的Getter方法</h3>
 	 *
-	 * @return the receiveAddress
+	 * @return 	<span class="en">Mail receive address list</span>
+	 * 			<span class="zh-CN">邮件收件地址列表</span>
 	 */
 	public List<String> getReceiveAddress() {
 		return receiveAddress;
 	}
-
 	/**
-	 * Sets receive address.
+	 * <h3 class="en">Setter method for mail receive address list</h3>
+	 * <h3 class="zh-CN">邮件收件地址列表的Setter方法</h3>
 	 *
-	 * @param receiveAddress the receiveAddress to set
+	 * @param receiveAddress 	<span class="en">Mail receive address list</span>
+	 *                          <span class="zh-CN">邮件收件地址列表</span>
 	 */
 	public void setReceiveAddress(List<String> receiveAddress) {
 		this.receiveAddress = receiveAddress;
 	}
-
 	/**
-	 * Gets cc address.
+	 * <h3 class="en">Getter method for mail carbon copy address list</h3>
+	 * <h3 class="zh-CN">邮件抄送地址列表的Getter方法</h3>
 	 *
-	 * @return the ccAddress
+	 * @return 	<span class="en">Mail carbon copy address list</span>
+	 * 			<span class="zh-CN">邮件抄送地址列表</span>
 	 */
 	public List<String> getCcAddress() {
 		return ccAddress;
 	}
-
 	/**
-	 * Sets cc address.
+	 * <h3 class="en">Setter method for mail carbon copy address list</h3>
+	 * <h3 class="zh-CN">邮件抄送地址列表的Setter方法</h3>
 	 *
-	 * @param ccAddress the ccAddress to set
+	 * @param ccAddress 	<span class="en">Mail carbon copy address list</span>
+	 * 						<span class="zh-CN">邮件抄送地址列表</span>
 	 */
 	public void setCcAddress(List<String> ccAddress) {
 		this.ccAddress = ccAddress;
 	}
-
 	/**
-	 * Gets bcc address.
+	 * <h3 class="en">Getter method for mail blind carbon copy address list</h3>
+	 * <h3 class="zh-CN">邮件暗抄送地址列表的Getter方法</h3>
 	 *
-	 * @return the bccAddress
+	 * @return 	<span class="en">Mail blind carbon copy address list</span>
+	 * 			<span class="zh-CN">邮件暗抄送地址列表</span>
 	 */
 	public List<String> getBccAddress() {
 		return bccAddress;
 	}
-
 	/**
-	 * Sets bcc address.
+	 * <h3 class="en">Setter method for mail blind carbon copy address list</h3>
+	 * <h3 class="zh-CN">邮件暗抄送地址列表的Setter方法</h3>
 	 *
-	 * @param bccAddress the bccAddress to set
+	 * @param bccAddress 	<span class="en">Mail blind carbon copy address list</span>
+	 *                      <span class="zh-CN">邮件暗抄送地址列表</span>
 	 */
 	public void setBccAddress(List<String> bccAddress) {
 		this.bccAddress = bccAddress;
 	}
-
 	/**
-	 * Gets attach files.
+	 * <h3 class="en">Getter method for mail attachment file list</h3>
+	 * <h3 class="zh-CN">邮件附件文件列表的Getter方法</h3>
 	 *
-	 * @return the attachFiles
+	 * @return 	<span class="en">Mail attachment file list</span>
+	 * 			<span class="zh-CN">邮件附件文件列表</span>
 	 */
 	public List<String> getAttachFiles() {
 		return attachFiles;
 	}
-
 	/**
-	 * Sets attach files.
+	 * <h3 class="en">Setter method for unified identified ID</h3>
+	 * <h3 class="zh-CN">邮件附件文件列表的Setter方法</h3>
 	 *
-	 * @param attachFiles the attachFiles to set
+	 * @param attachFiles 	<span class="en">Mail attachment file list</span>
+	 *                      <span class="zh-CN">邮件附件文件列表</span>
 	 */
 	public void setAttachFiles(List<String> attachFiles) {
 		this.attachFiles = attachFiles;
 	}
-
 	/**
-	 * Gets include files.
+	 * <h3 class="en">Getter method for mail include file list</h3>
+	 * <h3 class="zh-CN">邮件包含文件列表的Getter方法</h3>
 	 *
-	 * @return the includeFiles
+	 * @return 	<span class="en">Mail include file list</span>
+	 * 			<span class="zh-CN">邮件包含文件列表</span>
 	 */
 	public List<String> getIncludeFiles() {
 		return includeFiles;
 	}
-
 	/**
-	 * Sets include files.
+	 * <h3 class="en">Setter method for mail include file list</h3>
+	 * <h3 class="zh-CN">邮件包含文件列表的Setter方法</h3>
 	 *
-	 * @param includeFiles the includeFiles to set
+	 * @param includeFiles 	<span class="en">Mail include file list</span>
+	 * 						<span class="zh-CN">邮件包含文件列表</span>
 	 */
 	public void setIncludeFiles(List<String> includeFiles) {
 		this.includeFiles = includeFiles;

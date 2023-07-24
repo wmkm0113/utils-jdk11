@@ -17,50 +17,61 @@
 package org.nervousync.enumerations.web;
 
 /**
- * The enum Http method option.
+ * <h2 class="en">HTTP method option Enumerations</h2>
+ * <h2 class="zh-CN">HTTP请求方法枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: May 22, 2015 12:12:30 PM $
+ * @version $Revision : 1.0 $ $Date: May 22, 2015 12:12:30 $
  */
 public enum HttpMethodOption {
 	/**
-	 * Get http method option.
+     * <span class="en">HTTP method: GET</span>
+     * <span class="zh-CN">HTTP请求方法：GET</span>
 	 */
 	GET,
 	/**
-	 * Head http method option.
+     * <span class="en">HTTP method: HEAD</span>
+     * <span class="zh-CN">HTTP请求方法：HEAD</span>
 	 */
 	HEAD,
 	/**
-	 * Patch http method option.
+     * <span class="en">HTTP method: PATCH</span>
+     * <span class="zh-CN">HTTP请求方法：PATCH</span>
 	 */
 	PATCH,
 	/**
-	 * Put http method option.
+     * <span class="en">HTTP method: PUT</span>
+     * <span class="zh-CN">HTTP请求方法：PUT</span>
 	 */
 	PUT,
 	/**
-	 * Post http method option.
+     * <span class="en">HTTP method: POST</span>
+     * <span class="zh-CN">HTTP请求方法：POST</span>
 	 */
 	POST,
 	/**
-	 * Trace http method option.
+     * <span class="en">HTTP method: TRACE</span>
+     * <span class="zh-CN">HTTP请求方法：TRACE</span>
 	 */
 	TRACE,
 	/**
-	 * Options http method option.
+     * <span class="en">HTTP method: OPTIONS</span>
+     * <span class="zh-CN">HTTP请求方法：OPTIONS</span>
 	 */
 	OPTIONS,
 	/**
-	 * Delete http method option.
+     * <span class="en">HTTP method: DELETE</span>
+     * <span class="zh-CN">HTTP请求方法：DELETE</span>
 	 */
 	DELETE,
 	/**
-	 * Default http method option.
+     * <span class="en">HTTP method: DEFAULT</span>
+     * <span class="zh-CN">HTTP请求方法：DEFAULT</span>
 	 */
 	DEFAULT,
 	/**
-	 * Unknown http method option.
+     * <span class="en">HTTP method: UNKNOWN</span>
+     * <span class="zh-CN">HTTP请求方法：UNKNOWN</span>
 	 */
 	UNKNOWN
 }

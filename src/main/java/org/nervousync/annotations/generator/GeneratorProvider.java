@@ -16,22 +16,19 @@
  */
 package org.nervousync.annotations.generator;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * <h3 class="en">Annotation class for ID generator implement class</h3>
- * <h3 class="zh-CN">ID生成器实现类的标注</h3>
+ * <h2 class="en">Annotation class for ID generator implement class</h2>
+ * <h2 class="zh-CN">ID生成器实现类的标注</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 12/10/2021 3:25 PM $
+ * @version $Revision : 1.0 $ $Date: Dec 10, 2021 15:24:26 $
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface GeneratorProvider {
-
     /**
      * <span class="en">ID generator implement name</span>
      * <span class="zh-CN">ID生成器实现名称</span>

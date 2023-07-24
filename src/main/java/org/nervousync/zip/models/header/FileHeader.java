@@ -18,7 +18,7 @@ package org.nervousync.zip.models.header;
 
 import java.util.List;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.zip.models.AESExtraDataRecord;
 import org.nervousync.zip.models.ExtraDataRecord;
 import org.nervousync.zip.models.Zip64ExtendInfo;

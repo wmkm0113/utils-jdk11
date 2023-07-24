@@ -16,7 +16,7 @@
  */
 package org.nervousync.mail.protocol.impl;
 
-import org.nervousync.commons.proxy.ProxyConfig;
+import org.nervousync.proxy.ProxyConfig;
 import org.nervousync.mail.operator.SendOperator;
 import org.nervousync.mail.protocol.BaseProtocol;
 
@@ -27,15 +27,20 @@ import org.nervousync.mail.protocol.BaseProtocol;
  * @version $Revision : 1.0 $ $Date: Jul 31, 2012 8:10:30 PM $
  */
 public final class SMTPProtocol extends BaseProtocol implements SendOperator {
-
 	/**
-	 * 
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -5226459745420272131L;
-
-	/**
-	 * Instantiates a new Smtp protocol.
-	 */
+    /**
+     * <h3 class="en">Constructor method for SMTPProtocol</h3>
+     * <h3 class="zh-CN">SMTPProtocol构造方法</h3>
+     *
+     * @param secureName    <span class="en">Secure config name</span>
+     *                      <span class="zh-CN">安全配置名称</span>
+     * @param proxyConfig   <span class="en">Proxy configure information</span>
+     *                      <span class="zh-CN">代理服务器配置信息</span>
+     */
 	public SMTPProtocol(final String secureName, final ProxyConfig proxyConfig) {
 		super(secureName, proxyConfig);
 		this.hostParam = "mail.smtp.host";

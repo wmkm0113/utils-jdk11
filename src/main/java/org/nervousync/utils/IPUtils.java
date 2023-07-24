@@ -16,44 +16,84 @@
  */
 package org.nervousync.utils;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.beans.ip.IPRange;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.RegexGlobals;
+import org.nervousync.commons.Globals;
+import org.nervousync.commons.RegexGlobals;
 import org.nervousync.enumerations.ip.IPType;
 
 import java.math.BigInteger;
 
 /**
- * IP Utils
+ * <h2 class="en">IP Address Utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Calculate IP range by given address and CIDR value</ul>
+ *     <ul>Convert between netmask address and CIDR value</ul>
+ *     <ul>Convert between IPv4 and IPv6</ul>
+ *     <ul>Convert between IP address and BigInteger(for support IPv6)</ul>
+ *     <ul>Expand the combo IPv6 address</ul>
+ * </span>
+ * <h2 class="zh-CN">IP地址工具</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>根据给定的地址和CIDR，计算IP地址范围</ul>
+ *     <ul>在子网掩码和CIDR之间转换数据</ul>
+ *     <ul>在IPv4和IPv6之间转换数据</ul>
+ *     <ul>在IP地址和BigInteger之间转换数据</ul>
+ *     <ul>将压缩显示的IPv6地址展开</ul>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Aug 15, 2022 16:23:13 AM $
+ * @version $Revision : 1.0 $ $Date: Aug 15, 2022 16:23:13 $
  */
 public final class IPUtils {
-
-	private static final String SPLIT_CHARACTER_IPV4 = ".";
-	private static final String SPLIT_CHARACTER_IPV6 = ":";
-	private static final String SPLIT_COMBO_CHARACTER_IPV6 = "::";
-
 	/**
-	 * Calculate IP range address
-	 *
-	 * @param ipAddress IP address in range
-	 * @param cidr      CIDR
-	 * @return IPRange object
+	 * <span class="en">Split character for IPv4 address</span>
+	 * <span class="zh-CN">IPv4地址的间隔符</span>
 	 */
-	public static IPRange calcRange(final String ipAddress, final int cidr) {
+	private static final String SPLIT_CHARACTER_IPV4 = ".";
+	/**
+	 * <span class="en">Split character for IPv6 address</span>
+	 * <span class="zh-CN">IPv6地址的间隔符</span>
+	 */
+	private static final String SPLIT_CHARACTER_IPV6 = ":";
+	/**
+	 * <span class="en">Split character for combo IPv6 address</span>
+	 * <span class="zh-CN">IPv6压缩地址的间隔符</span>
+	 */
+	private static final String SPLIT_COMBO_CHARACTER_IPV6 = "::";
+	/**
+	 * <h3 class="en">Private constructor for IPUtils</h3>
+	 * <h3 class="zh-CN">IP地址工具集的私有构造方法</h3>
+	 */
+	private IPUtils() {
+	}
+	/**
+	 * <h3 class="en">Calculate IP range by given address and CIDR value</h3>
+	 * <h3 class="zh-CN">根据给定的地址和CIDR，计算IP地址范围</h3>
+	 *
+	 * @param ipAddress 	<span class="en">IP address</span>
+	 *                      <span class="zh-CN">IP地址</span>
+	 * @param cidr      	<span class="en">CIDR value</span>
+	 *                      <span class="zh-CN">CIDR值</span>
+	 *
+	 * @return    <span class="en">Calculate result of IPRange instance</span>
+	 *            <span class="zh-CN">根据计算结果生成的IPRange对象</span>
+	 */
+	public static IPRange calcRange(@Nonnull final String ipAddress, final int cidr) {
 		IPRange ipRange = new IPRange();
-		String beginAddress;
-		String endAddress;
+		final String beginAddress;
+		final String endAddress;
 		if (ipAddress.contains(SPLIT_CHARACTER_IPV6)) {
 			ipRange.setIpType(IPType.IPv6);
 			beginAddress = beginIPv6(ipAddress, cidr);
 			endAddress = endIPv6(beginAddress, cidr);
 		} else {
 			ipRange.setIpType(IPType.IPv4);
-			beginAddress = beginIPv4(ipAddress, CIDRToNetmask(cidr));
-			endAddress = endIPv4(beginAddress, CIDRToNetmask(cidr));
+			String netmask = CIDRToNetmask(cidr);
+			beginAddress = beginIPv4(ipAddress, netmask);
+			endAddress = endIPv4(beginAddress, netmask);
 		}
 
 		ipRange.setBeginAddress(beginAddress);
@@ -61,16 +101,18 @@ public final class IPUtils {
 
 		return ipRange;
 	}
-
 	/**
-	 * Convert net mask to CIDR
+	 * <h3 class="en">Convert netmask string to CIDR value</h3>
+	 * <h3 class="zh-CN">转换子网掩码字符串为CIDR值</h3>
 	 *
-	 * @param netmask Net mask address
-	 * @return CIDR int
+	 * @param netmask 	<span class="en">IP address</span>
+	 *                  <span class="zh-CN">IP地址</span>
+	 *
+	 * @return    <span class="en">CIDR value</span>
+	 *            <span class="zh-CN">CIDR值</span>
 	 */
-	public static int NetmaskToCIDR(final String netmask) {
+	public static int NetmaskToCIDR(@Nonnull final String netmask) {
 		int result = 0;
-
 		String[] splitItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
 
 		for (String splitItem : splitItems) {
@@ -82,83 +124,104 @@ public final class IPUtils {
 				number /= 2;
 			}
 		}
-
 		return result;
 	}
-
 	/**
-	 * Convert CIDR to net mask address
+	 * <h3 class="en">Convert CIDR value to netmask string</h3>
+	 * <h3 class="zh-CN">转换CIDR值为子网掩码字符串</h3>
 	 *
-	 * @param cidr CIDR
-	 * @return Net mask address
+	 * @param cidr 		<span class="en">CIDR value</span>
+	 *                  <span class="zh-CN">CIDR值</span>
+	 *
+	 * @return    <span class="en">Netmask address string</span>
+	 *            <span class="zh-CN">子网掩码字符串</span>
 	 */
 	public static String CIDRToNetmask(final int cidr) {
 		int calcCIDR = cidr;
 		if (calcCIDR >= 0 && calcCIDR <= 32) {
-			String[] arrays = new String[4];
+			StringBuilder stringBuilder = new StringBuilder();
 			int index = 0;
-			while (index < 4 && calcCIDR >= 0) {
-				arrays[index] = Integer.toString(fillBitsFromLeft(calcCIDR));
+			while (index < 4) {
+				stringBuilder.append(SPLIT_CHARACTER_IPV4).append(fillBitsFromLeft(calcCIDR));
 				calcCIDR -= 8;
+				if (calcCIDR < 0) {
+					calcCIDR = 0;
+				}
 				index++;
 			}
-			return String.join(SPLIT_CHARACTER_IPV4, arrays);
+			return stringBuilder.substring(1);
 		}
-		return null;
+		return Globals.DEFAULT_VALUE_STRING;
 	}
-
-
 	/**
-	 * Is i pv 4 address boolean.
+	 * <h3 class="en">Check given IP address string is IPv4 address</h3>
+	 * <h3 class="zh-CN">检查给定的IP地址字符串是合法的IPv4地址</h3>
 	 *
-	 * @param ipAddress the ip address
-	 * @return the boolean
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">Check result. <code>true</code> for valid, <code>false</code> for invalid</span>
+	 *            <span class="zh-CN">检查结果。<code>true</code>合法地址，<code>false</code>非法地址</span>
 	 */
-	public static boolean isIPv4Address(final String ipAddress) {
+	public static boolean isIPv4Address(@Nonnull final String ipAddress) {
 		return StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX);
 	}
-
 	/**
-	 * Is i pv 6 address boolean.
+	 * <h3 class="en">Check given IP address string is IPv6 address</h3>
+	 * <h3 class="zh-CN">检查给定的IP地址字符串是合法的IPv6地址</h3>
 	 *
-	 * @param ipAddress the ip address
-	 * @return the boolean
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">Check result. <code>true</code> for valid, <code>false</code> for invalid</span>
+	 *            <span class="zh-CN">检查结果。<code>true</code>合法地址，<code>false</code>非法地址</span>
 	 */
-	public static boolean isIPv6Address(final String ipAddress) {
+	public static boolean isIPv6Address(@Nonnull final String ipAddress) {
 		return StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
 				|| StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX);
 	}
 	/**
-	 * Convert IPv4 address to compatible IPv6 address
+	 * <h3 class="en">Convert given IPv4 address string to compatible IPv6 address</h3>
+	 * <h3 class="zh-CN">转换给定的IPv4地址为IPv6兼容地址</h3>
 	 *
-	 * @param ipAddress IPv4 address
-	 * @return Compatible IPv6 address
+	 * @param ipAddress 	<span class="en">IPv4 address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">Compatible IPv6 address string</span>
+	 *            <span class="zh-CN">转换后的IPv6兼容地址</span>
 	 */
-	public static String IPv4ToCompatibleIPv6(final String ipAddress) {
+	public static String IPv4ToCompatibleIPv6(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return SPLIT_COMBO_CHARACTER_IPV6 + ipAddress;
 		}
 		return null;
 	}
-
 	/**
-	 * Convert IPv4 address to IPv6 address and collapse
+	 * <h3 class="en">Convert given IPv4 address string to IPv6 address</h3>
+	 * <h3 class="zh-CN">转换给定的IPv4地址为IPv6兼容地址</h3>
 	 *
-	 * @param ipAddress IPv4 address
-	 * @return Collapse IPv6 address
+	 * @param ipAddress 	<span class="en">IPv4 address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">IPv6 address string</span>
+	 *            <span class="zh-CN">转换后的IPv6地址</span>
 	 */
-	public static String IPv4ToIPv6(final String ipAddress) {
+	public static String IPv4ToIPv6(@Nonnull final String ipAddress) {
 		return IPv4ToIPv6(ipAddress, Boolean.TRUE);
 	}
-
 	/**
-	 * Convert IPv4 address to IPv6 address
+	 * <h3 class="en">Convert given IPv4 address string to IPv6 address</h3>
+	 * <h3 class="zh-CN">转换给定的IPv4地址为IPv6兼容地址</h3>
 	 *
-	 * @param ipAddress IPv4 address
-	 * @param collapse  Collapse IPv6 address
-	 * @return IPv6 address
+	 * @param ipAddress 	<span class="en">IPv4 address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 * @param collapse 		<span class="en">Collapse converted IPv6 address</span>
+	 *                  	<span class="zh-CN">是否简写IPv6地址</span>
+	 *
+	 * @return    <span class="en">IPv6 address string</span>
+	 *            <span class="zh-CN">转换后的IPv6地址</span>
 	 */
-	public static String IPv4ToIPv6(final String ipAddress, final boolean collapse) {
+	public static String IPv4ToIPv6(@Nonnull final String ipAddress, final boolean collapse) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			StringBuilder stringBuilder;
@@ -180,14 +243,17 @@ public final class IPUtils {
 		}
 		return null;
 	}
-
 	/**
-	 * Convert IP Address to byte arrays
+	 * <h3 class="en">Convert given IP address string to byte array</h3>
+	 * <h3 class="zh-CN">转换给定的IP地址为字节数组</h3>
 	 *
-	 * @param ipAddress IP Address
-	 * @return byte array
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted byte array</span>
+	 *            <span class="zh-CN">转换后的字节数组</span>
 	 */
-	public static byte[] IPToBytes(final String ipAddress) {
+	public static byte[] IPToBytes(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return IPv4ToBytes(ipAddress);
 		} else if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
@@ -197,14 +263,17 @@ public final class IPUtils {
 			return new byte[0];
 		}
 	}
-
 	/**
-	 * Convert IPv4 address to byte arrays
+	 * <h3 class="en">Convert given IPv4 address string to byte array</h3>
+	 * <h3 class="zh-CN">转换给定的IPv4地址为字节数组</h3>
 	 *
-	 * @param ipAddress IPv4 address
-	 * @return byte array length 4
+	 * @param ipAddress 	<span class="en">IPv4 address string</span>
+	 *                  	<span class="zh-CN">IPv4地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted byte array</span>
+	 *            <span class="zh-CN">转换后的字节数组</span>
 	 */
-	public static byte[] IPv4ToBytes(final String ipAddress) {
+	public static byte[] IPv4ToBytes(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			byte[] addressBytes = new byte[4];
@@ -218,14 +287,17 @@ public final class IPUtils {
 		}
 		return null;
 	}
-
 	/**
-	 * Convert IPv6 address to byte arrays
+	 * <h3 class="en">Convert given IPv6 address string to byte array</h3>
+	 * <h3 class="zh-CN">转换给定的IPv6地址为字节数组</h3>
 	 *
-	 * @param ipAddress IPv6 address
-	 * @return byte array length 16
+	 * @param ipAddress 	<span class="en">IPv6 address string</span>
+	 *                  	<span class="zh-CN">IPv6地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted byte array</span>
+	 *            <span class="zh-CN">转换后的字节数组</span>
 	 */
-	public static byte[] IPv6ToBytes(final String ipAddress) {
+	public static byte[] IPv6ToBytes(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_REGEX)
 				|| StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
 			String ipv6Address = expandIPv6(ipAddress);
@@ -242,14 +314,17 @@ public final class IPUtils {
 		}
 		return null;
 	}
-
 	/**
-	 * Expand i pv 6 string.
+	 * <h3 class="en">Expand the given combo IPv6 address string</h3>
+	 * <h3 class="zh-CN">展开给定的缩略IPv6地址字符串</h3>
 	 *
-	 * @param ipAddress the ip address
-	 * @return the string
+	 * @param ipAddress 	<span class="en">Combo IPv6 address string</span>
+	 *                  	<span class="zh-CN">缩略的IPv6地址字符串</span>
+	 *
+	 * @return    <span class="en">Expanded IPv6 address string</span>
+	 *            <span class="zh-CN">展开后的IPv6地址字符串</span>
 	 */
-	public static String expandIPv6(final String ipAddress) {
+	public static String expandIPv6(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV6_COMPRESS_REGEX)) {
 			int sigCount = StringUtils.countOccurrencesOf(ipAddress, SPLIT_CHARACTER_IPV6);
 			int expandCount = 8 - sigCount;
@@ -276,28 +351,34 @@ public final class IPUtils {
 		}
 		return ipAddress;
 	}
-
 	/**
-	 * Convert IP address to BigInteger(supported IPv4 and IPv6)
+	 * <h3 class="en">Convert given IP address string to BigInteger instance</h3>
+	 * <h3 class="zh-CN">转换给定的IP地址为BigInteger实例对象</h3>
 	 *
-	 * @param ipAddress IP address
-	 * @return BigInteger big integer
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted BigInteger instance</span>
+	 *            <span class="zh-CN">转换后的BigInteger实例对象</span>
 	 */
-	public static BigInteger IPtoBigInteger(final String ipAddress) {
+	public static BigInteger IPtoBigInteger(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			return IPv4ToBigInteger(ipAddress);
 		} else {
 			return IPv6ToBigInteger(ipAddress);
 		}
 	}
-
 	/**
-	 * Convert IPv4 address to BigInteger
+	 * <h3 class="en">Convert given IPv4 address string to BigInteger instance</h3>
+	 * <h3 class="zh-CN">转换给定的IPv4地址为BigInteger实例对象</h3>
 	 *
-	 * @param ipAddress IPv4 address
-	 * @return BigInteger big integer
+	 * @param ipAddress 	<span class="en">IPv4 address string</span>
+	 *                  	<span class="zh-CN">IPv4地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted BigInteger instance</span>
+	 *            <span class="zh-CN">转换后的BigInteger实例对象</span>
 	 */
-	public static BigInteger IPv4ToBigInteger(final String ipAddress) {
+	public static BigInteger IPv4ToBigInteger(@Nonnull final String ipAddress) {
 		if (StringUtils.matches(ipAddress, RegexGlobals.IPV4_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 			if (splitAddress.length == 4) {
@@ -310,14 +391,17 @@ public final class IPUtils {
 		}
 		return BigInteger.ZERO;
 	}
-
 	/**
-	 * Convert IPv6 address to BigInteger
+	 * <h3 class="en">Convert given IPv6address string to BigInteger instance</h3>
+	 * <h3 class="zh-CN">转换给定的IPv6地址为BigInteger实例对象</h3>
 	 *
-	 * @param ipAddress IPv6 address
-	 * @return BigInteger big integer
+	 * @param ipAddress 	<span class="en">IPv6 address string</span>
+	 *                  	<span class="zh-CN">IPv6地址字符串</span>
+	 *
+	 * @return    <span class="en">Converted BigInteger instance</span>
+	 *            <span class="zh-CN">转换后的BigInteger实例对象</span>
 	 */
-	public static BigInteger IPv6ToBigInteger(final String ipAddress) {
+	public static BigInteger IPv6ToBigInteger(@Nonnull final String ipAddress) {
 		String fullAddress = expandIgnore(ipAddress);
 		if (StringUtils.matches(fullAddress, RegexGlobals.IPV6_REGEX)) {
 			String[] splitAddress = StringUtils.tokenizeToStringArray(fullAddress, SPLIT_CHARACTER_IPV6);
@@ -340,52 +424,57 @@ public final class IPUtils {
 		}
 		return BigInteger.ZERO;
 	}
-
 	/**
-	 * Convert BigInteger value to IPv4 address(x.x.x.x)
+	 * <h3 class="en">Convert given BigInteger instance to IPv4 address string</h3>
+	 * <h3 class="zh-CN">转换给定的BigInteger实例对象为IPv4地址字符串</h3>
 	 *
-	 * @param bigInteger BigInteger value
-	 * @return IPv4 address
+	 * @param bigInteger 	<span class="en">BigInteger instance</span>
+	 *                  	<span class="zh-CN">BigInteger实例对象</span>
+	 *
+	 * @return    <span class="en">Converted IPv4 address string</span>
+	 *            <span class="zh-CN">转换后的IPv4地址字符串</span>
 	 */
-	public static String BigIntegerToIPv4(final BigInteger bigInteger) {
+	public static String BigIntegerToIPv4(@Nonnull final BigInteger bigInteger) {
 		StringBuilder ipv4Address = new StringBuilder();
 		BigInteger calcInteger = new BigInteger(bigInteger.toByteArray());
 		BigInteger ff = BigInteger.valueOf(0xFFL);
-
 		for (int i = 0; i < 4; i++) {
 			ipv4Address.insert(0, SPLIT_CHARACTER_IPV4 + calcInteger.and(ff));
 			calcInteger = calcInteger.shiftRight(8);
 		}
-
 		return ipv4Address.substring(1);
 	}
-
 	/**
-	 * Convert BigInteger value to IPv6 address(xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx or :xxxx:xxxx::xxxx)
+	 * <h3 class="en">Convert given BigInteger instance to IPv6 address string</h3>
+	 * <h3 class="zh-CN">转换给定的BigInteger实例对象为IPv6地址字符串</h3>
 	 *
-	 * @param bigInteger BigInteger value
-	 * @return IPv6 address
+	 * @param bigInteger 	<span class="en">BigInteger instance</span>
+	 *                  	<span class="zh-CN">BigInteger实例对象</span>
+	 *
+	 * @return    <span class="en">Converted IPv6 address string</span>
+	 *            <span class="zh-CN">转换后的IPv6地址字符串</span>
 	 */
-	public static String BigIntegerToIPv6Address(final BigInteger bigInteger) {
+	public static String BigIntegerToIPv6Address(@Nonnull final BigInteger bigInteger) {
 		StringBuilder ipv6Address = new StringBuilder();
 		BigInteger calcInteger = new BigInteger(bigInteger.toByteArray());
 		BigInteger ff = BigInteger.valueOf(0xFFFFL);
-
 		for (int i = 0; i < 8; i++) {
 			ipv6Address.insert(0, SPLIT_CHARACTER_IPV6 + calcInteger.and(ff).toString(16));
 			calcInteger = calcInteger.shiftRight(16);
 		}
-
 		return ipv6Address.substring(1).replaceFirst(RegexGlobals.IPV6_COMPRESS_REGEX, SPLIT_COMBO_CHARACTER_IPV6);
 	}
-
 	/**
-	 * Expand IPv6 address ignore data
+	 * <h3 class="en">Expand the given combo IPv6 address string and append 0</h3>
+	 * <h3 class="zh-CN">展开给定的缩略IPv6地址字符串并填充0</h3>
 	 *
-	 * @param ipv6Address IPv6 address
-	 * @return Expand IPv6 address
+	 * @param ipv6Address 	<span class="en">Combo IPv6 address string</span>
+	 *                  	<span class="zh-CN">缩略的IPv6地址字符串</span>
+	 *
+	 * @return    <span class="en">Expanded IPv6 address string</span>
+	 *            <span class="zh-CN">展开后的IPv6地址字符串</span>
 	 */
-	public static String expandIgnore(final String ipv6Address) {
+	public static String expandIgnore(@Nonnull final String ipv6Address) {
 		String resultAddress = ipv6Address;
 		if (resultAddress.contains("::")) {
 			int count = StringUtils.countOccurrencesOf(resultAddress, SPLIT_CHARACTER_IPV6);
@@ -398,7 +487,6 @@ public final class IPUtils {
 				resultAddress += "0000";
 			}
 		}
-
 		String[] addressItems = StringUtils.delimitedListToStringArray(resultAddress, SPLIT_CHARACTER_IPV6);
 		StringBuilder stringBuilder = new StringBuilder();
 		for (String addressItem : addressItems) {
@@ -411,20 +499,22 @@ public final class IPUtils {
 		}
 		return stringBuilder.substring(1);
 	}
-
 	/**
-	 * Calculate IP range begins address
+	 * <h3 class="en">Calculate the begin IP address by given IP address and netmask string</h3>
+	 * <h3 class="zh-CN">根据给定的IP地址和子网掩码字符串计算起始IP地址</h3>
 	 *
-	 * @param ipAddress IP address in range
-	 * @param netmask   Net mask address
-	 * @return Begin IP address
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 * @param netmask 		<span class="en">IP address</span>
+	 *                  	<span class="zh-CN">IP地址</span>
+	 *
+	 * @return    <span class="en">Begin IPv4 address string</span>
+	 *            <span class="zh-CN">起始的IPv4地址字符串</span>
 	 */
-	private static String beginIPv4(final String ipAddress, final String netmask) {
+	private static String beginIPv4(@Nonnull final String ipAddress, @Nonnull final String netmask) {
 		String[] addressItems = StringUtils.tokenizeToStringArray(ipAddress, SPLIT_CHARACTER_IPV4);
 		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
-
 		StringBuilder stringBuilder = new StringBuilder();
-
 		for (int i = 0; i < 4; i++) {
 			int itemValue = i < addressItems.length ? Integer.parseInt(addressItems[i])
 					: Globals.INITIALIZE_INT_VALUE;
@@ -434,80 +524,87 @@ public final class IPUtils {
 			}
 			stringBuilder.append(SPLIT_CHARACTER_IPV4).append(beginItem);
 		}
-
 		return stringBuilder.substring(1);
 	}
-
 	/**
-	 * Calculate IP range end address
+	 * <h3 class="en">Calculate the end IP address by given IP address and netmask string</h3>
+	 * <h3 class="zh-CN">根据给定的IP地址和子网掩码字符串计算起始IP地址</h3>
 	 *
-	 * @param beginIP Begin address of range
-	 * @param netmask Net mask address
-	 * @return End IP address
+	 * @param beginIP 		<span class="en">Begin IP address string</span>
+	 *                  	<span class="zh-CN">起始IP地址字符串</span>
+	 * @param netmask 		<span class="en">IP address</span>
+	 *                  	<span class="zh-CN">IP地址</span>
+	 *
+	 * @return    <span class="en">End IPv4 address string</span>
+	 *            <span class="zh-CN">终止的IPv4地址字符串</span>
 	 */
-	private static String endIPv4(final String beginIP, final String netmask) {
+	private static String endIPv4(@Nonnull final String beginIP, @Nonnull final String netmask) {
 		String[] addressItems = StringUtils.tokenizeToStringArray(beginIP, SPLIT_CHARACTER_IPV4);
 		String[] maskItems = StringUtils.tokenizeToStringArray(netmask, SPLIT_CHARACTER_IPV4);
-
 		StringBuilder stringBuilder = new StringBuilder();
-
 		for (int i = 0; i < 4; i++) {
 			int endItem = 255 - Integer.parseInt(addressItems[i]) ^ Integer.parseInt(maskItems[i]);
 			stringBuilder.append(SPLIT_CHARACTER_IPV4).append(endItem);
 		}
-
 		return stringBuilder.substring(1);
 	}
-
 	/**
-	 * Calculate IPv6 range begins address
+	 * <h3 class="en">Calculate the begin IPv6 address by given IP address and netmask string</h3>
+	 * <h3 class="zh-CN">根据给定的IP地址和子网掩码字符串计算起始IP地址</h3>
 	 *
-	 * @param ipAddress IPv6 address
-	 * @param cidr      CIDR
-	 * @return Begin address
+	 * @param ipAddress 	<span class="en">IP address string</span>
+	 *                  	<span class="zh-CN">IP地址字符串</span>
+	 * @param cidr 			<span class="en">CIDR value</span>
+	 *                  	<span class="zh-CN">CIDR值</span>
+	 *
+	 * @return    <span class="en">Begin IPv6 address string</span>
+	 *            <span class="zh-CN">起始的IPv6地址字符串</span>
 	 */
-	private static String beginIPv6(final String ipAddress, final int cidr) {
-		if (cidr >= 0 && cidr <= 128) {
+	private static String beginIPv6(@Nonnull final String ipAddress, final int cidr) {
+		if (cidr >= Globals.INITIALIZE_INT_VALUE && cidr <= 128) {
 			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), SPLIT_CHARACTER_IPV6, Globals.DEFAULT_VALUE_STRING);
-			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
-
+			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(Globals.INITIALIZE_INT_VALUE, cidr));
 			while (baseIP.length() < 128) {
 				baseIP.append("0");
 			}
-
 			return binToHex(baseIP.toString());
 		}
-		return null;
+		return Globals.DEFAULT_VALUE_STRING;
 	}
-
 	/**
-	 * Calculate IPv6 range end address
+	 * <h3 class="en">Calculate the end IPv6 address by given begin IPv6 address and netmask string</h3>
+	 * <h3 class="zh-CN">根据给定的IP地址和子网掩码字符串计算起始IP地址</h3>
 	 *
-	 * @param ipAddress IPv6 address
-	 * @param cidr      CIDR
-	 * @return End address
+	 * @param beginIP 		<span class="en">Begin IPv6 address string</span>
+	 *                  	<span class="zh-CN">起始IPv6地址字符串</span>
+	 * @param cidr 			<span class="en">CIDR value</span>
+	 *                  	<span class="zh-CN">CIDR值</span>
+	 *
+	 * @return    <span class="en">End IPv6 address string</span>
+	 *            <span class="zh-CN">终止的IPv6地址字符串</span>
 	 */
-	private static String endIPv6(final String ipAddress, final int cidr) {
-		if (cidr >= 0 && cidr <= 128) {
-			String hexAddress = StringUtils.replace(expandIgnore(ipAddress), SPLIT_CHARACTER_IPV6, Globals.DEFAULT_VALUE_STRING);
-			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(0, cidr));
-
+	private static String endIPv6(@Nonnull final String beginIP, final int cidr) {
+		if (cidr >= Globals.INITIALIZE_INT_VALUE && cidr <= 128) {
+			String hexAddress = StringUtils.replace(expandIgnore(beginIP), SPLIT_CHARACTER_IPV6, Globals.DEFAULT_VALUE_STRING);
+			StringBuilder baseIP = new StringBuilder(hexToBin(hexAddress).substring(Globals.INITIALIZE_INT_VALUE, cidr));
 			while (baseIP.length() < 128) {
 				baseIP.append("1");
 			}
-
 			return binToHex(baseIP.toString());
 		}
-		return null;
+		return Globals.DEFAULT_VALUE_STRING;
 	}
-
 	/**
-	 * Convert IPv6 address from hex data to binary data
+	 * <h3 class="en">Convert hex address to binary string</h3>
+	 * <h3 class="zh-CN">转换16进制地址为二进制地址字符串</h3>
 	 *
-	 * @param hexAddress hex data address
-	 * @return binary data address
+	 * @param hexAddress 	<span class="en">Hex address string</span>
+	 *                  	<span class="zh-CN">16进制地址字符串</span>
+	 *
+	 * @return    <span class="en">Binary address string</span>
+	 *            <span class="zh-CN">二进制地址字符串</span>
 	 */
-	private static String hexToBin(final String hexAddress) {
+	private static String hexToBin(@Nonnull final String hexAddress) {
 		StringBuilder binBuilder = new StringBuilder();
 		int index = 0;
 		while (index < hexAddress.length()) {
@@ -521,14 +618,17 @@ public final class IPUtils {
 		}
 		return binBuilder.toString();
 	}
-
 	/**
-	 * Convert IPv6 address from binary data to hex data
+	 * <h3 class="en">Convert binary address to hex string</h3>
+	 * <h3 class="zh-CN">转换16进制地址为二进制地址字符串</h3>
 	 *
-	 * @param binAddress binary data address
-	 * @return hex data address
+	 * @param binAddress 	<span class="en">Binary address string</span>
+	 *                  	<span class="zh-CN">二进制地址字符串</span>
+	 *
+	 * @return    <span class="en">Hex address string</span>
+	 *            <span class="zh-CN">16进制地址字符串</span>
 	 */
-	private static String binToHex(final String binAddress) {
+	private static String binToHex(@Nonnull final String binAddress) {
 		StringBuilder binBuilder = new StringBuilder();
 		int index = 0;
 		while (index < binAddress.length()) {
@@ -541,7 +641,6 @@ public final class IPUtils {
 		}
 		return binBuilder.substring(1);
 	}
-
 	private static int fillBitsFromLeft(final int value) {
 		if (value >= 8) {
 			return 255;

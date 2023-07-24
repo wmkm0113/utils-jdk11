@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 @XmlSchema(namespace = "https://nervousync.org/schemas/secure", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/secure_config_1.0.xsd",
+		location = "https://nervousync.org/schemas/secure_config_1_0.xsd",
 		xmlns = @XmlNs(prefix = "secure", namespaceURI = "https://nervousync.org/schemas/secure")
 )
 package org.nervousync.security.factory;

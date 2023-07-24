@@ -17,22 +17,26 @@
 package org.nervousync.enumerations.ip;
 
 /**
- * The enum Ip type.
+ * <h2 class="en">IP address type Enumerations</h2>
+ * <h2 class="zh-CN">IP地址类型枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: 2018-09-21 18:25
+ * @version $Revision : 1.0 $Date: Sep 21, 2018 18:25:33 $
  */
 public enum IPType {
 	/**
-	 * Pv 4 ip type.
+     * <span class="en">IPv4 address</span>
+     * <span class="zh-CN">IPv4地址</span>
 	 */
 	IPv4,
 	/**
-	 * Pv 6 ip type.
+     * <span class="en">IPv6 address</span>
+     * <span class="zh-CN">IPv6地址</span>
 	 */
 	IPv6,
 	/**
-	 * Unknown ip type.
+     * <span class="en">Unknown type</span>
+     * <span class="zh-CN">未知类型</span>
 	 */
 	Unknown
 }

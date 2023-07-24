@@ -27,36 +27,38 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.nervousync.beans.image.CutOptions;
 import org.nervousync.beans.image.MarkOptions;
-import org.nervousync.beans.image.MarkOptions.MarkPosition;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
- * Image utils
- * implements:
- * Resize image by ratio
- * Resize image to target width/height
- * Retrieve image width value
- * Retrieve image height value
- * Cut image
+ * <h2 class="en">Image Utilities</h2>
+ * <h2 class="zh-CN">图片工具集</h2>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: May 1, 2018 1:49:46 PM $
+ * @version $Revision: 1.0 $ $Date: May 1, 2018 13:49:46 $
  */
 public final class ImageUtils {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ImageUtils.class);
-
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+	private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(ImageUtils.class);
+	/**
+	 * <h3 class="en">Private constructor for ImageUtils</h3>
+	 * <h3 class="zh-CN">图片工具集的私有构造方法</h3>
+	 */
 	private ImageUtils() {
 	}
-
 	/**
-	 * Read image width
-	 * @param imagePath		image file path
-	 * @return	image width value
+	 * <h3 class="en">Retrieve image width value</h3>
+	 * <h3 class="zh-CN">获取图片宽度</h3>
+	 *
+	 * @param imagePath		<span class="en">Image file path</span>
+	 *                      <span class="zh-CN">图片地址</span>
+	 *
+	 * @return 	<span class="en">Image width value</span>
+	 * 			<span class="zh-CN">图片宽度值</span>
 	 */
 	public static int imageWidth(final String imagePath) {
 		if (FileUtils.isExists(imagePath) && FileUtils.imageFile(imagePath)) {
@@ -64,18 +66,23 @@ public final class ImageUtils {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getWidth(null);
 			} catch (Exception e) {
+				LOGGER.error("Utils", "Read_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Read picture error! ", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}
 		return Globals.DEFAULT_VALUE_INT;
 	}
-
 	/**
-	 * Read image height
-	 * @param imagePath		image file path
-	 * @return	image height value
+	 * <h3 class="en">Retrieve image height value</h3>
+	 * <h3 class="zh-CN">获取图片高度</h3>
+	 *
+	 * @param imagePath		<span class="en">Image file path</span>
+	 *                      <span class="zh-CN">图片地址</span>
+	 *
+	 * @return 	<span class="en">Image height value</span>
+	 * 			<span class="zh-CN">图片高度值</span>
 	 */
 	public static int imageHeight(final String imagePath) {
 		if (FileUtils.isExists(imagePath) && FileUtils.imageFile(imagePath)) {
@@ -83,18 +90,23 @@ public final class ImageUtils {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getHeight(null);
 			} catch (Exception e) {
+				LOGGER.error("Utils", "Read_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Read picture error! ", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}
 		return Globals.DEFAULT_VALUE_INT;
 	}
-
 	/**
-	 * Read the image ratio
-	 * @param imagePath		image file path
-	 * @return  image ratio
+	 * <h3 class="en">Retrieve image ratio value</h3>
+	 * <h3 class="zh-CN">获取图片宽高比</h3>
+	 *
+	 * @param imagePath		<span class="en">Image file path</span>
+	 *                      <span class="zh-CN">图片地址</span>
+	 *
+	 * @return 	<span class="en">Image ratio value</span>
+	 * 			<span class="zh-CN">图片宽高比</span>
 	 */
 	public static double imageRatio(final String imagePath) {
 		double imageHeight = ImageUtils.imageHeight(imagePath);
@@ -106,22 +118,28 @@ public final class ImageUtils {
 
 		return imageWidth / imageHeight;
 	}
-
 	/**
-	 * Cut image
-	 * @param origPath			original image file path
-	 * @param destPath			target output file path
-	 * @param cutOptions		cut options
-	 * @return		<code>true</code>success	<code>false</code>failed
+	 * <h3 class="en">Cut original image file and save to target path by given cut options</h3>
+	 * <h3 class="zh-CN">根据给定的切割参数对原始图片进行切割并存储到目标地址</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param cutOptions	<span class="en">cut options</span>
+	 *                      <span class="zh-CN">切割参数</span>
+	 *
+	 * @return 	<span class="en">Cut process result</span>
+	 * 			<span class="zh-CN">切割处理结果</span>
 	 */
-	public static boolean cutImage(final String origPath, final String destPath, final CutOptions cutOptions) {
+	public static boolean cutImage(final String origPath, final String targetPath, final CutOptions cutOptions) {
 		if (origPath != null && FileUtils.isExists(origPath) && cutOptions != null) {
 			if (cutOptions.getPositionX() + cutOptions.getCutWidth() > ImageUtils.imageWidth(origPath)) {
-				LOGGER.error("Width is out of original file");
+				LOGGER.error("Utils", "Width_Exceeds_Original_Image_Error");
 				return Boolean.FALSE;
 			}
 			if (cutOptions.getPositionY() + cutOptions.getCutHeight() > ImageUtils.imageHeight(origPath)) {
-				LOGGER.error("Height is out of original file");
+				LOGGER.error("Utils", "Height_Exceeds_Original_Image_Error");
 				return Boolean.FALSE;
 			}
 
@@ -138,37 +156,51 @@ public final class ImageUtils {
 					}
 				}
 
-				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
+				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(targetPath),
+						FileUtils.getFile(targetPath));
 			} catch (Exception e) {
+				LOGGER.error("Utils", "Cut_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Read picture error! ", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}
 		return Boolean.FALSE;
 	}
-
 	/**
-	 * Resize picture by given ratio
-	 * @param origPath		original picture file path
-	 * @param destPath		target picture file path
-	 * @param ratio			resize ratio
-	 * @return		<code>true</code>success	<code>false</code>failed
+	 * <h3 class="en">Resize original image file and save to target path by given ratio value</h3>
+	 * <h3 class="zh-CN">根据给定的缩放比例对原始图片进行放大/缩小并存储到目标地址</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param ratio			<span class="en">ratio value</span>
+	 *                      <span class="zh-CN">缩放比例</span>
+	 *
+	 * @return 	<span class="en">Resize process result</span>
+	 * 			<span class="zh-CN">修改尺寸处理结果</span>
 	 */
-	public static boolean resizeByRatio(final String origPath, final String destPath, final double ratio) {
-		return ImageUtils.resizeByRatio(origPath, destPath, ratio, null);
+	public static boolean resizeByRatio(final String origPath, final String targetPath, final double ratio) {
+		return ImageUtils.resizeByRatio(origPath, targetPath, ratio, null);
 	}
-
 	/**
-	 * Resize picture by given ratio
-	 * @param origPath		original picture file path
-	 * @param destPath		target picture file path
-	 * @param ratio			resize ratio
-	 * @param markOptions	mark options
-	 * @see MarkOptions
-	 * @return		<code>true</code>success	<code>false</code>failed
+	 * <h3 class="en">Resize original image file and save to target path by given ratio value, and add mark to target image if configured</h3>
+	 * <h3 class="zh-CN">根据给定的缩放比例对原始图片进行放大/缩小并存储到目标地址，并添加水印到目标图片（如果设置了水印选项）</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param ratio			<span class="en">ratio value</span>
+	 *                      <span class="zh-CN">缩放比例</span>
+	 * @param markOptions	<span class="en">Mark options</span>
+	 *                      <span class="zh-CN">水印选项</span>
+	 *
+	 * @return 	<span class="en">Resize process result</span>
+	 * 			<span class="zh-CN">修改尺寸处理结果</span>
 	 */
-	public static boolean resizeByRatio(final String origPath, final String destPath, final double ratio,
+	public static boolean resizeByRatio(final String origPath, final String targetPath, final double ratio,
 	                                    final MarkOptions markOptions) {
 		if (FileUtils.isExists(origPath) && FileUtils.imageFile(origPath) && ratio > 0) {
 			try {
@@ -181,41 +213,56 @@ public final class ImageUtils {
 				int targetHeight = Double.valueOf(origHeight * ratio).intValue();
 
 				return ImageIO.write(processImage(srcImage, targetWidth, targetHeight, markOptions),
-						StringUtils.getFilenameExtension(destPath),
-						FileUtils.getFile(destPath));
+						StringUtils.getFilenameExtension(targetPath),
+						FileUtils.getFile(targetPath));
 			} catch (Exception e) {
+				LOGGER.error("Utils", "Resize_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Resize picture error! ", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}
 		return Boolean.FALSE;
 	}
-
 	/**
-	 * Resize picture with given width and height
-	 * @param origPath			original picture file path
-	 * @param destPath			target picture file path
-	 * @param targetWidth		target width	(if -1 width will auto set by height ratio)
-	 * @param targetHeight		target height	(if -1 height will auto set by width ratio)
-	 * @return		<code>true</code>success	<code>false</code>failed
+	 * <h3 class="en">Resize original image file to the given width and height, save to target path</h3>
+	 * <h3 class="zh-CN">将原始图片调整到指定的宽度、高度，并存储到目标地址</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param targetWidth	<span class="en">target width	(if -1 width will auto set by height ratio)</span>
+	 *                      <span class="zh-CN">图片调整后的宽度，如果值为-1则自动根据图片宽高比进行调整</span>
+	 * @param targetHeight	<span class="en">target height	(if -1 height will auto set by width ratio)</span>
+	 *                      <span class="zh-CN">图片调整后的高度，如果值为-1则自动根据图片宽高比进行调整</span>
+	 *
+	 * @return 	<span class="en">Resize process result</span>
+	 * 			<span class="zh-CN">修改尺寸处理结果</span>
 	 */
-	public static boolean resizeTo(final String origPath, final String destPath,
+	public static boolean resizeTo(final String origPath, final String targetPath,
 	                               final int targetWidth, final int targetHeight) {
-		return ImageUtils.resizeTo(origPath, destPath, targetWidth, targetHeight, null);
+		return ImageUtils.resizeTo(origPath, targetPath, targetWidth, targetHeight, null);
 	}
-
 	/**
-	 * Resize picture with given width and height
-	 * @param origPath			original picture file path
-	 * @param destPath			target picture file path
-	 * @param targetWidth		target width	(if -1 width will auto set by height ratio)
-	 * @param targetHeight		target height	(if -1 height will auto set by width ratio)
-	 * @param markOptions		mark options
-	 * @see MarkOptions
-	 * @return		<code>true</code>success	<code>false</code>failed
+	 * <h3 class="en">Resize original image file to the given width and height, save to target path, and add mark to target image if configured</h3>
+	 * <h3 class="zh-CN">将原始图片调整到指定的宽度、高度，并存储到目标地址，并添加水印到目标图片（如果设置了水印选项）</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param targetWidth	<span class="en">target width	(if -1 width will auto set by height ratio)</span>
+	 *                      <span class="zh-CN">图片调整后的宽度，如果值为-1则自动根据图片宽高比进行调整</span>
+	 * @param targetHeight	<span class="en">target height	(if -1 height will auto set by width ratio)</span>
+	 *                      <span class="zh-CN">图片调整后的高度，如果值为-1则自动根据图片宽高比进行调整</span>
+	 * @param markOptions	<span class="en">Mark options</span>
+	 *                      <span class="zh-CN">水印选项</span>
+	 *
+	 * @return 	<span class="en">Resize process result</span>
+	 * 			<span class="zh-CN">修改尺寸处理结果</span>
 	 */
-	public static boolean resizeTo(final String origPath, final String destPath,
+	public static boolean resizeTo(final String origPath, final String targetPath,
 	                               final int targetWidth, final int targetHeight, final MarkOptions markOptions) {
 		if (FileUtils.isExists(origPath) && FileUtils.imageFile(origPath)
 				&& (targetWidth > 0 || targetHeight > 0)) {
@@ -242,107 +289,139 @@ public final class ImageUtils {
 				}
 
 				return ImageIO.write(processImage(srcImage, resizeWidth, resizeHeight, markOptions),
-						StringUtils.getFilenameExtension(destPath), FileUtils.getFile(destPath));
+						StringUtils.getFilenameExtension(targetPath), FileUtils.getFile(targetPath));
 			} catch (Exception e) {
+				LOGGER.error("Utils", "Resize_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Resize picture error! ", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}
 		return Boolean.FALSE;
 	}
-
 	/**
-	 * Mark image
-	 * @param filePath          original picture file path
-	 * @param targetPath        target picture file path
-	 * @param markOptions       mark options
-	 * @return                  operate result
+	 * <h3 class="en">Add mark to original image and save result image to target path</h3>
+	 * <h3 class="zh-CN">添加水印到原始图片，并将添加好水印的图片保存到目标地址</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 * @param markOptions	<span class="en">Mark options</span>
+	 *                      <span class="zh-CN">水印选项</span>
+	 *
+	 * @return 	<span class="en">Mark process result</span>
+	 * 			<span class="zh-CN">添加水印处理结果</span>
 	 */
-	public static boolean markImage(final String filePath, final String targetPath, final MarkOptions markOptions) {
-		int imageWidth = ImageUtils.imageWidth(filePath);
-		int imageHeight = ImageUtils.imageHeight(filePath);
+	public static boolean markImage(final String origPath, final String targetPath, final MarkOptions markOptions) {
+		int imageWidth = ImageUtils.imageWidth(origPath);
+		int imageHeight = ImageUtils.imageHeight(origPath);
 		try {
 			BufferedImage bufferedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 			return ImageIO.write(processImage(bufferedImage, imageWidth, imageHeight, markOptions),
 					StringUtils.getFilenameExtension(targetPath),
 					FileUtils.getFile(targetPath));
 		} catch (Exception e) {
+			LOGGER.error("Utils", "Water_Mark_Image_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Mark picture error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 		}
 		return Boolean.FALSE;
 	}
-
 	/**
-	 * Calculate dHash hamming between original image and target image
-	 * @param origPath			original picture file path
-	 * @param destPath			target picture file path
-	 * @return                  Hamming result
+	 * <h3 class="en">Calculate dHash hamming between original image and target image</h3>
+	 * <h3 class="en">计算原始图片和目标图片间差异值哈希的汉明距离</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 *
+	 * @return 	<span class="en">Calculated hamming result</span>
+	 * 			<span class="zh-CN">计算的汉明距离</span>
 	 */
-	public static int dHashHamming(final String origPath, final String destPath) {
+	public static int dHashHamming(final String origPath, final String targetPath) {
 		String origHash = ImageUtils.dHash(origPath);
-		String destHash = ImageUtils.dHash(destPath);
+		String destHash = ImageUtils.dHash(targetPath);
 		int diff = 0;
 		for (int j = 0 ; j < origHash.length() ; j++) {
 			diff += (origHash.charAt(j) ^ destHash.charAt(j));
 		}
 		return diff;
 	}
-
 	/**
-	 * Calculate pHash hamming between original image and target image
-	 * @param origPath			original picture file path
-	 * @param destPath			target picture file path
-	 * @return                  Hamming result
+	 * <h3 class="en">Calculate pHash hamming between original image and target image</h3>
+	 * <h3 class="en">计算原始图片和目标图片间感知哈希的汉明距离</h3>
+	 *
+	 * @param origPath 		<span class="en">original image file path</span>
+	 *                      <span class="zh-CN">原始图片地址</span>
+	 * @param targetPath 	<span class="en">target image file path</span>
+	 *                      <span class="zh-CN">目标图片地址</span>
+	 *
+	 * @return 	<span class="en">Calculated hamming result</span>
+	 * 			<span class="zh-CN">计算的汉明距离</span>
 	 */
-	public static int pHashHamming(final String origPath, final String destPath) {
+	public static int pHashHamming(final String origPath, final String targetPath) {
 		String origHash = ImageUtils.pHash(origPath);
-		String destHash = ImageUtils.pHash(destPath);
+		String destHash = ImageUtils.pHash(targetPath);
 		int diff = 0;
 		for (int j = 0 ; j < origHash.length() ; j++) {
 			diff += (origHash.charAt(j) ^ destHash.charAt(j));
 		}
 		return diff;
 	}
-
 	/**
-	 * dHash signature
-	 * @param filePath  picture file path
-	 * @return          signature value
+	 * <h3 class="en">Calculate dHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的差异值哈希</h3>
+	 *
+	 * @param filePath 	<span class="en">Image file path</span>
+	 *                  <span class="zh-CN">图片文件地址</span>
+	 *
+	 * @return 	<span class="en">dHash string</span>
+	 * 			<span class="zh-CN">差异值哈希字符串</span>
 	 */
 	public static String dHash(final String filePath) {
 		try {
 			return ImageUtils.dHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
+			LOGGER.error("Utils", "Not_Found_File_Error", filePath);
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Calculate picture pHash error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 	}
-
 	/**
-	 * dHash signature
-	 * @param file      picture file instance
-	 * @return          signature value
+	 * <h3 class="en">Calculate dHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的差异值哈希</h3>
+	 *
+	 * @param file 	<span class="en">Image file instance</span>
+	 *              <span class="zh-CN">图片文件实例对象</span>
+	 *
+	 * @return 	<span class="en">dHash string</span>
+	 * 			<span class="zh-CN">差异值哈希字符串</span>
 	 */
 	public static String dHash(final File file) {
 		try {
 			return ImageUtils.dHash(ImageIO.read(file));
 		} catch (IOException e) {
+			LOGGER.error("Utils", "Read_Files_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Calculate picture pHash error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 	}
-
 	/**
-	 * dHash signature
-	 * @param bufferedImage     picture file with bufferedImage instance
-	 * @return                  signature value
+	 * <h3 class="en">Calculate dHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的差异值哈希</h3>
+	 *
+	 * @param bufferedImage 	<span class="en">Buffered image</span>
+	 *                          <span class="zh-CN">缓冲图片实例对象</span>
+	 *
+	 * @return 	<span class="en">dHash string</span>
+	 * 			<span class="zh-CN">差异值哈希字符串</span>
 	 */
 	public static String dHash(final BufferedImage bufferedImage) {
 		BufferedImage prepareImage;
@@ -353,51 +432,65 @@ public final class ImageUtils {
 		}
 
 		double[][] grayMatrix = ImageUtils.grayMatrix(prepareImage);
-		StringBuilder pHash = new StringBuilder();
+		StringBuilder dHash = new StringBuilder();
 		for (int x = 0 ; x < 8 ; x++) {
 			for (int y = 0 ; y < 8 ; y++) {
-				pHash.append((grayMatrix[x][y] > grayMatrix[x][y + 1]) ? "1" : "0");
+				dHash.append((grayMatrix[x][y] > grayMatrix[x][y + 1]) ? "1" : "0");
 			}
 		}
-		return pHash.toString();
+		return dHash.toString();
 	}
-
 	/**
-	 * pHash signature
-	 * @param filePath  picture file path
-	 * @return          signature value
+	 * <h3 class="en">Calculate pHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的感知哈希</h3>
+	 *
+	 * @param filePath 	<span class="en">Image file path</span>
+	 *                  <span class="zh-CN">图片文件地址</span>
+	 *
+	 * @return 	<span class="en">pHash string</span>
+	 * 			<span class="zh-CN">感知哈希字符串</span>
 	 */
 	public static String pHash(final String filePath) {
 		try {
 			return ImageUtils.pHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
+			LOGGER.error("Utils", "Not_Found_File_Error", filePath);
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Calculate picture pHash error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 	}
-
 	/**
-	 * pHash signature
-	 * @param file      picture file instance
-	 * @return          signature value
+	 * <h3 class="en">Calculate pHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的感知哈希</h3>
+	 *
+	 * @param file 	<span class="en">Image file instance</span>
+	 *              <span class="zh-CN">图片文件实例对象</span>
+	 *
+	 * @return 	<span class="en">pHash string</span>
+	 * 			<span class="zh-CN">感知哈希字符串</span>
 	 */
 	public static String pHash(final File file) {
 		try {
 			return ImageUtils.pHash(ImageIO.read(file));
 		} catch (IOException e) {
+			LOGGER.error("Utils", "Read_Files_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Calculate picture pHash error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 	}
-
 	/**
-	 * pHash signature
-	 * @param bufferedImage     picture file with bufferedImage instance
-	 * @return                  signature value
+	 * <h3 class="en">Calculate pHash of given image file</h3>
+	 * <h3 class="en">计算给定图片的感知哈希</h3>
+	 *
+	 * @param bufferedImage 	<span class="en">Buffered image</span>
+	 *                          <span class="zh-CN">缓冲图片实例对象</span>
+	 *
+	 * @return 	<span class="en">pHash string</span>
+	 * 			<span class="zh-CN">感知哈希字符串</span>
 	 */
 	public static String pHash(final BufferedImage bufferedImage) {
 		BufferedImage prepareImage;
@@ -424,84 +517,92 @@ public final class ImageUtils {
 		}
 		return pHash.toString();
 	}
-
 	/**
-	 * Process image mark
-	 * @param graphics			target image graphics object
-	 * @param width				image width
-	 * @param height			image height
-	 * @param markOptions		image mark options
+	 * <h3 class="en">Add text/image watermark to the target image</h3>
+	 * <h3 class="en">添加文字/图片水印到目标图片</h3>
+	 *
+	 * @param graphics 		<span class="en">target image Graphics2D object</span>
+	 *                      <span class="zh-CN">目标图片的Graphics2D实例对象</span>
+	 * @param width			<span class="en">image width</span>
+	 *                      <span class="zh-CN">图片宽度</span>
+	 * @param height		<span class="en">image height</span>
+	 *                      <span class="zh-CN">图片高度</span>
+	 * @param markOptions	<span class="en">Mark options</span>
+	 *                      <span class="zh-CN">水印选项</span>
 	 */
 	private static void markImage(final Graphics2D graphics, final int width, final int height,
 	                              final MarkOptions markOptions) {
-		MarkPosition markPosition = markOptions.retrievePosition(width, height);
+		Optional.ofNullable(markOptions.retrievePosition(width, height))
+				.ifPresent(markPosition -> {
+					switch (markOptions.getMarkType()) {
+					case ICON:
+						try {
+							BufferedImage iconImg = ImageIO.read(FileUtils.getFile(markOptions.getMarkPath()));
+							if (iconImg != null && markOptions.getTransparency() >= 0
+									&& markOptions.getTransparency() <= 1) {
+								graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+										markOptions.getTransparency()));
+								graphics.drawImage(iconImg, markPosition.getPositionX(), markPosition.getPositionY(), null);
 
-		if (markPosition != null) {
-			switch (markOptions.getMarkType()) {
-			case ICON:
-				try {
-					BufferedImage iconImg = ImageIO.read(FileUtils.getFile(markOptions.getMarkPath()));
-					if (iconImg != null && markOptions.getTransparency() >= 0
-							&& markOptions.getTransparency() <= 1) {
-						graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
-								markOptions.getTransparency()));
-						graphics.drawImage(iconImg, markPosition.getPositionX(), markPosition.getPositionY(), null);
+								graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+							}
+						} catch (Exception e) {
+							LOGGER.error("Utils", "Water_Mark_Image_Error");
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("Utils", "Stack_Message_Error", e);
+							}
+						}
+						break;
+					case TEXT:
+						if (markOptions.getMarkText() != null && markOptions.getFontName() != null
+								&& markOptions.getFontSize() > 0) {
+							graphics.setColor(markOptions.getColor());
+							graphics.setFont(new Font(markOptions.getFontName(), Font.PLAIN, markOptions.getFontSize()));
 
-						graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+							graphics.drawString(markOptions.getMarkText(), markPosition.getPositionX(), markPosition.getPositionY());
+						}
+						break;
 					}
-				} catch (Exception e) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Read icon file error! ", e);
-					}
-				}
-				break;
-			case TEXT:
-				if (markOptions.getMarkText() != null && markOptions.getFontName() != null
-						&& markOptions.getFontSize() > 0) {
-					graphics.setColor(markOptions.getColor());
-					graphics.setFont(new Font(markOptions.getFontName(), Font.PLAIN, markOptions.getFontSize()));
-
-					graphics.drawString(markOptions.getMarkText(), markPosition.getPositionX(), markPosition.getPositionY());
-				}
-				break;
-			}
-		}
+				});
 	}
-
 	/**
-	 * Process image operates
-	 * @param srcImage				original image object
-	 * @param targetWidth			target width
-	 * @param targetHeight			target height
-	 * @param markOptions			image mark options
+	 * <h3 class="en">Process image by given parameters</h3>
+	 * <h3 class="en">根据给定的参数处理图片</h3>
+	 *
+	 * @param srcImage 		<span class="en">Buffered image</span>
+	 *                      <span class="zh-CN">缓冲图片实例对象</span>
+	 * @param targetWidth	<span class="en">target width</span>
+	 *                      <span class="zh-CN">图片调整后的宽度</span>
+	 * @param targetHeight	<span class="en">target height</span>
+	 *                      <span class="zh-CN">图片调整后的高度</span>
+	 * @param markOptions	<span class="en">Mark options</span>
+	 *                      <span class="zh-CN">水印选项</span>
+	 *
 	 * @return		<code>true</code>success	<code>false</code>failed
 	 */
 	private static BufferedImage processImage(final BufferedImage srcImage, final int targetWidth,
 	                                          final int targetHeight, final MarkOptions markOptions) {
 		if (srcImage != null && targetWidth > 0 && targetHeight > 0) {
-			try {
-				BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-				Graphics2D graphics = bufferedImage.createGraphics();
-				graphics.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
+			BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphics = bufferedImage.createGraphics();
+			graphics.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
 
-				Optional.ofNullable(markOptions)
-						.ifPresent(options -> markImage(graphics, targetWidth, targetHeight, options));
-				graphics.dispose();
-
-				return bufferedImage;
-			} catch (Exception e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Resize picture error! ", e);
-				}
-			}
+			Optional.ofNullable(markOptions)
+					.ifPresent(options -> markImage(graphics, targetWidth, targetHeight, options));
+			graphics.dispose();
+			return bufferedImage;
 		}
 		return srcImage;
 	}
-
 	/**
-	 * Convert bufferedImage to grayMatrix
-	 * @param bufferedImage     BufferedImage instance
-	 * @return                  Gray matrix
+	 * <h3 class="en">Convert bufferedImage to gray matrix</h3>
+	 * <h3 class="en">转换缓冲图片实例对象为灰度二维数组</h3>
+	 *
+	 * @param bufferedImage <span class="en">Buffered image</span>
+	 *                      <span class="zh-CN">缓冲图片实例对象</span>
+	 *
+	 * @return 	<span class="en">gray matrix</span>
+	 * 			<span class="zh-CN">灰度二维数组</span>
 	 */
 	private static double[][] grayMatrix(final BufferedImage bufferedImage) {
 		if (bufferedImage == null) {
@@ -520,11 +621,15 @@ public final class ImageUtils {
 		}
 		return grayMatrix;
 	}
-
 	/**
-	 * Convert bufferedImage to DCT matrix
-	 * @param bufferedImage     BufferedImage instance
-	 * @return                  DCT matrix
+	 * <h3 class="en">Process Discrete Cosine Transform to bufferedImage</h3>
+	 * <h3 class="en">对给定的缓冲图片实例对象做离散余弦变换</h3>
+	 *
+	 * @param bufferedImage <span class="en">Buffered image</span>
+	 *                      <span class="zh-CN">缓冲图片实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">处理结果</span>
 	 */
 	private static double[][] applyDCT(final BufferedImage bufferedImage) {
 		if (bufferedImage == null) {

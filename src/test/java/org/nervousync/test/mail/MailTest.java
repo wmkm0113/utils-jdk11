@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.mail.MailObject;
@@ -50,13 +50,13 @@ public final class MailTest extends BaseTest {
             this.logger.info("Initialize SecureFactory result: {}", initResult);
         }
         SecureConfig secureConfig = SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES192)
-                .filter(config -> SecureFactory.getInstance().register(MAIL_SECURE, config))
+                .filter(config -> SecureFactory.register(MAIL_SECURE, config))
                 .orElse(null);
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
         X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
-        PROPERTIES = ConvertUtils.loadProperties("src/test/resources/mail.xml");
+        PROPERTIES = PropertiesUtils.loadProperties("src/test/resources/mail.xml");
         MAIL_CONFIG = MailConfigBuilder.newBuilder()
                 .secureName(MAIL_SECURE)
                 .secureConfig(MAIL_SECURE, secureConfig)
@@ -142,11 +142,11 @@ public final class MailTest extends BaseTest {
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid, Boolean.TRUE)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid, Boolean.TRUE))
                                 .ifPresent(receiveObject -> {
                                     this.logger.info("UID: {}", receiveObject.getUid());
                                     this.logger.info("Title: {}", receiveObject.getSubject());
@@ -169,7 +169,7 @@ public final class MailTest extends BaseTest {
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid -> {
@@ -199,7 +199,7 @@ public final class MailTest extends BaseTest {
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_TRASH)
                 .stream()
                 .filter(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid))
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
@@ -218,14 +218,14 @@ public final class MailTest extends BaseTest {
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
                 .stream()
                 .filter(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->
                         this.logger.info("Delete mail result: {}",
                                 mailAgent.deleteMails(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid)));
         mailAgent.mailList(Globals.DEFAULT_EMAIL_FOLDER_TRASH).stream().filter(uid ->
-                        mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid)
+                        Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid))
                                 .map(receiveObject -> MAIL_SUBJECT.equalsIgnoreCase(receiveObject.getSubject()))
                                 .orElse(Boolean.FALSE))
                 .forEach(uid ->

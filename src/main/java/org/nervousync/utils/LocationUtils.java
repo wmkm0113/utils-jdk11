@@ -20,21 +20,54 @@ import org.nervousync.beans.location.GeoPoint;
 import org.nervousync.exceptions.location.LocationConvertException;
 
 /**
+ * <h2 class="en">Geography Utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Convert GeoPoint at WGS84(GPS)/GCJ02/BD09</ul>
+ *     <ul>Calculate distance of two given geography point. (Unit: Kilometers)</ul>
+ * </span>
+ * <h2 class="zh-CN">地理位置信息工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>在不同坐标系间转换数据，支持的坐标系：WGS84(GPS)/GCJ02/BD09</ul>
+ *     <ul>计算两个物理坐标之间的距离，单位：公里</ul>
+ * </span>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 19, 2017 1:01:14 PM $
+ * @version $Revision: 1.0 $ $Date: Dec 19, 2017 13:01:14 $
  */
 public final class LocationUtils {
-
-	private static final double X_PI = Math.PI * 3000.0 / 180.0;
-	private static final double EARTH_R = 6378137.0;
-	private static final double EARTH_EE = 0.00669342162296594323;
-
 	/**
-	 * Calc distance of beginning point and end point(Unit: Kilometers)
-	 * @param beginPoint    Begin point
-	 * @param endPoint      End point
-	 * @return              distance
-	 * @throws LocationConvertException     convert point to GPS failed
+	 * <span class="en">Earth radius</span>
+	 * <span class="zh-CN">地球半径</span>
+	 */
+	private static final double EARTH_R = 6378245.0;
+	/**
+	 * <span class="en">Square value of earth eccentricity</span>
+	 * <span class="zh-CN">地球偏心率平方值</span>
+	 */
+	private static final double EARTH_EE = 0.00669342162296594323;
+	/**
+	 * <h3 class="en">Private constructor for LocationUtils</h3>
+	 * <h3 class="zh-CN">地理位置信息工具集的私有构造方法</h3>
+	 */
+	private LocationUtils() {
+	}
+	/**
+	 * <h3 class="en">Calculate distance of two given geography location. (Unit: Kilometers)</h3>
+	 * <h3 class="zh-CN">计算两个物理坐标之间的距离，单位：公里</h3>
+	 *
+	 * @param beginPoint    <span class="en">GroPoint instance of beginning geography location</span>
+	 *                      <span class="zh-CN">起始位置坐标的GroPoint实例</span>
+	 * @param endPoint    	<span class="en">GroPoint instance of end geography location</span>
+	 *                      <span class="zh-CN">终止位置坐标的GroPoint实例</span>
+	 *
+	 * @return	<span class="en">Calculated distance value</span>
+	 * 			<span class="zh-CN">计算完成的距离值</span>
+	 *
+	 * @throws LocationConvertException
+	 * <span class="en">If convert GeoPoint instance to GPS location has error</span>
+	 * <span class="zh-CN">当转换GeoPoint为GPS坐标时出现错误</span>
 	 */
 	public static double calcDistance(final GeoPoint beginPoint, final GeoPoint endPoint)
 			throws LocationConvertException {
@@ -46,16 +79,23 @@ public final class LocationUtils {
 		return Math.hypot(tmpX, tmpY);
 
 	}
-	
 	/**
-	 * Convert to GPS point
-	 * @param currentPoint		current location point object
-	 * @return					convert location point object
-	 * @throws LocationConvertException  location type is invalid
+	 * <h3 class="en">Convert given GeoPoint instance to GPS GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换给定的GeoPoint实例为GPS坐标GeoPoint实例</h3>
+	 *
+	 * @param currentPoint 	<span class="en">Given GroPoint instance</span>
+	 *                      <span class="zh-CN">给定的坐标的GroPoint实例</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
+	 *
+	 * @throws LocationConvertException
+	 * <span class="en">If convert GeoPoint instance to GPS location has error</span>
+	 * <span class="zh-CN">当转换GeoPoint为GPS坐标时出现错误</span>
 	 */
 	public static GeoPoint anyToGPS(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException("Current point is null");
+			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -66,19 +106,26 @@ public final class LocationUtils {
 			GeoPoint gcjPoint = BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 			return GCJ02ToGPS(gcjPoint.getLongitude(), gcjPoint.getLatitude());
 			default:
-				throw new LocationConvertException("Location type does not supported");
+				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
 		}
 	}
-
 	/**
-	 * Convert to GCJ-02 point
-	 * @param currentPoint		current location point object
-	 * @return					convert location point object
-	 * @throws LocationConvertException  location type is invalid
+	 * <h3 class="en">Convert given GeoPoint instance to GCJ02 GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换给定的GeoPoint实例为GCJ02坐标GeoPoint实例</h3>
+	 *
+	 * @param currentPoint 	<span class="en">Given GroPoint instance</span>
+	 *                      <span class="zh-CN">给定的坐标的GroPoint实例</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
+	 *
+	 * @throws LocationConvertException
+	 * <span class="en">If convert GeoPoint instance to GPS location has error</span>
+	 * <span class="zh-CN">当转换GeoPoint为GPS坐标时出现错误</span>
 	 */
 	public static GeoPoint anyToGCJ02(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException("Current point is null");
+			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -88,19 +135,26 @@ public final class LocationUtils {
 		case BD_09:
 			return BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 			default:
-				throw new LocationConvertException("Location type does not supported");
+				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
 		}
 	}
-
 	/**
-	 * Convert to BD-09 point
-	 * @param currentPoint		current location point object
-	 * @return					convert location point object
-	 * @throws LocationConvertException  location type is invalid
+	 * <h3 class="en">Convert given GeoPoint instance to BD09 GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换给定的GeoPoint实例为BD09坐标GeoPoint实例</h3>
+	 *
+	 * @param currentPoint 	<span class="en">Given GroPoint instance</span>
+	 *                      <span class="zh-CN">给定的坐标的GroPoint实例</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
+	 *
+	 * @throws LocationConvertException
+	 * <span class="en">If convert GeoPoint instance to GPS location has error</span>
+	 * <span class="zh-CN">当转换GeoPoint为GPS坐标时出现错误</span>
 	 */
 	public static GeoPoint anyToBD09(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException("Current point is null");
+			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -111,45 +165,60 @@ public final class LocationUtils {
 		case BD_09:
 			return currentPoint;
 			default:
-				throw new LocationConvertException("Location type does not supported");
+				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
 		}
 	}
-
 	/**
-	 * Convert GCJ02 to BD09
-	 * @param longitude     longitude value of GCJ02
-	 * @param latitude      latitude value of GCJ02
-	 * @return              Location point
+	 * <h3 class="en">Convert GCJ02 GeoPoint instance to BD09 GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换GCJ02坐标的GeoPoint实例为BD09坐标GeoPoint实例</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
 	 */
 	private static GeoPoint GCJ02ToBD09(final double longitude, final double latitude) {
-		double fixValue = Math.sqrt(Math.pow(longitude, 2) + Math.pow(latitude, 2)) + 0.00002 * Math.sin(latitude * X_PI);
-		double fixTemp = Math.atan2(latitude, longitude) + 0.000003 * Math.cos(longitude * X_PI);
-		double bdLat = fixValue * Math.sin(fixTemp) + 0.006;
-		double bdLon = fixValue * Math.cos(fixTemp) + 0.0065;
+		double fixValue = Math.sqrt(Math.pow(longitude, 2) + Math.pow(latitude, 2)) + 0.00002 * Math.sin(latitude * Math.PI);
+		double delta = Math.atan2(latitude, longitude) + 0.000003 * Math.cos(longitude * Math.PI);
+		double bdLat = fixValue * Math.sin(delta) + 0.006;
+		double bdLon = fixValue * Math.cos(delta) + 0.0065;
 		return GeoPoint.bd09Point(bdLon, bdLat);
 	}
-
 	/**
-	 * Convert BD09 to GCJ02
-	 * @param longitude     longitude value of BD09
-	 * @param latitude      latitude value of BD09
-	 * @return              Location point
+	 * <h3 class="en">Convert BD09 GeoPoint instance to GCJ02 GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换BD09坐标的GeoPoint实例为GCJ02坐标GeoPoint实例</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
 	 */
 	private static GeoPoint BD09ToGCJ02(final double longitude, final double latitude) {
-		double fixValue = Math.sqrt(Math.pow(longitude - 0.0065, 2) + Math.pow(latitude - 0.006, 2)) 
-				- 0.00002 * Math.sin((latitude - 0.006) * X_PI);
-		double fixTemp = Math.atan2(latitude - 0.006, longitude - 0.0065) 
-				- 0.000003 * Math.cos((longitude - 0.0065) * X_PI);
+		double fixValue = Math.sqrt(Math.pow(longitude - 0.0065, 2) + Math.pow(latitude - 0.006, 2))
+				- 0.00002 * Math.sin((latitude - 0.006) * Math.PI);
+		double fixTemp = Math.atan2(latitude - 0.006, longitude - 0.0065)
+				- 0.000003 * Math.cos((longitude - 0.0065) * Math.PI);
 		double gcjLat = fixValue * Math.sin(fixTemp);
 		double gcjLon = fixValue * Math.cos(fixTemp);
 		return GeoPoint.gcj02Point(gcjLon, gcjLat);
 	}
-
 	/**
-	 * Convert GCJ02 to GPS
-	 * @param longitude     longitude value of GCJ02
-	 * @param latitude      latitude value of GCJ02
-	 * @return              Location point
+	 * <h3 class="en">Convert GCJ02 GeoPoint instance to GPS GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换GCJ02坐标的GeoPoint实例为GPS坐标GeoPoint实例</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
 	 */
 	private static GeoPoint GCJ02ToGPS(final double longitude, final double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) || (latitude < 0.8293 || latitude > 55.8271)) {
@@ -160,12 +229,17 @@ public final class LocationUtils {
 					latitude - deltaPoint.getLatitude());
 		}
 	}
-
 	/**
-	 * Convert GPS to GCJ02
-	 * @param longitude     longitude value of GPS
-	 * @param latitude      latitude value of GPS
-	 * @return              Location point
+	 * <h3 class="en">Convert GPS GeoPoint instance to GCJ02 GeoPoint instance</h3>
+	 * <h3 class="zh-CN">转换GPS坐标的GeoPoint实例为GCJ02坐标GeoPoint实例</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
 	 */
 	private static GeoPoint GPSToGCJ02(final double longitude, final double latitude) {
 		if ((longitude < 72.004 || longitude > 137.8347) && (latitude < 0.8293 || latitude > 55.8271)) {
@@ -175,7 +249,18 @@ public final class LocationUtils {
 		return GeoPoint.gcj02Point(longitude + deltaPoint.getLongitude(),
 				latitude + deltaPoint.getLatitude());
 	}
-	
+	/**
+	 * <h3 class="en">Calculate delta value of GeoPoint convert</h3>
+	 * <h3 class="zh-CN">计算地理坐标的偏移量</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">Converted GeoPoint instance</span>
+	 * 			<span class="zh-CN">转换后的GeoPoint实例</span>
+	 */
 	private static GeoPoint deltaPoint(final double longitude, final double latitude) {
 		double transformLatitude = latitude / 180.0 * Math.PI;
 		double magic = 1 - EARTH_EE * Math.pow(Math.sin(transformLatitude), 2);
@@ -186,32 +271,46 @@ public final class LocationUtils {
 				/ (EARTH_R / magicSqrt * Math.cos(transformLatitude) * Math.PI));
 		return GeoPoint.deltaPoint(fixedLongitude, fixedLatitude);
 	}
-	
+	/**
+	 * <h3 class="en">Calculate value of transformed latitude</h3>
+	 * <h3 class="zh-CN">计算转换后的纬度值</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">transformed latitude value</span>
+	 * 			<span class="zh-CN">转换后的纬度值</span>
+	 */
 	private static double transformLatitude(final double longitude, final double latitude) {
-		double transformLatitude = -100.0 + 2.0 * longitude + 3.0 * latitude + 0.2 * Math.pow(latitude, 2);
-		transformLatitude += 0.1 * longitude * latitude + 0.2 * Math.sqrt(Math.abs(longitude));
-		transformLatitude += calcFirst(longitude);
-		transformLatitude += calcLast(latitude);
-		transformLatitude +=
-				(160.0 * Math.sin(latitude / 12.0 * Math.PI) + 320.0 * Math.sin(latitude * Math.PI / 30.0)) * 2.0 / 3.0;
-		return transformLatitude;
+		double result = -100.0 + 2.0 * longitude + 3.0 * latitude + 0.2 * Math.pow(latitude, 2);
+		result += 0.1 * longitude * latitude + 0.2 * Math.sqrt(Math.abs(longitude));
+		result += calculate(longitude, latitude);
+		result += (160.0 * Math.sin(latitude / 12.0 * Math.PI) + 320.0 * Math.sin(latitude * Math.PI / 30.0)) * 2.0 / 3.0;
+		return result;
 	}
-	
+	/**
+	 * <h3 class="en">Calculate value of transformed longitude</h3>
+	 * <h3 class="zh-CN">计算转换后的经度值</h3>
+	 *
+	 * @param longitude		<span class="en">Longitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标经度值</span>
+	 * @param latitude		<span class="en">Latitude value of GeoPoint</span>
+	 *                      <span class="zh-CN">地理坐标纬度值</span>
+	 *
+	 * @return	<span class="en">transformed longitude value</span>
+	 * 			<span class="zh-CN">转换后的经度值</span>
+	 */
 	private static double transformLongitude(final double longitude, final double latitude) {
-		double transformLongitude = 300.0 + longitude + 2.0 * latitude + 0.1 * Math.pow(longitude, 2);
-		transformLongitude += 0.1 * longitude * latitude + 0.1 * Math.sqrt(Math.abs(longitude));
-		transformLongitude += calcFirst(longitude);
-		transformLongitude += calcLast(longitude);
-		transformLongitude +=
-				(150.0 * Math.sin(longitude / 12.0 * Math.PI) + 300.0 * Math.sin(longitude * Math.PI / 30.0)) * 2.0 / 3.0;
-		return transformLongitude;
+		double result = 300.0 + longitude + 2.0 * latitude + 0.1 * Math.pow(longitude, 2);
+		result += 0.1 * longitude * latitude + 0.1 * Math.sqrt(Math.abs(longitude));
+		result += calculate(longitude, longitude);
+		result += (150.0 * Math.sin(longitude / 12.0 * Math.PI) + 300.0 * Math.sin(longitude * Math.PI / 30.0)) * 2.0 / 3.0;
+		return result;
 	}
-
-	private static double calcFirst(final double value) {
-		return (20.0 * Math.sin(6.0 * value * Math.PI) + 20.0 * Math.sin(2.0 * value * Math.PI)) * 2.0 / 3.0;
-	}
-
-	private static double calcLast(final double value) {
-		return (20.0 * Math.sin(value * Math.PI) + 40.0 * Math.sin(value / 3.0 * Math.PI)) * 2.0 / 3.0;
+	private static double calculate(final double value1, final double value2) {
+		return ((20.0 * Math.sin(6.0 * value1 * Math.PI) + 20.0 * Math.sin(2.0 * value1 * Math.PI)) * 2.0 / 3.0)
+				+ ((20.0 * Math.sin(value2 * Math.PI) + 40.0 * Math.sin(value2 / 3.0 * Math.PI)) * 2.0 / 3.0);
 	}
 }

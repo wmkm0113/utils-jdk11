@@ -17,23 +17,31 @@
 package org.nervousync.enumerations.crypto;
 
 /**
- * The enum Crypto mode.
+ * <h2 class="en">Crypto Mode Enumerations</h2>
+ * <h2 class="zh-CN">加密模式枚举</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jun 28, 2019 14:32:16 $
  */
 public enum CryptoMode {
     /**
-     * Encrypt crypto mode.
+     * <span class="en">Encrypt Mode</span>
+     * <span class="zh-CN">加密模式</span>
      */
     ENCRYPT,
     /**
-     * Decrypt crypto mode.
+     * <span class="en">Decrypt Mode</span>
+     * <span class="zh-CN">解密模式</span>
      */
     DECRYPT,
     /**
-     * Signature crypto mode.
+     * <span class="en">Signature Mode</span>
+     * <span class="zh-CN">签名模式</span>
      */
     SIGNATURE,
     /**
-     * Verify crypto mode.
+     * <span class="en">Verify Signature Mode</span>
+     * <span class="zh-CN">验证签名模式</span>
      */
     VERIFY
 }

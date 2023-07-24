@@ -16,143 +16,226 @@
  */
 package org.nervousync.utils;
 
-import org.nervousync.commons.core.Globals;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.commons.Globals;
+import org.nervousync.exceptions.utils.DataInvalidException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- * OTP(One-time Password Algorithm) Utility
+ * <h2 class="en">OTP(One-time Password Algorithm) Utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Calculate OTP fixed time value</ul>
+ *     <ul>Generate random key</ul>
+ *     <ul>Generate TOTP/HOTP Code</ul>
+ *     <ul>Verify TOTP/HOTP Code</ul>
+ * </span>
+ * <h2 class="zh-CN">一次性密码算法工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>计算一次性密码算法的修正时间值</ul>
+ *     <ul>生成随机密钥</ul>
+ *     <ul>生成基于HMAC算法加密的一次性密码/基于时间戳算法的一次性密码值</ul>
+ *     <ul>验证基于HMAC算法加密的一次性密码/基于时间戳算法的一次性密码值</ul>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: 2019-06-04 10:47 $
+ * @version $Revision : 1.0 $ $Date: Jun 04, 2019 10:47:28 $
  */
 public final class OTPUtils {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(OTPUtils.class);
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+	private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(OTPUtils.class);
 
 	//  Unit: Second
+	/**
+	 * <span class="en">Time Step, Unit: Second</span>
+	 * <span class="zh-CN">时间步长，单位：秒</span>
+	 */
 	private static final int DEFAULT_SYNC_COUNT = 30;
 
 	//  Default 3, Maximum 17 (From Google Docs)
+	/**
+	 * <span class="en">Default window size</span>
+	 * <span class="zh-CN">默认的最多可偏移时间</span>
+	 */
 	private static final int DEFAULT_WINDOW_SIZE = 3;
+	/**
+	 * <span class="en">Default secret size</span>
+	 * <span class="zh-CN">默认的密钥长度</span>
+	 */
 	private static final int DEFAULT_SECRET_SIZE = 10;
+	/**
+	 * <span class="en">Default secret seed character</span>
+	 * <span class="zh-CN">默认的密钥种子字符</span>
+	 */
 	private static final String DEFAULT_SECRET_SEED = "TmVydm91c3luY0RlZmF1bHRTZWNyZXRTZWVk";
+	/**
+	 * <span class="en">Default random algorithm</span>
+	 * <span class="zh-CN">默认的随机数算法</span>
+	 */
 	private static final String DEFAULT_RANDOM_ALGORITHM = "SHA1PRNG";
-
+	/**
+	 * <h3 class="en">Private constructor for OTPUtils</h3>
+	 * <h3 class="zh-CN">一次性密码算法工具集的私有构造方法</h3>
+	 */
 	private OTPUtils() {
 	}
-
 	/**
-	 * Calculate fixed time
+	 * <h3 class="en">Calculate fixed time</h3>
+ 	 * <h3 class="zh-CN">计算修正时间</h3>
 	 *
-	 * @param randomKey Random key
-	 * @param authCode  Auth code
-	 * @return Fixed time
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param authCode  	<span class="en">Client generated authenticate code</span>
+	 *                      <span class="zh-CN">客户端生成的随机验证码</span>
+	 *
+	 * @return 	<span class="en">Calculated fixed time</span>
+	 * 			<span class="zh-CN">计算出的修正时间</span>
 	 */
-	public static long calculateFixedTime(final String randomKey, final int authCode) {
-		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
+	public static long calculateFixedTime(final String secret, final int authCode) {
+		return calculateFixedTime(CalcType.HmacSHA1, secret, authCode, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Calculate fixed time
+	 * <h3 class="en">Calculate fixed time</h3>
+ 	 * <h3 class="zh-CN">计算修正时间</h3>
 	 *
-	 * @param randomKey Random key
-	 * @param authCode  Auth code
-	 * @param syncCount Synchronize count
-	 * @return Fixed time
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param authCode  	<span class="en">Client generated authenticate code</span>
+	 *                      <span class="zh-CN">客户端生成的随机验证码</span>
+	 * @param syncCount 	<span class="en">Time Step, Unit: Second</span>
+	 *                      <span class="zh-CN">时间步长，单位：秒</span>
+	 *
+	 * @return 	<span class="en">Calculated fixed time</span>
+	 * 			<span class="zh-CN">计算出的修正时间</span>
 	 */
-	public static long calculateFixedTime(final String randomKey, final int authCode, final int syncCount) {
-		return calculateFixedTime(CalcType.HmacSHA1, randomKey, authCode, syncCount);
+	public static long calculateFixedTime(final String secret, final int authCode, final int syncCount) {
+		return calculateFixedTime(CalcType.HmacSHA1, secret, authCode, syncCount);
 	}
-
 	/**
-	 * Calculate fixed time
+	 * <h3 class="en">Calculate fixed time</h3>
+ 	 * <h3 class="zh-CN">计算修正时间</h3>
 	 *
-	 * @param calcType  Calculate type
-	 * @param randomKey Random key
-	 * @param authCode  Auth code
-	 * @return Fixed time
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param authCode  	<span class="en">Client generated authenticate code</span>
+	 *                      <span class="zh-CN">客户端生成的随机验证码</span>
+	 *
+	 * @return 	<span class="en">Calculated fixed time</span>
+	 * 			<span class="zh-CN">计算出的修正时间</span>
 	 */
-	public static long calculateFixedTime(final CalcType calcType, final String randomKey, final int authCode) {
-		return calculateFixedTime(calcType, randomKey, authCode, Globals.DEFAULT_VALUE_INT);
+	public static long calculateFixedTime(final CalcType calcType, final String secret, final int authCode) {
+		return calculateFixedTime(calcType, secret, authCode, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Calculate fixed time
+	 * <h3 class="en">Calculate fixed time</h3>
+	 * <h3 class="zh-CN">计算修正时间</h3>
 	 *
-	 * @param calcType  Calculate type
-	 * @param randomKey Random key
-	 * @param authCode  Auth code
-	 * @param syncCount Synchronize count
-	 * @return Fixed time
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param authCode  	<span class="en">Client generated authenticate code</span>
+	 *                      <span class="zh-CN">客户端生成的随机验证码</span>
+	 * @param syncCount 	<span class="en">Time Step, Unit: Second</span>
+	 *                      <span class="zh-CN">时间步长，单位：秒</span>
+	 *
+	 * @return 	<span class="en">Calculated fixed time</span>
+	 * 			<span class="zh-CN">计算出的修正时间</span>
 	 */
-	public static long calculateFixedTime(final CalcType calcType, final String randomKey,
+	public static long calculateFixedTime(final CalcType calcType, final String secret,
 										  final int authCode, final int syncCount) {
 		for (int i = -12 ; i <= 12 ; i++) {
 			long fixedTime = i * 60 * 60 * 1000L;
-			if (validateTOTPCode(authCode, calcType, randomKey, fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE)) {
+			if (validateTOTPCode(authCode, calcType, secret, fixedTime, syncCount, Globals.INITIALIZE_INT_VALUE)) {
 				return fixedTime;
 			}
 		}
 		return Globals.DEFAULT_VALUE_INT;
 	}
-
 	/**
-	 * Generate auth code
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
 	 *
-	 * @param secret    Secret string
-	 * @return Auth code
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
 	public static String generateTOTPCode(final String secret) {
 		return generateTOTPCode(CalcType.HmacSHA1, secret, Globals.INITIALIZE_INT_VALUE, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Generate auth code
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
 	 *
-	 * @param secret    Secret string
-	 * @param fixedTime Fixed time
-	 * @return Auth code
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
 	public static String generateTOTPCode(final String secret, final long fixedTime) {
 		return generateTOTPCode(CalcType.HmacSHA1, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Generate auth code
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
 	 *
-	 * @param secret    Secret string
-	 * @param fixedTime Fixed time
-	 * @param syncCount Synchronize count
-	 * @return Auth code
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 * @param syncCount 	<span class="en">Time Step, Unit: Second</span>
+	 *                      <span class="zh-CN">时间步长，单位：秒</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
 	public static String generateTOTPCode(final String secret, final long fixedTime, final int syncCount) {
 		return generateTOTPCode(CalcType.HmacSHA1, secret, fixedTime, syncCount);
 	}
-
 	/**
-	 * Generate auth code
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
 	 *
-	 * @param calcType  Calculate type
-	 * @param secret    Secret string
-	 * @param fixedTime Fixed time
-	 * @return Auth code
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
 	public static String generateTOTPCode(final CalcType calcType, final String secret, final long fixedTime) {
 		return generateTOTPCode(calcType, secret, fixedTime, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Generate auth code
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
 	 *
-	 * @param calcType  Calculate type
-	 * @param secret    Secret string
-	 * @param fixedTime Fixed time
-	 * @param syncCount Synchronize count
-	 * @return Auth code
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 * @param syncCount 	<span class="en">Time Step, Unit: Second</span>
+	 *                      <span class="zh-CN">时间步长，单位：秒</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
 	public static String generateTOTPCode(final CalcType calcType, final String secret,
 										  final long fixedTime, final int syncCount) {
@@ -168,124 +251,70 @@ public final class OTPUtils {
 		}
 		return returnCode.toString();
 	}
-
 	/**
-	 * Generate a random secret key using default algorithm, seed and seed size
+	 * <h3 class="en">Validate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">验证基于时间的一次性密码</h3>
 	 *
-	 * @return Random secret key
-	 */
-	public static String generateRandomKey() {
-		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, Globals.DEFAULT_VALUE_INT);
-	}
-
-	/**
-	 * Generate a random secret key using default algorithm and seed
+	 * @param authCode  	<span class="en">Authenticate code</span>
+	 *                      <span class="zh-CN">需要验证的一次性密码</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
 	 *
-	 * @param size seed size
-	 * @return Random secret key
+	 * @return 	<span class="en">Validate result</span>
+	 * 			<span class="zh-CN">验证结果</span>
 	 */
-	public static String generateRandomKey(final int size) {
-		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, size);
-	}
-
-	/**
-	 * Generate random secret key by given algorithm, seed and seed size
-	 *
-	 * @param algorithm Secure algorithm
-	 * @param seed      Secret seed
-	 * @param size      Seed size
-	 * @return Random secret key
-	 */
-	public static String generateRandomKey(final String algorithm, final String seed, final int size) {
-		String randomKey = null;
-		try {
-			SecureRandom secureRandom = StringUtils.notBlank(algorithm)
-					? SecureRandom.getInstance(algorithm)
-					: new SecureRandom();
-			if (StringUtils.notBlank(seed)) {
-				secureRandom.setSeed(StringUtils.base64Decode(seed));
-			}
-			byte[] randomKeyBytes =
-					secureRandom.generateSeed(size == Globals.DEFAULT_VALUE_INT ? DEFAULT_SECRET_SIZE : size);
-			randomKey = StringUtils.base32Encode(randomKeyBytes, Boolean.FALSE);
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("Generate random key error!");
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Stack message: ", e);
-			}
-		}
-		return randomKey;
-	}
-
-	/**
-	 * Generate HOTP auth code using default calculate type: HmacSHA1
-	 *
-	 * @param randomKey  random secret key
-	 * @param randomCode random code
-	 * @return generated code
-	 */
-	public static int generateHOTPCode(final String randomKey, final long randomCode) {
-		return generateCode(CalcType.HmacSHA1, randomKey, randomCode);
-	}
-
-	/**
-	 * Generate HOTP auth code
-	 *
-	 * @param calcType   Calculate type
-	 * @param randomKey  random secret key
-	 * @param randomCode random code
-	 * @return generated code
-	 */
-	public static int generateHOTPCode(final CalcType calcType, final String randomKey, final long randomCode) {
-		return generateCode(calcType, randomKey, randomCode);
-	}
-
-	/**
-	 * Validate auth code by given secret key and fixed time using the default calculating type: HmacSHA1
-	 *
-	 * @param authCode  auth code
-	 * @param randomKey random secret key
-	 * @param fixedTime fixed time
-	 * @return validate result
-	 */
-	public static boolean validateTOTPCode(final int authCode, final String randomKey, final long fixedTime) {
-		return validateTOTPCode(authCode, CalcType.HmacSHA1, randomKey, fixedTime,
+	public static boolean validateTOTPCode(final int authCode, final String secret, final long fixedTime) {
+		return validateTOTPCode(authCode, CalcType.HmacSHA1, secret, fixedTime,
 				Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Validate auth code by given secret key, fixed time and fix windows using the default calculating type: HmacSHA1
+	 * <h3 class="en">Validate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">验证基于时间的一次性密码</h3>
 	 *
-	 * @param authCode  auth code
-	 * @param randomKey random secret key
-	 * @param fixedTime fixed time
-	 * @param fixWindow fix window
-	 * @return validate result
+	 * @param authCode  	<span class="en">Authenticate code</span>
+	 *                      <span class="zh-CN">需要验证的一次性密码</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 * @param fixWindow 	<span class="en">Fix window size</span>
+	 *                      <span class="zh-CN">最多可偏移时间</span>
+	 *
+	 * @return 	<span class="en">Validate result</span>
+	 * 			<span class="zh-CN">验证结果</span>
 	 */
-	public static boolean validateTOTPCode(final int authCode, final String randomKey,
+	public static boolean validateTOTPCode(final int authCode, final String secret,
 	                                       final long fixedTime, final int fixWindow) {
-		return validateTOTPCode(authCode, CalcType.HmacSHA1, randomKey, fixedTime,
+		return validateTOTPCode(authCode, CalcType.HmacSHA1, secret, fixedTime,
 				Globals.DEFAULT_VALUE_INT, fixWindow);
 	}
-
 	/**
-	 * Validate auth code by given secret key, fixed time, synchronize count and fix window
+	 * <h3 class="en">Validate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">验证基于时间的一次性密码</h3>
 	 *
-	 * @param calcType  Calculate type
-	 * @param authCode  auth code
-	 * @param randomKey random secret key
-	 * @param fixedTime fixed time
-	 * @param syncCount synchronize count
-	 * @param fixWindow fix window
-	 * @return validate result
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param authCode  	<span class="en">Authenticate code</span>
+	 *                      <span class="zh-CN">需要验证的一次性密码</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 * @param fixWindow 	<span class="en">Fix window size</span>
+	 *                      <span class="zh-CN">最多可偏移时间</span>
+	 *
+	 * @return 	<span class="en">Validate result</span>
+	 * 			<span class="zh-CN">验证结果</span>
 	 */
-	public static boolean validateTOTPCode(final int authCode, final CalcType calcType, final String randomKey,
+	public static boolean validateTOTPCode(final int authCode, final CalcType calcType, final String secret,
 										   final long fixedTime, final int syncCount, final int fixWindow) {
 		if (authCode > Globals.INITIALIZE_INT_VALUE) {
 			int minWindow = fixWindow < 0 ? (-1 * DEFAULT_WINDOW_SIZE) : (-1 * fixWindow);
 			int maxWindow = fixWindow < 0 ? DEFAULT_WINDOW_SIZE : fixWindow;
 			for (int i = minWindow ; i <= maxWindow ; i++) {
-				int generateCode = generateTOTPCode(calcType, randomKey, fixedTime, syncCount, i);
+				int generateCode = generateTOTPCode(calcType, secret, fixedTime, syncCount, i);
 				if (generateCode == authCode) {
 					return true;
 				}
@@ -293,47 +322,155 @@ public final class OTPUtils {
 		}
 		return Boolean.FALSE;
 	}
-
 	/**
-	 * Validate auth code by given secret key and fixed time using the default calculating type: HmacSHA1
+	 * <h3 class="en">Generate HOTP(HMAC-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于HMAC算法加密的一次性密码</h3>
 	 *
-	 * @param authCode   auth code
-	 * @param randomKey  random secret key
-	 * @param randomCode the random code
-	 * @return validate result
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param randomCode 	<span class="en">Random number</span>
+	 *                      <span class="zh-CN">随机数</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
 	 */
-	public static boolean validateHOTPCode(final int authCode, final String randomKey, final long randomCode) {
+	public static int generateHOTPCode(final String secret, final long randomCode) {
+		return generateCode(CalcType.HmacSHA1, secret, randomCode);
+	}
+	/**
+	 * <h3 class="en">Generate HOTP(HMAC-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于HMAC算法加密的一次性密码</h3>
+	 *
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param randomCode 	<span class="en">Random number</span>
+	 *                      <span class="zh-CN">随机数</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
+	 */
+	public static int generateHOTPCode(final CalcType calcType, final String secret, final long randomCode) {
+		return generateCode(calcType, secret, randomCode);
+	}
+	/**
+	 * <h3 class="en">Validate HOTP(HMAC-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">验证基于HMAC算法加密的一次性密码</h3>
+	 *
+	 * @param authCode  	<span class="en">Authenticate code</span>
+	 *                      <span class="zh-CN">需要验证的一次性密码</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param randomCode 	<span class="en">Random number</span>
+	 *                      <span class="zh-CN">随机数</span>
+	 *
+	 * @return 	<span class="en">Validate result</span>
+	 * 			<span class="zh-CN">验证结果</span>
+	 */
+	public static boolean validateHOTPCode(final int authCode, final String secret, final long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
-				? authCode == generateHOTPCode(CalcType.HmacSHA1, randomKey, randomCode)
+				? authCode == generateHOTPCode(CalcType.HmacSHA1, secret, randomCode)
 				: Boolean.FALSE;
 	}
-
 	/**
-	 * Validate auth code by given secret key and fixed time using the given calculating type
+	 * <h3 class="en">Validate HOTP(HMAC-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">验证基于HMAC算法加密的一次性密码</h3>
 	 *
-	 * @param authCode   auth code
-	 * @param calcType   the calc type
-	 * @param randomKey  random secret key
-	 * @param randomCode the random code
-	 * @return validate result
+	 * @param authCode  	<span class="en">Authenticate code</span>
+	 *                      <span class="zh-CN">需要验证的一次性密码</span>
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param randomCode 	<span class="en">Random number</span>
+	 *                      <span class="zh-CN">随机数</span>
+	 *
+	 * @return 	<span class="en">Validate result</span>
+	 * 			<span class="zh-CN">验证结果</span>
 	 */
-	public static boolean validateHOTPCode(final int authCode, final CalcType calcType, final String randomKey,
+	public static boolean validateHOTPCode(final int authCode, final CalcType calcType, final String secret,
 										   final long randomCode) {
 		return authCode > Globals.INITIALIZE_INT_VALUE
-				? authCode == generateHOTPCode(calcType, randomKey, randomCode)
+				? authCode == generateHOTPCode(calcType, secret, randomCode)
 				: Boolean.FALSE;
 	}
-
 	/**
-	 * Generate auth code
-	 * @param calcType      Calculate type
-	 * @param randomKey     random secret key
-	 * @param fixedTime     fixed time
-	 * @param syncCount     synchronize count
-	 * @param fixWindow     fix window
-	 * @return      generated code
+	 * <h3 class="en">Generate random secret key string</h3>
+ 	 * <h3 class="zh-CN">生成随机的密码字符串</h3>
+	 *
+	 * @return 	<span class="en">Generated secret key string</span>
+	 * 			<span class="zh-CN">生成的密码字符串</span>
 	 */
-	private static int generateTOTPCode(final CalcType calcType, final String randomKey, final long fixedTime,
+	public static String generateRandomKey() {
+		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, Globals.DEFAULT_VALUE_INT);
+	}
+	/**
+	 * <h3 class="en">Generate random secret key string</h3>
+ 	 * <h3 class="zh-CN">生成随机的密码字符串</h3>
+	 *
+	 * @param size 		<span class="en">Secret size</span>
+	 *                  <span class="zh-CN">密钥长度</span>
+	 *
+	 * @return 	<span class="en">Generated secret key string</span>
+	 * 			<span class="zh-CN">生成的密码字符串</span>
+	 */
+	public static String generateRandomKey(final int size) {
+		return generateRandomKey(DEFAULT_RANDOM_ALGORITHM, DEFAULT_SECRET_SEED, size);
+	}
+	/**
+	 * <h3 class="en">Generate random secret key string</h3>
+ 	 * <h3 class="zh-CN">生成随机的密码字符串</h3>
+	 *
+	 * @param algorithm <span class="en">Secure random algorithm</span>
+	 *                  <span class="zh-CN">安全随机数算法</span>
+	 * @param seed      <span class="en">Secret seed character</span>
+	 *                  <span class="zh-CN">密钥种子字符</span>
+	 * @param size 		<span class="en">Secret size</span>
+	 *                  <span class="zh-CN">密钥长度</span>
+	 *
+	 * @return 	<span class="en">Generated secret key string</span>
+	 * 			<span class="zh-CN">生成的密码字符串</span>
+	 */
+	public static String generateRandomKey(final String algorithm, final String seed, final int size) {
+		String randomKey = null;
+		try {
+			SecureRandom secureRandom = StringUtils.notBlank(algorithm)
+					? SecureRandom.getInstance(algorithm)
+					: SecureRandom.getInstance(DEFAULT_RANDOM_ALGORITHM);
+			if (StringUtils.notBlank(seed)) {
+				secureRandom.setSeed(StringUtils.base64Decode(seed));
+			}
+			byte[] randomKeyBytes =
+					secureRandom.generateSeed(size == Globals.DEFAULT_VALUE_INT ? DEFAULT_SECRET_SIZE : size);
+			randomKey = StringUtils.base32Encode(randomKeyBytes, Boolean.FALSE);
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.error("Utils", "Random_Key_Generate_OTP_Error");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
+			}
+		}
+		return randomKey;
+	}
+	/**
+	 * <h3 class="en">Generate TOTP(Time-based One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
+	 *
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param fixedTime 	<span class="en">Client fixed time</span>
+	 *                      <span class="zh-CN">客户端的修正时间</span>
+	 * @param syncCount 	<span class="en">Time Step, Unit: Second</span>
+	 *                      <span class="zh-CN">时间步长，单位：秒</span>
+	 * @param fixWindow 	<span class="en">Fix window size</span>
+	 *                      <span class="zh-CN">最多可偏移时间</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
+	 */
+	private static int generateTOTPCode(final CalcType calcType, final String secret, final long fixedTime,
 										final int syncCount, final int fixWindow) {
 		long currentTime = DateTimeUtils.currentTimeMillis();
 		long calcTime = (currentTime + fixedTime) / 1000L;
@@ -343,23 +480,44 @@ public final class OTPUtils {
 			calcTime /= DEFAULT_SYNC_COUNT;
 		}
 		calcTime += fixWindow;
-		return generateCode(calcType, randomKey, calcTime);
+		return generateCode(calcType, secret, calcTime);
 	}
-
-	private static int generateCode(final CalcType calcType, final String randomKey, long calcTime) {
+	/**
+	 * <h3 class="en">Generate OTP(One-time Password) code</h3>
+ 	 * <h3 class="zh-CN">生成基于时间的一次性密码</h3>
+	 *
+	 * @param calcType 		<span class="en">Calculate type</span>
+	 *                      <span class="zh-CN">密码算法类型</span>
+	 * @param secret 		<span class="en">Secret key string</span>
+	 *                      <span class="zh-CN">随机密钥字符串</span>
+	 * @param randomCode 	<span class="en">Random number</span>
+	 *                      <span class="zh-CN">随机数</span>
+	 *
+	 * @return 	<span class="en">Generated code</span>
+	 * 			<span class="zh-CN">生成的一次性密码</span>
+	 */
+	private static int generateCode(final CalcType calcType, final String secret, long randomCode) {
 		byte[] signData = new byte[8];
-		RawUtils.writeLong(signData, calcTime);
-		byte[] secret = StringUtils.base32Decode(randomKey);
+		try {
+			RawUtils.writeLong(signData, randomCode);
+		} catch (DataInvalidException e) {
+			LOGGER.error("Utils", "Process_Signature_Data_OTP_Error");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
+			}
+			return Globals.DEFAULT_VALUE_INT;
+		}
+		byte[] secretBytes = StringUtils.base32Decode(secret);
 		byte[] hash;
 		switch (calcType) {
 			case HmacSHA1:
-				hash = SecurityUtils.HmacSHA1(secret, signData);
+				hash = SecurityUtils.HmacSHA1(secretBytes, signData);
 				break;
 			case HmacSHA256:
-				hash = SecurityUtils.HmacSHA256(secret, signData);
+				hash = SecurityUtils.HmacSHA256(secretBytes, signData);
 				break;
 			case HmacSHA512:
-				hash = SecurityUtils.HmacSHA512(secret, signData);
+				hash = SecurityUtils.HmacSHA512(secretBytes, signData);
 				break;
 			default:
 				return Globals.DEFAULT_VALUE_INT;
@@ -373,22 +531,11 @@ public final class OTPUtils {
 		resultCode %= 1000000;
 		return (int)resultCode;
 	}
-
 	/**
-	 * The enum Calc type.
+	 * <h2 class="en">Enumeration of Calculate type</h2>
+	 * <h2 class="zh-CN">密码算法类型枚举</h2>
 	 */
 	public enum CalcType {
-		/**
-		 * Hmac sha 1 calc type.
-		 */
-		HmacSHA1,
-		/**
-		 * Hmac sha 256 calc type.
-		 */
-		HmacSHA256,
-		/**
-		 * Hmac sha 512 calc type.
-		 */
-		HmacSHA512
+		HmacSHA1, HmacSHA256, HmacSHA512
 	}
 }

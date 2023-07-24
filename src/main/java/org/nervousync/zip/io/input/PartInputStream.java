@@ -19,7 +19,7 @@ package org.nervousync.zip.io.input;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.exceptions.zip.ZipException;
@@ -58,7 +58,7 @@ public class PartInputStream extends InputStream {
 	 */
 	public PartInputStream(final ZipFile zipFile, final int currentIndex, final long seekPosition,
 	                       final long length, final Decryptor decryptor, final boolean isAESEncryptedFile)
-			throws IOException {
+			throws IOException, ZipException {
 		this.zipFile = zipFile;
 		this.currentIndex = currentIndex;
 		this.input = this.zipFile.openSplitFile(currentIndex);
@@ -91,55 +91,59 @@ public class PartInputStream extends InputStream {
 
 	@Override
 	public synchronized int read(byte[] b, int off, int len) throws IOException {
-		if (len > (this.length - this.readBytes)) {
-			len = (int)(this.length - this.readBytes);
-			
-			if (len == 0) {
-				this.checkAndReadAESMacBytes();
-				return Globals.DEFAULT_VALUE_INT;
-			}
-		}
-		
-		if (this.decryptor instanceof AESDecryptor) {
-			if ((this.readBytes + len) < this.length
-					&& (len % 16 != 0)) {
-				len -= (len % 16);
-			}
-		}
+		try {
+			if (len > (this.length - this.readBytes)) {
+				len = (int)(this.length - this.readBytes);
 
-		int count = this.input.read(b, off, len);
-		if ((count < len) && this.zipFile.isSplitArchive()) {
-			this.input.close();
-			this.currentIndex++;
-			this.input = this.zipFile.openSplitFile(this.currentIndex);
-
-			if (count < 0) {
-				count = 0;
-			}
-
-			int readCount = this.input.read(b, count, len - count);
-			if (readCount > 0) {
-				count += readCount;
-			}
-		}
-		
-		if (count > 0) {
-			if (this.decryptor != null) {
-				try {
-					this.decryptor.decryptData(b, off, count);
-				} catch (ZipException e) {
-					throw new IOException(e);
+				if (len == 0) {
+					this.checkAndReadAESMacBytes();
+					return Globals.DEFAULT_VALUE_INT;
 				}
 			}
-			
-			this.readBytes += count;
+
+			if (this.decryptor instanceof AESDecryptor) {
+				if ((this.readBytes + len) < this.length
+						&& (len % 16 != 0)) {
+					len -= (len % 16);
+				}
+			}
+
+			int count = this.input.read(b, off, len);
+			if ((count < len) && this.zipFile.isSplitArchive()) {
+				this.input.close();
+				this.currentIndex++;
+				this.input = this.zipFile.openSplitFile(this.currentIndex);
+
+				if (count < 0) {
+					count = 0;
+				}
+
+				int readCount = this.input.read(b, count, len - count);
+				if (readCount > 0) {
+					count += readCount;
+				}
+			}
+
+			if (count > 0) {
+				if (this.decryptor != null) {
+					try {
+						this.decryptor.decryptData(b, off, count);
+					} catch (ZipException e) {
+						throw new IOException(e);
+					}
+				}
+
+				this.readBytes += count;
+			}
+
+			if (this.readBytes >= this.length) {
+				this.checkAndReadAESMacBytes();
+			}
+
+			return count;
+		} catch (ZipException e) {
+			throw new IOException(e);
 		}
-		
-		if (this.readBytes >= this.length) {
-			this.checkAndReadAESMacBytes();
-		}
-		
-		return count;
 	}
 	
 	public int available() {
@@ -191,7 +195,7 @@ public class PartInputStream extends InputStream {
 	 *
 	 * @throws IOException the io exception
 	 */
-	protected void checkAndReadAESMacBytes() throws IOException {
+	protected void checkAndReadAESMacBytes() throws IOException, ZipException {
 		if (this.isAESEncryptedFile
 				&& (this.decryptor instanceof AESDecryptor)) {
 			if (((AESDecryptor)this.decryptor).getStoredMac() != null) {

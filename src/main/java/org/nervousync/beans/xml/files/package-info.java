@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@XmlSchema(namespace = "https://nervousync.org/schemas/file_segment", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/file_segment_1.0.xsd",
-		xmlns = @XmlNs(prefix = "segment", namespaceURI = "https://nervousync.org/schemas/file_segment")
+@XmlSchema(namespace = "https://nervousync.org/schemas/segment", elementFormDefault = XmlNsForm.QUALIFIED,
+		location = "https://nervousync.org/schemas/segment_1_0.xsd",
+		xmlns = @XmlNs(prefix = "segment", namespaceURI = "https://nervousync.org/schemas/segment")
 )
 package org.nervousync.beans.xml.files;
 

@@ -16,21 +16,22 @@
  */
 package org.nervousync.launcher.core;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.launcher.StartupLauncher;
+import org.nervousync.utils.LoggerUtils;
 
-public abstract class AbstractStartupLauncher {
-
-	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	protected String parsePath(final String basePath) {
-		if (StringUtils.isEmpty(basePath)) {
-			return Globals.DEFAULT_VALUE_STRING;
-		}
-		return basePath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR)
-				? basePath.substring(0, basePath.length() - 1)
-				: basePath;
-	}
+/**
+ * <h2 class="en">Abstract class for startup launcher</h2>
+ * <span class="en">Only add an unified logger instance</span>
+ * <h2 class="zh-CN">启动器抽象实现类</h2>
+ * <span class="zh-CN">仅添加了统一的日志对象实例</span>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:01:22 $
+ */
+public abstract class AbstractStartupLauncher implements StartupLauncher {
+	/**
+	 * <span class="en">Logger instance</span>
+	 * <span class="zh-CN">日志对象</span>
+	 */
+	protected final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
 }

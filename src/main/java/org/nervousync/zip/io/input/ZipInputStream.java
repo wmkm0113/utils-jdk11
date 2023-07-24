@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
  * The type Zip input stream.

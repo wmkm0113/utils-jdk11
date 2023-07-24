@@ -17,89 +17,103 @@
 package org.nervousync.beans.ip;
 
 import org.nervousync.enumerations.ip.IPType;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 import java.io.Serializable;
 
 /**
- * The type Ip range.
+ * <h2 class="en">IP address range define</h2>
+ * <h2 class="zh-CN">IP地址范围定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: 2018-09-21 18:25
+ * @version $Revision : 1.0 $Date: Sep 21, 2018 18:25:52 $
  */
 public final class IPRange implements Serializable {
-	
-	private static final long serialVersionUID = 7569297312912043791L;
-
 	/**
-	 * IP address type
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
+	 */
+	private static final long serialVersionUID = 7569297312912043791L;
+	/**
+	 * <span class="en">Enumeration value of IPType</span>
+	 * <span class="zh-CN">地址类型枚举值</span>
+	 * @see org.nervousync.enumerations.ip.IPType
 	 */
 	private IPType ipType;
 	/**
-	 * Begin address
+	 * <span class="en">IP range begin address</span>
+	 * <span class="zh-CN">IP范围起始地址</span>
 	 */
 	private String beginAddress = Globals.DEFAULT_VALUE_STRING;
 	/**
-	 * End address
+	 * <span class="en">IP range end address</span>
+	 * <span class="zh-CN">IP范围终止地址</span>
 	 */
 	private String endAddress = Globals.DEFAULT_VALUE_STRING;
-
 	/**
-	 * Instantiates a new Ip range.
+	 * <h3 class="en">Constructor for IPRange</h3>
+	 * <h3 class="zh-CN">IPRange默认构造方法</h3>
 	 */
 	public IPRange() {
-
 	}
-
 	/**
-	 * Gets the ip type.
+	 * <h3 class="en">Getter method for IP type</h3>
+	 * <h3 class="zh-CN">地址类型的Getter方法</h3>
 	 *
-	 * @return the ip type
+	 * @return    <span class="en">Value of IPType</span>
+	 *            <span class="zh-CN">地址类型枚举值</span>
+	 * @see org.nervousync.enumerations.ip.IPType
 	 */
 	public IPType getIpType() {
 		return ipType;
 	}
-
 	/**
-	 * Sets the ip type.
+	 * <h3 class="en">Setter method for IP type</h3>
+	 * <h3 class="zh-CN">地址类型的Setter方法</h3>
 	 *
-	 * @param ipType the ip type
+	 * @param ipType 	<span class="en">Value of IPType</span>
+	 *            		<span class="zh-CN">地址类型枚举值</span>
+	 * @see org.nervousync.enumerations.ip.IPType
 	 */
 	public void setIpType(IPType ipType) {
 		this.ipType = ipType;
 	}
-
 	/**
-	 * Gets begin address.
+	 * <h3 class="en">Getter method for IP range begin address</h3>
+	 * <h3 class="zh-CN">IP范围起始地址的Getter方法</h3>
 	 *
-	 * @return the beginning address
+	 * @return    <span class="en">Value of IP range begin address</span>
+	 *            <span class="zh-CN">IP范围起始地址</span>
 	 */
 	public String getBeginAddress() {
 		return beginAddress;
 	}
-
 	/**
-	 * Sets begin address.
+	 * <h3 class="en">Setter method for IP range begin address</h3>
+	 * <h3 class="zh-CN">IP范围起始地址的Setter方法</h3>
 	 *
-	 * @param beginAddress the beginning address
+	 * @param beginAddress 	<span class="en">Value of IP range begin address</span>
+	 *            			<span class="zh-CN">IP范围起始地址</span>
 	 */
 	public void setBeginAddress(String beginAddress) {
 		this.beginAddress = beginAddress;
 	}
-
 	/**
-	 * Gets end address.
+	 * <h3 class="en">Getter method for IP range end address</h3>
+	 * <h3 class="zh-CN">IP范围终止地址的Getter方法</h3>
 	 *
-	 * @return the end address
+	 * @return    <span class="en">Value of IP range end address</span>
+	 *            <span class="zh-CN">IP范围终止地址</span>
 	 */
 	public String getEndAddress() {
 		return endAddress;
 	}
-
 	/**
-	 * Sets end address.
+	 * <h3 class="en">Setter method for IP range end address</h3>
+	 * <h3 class="zh-CN">IP范围终止地址的Setter方法</h3>
 	 *
-	 * @param endAddress the end address
+	 * @param endAddress 	<span class="en">Value of IP range end address</span>
+	 *            			<span class="zh-CN">IP范围终止地址</span>
 	 */
 	public void setEndAddress(String endAddress) {
 		this.endAddress = endAddress;

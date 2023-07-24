@@ -17,100 +17,136 @@
 package org.nervousync.beans.servlet.request;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.proxy.AbstractProxyConfigBuilder;
+import jakarta.annotation.Nonnull;
+import org.nervousync.commons.Globals;
+import org.nervousync.proxy.AbstractProxyConfigBuilder;
 import org.nervousync.enumerations.web.HttpMethodOption;
-import org.nervousync.commons.http.cert.TrustCert;
-import org.nervousync.commons.http.cookie.CookieEntity;
-import org.nervousync.commons.http.header.SimpleHeader;
-import org.nervousync.commons.proxy.ProxyConfig;
+import org.nervousync.http.cert.TrustCert;
+import org.nervousync.http.cookie.CookieEntity;
+import org.nervousync.http.header.SimpleHeader;
+import org.nervousync.proxy.ProxyConfig;
+import org.nervousync.utils.FileUtils;
 
 /**
- * Request information for sending by com.nervousync.utils.RequestUtils
+ * <h2 class="en">Request information define</h2>
+ * <p class="en">Using for parameter of method: org.nervousync.utils.RequestUtils#sendRequest</p>
+ * <h2 class="zh-CN">网络请求信息定义</h2>
+ * <p class="en">用于方法org.nervousync.utils.RequestUtils#sendRequest的参数值</p>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:04:17 AM $
+ * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:04:17 $
  */
 public final class RequestInfo {
-
     /**
-     * Http method define
-     *
-     * @see HttpMethodOption
+	 * <span class="en">Enumeration value of HttpMethodOption</span>
+	 * <span class="zh-CN">HttpMethodOption的枚举值</span>
+     * @see org.nervousync.enumerations.web.HttpMethodOption
      */
-    private final HttpMethodOption httpMethodOption;
+    private final HttpMethodOption methodOption;
     /**
-     * Proxy server configuration
+	 * <span class="en">Proxy server config for sending request</span>
+     * <p class="en">Default is null for direct connect</p>
+	 * <span class="zh-CN">发送请求时使用的代理服务器设置</span>
+     * <p class="zh-CN">默认为null代表不使用代理服务器</p>
+     * @see org.nervousync.proxy.ProxyConfig
      */
     private final ProxyConfig proxyConfig;
     /**
-     * Custom certificate info
+	 * <span class="en">Trusted certificate list for sending secure request</span>
+     * <p class="en">Default is empty list for using JDK certificate library</p>
+	 * <span class="zh-CN">发送加密请求时信任的证书列表</span>
+     * <p class="en">默认为空列表，代表使用JDK默认的证书库</p>
+     * @see org.nervousync.http.cert.TrustCert
      */
     private final List<TrustCert> trustTrustCerts;
     /**
-     * Default pass phrase
+	 * <span class="en">Pass phrase for system certificate library</span>
+	 * <span class="zh-CN">系统信任证书库读取密钥</span>
      */
     private final String passPhrase;
     /**
-     * User agent
+	 * <span class="en">Using for setting user agent string of request header</span>
+	 * <span class="zh-CN">用于设置请求头中的用户代理信息</span>
      */
     private final String userAgent;
     /**
-     * Request URL
+	 * <span class="en">Current request url path</span>
+	 * <span class="zh-CN">当前请求地址</span>
      */
     private final String requestUrl;
     /**
-     * Charset encoding
+	 * <span class="en">Character encoding for http request header "Content-Type" and send request body</span>
+	 * <span class="zh-CN">请求头"Content-Type"及发送请求体使用的编码集</span>
      */
     private final String charset;
     /**
-     * Content type
+	 * <span class="en">String value for http request header "Content-Type"</span>
+	 * <span class="zh-CN">请求头"Content-Type"的字符串值</span>
      */
     private final String contentType;
     /**
-     * Request timeout
+	 * <span class="en">Request timeout setting</span>
+	 * <span class="zh-CN">请求超时时间</span>
      */
     private final int timeOut;
     /**
-     * Post ata arrays
+	 * <span class="en">Binary data array of current request will post</span>
+	 * <span class="zh-CN">当前请求要发送的二进制数据数组</span>
      */
-    private final byte[] postDatas;
+    private final byte[] postData;
     /**
-     * Send header values of request
+	 * <span class="en">Request header information list</span>
+	 * <span class="zh-CN">发送请求的请求头信息列表</span>
      */
     private final List<SimpleHeader> headers;
     /**
-     * Send form fields of request
+	 * <span class="en">Request parameters information mapping</span>
+	 * <span class="zh-CN">发送请求的参数信息映射</span>
      */
     private final Map<String, String[]> parameters;
     /**
-     * Send multipart fields of request
+	 * <span class="en">Upload files of request parameters mapping</span>
+	 * <span class="zh-CN">发送请求的上传文件参数信息映射</span>
      */
     private final Map<String, File> uploadParams;
     /**
-     * Cookie list
+	 * <span class="en">Request cookies information list</span>
+	 * <span class="zh-CN">发送请求的Cookie信息列表</span>
      */
     private final List<CookieEntity> cookieList;
 
     /**
-     * Constructor for given http method, request URL, and many options
+     * <h3 class="en">Constructor for RequestInfo</h3>
+     * <p class="en">Only using for RequestBuilder instance to generate RequestInfo instance</p>
+     * <h3 class="zh-CN">RequestInfo的构造方法</h3>
+     * <p class="zh-CN">仅用于请求构造器生成RequestInfo实例对象使用</p>
      *
-     * @param httpMethodOption Request http method
-     * @param requestUrl       Target request url
-     * @param charset          Charset encoding
-     * @param timeOut          Request timeout setting
-     * @param headers          Send header information of request
-     * @param parameters       Send parameter information of request
-     * @param uploadParams     Send multipart files of request
+     * @param methodOption      <span class="en">Enumeration value of HttpMethodOption</span>
+     *                          <span class="zh-CN">HttpMethodOption的枚举值</span>
+     * @param requestUrl        <span class="en">Current request url path</span>
+     *                          <span class="zh-CN">当前请求地址</span>
+     * @param charset           <span class="en">Character encoding for http request header "Content-Type" and send request body</span>
+     *                          <span class="zh-CN">请求头"Content-Type"及发送请求体使用的编码集</span>
+     * @param timeOut           <span class="en">Request timeout setting</span>
+     *                          <span class="zh-CN">请求超时时间</span>
+     * @param headers           <span class="en">Request header information list</span>
+     *                          <span class="zh-CN">发送请求的请求头信息列表</span>
+     * @param parameters        <span class="en">Request parameters information mapping</span>
+     *                          <span class="zh-CN">发送请求的参数信息映射</span>
+     * @param uploadParams      <span class="en">Upload files of request parameters mapping</span>
+     *                          <span class="zh-CN">发送请求的上传文件参数信息映射</span>
+     * @param cookieList        <span class="en">Request cookies information list</span>
+     *                          <span class="zh-CN">发送请求的Cookie信息列表</span>
      */
-    private RequestInfo(final HttpMethodOption httpMethodOption, final ProxyConfig proxyConfig,
+    private RequestInfo(final HttpMethodOption methodOption, final ProxyConfig proxyConfig,
                         final List<TrustCert> trustTrustCerts, final String passPhrase, final String userAgent,
                         final String requestUrl, final String charset, final String contentType, final int timeOut,
-                        final byte[] postDatas, final List<SimpleHeader> headers, final List<CookieEntity> cookieList,
-                        final Map<String, String[]> parameters, final Map<String, File> uploadParams) {
-        this.httpMethodOption = httpMethodOption;
+                        final byte[] postData, final List<SimpleHeader> headers, final Map<String, String[]> parameters,
+                        final Map<String, File> uploadParams, final List<CookieEntity> cookieList) {
+        this.methodOption = methodOption;
         this.proxyConfig = proxyConfig;
         this.trustTrustCerts = trustTrustCerts;
         this.passPhrase = passPhrase;
@@ -119,13 +155,12 @@ public final class RequestInfo {
         this.charset = charset;
         this.contentType = contentType;
         this.timeOut = timeOut;
-        this.postDatas = postDatas;
+        this.postData = postData;
         this.headers = headers;
         this.parameters = parameters;
         this.uploadParams = uploadParams;
         this.cookieList = cookieList;
     }
-
     /**
      * Builder request builder.
      *
@@ -135,395 +170,469 @@ public final class RequestInfo {
     public static RequestBuilder builder(final HttpMethodOption httpMethodOption) {
         return new RequestBuilder(httpMethodOption);
     }
-
-    /**
-     * Gets http method option.
-     *
-     * @return the http method option
-     */
-    public HttpMethodOption getHttpMethodOption() {
-        return httpMethodOption;
+	/**
+	 * <h3 class="en">Getter method for method option</h3>
+	 * <h3 class="zh-CN">请求类型的Getter方法</h3>
+	 */
+    public HttpMethodOption getMethodOption() {
+        return methodOption;
     }
-
-    /**
-     * Gets upload params.
-     *
-     * @return the upload params
-     */
+	/**
+	 * <h3 class="en">Getter method for upload parameters</h3>
+	 * <h3 class="zh-CN">上传文件信息映射的Getter方法</h3>
+	 */
     public Map<String, File> getUploadParams() {
         return uploadParams;
     }
-
-    /**
-     * Gets the cookie list.
-     *
-     * @return the cookie list
-     */
+	/**
+	 * <h3 class="en">Getter method for cookies list</h3>
+	 * <h3 class="zh-CN">请求发送的Cookie信息列表的Getter方法</h3>
+	 */
     public List<CookieEntity> getCookieList() {
         return cookieList;
     }
-
-    /**
-     * Gets proxy info.
-     *
-     * @return the proxy info
-     */
+	/**
+	 * <h3 class="en">Getter method for proxy config</h3>
+	 * <h3 class="zh-CN">代理服务器设置的Getter方法</h3>
+	 */
     public ProxyConfig getProxyInfo() {
         return proxyConfig;
     }
-
-    /**
-     * Gets trust cert infos.
-     *
-     * @return the trust cert infos
-     */
+	/**
+	 * <h3 class="en">Getter method for trusted certificate list</h3>
+	 * <h3 class="zh-CN">信任证书列表的Getter方法</h3>
+	 */
     public List<TrustCert> getTrustCertInfos() {
         return trustTrustCerts;
     }
-
-    /**
-     * Gets pass phrase.
-     *
-     * @return the pass phrase
-     */
+	/**
+	 * <h3 class="en">Getter method for pass phrase of system certificate list</h3>
+	 * <h3 class="zh-CN">系统信任证书库读取密钥的Getter方法</h3>
+	 */
     public String getPassPhrase() {
         return passPhrase;
     }
-
-    /**
-     * Gets user agent.
-     *
-     * @return the user agent
-     */
+	/**
+	 * <h3 class="en">Getter method for user agent string</h3>
+	 * <h3 class="zh-CN">用户代理字符串的Getter方法</h3>
+	 */
     public String getUserAgent() {
         return userAgent;
     }
-
-    /**
-     * Gets request url.
-     *
-     * @return the request url
-     */
+	/**
+	 * <h3 class="en">Getter method for request url</h3>
+	 * <h3 class="zh-CN">请求地址的Getter方法</h3>
+	 */
     public String getRequestUrl() {
         return requestUrl;
     }
-
-    /**
-     * Gets charset.
-     *
-     * @return the charset
-     */
+	/**
+	 * <h3 class="en">Getter method for character encoding</h3>
+	 * <h3 class="zh-CN">数据编码集的Getter方法</h3>
+	 */
     public String getCharset() {
         return charset;
     }
-
-    /**
-     * Gets the content type.
-     *
-     * @return the content type
-     */
+	/**
+	 * <h3 class="en">Getter method for content type string</h3>
+	 * <h3 class="zh-CN">请求头"Content-Type"字符串的Getter方法</h3>
+	 */
     public String getContentType() {
         return contentType;
     }
-
-    /**
-     * Gets time out.
-     *
-     * @return the time-out
-     */
+	/**
+	 * <h3 class="en">Getter method for request time out</h3>
+	 * <h3 class="zh-CN">请求超时时间的Getter方法</h3>
+	 */
     public int getTimeOut() {
         return timeOut;
     }
-
-    /**
-     * Get post datas byte [ ].
-     *
-     * @return the byte [ ]
-     */
-    public byte[] getPostDatas() {
-        return postDatas;
+	/**
+	 * <h3 class="en">Getter method for post binary data array</h3>
+	 * <h3 class="zh-CN">POST发送二进制数据的Getter方法</h3>
+	 */
+    public byte[] getPostData() {
+        return postData;
     }
-
-    /**
-     * Gets headers.
-     *
-     * @return the headers
-     */
+	/**
+	 * <h3 class="en">Getter method for request header list</h3>
+	 * <h3 class="zh-CN">请求头信息列表的Getter方法</h3>
+	 */
     public List<SimpleHeader> getHeaders() {
         return headers;
     }
-
-    /**
-     * Gets parameters.
-     *
-     * @return the parameters
-     */
+	/**
+	 * <h3 class="en">Getter method for parameters mapping</h3>
+	 * <h3 class="zh-CN">请求参数信息映射的Getter方法</h3>
+	 */
     public Map<String, String[]> getParameters() {
         return parameters;
     }
-
-    /**
-     * Gets upload param.
-     *
-     * @return the upload param
-     */
+	/**
+	 * <h3 class="en">Getter method for upload parameters mapping</h3>
+	 * <h3 class="zh-CN">上传文件信息映射的Getter方法</h3>
+	 */
     public Map<String, File> getUploadParam() {
         return uploadParams;
     }
-
+    /**
+     * <h2 class="en">Request proxy configure builder</h2>
+     * <h2 class="zh-CN">网络请求代理服务器构建器</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:08:22 $
+     */
     public static final class RequestProxyBuilder extends AbstractProxyConfigBuilder<RequestBuilder> {
-
-        private RequestProxyBuilder(final RequestBuilder requestBuilder, final ProxyConfig proxyConfig) {
-            super(requestBuilder, Globals.DEFAULT_VALUE_STRING, proxyConfig);
+        /**
+         * <h3 class="en">Private constructor for RequestProxyBuilder</h3>
+         * <h3 class="zh-CN">RequestProxyBuilder的私有构造方法</h3>
+         *
+         * @param requestBuilder    <span class="en">RequestBuilder instance</span>
+         *                          <span class="zh-CN">RequestBuilder实例对象</span>
+         */
+        private RequestProxyBuilder(@Nonnull final RequestBuilder requestBuilder) {
+            super(requestBuilder, Globals.DEFAULT_VALUE_STRING, requestBuilder.proxyConfig);
         }
-
+        /**
+         * <h3 class="en">Confirm proxy configure</h3>
+         * <h3 class="zh-CN">确认代理服务器配置</h3>
+         */
+        @Override
         protected void build() {
             this.parentBuilder.proxyConfig(this.proxyConfig);
         }
     }
-
     /**
-     * The type Request builder.
+     * <h2 class="en">Request builder</h2>
+     * <h2 class="zh-CN">网络请求构建器</h2>
+     *
      */
     public static final class RequestBuilder {
-
         /**
-         * Http method define
-         *
-         * @see HttpMethodOption
+         * <span class="en">Enumeration value of HttpMethodOption</span>
+         * <span class="zh-CN">HttpMethodOption的枚举值</span>
+         * @see org.nervousync.enumerations.web.HttpMethodOption
          */
-        private final HttpMethodOption httpMethodOption;
+        private final HttpMethodOption methodOption;
         /**
-         * Proxy server configuration
+         * <span class="en">Proxy server config for sending request</span>
+         * <p class="en">Default is null for direct connect</p>
+         * <span class="zh-CN">发送请求时使用的代理服务器设置</span>
+         * <p class="zh-CN">默认为null代表不使用代理服务器</p>
+         * @see org.nervousync.proxy.ProxyConfig
          */
         private ProxyConfig proxyConfig;
         /**
-         * Custom certificate info
+         * <span class="en">Trusted certificate list for sending secure request</span>
+         * <p class="en">Default is empty list for using JDK certificate library</p>
+         * <span class="zh-CN">发送加密请求时信任的证书列表</span>
+         * <p class="en">默认为空列表，代表使用JDK默认的证书库</p>
+         * @see org.nervousync.http.cert.TrustCert
          */
         private final List<TrustCert> trustTrustCerts = new ArrayList<>();
         /**
-         * Default pass phrase
+         * <span class="en">Pass phrase for system certificate library</span>
+         * <span class="zh-CN">系统信任证书库读取密钥</span>
          */
         private String passPhrase;
         /**
-         * User agent
+         * <span class="en">Using for setting user agent string of request header</span>
+         * <span class="zh-CN">用于设置请求头中的用户代理信息</span>
          */
         private String userAgent;
         /**
-         * Request URL
+         * <span class="en">Current request url path</span>
+         * <span class="zh-CN">当前请求地址</span>
          */
         private String requestUrl;
         /**
-         * Charset encoding
+         * <span class="en">Character encoding for http request header "Content-Type" and send request body</span>
+         * <span class="zh-CN">请求头"Content-Type"及发送请求体使用的编码集</span>
          */
         private String charset;
         /**
-         * Content type
+         * <span class="en">String value for http request header "Content-Type"</span>
+         * <span class="zh-CN">请求头"Content-Type"的字符串值</span>
          */
         private String contentType;
         /**
-         * Request timeout
+         * <span class="en">Request timeout setting</span>
+         * <span class="zh-CN">请求超时时间</span>
          */
         private int timeOut = Globals.DEFAULT_TIME_OUT;
         /**
-         * Post ata arrays
+         * <span class="en">Binary data array of current request will post</span>
+         * <span class="zh-CN">当前请求要发送的二进制数据数组</span>
          */
         private byte[] postData;
         /**
-         * Send header values of request
+         * <span class="en">Request header information list</span>
+         * <span class="zh-CN">发送请求的请求头信息列表</span>
          */
         private final List<SimpleHeader> headers = new ArrayList<>();
         /**
-         * Send form fields of request
+         * <span class="en">Request parameters information mapping</span>
+         * <span class="zh-CN">发送请求的参数信息映射</span>
          */
         private final Map<String, String[]> parameters = new HashMap<>();
         /**
-         * Send multipart fields of request
+         * <span class="en">Upload files of request parameters mapping</span>
+         * <span class="zh-CN">发送请求的上传文件参数信息映射</span>
          */
         private final Map<String, File> uploadParams = new HashMap<>();
         /**
-         * Cookie list
+         * <span class="en">Request cookies information list</span>
+         * <span class="zh-CN">发送请求的Cookie信息列表</span>
          */
         private final List<CookieEntity> cookieList = new ArrayList<>();
 
-        private RequestBuilder(final HttpMethodOption httpMethodOption) {
-            this.httpMethodOption = httpMethodOption;
+        private RequestBuilder(final HttpMethodOption methodOption) {
+            this.methodOption = methodOption;
         }
-
         /**
-         * Build request info.
+         * <h3 class="en">Confirm request info and generate RequestInfo instance</h3>
+         * <h3 class="zh-CN">确认请求配置信息并生成RequestInfo实例对象</h3>
          *
-         * @return the request info
+         * @return  <span class="en">RequestInfo instance</span>
+         *          <span class="zh-CN">RequestInfo实例对象</span>
          */
         public RequestInfo build() {
-            return new RequestInfo(this.httpMethodOption, this.proxyConfig, this.trustTrustCerts, this.passPhrase,
+            return new RequestInfo(this.methodOption, this.proxyConfig, this.trustTrustCerts, this.passPhrase,
                     this.userAgent, this.requestUrl, this.charset, this.contentType, this.timeOut,
-                    this.postData, this.headers, this.cookieList, this.parameters, this.uploadParams);
+                    this.postData, this.headers, this.parameters, this.uploadParams, this.cookieList);
         }
-
-        public RequestProxyBuilder proxyConfig() {
-            return new RequestProxyBuilder(this, this.proxyConfig);
-        }
-
         /**
-         * Add cert info.
+         * <h3 class="en">Generate RequestProxyBuilder instance to configure proxy server</h3>
+         * <h3 class="zh-CN">生成RequestProxyBuilder实例对象用于配置代理服务器</h3>
          *
-         * @param certPath     the cert path
-         * @param certPassword the cert password
-         * @return the cert info
+         * @return  <span class="en">RequestProxyBuilder instance</span>
+         *          <span class="zh-CN">RequestProxyBuilder实例对象</span>
+         */
+        public RequestProxyBuilder proxyConfig() {
+            return new RequestProxyBuilder(this);
+        }
+        /**
+         * <h3 class="en">Add trusted certificate library</h3>
+         * <h3 class="zh-CN">添加信任证书库</h3>
+         *
+         * @param certPath      <span class="en">Trust certificate path</span>
+         *                      <span class="zh-CN">信任证书地址</span>
+         * @param certPassword  <span class="en">Password of trust certificate</span>
+         *                      <span class="zh-CN">读取证书的密钥</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addTrustCertificate(final String certPath, final String certPassword) {
-            this.trustTrustCerts.add(TrustCert.newInstance(certPath, certPassword));
+            try {
+                return this.addTrustCertificate(FileUtils.readFileBytes(certPath), certPassword);
+            } catch (IOException ignore) {
+            }
             return this;
         }
-
         /**
-         * Add cert info.
+         * <h3 class="en">Add trusted certificate library</h3>
+         * <h3 class="zh-CN">添加信任证书库</h3>
          *
-         * @param certContent  the cert content
-         * @param certPassword the cert password
-         * @return the cert info
+         * @param certContent   <span class="en">Trust certificate data bytes</span>
+         *                      <span class="zh-CN">信任证书二进制字节数组</span>
+         * @param certPassword  <span class="en">Password of trust certificate</span>
+         *                      <span class="zh-CN">读取证书的密钥</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addTrustCertificate(final byte[] certContent, final String certPassword) {
-            this.trustTrustCerts.add(TrustCert.newInstance(certContent, certPassword));
+            Optional.of(TrustCert.newInstance(certContent, certPassword))
+                    .filter(trustCert ->
+                            this.trustTrustCerts.stream().noneMatch(existCert ->
+                                    existCert.getSha256().equals(trustCert.getSha256())))
+                    .ifPresent(this.trustTrustCerts::add);
             return this;
         }
-
         /**
-         * Pass phrase request builder.
+         * <h3 class="en">Configure pass phrase of system certificate library</h3>
+         * <h3 class="zh-CN">设置系统证书库的读取密码</h3>
          *
-         * @param passPhrase the pass phrase
-         * @return the request builder
+         * @param passPhrase    <span class="en">Pass phrase of system certificate library</span>
+         *                      <span class="zh-CN">系统证书库的读取密码</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder passPhrase(final String passPhrase) {
             this.passPhrase = passPhrase;
             return this;
         }
-
         /**
-         * User agent request builder.
+         * <h3 class="en">Configure user agent string will used</h3>
+         * <h3 class="zh-CN">设置即将使用的用户代理字符串</h3>
          *
-         * @param userAgent the user agent
-         * @return the request builder
+         * @param userAgent     <span class="en">User agent string</span>
+         *                      <span class="zh-CN">用户代理字符串</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder userAgent(final String userAgent) {
             this.userAgent = userAgent;
             return this;
         }
-
         /**
-         * Request url request builder.
+         * <h3 class="en">Configure request url</h3>
+         * <h3 class="zh-CN">设置请求地址</h3>
          *
-         * @param requestUrl the request url
-         * @return the request builder
+         * @param requestUrl     <span class="en">Request url string</span>
+         *                      <span class="zh-CN">请求地址字符串</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder requestUrl(final String requestUrl) {
             this.requestUrl = requestUrl;
             return this;
         }
-
         /**
-         * Charset request builder.
+         * <h3 class="en">Configure character encoding</h3>
+         * <h3 class="zh-CN">设置请求字符集</h3>
          *
-         * @param charset the charset
-         * @return the request builder
+         * @param charset       <span class="en">character encoding</span>
+         *                      <span class="zh-CN">字符集</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder charset(final String charset) {
             this.charset = charset;
             return this;
         }
-
         /**
-         * Content type request builder.
+         * <h3 class="en">Configure content type string</h3>
+         * <h3 class="zh-CN">设置"Content-Type"值</h3>
          *
-         * @param contentType the content type
-         * @return the request builder
+         * @param contentType   <span class="en">Content type string</span>
+         *                      <span class="zh-CN">需要设置的字符串</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder contentType(final String contentType) {
             this.contentType = contentType;
             return this;
         }
-
         /**
-         * Time out request builder.
+         * <h3 class="en">Configure request timeout</h3>
+         * <h3 class="zh-CN">设置请求超时时间</h3>
          *
-         * @param timeOut the time-out
-         * @return the request builder
+         * @param timeOut       <span class="en">Timeout value</span>
+         *                      <span class="zh-CN">请求超时时间</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder timeOut(final int timeOut) {
             this.timeOut = timeOut;
             return this;
         }
-
         /**
-         * Post datas request builder.
+         * <h3 class="en">Configure request send data bytes</h3>
+         * <h3 class="zh-CN">设置请求发送的二进制数据</h3>
          *
-         * @param postData the post datas
-         * @return the request builder
+         * @param postData      <span class="en">Binary data bytes</span>
+         *                      <span class="zh-CN">二进制数据</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder postData(final byte[] postData) {
             this.postData = postData;
             return this;
         }
-
         /**
-         * Add header request builder.
+         * <h3 class="en">Add request header name and value</h3>
+         * <h3 class="zh-CN">添加请求头的键和值</h3>
          *
-         * @param headerName  the header name
-         * @param headerValue the header value
-         * @return the request builder
+         * @param headerName    <span class="en">Request header name</span>
+         *                      <span class="zh-CN">请求头键名</span>
+         * @param headerValue   <span class="en">Request header value</span>
+         *                      <span class="zh-CN">请求头键值</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addHeader(final String headerName, final String headerValue) {
             this.headers.add(new SimpleHeader(headerName, headerValue));
             return this;
         }
-
         /**
-         * Add parameter request builder.
+         * <h3 class="en">Add request parameter name and value</h3>
+         * <h3 class="zh-CN">添加请求参数的键和值</h3>
          *
-         * @param parameterName   the parameter name
-         * @param parameterValues the parameter values
-         * @return the request builder
+         * @param parameterName     <span class="en">Request parameter name</span>
+         *                          <span class="zh-CN">请求参数名</span>
+         * @param parameterValues   <span class="en">Request parameter value</span>
+         *                          <span class="zh-CN">请求参数值</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addParameter(final String parameterName, final String[] parameterValues) {
             this.parameters.put(parameterName, parameterValues);
             return this;
         }
-
         /**
-         * Add upload param request builder.
+         * <h3 class="en">Add request upload parameter name and value</h3>
+         * <h3 class="zh-CN">添加请求上传数据的键和值</h3>
          *
-         * @param parameterName  the parameter name
-         * @param parameterValue the parameter value
-         * @return the request builder
+         * @param parameterName     <span class="en">Request upload parameter name</span>
+         *                          <span class="zh-CN">请求上传参数名</span>
+         * @param parameterValue    <span class="en">Request upload parameter value</span>
+         *                          <span class="zh-CN">请求上传文件实例对象</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addUploadParam(final String parameterName, final File parameterValue) {
             this.uploadParams.put(parameterName, parameterValue);
             return this;
         }
-
         /**
-         * Add cookie request builder.
+         * <h3 class="en">Add request cookie values</h3>
+         * <h3 class="zh-CN">添加请求Cookie信息</h3>
          *
-         * @param cookieEntities the cookie entity array
-         * @return the request builder
+         * @param cookieEntities    <span class="en">CookieEntity instance array</span>
+         *                          <span class="zh-CN">CookieEntity实例对象数组</span>
+         * @see org.nervousync.http.cookie.CookieEntity
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addCookies(final CookieEntity... cookieEntities) {
             this.cookieList.addAll(Arrays.asList(cookieEntities));
             return this;
         }
-
         /**
-         * Add cookie request builder.
+         * <h3 class="en">Add request cookie values from response header "Set-Cookie"</h3>
+         * <h3 class="zh-CN">解析响应数据头中的"Set-Cookie"信息，并添加请求Cookie信息</h3>
          *
-         * @param responseCookieValue the response cookie value
-         * @return the request builder
+         * @param responseCookieValue   <span class="en">String value of response header "Set-Cookie"</span>
+         *                              <span class="zh-CN">响应头中的"Set-Cookie"字符串值</span>
+         *
+         * @return  <span class="en">Current RequestBuilder instance</span>
+         *          <span class="zh-CN">当前RequestBuilder实例对象</span>
          */
         public RequestBuilder addCookies(final String responseCookieValue) {
             this.cookieList.add(new CookieEntity(responseCookieValue));
             return this;
         }
-
+        /**
+         * <h3 class="en">Confirm proxy configure</h3>
+         * <h3 class="zh-CN">确认代理服务器配置</h3>
+         *
+         * @param proxyConfig   <span class="en">ProxyConfig instance</span>
+         *                      <span class="zh-CN">ProxyConfig实例对象</span>
+         * @see org.nervousync.proxy.ProxyConfig
+         */
         void proxyConfig(final ProxyConfig proxyConfig) {
             this.proxyConfig = proxyConfig;
         }

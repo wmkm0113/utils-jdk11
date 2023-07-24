@@ -27,7 +27,7 @@ public final class SystemTest extends BaseTest {
 				SystemUtils.isFreeBSD(), SystemUtils.isIrix(), SystemUtils.isDigitalUnix(), SystemUtils.isNetware(),
 				SystemUtils.isOSF1(), SystemUtils.isOpenVMS());
 		this.logger.info("Java version: {}, major version: {}, java home: {}, tmp directory: {}",
-				SystemUtils.JAVA_VERSION, SystemUtils.MAJOR_VERSION, SystemUtils.JAVA_HOME, SystemUtils.JAVA_TMP_DIR);
+				SystemUtils.JDK_VERSION, SystemUtils.MAJOR_VERSION, SystemUtils.JAVA_HOME, SystemUtils.JAVA_TMP_DIR);
 	}
 
 	@Test

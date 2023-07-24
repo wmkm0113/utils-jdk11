@@ -17,10 +17,8 @@
 package org.nervousync.security.factory;
 
 import org.nervousync.exceptions.crypto.CryptoException;
-import org.nervousync.security.SecureProvider;
+import org.nervousync.security.api.SecureAdapter;
 import org.nervousync.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -30,70 +28,92 @@ import java.security.cert.Certificate;
 import java.util.*;
 
 /**
- * Secure factory for protect password in config file
- * <p>
- * Supported algorithm: RSA1024/RSA2048/SM2/AES128/AES192/AES256/DES/3DES/SM4
+ * <h2 class="en">Secure factory instance</h2>
+ * <p class="en">
+ *     Running in singleton mode. Using for protect password in any configure files.
+ *     Supported algorithm: RSA1024/RSA2048/SM2/AES128/AES192/AES256/DES/3DES/SM4
+ * </p>
+ * <h2 class="zh-CN">安全配置信息定义</h2>
+ * <p class="zh-CN">使用单例模式运行。用于在任何配置文件中保护密码。支持的算法：RSA1024/RSA2048/SM2/AES128/AES192/AES256/DES/3DES/SM4</p>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:33:56 $
  */
 public final class SecureFactory {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecureFactory.class);
-
+	/**
+	 * <span class="en">Logger instance</span>
+	 * <span class="zh-CN">日志对象</span>
+	 */
+    private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(SecureFactory.class);
+	/**
+	 * <span class="en">Default certificate alias</span>
+	 * <span class="zh-CN">默认证书别名</span>
+	 */
     private static final String SECURE_CERTIFICATE_ALIAS = "NSYC";
+	/**
+	 * <span class="en">Default certificate password</span>
+	 * <span class="zh-CN">默认证书库密码</span>
+	 */
     private static final String SECURE_CERTIFICATE_PASSWORD = "ns0528AO";
-
-    private static final SecureFactory INSTANCE = new SecureFactory();
-
-    private SecureNode factoryNode = null;
-    private final Map<String, SecureNode> registeredNodeMap;
-
-    private SecureFactory() {
-        this.registeredNodeMap = new HashMap<>();
-    }
-
+	/**
+	 * <span class="en">Root secure node</span>
+	 * <span class="zh-CN">根安全节点</span>
+	 */
+    private static SecureNode FACTORY_NODE = null;
+	/**
+	 * <span class="en">Registered secure node mapping</span>
+	 * <span class="zh-CN">已注册的安全节点映射</span>
+	 */
+    private static final Map<String, SecureNode> REGISTERED_NODE_MAP = new HashMap<>();
     /**
-     * Initialized boolean.
+	 * <h3 class="en">Private constructor method for SecureFactory</h3>
+	 * <h3 class="zh-CN">安全工厂的私有构造方法</h3>
+     */
+    private SecureFactory() {
+    }
+    /**
+	 * <h3 class="en">Check root secure node was configured</h3>
+	 * <h3 class="zh-CN">检查根安全节点是否配置成功</h3>
      *
-     * @return the boolean
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
      */
     public static boolean initialized() {
-        return INSTANCE.factoryNode != null && INSTANCE.factoryNode.isInitialized();
+        return FACTORY_NODE != null && FACTORY_NODE.isInitialized();
     }
-
     /**
-     * Gets instance.
+	 * <h3 class="en">Configure root secure node using given secure config</h3>
+	 * <h3 class="zh-CN">使用给定的安全配置信息设置安全工厂的根安全节点</h3>
      *
-     * @return the instance
-     */
-    public static SecureFactory getInstance() {
-        return SecureFactory.INSTANCE;
-    }
-
-    /**
-     * Initialize boolean.
+     * @param secureConfig  <span class="en">Secure config information</span>
+     *                      <span class="zh-CN">安全配置信息</span>
      *
-     * @param secureConfig the secure config
-     * @return the boolean
+     * @return  <span class="en">Initialize result</span>
+     *          <span class="zh-CN">初始化结果</span>
      */
     public static boolean initialize(final SecureConfig secureConfig) {
         return SecureNode.initFactory(secureConfig)
                 .filter(SecureNode::isInitialized)
                 .map(secureNode -> {
-                    if (INSTANCE.factoryNode != null && LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Override factory config! ");
+                    if (FACTORY_NODE != null && LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Utils", "Override_Factory_Config_Debug");
                     }
-                    INSTANCE.factoryNode = secureNode;
+                    FACTORY_NODE = secureNode;
                     return Boolean.TRUE;
                 })
                 .orElse(Boolean.FALSE);
     }
-
     /**
-     * Check given secure algorithm was supported
+	 * <h3 class="en">Check given secure algorithm was supported</h3>
+	 * <h3 class="zh-CN">检查给定的安全算法支持状态</h3>
      *
-     * @param secureAlgorithm Secure algorithm name
-     * @return Check result
+     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+	 *                          <span class="zh-CN">安全算法</span>
+     *
+     * @return  <span class="en">Check result</span>
+     *          <span class="zh-CN">检查结果</span>
      */
-    public static boolean supportedAlgorithm(String secureAlgorithm) {
+    public static boolean supportedAlgorithm(final String secureAlgorithm) {
         try {
             SecureAlgorithm.valueOf(secureAlgorithm);
             return Boolean.TRUE;
@@ -101,49 +121,58 @@ public final class SecureFactory {
             return Boolean.FALSE;
         }
     }
-
     /**
-     * Init config optional.
+	 * <h3 class="en">Generate secure configure information using given secure algorithm</h3>
+	 * <h3 class="zh-CN">使用给定的安全算法生成安全配置信息实例对象</h3>
      *
-     * @param secureAlgorithm the secure algorithm
-     * @return optional
+     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+	 *                          <span class="zh-CN">安全算法</span>
+     *
+     * @return  <span class="en">Optional of SecureConfig instance</span>
+     *          <span class="zh-CN">Optional包装的安全配置信息实例对象</span>
      */
-    public static Optional<SecureConfig> initConfig(SecureAlgorithm secureAlgorithm) {
+    public static Optional<SecureConfig> initConfig(final SecureAlgorithm secureAlgorithm) {
         final byte[] keyBytes = generate(secureAlgorithm);
         if (keyBytes.length == 0) {
-            LOGGER.error("Key bytes is empty! ");
+            LOGGER.error("Utils", "Key_Bytes_Empty_Error");
             return Optional.empty();
         }
-        byte[] encBytes = INSTANCE.initKey(keyBytes, Boolean.TRUE);
+        byte[] encBytes = initKey(keyBytes, Boolean.TRUE);
 
         SecureConfig secureConfig = new SecureConfig();
         secureConfig.setSecureAlgorithm(secureAlgorithm);
         secureConfig.setSecureKey(StringUtils.base64Encode(encBytes));
         return Optional.of(secureConfig);
     }
-
     /**
-     * Registered config boolean.
+	 * <h3 class="en">Check given secure name was registered</h3>
+	 * <h3 class="zh-CN">检查给定的安全名称注册状态</h3>
      *
-     * @param configName the config name
+     * @param secureName    <span class="en">Secure name</span>
+     *                      <span class="zh-CN">安全名称</span>
      * @return the boolean
      */
-    public boolean registeredConfig(String configName) {
-        if (StringUtils.isEmpty(configName) || this.factoryNode == null || !this.factoryNode.isInitialized()) {
+    public static boolean registeredConfig(final String secureName) {
+        if (StringUtils.isEmpty(secureName) || FACTORY_NODE == null || !FACTORY_NODE.isInitialized()) {
             return Boolean.FALSE;
         }
-        return this.registeredNodeMap.containsKey(configName);
+        return REGISTERED_NODE_MAP.containsKey(secureName);
     }
 
     /**
-     * Register boolean.
+	 * <h3 class="en">Register secure config by given secure name and configure information instance</h3>
+	 * <h3 class="zh-CN">将给定的安全名称和安全配置信息实例注册到安全工厂</h3>
      *
-     * @param configName   the config name
-     * @param secureConfig the secure config
-     * @return the boolean
+     * @param secureName    <span class="en">Secure name</span>
+     *                      <span class="zh-CN">安全名称</span>
+     * @param secureConfig  <span class="en">Secure config information</span>
+     *                      <span class="zh-CN">安全配置信息</span>
+     *
+     * @return  <span class="en">Register result</span>
+     *          <span class="zh-CN">注册结果</span>
      */
-    public boolean register(String configName, SecureConfig secureConfig) {
-        if (StringUtils.isEmpty(configName) || this.factoryNode == null || !this.factoryNode.isInitialized()) {
+    public static boolean register(final String secureName, final SecureConfig secureConfig) {
+        if (StringUtils.isEmpty(secureName) || FACTORY_NODE == null || !FACTORY_NODE.isInitialized()) {
             return Boolean.FALSE;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -151,167 +180,159 @@ public final class SecureFactory {
         }
         return SecureNode.initialize(secureConfig).filter(SecureNode::isInitialized)
                 .map(secureNode -> {
-                    if (this.registeredNodeMap.containsKey(configName)) {
+                    if (REGISTERED_NODE_MAP.containsKey(secureName)) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Override secure config: {}", configName);
+                            LOGGER.debug("Override secure config: {}", secureName);
                         }
                     }
-                    this.registeredNodeMap.put(configName, secureNode);
+                    REGISTERED_NODE_MAP.put(secureName, secureNode);
                     return Boolean.TRUE;
                 })
                 .orElse(Boolean.FALSE);
     }
-
     /**
-     * Deregister.
+	 * <h3 class="en">Deregister secure config by given secure name</h3>
+	 * <h3 class="zh-CN">将给定的安全名称取消注册</h3>
      *
-     * @param configName the config name
+     * @param secureName    <span class="en">Secure name</span>
+     *                      <span class="zh-CN">安全名称</span>
      */
-    public void deregister(String configName) {
-        if (StringUtils.notBlank(configName)) {
-            this.registeredNodeMap.remove(configName);
+    public static void deregister(String secureName) {
+        if (StringUtils.notBlank(secureName)) {
+            REGISTERED_NODE_MAP.remove(secureName);
         }
     }
-
     /**
-     * Re-encrypt password data.
+	 * <h3 class="en">Update secure config protected password data</h3>
+	 * <h3 class="zh-CN">更新安全配置保护的密码信息</h3>
      *
-     * @param dataContent   Original password data.
-     * @param originalName  Original secure name.
-     * @param secureName    New secure name.
-     * @return      Re-encrypt password data
+     * @param dataContent   <span class="en">Password data</span>
+     *                      <span class="zh-CN">密码信息</span>
+     * @param originalName  <span class="en">Original secure name</span>
+     *                      <span class="zh-CN">旧安全配置名称</span>
+     * @param secureName    <span class="en">New secure name</span>
+     *                      <span class="zh-CN">新安全配置名称</span>
+     *
+     * @return  <span class="en">Updated password data</span>
+     *          <span class="zh-CN">更新后的密码信息</span>
      */
-    public String update(final String dataContent, final String originalName, final String secureName) {
+    public static String update(final String dataContent, final String originalName, final String secureName) {
         if (StringUtils.isEmpty(dataContent)) {
             return dataContent;
         }
 
-        byte[] dataBytes = StringUtils.notBlank(originalName)
-                ? this.decrypt(originalName, StringUtils.base64Decode(dataContent))
-                : ConvertUtils.objectToByteArray(dataContent);
+        String string = decrypt(originalName, dataContent);
         if (StringUtils.isEmpty(secureName)) {
-            return ConvertUtils.convertToString(dataBytes);
+            return string;
         } else {
-            return StringUtils.base64Encode(this.encrypt(secureName, dataBytes));
+            return encrypt(secureName, string);
         }
     }
-
     /**
-     * Encrypt data content
+	 * <h3 class="en">Encrypt data content using given secure name</h3>
+	 * <h3 class="zh-CN">使用给定的安全名称加密密码信息</h3>
      *
-     * @param configName    the config name
-     * @param dataContent   the data bytes
-     * @return the byte [ ]
+     * @param secureName    <span class="en">New secure name</span>
+     *                      <span class="zh-CN">新安全配置名称</span>
+     * @param dataContent   <span class="en">Password data</span>
+     *                      <span class="zh-CN">密码信息</span>
+     *
+     * @return  <span class="en">Encrypted password data</span>
+     *          <span class="zh-CN">加密后的密码信息</span>
      */
-    public String encrypt(final String configName, final String dataContent) {
-        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(configName) || !this.registeredConfig(configName)) {
+    public static String encrypt(final String secureName, final String dataContent) {
+        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(secureName) || !registeredConfig(secureName)) {
             return dataContent;
         }
-        byte[] dataBytes = ConvertUtils.objectToByteArray(dataContent);
-        return Optional.ofNullable(this.registeredNodeMap.get(configName))
+
+        return Optional.ofNullable(REGISTERED_NODE_MAP.get(secureName))
                 .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
                 .map(secureProvider -> {
                     try {
-                        return StringUtils.base64Encode(secureProvider.finish(dataBytes));
+                        return StringUtils.base64Encode(secureProvider.finish(ConvertUtils.toByteArray(dataContent)));
                     } catch (CryptoException e) {
-                        LOGGER.error("Encrypt data error! ");
+                        LOGGER.error("Utils", "Encrypt_Data_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Stack message: ", e);
+                            LOGGER.debug("Utils", "Stack_Message_Error", e);
                         }
                         return dataContent;
                     }
                 })
                 .orElse(dataContent);
     }
-
     /**
-     * Decrypt byte [ ].
+	 * <h3 class="en">Decrypt data content using given secure name</h3>
+	 * <h3 class="zh-CN">使用给定的安全名称解密密码信息</h3>
      *
-     * @param configName    the config name
-     * @param dataContent   the data bytes
-     * @return the byte [ ]
+     * @param secureName    <span class="en">New secure name</span>
+     *                      <span class="zh-CN">新安全配置名称</span>
+     * @param dataContent   <span class="en">Password data</span>
+     *                      <span class="zh-CN">密码信息</span>
+     *
+     * @return  <span class="en">Decrypted password data</span>
+     *          <span class="zh-CN">解密后的密码信息</span>
      */
-    public String decrypt(String configName, String dataContent) {
-        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(configName) || !this.registeredConfig(configName)) {
+    public static String decrypt(final String secureName, final String dataContent) {
+        if (StringUtils.isEmpty(dataContent) || StringUtils.isEmpty(secureName) || !registeredConfig(secureName)) {
             return dataContent;
         }
         byte[] encBytes = StringUtils.base64Decode(dataContent);
         if (encBytes.length == 0) {
             return dataContent;
         }
-        return Optional.ofNullable(this.registeredNodeMap.get(configName))
+        return Optional.ofNullable(REGISTERED_NODE_MAP.get(secureName))
                 .map(secureNode -> secureNode.initCryptor(Boolean.FALSE))
                 .map(secureProvider -> {
                     try {
-                        return ConvertUtils.convertToString(secureProvider.finish(encBytes));
+                        return ConvertUtils.toString(secureProvider.finish(encBytes));
                     } catch (CryptoException e) {
-                        LOGGER.error("Encrypt data error! ");
+                        LOGGER.error("Utils", "Encrypt_Data_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Stack message: ", e);
+                            LOGGER.debug("Utils", "Stack_Message_Error", e);
                         }
                         return dataContent;
                     }
                 })
                 .orElse(dataContent);
     }
-
-    private byte[] encrypt(String configName, byte[] dataBytes) {
-        if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            return Optional.ofNullable(this.registeredNodeMap.get(configName))
-                    .map(secureNode -> secureNode.initCryptor(Boolean.TRUE))
-                    .map(secureProvider -> {
-                        try {
-                            return secureProvider.finish(dataBytes);
-                        } catch (CryptoException e) {
-                            LOGGER.error("Encrypt data error! ");
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Stack message: ", e);
-                            }
-                            return dataBytes;
-                        }
-                    })
-                    .orElse(dataBytes);
-        }
-        return dataBytes;
-    }
-
-    private byte[] decrypt(String configName, byte[] dataBytes) {
-        if (StringUtils.notBlank(configName) && dataBytes.length > 0) {
-            return Optional.ofNullable(this.registeredNodeMap.get(configName))
-                    .map(secureNode -> secureNode.initCryptor(Boolean.FALSE))
-                    .map(secureProvider -> {
-                        try {
-                            return secureProvider.finish(dataBytes);
-                        } catch (CryptoException e) {
-                            LOGGER.error("Encrypt data error! ");
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Stack message: ", e);
-                            }
-                            return dataBytes;
-                        }
-                    })
-                    .orElse(dataBytes);
-        }
-        return dataBytes;
-    }
-
-    private byte[] initKey(byte[] dataBytes, boolean encrypt) {
-        if (this.factoryNode == null) {
+    /**
+	 * <h3 class="en">Initialize key bytes</h3>
+	 * <h3 class="zh-CN">初始化加密密钥数据</h3>
+     *
+     * @param dataBytes     <span class="en">key bytes</span>
+     *                      <span class="zh-CN">加密密钥数据</span>
+     * @param encrypt       <span class="en">Encrypt status</span>
+     *                      <span class="zh-CN">加密密钥数据</span>
+     *
+     * @return  <span class="en">Initialized data bytes</span>
+     *          <span class="zh-CN">初始化的数据</span>
+     */
+    private static byte[] initKey(final byte[] dataBytes, final boolean encrypt) {
+        if (FACTORY_NODE == null) {
             return dataBytes;
         }
-        SecureProvider secureProvider = this.factoryNode.initCryptor(encrypt);
-        if (secureProvider == null) {
-            LOGGER.error("Secure factory not initialized! ");
+        SecureAdapter secureAdapter = FACTORY_NODE.initCryptor(encrypt);
+        if (secureAdapter == null) {
+            LOGGER.error("Utils", "Security_Factory_Not_Initialized_Error");
             return new byte[0];
         }
         try {
-            return secureProvider.finish(dataBytes);
+            return secureAdapter.finish(dataBytes);
         } catch (Exception e) {
             return dataBytes;
         }
     }
-
-    private static byte[] generate(SecureAlgorithm secureAlgorithm) {
+    /**
+	 * <h3 class="en">Generate secure key by given secure algorithm</h3>
+	 * <h3 class="zh-CN">使用给定的安全算法生成安全密钥</h3>
+     *
+     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+	 *                          <span class="zh-CN">安全算法</span>
+     *
+     * @return  <span class="en">Generated key data bytes</span>
+     *          <span class="zh-CN">生成的安全密钥数据</span>
+     */
+    private static byte[] generate(final SecureAlgorithm secureAlgorithm) {
         switch (secureAlgorithm) {
             case RSA1024:
                 return convertKeyPair(SecurityUtils.RSAKeyPair(1024), "SHA256withRSA");
@@ -335,29 +356,67 @@ public final class SecureFactory {
                 return new byte[0];
         }
     }
-
-    private static byte[] convertKeyPair(KeyPair keyPair, String signAlgorithm) {
+    /**
+	 * <h3 class="en">Convert asymmetric key pair instance to secure key data bytes, using given signature algorithm</h3>
+	 * <h3 class="zh-CN">使用给定的签名算法将非对称密钥对实例对象转换为安全密钥数据</h3>
+     *
+     * @param keyPair           <span class="en">Asymmetric key pair instance</span>
+	 *                          <span class="zh-CN">非对称密钥对实例对象</span>
+     * @param signAlgorithm     <span class="en">Signature algorithm</span>
+	 *                          <span class="zh-CN">签名算法</span>
+     *
+     * @return  <span class="en">Generated key data bytes</span>
+     *          <span class="zh-CN">生成的安全密钥数据</span>
+     */
+    private static byte[] convertKeyPair(final KeyPair keyPair, final String signAlgorithm) {
         long currentTime  = DateTimeUtils.currentTimeMillis();
         return CertificateUtils.PKCS12(keyPair, currentTime, new Date(currentTime),
                 new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), SECURE_CERTIFICATE_ALIAS,
                 SECURE_CERTIFICATE_ALIAS, SECURE_CERTIFICATE_PASSWORD, null, signAlgorithm);
     }
-
+    /**
+     * <h2 class="en">Secure Node</h2>
+     * <h2 class="zh-CN">安全配置信息定义</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:38:45 $
+     */
     private static final class SecureNode {
-
-        private final boolean initialized;
-        private final SecureAlgorithm secureAlgorithm;
-        private final byte[] keyBytes;
-        private final PrivateKey privateKey;
-        private final PublicKey publicKey;
-
         /**
-         * Instantiates a new Secure node.
-         *
-         * @param secureAlgorithm the algorithm
-         * @param dataBytes       the data bytes
+         * <span class="en">Node initialize status</span>
+         * <span class="zh-CN">节点初始化状态</span>
          */
-        private SecureNode(SecureAlgorithm secureAlgorithm, byte[] dataBytes) {
+        private final boolean initialized;
+        /**
+         * <span class="en">Secure algorithm</span>
+         * <span class="zh-CN">安全算法</span>
+         */
+        private final SecureAlgorithm secureAlgorithm;
+        /**
+         * <span class="en">Secure key data bytes</span>
+         * <span class="zh-CN">安全密钥数据</span>
+         */
+        private final byte[] keyBytes;
+        /**
+         * <span class="en">Asymmetric private key</span>
+         * <span class="zh-CN">非对称加密私钥</span>
+         */
+        private final PrivateKey privateKey;
+        /**
+         * <span class="en">Asymmetric public key</span>
+         * <span class="zh-CN">非对称加密公钥</span>
+         */
+        private final PublicKey publicKey;
+        /**
+         * <h3 class="en">Constructor for SecureNode</h3>
+         * <h3 class="zh-CN">安全节点构造方法</h3>
+         *
+         * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+         *                          <span class="zh-CN">安全算法</span>
+         * @param dataBytes         <span class="en">Secure key data bytes</span>
+         *                          <span class="zh-CN">安全密钥数据</span>
+         */
+        private SecureNode(final SecureAlgorithm secureAlgorithm, final byte[] dataBytes) {
             this.secureAlgorithm = secureAlgorithm;
             switch (this.secureAlgorithm) {
                 case RSA1024:
@@ -398,27 +457,39 @@ public final class SecureFactory {
                     break;
             }
         }
-
         /**
-         * Initialize optional.
+         * <h3 class="en">Static method for initialize secure node by given secure config</h3>
+         * <h3 class="zh-CN">静态方法用于使用给定的安全配置信息初始化安全节点实例</h3>
          *
-         * @param secureConfig the secure config
-         * @return the optional
+         * @param secureConfig  <span class="en">Secure config information</span>
+         *                      <span class="zh-CN">安全配置信息</span>
+         *
+         * @return  <span class="en">Optional of SecureNode instance</span>
+         *          <span class="zh-CN">Optional包装的安全节点实例对象</span>
          */
-        public static Optional<SecureNode> initialize(SecureConfig secureConfig) {
+        public static Optional<SecureNode> initialize(final SecureConfig secureConfig) {
             if (secureConfig == null) {
                 return Optional.empty();
             }
 
             try {
                 return Optional.of(new SecureNode(secureConfig.getSecureAlgorithm(),
-                        INSTANCE.initKey(StringUtils.base64Decode(secureConfig.getSecureKey()), Boolean.FALSE)));
+                        initKey(StringUtils.base64Decode(secureConfig.getSecureKey()), Boolean.FALSE)));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
             }
         }
-
-        private static Optional<SecureNode> initFactory(SecureConfig secureConfig) {
+        /**
+         * <h3 class="en">Static method for initialize factory secure node by given secure config</h3>
+         * <h3 class="zh-CN">静态方法用于使用给定的安全配置信息初始化根安全节点实例</h3>
+         *
+         * @param secureConfig  <span class="en">Secure config information</span>
+         *                      <span class="zh-CN">安全配置信息</span>
+         *
+         * @return  <span class="en">Optional of SecureNode instance</span>
+         *          <span class="zh-CN">Optional包装的安全节点实例对象</span>
+         */
+        private static Optional<SecureNode> initFactory(final SecureConfig secureConfig) {
             if (secureConfig == null) {
                 return Optional.empty();
             }
@@ -430,101 +501,79 @@ public final class SecureFactory {
                 return Optional.empty();
             }
         }
-
-        private SecureProvider initCryptor(boolean encrypt) {
-            SecureProvider secureProvider = null;
+        /**
+         * <h3 class="en">Initialize secure adapter</h3>
+         * <h3 class="zh-CN">初始化加密解密适配器</h3>
+         *
+         * @param encrypt   <span class="en">Encrypt status</span>
+         *                  <span class="zh-CN">加密状态</span>
+         *
+         * @return  <span class="en">Initialized adapter instance</span>
+         *          <span class="zh-CN">初始化的适配器实例对象</span>
+         */
+        private SecureAdapter initCryptor(boolean encrypt) {
+            SecureAdapter secureAdapter = null;
             if (this.initialized) {
                 try {
                     switch (this.secureAlgorithm) {
                         case RSA1024:
                         case RSA2048:
-                            secureProvider = encrypt ? SecurityUtils.RSAEncryptor(this.publicKey)
+                            secureAdapter = encrypt ? SecurityUtils.RSAEncryptor(this.publicKey)
                                     : SecurityUtils.RSADecryptor(this.privateKey);
                             break;
                         case SM2:
-                            secureProvider = encrypt ? SecurityUtils.SM2Encryptor(this.publicKey)
+                            secureAdapter = encrypt ? SecurityUtils.SM2Encryptor(this.publicKey)
                                     : SecurityUtils.SM2Decryptor(this.privateKey);
                             break;
                         case AES128:
                         case AES192:
                         case AES256:
-                            secureProvider = encrypt ? SecurityUtils.AESEncryptor(this.keyBytes)
+                            secureAdapter = encrypt ? SecurityUtils.AESEncryptor(this.keyBytes)
                                     : SecurityUtils.AESDecryptor(this.keyBytes);
                             break;
                         case DES:
-                            secureProvider = encrypt ? SecurityUtils.DESEncryptor(this.keyBytes)
+                            secureAdapter = encrypt ? SecurityUtils.DESEncryptor(this.keyBytes)
                                     : SecurityUtils.DESDecryptor(this.keyBytes);
                             break;
                         case TRIPLE_DES:
-                            secureProvider = encrypt ? SecurityUtils.TripleDESEncryptor(this.keyBytes)
+                            secureAdapter = encrypt ? SecurityUtils.TripleDESEncryptor(this.keyBytes)
                                     : SecurityUtils.TripleDESDecryptor(this.keyBytes);
                             break;
                         case SM4:
-                            secureProvider = encrypt ? SecurityUtils.SM4Encryptor(this.keyBytes)
+                            secureAdapter = encrypt ? SecurityUtils.SM4Encryptor(this.keyBytes)
                                     : SecurityUtils.SM4Decryptor(this.keyBytes);
                             break;
                         default:
                             break;
                     }
                 } catch (CryptoException e) {
-                    LOGGER.error("Initialize cryptor error! ");
+                    LOGGER.error("Utils", "Init_Crypto_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Stack message: ", e);
+                        LOGGER.debug("Utils", "Stack_Message_Error", e);
                     }
                 }
             }
-            return secureProvider;
+            return secureAdapter;
         }
-
         /**
-         * Is initialized boolean.
+         * <h3 class="en">Getter method for Node initialize status</h3>
+         * <h3 class="zh-CN">节点初始化状态的Getter方法</h3>
          *
-         * @return the boolean
+         * @return  <span class="en">Node initialize status</span>
+         *          <span class="zh-CN">节点初始化状态</span>
          */
         public boolean isInitialized() {
             return initialized;
         }
     }
-
     /**
-     * The enum Secure algorithm.
+     * <h2 class="en">Enumeration of Secure Algorithm</h2>
+     * <h2 class="zh-CN">安全算法的枚举类</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:37:28 $
      */
     public enum SecureAlgorithm {
-        /**
-         * Rsa 1024 secure algorithm.
-         */
-        RSA1024,
-        /**
-         * Rsa 2048 secure algorithm.
-         */
-        RSA2048,
-        /**
-         * Sm 2 secure algorithm.
-         */
-        SM2,
-        /**
-         * Aes 128 secure algorithm.
-         */
-        AES128,
-        /**
-         * Aes 192 secure algorithm.
-         */
-        AES192,
-        /**
-         * Aes 256 secure algorithm.
-         */
-        AES256,
-        /**
-         * Des secure algorithm.
-         */
-        DES,
-        /**
-         * Triple des secure algorithm.
-         */
-        TRIPLE_DES,
-        /**
-         * Sm 4 secure algorithm.
-         */
-        SM4
+        RSA1024, RSA2048, SM2, AES128, AES192, AES256, DES, TRIPLE_DES, SM4
     }
 }

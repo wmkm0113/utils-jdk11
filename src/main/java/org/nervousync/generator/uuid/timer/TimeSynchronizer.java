@@ -17,27 +17,34 @@
 package org.nervousync.generator.uuid.timer;
 
 /**
- * The interface Time synchronizer.
+ * <h2 class="en">Interface of time synchronizer, using for UUID version 2</h2>
+ * <h2 class="zh-CN">时间同步器接口，用于UUID版本2</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:54:12 $
  */
 public interface TimeSynchronizer {
-
     /**
-     * Initialize long.
+	 * <h3 class="en">Initialize current time synchronizer</h3>
+	 * <h3 class="zh-CN">初始化当前时间同步器</h3>
      *
-     * @return the long
+     * @return  <span class="en">Initialize timestamp value</span>
+     *          <span class="zh-CN">初始时间戳</span>
      */
     long initialize();
-
     /**
-     * Deactivate.
+	 * <h3 class="en">Deactivate current time synchronizer</h3>
+	 * <h3 class="zh-CN">反激活当前时间同步器</h3>
      */
     void deactivate();
-
     /**
-     * Update long.
+	 * <h3 class="en">Update timestamp of current time synchronizer</h3>
+	 * <h3 class="zh-CN">更新当前时间同步器的时间戳</h3>
      *
-     * @param currentTimeMillis the current time millis
-     * @return the long
+     * @param currentTimeMillis     <span class="en">Update timestamp value</span>
+     *                              <span class="zh-CN">更新时间戳</span>
+     * @return  <span class="en">Updated timestamp value</span>
+     *          <span class="zh-CN">更新的时间戳</span>
      */
     long update(long currentTimeMillis);
 

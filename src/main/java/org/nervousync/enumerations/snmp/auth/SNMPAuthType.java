@@ -17,22 +17,26 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
- * The enum Snmp auth type.
+ * <h2 class="en">SNMP Authentication Type Enumerations</h2>
+ * <h2 class="zh-CN">SNMP身份验证类型枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 27, 2017 1:57:59 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 13:57:59 $
  */
 public enum SNMPAuthType {
 	/**
-	 * Noauth nopriv snmp auth type.
+     * <span class="en">No Authentication</span>
+     * <span class="zh-CN">无验证</span>
 	 */
 	NOAUTH_NOPRIV,
 	/**
-	 * Auth nopriv snmp auth type.
+     * <span class="en">Authentication with No Private</span>
+     * <span class="zh-CN">验证不使用私有验证</span>
 	 */
 	AUTH_NOPRIV,
 	/**
-	 * Auth priv snmp auth type.
+     * <span class="en">Authentication with Private</span>
+     * <span class="zh-CN">验证并使用私有验证</span>
 	 */
 	AUTH_PRIV
 }

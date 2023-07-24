@@ -34,14 +34,14 @@ public final class FactoryTest extends BaseTest {
     public void config() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES128)
                 .ifPresent(secureConfig -> this.logger.info("Config result: {}",
-                        SecureFactory.getInstance().register("TestConfig", secureConfig)));
+                        SecureFactory.register("TestConfig", secureConfig)));
     }
 
     @Test
     @Order(30)
     public void crypto() {
-        String encResult = SecureFactory.getInstance().encrypt("TestConfig", "TestString中文测试");
+        String encResult = SecureFactory.encrypt("TestConfig", "TestString中文测试");
         this.logger.info("Encrypt result: {}", encResult);
-        this.logger.info("Decrypt result: {}", SecureFactory.getInstance().decrypt("TestConfig", encResult));
+        this.logger.info("Decrypt result: {}", SecureFactory.decrypt("TestConfig", encResult));
     }
 }

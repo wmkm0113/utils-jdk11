@@ -16,7 +16,7 @@
  */
 package org.nervousync.zip.models;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 /**
  * The type Aes extra data record.

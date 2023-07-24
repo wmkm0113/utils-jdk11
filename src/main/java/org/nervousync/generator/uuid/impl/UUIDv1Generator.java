@@ -17,7 +17,7 @@
 package org.nervousync.generator.uuid.impl;
 
 import org.nervousync.annotations.generator.GeneratorProvider;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.StringUtils;
@@ -30,7 +30,11 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * The type Uui dv 1 generator.
+ * <h2 class="en">UUID version 1 generator</h2>
+ * <h2 class="zh-CN">UUID版本1生成器</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:51:08 $
  */
 @GeneratorProvider(IDUtils.UUIDv1)
 public final class UUIDv1Generator extends UUIDGenerator {
@@ -42,20 +46,46 @@ public final class UUIDv1Generator extends UUIDGenerator {
      */
     public static final String UUID_SEQUENCE = "org.nervousync.uuid.UUIDSequence";
     private static final String ASSIGNED_SEQUENCES = "org.nervousync.uuid.AssignedSequences";
-
+    /**
+     * <span class="en">Secure Random instance</span>
+     * <span class="zh-CN">安全随机数对象</span>
+     */
     private final SecureRandom secureRandom = new SecureRandom();
     private final AtomicInteger generateCount = new AtomicInteger(0);
-
+    /**
+	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="zh-CN">生成ID值</h3>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random() {
+    public String generate() {
         return new UUID(super.highBits(this.currentTimeMillis()), this.lowBits(SystemUtils.localMac())).toString();
     }
-
+    /**
+	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
+     *
+     * @param dataBytes     <span class="en">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random(byte[] dataBytes) {
-        return this.random();
+    public String generate(byte[] dataBytes) {
+        return this.generate();
     }
-
+    /**
+	 * <h3 class="en">Calculate low bits of given data bytes</h3>
+	 * <h3 class="zh-CN">从给定的二进制数组计算低位值</h3>
+     *
+     * @param dataBytes     <span class="en">given data bytes</span>
+     *                      <span class="zh-CN">给定的二进制数组</span>
+     * @return  <span class="en">Low bits value in long</span>
+     *          <span class="zh-CN">long型的低位比特值</span>
+     */
     @Override
     protected long lowBits(byte[] dataBytes) {
         if (dataBytes == null || dataBytes.length == 0) {
@@ -87,10 +117,10 @@ public final class UUIDv1Generator extends UUIDGenerator {
         rand &= 0x3FFF;
         boolean duplicate;
         do {
-            duplicate = false;
+            duplicate = Boolean.FALSE;
             for (final long sequence : sequences) {
                 if (sequence == rand) {
-                    duplicate = true;
+                    duplicate = Boolean.TRUE;
                     break;
                 }
             }

@@ -18,442 +18,306 @@ package org.nervousync.mail.config;
 
 import jakarta.xml.bind.annotation.*;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.proxy.ProxyConfig;
+import org.nervousync.commons.Globals;
+import org.nervousync.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.security.factory.SecureConfig;
 
 /**
- * The type Mail config.
+ * <h2 class="en">Mail configure information define</h2>
+ * <h2 class="zh-CN">邮件配置信息定义</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:06:18 $
  */
 @XmlType(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
 @XmlRootElement(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class MailConfig extends BeanObject {
-
+	/**
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
+	 */
     private static final long serialVersionUID = -506685998495058905L;
-
     /**
-     * Secure name
+	 * <span class="en">Secure config name</span>
+	 * <span class="zh-CN">安全配置名称</span>
      */
     @XmlElement(name = "secure_name")
     private String secureName;
+    /**
+	 * <span class="en">Secure config information</span>
+	 * <span class="zh-CN">安全配置定义</span>
+     */
     @XmlElement(name = "secure_config", namespace = "https://nervousync.org/schemas/secure")
     private SecureConfig secureConfig;
     /**
-     * Mail account username
+	 * <span class="en">Mail account username</span>
+	 * <span class="zh-CN">邮件账户用户名</span>
      */
     @XmlElement(name = "username")
     private String userName;
     /**
-     * Mail account password
+	 * <span class="en">Mail account password</span>
+	 * <span class="zh-CN">邮件账户密码</span>
      */
     @XmlElement(name = "password")
     private String password;
+    /**
+	 * <span class="en">Proxy configure information</span>
+	 * <span class="zh-CN">代理服务器配置信息</span>
+     */
     @XmlElement(name = "proxy_config", namespace = "https://nervousync.org/schemas/proxy")
     private ProxyConfig proxyConfig = ProxyConfig.redirect();
     /**
-     * Mail send server config
+	 * <span class="en">Mail send server config</span>
+	 * <span class="zh-CN">邮件发送服务器配置信息</span>
      */
     @XmlElement(name = "send_config")
     private ServerConfig sendConfig;
     /**
-     * Mail receive server config
+	 * <span class="en">Mail receive server config</span>
+	 * <span class="zh-CN">邮件接收服务器配置信息</span>
      */
     @XmlElement(name = "receive_config")
     private ServerConfig receiveConfig;
     /**
-     * Attaches the file storage path
+	 * <span class="en">Attaches the file storage path</span>
+	 * <span class="zh-CN">附件文件的保存地址</span>
      */
     @XmlElement(name = "storage_path")
     private String storagePath;
+    /**
+	 * <span class="en">Base64 encoded binary data bytes of x509 certificate</span>
+     * <p class="en">Using for email signature verify</p>
+	 * <span class="zh-CN">Base64编码的x509证书二进制数组</span>
+     * <p class="zh-CN">用于电子邮件签名验证</p>
+     */
     @XmlElement
     private String certificate;
+    /**
+	 * <span class="en">Base64 encoded binary data bytes of private key</span>
+     * <p class="en">Using for email signature</p>
+	 * <span class="zh-CN">Base64编码的私有密钥二进制数组</span>
+     * <p class="zh-CN">用于电子邮件签名</p>
+     */
     @XmlElement(name = "private_key")
     private String privateKey;
-
     /**
-     * Instantiates a new Mail config.
+	 * <h3 class="en">Constructor method for MailConfig</h3>
+	 * <h3 class="zh-CN">MailConfig构造方法</h3>
      */
     public MailConfig() {
         this.secureName = Globals.DEFAULT_VALUE_STRING;
         this.certificate = Globals.DEFAULT_VALUE_STRING;
         this.privateKey = Globals.DEFAULT_VALUE_STRING;
     }
-
-    /**
-     * Gets secure name.
-     *
-     * @return the secure name
-     */
+	/**
+	 * <h3 class="en">Getter method for secure config name</h3>
+	 * <h3 class="zh-CN">安全配置名称的Getter方法</h3>
+	 *
+	 * @return 	<span class="en">Secure config name</span>
+	 *          <span class="zh-CN">安全配置名称</span>
+	 */
     public String getSecureName() {
         return secureName;
     }
-
-    /**
-     * Sets secure name.
-     *
-     * @param secureName the secure name
-     */
+	/**
+	 * <h3 class="en">Setter method for secure config name</h3>
+	 * <h3 class="zh-CN">安全配置名称的Setter方法</h3>
+	 *
+	 * @param secureName    <span class="en">Secure config name</span>
+	 *                      <span class="zh-CN">安全配置名称</span>
+	 */
     public void setSecureName(String secureName) {
         this.secureName = secureName;
     }
-
     /**
-     * Gets secure config.
+	 * <h3 class="en">Getter method for secure config information</h3>
+	 * <h3 class="zh-CN">安全配置名称的Getter方法</h3>
      *
-     * @return the secure config
+	 * @return  <span class="en">Secure config information</span>
+	 *          <span class="zh-CN">安全配置定义</span>
      */
     public SecureConfig getSecureConfig() {
         return secureConfig;
     }
-
     /**
-     * Sets secure config.
+	 * <h3 class="en">Setter method for secure config information</h3>
+	 * <h3 class="zh-CN">安全配置定义的Setter方法</h3>
      *
-     * @param secureConfig the secure config
+	 * @param secureConfig  <span class="en">Secure config information</span>
+	 *                      <span class="zh-CN">安全配置定义</span>
      */
     public void setSecureConfig(SecureConfig secureConfig) {
         this.secureConfig = secureConfig;
     }
-
     /**
-     * Gets username.
+	 * <h3 class="en">Getter method for mail account username</h3>
+	 * <h3 class="zh-CN">邮件账户用户名的Getter方法</h3>
      *
-     * @return the username
+	 * @return  <span class="en">Mail account username</span>
+	 *          <span class="zh-CN">邮件账户用户名</span>
      */
     public String getUserName() {
         return userName;
     }
-
     /**
-     * Sets username.
+	 * <h3 class="en">Setter method for mail account username</h3>
+	 * <h3 class="zh-CN">邮件账户用户名的Setter方法</h3>
      *
-     * @param userName the username
+     * @param userName  <span class="en">Mail account username</span>
+     *                  <span class="zh-CN">邮件账户用户名</span>
      */
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
     /**
-     * Gets pass word.
+	 * <h3 class="en">Getter method for mail account password</h3>
+	 * <h3 class="zh-CN">邮件账户密码的Getter方法</h3>
      *
-     * @return the pass word
+	 * @return  <span class="en">Mail account password</span>
+	 *          <span class="zh-CN">邮件账户密码</span>
      */
     public String getPassword() {
         return password;
     }
-
     /**
-     * Sets pass word.
+	 * <h3 class="en">Setter method for mail account password</h3>
+	 * <h3 class="zh-CN">邮件账户密码的Setter方法</h3>
      *
-     * @param password the pass word
+     * @param password  <span class="en">Mail account password</span>
+     *                  <span class="zh-CN">邮件账户密码</span>
      */
     public void setPassword(String password) {
         this.password = password;
     }
-
     /**
-     * Gets proxy config.
+	 * <h3 class="en">Getter method for proxy configure information</h3>
+	 * <h3 class="zh-CN">代理服务器配置信息的Getter方法</h3>
      *
-     * @return the proxy config
+	 * @return  <span class="en">Proxy configure information</span>
+	 *          <span class="zh-CN">代理服务器配置信息</span>
      */
     public ProxyConfig getProxyConfig() {
         return proxyConfig;
     }
-
     /**
-     * Sets proxy config.
+	 * <h3 class="en">Setter method for proxy configure information</h3>
+	 * <h3 class="zh-CN">代理服务器配置信息的Setter方法</h3>
      *
-     * @param proxyConfig the proxy config
+     * @param proxyConfig   <span class="en">Proxy configure information</span>
+     *                      <span class="zh-CN">代理服务器配置信息</span>
      */
     public void setProxyConfig(ProxyConfig proxyConfig) {
         this.proxyConfig = proxyConfig;
     }
-
     /**
-     * Gets send config.
+	 * <h3 class="en">Getter method for mail send server config</h3>
+	 * <h3 class="zh-CN">邮件发送服务器配置信息的Getter方法</h3>
      *
-     * @return send config
+	 * <span class="en">Mail send server config</span>
+	 * <span class="zh-CN">邮件发送服务器配置信息</span>
      */
     public ServerConfig getSendConfig() {
         return sendConfig;
     }
-
     /**
-     * Sets send config.
+	 * <h3 class="en">Setter method for mail send server config</h3>
+	 * <h3 class="zh-CN">邮件发送服务器配置信息的Setter方法</h3>
      *
-     * @param sendConfig send config
+     * @param sendConfig    <span class="en">Mail send server config</span>
+     *                      <span class="zh-CN">邮件发送服务器配置信息</span>
      */
     public void setSendConfig(ServerConfig sendConfig) {
         this.sendConfig = sendConfig;
     }
-
     /**
-     * Gets receive config.
+	 * <h3 class="en">Getter method for mail receive server config</h3>
+	 * <h3 class="zh-CN">邮件接收服务器配置信息的Getter方法</h3>
      *
-     * @return receive config
+	 * @return  <span class="en">Mail receive server config</span>
+	 *          <span class="zh-CN">邮件接收服务器配置信息</span>
      */
     public ServerConfig getReceiveConfig() {
         return receiveConfig;
     }
-
     /**
-     * Sets receive config.
+	 * <h3 class="en">Setter method for mail receive server config</h3>
+	 * <h3 class="zh-CN">邮件接收服务器配置信息的Setter方法</h3>
      *
-     * @param receiveConfig receive config
+	 * @param receiveConfig     <span class="en">Mail receive server config</span>
+     *                          <span class="zh-CN">邮件接收服务器配置信息</span>
      */
     public void setReceiveConfig(ServerConfig receiveConfig) {
         this.receiveConfig = receiveConfig;
     }
-
     /**
-     * Gets the storage path.
+	 * <h3 class="en">Getter method for attaches the file storage path</h3>
+	 * <h3 class="zh-CN">附件文件的保存地址的Getter方法</h3>
      *
-     * @return the storage path
+	 * @return  <span class="en">Attaches the file storage path</span>
+	 *          <span class="zh-CN">附件文件的保存地址</span>
      */
     public String getStoragePath() {
         return storagePath;
     }
-
     /**
-     * Sets the storage path.
+	 * <h3 class="en">Setter method for attaches the file storage path</h3>
+	 * <h3 class="zh-CN">附件文件的保存地址的Setter方法</h3>
      *
-     * @param storagePath the storage path
+     * @param storagePath   <span class="en">Attaches the file storage path</span>
+     *                      <span class="zh-CN">附件文件的保存地址</span>
      */
     public void setStoragePath(String storagePath) {
         this.storagePath = storagePath;
     }
-
     /**
-     * Gets certificate.
+	 * <h3 class="en">Getter method for base64 encoded binary data bytes of x509 certificate</h3>
+	 * <h3 class="zh-CN">Base64编码的x509证书二进制数组的Getter方法</h3>
      *
-     * @return the certificate
+	 * @return  <span class="en">Base64 encoded binary data bytes of x509 certificate</span>
+	 *          <span class="zh-CN">Base64编码的x509证书二进制数组</span>
      */
     public String getCertificate() {
         return certificate;
     }
-
     /**
-     * Sets certificate.
+	 * <h3 class="en">Setter method for base64 encoded binary data bytes of x509 certificate</h3>
+	 * <h3 class="zh-CN">Base64编码的x509证书二进制数组的Setter方法</h3>
      *
-     * @param certificate the certificate
+     * @param certificate   <span class="en">Base64 encoded binary data bytes of x509 certificate</span>
+     *                      <span class="zh-CN">Base64编码的x509证书二进制数组</span>
      */
     public void setCertificate(String certificate) {
         this.certificate = certificate;
     }
-
     /**
-     * Gets private key.
+	 * <h3 class="en">Getter method for base64 encoded binary data bytes of private key</h3>
+	 * <h3 class="zh-CN">Base64编码的私有密钥二进制数组的Getter方法</h3>
      *
-     * @return the private key
+	 * @return  <span class="en">Base64 encoded binary data bytes of private key</span>
+	 *          <span class="zh-CN">Base64编码的私有密钥二进制数组</span>
      */
     public String getPrivateKey() {
         return privateKey;
     }
-
     /**
-     * Sets private key.
+	 * <h3 class="en">Setter method for base64 encoded binary data bytes of private key</h3>
+	 * <h3 class="zh-CN">Base64编码的私有密钥二进制数组的Setter方法</h3>
      *
-     * @param privateKey the private key
+     * @param privateKey    <span class="en">Base64 encoded binary data bytes of private key</span>
+     *                      <span class="zh-CN">Base64编码的私有密钥二进制数组</span>
      */
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
     }
-
     /**
-     * The type Server config.
-     */
-    @XmlType(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
-    @XmlRootElement(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
-    @XmlAccessorType(XmlAccessType.NONE)
-    public static final class ServerConfig extends BeanObject {
-
-        private static final long serialVersionUID = -1768113760096890529L;
-
-        /**
-         * Host name
-         */
-        @XmlElement(name = "host_name")
-        private String hostName;
-        /**
-         * Host port
-         */
-        @XmlElement(name = "host_port")
-        private int hostPort;
-        /**
-         * Using SSL
-         */
-        @XmlElement(name = "ssl")
-        private boolean ssl;
-        /**
-         * Auth Login
-         */
-        @XmlElement(name = "auth_login")
-        private boolean authLogin;
-        /**
-         * Protocol option
-         */
-        @XmlElement(name = "protocol")
-        private MailProtocol protocolOption;
-        /**
-         * Connect timeout
-         */
-        @XmlElement(name = "connection_timeout")
-        private int connectionTimeout = 5;
-        /**
-         * Process time out
-         */
-        @XmlElement(name = "process_timeout")
-        private int processTimeout = 5;
-
-        /**
-         * Instantiates a new Server config.
-         */
-        public ServerConfig() {
-            this.hostName = Globals.DEFAULT_VALUE_STRING;
-        }
-
-        /**
-         * Gets serial version uid.
-         *
-         * @return the serial version uid
-         */
-        public static long getSerialVersionUID() {
-            return serialVersionUID;
-        }
-
-        /**
-         * Gets host name.
-         *
-         * @return the host name
-         */
-        public String getHostName() {
-            return hostName;
-        }
-
-        /**
-         * Sets host name.
-         *
-         * @param hostName the host name
-         */
-        public void setHostName(String hostName) {
-            this.hostName = hostName;
-        }
-
-        /**
-         * Gets host port.
-         *
-         * @return the host port
-         */
-        public int getHostPort() {
-            return hostPort;
-        }
-
-        /**
-         * Sets host port.
-         *
-         * @param hostPort the host port
-         */
-        public void setHostPort(int hostPort) {
-            this.hostPort = hostPort;
-        }
-
-        /**
-         * Is ssl boolean.
-         *
-         * @return the boolean
-         */
-        public boolean isSsl() {
-            return ssl;
-        }
-
-        /**
-         * Sets ssl.
-         *
-         * @param ssl the ssl
-         */
-        public void setSsl(boolean ssl) {
-            this.ssl = ssl;
-        }
-
-        /**
-         * Is auth login boolean.
-         *
-         * @return the boolean
-         */
-        public boolean isAuthLogin() {
-            return authLogin;
-        }
-
-        /**
-         * Sets auth login.
-         *
-         * @param authLogin the auth login
-         */
-        public void setAuthLogin(boolean authLogin) {
-            this.authLogin = authLogin;
-        }
-
-        /**
-         * Gets the protocol option.
-         *
-         * @return the protocol option
-         */
-        public MailProtocol getProtocolOption() {
-            return protocolOption;
-        }
-
-        /**
-         * Sets the protocol option.
-         *
-         * @param protocolOption the protocol option
-         */
-        public void setProtocolOption(MailProtocol protocolOption) {
-            this.protocolOption = protocolOption;
-        }
-
-        /**
-         * Gets connection timeout.
-         *
-         * @return the connection timeout
-         */
-        public int getConnectionTimeout() {
-            return connectionTimeout;
-        }
-
-        /**
-         * Sets connection timeout.
-         *
-         * @param connectionTimeout the connection timeout
-         */
-        public void setConnectionTimeout(int connectionTimeout) {
-            this.connectionTimeout = connectionTimeout;
-        }
-
-        /**
-         * Gets process timeout.
-         *
-         * @return the process timeout
-         */
-        public int getProcessTimeout() {
-            return processTimeout;
-        }
-
-        /**
-         * Sets process timeout.
-         *
-         * @param processTimeout the process timeout
-         */
-        public void setProcessTimeout(int processTimeout) {
-            this.processTimeout = processTimeout;
-        }
-    }
-
-    /**
-     * Copy properties.
+     * <h3 class="en">Copy configure information from given MailConfig instance</h3>
+     * <h3 class="zh-CN">从给定的MailConfig实例对象复制配置信息</h3>
      *
-     * @param mailConfig the mail config
+     * @param mailConfig    <span class="en">MailConfig instance</span>
+     *                      <span class="zh-CN">邮件配置信息实例对象</span>
      */
     public void copyProperties(final MailConfig mailConfig) {
         if (mailConfig == null) {
@@ -468,5 +332,211 @@ public final class MailConfig extends BeanObject {
         this.storagePath = mailConfig.getStoragePath();
         this.certificate = mailConfig.getCertificate();
         this.privateKey = getPrivateKey();
+    }
+    /**
+     * <h2 class="en">Mail server configure information define</h2>
+     * <h2 class="zh-CN">邮件服务器配置信息定义</h2>
+     *
+     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:09:18 $
+     */
+    @XmlType(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
+    @XmlRootElement(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
+    @XmlAccessorType(XmlAccessType.NONE)
+    public static final class ServerConfig extends BeanObject {
+        /**
+         * <span class="en">Serial version UID</span>
+         * <span class="zh-CN">序列化UID</span>
+         */
+        private static final long serialVersionUID = -1768113760096890529L;
+        /**
+         * <span class="en">Mail server domain name</span>
+         * <span class="zh-CN">邮件服务器域名</span>
+         */
+        @XmlElement(name = "host_name")
+        private String hostName;
+        /**
+         * <span class="en">Mail server port</span>
+         * <span class="zh-CN">邮件服务器端口号</span>
+         */
+        @XmlElement(name = "host_port")
+        private int hostPort;
+        /**
+         * <span class="en">Using secure connection to host server</span>
+         * <span class="zh-CN">使用安全连接到邮件服务器</span>
+         */
+        @XmlElement(name = "ssl")
+        private boolean ssl;
+        /**
+         * <span class="en">Host server authenticate login</span>
+         * <span class="zh-CN">邮件服务器需要身份验证</span>
+         */
+        @XmlElement(name = "auth_login")
+        private boolean authLogin;
+        /**
+         * <span class="en">Mail server protocol</span>
+         * <span class="zh-CN">邮件服务器协议</span>
+         */
+        @XmlElement(name = "protocol")
+        private MailProtocol protocolOption;
+        /**
+         * <span class="en">Connection timeout(Unit: seconds)</span>
+         * <span class="zh-CN">连接超时时间（单位：秒）</span>
+         */
+        @XmlElement(name = "connection_timeout")
+        private int connectionTimeout = 5;
+        /**
+         * <span class="en">Process timeout(Unit: seconds)</span>
+         * <span class="zh-CN">操作超时时间（单位：秒）</span>
+         */
+        @XmlElement(name = "process_timeout")
+        private int processTimeout = 5;
+        /**
+         * <h3 class="en">Constructor method for ServerConfig</h3>
+         * <h3 class="zh-CN">ServerConfig构造方法</h3>
+         */
+        public ServerConfig() {
+            this.hostName = Globals.DEFAULT_VALUE_STRING;
+        }
+        /**
+         * <h3 class="en">Getter method for mail server domain name</h3>
+         * <h3 class="zh-CN">邮件服务器域名的Getter方法</h3>
+         *
+         * @return  <span class="en">Mail server domain name</span>
+         *          <span class="zh-CN">邮件服务器域名</span>
+         */
+        public String getHostName() {
+            return hostName;
+        }
+        /**
+         * <h3 class="en">Setter method for mail server domain name</h3>
+         * <h3 class="zh-CN">邮件服务器域名的Setter方法</h3>
+         *
+         * @param hostName  <span class="en">Mail server domain name</span>
+         *                  <span class="zh-CN">邮件服务器域名</span>
+         */
+        public void setHostName(String hostName) {
+            this.hostName = hostName;
+        }
+        /**
+         * <h3 class="en">Getter method for mail server port</h3>
+         * <h3 class="zh-CN">邮件服务器端口号的Getter方法</h3>
+         *
+         * @return  <span class="en">Mail server port</span>
+         *          <span class="zh-CN">邮件服务器端口号</span>
+         */
+        public int getHostPort() {
+            return hostPort;
+        }
+        /**
+         * <h3 class="en">Setter method for mail server port</h3>
+         * <h3 class="zh-CN">邮件服务器端口号的Setter方法</h3>
+         *
+         * @param hostPort  <span class="en">Mail server port</span>
+         *                  <span class="zh-CN">邮件服务器端口号</span>
+         */
+        public void setHostPort(int hostPort) {
+            this.hostPort = hostPort;
+        }
+        /**
+         * <h3 class="en">Getter method for using secure connection to host server</h3>
+         * <h3 class="zh-CN">使用安全连接到邮件服务器的Getter方法</h3>
+         *
+         * @return  <span class="en">Using secure connection to host server</span>
+         *          <span class="zh-CN">使用安全连接到邮件服务器</span>
+         */
+        public boolean isSsl() {
+            return ssl;
+        }
+        /**
+         * <h3 class="en">Setter method for using secure connection to host server</h3>
+         * <h3 class="zh-CN">使用安全连接到邮件服务器的Setter方法</h3>
+         *
+         * @param ssl   <span class="en">Using secure connection to host server</span>
+         *              <span class="zh-CN">使用安全连接到邮件服务器</span>
+         */
+        public void setSsl(boolean ssl) {
+            this.ssl = ssl;
+        }
+        /**
+         * <h3 class="en">Getter method for host server authenticate login</h3>
+         * <h3 class="zh-CN">邮件服务器需要身份验证的Getter方法</h3>
+         *
+         * @return  <span class="en">Host server authenticate login</span>
+         *          <span class="zh-CN">邮件服务器需要身份验证</span>
+         */
+        public boolean isAuthLogin() {
+            return authLogin;
+        }
+        /**
+         * <h3 class="en">Setter method for host server authenticate login</h3>
+         * <h3 class="zh-CN">邮件服务器需要身份验证的Setter方法</h3>
+         *
+         * @param authLogin     <span class="en">Host server authenticate login</span>
+         *                      <span class="zh-CN">邮件服务器需要身份验证</span>
+         */
+        public void setAuthLogin(boolean authLogin) {
+            this.authLogin = authLogin;
+        }
+        /**
+         * <h3 class="en">Getter method for mail server protocol</h3>
+         * <h3 class="zh-CN">邮件服务器协议的Getter方法</h3>
+         *
+         * @return  <span class="en">Mail server protocol</span>
+         *          <span class="zh-CN">邮件服务器协议</span>
+         */
+        public MailProtocol getProtocolOption() {
+            return protocolOption;
+        }
+        /**
+         * <h3 class="en">Setter method for mail server protocol</h3>
+         * <h3 class="zh-CN">邮件服务器协议的Setter方法</h3>
+         *
+         * @param protocolOption    <span class="en">Mail server protocol</span>
+         *                          <span class="zh-CN">邮件服务器协议</span>
+         */
+        public void setProtocolOption(MailProtocol protocolOption) {
+            this.protocolOption = protocolOption;
+        }
+        /**
+         * <h3 class="en">Getter method for connection timeout</h3>
+         * <h3 class="zh-CN">连接超时时间的Getter方法</h3>
+         *
+         * @return  <span class="en">Connection timeout(Unit: seconds)</span>
+         *          <span class="zh-CN">连接超时时间（单位：秒）</span>
+         */
+        public int getConnectionTimeout() {
+            return connectionTimeout;
+        }
+        /**
+         * <h3 class="en">Setter method for connection timeout</h3>
+         * <h3 class="zh-CN">连接超时时间的Setter方法</h3>
+         *
+         * @param connectionTimeout     <span class="en">Connection timeout(Unit: seconds)</span>
+         *                              <span class="zh-CN">连接超时时间（单位：秒）</span>
+         */
+        public void setConnectionTimeout(int connectionTimeout) {
+            this.connectionTimeout = connectionTimeout;
+        }
+        /**
+         * <h3 class="en">Getter method for process timeout</h3>
+         * <h3 class="zh-CN">操作超时时间的Getter方法</h3>
+         *
+         * @return  <span class="en">Process timeout(Unit: seconds)</span>
+         *          <span class="zh-CN">操作超时时间（单位：秒）</span>
+         */
+        public int getProcessTimeout() {
+            return processTimeout;
+        }
+        /**
+         * <h3 class="en">Setter method for process timeout</h3>
+         * <h3 class="zh-CN">操作超时时间的Setter方法</h3>
+         *
+         * @param processTimeout    <span class="en">Process timeout(Unit: seconds)</span>
+         *                          <span class="zh-CN">操作超时时间（单位：秒）</span>
+         */
+        public void setProcessTimeout(int processTimeout) {
+            this.processTimeout = processTimeout;
+        }
     }
 }

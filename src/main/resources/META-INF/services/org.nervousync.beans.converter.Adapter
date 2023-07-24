@@ -1,0 +1,15 @@
+org.nervousync.beans.converter.impl.beans.BeanStringAdapter
+org.nervousync.beans.converter.impl.basic.BigDecimalStringAdapter
+org.nervousync.beans.converter.impl.basic.BigIntegerStringAdapter
+org.nervousync.beans.converter.impl.basic.BooleanStringAdapter
+org.nervousync.beans.converter.impl.blob.Base32Adapter
+org.nervousync.beans.converter.impl.blob.Base64Adapter
+org.nervousync.beans.converter.impl.basic.ByteStringAdapter
+org.nervousync.beans.converter.impl.basic.DoubleStringAdapter
+org.nervousync.beans.converter.impl.basic.FloatStringAdapter
+org.nervousync.beans.converter.impl.basic.IntegerStringAdapter
+org.nervousync.beans.converter.impl.basic.LongStringAdapter
+org.nervousync.beans.converter.impl.basic.ShortStringAdapter
+org.nervousync.beans.converter.impl.beans.JsonStringAdapter
+org.nervousync.beans.converter.impl.beans.XmlStringAdapter
+org.nervousync.beans.converter.impl.beans.YamlStringAdapter

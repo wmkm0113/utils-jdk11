@@ -18,29 +18,43 @@ package org.nervousync.mail.authenticator;
 
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.utils.StringUtils;
 
 /**
- * Username and password authenticator for SMTP/POP3/IMAP server
+ * <h2 class="en">Username and password authenticator for SMTP/POP3/IMAP server</h2>
+ * <h2 class="zh-CN">用于SMTP/POP3/IMAP服务器用户名、密码的身份验证器</h2>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 8:56:49 PM $
+ * @version $Revision: 1.0 $ $Date: Jul 31, 2012 20:56:49 $
  */
 public final class DefaultAuthenticator extends Authenticator {
-
-	private final PasswordAuthentication passwordAuthentication;
-	
 	/**
-	 * Initialize authenticator
-	 * @param username		Authenticate username
-	 * @param password		Authenticate password
+	 * <span class="en">A repository for a user name and a password.</span>
+	 * <span class="zh-CN">存储用户名密码的仓库</span>
+	 */
+	private final PasswordAuthentication passwordAuthentication;
+	/**
+	 * <h3 class="en">Constructor method for DefaultAuthenticator</h3>
+	 * <h3 class="zh-CN">DefaultAuthenticator构造方法</h3>
+	 *
+	 * @param username 	<span class="en">Authenticate username</span>
+	 *                  <span class="zh-CN">验证用户名</span>
+	 * @param password 	<span class="en">Authenticate password</span>
+	 *                  <span class="zh-CN">验证密码</span>
 	 */
 	public DefaultAuthenticator(String username, String password) {
 		this.passwordAuthentication =
 				new PasswordAuthentication(StringUtils.notBlank(username) ? username : Globals.DEFAULT_VALUE_STRING,
 						StringUtils.notBlank(password) ? password : Globals.DEFAULT_VALUE_STRING);
 	}
-	
+	/**
+	 * <h3 class="en">Getter method for repository for a user name and a password.</h3>
+	 * <h3 class="zh-CN">存储用户名密码的仓库的Getter方法</h3>
+	 *
+	 * @return 	<span class="en">A repository for a user name and a password.</span>
+	 * 			<span class="zh-CN">存储用户名密码的仓库</span>
+	 */
 	@Override
 	protected PasswordAuthentication getPasswordAuthentication(){
 		return this.passwordAuthentication;

@@ -17,27 +17,35 @@
 package org.nervousync.generator;
 
 /**
- * The interface Generator.
+ * <h2 class="en">Interface class of ID generator</h2>
+ * <h2 class="zh-CN">ID生成器的接口</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:37:26 $
  */
 public interface IGenerator<T> {
-
     /**
-     * Random object.
+	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return the object
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
      */
-    T random();
-
+    T generate();
     /**
-     * Random object.
+	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes the data bytes
-     * @return the object
+     * @param dataBytes     <span class="en">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
      */
-    T random(byte[] dataBytes);
-
+    T generate(byte[] dataBytes);
     /**
-     * Destroy generator
+	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     void destroy();
 }

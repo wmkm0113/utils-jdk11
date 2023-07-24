@@ -19,15 +19,20 @@ package org.nervousync.commons.snmp;
 import org.nervousync.beans.snmp.SNMPData;
 
 /**
- * SNMP Operator
+ * <h2 class="en">SNMP data operator interface class</h2>
+ * <h2 class="zh-CN">SNMP数据处理器接口</h2>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 25, 2017 10:28:31 PM $
+ * @version $Revision: 1.0 $ $Date: Oct 25, 2017 10:28:31 $
  */
 public interface SNMPDataOperator {
 
 	/**
-	 * Parse and analyze datas
-	 * @param snmpData	SNMP data
+     * <h3 class="en">Process given SNMPData instance</h3>
+     * <h3 class="zh-CN">处理给定的SNMPData实例对象</h3>
+	 *
+	 * @param snmpData 	<span class="en">SNMPData instance</span>
+	 *                  <span class="zh-CN">SNMPData实例对象</span>
 	 */
 	void operateData(SNMPData snmpData);
 }

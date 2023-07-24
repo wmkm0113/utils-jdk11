@@ -21,621 +21,966 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.exceptions.zip.ZipException;
 
 /**
- * RAW data process utils
+ * <h2 class="en">Raw data process utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Read boolean/short/int/long/String from binary data bytes</ul>
+ *     <ul>Write boolean/short/int/long/String into binary data bytes</ul>
+ *     <ul>Convert char array to binary data bytes</ul>
+ *     <ul>Convert bit array to byte</ul>
+ * </span>
+ * <h2 class="zh-CN">二进制数据处理工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>从二进制数组中读取boolean/short/int/long/String类型的数据</ul>
+ *     <ul>向二进制数组中写入boolean/short/int/long/String类型的数据</ul>
+ *     <ul>转换字节数组为二进制数组</ul>
+ *     <ul>转换位数组为字节</ul>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 28, 2017 5:34:55 PM $
+ * @version $Revision : 1.0 $ $Date: Nov 28, 2017 17:34:55 $
  */
 public final class RawUtils {
-
+	/**
+	 * <span class="en">Default index of data bytes</span>
+	 * <span class="zh-CN">默认的数组起始下标</span>
+	 */
 	private static final int DEFAULT_INDEX = 0;
-
+	/**
+	 * <h3 class="en">Private constructor for RawUtils</h3>
+	 * <h3 class="zh-CN">二进制数据处理工具集的私有构造方法</h3>
+	 */
 	private RawUtils() {
 	}
-
 	/**
-	 * Read boolean value from index 0 of data bytes
+ 	 * <h3 class="en">Read boolean from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取boolean类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @return <code>true</code> If value is 1 or <code>false</code> for otherwise
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 *
+	 * @return 	<span class="en"><code>true</code> If value is 1 or <code>false</code> for otherwise</span>
+	 * 			<span class="zh-CN">如果读取的数据为数字1则返回<code>true</code>，其他情况返回<code>false</code></span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static boolean readBoolean(byte[] dataBytes) throws DataInvalidException {
+	public static boolean readBoolean(final byte[] dataBytes) throws DataInvalidException {
 		return readBoolean(dataBytes, DEFAULT_INDEX);
 	}
-
 	/**
-	 * Read boolean value from the position of data bytes
+ 	 * <h3 class="en">Read boolean from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取boolean类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @return <code>true</code> If value is 1 or <code>false</code> for otherwise
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 *
+	 * @return 	<span class="en"><code>true</code> If value is 1 or <code>false</code> for otherwise</span>
+	 * 			<span class="zh-CN">如果读取的数据为数字1则返回<code>true</code>，其他情况返回<code>false</code></span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static boolean readBoolean(byte[] dataBytes, int position) throws DataInvalidException {
+	public static boolean readBoolean(final byte[] dataBytes, final int position) throws DataInvalidException {
 		if (dataBytes.length <= position) {
-			throw new DataInvalidException(
-					"Array index out of bounds! Array length: " + dataBytes.length + " position: " + position);
+			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
 		}
-		return dataBytes[position] == Globals.NERVOUSYNC_STATUS_TRUE;
+		return dataBytes[position] == Globals.DEFAULT_STATUS_TRUE;
 	}
-
 	/**
-	 * Write boolean value to data bytes
+ 	 * <h3 class="en">Write boolean into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入boolean类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Boolean value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeBoolean(byte[] dataBytes, boolean value) throws DataInvalidException {
+	public static void writeBoolean(final byte[] dataBytes, final boolean value) throws DataInvalidException {
 		writeBoolean(dataBytes, DEFAULT_INDEX, value);
 	}
-
 	/**
-	 * Write boolean value to target position of data bytes or do nothing if position is out of byte array length
+ 	 * <h3 class="en">Write boolean into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入boolean类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Boolean value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeBoolean(byte[] dataBytes, int position, boolean value) throws DataInvalidException {
+	public static void writeBoolean(final byte[] dataBytes, final int position, final boolean value)
+			throws DataInvalidException {
 		if (dataBytes.length <= position) {
-			throw new DataInvalidException(
-					"Array index out of bounds! Array length: " + dataBytes.length + " position: " + position);
+			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
 		}
-		dataBytes[position] = (byte) (value ? Globals.NERVOUSYNC_STATUS_TRUE : Globals.NERVOUSYNC_STATUS_FALSE);
+		dataBytes[position] = (byte) (value ? Globals.DEFAULT_STATUS_TRUE : Globals.DEFAULT_STATUS_FALSE);
 	}
-
 	/**
-	 * Read short value from index 0 of data bytes
+ 	 * <h3 class="en">Read short from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @return Read short value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static short readShort(byte[] dataBytes) throws DataInvalidException {
+	public static short readShort(final byte[] dataBytes) throws DataInvalidException {
 		return readShort(dataBytes, DEFAULT_INDEX);
 	}
-
 	/**
-	 * Read short value from index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Read short from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @return Read short value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static short readShort(byte[] dataBytes, ByteOrder byteOrder) throws DataInvalidException {
+	public static short readShort(final byte[] dataBytes, final ByteOrder byteOrder) throws DataInvalidException {
 		return readShort(dataBytes, DEFAULT_INDEX, byteOrder);
 	}
-
 	/**
-	 * Read short value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read short from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @return Read short value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static short readShort(byte[] dataBytes, int position) throws DataInvalidException {
+	public static short readShort(final byte[] dataBytes, final int position) throws DataInvalidException {
 		return readShort(dataBytes, position, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read short value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read short from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @return Read short value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static short readShort(byte[] dataBytes, int position, ByteOrder byteOrder) throws DataInvalidException {
+	public static short readShort(final byte[] dataBytes, final int position, final ByteOrder byteOrder)
+			throws DataInvalidException {
 		return (short) readNumber(dataBytes, position, byteOrder, 2);
 	}
-
 	/**
-	 * Write short value to index 0 of data bytes
+ 	 * <h3 class="en">Write short into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeShort(byte[] dataBytes, short value) throws DataInvalidException {
+	public static void writeShort(final byte[] dataBytes, final short value) throws DataInvalidException {
 		writeShort(dataBytes, DEFAULT_INDEX, value);
 	}
-
 	/**
-	 * Write short value to index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Write short into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeShort(byte[] dataBytes, ByteOrder byteOrder, short value) throws DataInvalidException {
+	public static void writeShort(final byte[] dataBytes, final ByteOrder byteOrder, final short value)
+			throws DataInvalidException {
 		writeShort(dataBytes, DEFAULT_INDEX, byteOrder, value);
 	}
-
 	/**
-	 * Write short value to position of data bytes
+ 	 * <h3 class="en">Write short into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeShort(byte[] dataBytes, int position, short value) throws DataInvalidException {
+	public static void writeShort(final byte[] dataBytes, final int position, final short value)
+			throws DataInvalidException {
 		writeShort(dataBytes, position, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write short value to position of data bytes, endian by given
+ 	 * <h3 class="en">Write short into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入short类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeShort(byte[] dataBytes, int position, ByteOrder byteOrder, short value)
-			throws DataInvalidException {
+	public static void writeShort(final byte[] dataBytes, final int position,
+								  final ByteOrder byteOrder, final short value) throws DataInvalidException {
 		writeNumber(dataBytes, position, Short.SIZE, byteOrder, value);
 	}
-
 	/**
-	 * Read int value from index 0 of data bytes
+ 	 * <h3 class="en">Read int from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @return Read int value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static int readInt(byte[] dataBytes) throws DataInvalidException {
+	public static int readInt(final byte[] dataBytes) throws DataInvalidException {
 		return readInt(dataBytes, DEFAULT_INDEX);
 	}
-
 	/**
-	 * Read int value from index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Read int from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @return Read int value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static int readInt(byte[] dataBytes, ByteOrder byteOrder) throws DataInvalidException {
+	public static int readInt(final byte[] dataBytes, final ByteOrder byteOrder) throws DataInvalidException {
 		return readInt(dataBytes, DEFAULT_INDEX, byteOrder);
 	}
-
 	/**
-	 * Read int value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read int from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @return Read int value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static int readInt(byte[] dataBytes, int position) throws DataInvalidException {
+	public static int readInt(final byte[] dataBytes, final int position) throws DataInvalidException {
 		return readInt(dataBytes, position, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read int value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read int from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @return Read int value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static int readInt(byte[] dataBytes, int position, ByteOrder byteOrder) throws DataInvalidException {
+	public static int readInt(final byte[] dataBytes, final int position, final ByteOrder byteOrder)
+			throws DataInvalidException {
 		return (int) readNumber(dataBytes, position, byteOrder, 4);
 	}
-
 	/**
-	 * Write int value to index 0 of data bytes
+ 	 * <h3 class="en">Write int into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeInt(byte[] dataBytes, int value) throws DataInvalidException {
+	public static void writeInt(final byte[] dataBytes, final int value) throws DataInvalidException {
 		writeInt(dataBytes, DEFAULT_INDEX, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write int value to index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Write int into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeInt(byte[] dataBytes, ByteOrder byteOrder, int value) throws DataInvalidException {
+	public static void writeInt(final byte[] dataBytes, final ByteOrder byteOrder, final int value)
+			throws DataInvalidException {
 		writeInt(dataBytes, DEFAULT_INDEX, byteOrder, value);
 	}
-
 	/**
-	 * Write int value to position of data bytes
+ 	 * <h3 class="en">Write int into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeInt(byte[] dataBytes, int position, int value) throws DataInvalidException {
+	public static void writeInt(final byte[] dataBytes, final int position, final int value)
+			throws DataInvalidException {
 		writeInt(dataBytes, position, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write int value to position of data bytes, endian by given
+ 	 * <h3 class="en">Write int into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入int类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeInt(byte[] dataBytes, int position, ByteOrder byteOrder, int value) throws DataInvalidException {
+	public static void writeInt(final byte[] dataBytes, final int position,
+								final ByteOrder byteOrder, final int value) throws DataInvalidException {
 		writeNumber(dataBytes, position, Integer.SIZE, byteOrder, value);
 	}
-
 	/**
-	 * Read long value from index 0 of data bytes
+ 	 * <h3 class="en">Read long from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @return Read long value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static long readLong(byte[] dataBytes) throws DataInvalidException {
+	public static long readLong(final byte[] dataBytes) throws DataInvalidException {
 		return readLong(dataBytes, DEFAULT_INDEX);
 	}
-
 	/**
-	 * Read long value from index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Read long from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @return Read long value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static long readLong(byte[] dataBytes, ByteOrder byteOrder) throws DataInvalidException {
+	public static long readLong(final byte[] dataBytes, final ByteOrder byteOrder) throws DataInvalidException {
 		return readLong(dataBytes, DEFAULT_INDEX, byteOrder);
 	}
-
 	/**
-	 * Read long value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read long from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @return Read long value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static long readLong(byte[] dataBytes, int position) throws DataInvalidException {
+	public static long readLong(final byte[] dataBytes, final int position) throws DataInvalidException {
 		return readLong(dataBytes, position, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read long value from position of data bytes, endian by given
+ 	 * <h3 class="en">Read long from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @return Read long value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static long readLong(byte[] dataBytes, int position, ByteOrder byteOrder) throws DataInvalidException {
+	public static long readLong(final byte[] dataBytes, final int position, final ByteOrder byteOrder)
+			throws DataInvalidException {
 		return (long) readNumber(dataBytes, position, byteOrder, 8);
 	}
-
 	/**
-	 * Write long value to index 0 of data bytes
+ 	 * <h3 class="en">Write long into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeLong(byte[] dataBytes, long value) throws DataInvalidException {
+	public static void writeLong(final byte[] dataBytes, final long value) throws DataInvalidException {
 		writeLong(dataBytes, DEFAULT_INDEX, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write long value to index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Write long into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeLong(byte[] dataBytes, ByteOrder byteOrder, long value) throws DataInvalidException {
+	public static void writeLong(final byte[] dataBytes, final ByteOrder byteOrder, final long value)
+			throws DataInvalidException {
 		writeLong(dataBytes, DEFAULT_INDEX, byteOrder, value);
 	}
-
 	/**
-	 * Write long value to position of data bytes
+ 	 * <h3 class="en">Write long into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeLong(byte[] dataBytes, int position, long value) throws DataInvalidException {
+	public static void writeLong(final byte[] dataBytes, final int position, final long value)
+			throws DataInvalidException {
 		writeLong(dataBytes, position, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write long value to position of data bytes, endian by given
+ 	 * <h3 class="en">Write long into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入long类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @param value     Write value
-	 * @throws DataInvalidException If array index out of bounds or endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeLong(byte[] dataBytes, int position, ByteOrder byteOrder, long value)
-			throws DataInvalidException {
+	public static void writeLong(final byte[] dataBytes, final int position,
+								 final ByteOrder byteOrder, final long value) throws DataInvalidException {
 		writeNumber(dataBytes, position, Long.SIZE, byteOrder, value);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes) throws DataInvalidException {
 		return readString(dataBytes, Globals.DEFAULT_VALUE_INT);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param length    Data length
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int length) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int length) throws DataInvalidException {
 		return readString(dataBytes, DEFAULT_INDEX, length);
 	}
-
 	/**
-	 * Read string from position of data bytes
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param length    Data length
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int position, int length) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int position, final int length)
+			throws DataInvalidException {
 		return readString(dataBytes, position, length, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param length    Data length
-	 * @param byteOrder ByteOrder
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int length, ByteOrder byteOrder) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int length, final ByteOrder byteOrder)
+			throws DataInvalidException {
 		return readString(dataBytes, length, Globals.DEFAULT_ENCODING, byteOrder);
 	}
-
 	/**
-	 * Read string from position of data bytes, endian by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param length    Data length
-	 * @param byteOrder ByteOrder
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int position, int length, ByteOrder byteOrder)
-			throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int position,
+									final int length, final ByteOrder byteOrder) throws DataInvalidException {
 		return readString(dataBytes, position, length, Globals.DEFAULT_ENCODING, byteOrder);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes, encoding by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param length    Data length
-	 * @param encoding  String encoding
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds or encoding didn't support
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param encoding  	<span class="en">Charset encoding</span>
+	 *                      <span class="zh-CN">字符集编码</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int length, String encoding) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int length, final String encoding)
+			throws DataInvalidException {
 		return readString(dataBytes, length, encoding, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes, encoding by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param length    Data length
-	 * @param encoding  String encoding
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds or encoding didn't support
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param encoding  	<span class="en">Charset encoding</span>
+	 *                      <span class="zh-CN">字符集编码</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int position, int length, String encoding) throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int position,
+									final int length, final String encoding) throws DataInvalidException {
 		return readString(dataBytes, position, length, encoding, ByteOrder.BIG_ENDIAN);
 	}
-
 	/**
-	 * Read string from index 0 of data bytes, endian and encoding by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param length    Data length
-	 * @param encoding  String encoding
-	 * @param byteOrder ByteOrder
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param encoding  	<span class="en">Charset encoding</span>
+	 *                      <span class="zh-CN">字符集编码</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static String readString(byte[] dataBytes, int length, String encoding, ByteOrder byteOrder)
-			throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int length, final String encoding,
+									final ByteOrder byteOrder) throws DataInvalidException {
 		return readString(dataBytes, DEFAULT_INDEX, length, encoding, byteOrder);
 	}
-
 	/**
-	 * Read string from position of data bytes, endian and encoding by given
+ 	 * <h3 class="en">Read String from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param length    Data length
-	 * @param encoding  String encoding
-	 * @param byteOrder ByteOrder
-	 * @return Read string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param encoding  	<span class="en">Charset encoding</span>
+	 *                      <span class="zh-CN">字符集编码</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Read string</span>
+	 * 			<span class="zh-CN">读取的字符串</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds or charset encoding not supported</span>
+	 * <span class="zh-CN">如果数组下标越界或字符集编码不支持</span>
 	 */
-	public static String readString(byte[] dataBytes, int position, int length, String encoding, ByteOrder byteOrder)
-			throws DataInvalidException {
+	public static String readString(final byte[] dataBytes, final int position, final int length,
+									final String encoding, final ByteOrder byteOrder) throws DataInvalidException {
 		if (position < 0 || dataBytes == null) {
-			throw new DataInvalidException("Parameter invalid! ");
+			throw new DataInvalidException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
 		int readLength = (length == Globals.DEFAULT_VALUE_INT) ? dataBytes.length - position : length;
 		if (dataBytes.length < (position + readLength)) {
-			throw new DataInvalidException("No enough data to read! ");
+			throw new DataInvalidException(0x000000130002L, "Utils", "Length_Not_Enough_Raw_Error");
 		}
 		try {
 			byte[] readBytes = new byte[readLength];
 			initBuffer(dataBytes, position, readLength, byteOrder).get(readBytes);
 			return new String(readBytes, encoding);
 		} catch (UnsupportedEncodingException e) {
-			throw new DataInvalidException(e);
+			throw new DataInvalidException(0x000000FF0002L, "Utils", "Not_Support_Encoding_Error", e);
 		}
 	}
-
 	/**
-	 * Write string to index 0 of data bytes
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeString(byte[] dataBytes, String value) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final String value) throws DataInvalidException {
 		writeString(dataBytes, DEFAULT_INDEX, Globals.DEFAULT_ENCODING, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write string to target position of data bytes
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeString(byte[] dataBytes, int position, String value) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final int position, final String value)
+			throws DataInvalidException {
 		writeString(dataBytes, position, Globals.DEFAULT_ENCODING, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write string to index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeString(byte[] dataBytes, ByteOrder byteOrder, String value) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final ByteOrder byteOrder, final String value)
+			throws DataInvalidException {
 		writeString(dataBytes, DEFAULT_INDEX, byteOrder, value);
 	}
-
 	/**
-	 * Write string to target position of data bytes, endian by given
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param byteOrder ByteOrder
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	public static void writeString(byte[] dataBytes, int position, ByteOrder byteOrder, String value) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final int position,
+								   final ByteOrder byteOrder, final String value) throws DataInvalidException {
 		writeString(dataBytes, position, Globals.DEFAULT_ENCODING, byteOrder, value);
 	}
-
 	/**
-	 * Write string to index 0 of data bytes
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds or charset encoding not supported</span>
+	 * <span class="zh-CN">如果数组下标越界或字符集编码不支持</span>
 	 */
-	public static void writeString(byte[] dataBytes, String value, String encoding) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final String value, final String encoding)
+			throws DataInvalidException {
 		writeString(dataBytes, ByteOrder.BIG_ENDIAN, value, encoding);
 	}
-
 	/**
-	 * Write string to target position of data bytes
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds or charset encoding not supported</span>
+	 * <span class="zh-CN">如果数组下标越界或字符集编码不支持</span>
 	 */
-	public static void writeString(byte[] dataBytes, int position, String value, String encoding) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final int position,
+								   final String value, final String encoding) throws DataInvalidException {
 		writeString(dataBytes, position, encoding, ByteOrder.BIG_ENDIAN, value);
 	}
-
 	/**
-	 * Write string to index 0 of data bytes, endian by given
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param byteOrder ByteOrder
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds or charset encoding not supported</span>
+	 * <span class="zh-CN">如果数组下标越界或字符集编码不支持</span>
 	 */
-	public static void writeString(byte[] dataBytes, ByteOrder byteOrder, String value, String encoding) throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final ByteOrder byteOrder,
+								   final String value, final String encoding) throws DataInvalidException {
 		writeString(dataBytes, DEFAULT_INDEX, encoding, byteOrder, value);
 	}
-
 	/**
-	 * Write string to target position of data bytes, encoding and endian by given
+ 	 * <h3 class="en">Write String into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入String类型的数据</h3>
 	 *
-	 * @param dataBytes Data bytes
-	 * @param position  Position index
-	 * @param encoding  String encoding
-	 * @param byteOrder ByteOrder
-	 * @param value     Write string
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid or encoding not supported
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param encoding  	<span class="en">Charset encoding</span>
+	 *                      <span class="zh-CN">字符集编码</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds or charset encoding not supported</span>
+	 * <span class="zh-CN">如果数组下标越界或字符集编码不支持</span>
 	 */
-	public static void writeString(byte[] dataBytes, int position, String encoding, ByteOrder byteOrder, String value)
-			throws DataInvalidException {
+	public static void writeString(final byte[] dataBytes, final int position, final String encoding,
+								   final ByteOrder byteOrder, final String value) throws DataInvalidException {
 		if (StringUtils.isEmpty(value)) {
 			return;
 		}
-
 		try {
 			byte[] valueBytes = initBuffer(value.getBytes(encoding), byteOrder).array();
 			if ((position + valueBytes.length) <= dataBytes.length) {
 				System.arraycopy(valueBytes, 0, dataBytes, position, valueBytes.length);
 			} else {
-				throw new DataInvalidException("Array index out of bounds! Array length: "
-						+ dataBytes.length + " position: " + position + " length: " + valueBytes.length);
+				throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+						dataBytes.length, position, valueBytes.length);
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new DataInvalidException(e);
+			throw new DataInvalidException(0x000000FF0002L, "Utils", "Not_Support_Encoding_Error", e);
 		}
 	}
-
 	/**
-	 * Convert char arrays to byte arrays
+	 * <h3 class="en">Convert char array to binary data bytes</h3>
+	 * <h3 class="zh-CN">转换字节数组为二进制数组</h3>
 	 *
-	 * @param charArray char arrays
-	 * @return Convert byte arrays
+	 * @param charArray 	<span class="en">char array</span>
+	 *                      <span class="zh-CN">字节数组</span>
+	 *
+	 * @return 	<span class="en">Converted Binary data bytes</span>
+	 *          <span class="zh-CN">转换后的二进制字节数组</span>
 	 */
-	public static byte[] charArrayToByteArray(char[] charArray) {
+	public static byte[] charArrayToByteArray(final char[] charArray) {
 		if (charArray == null) {
 			throw new NullPointerException();
 		}
@@ -648,25 +993,31 @@ public final class RawUtils {
 
 		return bytes;
 	}
-
 	/**
-	 * Convert bit arrays to byte
+	 * <h3 class="en">Convert bit array to byte</h3>
+	 * <h3 class="zh-CN">转换位数组为字节</h3>
 	 *
-	 * @param bitArray bit arrays
-	 * @return Convert byte value
-	 * @throws ZipException bitArray is null or invalid
+	 * @param bitArray 	<span class="en">bit array</span>
+	 *                  <span class="zh-CN">位数组</span>
+	 *
+	 * @return 	<span class="en">Converted byte value</span>
+	 *          <span class="zh-CN">转换后的字节值</span>
+	 *
+	 * @throws ZipException
+	 * <span class="en">If bitArray is null or invalid</span>
+	 * <span class="zh-CN">如果位数组为null或者长度非法</span>
 	 */
-	public static byte bitArrayToByte(int[] bitArray) throws ZipException {
+	public static byte bitArrayToByte(final int[] bitArray) throws ZipException {
 		if (bitArray == null) {
-			throw new ZipException("Bit array is null!");
+			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
 
 		if (bitArray.length != 8) {
-			throw new ZipException("Invalid bit array length!");
+			throw new ZipException(0x000000130003L, "Utils", "Length_Bits_Invalid_Raw_Error");
 		}
 
 		if (Arrays.stream(bitArray).anyMatch(bit -> (bit != 0 && bit != 1))) {
-			throw new ZipException("Invalid bits provided!");
+			throw new ZipException(0x000000130004L, "Utils", "Data_Bits_Invalid_Raw_Error");
 		}
 
 		int calValue = 0;
@@ -675,47 +1026,82 @@ public final class RawUtils {
 		}
 		return (byte)calValue;
 	}
-
 	/**
-	 * Initialize ByteBuffer by given data bytes and endian
+	 * <h3 class="en">Initialize ByteBuffer by given data bytes and byte order type</h3>
+	 * <h3 class="zh-CN">使用给定的字节数组和排序类型初始化ByteBuffer实例对象</h3>
 	 *
-	 * @param dataBytes		Data array
-	 * @param byteOrder 	ByteOrder
-	 * @return				Initialized ByteBuffer instance
-	 * @throws DataInvalidException	If endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Initialized ByteBuffer instance</span>
+	 * 			<span class="zh-CN">初始化的ByteBuffer实例对象</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	private static ByteBuffer initBuffer(byte[] dataBytes, ByteOrder byteOrder) throws DataInvalidException {
+	private static ByteBuffer initBuffer(final byte[] dataBytes, final ByteOrder byteOrder)
+			throws DataInvalidException {
 		return initBuffer(dataBytes, 0, dataBytes.length, byteOrder);
 	}
-
 	/**
-	 * Initialize ByteBuffer by given data bytes and endian
+	 * <h3 class="en">Initialize ByteBuffer by given data bytes and byte order type</h3>
+	 * <h3 class="zh-CN">使用给定的字节数组和排序类型初始化ByteBuffer实例对象</h3>
 	 *
-	 * @param dataBytes		Data array
-	 * @param position 		Position index
-	 * @param length 		Data length
-	 * @param byteOrder		ByteOrder
-	 * @return				Initialized ByteBuffer instance
-	 * @throws DataInvalidException If array index out of bounds, endian is invalid
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param length    	<span class="en">Read data bytes length</span>
+	 *                      <span class="zh-CN">读取的二进制字节长度</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 *
+	 * @return 	<span class="en">Initialized ByteBuffer instance</span>
+	 * 			<span class="zh-CN">初始化的ByteBuffer实例对象</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
 	 */
-	private static ByteBuffer initBuffer(byte[] dataBytes, int position, int length, ByteOrder byteOrder)
-			throws DataInvalidException {
+	private static ByteBuffer initBuffer(final byte[] dataBytes, final int position, final int length,
+										 final ByteOrder byteOrder) throws DataInvalidException {
 		if (dataBytes.length < (position + length)) {
-			throw new DataInvalidException("Array index out of bounds! Array length: "
-					+ dataBytes.length + " position: " + position + " length: " + length);
+			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+					dataBytes.length, position, length);
 		}
 		return ByteBuffer.wrap(dataBytes, position, length).order(byteOrder);
 	}
-
+	/**
+ 	 * <h3 class="en">Write number into binary data bytes</h3>
+ 	 * <h3 class="zh-CN">向二进制数组中写入数值类型的数据</h3>
+	 *
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param dataSize 		<span class="en">Data bytes length</span>
+	 *                      <span class="zh-CN">写入的数据长度</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param value     	<span class="en">Write value</span>
+	 *                      <span class="zh-CN">写入的数据</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
+	 */
 	private static void writeNumber(final byte[] dataBytes, final int position, final int dataSize,
 									final ByteOrder byteOrder, final Object value) throws DataInvalidException {
 		if (dataSize % Byte.SIZE != 0) {
-			throw new DataInvalidException("Data size invalid.");
+			throw new DataInvalidException(0x000000130005L, "Utils", "Data_Size_Invalid_Raw_Error");
 		}
 		int dataLength = dataSize / Byte.SIZE;
 		if (dataBytes.length < (position + dataLength)) {
-			throw new DataInvalidException("Array index out of bounds! Array length: "
-					+ dataBytes.length + " position: " + position + " length: " + dataLength);
+			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+					dataBytes.length, position, dataLength);
 		}
 		final ByteBuffer byteBuffer = initBuffer(dataBytes, position, dataLength, byteOrder);
 		switch (dataSize) {
@@ -729,15 +1115,34 @@ public final class RawUtils {
 				byteBuffer.putLong((long) value);
 				break;
 			default:
-				throw new DataInvalidException("Unknown data length");
+				throw new DataInvalidException(0x000000130006L, "Utils", "Data_Size_Unknown_Raw_Error");
 		}
 	}
-
+	/**
+ 	 * <h3 class="en">Read number from binary data bytes</h3>
+ 	 * <h3 class="zh-CN">从二进制数组中读取数值类型的数据</h3>
+	 *
+	 * @param dataBytes 	<span class="en">Binary data bytes</span>
+	 *                      <span class="zh-CN">二进制字节数组</span>
+	 * @param position  	<span class="en">Begin position of data bytes</span>
+	 *                      <span class="zh-CN">字节数组的起始下标</span>
+	 * @param byteOrder 	<span class="en">Byte order type</span>
+	 *                      <span class="zh-CN">大端/小端</span>
+	 * @param dataLength 	<span class="en">Data bytes length</span>
+	 *                      <span class="zh-CN">读取的数据长度</span>
+	 *
+	 * @return 	<span class="en">Read value</span>
+	 * 			<span class="zh-CN">读取的数值</span>
+	 *
+	 * @throws DataInvalidException
+	 * <span class="en">If array index out of bounds</span>
+	 * <span class="zh-CN">如果数组下标越界</span>
+	 */
 	private static Object readNumber(final byte[] dataBytes, final int position, final ByteOrder byteOrder,
 									 final int dataLength) throws DataInvalidException {
 		if (dataBytes.length < (position + dataLength)) {
-			throw new DataInvalidException("Array index out of bounds! Array length: "
-					+ dataBytes.length + " position: " + position + " length: 8");
+			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+					dataBytes.length, position, 8);
 		}
 		final ByteBuffer byteBuffer = initBuffer(dataBytes, position, dataLength, byteOrder);
 		switch (dataLength) {
@@ -748,7 +1153,7 @@ public final class RawUtils {
 			case 8:
 				return byteBuffer.getLong();
 			default:
-				throw new DataInvalidException("Unknown data length");
+				throw new DataInvalidException(0x000000130006L, "Utils", "Data_Size_Unknown_Raw_Error");
 		}
 	}
 }

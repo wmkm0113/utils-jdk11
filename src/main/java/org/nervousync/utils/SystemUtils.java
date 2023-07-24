@@ -22,268 +22,324 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import org.nervousync.commons.core.Globals;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.commons.Globals;
 
 import org.nervousync.beans.network.NetworkInfo;
 import org.nervousync.exceptions.beans.network.NetworkInfoException;
 
 /**
- * The type System utils.
+ * <h2 class="en">System Utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Retrieve current system information.</ul>
+ *     <ul>Retrieve current system Java runtime information.</ul>
+ *     <ul>Generate unique identified ID for current system.</ul>
+ * </span>
+ * <h2 class="zh-CN">系统工具</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>获取当前系统信息</ul>
+ *     <ul>获取当前系统中的Java运行环境信息</ul>
+ *     <ul>生成当前系统的唯一标识ID</ul>
+ * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:43:24 AM $
+ * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:43:24 $
  */
 public final class SystemUtils {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SystemUtils.class);
-	
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+	private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(SystemUtils.class);
+    /**
+     * <span class="en">Default certificate library path of Java runtime</span>
+     * <span class="zh-CN">Java运行环境默认证书库地址</span>
+     */
 	private static final String JAVA_CERT_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "lib"
 			+ Globals.DEFAULT_PAGE_SEPARATOR + "security" + Globals.DEFAULT_PAGE_SEPARATOR + "cacerts";
-
 	/**
-	 * The constant OPERATE_SYSTEM_NAME.
+     * <span class="en">Current operating system name</span>
+     * <span class="zh-CN">当前操作系统名称</span>
 	 */
 	public static final String OPERATE_SYSTEM_NAME = System.getProperty("os.name");
 	/**
-	 * The constant OPERATE_SYSTEM_VERSION.
+     * <span class="en">Current operating system version</span>
+     * <span class="zh-CN">当前操作系统版本</span>
 	 */
 	public static final String OPERATE_SYSTEM_VERSION = System.getProperty("os.version");
 	/**
-	 * The constant JAVA_HOME.
+     * <span class="en">Current JRE home folder path</span>
+     * <span class="zh-CN">当前JRE主目录地址</span>
 	 */
 	public static final String JAVA_HOME = System.getProperty("java.home");
 	/**
-	 * The constant JAVA_VERSION.
+     * <span class="en">Current JDK version</span>
+     * <span class="zh-CN">当前JDK版本信息</span>
 	 */
-	public static final String JAVA_VERSION = System.getProperty("java.version");
+	public static final String JDK_VERSION = System.getProperty("java.version");
 	/**
-	 * The constant JAVA_TMP_DIR.
+     * <span class="en">Current JDK tmp directory path</span>
+     * <span class="zh-CN">当前JDK临时目录地址</span>
 	 */
 	public static final String JAVA_TMP_DIR = System.getProperty("java.io.tmpdir");
 	/**
-	 * The constant USER_NAME.
+     * <span class="en">Current username</span>
+     * <span class="zh-CN">当前用户名</span>
 	 */
 	public static final String USER_NAME = System.getProperty("user.name");
 	/**
-	 * The constant USER_HOME.
+     * <span class="en">Current user home directory path</span>
+     * <span class="zh-CN">当前用户主目录地址</span>
 	 */
 	public static final String USER_HOME = System.getProperty("user.home");
 	/**
-	 * The constant USER_DIR.
+     * <span class="en">Current user work directory path</span>
+     * <span class="zh-CN">当前用户工作目录地址</span>
 	 */
 	public static final String USER_DIR = System.getProperty("user.dir");
-
+	/**
+     * <span class="en">Major version of current JDK version</span>
+     * <span class="zh-CN">当前JDK的主版本号</span>
+	 */
 	public static final int MAJOR_VERSION;
-
+	/**
+     * <span class="en">System identified ID</span>
+     * <span class="zh-CN">系统标识ID</span>
+	 */
 	private static final String IDENTIFIED_KEY = SystemUtils.generateIdentifiedKey();
 
 	static {
-		if (JAVA_VERSION.startsWith("1.8.")) {
+		if (JDK_VERSION.startsWith("1.8.")) {
 			MAJOR_VERSION = 8;
-		} else if (JAVA_VERSION.startsWith("1.7.")) {
+		} else if (JDK_VERSION.startsWith("1.7.")) {
 			MAJOR_VERSION = 7;
-		} else if (JAVA_VERSION.startsWith("1.6.")) {
+		} else if (JDK_VERSION.startsWith("1.6.")) {
 			MAJOR_VERSION = 6;
-		} else if (JAVA_VERSION.startsWith("1.5.")) {
+		} else if (JDK_VERSION.startsWith("1.5.")) {
 			MAJOR_VERSION = 5;
-		} else if (JAVA_VERSION.startsWith("1.")) {
+		} else if (JDK_VERSION.startsWith("1.")) {
 			MAJOR_VERSION = Globals.DEFAULT_VALUE_INT;
 		} else {
-			MAJOR_VERSION = JAVA_VERSION.indexOf(".") > 0
-					? Integer.parseInt(JAVA_VERSION.substring(0, JAVA_VERSION.indexOf(".")))
-					: Integer.parseInt(JAVA_VERSION);
+			MAJOR_VERSION = JDK_VERSION.indexOf(".") > 0
+					? Integer.parseInt(JDK_VERSION.substring(0, JDK_VERSION.indexOf(".")))
+					: Integer.parseInt(JDK_VERSION);
 		}
 	}
-
+    /**
+     * <h3 class="en">Private constructor for SystemUtils</h3>
+     * <span class="en">SystemUtils is running in singleton instance mode</span>
+     * <h3 class="zh-CN">SystemUtils的私有构造函数</h3>
+     * <span class="zh-CN">SystemUtils使用单例模式运行</span>
+     */
 	private SystemUtils() {
 	}
-
 	/**
-	 * Identify key of current machine
+     * <h3 class="en">Retrieve system identified ID</h3>
+     * <h3 class="zh-CN">读取系统唯一标识ID</h3>
 	 *
-	 * @return Identify key
+     * @return 	<span class="en">System identified ID</span>
+     * 			<span class="zh-CN">系统标识ID</span>
 	 */
 	public static String identifiedKey() {
 		return IDENTIFIED_KEY;
 	}
-
 	/**
-	 * Current operate system is Microsoft Windows
+     * <h3 class="en">Check current operating system is Windows</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Windows</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isWindows() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().contains("windows");
 	}
-
 	/**
-	 * Current operate system is Unix
+     * <h3 class="en">Check current operating system is Unix</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Unix</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isUnix() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("unix") > 0;
 	}
-
 	/**
-	 * Current operate system is Linux
+     * <h3 class="en">Check current operating system is Linux</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Linux</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isLinux() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("linux") > 0;
 	}
-
 	/**
-	 * Current operate system is Apple MacOS
+     * <h3 class="en">Check current operating system is Apple MacOS</h3>
+     * <h3 class="zh-CN">判断当前操作系统为苹果MacOS</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isMacOS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mac os") > 0;
 	}
-
 	/**
-	 * Current operate system is Apple Mac OS X
+     * <h3 class="en">Check current operating system is Apple MacOS X</h3>
+     * <h3 class="zh-CN">判断当前操作系统为苹果MacOS X</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isMacOSX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mac os x") > 0;
 	}
-
 	/**
-	 * Current operate system is OS2
+     * <h3 class="en">Check current operating system is OS2</h3>
+     * <h3 class="zh-CN">判断当前操作系统为OS2</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isOS2() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("os/2") > 0;
 	}
-
 	/**
-	 * Current operate system is Solaris
+     * <h3 class="en">Check current operating system is Solaris</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Solaris</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isSolaris() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("solaris") > 0;
 	}
-
 	/**
-	 * Current operate system is Sun OS
+     * <h3 class="en">Check current operating system is SunOS</h3>
+     * <h3 class="zh-CN">判断当前操作系统为SunOS</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isSunOS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("sunos") > 0;
 	}
-
 	/**
-	 * Current operate system is MPEiX
+     * <h3 class="en">Check current operating system is MPEiX</h3>
+     * <h3 class="zh-CN">判断当前操作系统为MPEiX</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isMPEiX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("mpe/ix") > 0;
 	}
-
 	/**
-	 * Current operate system is HPUX
+     * <h3 class="en">Check current operating system is HP Unix</h3>
+     * <h3 class="zh-CN">判断当前操作系统为HP Unix</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isHPUX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("hp-ux") > 0;
 	}
-
 	/**
-	 * Current operate system is AIX
+     * <h3 class="en">Check current operating system is AIX</h3>
+     * <h3 class="zh-CN">判断当前操作系统为AIX</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isAIX() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("aix") > 0;
 	}
-
 	/**
-	 * Current operate system is OS390
+     * <h3 class="en">Check current operating system is OS390</h3>
+     * <h3 class="zh-CN">判断当前操作系统为OS390</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isOS390() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("os/390") > 0;
 	}
-
 	/**
-	 * Current operate system is Free BSD
+     * <h3 class="en">Check current operating system is FreeBSD</h3>
+     * <h3 class="zh-CN">判断当前操作系统为FreeBSD</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isFreeBSD() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("freebsd") > 0;
 	}
-
 	/**
-	 * Current operate system is Irix
+     * <h3 class="en">Check current operating system is Irix</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Irix</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isIrix() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("irix") > 0;
 	}
-
 	/**
-	 * Current operate system is Digital Unix
+     * <h3 class="en">Check current operating system is Digital Unix</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Digital Unix</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isDigitalUnix() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("digital unix") > 0;
 	}
-
 	/**
-	 * Current operate system is Netware
+     * <h3 class="en">Check current operating system is Netware</h3>
+     * <h3 class="zh-CN">判断当前操作系统为Netware</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isNetware() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("netware") > 0;
 	}
-
 	/**
-	 * Current operate system is OSF1
+     * <h3 class="en">Check current operating system is OSF1</h3>
+     * <h3 class="zh-CN">判断当前操作系统为OSF1</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isOSF1() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("osf1") > 0;
 	}
-
 	/**
-	 * Current operate system is OpenVMS
+     * <h3 class="en">Check current operating system is OpenVMS</h3>
+     * <h3 class="zh-CN">判断当前操作系统为OpenVMS</h3>
 	 *
-	 * @return check result
+     * @return 	<span class="en">Check result</span>
+     * 			<span class="zh-CN">检查结果</span>
 	 */
 	public static boolean isOpenVMS() {
 		return OPERATE_SYSTEM_NAME.toLowerCase().indexOf("openvms") > 0;
 	}
-
 	/**
-	 * System certificate file path
+     * <h3 class="en">Retrieve default certificate library path</h3>
+     * <h3 class="zh-CN">读取当前默认证书库的路径</h3>
 	 *
-	 * @return System certificate file path
+     * @return 	<span class="en">Certificate library path</span>
+     * 			<span class="zh-CN">证书库的路径</span>
 	 */
 	public static String systemCertPath() {
 		return JAVA_HOME + JAVA_CERT_PATH;
 	}
-
 	/**
-	 * Local mac byte [ ].
+     * <h3 class="en">Retrieve current network interface MAC address</h3>
+     * <h3 class="zh-CN">读取当前系统网卡的物理地址</h3>
 	 *
-	 * @return the byte [ ]
+     * @return 	<span class="en">MAC address data bytes</span>
+     * 			<span class="zh-CN">网卡物理地址的二进制数组</span>
 	 */
 	public static byte[] localMac() {
 		byte[] macAddress = null;
@@ -304,7 +360,7 @@ public final class SystemUtils {
 					}
 				}
 			} catch (final SocketException e) {
-				LOGGER.error("Retrieve local MAC address error! ", e);
+				LOGGER.error("Utils", "Retrieve_MAC_System_Error", e);
 			}
 			if (macAddress == null || macAddress.length == 0) {
 				// Take only 6 bytes if the address is an IPv6 otherwise will pad with two zero bytes
@@ -315,10 +371,12 @@ public final class SystemUtils {
 		}
 		return macAddress;
 	}
-
 	/**
-	 * Generate current identify key
-	 * @return  generated value
+     * <h3 class="en">Generate system identified ID</h3>
+     * <h3 class="zh-CN">生成系统唯一标识ID</h3>
+	 *
+     * @return 	<span class="en">Generated ID string</span>
+     * 			<span class="zh-CN">生成的ID字符串</span>
 	 */
 	private static String generateIdentifiedKey() {
 		try {
@@ -333,32 +391,37 @@ public final class SystemUtils {
 			}
 			
 			Collections.sort(macAddressList);
-			return ConvertUtils.byteToHex(SecurityUtils.SHA256(macAddressList));
+			return ConvertUtils.toHex(SecurityUtils.SHA256(macAddressList));
 		} catch (Exception e) {
+			LOGGER.error("Utils", "Generate_Identified_ID_System_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Generate identified key error!", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 		}
 		
 		return null;
 	}
-
 	/**
-	 * Retrieve the local network adapter list
-	 * @return      Local network adapter info list
-	 * @throws SocketException  Retrieve network interfaces error
+     * <h3 class="en">Retrieve system local network adapter list</h3>
+     * <h3 class="zh-CN">获取系统物理网络适配器列表</h3>
+	 *
+     * @return 	<span class="en">Local network adapter info list</span>
+     * 			<span class="zh-CN">物理网络适配器列表</span>
+	 *
+	 * @throws SocketException
+	 * <span class="en">Retrieve network interfaces error</span>
+	 * <span class="zgs">获取网络适配器时发生错误</span>
 	 */
 	private static List<NetworkInfo> retrieveNetworkList() throws SocketException {
 		List<NetworkInfo> networkList = new ArrayList<>();
-		
 		Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
-		
 		while (enumeration.hasMoreElements()) {
 			try {
 				networkList.add(new NetworkInfo(enumeration.nextElement()));
 			} catch (NetworkInfoException e) {
+				LOGGER.error("Utils", "Retrieve_Network_Interface_System_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieve network info error!", e);
+					LOGGER.debug("Utils", "Stack_Message_Error", e);
 				}
 			}
 		}

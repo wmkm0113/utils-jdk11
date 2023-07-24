@@ -16,10 +16,42 @@
  */
 package org.nervousync.launcher;
 
+/**
+ * <h2 class="en">Interface class for startup launcher</h2>
+ * <span class=“en“>
+ *     Launcher class must implement current interface and add annotation
+ *     org.nervousync.annotations.launcher.Launcher at launcher class.
+ *     StartupManager will load launcher instance by Java SPI, and invoke startup method at system start,
+ *     invoke destroy method at system shutdown.
+ *     Users can add parameter value (type: int) at annotation org.nervousync.annotations.launcher.Launcher
+ *     to move the sort of launcher execute, sort type: DESC
+ * </span>
+ * <h2 class="zh-CN">启动器接口</h2>
+ * <span class=“zhs“>
+ *     启动器实现类必须实现当前接口并添加注解org.nervousync.annotations.launcher.Launcher到启动器实现类上。
+ *     启动管理器会使用Java的SPI机制自动加载所有启动器实例，启动管理器会在系统启动时调用startup方法，在系统退出时调用destroy方法。
+ *     用户可以通过设置一个int类型的参数值在注解org.nervousync.annotations.launcher.Launcher上，
+ *     用于调整启动器的执行顺序，排序方式为：倒叙
+ * </span>
+ *.0
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Nov 3, 2017 16:39:41 $
+ */
 public interface StartupLauncher {
-
-	void initialize(final String basePath);
-
+	/**
+	 * <h3 class="en">Startup method</h3>
+	 * <span class=“en“>StartupManager invoke this method to execute current launcher</span>
+	 * <h3 class="zh-CN">启动方法</h3>
+	 * <span class=“zhs“>启动管理器调用此方法来执行当前的启动器</span>
+	 *
+	 * @param basePath	<span class="en">Base path for launcher execute</span>
+	 *                  <span class="zh-CN">启动器执行的基本目录</span>
+	 */
+	void startup(final String basePath);
+	/**
+	 * <h3 class="en">Destroy current launcher instance</h3>
+	 * <h3 class="zh-CN">销毁当前启动器实例</h3>
+	 */
 	void destroy();
 
 }

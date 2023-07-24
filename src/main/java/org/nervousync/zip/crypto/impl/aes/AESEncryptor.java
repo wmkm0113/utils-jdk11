@@ -16,8 +16,9 @@
  */
 package org.nervousync.zip.crypto.impl.aes;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.crypto.CryptoException;
+import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Encryptor;
 
@@ -46,7 +47,7 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public void encryptData(byte[] buff) throws ZipException {
 		if (buff == null) {
-			throw new ZipException("input bytes are null, cannot perform AES encryption");
+			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
 		this.encryptData(buff, 0, buff.length);
 	}
@@ -54,11 +55,11 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public void encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (this.finished) {
-			throw new ZipException("AES Encryptor is in finished state (A non 16 byte block has already been passed to encryptor)");
+			throw new ZipException(0x0000001B0012L, "Utils", "Finished_Encryptor_AES_Zip_Error");
 		}
 		
 		if (len % 16 != 0) {
-			this.finished = true;
+			this.finished = Boolean.TRUE;
 		}
 
 		try {
@@ -70,8 +71,8 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 				super.processData(buff, i);
 				this.macBasedPRF.append(buff, i, this.loopCount);
 			}
-		} catch (CryptoException e) {
-			throw new ZipException(e);
+		} catch (CryptoException | DataInvalidException e) {
+			throw new ZipException(0x0000001B000CL, "Utils", "Encrypt_Crypto_Zip_Error", e);
 		}
 	}
 

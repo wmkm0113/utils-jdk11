@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 @XmlSchema(namespace = "https://nervousync.org/schemas/mail", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/mail_config_1.0.xsd",
+		location = "https://nervousync.org/schemas/mail_config_1_0.xsd",
 		xmlns = {
 				@XmlNs(prefix = "mail", namespaceURI = "https://nervousync.org/schemas/mail"),
 				@XmlNs(prefix = "proxy", namespaceURI = "https://nervousync.org/schemas/proxy"),

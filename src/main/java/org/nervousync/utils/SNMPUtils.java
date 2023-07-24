@@ -24,9 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.nervousync.commons.core.Globals;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.commons.Globals;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -57,114 +55,150 @@ import org.nervousync.enumerations.snmp.auth.SNMPAuthProtocol;
 import org.nervousync.exceptions.snmp.ProcessorConfigException;
 
 /**
- * The type Snmp utils.
+ * <h2 class="en">SNMP utilities</h2>
+ * <h2 class="zh-CN">SNMP工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 25, 2017 8:50:34 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 25, 2017 20:50:34 $
  */
 public final class SNMPUtils {
-
+    /**
+     * <span class="en">Singleton instance</span>
+     * <span class="zh-CN">单一实例对象</span>
+     */
 	private static volatile SNMPUtils INSTANCE = null;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SNMPUtils.class);
-	
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+	private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(SNMPUtils.class);
+    /**
+     * <span class="en">Prefix string of UDP protocol</span>
+     * <span class="zh-CN">UDP协议前缀</span>
+     */
 	private static final String PROTOCOL_UDP = "udp:";
+    /**
+     * <span class="en">Prefix string of TCP protocol</span>
+     * <span class="zh-CN">TCP协议前缀</span>
+     */
 	private static final String PROTOCOL_TCP = "tcp:";
-	
-	private static final OctetString NO_AUTH_NOPRIV = new OctetString("noAuthUser");
-	private static final OctetString AUTH_NOPRIV = new OctetString("authUser");
-	private static final OctetString AUTH_PRIV = new OctetString("privUser");
-	
-	private final IPProtocol protocol;
+    /**
+     * <span class="en">Schedule process period time (Unit: milliseconds)</span>
+     * <span class="zh-CN">调度处理的间隔时间（单位：毫秒）</span>
+     */
 	private final long period;
+    /**
+     * <span class="en">Registered target host list</span>
+     * <span class="zh-CN">注册的目标主机列表</span>
+     */
 	private final List<TargetHost> existsHosts;
+    /**
+     * <span class="en">Schedule processor</span>
+     * <span class="zh-CN">调度处理器</span>
+     */
 	private final ScheduledExecutorService scheduledExecutorService;
-	private Snmp snmp = null;
-	
-	private SNMPUtils(final IPProtocol protocol, final int serverCount, final long period) throws IOException {
-		this.protocol = protocol;
+    /**
+     * <span class="en">UDP agent</span>
+     * <span class="zh-CN">UDP客户端</span>
+     */
+	private Snmp udpAgent;
+    /**
+     * <span class="en">TCP agent</span>
+     * <span class="zh-CN">TCP客户端</span>
+     */
+	private Snmp tcpAgent;
+	/**
+	 * <h3 class="en">Private constructor for SNMPUtils</h3>
+	 * <h3 class="zh-CN">SNMP工具集的私有构造方法</h3>
+	 *
+	 * @param serverCount 	<span class="en">Maximum size of registered server list</span>
+	 *                      <span class="zh-CN">允许注册目标主机的最大值</span>
+	 * @param period 		<span class="en">Schedule process period time (Unit: milliseconds)</span>
+	 *                      <span class="zh-CN">调度处理的间隔时间（单位：毫秒）</span>
+	 *
+	 * @throws IOException
+	 * <span class="en">If an error occurs when generate agent</span>
+	 * <span class="zh-CN">当创建客户端时出现异常</span>
+	 */
+	private SNMPUtils(final int serverCount, final long period) throws IOException {
 		this.period = Math.max(period, 1000L);
 		this.existsHosts = new ArrayList<>(serverCount);
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(serverCount);
-		switch (this.protocol) {
-		case TCP:
-			this.snmp = new Snmp(new DefaultTcpTransportMapping());
-			break;
-		case UDP:
-			this.snmp = new Snmp(new DefaultUdpTransportMapping());
-			break;
-			default:
-				return;
-		}
-		
-		this.snmp.listen();
+		this.udpAgent = new Snmp(new DefaultUdpTransportMapping());
+		this.udpAgent.listen();
+		this.tcpAgent = new Snmp(new DefaultTcpTransportMapping());
+		this.tcpAgent.listen();
 	}
-
 	/**
-	 * Initialize boolean.
+	 * <h3 class="en">Initialize SNMP Utilities</h3>
+	 * <h3 class="zh-CN">初始化SNMP工具集</h3>
 	 *
-	 * @param serverCount the server count
-	 * @return the boolean
+	 * @param serverCount 	<span class="en">Maximum size of registered server list</span>
+	 *                      <span class="zh-CN">允许注册目标主机的最大值</span>
+	 *
+	 * @return 	<span class="en">Initialize result</span>
+	 * 			<span class="zh-CN">初始化结果</span>
 	 */
 	public static boolean initialize(final int serverCount) {
 		return SNMPUtils.initialize(serverCount, Globals.DEFAULT_VALUE_LONG);
 	}
 
 	/**
-	 * Initialize boolean.
+	 * <h3 class="en">Initialize SNMP Utilities</h3>
+	 * <h3 class="zh-CN">初始化SNMP工具集</h3>
 	 *
-	 * @param serverCount the server count
-	 * @param period      read data period
-	 * @return the boolean
+	 * @param serverCount 	<span class="en">Maximum size of registered server list</span>
+	 *                      <span class="zh-CN">允许注册目标主机的最大值</span>
+	 * @param period 		<span class="en">Schedule process period time (Unit: milliseconds)</span>
+	 *                      <span class="zh-CN">调度处理的间隔时间（单位：毫秒）</span>
+	 *
+	 * @return 	<span class="en">Initialize result</span>
+	 * 			<span class="zh-CN">初始化结果</span>
 	 */
 	public static boolean initialize(final int serverCount, final long period) {
-		return SNMPUtils.initialize(IPProtocol.UDP, serverCount, period);
-	}
-
-	/**
-	 * Initialize boolean.
-	 *
-	 * @param protocol    the protocol
-	 * @param serverCount the server count
-	 * @param period      read data period
-	 * @return the boolean
-	 */
-	public static boolean initialize(final IPProtocol protocol, final int serverCount, final long period) {
 		if (SNMPUtils.INSTANCE != null) {
 			return Boolean.TRUE;
 		}
 		try {
 			synchronized (SNMPUtils.class) {
 				if (SNMPUtils.INSTANCE == null) {
-					SNMPUtils.INSTANCE = new SNMPUtils(protocol, serverCount, period);
+					SNMPUtils.INSTANCE = new SNMPUtils(serverCount, period);
 				}
 			}
 			return Boolean.TRUE;
 		} catch (IOException e) {
+			LOGGER.error("Utils", "Init_SNMP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Initialize instance error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		}
 	}
-
 	/**
-	 * Gets instance.
+	 * <h3 class="en">Static method for retrieve singleton instance of SNMP utilities</h3>
+	 * <h3 class="zh-CN">静态方法用于获取SNMP工具集单例实例对象</h3>
 	 *
-	 * @return the instance
+	 * @return 	<span class="en">Singleton instance</span>
+	 * 			<span class="zh-CN">单例实例对象</span>
 	 */
 	public static SNMPUtils getInstance() {
 		return SNMPUtils.INSTANCE;
 	}
-
 	/**
-	 * Add monitor boolean.
+	 * <h3 class="en">Add monitor target host</h3>
+	 * <h3 class="zh-CN">添加要监控的目标主机</h3>
 	 *
-	 * @param identifiedKey    the identified key
-	 * @param targetHost       the target host
-	 * @param pduArray         the pdu array
-	 * @param snmpDataOperator the snmp data operator
-	 * @return the boolean
+	 * @param identifiedKey    <span class="en">Identify key of target host</span>
+	 *                         <span class="zh-CN">目标主机的唯一标识字符串</span>
+	 * @param targetHost       <span class="en">Target host instance</span>
+	 *                         <span class="zh-CN">目标主机实例对象</span>
+	 * @param pduArray         <span class="en">PDU instance array</span>
+	 *                         <span class="zh-CN">协议数据单元实例对象数组</span>
+	 * @param snmpDataOperator <span class="en">SNMP data operator instance</span>
+	 *                         <span class="zh-CN">SNMP数据操作器实例对象</span>
+	 *
+	 * @return 	<span class="en">Add result</span>
+	 * 			<span class="zh-CN">添加结果</span>
 	 */
 	public boolean addMonitor(final String identifiedKey, final TargetHost targetHost,
 	                          final SNMPDataOperator snmpDataOperator, final PDU... pduArray) {
@@ -179,81 +213,158 @@ public final class SNMPUtils {
 					0L, this.period, TimeUnit.MILLISECONDS);
 			return Boolean.TRUE;
 		} catch (ProcessorConfigException e) {
+			LOGGER.error("Utils", "Add_Target_SNMP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Add monitor target host error! ", e);
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		}
 	}
-
 	/**
-	 * Destroy.
+	 * <h3 class="en">Destroy agent and schedule processor</h3>
+	 * <h3 class="zh-CN">静态方法用于获取SNMP工具集单例实例对象</h3>
 	 *
-	 * @throws IOException the io exception
+	 * @throws IOException
+	 * <span class="en">If an error occurs when close agent</span>
+	 * <span class="zh-CN">当关闭客户端时出现异常</span>
 	 */
-	public void destroy() throws IOException {
-		this.scheduledExecutorService.shutdownNow();
-		this.snmp.close();
-	}
+	public static void destroy() throws IOException {
+		if (INSTANCE != null) {
+			INSTANCE.scheduledExecutorService.shutdownNow();
+			INSTANCE.tcpAgent.close();
+			INSTANCE.tcpAgent = null;
+			INSTANCE.udpAgent.close();
+			INSTANCE.udpAgent = null;
+			INSTANCE.existsHosts.clear();
 
-	private List<VariableBinding> retrieveData(final Target<Address> target, final PDU pdu) {
-		if (this.snmp != null) {
-			try {
-				ResponseEvent<Address> responseEvent = this.snmp.send(pdu, target);
-				if (responseEvent != null && responseEvent.getResponse() != null) {
-					PDU response = responseEvent.getResponse();
-					if (response.getErrorIndex() == PDU.noError 
-							&& response.getErrorStatus() == PDU.noError) {
-						return response.getBindingList(new OID());
-					}
+			INSTANCE = null;
+		}
+	}
+	/**
+	 * <h3 class="en">Retrieve data from target host</h3>
+	 * <h3 class="zh-CN">从目标主机读取数据</h3>
+	 *
+	 * @param protocol 		<span class="en">IP Protocol</span>
+	 *                      <span class="zh-CN">IP协议</span>
+	 * @param target 		<span class="en">Target host instance</span>
+	 *                      <span class="zh-CN">目标主机实例对象</span>
+	 * @param pdu 			<span class="en">PDU instance</span>
+	 *                      <span class="zh-CN">协议数据单元实例对象</span>
+	 *
+	 * @return 	<span class="en">Read data list</span>
+	 * 			<span class="zh-CN">读取数据列表</span>
+	 */
+	private List<VariableBinding> retrieveData(final IPProtocol protocol, final Target<Address> target, final PDU pdu) {
+		try {
+			ResponseEvent<Address> responseEvent;
+			switch (protocol) {
+				case TCP:
+					responseEvent = this.tcpAgent.send(pdu, target);
+					break;
+				case UDP:
+					responseEvent = this.udpAgent.send(pdu, target);
+					break;
+				default:
+					return new ArrayList<>();
+			}
+			if (responseEvent != null && responseEvent.getResponse() != null) {
+				PDU response = responseEvent.getResponse();
+				if (response.getErrorIndex() == PDU.noError
+						&& response.getErrorStatus() == PDU.noError) {
+					return response.getBindingList(new OID());
 				}
-			} catch (IOException e) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Retrieve snmp data error! ", e);
-				}
+			}
+		} catch (IOException e) {
+			LOGGER.error("Utils", "Retrieve_Data_SNMP_Error");
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Utils", "Stack_Message_Error", e);
 			}
 		}
 		return new ArrayList<>();
 	}
-	
+	/**
+	 * <h2 class="en">SNMP processor</h2>
+	 * <h2 class="zh-CN">SNMP处理器线程</h2>
+	 *
+	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+	 * @version $Revision : 1.0 $ $Date: Oct 25, 2017 21:08:26 $
+	 */
 	private static final class SNMPProcessor implements Runnable {
-
-		private final String identifiedKey;
-		private final Target<Address> target;
-		private final PDU[] pduArray;
-		private final SNMPDataOperator snmpDataOperator;
-
 		/**
-		 * Instantiates a new Snmp processor.
+		 * <span class="en">Identify key of target host</span>
+		 * <span class="zh-CN">目标主机的唯一标识字符串</span>
+		 */
+		private final String identifiedKey;
+		/**
+		 * <span class="en">IP Protocol</span>
+		 * <span class="zh-CN">IP协议</span>
+		 */
+		private final IPProtocol protocol;
+		/**
+		 * <span class="en">Target host instance</span>
+		 * <span class="zh-CN">目标主机实例对象</span>
+		 */
+		private final Target<Address> target;
+		/**
+		 * <span class="en">PDU instance array</span>
+		 * <span class="zh-CN">协议数据单元实例对象数组</span>
+		 */
+		private final PDU[] pduArray;
+		/**
+		 * <span class="en">SNMP data operator instance</span>
+		 * <span class="zh-CN">SNMP数据操作器实例对象</span>
+		 */
+		private final SNMPDataOperator snmpDataOperator;
+		/**
+		 * <h3 class="en">Private constructor for SNMPProcessor</h3>
+		 * <h3 class="zh-CN">SNMP处理器线程的私有构造方法</h3>
 		 *
-		 * @param identifiedKey    the identified key
-		 * @param targetHost       the target host
-		 * @param pduArray         the pdu array
-		 * @param snmpDataOperator the snmp data operator
+		 * @param identifiedKey    <span class="en">Identify key of target host</span>
+		 *                         <span class="zh-CN">目标主机的唯一标识字符串</span>
+		 * @param targetHost       <span class="en">Target host instance</span>
+		 *                         <span class="zh-CN">目标主机实例对象</span>
+		 * @param pduArray         <span class="en">PDU instance array</span>
+		 *                         <span class="zh-CN">协议数据单元实例对象数组</span>
+		 * @param snmpDataOperator <span class="en">SNMP data operator instance</span>
+		 *                         <span class="zh-CN">SNMP数据操作器实例对象</span>
+		 *
 		 * @throws ProcessorConfigException the processor config exception
 		 */
 		public SNMPProcessor(final String identifiedKey, final TargetHost targetHost,
-		                     final SNMPDataOperator snmpDataOperator, final PDU... pduArray) throws ProcessorConfigException {
+		                     final SNMPDataOperator snmpDataOperator, final PDU... pduArray)
+				throws ProcessorConfigException {
 			if (identifiedKey == null || targetHost == null || pduArray == null
 					|| pduArray.length == 0 || snmpDataOperator == null) {
-				throw new ProcessorConfigException("Argument invalid");
+				throw new ProcessorConfigException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 			}
 			this.identifiedKey = identifiedKey;
+			this.protocol = targetHost.getProtocol();
 			this.target = SNMPUtils.getInstance().generateTarget(targetHost);
 			this.pduArray = pduArray;
 			this.snmpDataOperator = snmpDataOperator;
 		}
-		
+		/**
+		 * (Non-Javadoc)
+		 * @see Runnable#run()
+		 */
 		@Override
 		public void run() {
 			SNMPData snmpData = new SNMPData();
 			snmpData.setIdentifiedKey(this.identifiedKey);
 			Arrays.asList(this.pduArray).forEach(pdu ->
-					SNMPUtils.getInstance().retrieveData(this.target, pdu).forEach(snmpData::addData));
+					SNMPUtils.getInstance().retrieveData(this.protocol, this.target, pdu).forEach(snmpData::addData));
 			this.snmpDataOperator.operateData(snmpData);
 		}
 	}
-
+	/**
+	 * <h3 class="en">Retrieve authenticate protocol OID instance</h3>
+	 * <h3 class="zh-CN">SNMP处理器线程的私有构造方法</h3>
+	 *
+	 * @param snmpAuthProtocol 	<span class="en">SNMP Authentication Protocol</span>
+	 *                          <span class="zh-CN">SNMP身份验证协议</span>
+	 * @return 	<span class="en">OID instance</span>
+	 * 			<span class="zh-CN">OID实例对象</span>
+	 */
 	private OID retrieveAuthProtocol(final SNMPAuthProtocol snmpAuthProtocol) {
 		switch (snmpAuthProtocol) {
 			case MD5:
@@ -263,7 +374,16 @@ public final class SNMPUtils {
 		}
 		return null;
 	}
-	
+	/**
+	 * <h3 class="en">Convert TargetHost instance to Target instance</h3>
+	 * <h3 class="zh-CN">SNMP处理器线程的私有构造方法</h3>
+	 *
+	 * @param targetHost 	<span class="en">SNMP Target Host instance</span>
+	 *                      <span class="zh-CN">SNMP目标主机实例对象</span>
+	 *
+	 * @return 	<span class="en">Converted Target instance</span>
+	 * 			<span class="zh-CN">转换后的Target实例对象</span>
+	 */
 	private Target<Address> generateTarget(final TargetHost targetHost) {
 		if (targetHost == null) {
 			return null;
@@ -271,7 +391,7 @@ public final class SNMPUtils {
 
 		String address = null;
 
-		switch (this.protocol) {
+		switch (targetHost.getProtocol()) {
 		case TCP:
 			address = PROTOCOL_TCP + targetHost.getIpAddress() + "/" + targetHost.getPort();
 			break;
@@ -296,17 +416,17 @@ public final class SNMPUtils {
 			switch (targetHost.getAuth()) {
 				case NOAUTH_NOPRIV:
 					target.setSecurityLevel(SecurityLevel.NOAUTH_NOPRIV);
-					securityName = NO_AUTH_NOPRIV;
+					securityName = new OctetString("noAuthUser");
 					break;
 				case AUTH_NOPRIV:
 					target.setSecurityLevel(SecurityLevel.AUTH_NOPRIV);
-					securityName = AUTH_NOPRIV;
+					securityName = new OctetString("authUser");
 					authProtocol = retrieveAuthProtocol(targetHost.getAuthProtocol());
 					authPassword = new OctetString(targetHost.getAuthPassword());
 					break;
 				case AUTH_PRIV:
 					target.setSecurityLevel(SecurityLevel.AUTH_PRIV);
-					securityName = AUTH_PRIV;
+					securityName = new OctetString("privUser");
 					authProtocol = retrieveAuthProtocol(targetHost.getAuthProtocol());
 					authPassword = new OctetString(targetHost.getAuthPassword());
 					switch (targetHost.getPrivProtocol()) {
@@ -325,7 +445,14 @@ public final class SNMPUtils {
 				target.setSecurityName(securityName);
 
 				UsmUser usmUser = new UsmUser(securityName, authProtocol, authPassword, privProtocol, privPassword);
-				this.snmp.getUSM().addUser(securityName, usmUser);
+				switch (targetHost.getProtocol()) {
+				case TCP:
+					this.tcpAgent.getUSM().addUser(securityName, usmUser);
+					break;
+				case UDP:
+					this.udpAgent.getUSM().addUser(securityName, usmUser);
+					break;
+				}
 			}
 		} else {
 			target = new CommunityTarget<>();

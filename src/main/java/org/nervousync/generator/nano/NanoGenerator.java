@@ -19,46 +19,78 @@ package org.nervousync.generator.nano;
 import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.generator.IGenerator;
 import org.nervousync.utils.IDUtils;
+import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 
 /**
- * The type Nano generator.
+ * <h2 class="en">NanoID generator</h2>
+ * <h2 class="zh-CN">NanoID生成器</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:39:54 $
  */
 @GeneratorProvider(IDUtils.NANO_ID)
 public final class NanoGenerator implements IGenerator<String> {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private static final String DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
-    private static final int DEFAULT_LENGTH = 27;
-
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private char[] alphabetArray = DEFAULT_ALPHABET.toCharArray();
-    private int generateLength = DEFAULT_LENGTH;
-
     /**
-     * Config.
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
+    /**
+     * <span class="en">Default alphabet string</span>
+     * <span class="zh-CN">默认的字母表</span>
+     */
+    private static final String DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+    /**
+     * <span class="en">Default length of generated result</span>
+     * <span class="zh-CN">默认的生成结果长度</span>
+     */
+    private static final int DEFAULT_LENGTH = 27;
+    /**
+     * <span class="en">Secure Random instance</span>
+     * <span class="zh-CN">安全随机数对象</span>
+     */
+    private final SecureRandom secureRandom = new SecureRandom();
+    /**
+     * <span class="en">Result used alphabet character array</span>
+     * <span class="zh-CN">结果用到的字母字符数组</span>
+     */
+    private char[] alphabetArray = DEFAULT_ALPHABET.toCharArray();
+    /**
+     * <span class="en">Generated result length, default length: 27</span>
+     * <span class="zh-CN">生成结果的长度，默认值：27</span>
+     */
+    private int generateLength = DEFAULT_LENGTH;
+    /**
+	 * <h3 class="en">Configure current generator</h3>
+	 * <h3 class="zh-CN">修改当前生成器的配置</h3>
      *
-     * @param alphabetConfig the alphabet config
-     * @param generateLength generate length
+     * @param alphabetConfig    <span class="en">Alphabet configure string</span>
+     *                          <span class="zh-CN">输出字符设置</span>
+     * @param generateLength    <span class="en">Generated result length</span>
+     *                          <span class="zh-CN">生成结果的长度</span>
      */
     public void config(final String alphabetConfig, final int generateLength) {
         if (StringUtils.notBlank(alphabetConfig)) {
             if (alphabetConfig.length() > 255) {
-                this.logger.error("Alphabet must contain between 1 and 255 symbols.");
+                this.logger.error("Utils", "Alphabet_Nano_Error");
             } else {
                 this.alphabetArray = alphabetConfig.toCharArray();
             }
         }
         this.generateLength = generateLength > 0 ? generateLength : DEFAULT_LENGTH;
     }
-
+    /**
+	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="zh-CN">生成ID值</h3>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random() {
+    public String generate() {
         final int mask = (2 << (int) Math.floor(Math.log(this.alphabetArray.length - 1) / Math.log(2))) - 1;
         final int length = (int) Math.ceil(1.6 * mask * this.generateLength / this.alphabetArray.length);
 
@@ -66,7 +98,7 @@ public final class NanoGenerator implements IGenerator<String> {
 
         while (true) {
             final byte[] dataBytes = new byte[length];
-            SECURE_RANDOM.nextBytes(dataBytes);
+            this.secureRandom.nextBytes(dataBytes);
             for (int i = 0; i < length; i++) {
                 final int alphabetIndex = dataBytes[i] & mask;
                 if (alphabetIndex < this.alphabetArray.length) {
@@ -78,12 +110,24 @@ public final class NanoGenerator implements IGenerator<String> {
             }
         }
     }
-
+    /**
+	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
+     *
+     * @param dataBytes     <span class="en">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random(byte[] dataBytes) {
-        return this.random();
+    public String generate(byte[] dataBytes) {
+        return this.generate();
     }
-
+    /**
+	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
+     */
     @Override
     public void destroy() {
     }

@@ -23,75 +23,114 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.utils.FileUtils;
 
 import jcifs.smb.SmbRandomAccessFile;
 
 /**
- * RandomAccessFile Supported local files and NAS files
+ * <h2 class="en">Custom RandomAccessFile</h2>
+ * <span class="en">Supported local files and NAS files(protocol: smb://)</span>
+ * <h2 class="zh-CN">自定义的RandomAccessFile</h2>
+ * <span class="en">支持本地文件和网络文件（协议：smb://）</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision : 1.0 $ $Date: Dec 22, 2017 11:49:46 AM $
  */
 public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closeable {
-	
 	/**
-	 * Operate the file path
+     * <span class="en">Current file path</span>
+     * <span class="zh-CN">当前文件地址</span>
 	 */
 	private final String filePath;
+	/**
+     * <span class="en">Domain name for NAS file</span>
+     * <span class="zh-CN">NAS文件的域名地址</span>
+	 */
 	private final String domain;
+	/**
+     * <span class="en">Username for NAS file</span>
+     * <span class="zh-CN">NAS文件的用户名</span>
+	 */
 	private final String userName;
+	/**
+     * <span class="en">Password for NAS file</span>
+     * <span class="zh-CN">NAS文件的密码</span>
+	 */
 	private final String passWord;
 	/**
-	 * The object of RandomAccessFile/SmbRandomAccessFile
+     * <span class="en">Instance of RandomAccessFile/SmbRandomAccessFile</span>
+     * <span class="zh-CN">RandomAccessFile的SmbRandomAccessFile的实例对象</span>
 	 */
 	private Object originObject = null;
-
 	/**
-	 * Constructor
+     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open local file</h3>
+     * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath target file path
-	 * @throws FileNotFoundException if target file was not found
+	 * @param filePath 	<span class="en">Current file path</span>
+	 *                  <span class="zh-CN">当前文件地址</span>
+	 * @throws FileNotFoundException
+     * <span class="en">If target file was not found</span>
+     * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
 	public NervousyncRandomAccessFile(final String filePath) throws FileNotFoundException {
 		this(filePath, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
-
 	/**
-	 * Constructor
+     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open local file with writable mode</h3>
+     * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath target file path
-	 * @param writable the writable
-	 * @throws FileNotFoundException if target file was not found
+	 * @param filePath 	<span class="en">Current file path</span>
+	 *                  <span class="zh-CN">当前文件地址</span>
+	 * @param writable 	<span class="en">Open in or not in writable mode</span>
+	 *                  <span class="zh-CN">是否以写入模式打开文件</span>
+	 *
+	 * @throws FileNotFoundException
+     * <span class="en">If target file was not found</span>
+     * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
 	public NervousyncRandomAccessFile(final String filePath, final boolean writable) throws FileNotFoundException {
 		this(filePath, writable, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
-
 	/**
-	 * Constructor for open SMB file
+     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open samba file</h3>
+     * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开网络文件</h3>
 	 *
-	 * @param filePath SMB path
-	 * @param domain   SMB Authentication Domain
-	 * @param userName SMB Authentication Username
-	 * @param passWord SMB Authentication Password
-	 * @throws FileNotFoundException if connect to SMB file error
+	 * @param filePath 	<span class="en">Samba file path</span>
+	 *                  <span class="zh-CN">网络文件地址</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+	 *
+	 * @throws FileNotFoundException
+     * <span class="en">If connect to samba file has error occurs</span>
+     * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
 	public NervousyncRandomAccessFile(final String filePath, final String domain,
 	                                  final String userName, final String passWord) throws FileNotFoundException {
 		this(filePath, Boolean.FALSE, domain, userName, passWord);
 	}
-
 	/**
-	 * Constructor for open SMB file
+     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open smb file with writable mode</h3>
+     * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath SMB path
-	 * @param writable the writable
-	 * @param domain   SMB Authentication Domain
-	 * @param userName SMB Authentication Username
-	 * @param passWord SMB Authentication Password
-	 * @throws FileNotFoundException if connect to SMB file error
+	 * @param filePath 	<span class="en">Samba file path</span>
+	 *                  <span class="zh-CN">网络文件地址</span>
+	 * @param writable 	<span class="en">Open in or not in writable mode</span>
+	 *                  <span class="zh-CN">是否以写入模式打开文件</span>
+	 * @param domain 	<span class="en">Domain name for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的域名地址</span>
+	 * @param userName 	<span class="en">Username for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的用户名</span>
+	 * @param passWord 	<span class="en">Password for NAS file</span>
+     * 					<span class="zh-CN">NAS文件的密码</span>
+	 *
+	 * @throws FileNotFoundException
+     * <span class="en">If connect to samba file has error occurs</span>
+     * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
 	public NervousyncRandomAccessFile(final String filePath, final boolean writable, final String domain,
 	                                  final String userName, final String passWord) throws FileNotFoundException {
@@ -105,34 +144,42 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			this.userName = Globals.DEFAULT_VALUE_STRING;
 			this.passWord = Globals.DEFAULT_VALUE_STRING;
 		}
-		this.openFile(writable ? Globals.WRITE_MODE : Globals.READ_MODE);
+		this.openFile(writable ? "rw" : "r");
 	}
-
 	/**
-	 * Read file length
+     * <h3 class="en">Read current file total length</h3>
+     * <h3 class="zh-CN">读取当前文件的数据长度</h3>
 	 *
-	 * @return file length
-	 * @throws IOException If read file length failed
+	 * @return 	<span class="en">Total length</span>
+	 * 			<span class="zh-CN">数据长度</span>
+	 *
+	 * @throws IOException
+     * <span class="en">If I/O error occurs when read file length failed</span>
+     * <span class="zh-CN">读取当前文件的数据长度时出现I/O错误</span>
 	 */
 	public long length() throws IOException {
 		return FileUtils.fileSize(this.filePath,
 				FileUtils.generateContext(FileUtils.smbAuthenticator(this.domain, this.userName, this.passWord)));
 	}
-
-	/**
-	 * Gets the file path.
+    /**
+	 * <h3 class="en">Getter method for current file path</h3>
+	 * <h3 class="zh-CN">当前文件地址的Getter方法</h3>
 	 *
-	 * @return the file path
-	 */
+	 * @return 	<span class="en">Current file path</span>
+	 *          <span class="zh-CN">当前文件地址</span>
+     */
 	public String getFilePath() {
 		return filePath;
 	}
-
 	/**
-	 * Return current file pointer position
+	 * <h3 class="en">Getter method for current file read pointer</h3>
+	 * <h3 class="zh-CN">当前文件读取指针位置的Getter方法</h3>
 	 *
-	 * @return file pointer position
-	 * @throws IOException Retrieve position failed
+	 * @return 	<span class="en">Current file read pointer</span>
+	 *          <span class="zh-CN">当前文件读取指针位置</span>
+	 * @throws IOException
+     * <span class="en">If I/O error occurs when read file pointer</span>
+     * <span class="zh-CN">读取当前文件的读取指针时出现I/O错误</span>
 	 */
 	public long getFilePointer() throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
@@ -141,8 +188,19 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).getFilePointer();
 		}
 	}
-
 	/**
+	 * <h3 class="en">Sets the file-pointer offset</h3>
+	 * <span class="en">
+	 *     Measured from the beginning of this file, at which the next read or write occurs.
+	 *     The offset may be set beyond the end of the file.
+	 *     Setting the offset beyond the end of the file does not change the file length.
+	 *     The file length will change only by writing after the offset has been set beyond the end of the file.
+	 * </span>
+	 * <h3 class="zh-CN">设置当前文件读取指针的位移</h3>
+	 * <span class="zh-CN">
+	 *     从该文件的开头开始测量，此时发生下一次读取或写入。 偏移量可以设置为超出文件末尾。
+	 *     设置超出文件末尾的偏移量不会更改文件长度。 文件长度仅会在偏移量设置为超出文件末尾后写入才会更改。
+	 * </span>
 	 * Set the file-pointer to position
 	 *
 	 * @param pos target position
@@ -155,7 +213,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).seek(pos);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.Closeable#close()
@@ -168,7 +225,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).close();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#write(int)
@@ -181,7 +237,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).write(b);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#write(byte[])
@@ -194,7 +249,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).write(b);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#write(byte[], int, int)
@@ -207,7 +261,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).write(b, off, len);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeBoolean(boolean)
@@ -220,7 +273,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeBoolean(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeByte(int)
@@ -233,7 +285,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeByte(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeShort(int)
@@ -246,7 +297,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeShort(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeChar(int)
@@ -259,7 +309,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeChar(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeInt(int)
@@ -272,7 +321,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeInt(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeLong(long)
@@ -285,7 +333,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeLong(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeFloat(float)
@@ -298,7 +345,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeFloat(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeDouble(double)
@@ -311,7 +357,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeDouble(v);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeBytes(java.lang.String)
@@ -324,7 +369,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeBytes(s);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeChars(java.lang.String)
@@ -337,7 +381,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeChars(s);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataOutput#writeUTF(java.lang.String)
@@ -350,7 +393,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).writeUTF(s);
 		}
 	}
-
 	/**
 	 * Read data
 	 *
@@ -360,12 +402,11 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 	 */
 	public int read(byte[] b) throws IOException {
 		if (this.originObject instanceof SmbRandomAccessFile) {
-			return ((SmbRandomAccessFile)this.originObject).read(b, 0, b.length);
+			return ((SmbRandomAccessFile)this.originObject).read(b, Globals.INITIALIZE_INT_VALUE, b.length);
 		} else {
-			return ((RandomAccessFile)this.originObject).read(b, 0, b.length);
+			return ((RandomAccessFile)this.originObject).read(b, Globals.INITIALIZE_INT_VALUE, b.length);
 		}
 	}
-
 	/**
 	 * Read data
 	 *
@@ -382,7 +423,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).read(b, off, len);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readFully(byte[])
@@ -395,7 +435,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).readFully(b);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readFully(byte[], int, int)
@@ -408,7 +447,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			((RandomAccessFile)this.originObject).readFully(b, off, len);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#skipBytes(int)
@@ -421,7 +459,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).skipBytes(n);
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readBoolean()
@@ -434,7 +471,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readBoolean();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readByte()
@@ -447,7 +483,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readByte();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readUnsignedByte()
@@ -460,7 +495,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readUnsignedByte();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readShort()
@@ -473,7 +507,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readShort();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readUnsignedShort()
@@ -486,7 +519,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readUnsignedShort();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readChar()
@@ -499,7 +531,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readChar();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readInt()
@@ -512,7 +543,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readInt();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readLong()
@@ -525,7 +555,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readLong();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readFloat()
@@ -538,7 +567,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readFloat();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readDouble()
@@ -551,7 +579,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readDouble();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readLine()
@@ -564,7 +591,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readLine();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.DataInput#readUTF()
@@ -577,7 +603,6 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
 			return ((RandomAccessFile)this.originObject).readUTF();
 		}
 	}
-	
 	/**
 	 * Open target file
 	 * @param mode	Open type(Read-Only/Read-Write)

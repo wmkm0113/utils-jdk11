@@ -25,45 +25,75 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * The interface Mail receiver.
+ * <h2 class="en">Interface class for e-mail receive operator</h2>
+ * <h2 class="zh-CN">电子邮件接收器的接口</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Dec 10, 2019 15:47:26 $
  */
 public interface ReceiveOperator {
-
     /**
-     * Read uid string.
+     * <h3 class="en">Read UID string by given folder and message instance</h3>
+     * <h3 class="zh-CN">根据给定的电子邮件目录实例对象和邮件信息实例对象读取唯一识别ID字符串</h3>
      *
-     * @param folder  the folder
-     * @param message the message
-     * @return the string
-     * @throws MessagingException the messaging exception
+     * @param folder    <span class="en">E-mail folder instance</span>
+     *                  <span class="zh-CN">电子邮件目录实例对象</span>
+     * @param message   <span class="en">E-mail message instance</span>
+     *                  <span class="zh-CN">电子邮件信息实例对象</span>
+     *
+     * @return  <span class="en">Read UID string</span>
+     *          <span class="zh-CN">读取的唯一识别ID字符串</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when read UID string</span>
+     * <span class="zh-CN">当读取唯一识别ID字符串时出现异常</span>
      */
     String readUID(final Folder folder, final Message message) throws MessagingException;
-
     /**
-     * Read the folder message.
+     * <h3 class="en">Read E-mail message by given folder and message UID string</h3>
+     * <h3 class="zh-CN">从给定的电子邮件目录中读取唯一识别ID字符串标识的电子邮件信息</h3>
      *
-     * @param folder the folder
-     * @param uid    the uid
-     * @return the message
-     * @throws MessagingException the messaging exception
+     * @param folder    <span class="en">E-mail folder instance</span>
+     *                  <span class="zh-CN">电子邮件目录实例对象</span>
+     * @param uid       <span class="en">UID string</span>
+     *                  <span class="zh-CN">唯一标识ID字符串</span>
+     *
+     * @return  <span class="en">Read e-mail message instance</span>
+     *          <span class="zh-CN">读取的电子邮件信息实例对象</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when read UID string</span>
+     * <span class="zh-CN">当读取唯一识别ID字符串时出现异常</span>
      */
     Message readMessage(final Folder folder, final String uid) throws MessagingException;
-
     /**
-     * Read the folder messages list.
+     * <h3 class="en">Read E-mail message list by given folder and message UID string array</h3>
+     * <h3 class="zh-CN">从给定的电子邮件目录中读取唯一识别ID字符串数组标识的电子邮件信息列表</h3>
      *
-     * @param folder    the folder
-     * @param uidArrays the uid arrays
-     * @return the list
-     * @throws MessagingException the messaging exception
+     * @param folder    <span class="en">E-mail folder instance</span>
+     *                  <span class="zh-CN">电子邮件目录实例对象</span>
+     * @param uidArrays <span class="en">UID string</span>
+     *                  <span class="zh-CN">唯一标识ID字符串</span>
+     *
+     * @return  <span class="en">Read e-mail message instance list</span>
+     *          <span class="zh-CN">读取的电子邮件信息实例对象列表</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when read UID string</span>
+     * <span class="zh-CN">当读取唯一识别ID字符串时出现异常</span>
      */
     List<Message> readMessages(final Folder folder, final String... uidArrays) throws MessagingException;
-
     /**
-     * Read config properties.
+     * <h3 class="en">Convert given e-mail server configure instance to Properties instance</h3>
+     * <p class="en">Generated Properties instance is using for connect to E-mail server </p>
+     * <h3 class="zh-CN">转换给定的电子邮件配置实例对象为Properties实例对象</h3>
+     * <p class="zh-CN">生成的Properties实例对象用于连接到电子邮件服务器</p>
      *
-     * @param serverConfig the server config
-     * @return the properties
+     * @param serverConfig      <span class="en">Server configure information</span>
+     *                          <span class="zh-CN">服务器配置</span>
+     *
+     * @return  <span class="en">Generated Properties instance</span>
+     *          <span class="zh-CN">生成的Properties实例对象</span>
      */
     Properties readConfig(final MailConfig.ServerConfig serverConfig);
 

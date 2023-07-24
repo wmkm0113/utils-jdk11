@@ -21,15 +21,24 @@ import org.nervousync.mail.config.MailConfig;
 import java.util.Properties;
 
 /**
- * The interface SendOperator.
+ * <h2 class="en">Interface class for e-mail send operator</h2>
+ * <h2 class="zh-CN">电子邮件发送器的接口</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Dec 10, 2019 15:49:52 $
  */
 public interface SendOperator {
-
     /**
-     * Read config properties.
+     * <h3 class="en">Convert given e-mail server configure instance to Properties instance</h3>
+     * <p class="en">Generated Properties instance is using for connect to E-mail server </p>
+     * <h3 class="zh-CN">转换给定的电子邮件配置实例对象为Properties实例对象</h3>
+     * <p class="zh-CN">生成的Properties实例对象用于连接到电子邮件服务器</p>
      *
-     * @param serverConfig the server config
-     * @return the properties
+     * @param serverConfig      <span class="en">Server configure information</span>
+     *                          <span class="zh-CN">服务器配置</span>
+     *
+     * @return  <span class="en">Generated Properties instance</span>
+     *          <span class="zh-CN">生成的Properties实例对象</span>
      */
     Properties readConfig(final MailConfig.ServerConfig serverConfig);
 

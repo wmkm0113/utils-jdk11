@@ -54,6 +54,7 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.eclipse.angus.mail.imap.IMAPFolder;
 import org.eclipse.angus.mail.pop3.POP3Folder;
 import org.nervousync.enumerations.mail.MailProtocol;
+import org.nervousync.exceptions.mail.MailException;
 import org.nervousync.mail.MailObject;
 import org.nervousync.mail.authenticator.DefaultAuthenticator;
 import org.nervousync.mail.config.MailConfig;
@@ -62,27 +63,50 @@ import org.nervousync.mail.operator.SendOperator;
 import org.nervousync.mail.protocol.impl.IMAPProtocol;
 import org.nervousync.mail.protocol.impl.POP3Protocol;
 import org.nervousync.mail.protocol.impl.SMTPProtocol;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.security.factory.SecureFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * The type Mail utils.
+ * <h2 class="en">E-Mail Utilities</h2>
+ * <span class="en">
+ *     <span>Current utilities implements features:</span>
+ *     <ul>Send/Receive email</ul>
+ *     <ul>Count email in folder</ul>
+ *     <ul>List folder names</ul>
+ *     <ul>Download email attachment files automatically</ul>
+ *     <ul>Verify email signature</ul>
+ *     <ul>Add signature to email</ul>
+ * </span>
+ * <h2 class="zh-CN">电子邮件工具集</h2>
+ * <span class="zh-CN">
+ *     <span>此工具集实现以下功能:</span>
+ *     <ul>发送接收电子邮件</ul>
+ *     <ul>获取文件夹中的电子邮件数量</ul>
+ *     <ul>列出所有文件夹名称</ul>
+ *     <ul>自动下载电子邮件中包含的附件</ul>
+ *     <ul>验证电子邮件签名</ul>
+ *     <ul>添加电子签名到邮件</ul>
+ * </span>
  *
  * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2012 8:54:04 PM $
+ * @version $Revision : 1.0 $ $Date: Jul 31, 2012 20:54:04 $
  */
 public final class MailUtils {
-
+	/**
+	 * <h3 class="en">Private constructor for MailUtils</h3>
+	 * <h3 class="zh-CN">电子邮件工具集的私有构造方法</h3>
+	 */
     private MailUtils() {
     }
-
     /**
-     * Initialize a new mail agent by given mail config
+	 * <h3 class="en">Initialize Mail Agent instance by given mail configure information</h3>
+	 * <h3 class="zh-CN">使用给定的电子邮件配置信息生成电子邮件代理实例对象</h3>
      *
-     * @param mailConfig Mail config
-     * @return Optional instance of generated mail agent or empty Option instance if mail config is invalid
+     * @param mailConfig    <span class="en">Mail configure information define</span>
+     *                      <span class="zh-CN">邮件配置信息定义</span>
+     *
+     * @return  <span class="en">Generated Mail Agent instance</span>
+     *          <span class="zh-CN">生成的电子邮件代理实例对象</span>
      */
     public static Agent mailAgent(final MailConfig mailConfig) {
         if (mailConfig == null || StringUtils.isEmpty(mailConfig.getUserName())
@@ -91,27 +115,74 @@ public final class MailUtils {
         }
         return new Agent(mailConfig);
     }
-
     /**
-     * The type Agent.
+     * <h2 class="en">E-Mail Agent</h2>
+     * <h2 class="zh-CN">电子邮件代理</h2>
+     *
+     * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @version $Revision : 1.0 $ $Date: Jul 31, 2012 21:03:46 $
      */
     public static final class Agent {
-
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+        /**
+         * <span class="en">Logger instance</span>
+         * <span class="zh-CN">日志实例</span>
+         */
+        private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
+        /**
+         * <span class="en">Mail account username</span>
+         * <span class="zh-CN">邮件账户用户名</span>
+         */
         private final String userName;
+        /**
+         * <span class="en">Mail account password</span>
+         * <span class="zh-CN">邮件账户密码</span>
+         */
         private final String passWord;
+        /**
+         * <span class="en">Mail send server config</span>
+         * <span class="zh-CN">邮件发送服务器配置信息</span>
+         */
         private final MailConfig.ServerConfig sendConfig;
+        /**
+        * <span class="en">e-mail send operator</span>
+        * <span class="zh-CN">电子邮件发送器</span>
+         */
         private final SendOperator sendOperator;
+        /**
+         * <span class="en">Mail receive server config</span>
+         * <span class="zh-CN">邮件接收服务器配置信息</span>
+         */
         private final MailConfig.ServerConfig receiveConfig;
+        /**
+        * <span class="en">e-mail receive operator</span>
+        * <span class="zh-CN">电子邮件接收器</span>
+         */
         private final ReceiveOperator receiveOperator;
+        /**
+         * <span class="en">Attaches the file storage path</span>
+         * <span class="zh-CN">附件文件的保存地址</span>
+         */
         private final String storagePath;
+        /**
+         * <span class="en">x509 certificate Using for email signature verify</span>
+         * <span class="zh-CN">x509证书用于电子邮件签名验证</span>
+         */
         private final X509Certificate x509Certificate;
+        /**
+         * <span class="en">private key Using for email signature</span>
+         * <span class="zh-CN">私有密钥用于电子邮件签名</span>
+         */
         private final PrivateKey privateKey;
-
+        /**
+         * <h3 class="en">Private constructor for E-Mail Agent</h3>
+         * <h3 class="zh-CN">电子邮件代理的私有构造方法</h3>
+         *
+         * @param mailConfig    <span class="en">Mail configure information define</span>
+         *                      <span class="zh-CN">邮件配置信息定义</span>
+         */
         private Agent(final MailConfig mailConfig) {
             this.userName = mailConfig.getUserName().toLowerCase();
-            this.passWord = SecureFactory.getInstance().decrypt(mailConfig.getSecureName(), mailConfig.getPassword());
+            this.passWord = SecureFactory.decrypt(mailConfig.getSecureName(), mailConfig.getPassword());
             if (mailConfig.getSendConfig() == null
                     || !MailProtocol.SMTP.equals(mailConfig.getSendConfig().getProtocolOption())) {
                 this.sendConfig = null;
@@ -145,12 +216,15 @@ public final class MailUtils {
                     ? CertificateUtils.privateKey("RSA", StringUtils.base64Decode(mailConfig.getPrivateKey()))
                     : null;
         }
-
         /**
-         * Send mail boolean.
+         * <h3 class="en">Send E-Mail</h3>
+         * <h3 class="zh-CN">发送电子邮件</h3>
          *
-         * @param mailObject the mail object
-         * @return the boolean
+         * @param mailObject    <span class="en">E-Mail object</span>
+         *                      <span class="zh-CN">电子邮件信息</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean sendMail(final MailObject mailObject) {
             if (this.sendOperator == null) {
@@ -170,52 +244,57 @@ public final class MailUtils {
                 }
                 Transport.send(convert(session, mailObject, this.x509Certificate, this.privateKey));
                 return Boolean.TRUE;
-            } catch (MessagingException e) {
-                this.logger.error("Send mail failed!");
+            } catch (MessagingException | MailException e) {
+                this.logger.error("Utils", "Send_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Stack message: ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
         }
-
+        /**
+         * <h3 class="en">Read folder name list from default folder</h3>
+         * <h3 class="zh-CN">从默认文件夹中读取包含的文件夹名称列表</h3>
+         *
+         * @return  <span class="en">folder name list</span>
+         *          <span class="en">文件夹名称列表</span>
+         */
         public List<String> folderList() {
             List<String> folderList = new ArrayList<>();
             try (Store store = connect()) {
-                Optional.ofNullable(store.getDefaultFolder())
-                        .ifPresent(defaultFolder -> {
-                            try {
-                                Optional.ofNullable(defaultFolder.list()).map(Arrays::asList)
-                                        .ifPresent(folders ->
-                                                folders.forEach(folder -> folderList.add(folder.getFullName())));
-                            } catch (MessagingException e) {
-                                if (this.logger.isDebugEnabled()) {
-                                    this.logger.debug("Read folder list error! ", e);
-                                }
-                            }
-                        });
+                Folder defaultFolder = store.getDefaultFolder();
+                if (defaultFolder != null) {
+                    for (Folder folder : defaultFolder.list()) {
+                        folderList.add(folder.getFullName());
+                    }
+                }
             } catch (Exception e) {
+                this.logger.error("Utils", "Folders_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Read folder list error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
             return folderList;
         }
-
         /**
-         * Mail count int.
+         * <h3 class="en">Read mail count from inbox</h3>
+         * <h3 class="zh-CN">读取收件箱中的邮件数量</h3>
          *
-         * @return the int
+         * @return  <span class="en">Mail count</span>
+         *          <span class="zh-CN">邮件数量</span>
          */
         public int mailCount() {
             return this.mailCount(Globals.DEFAULT_EMAIL_FOLDER_INBOX);
         }
-
         /**
-         * Mail count int.
+         * <h3 class="en">Read mail count from given folder name</h3>
+         * <h3 class="zh-CN">读取给定文件夹中的邮件数量</h3>
          *
-         * @param folderName the folder name
-         * @return the int
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         *
+         * @return  <span class="en">Mail count</span>
+         *          <span class="zh-CN">邮件数量</span>
          */
         public int mailCount(final String folderName) {
             if (this.receiveOperator == null) {
@@ -227,39 +306,49 @@ public final class MailUtils {
                     return folder.getMessageCount();
                 }
             } catch (Exception e) {
+                this.logger.error("Utils", "Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Receive Message Error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
             return Globals.DEFAULT_VALUE_INT;
         }
-
         /**
-         * Mail list.
+         * <h3 class="en">Read mail UID list from inbox</h3>
+         * <h3 class="zh-CN">读取收件箱中的邮件唯一标识列表</h3>
          *
-         * @return the list
+         * @return  <span class="en">Mail UID list</span>
+         *          <span class="zh-CN">邮件唯一标识列表</span>
          */
         public List<String> mailList() {
             return this.mailList(Globals.DEFAULT_EMAIL_FOLDER_INBOX);
         }
-
         /**
-         * Mail list.
+         * <h3 class="en">Read mail UID list from given folder name</h3>
+         * <h3 class="zh-CN">读取给定文件夹中的邮件唯一标识列表</h3>
          *
-         * @param folderName the folder name
-         * @return the list
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         *
+         * @return  <span class="en">Mail UID list</span>
+         *          <span class="zh-CN">邮件唯一标识列表</span>
          */
         public List<String> mailList(final String folderName) {
             return mailList(folderName, Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT);
         }
-
         /**
-         * Mail list.
+         * <h3 class="en">Read mail UID list from given folder name limit index from begin to end</h3>
+         * <h3 class="zh-CN">读取给定文件夹中的部分邮件唯一标识列表，从给定的起始索引号到终止索引号</h3>
          *
-         * @param folderName the folder name
-         * @param begin      the beginning index
-         * @param end        the end index
-         * @return the list
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param begin         <span class="en">Begin index</span>
+         *                      <span class="zh-CN">起始索引号</span>
+         * @param end           <span class="en">End index</span>
+         *                      <span class="zh-CN">终止索引号</span>
+         *
+         * @return  <span class="en">Mail UID list</span>
+         *          <span class="zh-CN">邮件唯一标识列表</span>
          */
         public List<String> mailList(final String folderName, final int begin, final int end) {
             if (this.receiveOperator == null || end < begin) {
@@ -280,39 +369,49 @@ public final class MailUtils {
                 }
                 return mailList;
             } catch (Exception e) {
+                this.logger.error("Utils", "Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Receive Message Error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
             return Collections.emptyList();
         }
-
         /**
-         * Read mail optional.
+         * <h3 class="en">Read mail information from given folder name and UID</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识读取邮件信息</h3>
          *
-         * @param folderName the folder name
-         * @param uid        the uid
-         * @return the optional
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uid           <span class="en">E-Mail UID</span>
+         *                      <span class="zh-CN">邮件唯一标识</span>
+         *
+         * @return  <span class="en">Read MailObject instance</span>
+         *          <span class="zh-CN">读取的电子邮件信息实例对象</span>
          */
-        public Optional<MailObject> readMail(final String folderName, final String uid) {
+        public MailObject readMail(final String folderName, final String uid) {
             return this.readMail(folderName, uid, Boolean.FALSE);
         }
-
         /**
-         * Read mail optional.
+         * <h3 class="en">Read mail content information from given folder name and UID</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识读取邮件详细信息</h3>
          *
-         * @param folderName the folder name
-         * @param uid        the uid
-         * @param detail     read mail detail
-         * @return the optional
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uid           <span class="en">E-Mail UID</span>
+         *                      <span class="zh-CN">邮件唯一标识</span>
+         * @param detail        <span class="en">Read detail status</span>
+         *                      <span class="zh-CN">读取全部信息状态</span>
+         *
+         * @return  <span class="en">Read MailObject instance</span>
+         *          <span class="zh-CN">读取的电子邮件信息实例对象</span>
          */
-        public Optional<MailObject> readMail(final String folderName, final String uid, final boolean detail) {
+        public MailObject readMail(final String folderName, final String uid, final boolean detail) {
             if (this.receiveOperator == null) {
-                return Optional.empty();
+                return null;
             }
             try (Store store = connect(); Folder folder = openReadOnlyFolder(store, folderName)) {
                 if (!folder.exists() || !folder.isOpen()) {
-                    return Optional.empty();
+                    return null;
                 }
 
                 Message message = this.receiveOperator.readMessage(folder, uid);
@@ -320,20 +419,25 @@ public final class MailUtils {
                     return receiveMessage((MimeMessage) message, detail);
                 }
             } catch (Exception e) {
+                this.logger.error("Utils", "Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Receive Message Error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
 
-            return Optional.empty();
+            return null;
         }
-
         /**
-         * Read the mail list.
+         * <h3 class="en">Read mail content information list from given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组读取邮件详细信息</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the list
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Read MailObject instance list</span>
+         *          <span class="zh-CN">读取的电子邮件信息实例对象列表</span>
          */
         public List<MailObject> readMailList(final String folderName, final String... uidArrays) {
             List<MailObject> mailList = new ArrayList<>();
@@ -347,68 +451,89 @@ public final class MailUtils {
                 }
                 this.receiveOperator.readMessages(folder, uidArrays)
                         .forEach(message ->
-                                receiveMessage((MimeMessage) message, Boolean.FALSE)
+                                Optional.ofNullable(receiveMessage((MimeMessage) message, Boolean.FALSE))
                                         .ifPresent(mailList::add));
             } catch (Exception e) {
-                this.logger.error("Receive Message Error! ");
+                this.logger.error("Utils", "Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Stack message: ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
 
             return mailList;
         }
-
         /**
-         * Set mails status as read by uid list
+         * <h3 class="en">Set mails status as read with given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件置为已读状态</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean readMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.SEEN, Boolean.TRUE, folderName, uidArrays);
         }
-
         /**
-         * Set mails status as unread by uid list
+         * <h3 class="en">Set mails status as unread with given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件置为未读状态</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean unreadMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.SEEN, Boolean.FALSE, folderName, uidArrays);
         }
-
         /**
-         * Set mails status as answered by uid list
+         * <h3 class="en">Set mails status as answer with given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件置为已回复状态</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean answerMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.ANSWERED, Boolean.TRUE, folderName, uidArrays);
         }
-
         /**
-         * Set mails status as deleted by uid list
+         * <h3 class="en">Delete mails by given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件转移到回收站</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean deleteMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.DELETED, Boolean.TRUE, folderName, uidArrays);
         }
-
         /**
-         * Set mails status as not deleted by uid list
+         * <h3 class="en">Recovery mails by given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据邮件唯一标识数组，将对应的邮件置从回收站转移到给定的文件夹</h3>
+         * Set mails status as read by uid list
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean recoverMails(final String folderName, final String... uidArrays) {
             if (this.receiveOperator == null) {
@@ -423,44 +548,58 @@ public final class MailUtils {
                 List<Message> messageList = this.receiveOperator.readMessages(folder, uidArrays);
 
                 folder.copyMessages(messageList.toArray(new Message[0]), inbox);
-                return true;
+                return Boolean.TRUE;
             } catch (Exception e) {
+                this.logger.error("Utils", "Set_Status_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Set message status error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
         }
-
         /**
-         * Set mails status as flagged by uid list
+         * <h3 class="en">Set mails status as flag with given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件置为标记状态</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean flagMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.FLAGGED, Boolean.TRUE, folderName, uidArrays);
         }
-
         /**
-         * Set mails status as not flagged by uid list
+         * <h3 class="en">Set mails status as unflag with given folder name and UID array</h3>
+         * <h3 class="zh-CN">根据给定的文件夹名和邮件唯一标识数组，将对应的邮件置为未标记状态</h3>
          *
-         * @param folderName the folder name
-         * @param uidArrays  the uid arrays
-         * @return the boolean
+         * @param folderName    <span class="en">folder name</span>
+         *                      <span class="zh-CN">文件夹名称</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         public boolean unflagMails(final String folderName, final String... uidArrays) {
             return this.flagMailsStatus(Flags.Flag.FLAGGED, Boolean.FALSE, folderName, uidArrays);
         }
-
         /**
-         * Flag mails boolean.
+         * <h3 class="en">Set mails status with parameters</h3>
+         * <h3 class="zh-CN">根据参数信息设置对应的邮件状态</h3>
          *
-         * @param flag      the flag
-         * @param status    the status
-         * @param uidArrays the uid arrays
-         * @return the boolean
+         * @param flag          <span class="en">Flag code</span>
+         *                      <span class="zh-CN">标记类型</span>
+         * @param status        <span class="en">Flag status</span>
+         *                      <span class="zh-CN">标记状态</span>
+         * @param uidArrays     <span class="en">E-Mail UID array</span>
+         *                      <span class="zh-CN">邮件唯一标识数组</span>
+         *
+         * @return  <span class="en">Process result</span>
+         *          <span class="zh-CN">操作结果</span>
          */
         private boolean flagMailsStatus(final Flags.Flag flag, final boolean status,
                                         final String folderName, final String... uidArrays) {
@@ -480,18 +619,23 @@ public final class MailUtils {
                 }
                 return true;
             } catch (Exception e) {
+                this.logger.error("Utils", "Set_Status_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Set message status error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
         }
-
         /**
-         * Connect to mail server
+         * <h3 class="en">Connect to mail server</h3>
+         * <h3 class="zh-CN">连接到电子邮件服务器</h3>
          *
-         * @return Store instance
-         * @throws MessagingException connect failed
+         * @return  <span class="en">Store instance</span>
+         *          <span class="zh-CN">Store实例对象</span>
+         *
+         * @throws MessagingException
+         * <span class="en">If connect failed</span>
+         * <span class="zh-CN">如果连接失败</span>
          */
         private Store connect() throws MessagingException {
             Properties properties = this.receiveOperator.readConfig(this.receiveConfig);
@@ -505,7 +649,15 @@ public final class MailUtils {
                     this.userName, this.passWord);
             return store;
         }
-
+        /**
+         * <h3 class="en">Verify e-mail signature</h3>
+         * <h3 class="zh-CN">验证电子邮件签名</h3>
+         *
+         * @param mimeMessage   <span class="en">E-Mail MimeMessage instance</span>
+         *                      <span class="zh-CN">电子邮件信息实例对象</span>
+         * @return  <span class="en">Verify result</span>
+         *          <span class="zh-CN">验证结果</span>
+         */
         @SuppressWarnings("unchecked")
         private boolean verifyMessage(final MimeMessage mimeMessage) {
             try {
@@ -532,36 +684,42 @@ public final class MailUtils {
                                 new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certificate);
                         return signerInformation.verify(signerInformationVerifier);
                     } catch (Exception e) {
+                        this.logger.error("Utils", "Verify_Signature_Mail_Error");
                         if (this.logger.isDebugEnabled()) {
-                            this.logger.debug("Verify signature failed! ", e);
+                            this.logger.debug("Utils", "Stack_Message_Error", e);
                         }
                     }
                 }
             } catch (Exception e) {
+                this.logger.error("Utils", "Verify_Signature_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Verify signature failed! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
             return Boolean.FALSE;
         }
-
         /**
-         * Read mail info
+         * <h3 class="en">Parse MimeMessage instance to MailObject instance</h3>
+         * <h3 class="zh-CN">解析电子邮件MIME信息实例对象并转换为电子邮件信息实例对象</h3>
          *
-         * @param mimeMessage MIME message instance
-         * @param detail      read detail
-         * @return Mail object instance
+         * @param mimeMessage   <span class="en">E-Mail MimeMessage instance</span>
+         *                      <span class="zh-CN">电子邮件MIME信息实例对象</span>
+         * @param detail        <span class="en">Read detail status</span>
+         *                      <span class="zh-CN">读取全部信息状态</span>
+         *
+         * @return  <span class="en">Read MailObject instance</span>
+         *          <span class="zh-CN">读取的电子邮件信息实例对象</span>
          */
-        private Optional<MailObject> receiveMessage(final MimeMessage mimeMessage, final boolean detail) {
+        private MailObject receiveMessage(final MimeMessage mimeMessage, final boolean detail) {
             if (!verifyMessage(mimeMessage)) {
-                return Optional.empty();
+                return null;
             }
             try {
                 MailObject mailObject = new MailObject();
                 List<String> receiveList = new ArrayList<>();
                 Address[] allRecipients = mimeMessage.getAllRecipients();
                 if (allRecipients == null) {
-                    return Optional.empty();
+                    return null;
                 }
                 Arrays.stream(allRecipients)
                         .filter(InternetAddress.class::isInstance)
@@ -608,22 +766,39 @@ public final class MailUtils {
 
                     //	Read mail content message
                     StringBuilder contentBuffer = new StringBuilder();
-                    getMailContent(mimeMessage, contentBuffer);
+                    readMailContent(mimeMessage, contentBuffer);
                     mailObject.setContent(contentBuffer.toString());
                     mailObject.setContentType(mimeMessage.getContentType());
 
                     mailObject.setAttachFiles(getMailAttachment(mimeMessage));
                 }
 
-                return Optional.of(mailObject);
+                return mailObject;
             } catch (MessagingException | IOException e) {
+                this.logger.error("Utils", "Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Receive message error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
-                return Optional.empty();
+                return null;
             }
         }
-
+        /**
+         * <h3 class="en">Read attachment files from given part of e-mail MIME information</h3>
+         * <h3 class="zh-CN">从给定的电子邮件MIME信息中读取附件文件</h3>
+         *
+         * @param part      <span class="en">part of e-mail MIME information</span>
+         *                  <span class="zh-CN">电子邮件MIME信息</span>
+         *
+         * @return  <span class="en">Read file path list</span>
+         *          <span class="zh-CN">读取的附件文件路径列表</span>
+         *
+         * @throws MessagingException
+         * <span class="en">If an error occurs when read attachment information</span>
+         * <span class="zh-CN">当读取附件数据时出现异常</span>
+         * @throws IOException
+         * <span class="en">If an error occurs when save file to local</span>
+         * <span class="zh-CN">当写入数据到本地文件时出现异常</span>
+         */
         private List<String> getMailAttachment(final Part part) throws MessagingException, IOException {
             List<String> saveFiles = new ArrayList<>();
             if (StringUtils.isEmpty(this.storagePath)) {
@@ -639,7 +814,15 @@ public final class MailUtils {
             }
             return saveFiles;
         }
-
+        /**
+         * <h3 class="en">Read attachment files from given body part of MIME information</h3>
+         * <h3 class="zh-CN">从给定的电子邮件MIME信息体中读取附件文件</h3>
+         *
+         * @param bodyPart      <span class="en">body part of MIME information</span>
+         *                      <span class="zh-CN">电子邮件MIME信息体</span>
+         * @param saveFiles     <span class="en">Saved file path list</span>
+         *                      <span class="zh-CN">已保存的文件路径列表</span>
+         */
         private void readBodyPart(final Part bodyPart, final List<String> saveFiles) {
             try {
                 if (bodyPart.getHeader("Content-ID") != null
@@ -663,16 +846,40 @@ public final class MailUtils {
                     }
                 }
             } catch (MessagingException | IOException e) {
+                this.logger.error("Utils", "Attachment_Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Receive attaches file error! ", e);
+                    this.logger.debug("Utils", "Stack_Message_Error", e);
                 }
             }
         }
     }
-
+    /**
+     * <h3 class="en">Add signature to MailObject instance and convert to MimeMessage instance</h3>
+     * <h3 class="zh-CN">添加电子签名到电子邮件信息并转换为电子邮件MIME信息实例对象</h3>
+     *
+     * @param session           <span class="en">Current session</span>
+     *                          <span class="zh-CN">当前的事务链接</span>
+     * @param mailObject        <span class="en">Read MailObject instance</span>
+     *                          <span class="zh-CN">读取的电子邮件信息实例对象</span>
+     * @param x509Certificate   <span class="en">x509 certificate</span>
+     *                          <span class="zh-CN">x509证书</span>
+     * @param privateKey        <span class="en">private key</span>
+     *                          <span class="zh-CN">私有密钥</span>
+     *
+     * @return  <span class="en">Converted MimeMessage instance</span>
+     *          <span class="zh-CN">转换后的电子邮件MIME信息实例对象</span>
+     *
+     * @throws MailException
+     * <span class="en">If an error occurs when process convert</span>
+     * <span class="zh-CN">当转换数据时出现异常</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when process convert</span>
+     * <span class="zh-CN">当转换数据时出现异常</span>
+     */
     private static MimeMessage convert(final Session session, final MailObject mailObject,
                                        final X509Certificate x509Certificate, final PrivateKey privateKey)
-            throws MessagingException {
+            throws MailException, MessagingException {
         MimeMessage message = new MimeMessage(session);
 
         message.setSubject(mailObject.getSubject(), mailObject.getCharset());
@@ -688,7 +895,7 @@ public final class MailUtils {
                 try {
                     file = FileUtils.getFile(attachment);
                 } catch (FileNotFoundException e) {
-                    throw new MessagingException("Attachment file not found! ", e);
+                    throw new MailException(0x0000000E0005L, "Utils", "Attachment_File_Not_Found_Error", e);
                 }
 
                 DataSource dataSource = new FileDataSource(file);
@@ -712,13 +919,13 @@ public final class MailUtils {
                     mimeBodyPart = new MimeBodyPart();
                     DataHandler dataHandler =
                             new DataHandler(new ByteArrayDataSource(file.toURI().toURL().openStream(),
-                                    "application/octet-stream"));
+                                    Globals.DEFAULT_CONTENT_TYPE_BINARY));
                     mimeBodyPart.setDataHandler(dataHandler);
 
                     mimeBodyPart.setFileName(fileName);
                     mimeBodyPart.setHeader("Content-ID", fileName);
                 } catch (Exception e) {
-                    throw new MessagingException("Process include file error! ", e);
+                    throw new MailException(0x0000000E0006L, "Utils", "Attachment_File_Error", e);
                 }
 
                 mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
@@ -760,7 +967,7 @@ public final class MailUtils {
                 message.setContent(signedMimeMultipart, signedMimeMultipart.getContentType());
             } catch (CertificateEncodingException | CertificateParsingException | OperatorCreationException |
                      SMIMEException e) {
-                throw new MessagingException("Signature mail error! ", e);
+                throw new MailException(0x0000000E0007L, "Utils", "Signature_Mail_Error", e);
             }
         } else {
             message.setContent(mimeMultipart, mimeMultipart.getContentType());
@@ -769,7 +976,7 @@ public final class MailUtils {
         message.setFrom(new InternetAddress(mailObject.getSendAddress()));
 
         if (mailObject.getReceiveAddress() == null || mailObject.getReceiveAddress().isEmpty()) {
-            throw new MessagingException("Unknown receive address");
+            throw new MailException(0x0000000E0008L, "Utils", "Unknown_Receive_Address_Mail_Error");
         }
         StringBuilder receiveAddress = new StringBuilder();
         mailObject.getReceiveAddress().forEach(address -> receiveAddress.append(",").append(address));
@@ -797,20 +1004,67 @@ public final class MailUtils {
         message.setSentDate(mailObject.getSendDate() == null ? new Date() : mailObject.getSendDate());
         return message;
     }
-
+    /**
+     * <h3 class="en">Open folder from Store instance by given folder name in read only mode</h3>
+     * <h3 class="zh-CN">在只读模式中打开给定的Store实例对象中的文件夹</h3>
+     *
+     * @param store         <span class="en">Store instance</span>
+     *                      <span class="zh-CN">Store实例对象</span>
+     * @param folderName    <span class="en">folder name</span>
+     *                      <span class="zh-CN">文件夹名称</span>
+     *
+     * @return  <span class="en">Opened Folder instance</span>
+     *          <span class="zh-CN">打开的文件夹实例对象</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when process open</span>
+     * <span class="zh-CN">当读取数据时出现异常</span>
+     */
     private static Folder openReadOnlyFolder(final Store store, final String folderName)
             throws MessagingException {
         return openFolder(store, Boolean.TRUE, folderName);
     }
-
+    /**
+     * <h3 class="en">Open folder from Store instance by given folder name and mode</h3>
+     * <h3 class="zh-CN">使用给定的模式中打开给定的Store实例对象中的文件夹</h3>
+     *
+     * @param store         <span class="en">Store instance</span>
+     *                      <span class="zh-CN">Store实例对象</span>
+     * @param readOnly      <span class="en">Read only status</span>
+     *                      <span class="zh-CN">只读模式状态</span>
+     * @param folderName    <span class="en">folder name</span>
+     *                      <span class="zh-CN">文件夹名称</span>
+     *
+     * @return  <span class="en">Opened Folder instance</span>
+     *          <span class="zh-CN">打开的文件夹实例对象</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when process open</span>
+     * <span class="zh-CN">当读取数据时出现异常</span>
+     */
     private static Folder openFolder(final Store store, final boolean readOnly, final String folderName)
             throws MessagingException {
         Folder folder = store.getFolder(folderName);
         folder.open(readOnly ? Folder.READ_ONLY : Folder.READ_WRITE);
         return folder;
     }
-
-    private static void getMailContent(final Part part, final StringBuilder contentBuffer)
+    /**
+     * <h3 class="en">Read mail content information</h3>
+     * <h3 class="zh-CN">读取电子邮件详细信息</h3>
+     *
+     * @param part          <span class="en">part of e-mail MIME information</span>
+     *                      <span class="zh-CN">电子邮件MIME信息</span>
+     * @param contentBuffer <span class="en">Content information buffer</span>
+     *                      <span class="zh-CN">详细信息输出缓冲器</span>
+     *
+     * @throws MessagingException
+     * <span class="en">If an error occurs when process read</span>
+     * <span class="zh-CN">当读取信息时出现异常</span>
+     * @throws IOException
+     * <span class="en">If an error occurs when append content information to buffer</span>
+     * <span class="zh-CN">当追加详细信息到输出缓冲器时出现异常</span>
+     */
+    private static void readMailContent(final Part part, final StringBuilder contentBuffer)
             throws MessagingException, IOException {
         String contentType = part.getContentType();
         int nameIndex = contentType.indexOf("name");
@@ -827,10 +1081,10 @@ public final class MailUtils {
             Multipart multipart = (Multipart) part.getContent();
             int count = multipart.getCount();
             for (int i = 0; i < count; i++) {
-                getMailContent(multipart.getBodyPart(i), contentBuffer);
+                readMailContent(multipart.getBodyPart(i), contentBuffer);
             }
         } else if (part.isMimeType(Globals.DEFAULT_CONTENT_TYPE_MESSAGE_RFC822)) {
-            getMailContent((Part) part.getContent(), contentBuffer);
+            readMailContent((Part) part.getContent(), contentBuffer);
         }
     }
 }

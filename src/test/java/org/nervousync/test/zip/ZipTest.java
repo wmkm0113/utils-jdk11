@@ -1,8 +1,8 @@
 package org.nervousync.test.zip;
 
 import org.junit.jupiter.api.*;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipOptions;
+import org.nervousync.commons.Globals;
+import org.nervousync.zip.options.ZipOptions;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.FileUtils;
@@ -97,7 +97,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(10)
-	public void createEncFile() {
+	public void createEncFile() throws ZipException {
 		Assertions.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip",
 				ZipOptions.standardEncryptOptions(ZIP_PASSWORD), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
@@ -105,7 +105,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(20)
-	public void createAes256File() {
+	public void createAes256File() throws ZipException {
 		Assertions.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip",
 				ZipOptions.aesEncryptOptions(ZIP_PASSWORD), COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
@@ -113,7 +113,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(30)
-	public void createSplitFile() {
+	public void createSplitFile() throws ZipException {
 		Assertions.assertNotNull(ZipFile.createZipFileFromFolder(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip",
 				ZipOptions.newOptions(), Boolean.TRUE, 1024 * 1024L, COMPRESS_FOLDER));
 		this.logger.info("Create Zip File Success! ");
@@ -121,7 +121,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(40)
-	public void createCommentFile() {
+	public void createCommentFile() throws ZipException {
 		ZipOptions zipOptions = ZipOptions.newOptions();
 		//  Setting character encoding "GBK" if comment content contains CJK character for compatible the compress software (ex: 7-Zip)
 		zipOptions.setCharsetEncoding("GBK");
@@ -134,7 +134,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(45)
-	public void zipEntryTest() {
+	public void zipEntryTest() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFile.zip");
 		Assertions.assertNotNull(zipFile);
 		List<String> entryList = zipFile.entryList();
@@ -150,7 +150,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(50)
-	public void extractFile() {
+	public void extractFile() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoFolder.zip");
 		Assertions.assertNotNull(zipFile);
 		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demo");
@@ -158,7 +158,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(60)
-	public void extractEncFile() {
+	public void extractEncFile() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip");
 		Assertions.assertNotNull(zipFile);
 		zipFile.setPassword(ZIP_PASSWORD);
@@ -167,7 +167,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(70)
-	public void extractAes256File() {
+	public void extractAes256File() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip");
 		Assertions.assertNotNull(zipFile);
 		zipFile.setPassword(ZIP_PASSWORD);
@@ -176,7 +176,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(80)
-	public void extractSplitFile() {
+	public void extractSplitFile() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip");
 		Assertions.assertNotNull(zipFile);
 		zipFile.extractAll(EXTRACT_FOLDER + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit");
@@ -184,7 +184,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(90)
-	public void mergeSplitFile() {
+	public void mergeSplitFile() throws ZipException {
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoSplit.zip");
 		Assertions.assertNotNull(zipFile);
 		zipFile.mergeSplitFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoMerge.zip");
@@ -192,7 +192,7 @@ public final class ZipTest extends BaseTest {
 
 	@Test
 	@Order(100)
-	public void readComment() {
+	public void readComment() throws ZipException {
 		//  Using GBK Encoding if comment content contains CJK character
 		ZipFile zipFile = ZipFile.openZipFile(ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "demoComment.zip", "GBK");
 		Assertions.assertNotNull(zipFile);
@@ -205,7 +205,7 @@ public final class ZipTest extends BaseTest {
 	 */
 	@Test
 	@Order(110)
-	public void extractSoftwareZippedFile() {
+	public void extractSoftwareZippedFile() throws ZipException {
 		String filePath = ZIP_FILE_PATH + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip.zip.001";
 		this.logger.info("Read file path: {}", filePath);
 		if (FileUtils.isExists(filePath)) {

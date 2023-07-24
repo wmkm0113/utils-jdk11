@@ -3,7 +3,7 @@ package org.nervousync.test.otp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.OTPUtils;
 import org.nervousync.utils.StringUtils;

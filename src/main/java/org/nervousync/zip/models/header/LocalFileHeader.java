@@ -20,7 +20,7 @@ import java.io.DataInput;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.impl.aes.AESCrypto;
 import org.nervousync.zip.models.header.utils.HeaderOperator;
@@ -102,11 +102,10 @@ public final class LocalFileHeader extends FileHeader {
 	 *
 	 * @param input the input
 	 * @return the boolean
-	 * @throws ZipException the zip exception
 	 */
-	public boolean verifyPassword(DataInput input) throws ZipException {
+	public boolean verifyPassword(DataInput input) {
 		if (!this.isEncrypted()) {
-			return true;
+			return Boolean.TRUE;
 		}
 
 		try {
@@ -143,9 +142,9 @@ public final class LocalFileHeader extends FileHeader {
 				return Boolean.FALSE;
 			} else if (this.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
 				//	Not supported verify password of standard encrypt
-				return true;
+				return Boolean.TRUE;
 			} else {
-				throw new ZipException("Unsupported encryption method");
+				throw new ZipException(0x0000001B0001L, "Utils", "Not_Supported_Encryption_Mode_Zip_Error");
 			}
 		} catch (Exception e) {
 			return Boolean.FALSE;

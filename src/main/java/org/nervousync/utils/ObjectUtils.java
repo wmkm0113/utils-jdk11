@@ -17,56 +17,73 @@
 package org.nervousync.utils;
 
 import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Optional;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
-
-import org.nervousync.beans.core.BeanObject;
-import org.nervousync.commons.core.Globals;
-import org.nervousync.enumerations.xml.DataType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nervousync.commons.Globals;
 
 /**
- * The type Object utils.
+ * <h2 class="en">Object Operate Utilities</h2>
+ * <h2 class="zh-CN">对象操作工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 4:26:58 PM $
+ * @version $Revision : 1.0 $ $Date: Jan 13, 2010 16:26:58 $
  */
 public final class ObjectUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectUtils.class);
-
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(ObjectUtils.class);
+    /**
+     * <span class="en">Constant value of array start character</span>
+     * <span class="zh-CN">数组起始字符常量值</span>
+     */
     private static final String ARRAY_START = "[";
+    /**
+     * <span class="en">Constant value of array end character</span>
+     * <span class="zh-CN">数组终止字符常量值</span>
+     */
     private static final String ARRAY_END = "]";
+    /**
+     * <span class="en">Constant value of array separator character</span>
+     * <span class="zh-CN">数组元素分割字符常量值</span>
+     */
     private static final String ARRAY_ELEMENT_SEPARATOR = ", ";
-
+	/**
+	 * <h3 class="en">Private constructor for ObjectUtils</h3>
+	 * <h3 class="zh-CN">对象操作工具集的私有构造方法</h3>
+	 */
     private ObjectUtils() {
     }
-
     /**
-     * Create a proxy object instance
+	 * <h3 class="en">Create a object instance by invoke non-args constructor method</h3>
+	 * <h3 class="zh-CN">通过调用无参构造函数方法创建对象实例</h3>
      *
-     * @param <T>   T
-     * @param clazz define class
-     * @return object instance
+     * @param <T>       <span class="en">define class</span>
+     *                  <span class="zh-CN">定义类</span>
+     * @param clazz     <span class="en">define class</span>
+     *                  <span class="zh-CN">定义类</span>
+     *
+     * @return  <span class="en">Created object instance</span>
+     *          <span class="zh-CN">创建的对象实例</span>
      */
     public static <T> T newInstance(final Class<T> clazz) {
         return newInstance(clazz, new Object[0]);
     }
-
     /**
-     * Create a proxy object instance
+	 * <h3 class="en">Create a object instance by invoke constructor method as given parameter values</h3>
+	 * <h3 class="zh-CN">通过给定参数值作为参数来调用构造方法创建对象实例</h3>
      *
-     * @param <T>   T
-     * @param clazz define class
-     * @return object instance
+     * @param <T>           <span class="en">define class</span>
+     *                      <span class="zh-CN">定义类</span>
+     * @param clazz         <span class="en">define class</span>
+     *                      <span class="zh-CN">定义类</span>
+     * @param paramValues   <span class="en">Parameter values</span>
+     *                      <span class="zh-CN">参数值</span>
+     *
+     * @return  <span class="en">Created object instance</span>
+     *          <span class="zh-CN">创建的对象实例</span>
      */
     public static <T> T newInstance(final Class<T> clazz, final Object[] paramValues) {
         if (clazz == null) {
@@ -75,7 +92,7 @@ public final class ObjectUtils {
         Constructor<T> constructor;
         try {
             if (paramValues == null || paramValues.length == 0) {
-                constructor = ClassUtils.findConstructor(clazz);
+                constructor = ReflectionUtils.findConstructor(clazz);
                 if (!Modifier.isPublic(clazz.getModifiers()) || !ReflectionUtils.publicMember(constructor)) {
                     ReflectionUtils.makeAccessible(constructor);
                 }
@@ -85,7 +102,7 @@ public final class ObjectUtils {
                 for (int i = 0; i < paramValues.length; i++) {
                     paramTypes[i] = paramValues[i].getClass();
                 }
-                constructor = ClassUtils.findConstructor(clazz, paramTypes);
+                constructor = ReflectionUtils.findConstructor(clazz, paramTypes);
                 if (!Modifier.isPublic(clazz.getModifiers()) || !ReflectionUtils.publicMember(constructor)) {
                     ReflectionUtils.makeAccessible(constructor);
                 }
@@ -93,47 +110,48 @@ public final class ObjectUtils {
             }
         } catch (SecurityException | NoSuchMethodException | InstantiationException
                  | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.error("Utils", "Create_Instance_Object_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Create proxy instance error! ", e);
+                LOGGER.debug("Utils", "Stack_Message_Error", e);
             }
         }
         return null;
     }
-
     /**
-     * Create a proxy object instance
+	 * <h3 class="en">Create a proxy object instance</h3>
+	 * <h3 class="zh-CN">创建代理对象实例</h3>
      *
-     * @param <T>               T
-     * @param clazz             define class
-     * @param methodInterceptor method interceptor instance
-     * @return object instance
+     * @param <T>                   <span class="en">define class</span>
+     *                              <span class="zh-CN">定义类</span>
+     * @param clazz                 <span class="en">define class</span>
+     *                              <span class="zh-CN">定义类</span
+     * @param methodInterceptor     <span class="en">method interceptor instance</span>
+     *                              <span class="zh-CN">方法拦截器实例</span>
+     *
+     * @return  <span class="en">Created proxy object instance</span>
+     *          <span class="zh-CN">创建的代理对象实例</span>
      */
     public static <T> T newInstance(final Class<T> clazz, final InvocationHandler methodInterceptor) {
         return newInstance(clazz, new Class[]{clazz}, methodInterceptor);
     }
-
     /**
-     * Create a proxy object instance
+	 * <h3 class="en">Create a proxy object instance</h3>
+	 * <h3 class="zh-CN">创建代理对象实例</h3>
      *
-     * @param <T>   T
-     * @param clazz define class
-     * @return object instance
+     * @param <T>                   <span class="en">define class</span>
+     *                              <span class="zh-CN">定义类</span>
+     * @param clazz                 <span class="en">define class</span>
+     *                              <span class="zh-CN">定义类</span>
+     * @param interfaceClasses      <span class="en">Interface class array</span>
+     *                              <span class="zh-CN">接口类数组</span>
+     * @param invocationHandler     <span class="en">method interceptor instance</span>
+     *                              <span class="zh-CN">方法拦截器实例</span>
+     *
+     * @return  <span class="en">Created proxy object instance</span>
+     *          <span class="zh-CN">创建的代理对象实例</span>
      */
     public static <T> T newInstance(final Class<T> clazz, final Class<?>[] interfaceClasses,
-                                    final InvocationHandler methodInterceptor) {
-        return createProxyInstance(clazz, interfaceClasses, methodInterceptor);
-    }
-
-    /**
-     * Create a proxy object instance
-     *
-     * @param <T>               T
-     * @param clazz             define class
-     * @param invocationHandler method invocation handler instance
-     * @return object instance
-     */
-    private static <T> T createProxyInstance(final Class<T> clazz, final Class<?>[] interfaceClasses,
-                                             final InvocationHandler invocationHandler) {
+                                    final InvocationHandler invocationHandler) {
         if (clazz == null || invocationHandler == null) {
             return newInstance(clazz);
         }
@@ -145,49 +163,20 @@ public final class ObjectUtils {
         }
         return clazz.cast(Proxy.newProxyInstance(clazz.getClassLoader(), interfaces, invocationHandler));
     }
-
     /**
-     * Check whether the given exception is compatible with the exceptions
-     * declared in a throw clause.
+	 * <h3 class="en">Return whether the given object is empty: that is, <code>null</code> or a collection of zero-length.</h3>
+	 * <h3 class="zh-CN">返回给定对象是否为空：即 <code>null</code> 或长度为零的集合。</h3>
      *
-     * @param ex                 the exception to checked
-     * @param declaredExceptions the exceptions declared in the throw clause
-     * @return whether the given exception is compatible
-     */
-    public static boolean isCompatibleWithThrowClause(final Throwable ex, final Class<?>[] declaredExceptions) {
-        if (ex instanceof RuntimeException || ex instanceof Error) {
-            return Boolean.TRUE;
-        }
-        if (declaredExceptions != null) {
-            return Arrays.stream(declaredExceptions)
-                    .anyMatch(declaredException -> ClassUtils.isAssignableValue(declaredException, ex));
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * Return whether the given array is empty: that is, <code>null</code>
-     * or of zero-length.
+     * @param object    <span class="en">the object to check</span>
+     *                  <span class="zh-CN">检查对象</span>
      *
-     * @param array the array to check
-     * @return whether the given array is empty
-     */
-    public static boolean isEmpty(final Object[] array) {
-        return (array == null || array.length == 0);
-    }
-
-    /**
-     * Return whether the given array is empty: that is, <code>null</code>
-     * or of zero-length.
-     *
-     * @param object the object to check
-     * @return whether the given array is empty
+     * @return  <span class="en">whether the given object is <code>null</code> or collection is empty</span>
+     *          <span class="zh-CN">给定对象是否为 <code>null</code> 或集合是否为空</span>
      */
     public static boolean isNull(final Object object) {
         if (object == null) {
             return Boolean.TRUE;
         }
-
         if (object.getClass().isArray()) {
             return (Array.getLength(object) == 0);
         } else {
@@ -195,135 +184,34 @@ public final class ObjectUtils {
                 return (((String) object).length() == 0);
             }
         }
-
         return Boolean.FALSE;
     }
-
-    /**
-     * Check whether the given array contains the given element.
-     *
-     * @param array   the array to check (maybe <code>null</code>,
-     *                in which case the return value will always be <code>Boolean.FALSE</code>)
-     * @param element the element to check for
-     * @return whether the element has been found in the given array
-     */
-    public static boolean notContainsElement(final Collection<?> array, final Object element) {
-        if (array == null) {
-            return Boolean.TRUE;
-        }
-        return Arrays.stream(toObjectArray(array)).noneMatch(object -> nullSafeEquals(object, element));
-    }
-
-    /**
-     * Append the given Object to the given array, returning a new array
-     * consisting of the input array contents plus the given Object.
-     *
-     * @param array the array to append to (can be <code>null</code>)
-     * @param obj   the Object to append
-     * @return the new array (of the same component type; never <code>null</code>)
-     */
-    public static Object[] addObjectToArray(final Object[] array, final Object obj) {
-        Class<?> compType = Object.class;
-        if (array != null) {
-            compType = array.getClass().getComponentType();
-        } else if (obj != null) {
-            compType = obj.getClass();
-        }
-        int newArrLength = (array != null ? array.length + 1 : 1);
-        Object[] newArr = (Object[]) Array.newInstance(compType, newArrLength);
-        if (array != null) {
-            System.arraycopy(array, 0, newArr, 0, array.length);
-        }
-        newArr[newArr.length - 1] = obj;
-        return newArr;
-    }
-
-    /**
-     * Convert the given array (which may be a primitive array) to an
-     * object array (if necessary of primitive wrapper objects).
-     * <p>A <code>null</code> source value will be converted to an
-     * empty Object array.
-     *
-     * @param source the (potentially primitive) array
-     * @return the corresponding object array (never <code>null</code>)
-     * @throws IllegalArgumentException if the parameter is not an array
-     */
-    public static Object[] toObjectArray(final Object source) {
-        if (source instanceof Object[]) {
-            return (Object[]) source;
-        }
-        if (source == null) {
-            return new Object[0];
-        }
-        if (!source.getClass().isArray()) {
-            throw new IllegalArgumentException("Source is not an array: " + source);
-        }
-        int length = Array.getLength(source);
-        if (length == 0) {
-            return new Object[0];
-        }
-        Class<?> wrapperType = Array.get(source, 0).getClass();
-        Object[] newArray = (Object[]) Array.newInstance(wrapperType, length);
-        for (int i = 0; i < length; i++) {
-            newArray[i] = Array.get(source, i);
-        }
-        return newArray;
-    }
-
-    /**
-     * Retrieve simple data type data type.
-     *
-     * @param clazz the clazz
-     * @return the data type
-     */
-    public static DataType retrieveSimpleDataType(final Class<?> clazz) {
-        if (clazz == null) {
-            return DataType.UNKNOWN;
-        }
-
-        if (clazz.equals(Character[].class) || clazz.equals(char[].class)) {
-            return DataType.CDATA;
-        } else if (clazz.equals(Byte[].class) || clazz.equals(byte[].class)) {
-            return DataType.BINARY;
-        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-            return DataType.BOOLEAN;
-        } else if (clazz.equals(Date.class)) {
-            return DataType.DATE;
-        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)
-                || clazz.equals(Float.class) || clazz.equals(float.class)
-                || clazz.equals(Double.class) || clazz.equals(double.class)
-                || clazz.equals(Short.class) || clazz.equals(short.class)
-                || clazz.equals(Long.class) || clazz.equals(long.class)
-                || clazz.equals(byte.class) || clazz.equals(BigInteger.class)
-                || clazz.equals(BigDecimal.class) || clazz.equals(Number.class)) {
-            return DataType.NUMBER;
-        } else if (clazz.equals(String.class)) {
-            return DataType.STRING;
-        } else if (BeanObject.class.isAssignableFrom(clazz)
-                && (clazz.isAnnotationPresent(XmlType.class) || clazz.isAnnotationPresent(XmlRootElement.class))) {
-            return DataType.OBJECT;
-        } else if (clazz.isEnum()) {
-            return DataType.ENUM;
-        } else {
-            return DataType.UNKNOWN;
-        }
-    }
-
     //---------------------------------------------------------------------
     // Convenience methods for content-based equality/hash-code handling
     //---------------------------------------------------------------------
-
     /**
-     * Determine if the given objects are equal, returning <code>Boolean.TRUE</code>
-     * if both are <code>null</code> or <code>Boolean.FALSE</code> if only one is
-     * <code>null</code>.
-     * <p>Compares arrays with <code>Arrays.equals</code>, performing an equality
-     * check based on the array elements rather than the array reference.
+	 * <h3 class="en">Determine if the given objects are equal.</h3>
+     * <span class="en">
+     *     Returning <code>Boolean.TRUE</code> if both are <code>null</code>
+     *     or <code>Boolean.FALSE</code> if only one is <code>null</code>.
+     *     Compares arrays with <code>Arrays.equals</code>, performing an equality
+     *     check based on the array elements rather than the array reference.
+     * </span>
+	 * <h3 class="zh-CN">确定给定的对象是否相等。</h3>
+     * <span class="zh-CN">
+     *     如果两者都为 <code>null</code>，则返回 <code>Boolean.TRUE</code>；
+     *     如果只有一个为 <code>null</code>，则返回 <code>Boolean.FALSE</code>。
+     *     将数组与 Arrays.equals 进行比较，根据数组元素而不是数组引用执行相等性检查。
+     * </span>
+     * @see java.util.Arrays#equals
      *
-     * @param o1 first Object to compare
-     * @param o2 second Object to compare
-     * @return whether the given objects are equal
-     * @see java.util.Arrays#equals java.util.Arrays#equals
+     * @param o1    <span class="en">first Object to compare</span>
+     *              <span class="zh-CN">第一个要比较的对象</span>
+     * @param o2    <span class="en">second Object to compare</span>
+     *              <span class="zh-CN">第二个要比较的对象</span>
+     *
+     * @return  <span class="en">whether the given objects are equal</span>
+     *          <span class="zh-CN">给定的对象是否相等</span>
      */
     public static boolean nullSafeEquals(final Object o1, final Object o2) {
         if (o1 == o2) {
@@ -366,25 +254,33 @@ public final class ObjectUtils {
         }
         return Boolean.FALSE;
     }
-
     /**
-     * Return as hash code for the given object; typically the value of
-     * <code>{@link Object#hashCode()}</code>.
-     * If the object is an array, this method will delegate to any of the <code>nullSafeHashCode</code>
-     * methods for arrays in this class.
-     * If the object is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return as hash code for the given object; typically the value of <code>Object#hashCode()</code>.</h3>
+     * <span class="en">
+     *     If the object is an array, this method will delegate to any of the <code>nullSafeHashCode</code>
+     *     methods for arrays in this class.
+     *     If the object is <code>null</code>, this method returns 0.
+     * </span>
+	 * <h3 class="zh-CN">返回给定对象的哈希码；通常是 <code>Object#hashCode()</code> 的值。</h3>
+     * <span class="zh-CN">
+     *     如果对象是数组，则此方法将委托给此类中数组的任何 <code>ObjectUtils#nullSafeHashCode</code> 方法。
+     *     如果对象为 <code>null</code>，则此方法返回 0。
+     * </span>
+     * @see ObjectUtils#nullSafeHashCode(Object[])
+     * @see ObjectUtils#nullSafeHashCode(boolean[])
+     * @see ObjectUtils#nullSafeHashCode(byte[])
+     * @see ObjectUtils#nullSafeHashCode(char[])
+     * @see ObjectUtils#nullSafeHashCode(double[])
+     * @see ObjectUtils#nullSafeHashCode(float[])
+     * @see ObjectUtils#nullSafeHashCode(int[])
+     * @see ObjectUtils#nullSafeHashCode(long[])
+     * @see ObjectUtils#nullSafeHashCode(short[])
      *
-     * @param obj check object
-     * @return object hash code
-     * @see #nullSafeHashCode(Object[]) #nullSafeHashCode(Object[])
-     * @see #nullSafeHashCode(boolean[]) #nullSafeHashCode(boolean[])
-     * @see #nullSafeHashCode(byte[]) #nullSafeHashCode(byte[])
-     * @see #nullSafeHashCode(char[]) #nullSafeHashCode(char[])
-     * @see #nullSafeHashCode(double[]) #nullSafeHashCode(double[])
-     * @see #nullSafeHashCode(float[]) #nullSafeHashCode(float[])
-     * @see #nullSafeHashCode(int[]) #nullSafeHashCode(int[])
-     * @see #nullSafeHashCode(long[]) #nullSafeHashCode(long[])
-     * @see #nullSafeHashCode(short[]) #nullSafeHashCode(short[])
+     * @param obj   <span class="en">given object</span>
+     *              <span class="zh-CN">给定对象</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final Object obj) {
         if (obj == null) {
@@ -421,248 +317,307 @@ public final class ObjectUtils {
         }
         return obj.hashCode();
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final Object[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
-//		int arraySize = array.length;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (Object anArray : array) {
             hash = Globals.MULTIPLIER * hash + nullSafeHashCode(anArray);
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array  is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果 参数 array  为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final boolean[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (boolean bool : array) {
             hash = Globals.MULTIPLIER * hash + hashCode(bool);
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If byte array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果字节数组为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final byte[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (byte b : array) {
             hash = Globals.MULTIPLIER * hash + b;
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final char[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (char c : array) {
             hash = Globals.MULTIPLIER * hash + c;
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final double[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (double d : array) {
             hash = Globals.MULTIPLIER * hash + hashCode(d);
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final float[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (float f : array) {
             hash = Globals.MULTIPLIER * hash + hashCode(f);
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final int[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (int i : array) {
             hash = Globals.MULTIPLIER * hash + i;
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final long[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (long l : array) {
             hash = Globals.MULTIPLIER * hash + hashCode(l);
         }
         return hash;
     }
-
     /**
-     * Return a hash code based on the contents of the specified array.
-     * If <code>array</code> is <code>null</code>, this method returns 0.
+	 * <h3 class="en">Return a hash code based on the contents of the specified array.</h3>
+     * <span class="en">If argument array is <code>null</code>, this method returns 0.</span>
+	 * <h3 class="zh-CN">根据指定数组的内容返回哈希码。</h3>
+     * <span class="zh-CN">如果参数 array 为<code>null</code>，则此方法返回0。</span>
      *
-     * @param array specified array
-     * @return hash code result
+     * @param array <span class="en">specified array</span>
+     *              <span class="zh-CN">指定数组</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int nullSafeHashCode(final short[] array) {
         if (array == null) {
             return 0;
         }
-        int hash = Globals.INITIAL_HASH;
+        int hash = Globals.INITIALIZE_INT_VALUE;
         for (short s : array) {
             hash = Globals.MULTIPLIER * hash + s;
         }
         return hash;
     }
-
     /**
-     * Return the same value as <code>{@link Boolean#hashCode()}</code>.
+	 * <h3 class="en">Return the same value as <code>Boolean#hashCode()</code>.</h3>
+	 * <h3 class="zh-CN">返回与 <code>Boolean#hashCode()</code> 相同的值。</h3>
+     * @see Boolean#hashCode()
      *
-     * @param bool boolean value
-     * @return hash code result
-     * @see Boolean#hashCode() Boolean#hashCode()
+     * @param bool  <span class="en">boolean value</span>
+     *              <span class="zh-CN">布尔值</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int hashCode(final boolean bool) {
         return bool ? 1231 : 1237;
     }
-
     /**
-     * Return the same value as <code>{@link Double#hashCode()}</code>.
+	 * <h3 class="en">Return the same value as <code>Double#hashCode()</code>.</h3>
+	 * <h3 class="zh-CN">返回与 <code>Double#hashCode()</code> 相同的值。</h3>
+     * @see Double#hashCode() 
      *
-     * @param dbl double value
-     * @return hash code result
-     * @see Double#hashCode() Double#hashCode()
+     * @param dbl   <span class="en">double value</span>
+     *              <span class="zh-CN">双精度值</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int hashCode(final double dbl) {
         return hashCode(Double.doubleToLongBits(dbl));
     }
-
     /**
-     * Return the same value as <code>{@link Float#hashCode()}</code>.
+	 * <h3 class="en">Return the same value as <code>Float#hashCode()</code>.</h3>
+	 * <h3 class="zh-CN">返回与 <code>Float#hashCode()</code> 相同的值。</h3>
+     * @see Float#hashCode() 
      *
-     * @param flt float value
-     * @return hash code result
-     * @see Float#hashCode() Float#hashCode()
+     * @param flt   <span class="en">float value</span>
+     *              <span class="zh-CN">浮点数值</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int hashCode(final float flt) {
         return Float.floatToIntBits(flt);
     }
-
     /**
-     * Return the same value as <code>{@link Long#hashCode()}</code>.
+	 * <h3 class="en">Return the same value as <code>Long#hashCode()</code>.</h3>
+	 * <h3 class="zh-CN">返回与 <code>Long#hashCode()</code> 相同的值。</h3>
+     * @see Long#hashCode() 
      *
-     * @param lng long value
-     * @return hash code result
-     * @see Long#hashCode() Long#hashCode()
+     * @param lng   <span class="en">long value</span>
+     *              <span class="zh-CN">长整形值</span>
+     *
+     * @return  <span class="en">object hash code</span>
+     *          <span class="zh-CN">对象哈希值</span>
      */
     public static int hashCode(final long lng) {
         return (int) (lng ^ (lng >>> 32));
     }
-
-
-    //---------------------------------------------------------------------
-    // Convenience methods for toString output
-    //---------------------------------------------------------------------
-
     /**
-     * Determine the class name for the given object.
-     * <p>Returns <code>""</code> if <code>obj</code> is <code>null</code>.
+	 * <h3 class="en">Determine the class name for the given object.</h3>
+     * <span class="en">Returns empty string if argument obj is <code>null</code>.</span>
+	 * <h3 class="zh-CN">确定给定对象的类名。</h3>
+     * <span class="zh-CN">如果参数 obj 为 <code>null</code>，则返回空字符串。</span>
      *
-     * @param obj the object to introspect (maybe <code>null</code>)
-     * @return the corresponding class name
+     * @param obj   <span class="en">the object to introspect (maybe <code>null</code>)</span>
+     *              <span class="zh-CN">要获取类名的对象（可能<code>null</code>）</span>
+     *
+     * @return  <span class="en">the corresponding class name</span>
+     *          <span class="zh-CN">对应的类名</span>
      */
     public static String nullSafeClassName(final Object obj) {
         return obj != null ? nullSafeClassName(obj.getClass()) : Globals.DEFAULT_VALUE_STRING;
     }
-
     /**
-     * Determine the class name for the given object.
-     * <p>Returns <code>""</code> if <code>obj</code> is <code>null</code>.
+	 * <h3 class="en">Determine the class name for the given object.</h3>
+     * <span class="en">Returns empty string if argument clazz is <code>null</code>.</span>
+	 * <h3 class="zh-CN">确定给定对象的类名。</h3>
+     * <span class="zh-CN">如果参数 clazz 为 <code>null</code>，则返回空字符串。</span>
      *
-     * @param clazz the object to introspect (maybe <code>null</code>)
-     * @return the corresponding class name
+     * @param clazz <span class="en">the object to introspect (maybe <code>null</code>)</span>
+     *              <span class="zh-CN">要获取类名的对象（可能<code>null</code>）</span>
+     *
+     * @return  <span class="en">the corresponding class name</span>
+     *          <span class="zh-CN">对应的类名</span>
      */
     public static String nullSafeClassName(final Class<?> clazz) {
         return (clazz != null ? clazz.getName() : Globals.DEFAULT_VALUE_STRING);
     }
-
+    //---------------------------------------------------------------------
+    // Convenience methods for toString output
+    //---------------------------------------------------------------------
     /**
-     * Return a String representation of the specified Object.
-     * <p>Builds a String representation of the contents in case of an array.
-     * Returns <code>""</code> if <code>obj</code> is <code>null</code>.
+	 * <h3 class="en">Return a String representation of the specified Object.</h3>
+     * <span class="en">
+     *     Builds a String representation of the contents in case of an array.
+     *     Returns empty string if argument obj is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定对象的字符串表示形式。</h3>
+     * <span class="zh-CN">如果是数组，则构建内容的字符串表示形式。如果参数 obj 为 <code>null</code>，则返回空字符串。</span>
      *
-     * @param obj the object to build a String representation for
-     * @return a String representation of <code>obj</code>
+     * @param obj   <span class="en">the object to build a String representation for</span>
+     *              <span class="zh-CN">为其构建字符串表示的对象</span>
+     *
+     * @return  <span class="en">a String representation of argument obj</span>
+     *          <span class="zh-CN">参数 obj 的字符串表示形式</span>
      */
     public static String nullSafeToString(final Object obj) {
         if (obj == null) {
@@ -700,250 +655,1072 @@ public final class ObjectUtils {
         } else if (obj instanceof Class<?>[]) {
             return nullSafeToString((Class<?>[]) obj);
         } else if (obj.getClass().isArray()) {
-            return nullSafeToString(toObjectArray(obj));
+            return nullSafeToString(CollectionUtils.toArray(obj));
         } else if (obj.getClass().isPrimitive()) {
             return Optional.ofNullable(ClassUtils.primitiveWrapper(obj.getClass()))
-                    .map(wrapperClass -> ClassUtils.findMethod(wrapperClass, "toString", new Class[]{obj.getClass()}))
+                    .map(wrapperClass -> ReflectionUtils.findMethod(wrapperClass, "toString", new Class[]{obj.getClass()}))
                     .map(method -> (String) ReflectionUtils.invokeMethod(method, null, new Object[]{obj}))
                     .orElse(Globals.DEFAULT_VALUE_STRING);
         } else {
             return obj.toString();
         }
     }
-
     /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
      *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Class<?>[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Class<?>[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Class<?>[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Class<?>[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array  is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果 参数 array  为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array  的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final boolean[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array  is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果 参数 array  为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array  的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final boolean[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array  is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果 参数 array  为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array  的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final boolean[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array  is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果 参数 array  为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array  的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final boolean[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of byte array</span>
+     *          <span class="zh-CN">字节数组的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final byte[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of byte array</span>
+     *          <span class="zh-CN">字节数组的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final byte[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of byte array</span>
+     *          <span class="zh-CN">字节数组的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final byte[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of byte array</span>
+     *          <span class="zh-CN">字节数组的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final byte[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final char[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final char[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final char[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final char[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final double[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final double[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final double[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final double[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final float[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果 argument processCompletion为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final float[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final float[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final float[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final int[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final int[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final int[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final int[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final long[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final long[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final long[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final long[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final short[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final short[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final short[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final short[] array, final String separator,
+                                          final boolean processCompletion) {
+        return nullSafeToString(CollectionUtils.toArray(array), separator, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
      */
     public static String nullSafeToString(final Object[] array) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements.
+     *     Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由字符 <code>", "</code>（逗号后跟空格）分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Object[] array, final boolean processCompletion) {
+        return nullSafeToString(array, ARRAY_ELEMENT_SEPARATOR, processCompletion);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     enclosed in brackets (<code>"[]"</code>).
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，括在中括号 (<code>"[]"</code>) 中。
+     *     相邻元素由参数 separator 字符分隔。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Object[] array, final String separator) {
+        return nullSafeToString(array, separator, Boolean.TRUE);
+    }
+    /**
+	 * <h3 class="en">Return a String representation of the contents of the specified array.</h3>
+     * <span class="en">
+     *     The String representation consists of a list of the array's elements,
+     *     Adjacent elements are separated by the argument separator characters.
+     *     Enclosed in brackets (<code>"[]"</code>) if argument processCompletion is <code>Boolean.TRUE</code>.
+     *     Returns empty string if argument array is <code>null</code>.
+     * </span>
+	 * <h3 class="zh-CN">返回指定数组内容的字符串表示形式。</h3>
+     * <span class="zh-CN">
+     *     字符串表示形式由数组元素列表组成，相邻元素由参数 separator 字符分隔。
+     *     如果参数 processCompletion 为 <code>Boolean.TRUE</code> 则括在中括号 (<code>"[]"</code>) 中。
+     *     如果参数 array 为 <code>null</code>，则返回空字符串
+     * </span>
+     *
+     * @param array                 <span class="en">the array to build a String representation for</span>
+     *                              <span class="zh-CN">为其构建字符串表示的数组</span>
+     * @param separator             <span class="en">array separator character</span>
+     *                              <span class="zh-CN">数组元素分割字符</span>
+     * @param processCompletion     <span class="en">Enclosed result in brackets (<code>"[]"</code>)</span>
+     *                              <span class="zh-CN">将结果括在中括号 (<code>"[]"</code>) 中</span>
+     *
+     * @return  <span class="en">a String representation of argument array</span>
+     *          <span class="zh-CN">参数 array 的字符串表示形式</span>
+     */
+    public static String nullSafeToString(final Object[] array, final String separator,
+                                          final boolean processCompletion) {
         if (array == null || array.length == 0) {
             return Globals.DEFAULT_VALUE_STRING;
         }
         StringBuilder stringBuilder = new StringBuilder();
-        Arrays.asList(array).forEach(object -> stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(object));
-        return stringBuilderCompletion(stringBuilder);
+        String split = StringUtils.isEmpty(separator) ? ARRAY_ELEMENT_SEPARATOR : separator;
+        Arrays.asList(array).forEach(object -> stringBuilder.append(split).append(object));
+        return processCompletion ? stringBuilderCompletion(stringBuilder) : stringBuilder.substring(split.length());
     }
-
     /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
+	 * <h3 class="en">Insert array start character at index 0 and append array end character at end of the argument stringBuilder, and return the final result string.</h3>
+	 * <h3 class="zh-CN">在索引 0 处插入数组起始字符，并在参数 stringBuilder 末尾附加数组结束字符，并返回最终结果字符串。</h3>
      *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final Class<?>[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        Arrays.asList(array).forEach(clazz -> stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(clazz.getName()));
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
+     * @param stringBuilder     <span class="en">the string builder will process for</span>
+     *                          <span class="zh-CN">将处理的字符串生成器</span>
      *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
+     * @return  <span class="en">the final result string.</span>
+     *          <span class="zh-CN">最终结果字符串</span>
      */
-    public static String nullSafeToString(final boolean[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (boolean bool : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(bool);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final byte[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (byte b : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(b);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final char[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (char ch : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(ch);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final double[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (double d : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(d);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final float[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (float f : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(f);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final int[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(i);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final long[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (long l : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(l);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
-    /**
-     * Return a String representation of the contents of the specified array.
-     * <p>The String representation consists of a list of the array's elements,
-     * enclosed in curly braces (<code>"{}"</code>).
-     * Adjacent elements are separated by the characters <code>", "</code> (a comma followed by a space).
-     * Returns <code>""</code> if <code>array</code> is <code>null</code>.
-     *
-     * @param array the array to build a String representation for
-     * @return a String representation of <code>array</code>
-     */
-    public static String nullSafeToString(final short[] array) {
-        if (array == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (array.length == 0) {
-            return ARRAY_START + ARRAY_END;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (short s : array) {
-            stringBuilder.append(ARRAY_ELEMENT_SEPARATOR).append(s);
-        }
-        return stringBuilderCompletion(stringBuilder);
-    }
-
     private static String stringBuilderCompletion(final StringBuilder stringBuilder) {
         stringBuilder.insert(ARRAY_ELEMENT_SEPARATOR.length(), ARRAY_START).append(ARRAY_END);
         return stringBuilder.substring(ARRAY_ELEMENT_SEPARATOR.length());

@@ -19,7 +19,7 @@ package org.nervousync.zip.models.central;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.zip.models.header.GeneralFileHeader;
 import org.nervousync.utils.FileUtils;
 

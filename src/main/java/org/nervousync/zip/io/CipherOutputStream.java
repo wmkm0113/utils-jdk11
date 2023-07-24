@@ -24,12 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.CRC32;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.core.zip.ZipOptions;
+import org.nervousync.commons.Globals;
+import org.nervousync.exceptions.utils.DataInvalidException;
+import org.nervousync.zip.options.ZipOptions;
 import org.nervousync.zip.crypto.Encryptor;
 import org.nervousync.zip.crypto.impl.aes.AESEncryptor;
 import org.nervousync.zip.crypto.impl.standard.StandardEncryptor;
-import org.nervousync.zip.engine.AESEngine;
+import org.nervousync.zip.crypto.impl.aes.AESEngine;
 import org.nervousync.zip.models.AESExtraDataRecord;
 import org.nervousync.zip.models.central.CentralDirectory;
 import org.nervousync.zip.models.central.EndCentralDirectoryRecord;
@@ -110,11 +111,11 @@ public class CipherOutputStream extends OutputStream {
 	 */
 	public void putNextEntry(File file, ZipOptions zipOptions) throws ZipException {
 		if (!zipOptions.isSourceExternalStream() && file == null) {
-			throw new ZipException("Input file is null!");
+			throw new ZipException(0x0000001B0013L, "Utils", "Null_Input_File_Zip_Error");
 		}
 		
 		if (!zipOptions.isSourceExternalStream() && !FileUtils.isExists(file.getAbsolutePath())) {
-			throw new ZipException("Input file does not exists!");
+			throw new ZipException(0x0000001B0013L, "Utils", "Null_Input_File_Zip_Error");
 		}
 		
 		try {
@@ -146,7 +147,7 @@ public class CipherOutputStream extends OutputStream {
 						|| this.zipFile.getCentralDirectory().getFileHeaders() == null
 						|| this.zipFile.getCentralDirectory().getFileHeaders().size() == 0) {
 					byte[] intBuffer = new byte[4];
-					RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) Globals.SPLITSIG);
+					RawUtils.writeInt(intBuffer, ByteOrder.LITTLE_ENDIAN, (int) Globals.EXTSIG);
 					this.outputStream.write(intBuffer);
 					this.totalWriteBytes += 4L;
 				}
@@ -192,7 +193,7 @@ public class CipherOutputStream extends OutputStream {
 		} catch (ZipException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new ZipException(0x0000001B0015L, "Utils", "Failed_Add_File_Zip_Error", e);
 		}
 	}
 
@@ -264,7 +265,7 @@ public class CipherOutputStream extends OutputStream {
 				this.bytesWrittenForThisFile += 10;
 				this.totalWriteBytes += 10;
 			} else {
-				throw new ZipException("invalid encryptor for AES encrypted file");
+				throw new ZipException(0x0000001B0014L, "Utils", "Invalid_Encryptor_AES_Zip_Error");
 			}
 		}
 
@@ -291,8 +292,12 @@ public class CipherOutputStream extends OutputStream {
 		this.zipFile.getLocalFileHeaderList().add(this.localFileHeader);
 		this.zipFile.getCentralDirectory().getFileHeaders().add(this.generalFileHeader);
 
-		this.totalWriteBytes += 
-				HeaderOperator.writeExtendedLocalHeader(this.localFileHeader, this.outputStream);
+		try {
+			this.totalWriteBytes +=
+					HeaderOperator.writeExtendedLocalHeader(this.localFileHeader, this.outputStream);
+		} catch (DataInvalidException e) {
+			throw new IOException(e);
+		}
 
 		this.crc.reset();
 		this.bytesWrittenForThisFile = 0L;
@@ -391,7 +396,7 @@ public class CipherOutputStream extends OutputStream {
 		if (this.zipOptions.isSourceExternalStream()) {
 			this.generalFileHeader.setLastModFileTime((int) DateTimeUtils.toDosTime(System.currentTimeMillis()));
 			if (this.zipOptions.getFileNameInZip() == null || this.zipOptions.getFileNameInZip().length() == 0) {
-				throw new ZipException("fileNameInZip is null or empty");
+				throw new ZipException(0x0000001B0016L, "Utils", "Null_File_Name_Zip_Error");
 			}
 			entryPath = this.zipOptions.getFileNameInZip();
 		} else {
@@ -403,7 +408,7 @@ public class CipherOutputStream extends OutputStream {
 		}
 
 		if (entryPath == null || entryPath.length() == 0) {
-			throw new ZipException("fileName is null or empty. unable to create file header");
+			throw new ZipException(0x0000001B0016L, "Utils", "Null_File_Name_Zip_Error");
 		}
 		this.generalFileHeader.setEntryPath(entryPath);
 
@@ -458,7 +463,7 @@ public class CipherOutputStream extends OutputStream {
 							saltLength = 16;
 							break;
 						default:
-							throw new ZipException("invalid aes key strength, cannot determine key sizes");
+							throw new ZipException(0x0000001B0005L, "Utils", "Invalid_Key_Strength_AES_Zip_Error");
 						}
 						this.generalFileHeader
 								.setCompressedSize(fileSize + saltLength + Globals.AES_AUTH_LENGTH + 2);
@@ -495,7 +500,7 @@ public class CipherOutputStream extends OutputStream {
 
 	private void generateAESExtraDataRecord() throws ZipException {
 		if (this.zipOptions == null) {
-			throw new ZipException("zip parameters are null, cannot generate AES Extra Data record");
+			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
 
 		AESExtraDataRecord aesExtraDataRecord = new AESExtraDataRecord();
@@ -510,7 +515,7 @@ public class CipherOutputStream extends OutputStream {
 		} else if (this.zipOptions.getAesKeyStrength() == Globals.AES_STRENGTH_256) {
 			aesExtraDataRecord.setAesStrength(Globals.AES_STRENGTH_256);
 		} else {
-			throw new ZipException("invalid AES key strength, cannot generate AES Extra data record");
+			throw new ZipException(0x0000001B0005L, "Utils", "Invalid_Key_Strength_AES_Zip_Error");
 		}
 
 		aesExtraDataRecord.setCompressionMethod(this.zipOptions.getCompressionMethod());
@@ -520,7 +525,7 @@ public class CipherOutputStream extends OutputStream {
 
 	private int getFileAttributes(File file) throws ZipException {
 		if (file == null) {
-			throw new ZipException("input file is null, cannot get file attributes");
+			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
 
 		if (!file.exists()) {
@@ -559,7 +564,7 @@ public class CipherOutputStream extends OutputStream {
 
 	private void createLocalFileHeaders() throws ZipException {
 		if (this.generalFileHeader == null) {
-			throw new ZipException("file header is null, cannot create local file header");
+			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
 		}
 
 		this.localFileHeader = new LocalFileHeader();
@@ -590,7 +595,7 @@ public class CipherOutputStream extends OutputStream {
 				this.encryptor = new AESEncryptor(this.zipOptions.getPassword(), this.zipOptions.getAesKeyStrength());
 				break;
 			default:
-				throw new ZipException("invalid encryption method");
+				throw new ZipException(0x0000001B0001L, "Utils", "Not_Supported_Encryption_Mode_Zip_Error");
 			}
 		} else {
 			this.encryptor = null;
@@ -600,7 +605,7 @@ public class CipherOutputStream extends OutputStream {
 	private int writeLocalFileHeader(LocalFileHeader localFileHeader,
 			OutputStream outputStream) throws ZipException {
 		if (localFileHeader == null) {
-			throw new ZipException("Local file header is null, cannot write!");
+			throw new ZipException(0x0000001B000EL, "Utils", "Null_Local_File_Header_Zip_Error");
 		}
 		try {
 			List<String> headerBytesList = new ArrayList<>();
@@ -695,7 +700,7 @@ public class CipherOutputStream extends OutputStream {
 
 			return bytes.length;
 		} catch (Exception e) {
-			throw new ZipException(e);
+			throw new ZipException(0x0000001B0017L, "Utils", "Write_Local_File_Header_Zip_Error", e);
 		}
 	}
 }

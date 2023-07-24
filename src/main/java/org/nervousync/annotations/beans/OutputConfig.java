@@ -1,18 +1,57 @@
 package org.nervousync.annotations.beans;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.utils.StringUtils;
 
 import java.lang.annotation.*;
 
+/**
+ * <h2 class="en">Annotation for data output config</h2>
+ * <span class="en">Configure output data type, formatted output string and string encoding</span>
+ * <h2 class="zh-CN">标注用于数据输出的配置</h2>
+ * <span class="en">定义输出的数据类型，是否格式化输出的字符串以及输出字符串的编码集</span>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision : 1.0 $ $Date: Dec 25, 2022 14:27:15 $
+ */
+@Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface OutputConfig {
+
+    /**
+	 * <h3 class="en">Output string type</h3>
+     * <span class="en">Default is SIMPLE, base64 encoded byte arrays. Other types: JSON/XML/YAML</span>
+	 * <h3 class="zh-CN">输出字符串类型</h3>
+     * <span class="zh-CN">默认值为SIMPLE，使用Base64编码的字节数组。可选类型包括：JSON/XML/YAML</span>
+     *
+     * @see org.nervousync.utils.StringUtils.StringType
+     * @return  <span class="en">Enumeration value type of StringUtils.StringType</span>
+     *          <span class="zh-CN">StringUtils.StringType枚举类型</span>
+     */
     StringUtils.StringType type() default StringUtils.StringType.SIMPLE;
 
+    /**
+	 * <h3 class="en">Format output string status</h3>
+     * <span class="en"><code>true</code> for format output string, eg: add break line, add indent etc., <code>false</code> for output string in one line</span>
+	 * <h3 class="en">格式化输出字符串状态</h3>
+     * <span class="en"><code>true</code>格式化输出的字符串，添加换行及缩进等。<code>false</code>在同一行输出所有数据</span>
+     *
+     * @return  <span class="en">Formatted status</span>
+     *          <span class="zh-CN">格式化输出状态</span>
+     */
     boolean formatted() default false;
 
+    /**
+	 * <h3 class="en">Output string encoding</h3>
+     * <span class="en">Default is UTF-8</span>
+	 * <h3 class="zh-CN">输出字符串编码集</h3>
+     * <span class="zh-CN">默认值为UTF-8</span>
+     *
+     * @return  <span class="en">String encoding</span>
+     *          <span class="zh-CN">字符串编码集</span>
+     */
     String encoding() default Globals.DEFAULT_ENCODING;
 
 }

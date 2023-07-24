@@ -13,7 +13,7 @@ public abstract class BaseTest {
     protected transient final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     static {
-        LoggerUtils.initLoggerConfigure(Level.ERROR, LoggerUtils.newLogger("org.nervousync", Level.DEBUG));
+        LoggerUtils.initLoggerConfigure(Level.INFO);
     }
 
     @BeforeEach

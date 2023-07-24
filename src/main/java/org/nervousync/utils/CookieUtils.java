@@ -19,79 +19,147 @@ package org.nervousync.utils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 
 import java.util.Arrays;
 
 /**
+ * <h2 class="en">Cookie utilities</h2>
+ * <h2 class="zh-CN">Cookie工具集</h2>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 1:49:41 PM $
+ * @version $Revision: 1.0 $ $Date: Jan 13, 2010 13:49:41 $
  */
 public final class CookieUtils {
-
+	/**
+	 * <h3 class="en">Private constructor for CookieUtils</h3>
+	 * <h3 class="zh-CN">Cookie工具集的私有构造方法</h3>
+	 */
 	private CookieUtils() {
 	}
-
 	/**
-	 * Set cookie
-	 * @param cookieName    cookie name
-	 * @param cookieValue   cookie value
-	 * @param request       http request
-	 * @param response      http response
-	 * @return              Set result
+	 * <h3 class="en">Set cookie information</h3>
+	 * <h3 class="zh-CN">写入Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param cookieValue   <span class="en">Cookie value</span>
+	 *                      <span class="zh-CN">Cookie值</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">操作结果</span>
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue,
-									HttpServletRequest request, HttpServletResponse response) {
-		return setCookie(cookieName, cookieValue, null, null, request, response);
+	public static boolean setCookie(final String cookieName, final String cookieValue,
+									final HttpServletRequest request, final HttpServletResponse response) {
+		return setCookie(cookieName, cookieValue, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING,
+				request, response);
 	}
-
 	/**
-	 * Set cookie
-	 * @param cookieName    cookie name
-	 * @param cookieValue   cookie value
-	 * @param domainName    domain name
-	 * @param request       http request
-	 * @param response      http response
-	 * @return              Set result
+	 * <h3 class="en">Set cookie information</h3>
+	 * <h3 class="zh-CN">写入Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param cookieValue   <span class="en">Cookie value</span>
+	 *                      <span class="zh-CN">Cookie值</span>
+	 * @param domainName    <span class="en">Domain name</span>
+	 *                      <span class="zh-CN">所在域名</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">操作结果</span>
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, String domainName,
-									HttpServletRequest request, HttpServletResponse response) {
-		return setCookie(cookieName, cookieValue, domainName, null, request, response);
+	public static boolean setCookie(final String cookieName, final String cookieValue, final String domainName,
+									final HttpServletRequest request, final HttpServletResponse response) {
+		return setCookie(cookieName, cookieValue, domainName, Globals.DEFAULT_VALUE_STRING, null, request, response);
 	}
-
 	/**
-	 * Set cookie
-	 * @param cookieName    cookie name
-	 * @param cookieValue   cookie value
-	 * @param lifeCycle     life cycle
-	 * @param request       http request
-	 * @param response      http response
-	 * @return              Set result
+	 * <h3 class="en">Set cookie information</h3>
+	 * <h3 class="zh-CN">写入Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param cookieValue   <span class="en">Cookie value</span>
+	 *                      <span class="zh-CN">Cookie值</span>
+	 * @param domainName    <span class="en">Domain name</span>
+	 *                      <span class="zh-CN">所在域名</span>
+	 * @param cookiePath    <span class="en">Cookie path</span>
+	 *                      <span class="zh-CN">Cookie路径</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">操作结果</span>
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, Integer lifeCycle,
-									HttpServletRequest request, HttpServletResponse response) {
-		return setCookie(cookieName, cookieValue, null, lifeCycle, request, response);
+	public static boolean setCookie(final String cookieName, final String cookieValue,
+									final String domainName, final String cookiePath,
+									final HttpServletRequest request, final HttpServletResponse response) {
+		return setCookie(cookieName, cookieValue, domainName, cookiePath, null, request, response);
 	}
-
 	/**
-	 * Set cookie
-	 * @param cookieName    cookie name
-	 * @param cookieValue   cookie value
-	 * @param domainName    domain name
-	 * @param lifeCycle     life cycle
-	 * @param request       http request
-	 * @param response      http response
-	 * @return              Set result
+	 * <h3 class="en">Set cookie information</h3>
+	 * <h3 class="zh-CN">写入Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param cookieValue   <span class="en">Cookie value</span>
+	 *                      <span class="zh-CN">Cookie值</span>
+	 * @param lifeCycle     <span class="en">Life cycle</span>
+	 *                      <span class="zh-CN">生存周期</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">操作结果</span>
 	 */
-	public static boolean setCookie(String cookieName, String cookieValue, String domainName,
-									Integer lifeCycle, HttpServletRequest request, HttpServletResponse response) {
+	public static boolean setCookie(final String cookieName, final String cookieValue, final Integer lifeCycle,
+									final HttpServletRequest request, final HttpServletResponse response) {
+		return setCookie(cookieName, cookieValue, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING,
+				lifeCycle, request, response);
+	}
+	/**
+	 * <h3 class="en">Set cookie information</h3>
+	 * <h3 class="zh-CN">写入Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param cookieValue   <span class="en">Cookie value</span>
+	 *                      <span class="zh-CN">Cookie值</span>
+	 * @param domainName    <span class="en">Domain name</span>
+	 *                      <span class="zh-CN">所在域名</span>
+	 * @param cookiePath    <span class="en">Cookie path</span>
+	 *                      <span class="zh-CN">Cookie路径</span>
+	 * @param lifeCycle     <span class="en">Life cycle</span>
+	 *                      <span class="zh-CN">生存周期</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
+	 *
+	 * @return 	<span class="en">Process result</span>
+	 * 			<span class="zh-CN">操作结果</span>
+	 */
+	public static boolean setCookie(final String cookieName, final String cookieValue, final String domainName,
+									final String cookiePath, final Integer lifeCycle,
+									final HttpServletRequest request, final HttpServletResponse response) {
 		try {
 			Cookie cookie = getCookie(cookieName, request);
 
 			if (cookie == null) {
 				cookie = new Cookie(cookieName, cookieValue);
 
-				cookie.setPath("/");
+				cookie.setPath(StringUtils.isEmpty(cookiePath) ? "/" : cookiePath);
 				if (domainName != null) {
 					cookie.setDomain("." + domainName);
 				}
@@ -110,12 +178,17 @@ public final class CookieUtils {
 			return false;
 		}
 	}
-
 	/**
-	 * Read cookie value
-	 * @param cookieName    cookie name
-	 * @param request       http request
-	 * @return              cookie instance or null if not exists
+	 * <h3 class="en">Read cookie instance</h3>
+	 * <h3 class="zh-CN">读取Cookie实例对象</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 *
+	 * @return 	<span class="en">Cookie instance or null if not exists</span>
+	 * 			<span class="zh-CN">Cookie实例对象，如果不存在则返回null</span>
 	 */
 	public static Cookie getCookie(String cookieName, HttpServletRequest request) {
 		return Arrays.stream(request.getCookies())
@@ -123,12 +196,17 @@ public final class CookieUtils {
 				.findFirst()
 				.orElse(null);
 	}
-
 	/**
-	 * Read cookie value
-	 * @param cookieName    cookie name
-	 * @param request       http request
-	 * @return              cookie value or null if not exists
+	 * <h3 class="en">Read cookie information</h3>
+	 * <h3 class="zh-CN">读取Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 *
+	 * @return 	<span class="en">Cookie value or null if not exists</span>
+	 * 			<span class="zh-CN">Cookie值，如果不存在则返回null</span>
 	 */
 	public static String getCookieValue(String cookieName, HttpServletRequest request) {
 		return Arrays.stream(request.getCookies())
@@ -137,21 +215,28 @@ public final class CookieUtils {
 				.map(Cookie::getValue)
 				.orElse(Globals.DEFAULT_VALUE_STRING);
 	}
-
 	/**
-	 * Remove cookie
-	 * @param cookieName    cookie name
-	 * @param request       http request
-	 * @param response      http response
+	 * <h3 class="en">Remove cookie information</h3>
+	 * <h3 class="zh-CN">移除Cookie信息</h3>
+	 *
+	 * @param cookieName    <span class="en">Cookie name</span>
+	 *                      <span class="zh-CN">Cookie名称</span>
+	 * @param request       <span class="en">HttpServletRequest instance</span>
+	 *                      <span class="zh-CN">Http请求实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
 	 */
 	public static void delCookie(String cookieName, HttpServletRequest request, HttpServletResponse response) {
 		delCookie(getCookie(cookieName, request), response);
 	}
-
 	/**
-	 * Remove cookie
-	 * @param cookie        cookie instance
-	 * @param response      http response
+	 * <h3 class="en">Remove cookie information</h3>
+	 * <h3 class="zh-CN">移除Cookie信息</h3>
+	 *
+	 * @param cookie        <span class="en">Cookie instance</span>
+	 *                      <span class="zh-CN">Cookie实例对象</span>
+	 * @param response      <span class="en">HttpServletResponse instance</span>
+	 *                      <span class="zh-CN">Http响应实例对象</span>
 	 */
 	public static void delCookie(Cookie cookie, HttpServletResponse response) {
 		if (cookie != null) {

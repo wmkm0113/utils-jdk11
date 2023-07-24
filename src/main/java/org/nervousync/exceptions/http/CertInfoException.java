@@ -16,51 +16,59 @@
  */
 package org.nervousync.exceptions.http;
 
-import org.nervousync.utils.ObjectUtils;
+import org.nervousync.exceptions.AbstractException;
 
 /**
+ * <h2 class="en">Certification Information Exception</h2>
+ * <h2 class="zh-CN">证书信息异常</h2>
+ *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $Date: 2018-10-30 15:53
+ * @version $Revision: 1.0 $Date: Oct 30, 2018 15:53:06 $
  */
-public class CertInfoException extends Exception {
-	
+public final class CertInfoException extends AbstractException {
 	/**
-	 * Create a new IPAddressException with the specified message.
-	 * @param msg the detail message
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
 	 */
-	public CertInfoException(String msg) {
-		super(msg);
-	}
-	
+	private static final long serialVersionUID = 8516679443951678751L;
 	/**
-	 * Create a new IPAddressException with the specified message
-	 * and root cause.
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * <h3 class="en">Constructor method for CertInfoException</h3>
+	 * <span class="en">Create a new CertInfoException with the specified message.</span>
+	 * <h3 class="zh-CN">CertInfoException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息创建CertInfoException实例对象。</span>
+	 *
+	 * @param errorCode 	<span class="en">Error identified code</span>
+     *                      <span class="zh-CN">错误识别代码</span>
+     * @param bundle        <span class="en">Resource bundle name</span>
+     *                      <span class="zh-CN">资源包名</span>
+     * @param messageKey    <span class="en">Message identify key</span>
+     *                      <span class="zh-CN">信息识别键值</span>
+     * @param collections   <span class="en">given parameters of information formatter</span>
+     *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	public CertInfoException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-	
-	public boolean equals(Object other) {
-		if (other == null) {
-			return Boolean.FALSE;
-		}
-		
-		if (this == other) {
-			return Boolean.TRUE;
-		}
-		
-		if (other instanceof CertInfoException) {
-			CertInfoException otherBe = (CertInfoException) other;
-			return (getMessage().equals(otherBe.getMessage()) &&
-					ObjectUtils.nullSafeEquals(getCause(), otherBe.getCause()));
-		}
-		
-		return Boolean.FALSE;
-	}
-	
-	public int hashCode() {
-		return getMessage().hashCode();
+    public CertInfoException(final long errorCode, final String bundle, final String messageKey,
+							 final Object... collections) {
+        super(errorCode, bundle, messageKey, collections);
+    }
+	/**
+	 * <h3 class="en">Constructor method for CertInfoException</h3>
+	 * <span class="en">Create a new CertInfoException with the specified message and root cause.</span>
+	 * <h3 class="zh-CN">CertInfoException构造方法</h3>
+	 * <span class="zh-CN">使用特定的信息以及异常信息对象实例创建CertInfoException实例对象。</span>
+	 *
+	 * @param errorCode 	<span class="en">Error identified code</span>
+     *                      <span class="zh-CN">错误识别代码</span>
+     * @param bundle        <span class="en">Resource bundle name</span>
+     *                      <span class="zh-CN">资源包名</span>
+     * @param messageKey    <span class="en">Message identify key</span>
+     *                      <span class="zh-CN">信息识别键值</span>
+	 * @param cause 		<span class="en">The root cause</span>
+	 *              		<span class="zh-CN">异常信息对象实例</span>
+     * @param collections   <span class="en">given parameters of information formatter</span>
+     *                      <span class="zh-CN">用于资源信息格式化的参数</span>
+	 */
+	public CertInfoException(final long errorCode, final String bundle, final String messageKey,
+							 final Throwable cause, final Object... collections) {
+		super(errorCode, bundle, messageKey, cause, collections);
 	}
 }

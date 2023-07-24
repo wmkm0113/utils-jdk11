@@ -17,18 +17,21 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
- * The enum Snmp priv protocol.
+ * <h2 class="en">SNMP Authentication Private Protocol Enumerations</h2>
+ * <h2 class="zh-CN">SNMP身份验证私有协议枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 27, 2017 2:17:22 PM $
+ * @version $Revision : 1.0 $ $Date: Oct 27, 2017 14:17:22 $
  */
 public enum SNMPPrivProtocol {
 	/**
-	 * Priv des snmp priv protocol.
+     * <span class="en">DES Private Protocol</span>
+     * <span class="zh-CN">DES私有协议</span>
 	 */
 	PrivDES,
 	/**
-	 * Priv 3 des snmp priv protocol.
+     * <span class="en">TripleDES Private Protocol</span>
+     * <span class="zh-CN">3DES私有协议</span>
 	 */
 	Priv3DES
 }

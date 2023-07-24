@@ -21,12 +21,12 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.nervousync.commons.core.Globals;
+import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.crypto.CryptoException;
-import org.nervousync.security.SecureProvider;
-import org.nervousync.security.digest.BaseDigestProvider;
+import org.nervousync.exceptions.utils.DataInvalidException;
+import org.nervousync.security.api.SecureAdapter;
+import org.nervousync.security.digest.BaseDigestAdapter;
 import org.nervousync.utils.SecurityUtils;
-import org.nervousync.zip.engine.AESEngine;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.utils.RawUtils;
 
@@ -86,7 +86,7 @@ public class AESCrypto {
 	/**
 	 * MacBasedPRF instance
 	 */
-	SecureProvider macBasedPRF = null;
+	SecureAdapter macBasedPRF = null;
 
 	/**
 	 * Instantiates a new Aes crypto.
@@ -103,7 +103,8 @@ public class AESCrypto {
 	 * @param passwordBytes password bytes
 	 * @return verify result
 	 */
-	public static boolean verifyPassword(int aesStrength, byte[] salt, char[] password, byte[] passwordBytes) {
+	public static boolean verifyPassword(int aesStrength, byte[] salt, char[] password, byte[] passwordBytes)
+			throws ZipException {
 		if (password == null || password.length == 0 || passwordBytes == null || passwordBytes.length == 0) {
 			return Boolean.FALSE;
 		}
@@ -127,7 +128,7 @@ public class AESCrypto {
 	 *
 	 * @param aesStrength AES key strength
 	 */
-	void preInit(int aesStrength) {
+	void preInit(int aesStrength) throws ZipException {
 		this.iv = new byte[Globals.AES_BLOCK_SIZE];
 		this.countBlock = new byte[Globals.AES_BLOCK_SIZE];
 		
@@ -148,7 +149,7 @@ public class AESCrypto {
 				this.saltLength = 16;
 				break;
 			default:
-				throw new ZipException("Invalid aes key strength!");
+				throw new ZipException(0x0000001B0005L, "Utils", "Invalid_Key_Strength_AES_Zip_Error");
 		}
 	}
 
@@ -160,13 +161,13 @@ public class AESCrypto {
 	 */
 	void init(char[] password) throws ZipException {
 		if (password == null || password.length == 0) {
-			throw new ZipException("Password is null or empty");
+			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
 		}
 		this.generateSalt();
 		try {
 			this.initCrypto(password);
 		} catch (CryptoException e) {
-			throw new ZipException(e);
+			throw new ZipException(0x0000001B000AL, "Utils", "Init_Crypto_Zip_Error", e);
 		}
 	}
 
@@ -179,13 +180,13 @@ public class AESCrypto {
 	 */
 	void init(byte[] salt, char[] password) throws ZipException {
 		if (password == null || password.length == 0) {
-			throw new ZipException("Password is null or empty");
+			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
 		}
 		this.saltBytes = salt == null ? new byte[0] : salt.clone();
 		try {
 			this.initCrypto(password);
 		} catch (CryptoException e) {
-			throw new ZipException(e);
+			throw new ZipException(0x0000001B000AL, "Utils", "Init_Crypto_Zip_Error", e);
 		}
 	}
 
@@ -195,7 +196,7 @@ public class AESCrypto {
 	 * @param buff  the buff
 	 * @param index the index
 	 */
-	void processData(byte[] buff, int index) {
+	void processData(byte[] buff, int index) throws ZipException, DataInvalidException {
 		this.iv = new byte[16];
 		RawUtils.writeInt(this.iv, ByteOrder.LITTLE_ENDIAN, this.nonce);
 		this.aesEngine.processBlock(this.iv, this.countBlock);
@@ -213,13 +214,14 @@ public class AESCrypto {
 	 * @param dkLen			length
 	 * @return				processed data bytes
 	 */
-	private byte[] deriveKey(byte[] saltBytes, char[] password, int dkLen) throws CryptoException {
+	private byte[] deriveKey(byte[] saltBytes, char[] password, int dkLen)
+			throws CryptoException, DataInvalidException {
 		//	PBKDF2
 		if (password == null || password.length == 0) {
 			throw new NullPointerException();
 		}
 		byte[] passwordBytes = RawUtils.charArrayToByteArray(password);
-		BaseDigestProvider digestProvider = (BaseDigestProvider) SecurityUtils.HmacSHA1(passwordBytes);
+		BaseDigestAdapter digestProvider = (BaseDigestAdapter) SecurityUtils.HmacSHA1(passwordBytes);
 
 		if (dkLen == 0) {
 			dkLen = digestProvider.macLength();
@@ -253,9 +255,9 @@ public class AESCrypto {
 	 * @param password password
 	 * @return verify result
 	 */
-	boolean verifyPassword(byte[] password) {
+	boolean verifyPassword(byte[] password) throws ZipException {
 		if (this.derivedPasswordVerifier == null) {
-			throw new ZipException("Invalid derived password verifier!");
+			throw new ZipException(0x0000001B0007L, "Utils", "Invalid_Derived_Password_Verifier_Zip_Error");
 		}
 
 		return Arrays.equals(password, this.derivedPasswordVerifier);
@@ -269,20 +271,21 @@ public class AESCrypto {
 		return a / b + m;
 	}
 
-	private static void process(BaseDigestProvider baseDigestProvider,
-								byte[] dest, int offset, byte[] source, int blockIndex) throws CryptoException {
+	private static void process(BaseDigestAdapter baseDigestProvider,
+								byte[] dest, int offset, byte[] source, int blockIndex)
+			throws CryptoException, DataInvalidException {
 		int length = baseDigestProvider.macLength();
 		byte[] tempBytes = new byte[length];
 
 		byte[] intTmpBytes = new byte[source.length + 4];
-		System.arraycopy(source, 0, intTmpBytes, 0, source.length);
+		System.arraycopy(source, Globals.INITIALIZE_INT_VALUE, intTmpBytes, Globals.INITIALIZE_INT_VALUE, source.length);
 		RawUtils.writeInt(intTmpBytes, source.length, blockIndex);
 
 		for (int i = 0 ; i < 1000 ; i++) {
 			intTmpBytes = baseDigestProvider.finish(intTmpBytes);
 			XOR(tempBytes, intTmpBytes);
 		}
-		System.arraycopy(tempBytes, 0, dest, offset, length);
+		System.arraycopy(tempBytes, Globals.INITIALIZE_INT_VALUE, dest, offset, length);
 	}
 
 	private static void XOR(byte[] dest, byte[] source) {
@@ -295,22 +298,27 @@ public class AESCrypto {
 	 * Initialize crypto
 	 * @param password	password
 	 */
-	private void initCrypto(char[] password) throws CryptoException {
-		byte[] keyBytes = this.deriveKey(this.saltBytes, password, 
+	private void initCrypto(char[] password) throws CryptoException, ZipException {
+		byte[] keyBytes;
+		try {
+			keyBytes = this.deriveKey(this.saltBytes, password,
 				this.keyLength + this.macLength + Globals.PASSWORD_VERIFIER_LENGTH);
+		} catch (DataInvalidException e) {
+			throw new ZipException(0x0000001B000AL, "Utils", "Init_Crypto_Zip_Error", e);
+		}
 		
 		if (keyBytes.length != (this.keyLength + this.macLength + Globals.PASSWORD_VERIFIER_LENGTH)) {
-			throw new ZipException("Invalid derived key!");
+			throw new ZipException(0x0000001B0008L, "Utils", "Invalid_Derived_Key_Zip_Error");
 		}
 
 		byte[] aesKey = new byte[this.keyLength];
 		byte[] macKey = new byte[this.macLength];
 		this.derivedPasswordVerifier = new byte[Globals.PASSWORD_VERIFIER_LENGTH];
 		
-		System.arraycopy(keyBytes, 0, aesKey, 0, this.keyLength);
-		System.arraycopy(keyBytes, this.keyLength, macKey, 0, this.macLength);
+		System.arraycopy(keyBytes, Globals.INITIALIZE_INT_VALUE, aesKey, Globals.INITIALIZE_INT_VALUE, this.keyLength);
+		System.arraycopy(keyBytes, this.keyLength, macKey, Globals.INITIALIZE_INT_VALUE, this.macLength);
 		System.arraycopy(keyBytes, (this.keyLength + this.macLength), 
-				this.derivedPasswordVerifier, 0, Globals.PASSWORD_VERIFIER_LENGTH);
+				this.derivedPasswordVerifier, Globals.INITIALIZE_INT_VALUE, Globals.PASSWORD_VERIFIER_LENGTH);
 		
 		this.aesEngine = new AESEngine(aesKey);
 		this.macBasedPRF = SecurityUtils.HmacSHA1(macKey);
@@ -323,7 +331,7 @@ public class AESCrypto {
 	private void generateSalt() throws ZipException {
 		int rounds = this.saltLength / 4;
 		if (rounds < 2 || rounds > 4) {
-			throw new ZipException("Invalid salt size!");
+			throw new ZipException(0x0000001B0009, "Utils", "Invalid_Salt_Length_Zip_Error");
 		}
 
 		this.saltBytes = new byte[this.saltLength];

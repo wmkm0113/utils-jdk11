@@ -20,62 +20,95 @@ import java.io.Serializable;
 import java.security.Security;
 import java.util.*;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.commons.proxy.ProxyConfig;
+import org.nervousync.commons.Globals;
+import org.nervousync.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.mail.config.MailConfig;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.utils.StringUtils;
 
 /**
- * JavaMail base protocol
+ * <h2 class="en">Abstract class of JavaMail protocol</h2>
+ * <h2 class="zh-CN">JavaMail的协议抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 7:07:08 PM $
+ * @version $Revision: 1.0 $ $Date: Jul 31, 2012 19:07:08 $
  */
 public abstract class BaseProtocol implements Serializable {
-
-    /**
-     *
-     */
+	/**
+	 * <span class="en">Serial version UID</span>
+	 * <span class="zh-CN">序列化UID</span>
+	 */
     private static final long serialVersionUID = 6441571927997267674L;
-
+	/**
+	 * <span class="en">Default SSL socket factory class, using for connect to ssl mail server</span>
+	 * <span class="zh-CN">默认的安全套接字工厂类，用于连接到电子邮件服务器时使用安全连接</span>
+	 */
     private static final String SSL_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
+	/**
+	 * <span class="en">Protocol key name of connect to mail server store</span>
+	 * <span class="zh-CN">连接到电子邮件服务器的通讯协议类型键值名</span>
+	 */
     private static final String MAIL_STORE_PROTOCOL = "mail.store.protocol";
+	/**
+	 * <span class="en">Protocol key name of connect to mail server transport</span>
+	 * <span class="zh-CN">连接到电子邮件服务器的传输协议类型键值名</span>
+	 */
     private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
-
-    /**
-     * Connection timeout parameter name
-     */
+	/**
+	 * <span class="en">Connect timeout value</span>
+	 * <span class="zh-CN">连接超时时间</span>
+	 */
     protected String connectionTimeoutParam;
     /**
-     * Host parameter name
+     * <span class="en">Mail server domain name</span>
+     * <span class="zh-CN">邮件服务器域名</span>
      */
     protected String hostParam;
     /**
-     * Port parameter name
+     * <span class="en">Mail server port</span>
+     * <span class="zh-CN">邮件服务器端口号</span>
      */
     protected String portParam;
-    /**
-     * Timeout parameter name
-     */
+	/**
+	 * <span class="en">Process timeout value</span>
+	 * <span class="zh-CN">操作超时时间</span>
+	 */
     protected String timeoutParam;
-    private final String secureName;
-    private final ProxyConfig proxyConfig;
-
     /**
-     * Constructor for define the protocol type
+	 * <span class="en">Secure config name</span>
+	 * <span class="zh-CN">安全配置名称</span>
+     */
+    private final String secureName;
+    /**
+	 * <span class="en">Proxy configure information</span>
+	 * <span class="zh-CN">代理服务器配置信息</span>
+     */
+    private final ProxyConfig proxyConfig;
+    /**
+     * <h3 class="en">Constructor method for BaseProtocol</h3>
+     * <h3 class="zh-CN">BaseProtocol构造方法</h3>
+     *
+     * @param secureName    <span class="en">Secure config name</span>
+     *                      <span class="zh-CN">安全配置名称</span>
+     * @param proxyConfig   <span class="en">Proxy configure information</span>
+     *                      <span class="zh-CN">代理服务器配置信息</span>
      */
     protected BaseProtocol(final String secureName, final ProxyConfig proxyConfig) {
         this.secureName = secureName;
         this.proxyConfig = proxyConfig;
     }
-
     /**
-     * Read configuration for JavaMail using
+     * <h3 class="en">Convert given e-mail server configure instance to Properties instance</h3>
+     * <p class="en">Generated Properties instance is using for connect to E-mail server </p>
+     * <h3 class="zh-CN">转换给定的电子邮件配置实例对象为Properties实例对象</h3>
+     * <p class="zh-CN">生成的Properties实例对象用于连接到电子邮件服务器</p>
      *
-     * @param serverConfig the server config
-     * @return java.util.Properties for JavaMail using
+     * @param serverConfig      <span class="en">Server configure information</span>
+     *                          <span class="zh-CN">服务器配置</span>
+     *
+     * @return  <span class="en">Generated Properties instance</span>
+     *          <span class="zh-CN">生成的Properties实例对象</span>
      */
     public final Properties readConfig(final MailConfig.ServerConfig serverConfig) {
         Properties properties = new Properties();
@@ -103,8 +136,8 @@ public abstract class BaseProtocol implements Serializable {
                 properties.setProperty(MAIL_STORE_PROTOCOL, "imap");
 
                 if (serverConfig.isAuthLogin()) {
-                    properties.setProperty("mail.imap.auth.plain.disable", "true");
-                    properties.setProperty("mail.imap.auth.login.disable", "true");
+                    properties.setProperty("mail.imap.auth.plain.disable", Boolean.TRUE.toString());
+                    properties.setProperty("mail.imap.auth.login.disable", Boolean.TRUE.toString());
                 }
 
                 if (serverConfig.isSsl()) {
@@ -113,7 +146,7 @@ public abstract class BaseProtocol implements Serializable {
                     if (port != Globals.DEFAULT_VALUE_INT) {
                         properties.setProperty("mail.imap.socketFactory.port", Integer.toString(port));
                     }
-                    properties.setProperty("mail.imap.starttls.enable", "true");
+                    properties.setProperty("mail.imap.starttls.enable", Boolean.TRUE.toString());
                 }
                 break;
             case SMTP:
@@ -121,18 +154,18 @@ public abstract class BaseProtocol implements Serializable {
                 properties.setProperty(MAIL_TRANSPORT_PROTOCOL, "smtp");
 
                 if (serverConfig.isAuthLogin()) {
-                    properties.setProperty("mail.smtp.auth", "true");
+                    properties.setProperty("mail.smtp.auth", Boolean.TRUE.toString());
                 }
 
                 if (serverConfig.isSsl()) {
                     properties.setProperty(MAIL_STORE_PROTOCOL, "smtps");
-                    properties.setProperty("mail.smtp.ssl.enable", "true");
+                    properties.setProperty("mail.smtp.ssl.enable", Boolean.TRUE.toString());
                     properties.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY_CLASS);
-                    properties.setProperty("mail.smtp.socketFactory.fallback", "false");
+                    properties.setProperty("mail.smtp.socketFactory.fallback", Boolean.FALSE.toString());
                     if (port != Globals.DEFAULT_VALUE_INT) {
                         properties.setProperty("mail.smtp.socketFactory.port", Integer.toString(port));
                     }
-                    properties.setProperty("mail.smtp.starttls.enable", "true");
+                    properties.setProperty("mail.smtp.starttls.enable", Boolean.TRUE.toString());
                 }
                 break;
             case POP3:
@@ -146,9 +179,9 @@ public abstract class BaseProtocol implements Serializable {
                     if (port != 0) {
                         properties.setProperty("mail.pop3.socketFactory.port", Integer.toString(port));
                     }
-                    properties.setProperty("mail.pop3.disabletop", "true");
-                    properties.setProperty("mail.pop3.ssl.enable", "true");
-                    properties.setProperty("mail.pop3.useStartTLS", "true");
+                    properties.setProperty("mail.pop3.disabletop", Boolean.TRUE.toString());
+                    properties.setProperty("mail.pop3.ssl.enable", Boolean.TRUE.toString());
+                    properties.setProperty("mail.pop3.useStartTLS", Boolean.TRUE.toString());
                 }
                 break;
             default:
@@ -157,7 +190,15 @@ public abstract class BaseProtocol implements Serializable {
         this.configProxy(serverConfig.getProtocolOption(), properties);
         return properties;
     }
-
+    /**
+     * <h3 class="en">Add proxy configure information to target Properties instance</h3>
+     * <h3 class="zh-CN">添加代理服务器信息到给定的Properties实例对象中</h3>
+     *
+     * @param mailProtocol  <span class="en">Enumeration value of MailProtocol</span>
+     *                      <span class="zh-CN">电子邮件协议枚举值</span>
+     * @param properties    <span class="en">Given Properties instance</span>
+     *                      <span class="zh-CN">给定的Properties实例对象</span>
+     */
     private void configProxy(final MailProtocol mailProtocol, final Properties properties) {
         final String configPrefix;
         switch (mailProtocol) {
@@ -185,7 +226,7 @@ public abstract class BaseProtocol implements Serializable {
                         && StringUtils.notBlank(this.proxyConfig.getPassword())) {
                     properties.setProperty(configPrefix + ".proxy.user", this.proxyConfig.getUserName());
                     properties.setProperty(configPrefix + ".proxy.password",
-                            SecureFactory.getInstance().decrypt(this.secureName, this.proxyConfig.getPassword()));
+                            SecureFactory.decrypt(this.secureName, this.proxyConfig.getPassword()));
                 }
                 break;
             case SOCKS:

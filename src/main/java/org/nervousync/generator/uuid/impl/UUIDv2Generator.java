@@ -20,21 +20,27 @@ import org.nervousync.annotations.generator.GeneratorProvider;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.generator.uuid.timer.TimeSynchronizer;
 import org.nervousync.utils.IDUtils;
+import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The type Uui dv 2 generator.
+ * <h2 class="en">UUID version 2 generator</h2>
+ * <h2 class="zh-CN">UUID版本2生成器</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:53:06 $
  */
 @GeneratorProvider(IDUtils.UUIDv2)
 public final class UUIDv2Generator extends UUIDGenerator {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UUIDv2Generator.class);
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(UUIDv2Generator.class);
 
     private final UUIDTimer uuidTimer;
 
@@ -46,24 +52,49 @@ public final class UUIDv2Generator extends UUIDGenerator {
     }
 
     /**
-     * Config.
+	 * <h3 class="en">Configure current generator</h3>
+	 * <h3 class="zh-CN">修改当前生成器的配置</h3>
      *
-     * @param synchronizer the synchronizer
+     * @param synchronizer  <span class="en">Time synchronizer instance</span>
+     *                      <span class="zh-CN">时间同步器实例对象</span>
      */
     public void config(final TimeSynchronizer synchronizer) {
         this.uuidTimer.config(synchronizer);
     }
-
+    /**
+	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="zh-CN">生成ID值</h3>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random() {
+    public String generate() {
         return new UUID(super.highBits(this.uuidTimer.getTimestamp()), this.lowBits(SystemUtils.localMac())).toString();
     }
-
+    /**
+	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
+     *
+     * @param dataBytes     <span class="en">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     *
+     * @return  <span class="en">Generated value</span>
+     *          <span class="zh-CN">生成的ID值</span>
+     */
     @Override
-    public String random(byte[] dataBytes) {
-        return this.random();
+    public String generate(byte[] dataBytes) {
+        return this.generate();
     }
-
+    /**
+	 * <h3 class="en">Calculate low bits of given data bytes</h3>
+	 * <h3 class="zh-CN">从给定的二进制数组计算低位值</h3>
+     *
+     * @param dataBytes     <span class="en">given data bytes</span>
+     *                      <span class="zh-CN">给定的二进制数组</span>
+     * @return  <span class="en">Low bits value in long</span>
+     *          <span class="zh-CN">long型的低位比特值</span>
+     */
     @Override
     protected long lowBits(byte[] dataBytes) {
         if (dataBytes.length != 6) {
@@ -90,18 +121,21 @@ public final class UUIDv2Generator extends UUIDGenerator {
         uuidBytes[8] = (byte) (sequence >> 8);
         uuidBytes[9] = (byte) sequence;
 
-        long lowBits = (convertToLong(uuidBytes, 8) << 32) | (convertToLong(uuidBytes, 12) << 32 >>> 32);
+        long lowBits = (toLong(uuidBytes, 8) << 32) | (toLong(uuidBytes, 12) << 32 >>> 32);
         lowBits = lowBits << 2 >>> 2;
         lowBits |= -9223372036854775808L;
         return lowBits;
     }
-
+    /**
+	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
+     */
     @Override
     public void destroy() {
         this.uuidTimer.destroy();
     }
 
-    private static long convertToLong(byte[] buffer, int offset) {
+    private static long toLong(byte[] buffer, int offset) {
         return buffer[offset] << 24 | (buffer[offset + 1] & 255) << 16
                 | (buffer[offset + 2] & 255) << 8 | buffer[offset + 3] & 255;
     }
@@ -167,7 +201,7 @@ public final class UUIDv2Generator extends UUIDGenerator {
         public synchronized long getTimestamp() {
             long currentTimeMillis = System.currentTimeMillis();
             if (currentTimeMillis < this.systemTimestamp) {
-                LOGGER.warn("System time going backwards! (got value {}, last {}",
+                LOGGER.warn("Utils", "Go_Back_Time_UUID_Debug",
                         currentTimeMillis, this.systemTimestamp);
                 this.systemTimestamp = currentTimeMillis;
             }
@@ -179,7 +213,7 @@ public final class UUIDv2Generator extends UUIDGenerator {
                     long actDiff = this.usedTimestamp - currentTimeMillis;
                     long origTime = currentTimeMillis;
                     currentTimeMillis = this.usedTimestamp + 1L;
-                    LOGGER.warn("Timestamp over-run: need to reinitialize random sequence");
+                    LOGGER.warn("Utils", "Timestamp_Over_Run_Warn");
                     this.initCounters();
                     if (actDiff >= 100L) {
                         slowDown(origTime, actDiff);
@@ -219,7 +253,7 @@ public final class UUIDv2Generator extends UUIDGenerator {
                 delayMillis = 5L;
             }
 
-            LOGGER.warn("Need to wait for {} milliseconds; virtual clock advanced too far in the future", delayMillis);
+            LOGGER.warn("Utils", "Virtual_Clock_Warn", delayMillis);
             long timeOutMillis = startTime + delayMillis;
             int counter = 0;
 

@@ -16,8 +16,7 @@
  */
 package org.nervousync.zip.crypto.impl.standard;
 
-import org.nervousync.commons.core.Globals;
-import org.nervousync.zip.engine.ZipCryptoEngine;
+import org.nervousync.commons.Globals;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Decryptor;
@@ -30,7 +29,7 @@ import org.nervousync.zip.crypto.Decryptor;
  */
 public class StandardDecryptor implements Decryptor {
 
-	private final ZipCryptoEngine zipCryptoEngine;
+	private final StandardCryptoEngine standardCryptoEngine;
 
 	/**
 	 * Instantiates a new Standard decryptor.
@@ -42,21 +41,21 @@ public class StandardDecryptor implements Decryptor {
 	public StandardDecryptor(LocalFileHeader localFileHeader, byte[] decryptorHeader)
 			throws ZipException {
 		if (localFileHeader == null) {
-			throw new ZipException("General file header is null!");
+			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
 		}
 
-		this.zipCryptoEngine = new ZipCryptoEngine();
+		this.standardCryptoEngine = new StandardCryptoEngine();
 
 		if (localFileHeader.getPassword() == null
 				|| localFileHeader.getPassword().length == 0) {
-			throw new ZipException("Wrong password");
+			throw new ZipException(0x0000001B000DL, "Utils", "Wrong_Password_Zip_Error");
 		}
 		
-		this.zipCryptoEngine.initKeys(localFileHeader.getPassword());
+		this.standardCryptoEngine.initKeys(localFileHeader.getPassword());
 
 		int result = decryptorHeader[0];
 		for (int i = 0; i < Globals.STD_DEC_HDR_SIZE ; i++) {
-			this.zipCryptoEngine.updateKeys((byte)(result ^ this.zipCryptoEngine.decryptByte()));
+			this.standardCryptoEngine.updateKeys((byte)(result ^ this.standardCryptoEngine.processByte()));
 			if ((i + 1) != Globals.STD_DEC_HDR_SIZE) {
 				result = decryptorHeader[i + 1];
 			}
@@ -71,23 +70,18 @@ public class StandardDecryptor implements Decryptor {
 	@Override
 	public int decryptData(byte[] buff, int start, int len) throws ZipException {
 		if (start < 0 || len < 0) {
-			throw new ZipException("input argument error!");
+			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
 		}
-		
 		try {
 			for (int i = start ; i < start + len ; i++) {
 				int value = buff[i] & 0xFF;
-				value = (value ^ this.zipCryptoEngine.decryptByte()) & 0xFF;
-				this.zipCryptoEngine.updateKeys((byte)value);
+				value = (value ^ this.standardCryptoEngine.processByte()) & 0xFF;
+				this.standardCryptoEngine.updateKeys((byte)value);
 				buff[i] = (byte)value;
 			}
 			return len;
 		} catch (Exception e) {
-			if (e instanceof ZipException) {
-				throw (ZipException)e;
-			} else {
-				throw new ZipException(e);
-			}
+			throw new ZipException(0x0000001B000BL, "Utils", "Decrypt_Crypto_Zip_Error", e);
 		}
 	}
 
