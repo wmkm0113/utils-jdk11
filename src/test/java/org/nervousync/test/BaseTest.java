@@ -13,7 +13,7 @@ public abstract class BaseTest {
     protected transient final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     static {
-        LoggerUtils.initLoggerConfigure(Level.INFO);
+        LoggerUtils.initLoggerConfigure(Level.DEBUG);
     }
 
     @BeforeEach

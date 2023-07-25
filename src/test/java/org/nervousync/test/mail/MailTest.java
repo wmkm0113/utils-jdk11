@@ -84,8 +84,9 @@ public final class MailTest extends BaseTest {
                 .storagePath(PROPERTIES.getProperty("config.storagePath"))
                 .signer(x509Certificate, keyPair.getPrivate())
                 .confirm();
-        String xmlContent = MAIL_CONFIG.toXML();
-        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, MailConfig.class, "https://nervousync.org/schemas/mail", "https://nervousync.org/schemas/proxy");
+        String xmlContent = MAIL_CONFIG.toXML(Boolean.TRUE);
+        this.logger.info("Config: {}", xmlContent);
+        MailConfig parseConfig = StringUtils.stringToObject(xmlContent, MailConfig.class, "https://nervousync.org/schemas/mail");
         this.logger.info("Parse and verified config: {}", parseConfig.toFormattedJson());
     }
 

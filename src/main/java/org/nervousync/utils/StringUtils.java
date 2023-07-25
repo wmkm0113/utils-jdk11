@@ -52,7 +52,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 /**
@@ -2289,31 +2288,27 @@ public final class StringUtils {
                 Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
                 if (schemaPaths.length > 0) {
                     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    Schema schema;
-                    if (schemaPaths.length == 1) {
-                        schema = schemaFactory.newSchema(FileUtils.getFile(SCHEMA_MAPPING.getOrDefault(schemaPaths[0], schemaPaths[0])));
-                    } else {
-                        schemaFactory.setResourceResolver(new SchemaResourceResolver());
-                        try {
-                            Source[] sources = new Source[schemaPaths.length];
-                            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                            docFactory.setNamespaceAware(Boolean.TRUE);
-                            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                            for (int i = 0; i < schemaPaths.length; i++) {
-                                String locationPath = SCHEMA_MAPPING.getOrDefault(schemaPaths[i], schemaPaths[i]);
-                                Document document = docBuilder.parse(FileUtils.getFile(locationPath));
-                                sources[i] = new DOMSource(document, locationPath);
-                            }
-                            schema = schemaFactory.newSchema(sources);
-                        } catch (ParserConfigurationException e) {
-                            LOGGER.error("Utils", "Load_Schemas_Error");
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Utils", "Stack_Message_Error", e);
-                            }
-                            return null;
+                    schemaFactory.setResourceResolver(new SchemaResourceResolver());
+                    try {
+                        Source[] sources = new Source[schemaPaths.length];
+                        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                        docFactory.setNamespaceAware(Boolean.TRUE);
+                        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                        for (int i = 0; i < schemaPaths.length; i++) {
+                            String locationPath = SCHEMA_MAPPING.getOrDefault(schemaPaths[i], schemaPaths[i]);
+                            InputStream in = FileUtils.loadFile(locationPath);
+                            Document document = docBuilder.parse(in);
+                            sources[i] = new DOMSource(document, locationPath);
+                            IOUtils.closeStream(in);
                         }
+                        unmarshaller.setSchema(schemaFactory.newSchema(sources));
+                    } catch (ParserConfigurationException e) {
+                        LOGGER.error("Utils", "Load_Schemas_Error");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        }
+                        return null;
                     }
-                    unmarshaller.setSchema(schema);
                 }
                 return beanClass.cast(unmarshaller.unmarshal(inputStream));
             } catch (JAXBException | SAXException e) {
