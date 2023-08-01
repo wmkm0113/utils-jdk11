@@ -51,6 +51,7 @@ libraryDependencies += "org.nervousync" % "utils-jdk11" % "${version}" % "provid
 ### 1. 创建描述文件和资源文件
 在 META-INF 中创建文件 nervous.i18n，格式如下
 ```
+groupId={Your group id}
 bundle={Your bundle string}
 languages={language string using ',' split}
 ```
