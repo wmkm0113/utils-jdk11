@@ -30,7 +30,7 @@ import java.util.Arrays;
  * <h2 class="zh-CN">摘要算法适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 11:46:55 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 11:46:55 $
  */
 public abstract class BaseDigestAdapter extends SecureAdapter {
     /**
@@ -63,7 +63,7 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
      */
     protected BaseDigestAdapter(final String algorithm, final byte[] keyBytes) throws CryptoException {
         if (StringUtils.isEmpty(algorithm)) {
-            throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error");
+            throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error");
         }
         this.macMode = algorithm.toUpperCase().contains("HMAC");
         this.messageDigest = this.macMode ? null : this.initDigest(algorithm);
@@ -119,7 +119,7 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
     @Override
     public final void append(final byte[] dataBytes, final int position, final int length) throws CryptoException {
         if (dataBytes.length < (position + length)) {
-            throw new CryptoException(0x000000150001L, "Utils", "Length_Not_Enough_Crypto_Error");
+            throw new CryptoException(0x000000150001L, "Length_Not_Enough_Crypto_Error");
         }
         if (this.macMode) {
             this.hmac.update(dataBytes, position, length);
@@ -148,7 +148,7 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
     @Override
     public final byte[] finish(final byte[] dataBytes, final int position, final int length) throws CryptoException {
         if (dataBytes.length < (position + length)) {
-            throw new CryptoException(0x000000150001L, "Utils", "Length_Not_Enough_Crypto_Error");
+            throw new CryptoException(0x000000150001L, "Length_Not_Enough_Crypto_Error");
         }
         this.append(dataBytes, position, length);
         byte[] result;

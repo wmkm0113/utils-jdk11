@@ -8,6 +8,7 @@ import org.nervousync.commons.snmp.SNMPDataOperator;
 import org.nervousync.enumerations.net.IPProtocol;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.DateTimeUtils;
+import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.SNMPUtils;
 import org.nervousync.utils.StringUtils;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public final class SNMPTest extends BaseTest {
 	@Test
     @Order(0)
 	public void initialize() {
-		this.logger.info("Initialize result: {}", SNMPUtils.initialize(1, 2000L));
+		this.logger.info("SNMP_Init_Result", SNMPUtils.initialize(1, 2000L));
 	}
 
 	@Test
@@ -46,7 +47,7 @@ public final class SNMPTest extends BaseTest {
 		walkPDU.addOID(new VariableBinding(new OID(".1.3.6.1.2.1.2.2.1.3")));
 		walkPDU.addOID(new VariableBinding(new OID(".1.3.6.1.2.1.25.3.3.1.2")));
 		walkPDU.addOID(new VariableBinding(new OID(".1.3.6.1.4.1.2021.9.1.6")));
-		this.logger.info("Add monitor result: {}",
+		this.logger.info("SNMP_Add_Result",
 				SNMPUtils.getInstance().addMonitor(StringUtils.randomString(16),
 						TargetHost.remote(IPProtocol.UDP, "192.168.166.51"), new OutputOperator(), getPDU, walkPDU));
 	}
@@ -65,16 +66,16 @@ public final class SNMPTest extends BaseTest {
 
 	private static final class OutputOperator implements SNMPDataOperator {
 
-		private final Logger logger = LoggerFactory.getLogger(this.getClass());
+		private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
 
 		@Override
 		public void operateData(SNMPData snmpData) {
-			this.logger.info("Identify key: {}, current time: {}", snmpData.getIdentifiedKey(),
+			this.logger.info("SNMP_Record_Data", snmpData.getIdentifiedKey(),
 					DateTimeUtils.formatDate(new Date(snmpData.getCurrentGMTTime()), DateTimeUtils.DEFAULT_ISO8601_PATTERN));
 			Iterator<Map.Entry<String, String>> iterator = snmpData.iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<String, String> entry = iterator.next();
-				this.logger.info("Data key: {}, value: {}", entry.getKey(), entry.getValue());
+				this.logger.info("SNMP_Record_Info", entry.getKey(), entry.getValue());
 			}
 		}
 	}

@@ -26,7 +26,7 @@ import java.io.Serializable;
  * <h2 class="zh-CN">IP地址范围定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: Sep 21, 2018 18:25:52 $
+ * @version $Revision: 1.1.3 $Date: Dec 10, 2021 18:25:52 $
  */
 public final class IPRange implements Serializable {
 	/**

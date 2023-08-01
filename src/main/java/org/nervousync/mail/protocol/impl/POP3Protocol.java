@@ -34,7 +34,7 @@ import java.util.List;
  * <h2 class="zh-CN">JavaMail的IMAP协议类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2012 20:08:48 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 20:08:48 $
  */
 public final class POP3Protocol extends BaseProtocol implements ReceiveOperator {
 	/**

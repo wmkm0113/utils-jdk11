@@ -65,7 +65,7 @@ import java.util.Optional;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 25, 2015 16:26:15 $
+ * @version $Revision: 1.2.0 $ $Date: Jun 25, 2015 16:26:15 $
  */
 public final class CertificateUtils {
     /**
@@ -100,7 +100,7 @@ public final class CertificateUtils {
      */
     public static KeyPair keyPair(final String algorithm, final String randomAlgorithm, final int keySize) {
         if (keySize % 128 != 0) {
-            LOGGER.error("Utils", "Key_Size_Invalid_Error");
+            LOGGER.error("Key_Size_Invalid_Error");
             return null;
         }
 
@@ -108,7 +108,7 @@ public final class CertificateUtils {
         try {
             SecureRandom secureRandom;
             if (StringUtils.isEmpty(randomAlgorithm)) {
-                LOGGER.warn("Utils", "Random_Algorithm_Default_Warn");
+                LOGGER.warn("Random_Algorithm_Default_Warn");
                 secureRandom = SecureRandom.getInstance("SHA1PRNG");
             } else {
                 secureRandom = SecureRandom.getInstance(randomAlgorithm);
@@ -124,9 +124,9 @@ public final class CertificateUtils {
             }
             keyPair = keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
-            LOGGER.error("Utils", "Init_Key_Pair_Generator_Error");
+            LOGGER.error("Init_Key_Pair_Generator_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         }
         return keyPair;
@@ -171,9 +171,9 @@ public final class CertificateUtils {
             X509CertificateHolder certificateHolder = x509v3CertificateBuilder.build(contentSigner);
             return new JcaX509CertificateConverter().getCertificate(certificateHolder);
         } catch (OperatorCreationException | GeneralSecurityException | IOException e) {
-            LOGGER.error("Utils", "PKCS12_Generate_Error");
+            LOGGER.error("PKCS12_Generate_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         }
         return null;
@@ -242,7 +242,7 @@ public final class CertificateUtils {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(certBytes);
             x509Certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Certificate_SN_Debug", x509Certificate.getSerialNumber().toString());
+                LOGGER.debug("Certificate_SN_Debug", x509Certificate.getSerialNumber().toString());
             }
             if (checkValidity) {
                 x509Certificate.checkValidity();
@@ -251,9 +251,9 @@ public final class CertificateUtils {
                 x509Certificate.verify(verifyKey, "BC");
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Certificate_Invalid_Error");
+            LOGGER.error("Certificate_Invalid_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             x509Certificate = null;
         }
@@ -313,9 +313,9 @@ public final class CertificateUtils {
             x509Certificate.verify((verifyKey == null) ? x509Certificate.getPublicKey() : verifyKey, "BC");
             return Boolean.TRUE;
         } catch (Exception e) {
-            LOGGER.error("Utils", "Certificate_Invalid_Error");
+            LOGGER.error("Certificate_Invalid_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -385,7 +385,7 @@ public final class CertificateUtils {
                     try {
                         x509Certificate = (X509Certificate) keyStore.getCertificate(certAlias);
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Certificate_SN_Debug", x509Certificate.getSerialNumber().toString());
+                            LOGGER.debug("Certificate_SN_Debug", x509Certificate.getSerialNumber().toString());
                         }
                         if (checkValidity) {
                             x509Certificate.checkValidity();
@@ -394,9 +394,9 @@ public final class CertificateUtils {
                             x509Certificate.verify(verifyKey, "BC");
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Utils", "Certificate_Invalid_Error");
+                        LOGGER.error("Certificate_Invalid_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                            LOGGER.debug("Stack_Message_Error", e);
                         }
                         x509Certificate = null;
                     }
@@ -420,9 +420,9 @@ public final class CertificateUtils {
         try {
             return KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(keyBytes));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            LOGGER.error("Utils", "Data_Generate_Key_Error");
+            LOGGER.error("Data_Generate_Key_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         }
         return null;
@@ -443,9 +443,9 @@ public final class CertificateUtils {
         try {
             return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-            LOGGER.error("Utils", "Data_Generate_Key_Error");
+            LOGGER.error("Data_Generate_Key_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return null;
         }
@@ -550,9 +550,9 @@ public final class CertificateUtils {
             keyStore.store(byteArrayOutputStream, charArray);
             return byteArrayOutputStream.toByteArray();
         } catch (OperatorCreationException | GeneralSecurityException | IOException e) {
-            LOGGER.error("Utils", "PKCS12_Generate_Error");
+            LOGGER.error("PKCS12_Generate_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return new byte[0];
         } finally {
@@ -591,7 +591,7 @@ public final class CertificateUtils {
             return loadKeyStore(new FileInputStream(storePath), password);
         } catch (FileNotFoundException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Load_Key_Store_Error", e);
+                LOGGER.debug("Load_Key_Store_Error", e);
             }
         }
         return null;
@@ -615,7 +615,7 @@ public final class CertificateUtils {
             keyStore.load(inputStream, password == null ? null : password.toCharArray());
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Load_Key_Store_Error", e);
+                LOGGER.debug("Load_Key_Store_Error", e);
             }
             keyStore = null;
         } finally {
@@ -661,9 +661,9 @@ public final class CertificateUtils {
         try {
             return (X509Certificate) keyStore.getCertificate(certAlias);
         } catch (KeyStoreException e) {
-            LOGGER.error("Utils", "Read_Certificate_Error");
+            LOGGER.error("Read_Certificate_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return null;
         }
@@ -686,9 +686,9 @@ public final class CertificateUtils {
         try {
             return (PrivateKey) keyStore.getKey(certAlias, password == null ? null : password.toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            LOGGER.error("Utils", "Read_Private_Key_From_Store_Error");
+            LOGGER.error("Read_Private_Key_From_Store_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return null;
         }

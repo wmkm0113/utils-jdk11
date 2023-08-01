@@ -41,6 +41,7 @@ import jcifs.CIFSContext;
 import jcifs.CIFSException;
 import jcifs.Config;
 import jcifs.smb.NtlmPasswordAuthenticator;
+import org.nervousync.beans.ip.path.TargetPath;
 import org.nervousync.exceptions.zip.ZipException;
 
 import jcifs.config.PropertyConfiguration;
@@ -59,7 +60,7 @@ import org.nervousync.zip.ZipFile;
  * <h2 class="zh-CN">文件操作工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:08:14 $
+ * @version $Revision: 1.2.0 $ $Date: Jan 13, 2010 11:08:14 $
  */
 public final class FileUtils {
     /**
@@ -339,7 +340,7 @@ public final class FileUtils {
      *          <span class="zh-CN">如果文件存在，则最后修改时间为 long 类型</span>
      */
     public static long lastModify(final String resourceLocation, final Properties properties) {
-        if (resourceLocation == null || resourceLocation.trim().length() == 0) {
+        if (resourceLocation == null || resourceLocation.trim().isEmpty()) {
             return Globals.DEFAULT_VALUE_LONG;
         }
         if (resourceLocation.startsWith(Globals.SAMBA_PROTOCOL)) {
@@ -349,7 +350,7 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Last_Modify_Read_File_Error", e);
+                    LOGGER.debug("Last_Modify_Read_File_Error", e);
                 }
             }
         } else {
@@ -360,7 +361,7 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Last_Modify_Read_File_Error", e);
+                    LOGGER.debug("Last_Modify_Read_File_Error", e);
                 }
             }
         }
@@ -411,27 +412,29 @@ public final class FileUtils {
             inputStream = new SmbFileInputStream(resourceLocation,
                     new BaseContext(new PropertyConfiguration(new Properties())));
         } else {
-            JarPath jarPath = JarPath.parse(resourceLocation);
-            if (jarPath == null) {
+            TargetPath targetPath = TargetPath.parse(resourceLocation);
+            if (targetPath == null) {
                 inputStream = FileUtils.class.getResourceAsStream(resourceLocation);
                 if (inputStream == null) {
                     try {
                         inputStream = FileUtils.getURL(resourceLocation).openStream();
                     } catch (FileNotFoundException e) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Input_Stream_Open_Error", e);
+                            LOGGER.debug("Input_Stream_Open_Error", e);
                         }
                         throw new IOException(e);
                     }
                 }
             } else {
                 try {
-                    switch (StringUtils.getFilenameExtension(jarPath.getFilePath())) {
+                    switch (StringUtils.getFilenameExtension(targetPath.getFilePath())) {
                         case URL_PROTOCOL_JAR:
-                            inputStream = openInputStream(new JarFile(getFile(jarPath.getFilePath())), jarPath.getEntryPath());
+                            inputStream = openInputStream(new JarFile(getFile(targetPath.getFilePath())),
+                                    targetPath.getEntryPath());
                             break;
                         case URL_PROTOCOL_ZIP:
-                            inputStream = openInputStream(ZipFile.openZipFile(jarPath.getFilePath()), jarPath.getEntryPath());
+                            inputStream = openInputStream(ZipFile.openZipFile(targetPath.getFilePath()),
+                                    targetPath.getEntryPath());
                             break;
                         default:
                             inputStream = null;
@@ -732,7 +735,7 @@ public final class FileUtils {
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
+                LOGGER.debug("Entry_Content_Load_Error", e);
             }
         }
         return entryList;
@@ -757,7 +760,7 @@ public final class FileUtils {
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
+                LOGGER.debug("Entry_Content_Load_Error", e);
             }
         }
         return Globals.DEFAULT_VALUE_STRING;
@@ -802,7 +805,7 @@ public final class FileUtils {
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Entry_Content_Load_Error", e);
+                LOGGER.debug("Entry_Content_Load_Error", e);
             }
         }
         return new byte[0];
@@ -842,15 +845,15 @@ public final class FileUtils {
      * <span class="zh-CN">如果URL无法解析为文件系统中的文件</span>
      */
     public static byte[] readFileBytes(final String resourceLocation) throws FileNotFoundException {
-        JarPath jarPath = JarPath.parse(resourceLocation);
-        if (jarPath == null) {
+        TargetPath targetPath = TargetPath.parse(resourceLocation);
+        if (targetPath == null) {
             return readFileBytes(FileUtils.getFile(resourceLocation));
         }
-        if (jarPath.getFilePath().toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
-            return FileUtils.readJarEntryBytes(jarPath.getFilePath(), jarPath.getEntryPath());
-        } else if (jarPath.getFilePath().toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
+        if (targetPath.getFilePath().toLowerCase().endsWith(URL_PROTOCOL_JAR)) {
+            return FileUtils.readJarEntryBytes(targetPath.getFilePath(), targetPath.getEntryPath());
+        } else if (targetPath.getFilePath().toLowerCase().endsWith(URL_PROTOCOL_ZIP)) {
             try {
-                return ZipFile.openZipFile(jarPath.getFilePath()).readEntry(jarPath.getEntryPath());
+                return ZipFile.openZipFile(targetPath.getFilePath()).readEntry(targetPath.getEntryPath());
             } catch (ZipException ignored) {
                 return new byte[0];
             }
@@ -955,7 +958,7 @@ public final class FileUtils {
                 }
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Size_Read_File_Error", e);
+                    LOGGER.debug("Size_Read_File_Error", e);
                 }
                 return Globals.DEFAULT_VALUE_LONG;
             }
@@ -1093,10 +1096,10 @@ public final class FileUtils {
                 .map(fullPath -> {
                     int index = fullPath.indexOf(JAR_URL_SEPARATOR);
                     if (index > 0) {
-                        return new JarPath(fullPath.substring(0, index),
+                        return TargetPath.newInstance(fullPath.substring(0, index),
                                 fullPath.substring(index + JAR_URL_SEPARATOR.length()));
                     } else {
-                        return new JarPath(fullPath, Globals.DEFAULT_VALUE_STRING);
+                        return TargetPath.newInstance(fullPath, Globals.DEFAULT_VALUE_STRING);
                     }
                 })
                 .filter(jarPath -> FileUtils.isExists(jarPath.getFilePath()))
@@ -1123,7 +1126,7 @@ public final class FileUtils {
                         }
                     } catch (Exception e) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Entry_List_Error", e);
+                            LOGGER.debug("Entry_List_Error", e);
                         }
                     } finally {
                         IOUtils.closeStream(jarFile);
@@ -2007,9 +2010,9 @@ public final class FileUtils {
                     return Boolean.TRUE;
                 }
             } catch (IOException e) {
-                LOGGER.error("Utils", "Target_Save_File_Error");
+                LOGGER.error("Target_Save_File_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
             } finally {
                 IOUtils.closeStream(fileOutputStream);
@@ -2068,14 +2071,14 @@ public final class FileUtils {
             if (outputStream != null) {
                 long copiedLength = IOUtils.copyStream(inputStream, outputStream, Boolean.FALSE);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Copy_length_File_Debug", copiedLength);
+                    LOGGER.debug("Copy_length_File_Debug", copiedLength);
                 }
                 return Boolean.TRUE;
             }
         } catch (IOException e) {
-            LOGGER.error("Utils", "Target_Save_File_Error");
+            LOGGER.error("Target_Save_File_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         } finally {
             IOUtils.closeStream(outputStream);
@@ -2153,9 +2156,9 @@ public final class FileUtils {
             outputStreamWriter.flush();
             return Boolean.TRUE;
         } catch (Exception e) {
-            LOGGER.error("Utils", "Target_Save_File_Error");
+            LOGGER.error("Target_Save_File_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         } finally {
@@ -2285,9 +2288,9 @@ public final class FileUtils {
             }
             return Boolean.TRUE;
         } catch (Exception e) {
-            LOGGER.error("Utils", "Remove_Files_Error");
+            LOGGER.error("Remove_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -2452,9 +2455,9 @@ public final class FileUtils {
                     return FileUtils.copy(originalPath, originalContext, targetPath, targetContext, override)
                             && FileUtils.removeFile(originalPath);
                 } catch (Exception e) {
-                    LOGGER.error("Utils", "Move_Files_Error");
+                    LOGGER.error("Move_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        LOGGER.debug("Stack_Message_Error", e);
                     }
                 }
             }
@@ -2657,9 +2660,9 @@ public final class FileUtils {
                 return Boolean.FALSE;
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Move_Directory_Error");
+            LOGGER.error("Move_Directory_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -2700,9 +2703,9 @@ public final class FileUtils {
                 smbFile.mkdirs();
                 return Boolean.TRUE;
             } catch (Exception e) {
-                LOGGER.error("Utils", "Create_Directory_Error");
+                LOGGER.error("Create_Directory_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
@@ -2945,9 +2948,9 @@ public final class FileUtils {
                 return FileUtils.processFile(original, target, override);
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Copy_Directory_Error");
+            LOGGER.error("Copy_Directory_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         } finally {
@@ -2991,9 +2994,9 @@ public final class FileUtils {
             try {
                 return FileUtils.removeDir(FileUtils.getFile(directoryPath));
             } catch (Exception e) {
-                LOGGER.error("Utils", "Remove_Directory_Error");
+                LOGGER.error("Remove_Directory_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
@@ -3025,9 +3028,9 @@ public final class FileUtils {
                 return crc.getValue();
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "CRC_Calculate_Files_Error");
+            LOGGER.error("CRC_Calculate_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         } finally {
             IOUtils.closeStream(inputStream);
@@ -3172,9 +3175,9 @@ public final class FileUtils {
                 return zipFile.readEntryLength(entryPath);
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Entry_Length_Load_Error");
+            LOGGER.error("Entry_Length_Load_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         } finally {
             IOUtils.closeStream(inputStream);
@@ -3205,18 +3208,18 @@ public final class FileUtils {
                 jarFile = new JarFile(getFile(filePath));
                 return jarFile.getJarEntry(entryPath) != null;
             } catch (Exception e) {
-                LOGGER.error("Utils", "Entry_Content_Load_Error");
+                LOGGER.error("Entry_Content_Load_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
             } finally {
                 if (jarFile != null) {
                     try {
                         jarFile.close();
                     } catch (Exception e) {
-                        LOGGER.error("Utils", "Archive_Close_File_Error");
+                        LOGGER.error("Archive_Close_File_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                            LOGGER.debug("Stack_Message_Error", e);
                         }
                     }
                 }
@@ -3394,11 +3397,11 @@ public final class FileUtils {
     public static boolean mergeFile(final String savePath, final SegmentationInfo segmentationInfo) {
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(savePath, "rw")) {
             String extName = StringUtils.getFilenameExtension(savePath);
-            if (extName.length() == 0) {
+            if (extName.isEmpty()) {
                 extName = Globals.DEFAULT_VALUE_STRING;
             }
             if (!segmentationInfo.getExtName().equalsIgnoreCase(extName)) {
-                LOGGER.warn("Utils", "Not_Match_Ext_Name_Files_Warn");
+                LOGGER.warn("Not_Match_Ext_Name_Files_Warn");
             }
             long totalSize = 0;
             randomAccessFile.setLength(segmentationInfo.getTotalSize());
@@ -3414,7 +3417,7 @@ public final class FileUtils {
             }
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Size_Write_Files_Debug", totalSize);
+                LOGGER.debug("Size_Write_Files_Debug", totalSize);
             }
 
             if (totalSize != segmentationInfo.getTotalSize()) {
@@ -3423,9 +3426,9 @@ public final class FileUtils {
             }
             return Boolean.TRUE;
         } catch (Exception e) {
-            LOGGER.error("Utils", "Merge_Files_Error");
+            LOGGER.error("Merge_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -3475,7 +3478,7 @@ public final class FileUtils {
 
         try {
             String extName = StringUtils.getFilenameExtension(filePath);
-            if (extName.length() == 0) {
+            if (extName.isEmpty()) {
                 extName = Globals.DEFAULT_VALUE_STRING;
             } else {
                 extName = extName.toLowerCase();
@@ -3495,7 +3498,7 @@ public final class FileUtils {
             int readLength;
             while ((readLength = fileInputStream.read(readBuffer)) != -1) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Read_Block_Files_Debug", index, readLength);
+                    LOGGER.debug("Read_Block_Files_Debug", index, readLength);
                 }
                 byteArrayOutputStream = new ByteArrayOutputStream(blockSize);
                 byteArrayOutputStream.write(readBuffer, 0, readLength);
@@ -3508,14 +3511,14 @@ public final class FileUtils {
             return new SegmentationInfo(extName, fileSize, blockSize,
                     ConvertUtils.toHex(SecurityUtils.SHA256(fileObject)), segmentationBlockList);
         } catch (FileNotFoundException e) {
-            LOGGER.error("Utils", "Not_Found_File_Error", filePath);
+            LOGGER.error("Not_Found_File_Error", filePath);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         } catch (IOException e) {
-            LOGGER.error("Utils", "Read_Files_Error");
+            LOGGER.error("Read_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         } finally {
             IOUtils.closeStream(fileInputStream);
@@ -3671,9 +3674,9 @@ public final class FileUtils {
                 return ((File) directory).delete();
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Remove_Directory_Error");
+            LOGGER.error("Remove_Directory_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -3713,7 +3716,7 @@ public final class FileUtils {
                                      final SegmentationBlock segmentationBlock) throws IOException {
         if (segmentationBlock == null || !segmentationBlock.securityCheck()) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Invalid_Block_Segment_Error");
+                LOGGER.debug("Invalid_Block_Segment_Error");
             }
             return Boolean.FALSE;
         }
@@ -3808,74 +3811,6 @@ public final class FileUtils {
             return pathname.isDirectory();
         }
     }
-
-    /**
-     * <h2 class="en">Jar path define</h2>
-     * <h2 class="zh-CN">Jar路径定义</h2>
-     */
-    private static final class JarPath {
-        /**
-         * <span class="en">Jar file path</span>
-         * <span class="zh-CN">Jar文件路径</span>
-         */
-        private final String filePath;
-        /**
-         * <span class="en">Jar entry path</span>
-         * <span class="zh-CN">Jar资源路径</span>
-         */
-        private final String entryPath;
-        /**
-         * <h3 class="en">Constructor for JarPath</h3>
-         * <h3 class="zh-CN">Jar路径定义的构造方法</h3>
-         *
-         * @param filePath  <span class="en">Jar file path</span>
-         *                  <span class="zh-CN">Jar文件路径</span>
-         * @param entryPath <span class="en">Jar entry path</span>
-         *                  <span class="zh-CN">Jar资源路径</span>
-         */
-        JarPath(final String filePath, final String entryPath) {
-            this.filePath = filePath;
-            this.entryPath = entryPath;
-        }
-        /**
-         * <h3 class="en">Static method for parse resource location string to JarPath instance</h3>
-         * <h3 class="zh-CN">静态方法用于解析资源路径字符串为JarPath实例对象</h3>
-         *
-         * @param resourceLocation  <span class="en">the location String</span>
-         *                          <span class="zh-CN">位置字符串</span>
-         *
-         * @return  <span class="en">Parsed JarPath instance or <code>null</code> if resource location string invalid</span>
-         *          <span class="zh-CN">解析后的 JarPath 实例对象，如果位置字符串不是合法的资源路径则返回 <code>null</code></span>
-         */
-        static JarPath parse(final String resourceLocation) {
-            if (StringUtils.containsIgnoreCase(resourceLocation, JAR_URL_SEPARATOR)) {
-                int index = resourceLocation.indexOf(JAR_URL_SEPARATOR);
-                return new JarPath(resourceLocation.substring(0, index),
-                        resourceLocation.substring(index + JAR_URL_SEPARATOR.length()));
-            }
-            return null;
-        }
-        /**
-         * <h3 class="en">Getter method for file path</h3>
-         * <h3 class="zh-CN">Jar文件路径的Getter方法</h3>
-         *
-         * @return  <span class="en">Jar file path</span>
-         *          <span class="zh-CN">Jar文件路径</span>
-         */
-        public String getFilePath() {
-            return filePath;
-        }
-        /**
-         * <h3 class="en">Getter method for entry path</h3>
-         * <h3 class="zh-CN">Jar资源路径的Getter方法</h3>
-         *
-         * @return  <span class="en">Jar entry path</span>
-         *          <span class="zh-CN">Jar资源路径</span>
-         */
-        public String getEntryPath() {
-            return entryPath;
-        }
-    }
     /**
      * <h3 class="en">Move file from base samba path to target samba path</h3>
      * <h3 class="zh-CN">从原samba文件地址移动到目标samba文件地址</h3>
@@ -3911,9 +3846,9 @@ public final class FileUtils {
                     }
                     return Boolean.TRUE;
                 } catch (Exception e) {
-                    LOGGER.error("Utils", "Copy_Files_Error");
+                    LOGGER.error("Copy_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        LOGGER.debug("Stack_Message_Error", e);
                     }
                     return Boolean.FALSE;
                 }
@@ -3932,17 +3867,17 @@ public final class FileUtils {
                     }
                     return Boolean.TRUE;
                 } catch (Exception e) {
-                    LOGGER.error("Utils", "Copy_Files_Error");
+                    LOGGER.error("Copy_Files_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        LOGGER.debug("Stack_Message_Error", e);
                     }
                     return Boolean.FALSE;
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Utils", "Move_Files_Error");
+            LOGGER.error("Move_Files_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }
@@ -4022,9 +3957,9 @@ public final class FileUtils {
             }
             return processResult;
         } catch (Exception e) {
-            LOGGER.error("Utils", "Directory_Move_Error");
+            LOGGER.error("Directory_Move_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return Boolean.FALSE;
         }

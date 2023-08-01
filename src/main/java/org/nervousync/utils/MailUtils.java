@@ -89,7 +89,7 @@ import org.nervousync.security.factory.SecureFactory;
  * </span>
  *
  * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2012 20:54:04 $
+ * @version $Revision: 1.1.5 $ $Date: Jul 31, 2012 20:54:04 $
  */
 public final class MailUtils {
 	/**
@@ -120,7 +120,7 @@ public final class MailUtils {
      * <h2 class="zh-CN">电子邮件代理</h2>
      *
      * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jul 31, 2012 21:03:46 $
+     * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 21:03:46 $
      */
     public static final class Agent {
         /**
@@ -245,9 +245,9 @@ public final class MailUtils {
                 Transport.send(convert(session, mailObject, this.x509Certificate, this.privateKey));
                 return Boolean.TRUE;
             } catch (MessagingException | MailException e) {
-                this.logger.error("Utils", "Send_Mail_Error");
+                this.logger.error("Send_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
@@ -269,9 +269,9 @@ public final class MailUtils {
                     }
                 }
             } catch (Exception e) {
-                this.logger.error("Utils", "Folders_Mail_Error");
+                this.logger.error("Folders_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
             return folderList;
@@ -306,9 +306,9 @@ public final class MailUtils {
                     return folder.getMessageCount();
                 }
             } catch (Exception e) {
-                this.logger.error("Utils", "Receive_Mail_Error");
+                this.logger.error("Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
             return Globals.DEFAULT_VALUE_INT;
@@ -369,9 +369,9 @@ public final class MailUtils {
                 }
                 return mailList;
             } catch (Exception e) {
-                this.logger.error("Utils", "Receive_Mail_Error");
+                this.logger.error("Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
             return Collections.emptyList();
@@ -419,9 +419,9 @@ public final class MailUtils {
                     return receiveMessage((MimeMessage) message, detail);
                 }
             } catch (Exception e) {
-                this.logger.error("Utils", "Receive_Mail_Error");
+                this.logger.error("Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
 
@@ -454,9 +454,9 @@ public final class MailUtils {
                                 Optional.ofNullable(receiveMessage((MimeMessage) message, Boolean.FALSE))
                                         .ifPresent(mailList::add));
             } catch (Exception e) {
-                this.logger.error("Utils", "Receive_Mail_Error");
+                this.logger.error("Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
 
@@ -550,9 +550,9 @@ public final class MailUtils {
                 folder.copyMessages(messageList.toArray(new Message[0]), inbox);
                 return Boolean.TRUE;
             } catch (Exception e) {
-                this.logger.error("Utils", "Set_Status_Mail_Error");
+                this.logger.error("Set_Status_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
@@ -619,9 +619,9 @@ public final class MailUtils {
                 }
                 return true;
             } catch (Exception e) {
-                this.logger.error("Utils", "Set_Status_Mail_Error");
+                this.logger.error("Set_Status_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
                 return Boolean.FALSE;
             }
@@ -684,16 +684,16 @@ public final class MailUtils {
                                 new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certificate);
                         return signerInformation.verify(signerInformationVerifier);
                     } catch (Exception e) {
-                        this.logger.error("Utils", "Verify_Signature_Mail_Error");
+                        this.logger.error("Verify_Signature_Mail_Error");
                         if (this.logger.isDebugEnabled()) {
-                            this.logger.debug("Utils", "Stack_Message_Error", e);
+                            this.logger.debug("Stack_Message_Error", e);
                         }
                     }
                 }
             } catch (Exception e) {
-                this.logger.error("Utils", "Verify_Signature_Mail_Error");
+                this.logger.error("Verify_Signature_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
             return Boolean.FALSE;
@@ -775,9 +775,9 @@ public final class MailUtils {
 
                 return mailObject;
             } catch (MessagingException | IOException e) {
-                this.logger.error("Utils", "Receive_Mail_Error");
+                this.logger.error("Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
                 return null;
             }
@@ -846,9 +846,9 @@ public final class MailUtils {
                     }
                 }
             } catch (MessagingException | IOException e) {
-                this.logger.error("Utils", "Attachment_Receive_Mail_Error");
+                this.logger.error("Attachment_Receive_Mail_Error");
                 if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Utils", "Stack_Message_Error", e);
+                    this.logger.debug("Stack_Message_Error", e);
                 }
             }
         }
@@ -895,7 +895,7 @@ public final class MailUtils {
                 try {
                     file = FileUtils.getFile(attachment);
                 } catch (FileNotFoundException e) {
-                    throw new MailException(0x0000000E0005L, "Utils", "Attachment_File_Not_Found_Error", e);
+                    throw new MailException(0x0000000E0005L, "Attachment_File_Not_Found_Error", e);
                 }
 
                 DataSource dataSource = new FileDataSource(file);
@@ -925,7 +925,7 @@ public final class MailUtils {
                     mimeBodyPart.setFileName(fileName);
                     mimeBodyPart.setHeader("Content-ID", fileName);
                 } catch (Exception e) {
-                    throw new MailException(0x0000000E0006L, "Utils", "Attachment_File_Error", e);
+                    throw new MailException(0x0000000E0006L, "Attachment_File_Error", e);
                 }
 
                 mimeMultipart.addBodyPart(mimeBodyPart, mimeMultipart.getCount());
@@ -967,7 +967,7 @@ public final class MailUtils {
                 message.setContent(signedMimeMultipart, signedMimeMultipart.getContentType());
             } catch (CertificateEncodingException | CertificateParsingException | OperatorCreationException |
                      SMIMEException e) {
-                throw new MailException(0x0000000E0007L, "Utils", "Signature_Mail_Error", e);
+                throw new MailException(0x0000000E0007L, "Signature_Mail_Error", e);
             }
         } else {
             message.setContent(mimeMultipart, mimeMultipart.getContentType());
@@ -976,7 +976,7 @@ public final class MailUtils {
         message.setFrom(new InternetAddress(mailObject.getSendAddress()));
 
         if (mailObject.getReceiveAddress() == null || mailObject.getReceiveAddress().isEmpty()) {
-            throw new MailException(0x0000000E0008L, "Utils", "Unknown_Receive_Address_Mail_Error");
+            throw new MailException(0x0000000E0008L, "Unknown_Receive_Address_Mail_Error");
         }
         StringBuilder receiveAddress = new StringBuilder();
         mailObject.getReceiveAddress().forEach(address -> receiveAddress.append(",").append(address));

@@ -21,7 +21,7 @@ package org.nervousync.beans.converter;
  * <h2 class="zh-CN">数据转换器接口类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 21, 2023 11:22:15 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 21, 2023 11:22:15 $
  */
 public interface Adapter<ValueType, BoundType> {
     /**

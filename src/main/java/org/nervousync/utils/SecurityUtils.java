@@ -56,7 +56,7 @@ import javax.crypto.SecretKey;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 11:23:13 $
+ * @version $Revision: 1.1.3 $ $Date: Jan 13, 2010 11:23:13 $
  */
 public final class SecurityUtils {
     /**
@@ -274,7 +274,7 @@ public final class SecurityUtils {
                 new CRCConfig(32, 0x04C11DB7, 0xFFFFFFFFL, 0x00000000, Boolean.FALSE, Boolean.FALSE));
         SecurityUtils.registerConfig("CRC-32/XFER",
                 new CRCConfig(32, 0x000000AF, 0x00000000, 0x00000000, Boolean.FALSE, Boolean.FALSE));
-        LOGGER.info("Registered CRC config: {}",
+        LOGGER.info("Registered_CRC_Algorithm",
                 String.join(",", new ArrayList<>(REGISTERED_CRC_CONFIG.keySet())));
     }
 	/**
@@ -294,15 +294,15 @@ public final class SecurityUtils {
      */
     public static void registerConfig(final String algorithm, final CRCConfig crcConfig) {
         if (StringUtils.isEmpty(algorithm) || crcConfig == null) {
-            LOGGER.error("Utils", "Parameter_Null_Register_Security_Error");
+            LOGGER.error("Parameter_Null_Register_Security_Error");
             return;
         }
         if (crcConfig.getBit() > 32) {
-            LOGGER.error("Utils", "Lager_CRC_Security_Error");
+            LOGGER.error("Lager_CRC_Security_Error");
             return;
         }
         if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
-            LOGGER.warn("Utils", "Override_Config_Register_Security_Warn", algorithm);
+            LOGGER.warn("Override_Config_Register_Security_Warn", algorithm);
         }
         REGISTERED_CRC_CONFIG.put(algorithm, crcConfig);
     }
@@ -335,7 +335,7 @@ public final class SecurityUtils {
         if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
             return new CRCDigestAdapterImpl(REGISTERED_CRC_CONFIG.get(algorithm));
         }
-        throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+        throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
     }
     /**
      * <h3 class="en">Retrieve registered CRC configure information</h3>
@@ -376,7 +376,7 @@ public final class SecurityUtils {
                     }
                     return "0x" + stringBuilder;
                 })
-                .orElseThrow(() -> new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm));
+                .orElseThrow(() -> new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm));
     }
     /*
      * Digest Methods
@@ -412,7 +412,7 @@ public final class SecurityUtils {
             return calculate(source, MD5());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "MD5");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "MD5");
             }
             return new byte[0];
         }
@@ -452,7 +452,7 @@ public final class SecurityUtils {
             return calculate(source, HmacMD5(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacMD5");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacMD5");
             }
             return new byte[0];
         }
@@ -488,7 +488,7 @@ public final class SecurityUtils {
             return calculate(source, SHA1());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA1");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA1");
             }
             return new byte[0];
         }
@@ -527,7 +527,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA1(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA1");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA1");
             }
             return new byte[0];
         }
@@ -561,7 +561,7 @@ public final class SecurityUtils {
             return calculate(source, SHA224());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA224");
             }
             return new byte[0];
         }
@@ -600,7 +600,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA224(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA224");
             }
             return new byte[0];
         }
@@ -634,7 +634,7 @@ public final class SecurityUtils {
             return calculate(source, SHA256());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA256");
             }
             return new byte[0];
         }
@@ -673,7 +673,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA256(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA256");
             }
             return new byte[0];
         }
@@ -707,7 +707,7 @@ public final class SecurityUtils {
             return calculate(source, SHA384());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA384");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA384");
             }
             return new byte[0];
         }
@@ -746,7 +746,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA384(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA384");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA384");
             }
             return new byte[0];
         }
@@ -780,7 +780,7 @@ public final class SecurityUtils {
             return calculate(source, SHA512());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA512");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA512");
             }
             return new byte[0];
         }
@@ -819,7 +819,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA512(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA512");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA512");
             }
             return new byte[0];
         }
@@ -853,7 +853,7 @@ public final class SecurityUtils {
             return calculate(source, SHA512_224());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA512-224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA512-224");
             }
             return new byte[0];
         }
@@ -892,7 +892,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA512_224(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA512-224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA512-224");
             }
             return new byte[0];
         }
@@ -926,7 +926,7 @@ public final class SecurityUtils {
             return calculate(source, SHA512_256());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA512-256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA512-256");
             }
             return new byte[0];
         }
@@ -965,7 +965,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA512_256(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA512-256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA512-256");
             }
             return new byte[0];
         }
@@ -999,7 +999,7 @@ public final class SecurityUtils {
             return calculate(source, SHA3_224());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA3-224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA3-224");
             }
             return new byte[0];
         }
@@ -1038,7 +1038,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA3_224(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA3-224");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA3-224");
             }
             return new byte[0];
         }
@@ -1072,7 +1072,7 @@ public final class SecurityUtils {
             return calculate(source, SHA3_256());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA3-256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA3-256");
             }
             return new byte[0];
         }
@@ -1111,7 +1111,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA3_256(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA3-256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA3-256");
             }
             return new byte[0];
         }
@@ -1145,7 +1145,7 @@ public final class SecurityUtils {
             return calculate(source, SHA3_384());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA3-384");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA3-384");
             }
             return new byte[0];
         }
@@ -1184,7 +1184,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA3_384(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA3-384");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA3-384");
             }
             return new byte[0];
         }
@@ -1218,7 +1218,7 @@ public final class SecurityUtils {
             return calculate(source, SHA3_512());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHA3-512");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHA3-512");
             }
             return new byte[0];
         }
@@ -1257,7 +1257,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSHA3_512(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSHA3-512");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSHA3-512");
             }
             return new byte[0];
         }
@@ -1291,7 +1291,7 @@ public final class SecurityUtils {
             return calculate(source, SHAKE128());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHAKE128");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHAKE128");
             }
             return new byte[0];
         }
@@ -1325,7 +1325,7 @@ public final class SecurityUtils {
             return calculate(source, SHAKE256());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SHAKE256");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SHAKE256");
             }
             return new byte[0];
         }
@@ -1359,7 +1359,7 @@ public final class SecurityUtils {
             return calculate(source, SM3());
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "SM3");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "SM3");
             }
             return new byte[0];
         }
@@ -1398,7 +1398,7 @@ public final class SecurityUtils {
             return calculate(source, HmacSM3(keyBytes));
         } catch (CryptoException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Calculate_Value_Security_Error", e, "HmacSM3");
+                LOGGER.debug("Calculate_Value_Security_Error", e, "HmacSM3");
             }
             return new byte[0];
         }
@@ -2610,7 +2610,7 @@ public final class SecurityUtils {
     public static byte[] symmetricKey(final String algorithm, final int keySize, final String randomAlgorithm)
             throws CryptoException {
         if (StringUtils.isEmpty(algorithm)) {
-            throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+            throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
         }
 
         try {
@@ -2629,12 +2629,12 @@ public final class SecurityUtils {
                 case "BLOWFISH":
                     break;
                 default:
-                    throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+                    throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
             }
             SecretKey secretKey = keyGenerator.generateKey();
             return secretKey.getEncoded();
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw new CryptoException(0x000000150009L, "Utils", "Init_Key_Crypto_Error", e);
+            throw new CryptoException(0x000000150009L, "Init_Key_Crypto_Error", e);
         }
     }
     /**
@@ -2662,7 +2662,7 @@ public final class SecurityUtils {
                     secureAdapter.append(readBuffer, 0, readLength);
                 }
             } catch (Exception e) {
-                LOGGER.error("Utils", "Calculate_Digits_Security_Error", e);
+                LOGGER.error("Calculate_Digits_Security_Error", e);
                 return new byte[0];
             }
             return secureAdapter.finish();
@@ -2674,7 +2674,7 @@ public final class SecurityUtils {
                     secureAdapter.append(readBuffer, 0, readLength);
                 }
             } catch (Exception e) {
-                LOGGER.error("Utils", "Calculate_Digits_Security_Error", e);
+                LOGGER.error("Calculate_Digits_Security_Error", e);
                 return new byte[0];
             }
             return secureAdapter.finish();

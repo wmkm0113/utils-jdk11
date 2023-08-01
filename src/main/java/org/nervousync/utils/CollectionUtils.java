@@ -46,7 +46,7 @@ import java.util.*;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 13, 2010 16:27:49 $
+ * @version $Revision: 1.2.0 $ $Date: Jan 13, 2010 16:27:49 $
  */
 public final class CollectionUtils {
 	/**

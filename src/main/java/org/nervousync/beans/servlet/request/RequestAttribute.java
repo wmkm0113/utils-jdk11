@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * <h2 class="zh-CN">从HttpServletRequest实例对象解析的属性信息</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jun 19, 2015 08:56:50 $
+ * @version $Revision: 1.1.0 $ $Date: Aug 06, 2018 08:56:50 $
  */
 public final class RequestAttribute {
 	/**

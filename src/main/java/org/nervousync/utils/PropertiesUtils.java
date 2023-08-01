@@ -44,7 +44,7 @@ import java.util.Properties;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 14, 2010 11:47:08 $
+ * @version $Revision: 1.2.0 $ $Date: Jan 14, 2010 11:47:08 $
  */
 public final class PropertiesUtils {
     /**
@@ -121,9 +121,9 @@ public final class PropertiesUtils {
 			inputStream = url.openStream();
 			return loadProperties(inputStream, fileExtName.equalsIgnoreCase("xml"));
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Load_Properties_Error");
+			LOGGER.error("Load_Properties_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return new Properties();
 		} finally {
@@ -155,9 +155,9 @@ public final class PropertiesUtils {
 
 			return properties;
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Load_Properties_Error");
+			LOGGER.error("Load_Properties_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return new Properties();
 		}
@@ -183,9 +183,9 @@ public final class PropertiesUtils {
 			modifyProperties(modifyProperties, modifyMap);
 			return storeProperties(modifyProperties, propertiesFilePath, comment);
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Modify_Properties_Error");
+			LOGGER.error("Modify_Properties_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		}
@@ -240,9 +240,9 @@ public final class PropertiesUtils {
 			}
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Save_Properties_Error");
+			LOGGER.error("Save_Properties_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		} finally {

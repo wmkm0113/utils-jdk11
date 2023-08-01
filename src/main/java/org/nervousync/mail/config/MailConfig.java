@@ -28,7 +28,7 @@ import org.nervousync.security.factory.SecureConfig;
  * <h2 class="zh-CN">邮件配置信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:06:18 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2021 19:06:18 $
  */
 @XmlType(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
 @XmlRootElement(name = "mail_config", namespace = "https://nervousync.org/schemas/mail")
@@ -338,7 +338,7 @@ public final class MailConfig extends BeanObject {
      * <h2 class="zh-CN">邮件服务器配置信息定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:09:18 $
+     * @version $Revision: 1.0.0 $ $Date: Jul 31, 2021 19:09:18 $
      */
     @XmlType(name = "server_config", namespace = "https://nervousync.org/schemas/mail")
     @XmlRootElement(name = "server_config", namespace = "https://nervousync.org/schemas/mail")

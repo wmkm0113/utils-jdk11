@@ -26,7 +26,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="zh-CN">用于SMTP/POP3/IMAP服务器用户名、密码的身份验证器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 20:56:49 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 20:56:49 $
  */
 public final class DefaultAuthenticator extends Authenticator {
 	/**

@@ -16,6 +16,7 @@
  */
 package org.nervousync.exceptions;
 
+import org.nervousync.commons.Globals;
 import org.nervousync.utils.MultilingualUtils;
 import org.nervousync.utils.ObjectUtils;
 
@@ -24,7 +25,7 @@ import org.nervousync.utils.ObjectUtils;
  * <h2 class="zh-CN">异常抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2023 12:56:26 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2023 12:56:26 $
  */
 public abstract class AbstractException extends Exception {
 	/**
@@ -32,11 +33,13 @@ public abstract class AbstractException extends Exception {
 	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = 3698481050554660066L;
+	private final MultilingualUtils.Agent multiAgent = MultilingualUtils.newAgent(this.getClass());
 	/**
 	 * <span class="en">Error identified code</span>
 	 * <span class="zh-CN">错误识别代码</span>
 	 */
 	private final long errorCode;
+	private final String detailMessage;
 	/**
 	 * <h3 class="en">Constructor method for NetworkInfoException</h3>
 	 * <span class="en">Create a new NetworkInfoException with the specified message.</span>
@@ -45,17 +48,15 @@ public abstract class AbstractException extends Exception {
 	 *
 	 * @param errorCode 	<span class="en">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param bundle        <span class="en">Resource bundle name</span>
-     *                      <span class="zh-CN">资源包名</span>
      * @param messageKey    <span class="en">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
      * @param collections   <span class="en">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	protected AbstractException(final long errorCode, final String bundle, final String messageKey,
-								final Object... collections) {
-		super(MultilingualUtils.findMessage(bundle, messageKey, collections));
+	protected AbstractException(final long errorCode, final String messageKey, final Object... collections) {
+		super(Globals.DEFAULT_VALUE_STRING);
 		this.errorCode = errorCode;
+		this.detailMessage = this.multiAgent.findMessage(messageKey, collections);
 	}
 	/**
 	 * <h3 class="en">Constructor method for NetworkInfoException</h3>
@@ -65,8 +66,6 @@ public abstract class AbstractException extends Exception {
 	 *
 	 * @param errorCode 	<span class="en">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param bundle        <span class="en">Resource bundle name</span>
-     *                      <span class="zh-CN">资源包名</span>
      * @param messageKey    <span class="en">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
 	 * @param cause 		<span class="en">The root cause</span>
@@ -74,10 +73,11 @@ public abstract class AbstractException extends Exception {
      * @param collections   <span class="en">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	protected AbstractException(final long errorCode, final String bundle, final String messageKey,
+	protected AbstractException(final long errorCode, final String messageKey,
 								final Throwable cause, final Object... collections) {
-		super(MultilingualUtils.findMessage(bundle, messageKey, collections), cause);
+		super(Globals.DEFAULT_VALUE_STRING, cause);
 		this.errorCode = errorCode;
+		this.detailMessage = this.multiAgent.findMessage(messageKey, collections);
 	}
 	/**
 	 * <h3 class="en">Getter method for error identified code</h3>
@@ -89,6 +89,11 @@ public abstract class AbstractException extends Exception {
 	public long getErrorCode() {
 		return errorCode;
 	}
+
+	@Override
+	public final String getMessage() {
+        return detailMessage;
+    }
 
 	/**
 	 * (non-javadoc)

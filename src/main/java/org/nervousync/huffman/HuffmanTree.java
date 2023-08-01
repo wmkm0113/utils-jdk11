@@ -27,7 +27,7 @@ import java.util.Optional;
  * <h2 class="zh-CN">霍夫曼树</h2>
  *.0
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 3, 2017 16:39:41 $
+ * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 16:39:41 $
  */
 public final class HuffmanTree {
 	/**
@@ -204,7 +204,7 @@ public final class HuffmanTree {
 	 * <h2 class="zh-CN">霍夫曼节点</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision : 1.0 $ $Date: Nov 3, 2017 16:26:45 $
+	 * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 16:26:45 $
 	 */
 	public static final class Node {
 		/**
@@ -364,7 +364,7 @@ public final class HuffmanTree {
 	 * <h2 class="zh-CN">霍夫曼编码结果</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision : 1.0 $ $Date: Nov 6, 2017 14:13:35 $
+	 * @version $Revision: 1.0.0 $ $Date: Nov 6, 2017 14:13:35 $
 	 */
 	public static final class Result {
 		/**

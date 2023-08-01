@@ -44,7 +44,7 @@ import org.nervousync.commons.Globals;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 12, 2010 15:12:05 $
+ * @version $Revision: 1.2.0 $ $Date: Jan 12, 2010 15:12:05 $
  */
 public final class ConvertUtils {
     /**
@@ -177,9 +177,9 @@ public final class ConvertUtils {
 			objectOutputStream.writeObject(object);
 			return outputStream.toByteArray();
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Convert_Object_To_Array_Error");
+			LOGGER.error("Convert_Object_To_Array_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 		} finally {
 			IOUtils.closeStream(objectOutputStream);

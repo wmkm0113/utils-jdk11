@@ -27,7 +27,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="zh-CN">电子邮件信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2012 19:03:47 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 19:03:47 $
  */
 public final class MailObject implements Serializable {
 	/**

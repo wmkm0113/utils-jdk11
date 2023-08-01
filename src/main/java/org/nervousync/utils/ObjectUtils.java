@@ -27,7 +27,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="zh-CN">对象操作工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2010 16:26:58 $
+ * @version $Revision: 1.1.4 $ $Date: Jan 13, 2010 16:26:58 $
  */
 public final class ObjectUtils {
     /**
@@ -110,9 +110,9 @@ public final class ObjectUtils {
             }
         } catch (SecurityException | NoSuchMethodException | InstantiationException
                  | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.error("Utils", "Create_Instance_Object_Error");
+            LOGGER.error("Create_Instance_Object_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
         }
         return null;

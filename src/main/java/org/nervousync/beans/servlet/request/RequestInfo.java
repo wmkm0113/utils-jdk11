@@ -37,7 +37,7 @@ import org.nervousync.utils.FileUtils;
  * <p class="en">用于方法org.nervousync.utils.RequestUtils#sendRequest的参数值</p>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:04:17 $
+ * @version $Revision: 1.1.4 $ $Date: Sep 25, 2022 11:04:17 $
  */
 public final class RequestInfo {
     /**
@@ -280,7 +280,7 @@ public final class RequestInfo {
      * <h2 class="zh-CN">网络请求代理服务器构建器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Aug 25, 2017 11:08:22 $
+     * @version $Revision: 1.0.0 $ $Date: Aug 25, 2017 11:08:22 $
      */
     public static final class RequestProxyBuilder extends AbstractProxyConfigBuilder<RequestBuilder> {
         /**

@@ -21,7 +21,7 @@ package org.nervousync.generator.uuid.timer;
  * <h2 class="zh-CN">时间同步器接口，用于UUID版本2</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:54:12 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:54:12 $
  */
 public interface TimeSynchronizer {
     /**

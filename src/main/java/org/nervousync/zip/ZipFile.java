@@ -43,7 +43,7 @@ import org.nervousync.zip.models.header.GeneralFileHeader;
 import org.nervousync.zip.models.header.LocalFileHeader;
 import org.nervousync.zip.models.header.utils.HeaderOperator;
 import org.nervousync.exceptions.zip.ZipException;
-import org.nervousync.commons.io.NervousyncRandomAccessFile;
+import org.nervousync.commons.io.NervousyncFile;
 import org.nervousync.utils.*;
 
 import org.nervousync.zip.models.central.CentralDirectory;
@@ -56,7 +56,7 @@ import org.nervousync.zip.models.central.Zip64EndCentralDirectoryRecord;
  * Zip File
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 28, 2017 5:01:20 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 28, 2017 5:01:20 PM $
  */
 public final class ZipFile implements Cloneable {
 
@@ -145,7 +145,7 @@ public final class ZipFile implements Cloneable {
 		this.splitLength = splitLength;
 		if (FileUtils.isExists(this.filePath)) {
 			if (!FileUtils.canRead(this.filePath)) {
-				throw new ZipException(0x0000001B001AL, "Utils", "Read_Access_Failed_Zip_Error");
+				throw new ZipException(0x0000001B001AL, "Read_Access_Failed_Zip_Error");
 			}
 			this.readHeaders();
 		}
@@ -204,7 +204,7 @@ public final class ZipFile implements Cloneable {
 			boolean splitArchive, long splitLength, String... addFiles) throws ZipException {
 		ZipFile.checkFilePath(filePath);
 		if (addFiles == null || addFiles.length == 0) {
-			throw new ZipException(0x0000001B001BL, "Utils", "Null_Path_Zip_Error");
+			throw new ZipException(0x0000001B001BL, "Null_Path_Zip_Error");
 		}
 
 		ZipFile zipFile = ZipFile.createZipFile(filePath, zipOptions.getCharsetEncoding(), splitArchive, splitLength);
@@ -215,10 +215,10 @@ public final class ZipFile implements Cloneable {
 
 	private static void checkFilePath(String filePath) throws ZipException {
 		if (StringUtils.isEmpty(filePath)) {
-			throw new ZipException(0x0000001B001BL, "Utils", "Null_Path_Zip_Error");
+			throw new ZipException(0x0000001B001BL, "Null_Path_Zip_Error");
 		}
 		if (FileUtils.isExists(filePath)) {
-			throw new ZipException(0x0000001B001CL, "Utils", "Exists_Path_Zip_Error");
+			throw new ZipException(0x0000001B001CL, "Exists_Path_Zip_Error");
 		}
 	}
 
@@ -255,7 +255,7 @@ public final class ZipFile implements Cloneable {
 		ZipFile.checkFilePath(filePath);
 
 		if (StringUtils.isEmpty(folderPath)) {
-			throw new ZipException(0x0000001B001BL, "Utils", "Null_Path_Zip_Error");
+			throw new ZipException(0x0000001B001BL, "Null_Path_Zip_Error");
 		}
 		
 		ZipFile zipFile = ZipFile.createZipFile(filePath, zipOptions.getCharsetEncoding(), splitArchive, splitLength);
@@ -277,7 +277,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public static String getRelativeFileName(String file, String rootFolderInZip, String rootFolderPath) throws ZipException {
 		if (StringUtils.isEmpty(file)) {
-			throw new ZipException(0x0000001B001EL, "Utils", "Null_Input_Path_Zip_Error");
+			throw new ZipException(0x0000001B001EL, "Null_Input_Path_Zip_Error");
 		}
 		
 		String fileName;
@@ -326,7 +326,7 @@ public final class ZipFile implements Cloneable {
 		}
 		
 		if (StringUtils.isEmpty(fileName)) {
-			throw new ZipException(0x0000001B0020L, "Utils", "Determining_File_Name_Zip_Error");
+			throw new ZipException(0x0000001B0020L, "Determining_File_Name_Zip_Error");
 		}
 		
 		return fileName;
@@ -385,7 +385,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public int readEntryLength(String entryPath) throws ZipException {
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 		return this.readEntryLength(this.retrieveGeneralFileHeader(entryPath));
 	}
@@ -412,7 +412,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public byte[] readEntry(String entryPath, long position, int readLength) throws ZipException {
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 
 		return this.readEntry(this.retrieveGeneralFileHeader(entryPath), position, readLength);
@@ -427,7 +427,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public InputStream entryInputStream(String entryPath) throws ZipException {
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 
 		return this.openInputStream(this.retrieveGeneralFileHeader(entryPath));
@@ -480,11 +480,11 @@ public final class ZipFile implements Cloneable {
 
 	private void appendCheck(ZipOptions zipOptions) throws ZipException {
 		if (zipOptions == null) {
-			throw new ZipException(0x0000001B0021L, "Utils", "Null_Options_Zip_Error");
+			throw new ZipException(0x0000001B0021L, "Null_Options_Zip_Error");
 		}
 
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 	}
 
@@ -508,7 +508,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public void addStream(InputStream inputStream, ZipOptions zipOptions) throws ZipException {
 		if (inputStream == null) {
-			throw new ZipException(0x0000001B0022L, "Utils", "Null_Input_Stream_Zip_Error");
+			throw new ZipException(0x0000001B0022L, "Null_Input_Stream_Zip_Error");
 		}
 
 		this.appendCheck(zipOptions);
@@ -635,7 +635,7 @@ public final class ZipFile implements Cloneable {
 		}
 		
 		if (FileUtils.isExists(this.filePath) && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 		
 		this.removeFilesIfExists(Arrays.asList(existsEntries));
@@ -653,7 +653,7 @@ public final class ZipFile implements Cloneable {
 	 */
 	public void setPassword(String password) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
-			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
+			throw new ZipException(0x0000001B0006L, "Invalid_Password_Zip_Error");
 		}
 		this.setPassword(password.toCharArray());
 	}
@@ -791,7 +791,7 @@ public final class ZipFile implements Cloneable {
 		}
 		
 		OutputStream outputStream = null;
-		NervousyncRandomAccessFile input = null;
+		NervousyncFile input = null;
 		List<Long> sizeList = new ArrayList<>();
 		long totalWriteBytes = 0L;
 		boolean removeSplitSig = Boolean.FALSE;
@@ -1007,15 +1007,15 @@ public final class ZipFile implements Cloneable {
 	
 	private void addFolder(String folderPath, ZipOptions zipOptions, boolean checkSplitArchive) throws ZipException {
 		if (folderPath == null) {
-			throw new ZipException(0x0000001B001EL, "Utils", "Null_Input_Path_Zip_Error");
+			throw new ZipException(0x0000001B001EL, "Null_Input_Path_Zip_Error");
 		}
 		
 		if (zipOptions == null) {
-			throw new ZipException(0x0000001B0021L, "Utils", "Null_Options_Zip_Error");
+			throw new ZipException(0x0000001B0021L, "Null_Options_Zip_Error");
 		}
 		
 		if (checkSplitArchive && this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 		
 		this.addFolderToZip(folderPath, zipOptions);
@@ -1091,7 +1091,7 @@ public final class ZipFile implements Cloneable {
 	
 	private void addStreamToZip(InputStream inputStream, ZipOptions zipOptions) throws ZipException {
 		if (zipOptions == null) {
-			throw new ZipException(0x0000001B0021L, "Utils", "Null_Options_Zip_Error");
+			throw new ZipException(0x0000001B0021L, "Null_Options_Zip_Error");
 		}
 
 		if (inputStream == null) {
@@ -1130,11 +1130,11 @@ public final class ZipFile implements Cloneable {
 		}
 		
 		if (!FileUtils.canRead(folderPath)) {
-			throw new ZipException(0x0000001B001AL, "Utils", "Read_Access_Failed_Zip_Error");
+			throw new ZipException(0x0000001B001AL, "Read_Access_Failed_Zip_Error");
 		}
 
 		if (zipOptions == null) {
-			throw new ZipException(0x0000001B0021L, "Utils", "Null_Options_Zip_Error");
+			throw new ZipException(0x0000001B0021L, "Null_Options_Zip_Error");
 		}
 		
 		String rootFolderPath;
@@ -1214,7 +1214,7 @@ public final class ZipFile implements Cloneable {
 	private void extractFile(GeneralFileHeader generalFileHeader, String destPath, boolean ignoreFileAttr)
 			throws ZipException {
 		if (generalFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 
 		try {
@@ -1323,7 +1323,7 @@ public final class ZipFile implements Cloneable {
 	
 	private void checkOptions(ZipOptions zipOptions) throws ZipException {
 		if (zipOptions == null) {
-			throw new ZipException(0x0000001B0021L, "Utils", "Null_Options_Zip_Error");
+			throw new ZipException(0x0000001B0021L, "Null_Options_Zip_Error");
 		}
 		
 		if (zipOptions.getCompressionMethod() != Globals.COMP_STORE 
@@ -1340,7 +1340,7 @@ public final class ZipFile implements Cloneable {
 			if (zipOptions.getEncryptionMethod() != Globals.ENC_METHOD_STANDARD 
 					&& zipOptions.getEncryptionMethod() != Globals.ENC_METHOD_STRONG
 					&& zipOptions.getEncryptionMethod() != Globals.ENC_METHOD_AES) {
-				throw new ZipException(0x0000001B0001L, "Utils", "Not_Supported_Encryption_Mode_Zip_Error");
+				throw new ZipException(0x0000001B0001L, "Not_Supported_Encryption_Mode_Zip_Error");
 			}
 			
 			if (zipOptions.getPassword() == null || zipOptions.getPassword().length == 0) {
@@ -1355,11 +1355,11 @@ public final class ZipFile implements Cloneable {
 		}
 
 		if (this.splitArchive) {
-			throw new ZipException(0x0000001B0018L, "Utils", "Not_Allow_Update_Files_Zip_Error");
+			throw new ZipException(0x0000001B0018L, "Not_Allow_Update_Files_Zip_Error");
 		}
 
 		SplitOutputStream outputStream = null;
-		NervousyncRandomAccessFile input = null;
+		NervousyncFile input = null;
 		boolean success = Boolean.FALSE;
 		String tempFileName = this.filePath + System.currentTimeMillis() % 1000L;
 		
@@ -1382,7 +1382,7 @@ public final class ZipFile implements Cloneable {
 			input = this.createFileHandler(generalFileHeader);
 
 			if (!this.readLocalFileHeader(input, generalFileHeader).verifyPassword(input)) {
-				throw new ZipException(0x0000001B000DL, "Utils", "Wrong_Password_Zip_Error");
+				throw new ZipException(0x0000001B000DL, "Wrong_Password_Zip_Error");
 			}
 
 			long offsetLocalFileHeader = generalFileHeader.getOffsetLocalHeader();
@@ -1463,7 +1463,7 @@ public final class ZipFile implements Cloneable {
 	
 	private int retrieveIndexOfGeneralFileHeader(GeneralFileHeader generalFileHeader) throws ZipException {
 		if (generalFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 		if (this.centralDirectory == null) {
 			throw new ZipException("central directory is null, cannot determine index of file header");
@@ -1471,7 +1471,7 @@ public final class ZipFile implements Cloneable {
 		return this.centralDirectory.retrieveIndexOfGeneralFileHeader(generalFileHeader);
 	}
 
-	private NervousyncRandomAccessFile createFileHandler(final GeneralFileHeader generalFileHeader)
+	private NervousyncFile createFileHandler(final GeneralFileHeader generalFileHeader)
 			throws FileNotFoundException, ZipException {
 		if (StringUtils.notBlank(this.filePath)) {
 			if (this.splitArchive) {
@@ -1498,16 +1498,16 @@ public final class ZipFile implements Cloneable {
 						}
 					}
 				}
-				return new NervousyncRandomAccessFile(splitPath);
+				return new NervousyncFile(splitPath);
 			}
-			return new NervousyncRandomAccessFile(this.filePath);
+			return new NervousyncFile(this.filePath);
 		}
 
 		throw new ZipException("cannot create file handler to remove file");
 	}
 
-	private void copyFile(NervousyncRandomAccessFile input, 
-			OutputStream outputStream, long start, long end) throws ZipException {
+	private void copyFile(NervousyncFile input,
+                          OutputStream outputStream, long start, long end) throws ZipException {
 		if (input == null) {
 			throw new ZipException("Input stream is null!");
 		}
@@ -1559,7 +1559,7 @@ public final class ZipFile implements Cloneable {
 	private void extractFileToPath(GeneralFileHeader generalFileHeader, String destPath, boolean ignoreFileAttr)
 			throws ZipException {
 		if (generalFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 		
 		ZipInputStream inputStream = null;
@@ -1581,7 +1581,7 @@ public final class ZipFile implements Cloneable {
 			} else {
 				long calculatedCRC = inputStream.crcValue() & 0xFFFFFFFFL;
 				if (calculatedCRC != generalFileHeader.getCrc32()) {
-					throw new ZipException(0x0000001B0019L, "Utils", "CRC_Failed_Zip_Error");
+					throw new ZipException(0x0000001B0019L, "CRC_Failed_Zip_Error");
 				}
 			}
 		} catch (IOException e) {
@@ -1612,26 +1612,26 @@ public final class ZipFile implements Cloneable {
 			try {
 				tempMacBytes = ((AESDecryptor)this.decryptor).calculateAuthenticationBytes();
 			} catch (CryptoException e) {
-				throw new ZipException(0x0000001B0019L, "Utils", "CRC_Failed_Zip_Error");
+				throw new ZipException(0x0000001B0019L, "CRC_Failed_Zip_Error");
 			}
 			byte[] storedMac = ((AESDecryptor)this.decryptor).getStoredMac();
 			byte[] calculateMac = new byte[Globals.AES_AUTH_LENGTH];
 
 			if (storedMac == null) {
-				throw new ZipException(0x0000001B0019L, "Utils", "CRC_Failed_Zip_Error");
+				throw new ZipException(0x0000001B0019L, "CRC_Failed_Zip_Error");
 			}
 
 			System.arraycopy(tempMacBytes, 0, calculateMac, 0, Globals.AES_AUTH_LENGTH);
 
 			if (!Arrays.equals(calculateMac, storedMac)) {
-				throw new ZipException(0x0000001B0019L, "Utils", "CRC_Failed_Zip_Error");
+				throw new ZipException(0x0000001B0019L, "CRC_Failed_Zip_Error");
 			}
 		}
 	}
 
 	private int readEntryLength(GeneralFileHeader generalFileHeader) throws ZipException {
 		if (generalFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 
 		ZipInputStream inputStream = null;
@@ -1647,7 +1647,7 @@ public final class ZipFile implements Cloneable {
 
 	private byte[] readEntry(GeneralFileHeader generalFileHeader, long position, int dataLength) throws ZipException {
 		if (generalFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 		
 		ZipInputStream inputStream = null;
@@ -1695,7 +1695,7 @@ public final class ZipFile implements Cloneable {
 			} else {
 				long calculatedCRC = inputStream.crcValue();
 				if (calculatedCRC != generalFileHeader.getCrc32()) {
-					throw new ZipException(0x0000001B0019L, "Utils", "CRC_Failed_Zip_Error");
+					throw new ZipException(0x0000001B0019L, "CRC_Failed_Zip_Error");
 				}
 			}
 			
@@ -1709,7 +1709,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	private ZipInputStream openInputStream(GeneralFileHeader generalFileHeader) throws ZipException {
-		NervousyncRandomAccessFile input = null;
+		NervousyncFile input = null;
 		try {
 			input = this.createFileHandler(generalFileHeader);
 
@@ -1723,7 +1723,7 @@ public final class ZipFile implements Cloneable {
 				if (localFileHeader.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 					byte[] salt = null;
 					if (localFileHeader.getAesExtraDataRecord() != null) {
-						salt = new byte[HeaderOperator.retrieveSaltLength(localFileHeader.getAesExtraDataRecord().getAesStrength())];
+						salt = new byte[HeaderOperator.saltLength(localFileHeader.getAesExtraDataRecord().getAesStrength())];
 						input.seek(localFileHeader.getOffsetStartOfData());
 						if (input.read(salt) == Globals.DEFAULT_VALUE_INT) {
 							salt = null;
@@ -1743,7 +1743,7 @@ public final class ZipFile implements Cloneable {
 						this.decryptor = new StandardDecryptor(localFileHeader, decryptorHeader);
 					}
 				} else {
-					throw new ZipException(0x0000001B0001L, "Utils", "Not_Supported_Encryption_Mode_Zip_Error");
+					throw new ZipException(0x0000001B0001L, "Not_Supported_Encryption_Mode_Zip_Error");
 				}
 			}
 			
@@ -1853,7 +1853,7 @@ public final class ZipFile implements Cloneable {
 	 * @return the nervousync random access file
 	 * @throws ZipException the zip exception
 	 */
-	public NervousyncRandomAccessFile openSplitFile(int index) throws ZipException {
+	public NervousyncFile openSplitFile(int index) throws ZipException {
 		try {
 			if (this.splitArchive) {
 				if (index < 0) {
@@ -1866,9 +1866,9 @@ public final class ZipFile implements Cloneable {
 					throw new ZipException("Split file not found!");
 				}
 
-				return new NervousyncRandomAccessFile(currentSplitFile);
+				return new NervousyncFile(currentSplitFile);
 			}
-			return new NervousyncRandomAccessFile(this.filePath);
+			return new NervousyncFile(this.filePath);
 		} catch (Exception e) {
 			if (e instanceof ZipException) {
 				throw (ZipException)e;
@@ -1994,7 +1994,7 @@ public final class ZipFile implements Cloneable {
 	}
 	
 	private void readHeaders() throws ZipException {
-		try (NervousyncRandomAccessFile input = retrieveHeaderFile()) {
+		try (NervousyncFile input = retrieveHeaderFile()) {
 			this.readEndOfCentralDirectoryRecord(input);
 
 			// Check and set the zip64 format
@@ -2014,7 +2014,7 @@ public final class ZipFile implements Cloneable {
 		}
 	}
 
-	private NervousyncRandomAccessFile retrieveHeaderFile() throws FileNotFoundException {
+	private NervousyncFile retrieveHeaderFile() throws FileNotFoundException {
 		if (this.filePath.endsWith(".001")) {
 			String folderPath = this.filePath.substring(0, this.filePath.lastIndexOf(Globals.DEFAULT_PAGE_SEPARATOR));
 			final String fileName = Optional.ofNullable(StringUtils.getFilename(this.filePath))
@@ -2027,14 +2027,14 @@ public final class ZipFile implements Cloneable {
 				this.numberFormattedName = Boolean.TRUE;
 				this.splitCount = fileList.size();
 				this.splitLength = FileUtils.fileSize(fileList.get(1));
-				return new NervousyncRandomAccessFile(fileList.get(0));
+				return new NervousyncFile(fileList.get(0));
 			}
 		}
-		return new NervousyncRandomAccessFile(this.filePath);
+		return new NervousyncFile(this.filePath);
 	}
 	
-	private LocalFileHeader readLocalFileHeader(NervousyncRandomAccessFile input,
-			GeneralFileHeader generalFileHeader) throws ZipException {
+	private LocalFileHeader readLocalFileHeader(NervousyncFile input,
+                                                GeneralFileHeader generalFileHeader) throws ZipException {
 		if (generalFileHeader == null || input == null) {
 			throw new ZipException("invalid read parameters for local header");
 		}
@@ -2047,7 +2047,7 @@ public final class ZipFile implements Cloneable {
 			}
 
 			if (localHeaderOffset < 0) {
-				throw new ZipException(0x0000001B001DL, "Utils", "Invalid_Offset_Local_Header_Zip_Error");
+				throw new ZipException(0x0000001B001DL, "Invalid_Offset_Local_Header_Zip_Error");
 			}
 
 			if (this.numberFormattedName) {
@@ -2059,7 +2059,7 @@ public final class ZipFile implements Cloneable {
 
 			byte[] tempBuffer = new byte[4];
 			if (input.read(tempBuffer) == Globals.DEFAULT_VALUE_INT) {
-				throw new ZipException(0x0000001B001DL, "Utils", "Invalid_Offset_Local_Header_Zip_Error");
+				throw new ZipException(0x0000001B001DL, "Invalid_Offset_Local_Header_Zip_Error");
 			}
 
 			byte[] shortBuffer = new byte[2];
@@ -2076,7 +2076,7 @@ public final class ZipFile implements Cloneable {
 			byte[] readBuffer = new byte[30 + fileNameLength + extraFieldLength];
 
 			if (input.read(readBuffer) == Globals.DEFAULT_VALUE_INT) {
-				throw new ZipException(0x0000001B001DL, "Utils", "Invalid_Offset_Local_Header_Zip_Error");
+				throw new ZipException(0x0000001B001DL, "Invalid_Offset_Local_Header_Zip_Error");
 			}
 			
 			byte[] intBuffer = new byte[4];
@@ -2620,7 +2620,7 @@ public final class ZipFile implements Cloneable {
 		}
 	}
 	
-	private void readEndOfCentralDirectoryRecord(NervousyncRandomAccessFile input)
+	private void readEndOfCentralDirectoryRecord(NervousyncFile input)
 			throws ZipException {
 		if (input == null) {
 			throw new ZipException("Random access file is null!");
@@ -2702,7 +2702,7 @@ public final class ZipFile implements Cloneable {
 		}
 	}
 
-	private void readZip64EndCentralDirectoryLocator(NervousyncRandomAccessFile input)
+	private void readZip64EndCentralDirectoryLocator(NervousyncFile input)
 			throws ZipException {
 		try {
 			this.zip64EndCentralDirectoryLocator = new Zip64EndCentralDirectoryLocator();
@@ -2777,7 +2777,7 @@ public final class ZipFile implements Cloneable {
 		}
 	}
 
-	private void readCentralDirectory(NervousyncRandomAccessFile input)
+	private void readCentralDirectory(NervousyncFile input)
 			throws ZipException {
 		if (this.endCentralDirectoryRecord == null) {
 			throw new ZipException("End Central Record is null!");
@@ -2961,7 +2961,7 @@ public final class ZipFile implements Cloneable {
 		}
 	}
 
-	private void readZip64EndCentralDirectoryRecord(NervousyncRandomAccessFile input)
+	private void readZip64EndCentralDirectoryRecord(NervousyncFile input)
 			throws ZipException {
 		if (this.zip64EndCentralDirectoryLocator == null) {
 			throw new ZipException("Invalid zip64 end of central directory locator");
@@ -3264,7 +3264,7 @@ public final class ZipFile implements Cloneable {
 		return new byte[]{intByte[0], intByte[1], intByte[2], intByte[3], 0, 0, 0, 0};
 	}
 
-	private static int readIntFromDataInput(NervousyncRandomAccessFile input, byte[] bytes) throws ZipException {
+	private static int readIntFromDataInput(NervousyncFile input, byte[] bytes) throws ZipException {
 		try {
 			if (input.read(bytes, 0, 4) == 4) {
 				return RawUtils.readInt(bytes, 0, ByteOrder.LITTLE_ENDIAN);

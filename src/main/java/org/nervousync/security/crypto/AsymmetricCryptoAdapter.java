@@ -34,7 +34,7 @@ import java.util.Arrays;
  * <h2 class="zh-CN">非对称加密解密适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:27:33 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 12:27:33 $
  */
 public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
     /**
@@ -114,7 +114,7 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
     @Override
     public final void append(final byte[] dataBytes, final int position, final int length) throws CryptoException {
         if (dataBytes.length < (position + length)) {
-            throw new CryptoException(0x000000150001L, "Utils", "Length_Not_Enough_Crypto_Error");
+            throw new CryptoException(0x000000150001L, "Length_Not_Enough_Crypto_Error");
         }
         switch (this.cryptoMode) {
             case ENCRYPT:
@@ -127,11 +127,11 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                 try {
                     this.signature.update(dataBytes);
                 } catch (SignatureException e) {
-                    throw new CryptoException(0x000000150002L, "Utils", "Append_Data_Crypto_Error", e);
+                    throw new CryptoException(0x000000150002L, "Append_Data_Crypto_Error", e);
                 }
                 break;
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
     /**
@@ -172,7 +172,7 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                 byte[] encBytes = this.cipher.doFinal(dataBytes);
                 this.dataBytes = concat(this.dataBytes, encBytes);
             } catch (IllegalBlockSizeException | BadPaddingException e) {
-                throw new CryptoException(0x000000150004L, "Utils", "Process_Data_Crypto_Error", e);
+                throw new CryptoException(0x000000150004L, "Process_Data_Crypto_Error", e);
             } finally {
                 this.reset();
             }
@@ -239,7 +239,7 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                         byte[] encBytes = this.cipher.doFinal(finalBytes);
                         result = concat(this.dataBytes, encBytes);
                     } catch (IllegalBlockSizeException | BadPaddingException e) {
-                        throw new CryptoException(0x000000150004L, "Utils", "Process_Data_Crypto_Error", e);
+                        throw new CryptoException(0x000000150004L, "Process_Data_Crypto_Error", e);
                     } finally {
                         this.reset();
                         this.appendBuffer = new byte[0];
@@ -254,15 +254,15 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                     this.signature.update(dataBytes);
                     result = this.signature.sign();
                 } catch (SignatureException e) {
-                    throw new CryptoException(0x000000150005L, "Utils", "Signature_Data_Crypto_Error", e);
+                    throw new CryptoException(0x000000150005L, "Signature_Data_Crypto_Error", e);
                 } finally {
                     this.reset();
                 }
                 break;
             case VERIFY:
-                throw new CryptoException(0x000000150006L, "Utils", "Finish_Verify_Crypto_Error");
+                throw new CryptoException(0x000000150006L, "Finish_Verify_Crypto_Error");
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
         return result;
     }
@@ -283,14 +283,14 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
     @Override
     public final boolean verify(final byte[] signature) throws CryptoException {
         if (!CryptoMode.VERIFY.equals(this.cryptoMode)) {
-            throw new CryptoException(0x000000150007L, "Utils", "Verify_Method_Crypto_Error");
+            throw new CryptoException(0x000000150007L, "Verify_Method_Crypto_Error");
         }
         try {
             boolean result = this.signature.verify(signature);
             this.reset();
             return result;
         } catch (SignatureException e) {
-            throw new CryptoException(0x000000150008L, "Utils", "Verify_Signature_Crypto_Error", e);
+            throw new CryptoException(0x000000150008L, "Verify_Signature_Crypto_Error", e);
         }
     }
     /**
@@ -313,7 +313,7 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                 this.signature = this.initSignature();
                 break;
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
     /**
@@ -334,7 +334,7 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
             case DECRYPT:
                 return super.generateCipher(this.key, Globals.INITIALIZE_INT_VALUE);
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
     /**
@@ -359,11 +359,11 @@ public abstract class AsymmetricCryptoAdapter extends BaseCryptoAdapter {
                     signInstance.initVerify((PublicKey) this.key);
                     break;
                 default:
-                    throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                    throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
             }
             return signInstance;
         } catch (NoSuchAlgorithmException | InvalidKeyException | ClassCastException e) {
-            throw new CryptoException(0x000000150009L, "Utils", "Init_Signature_Crypto_Error", e);
+            throw new CryptoException(0x000000150009L, "Init_Signature_Crypto_Error", e);
         }
     }
 }

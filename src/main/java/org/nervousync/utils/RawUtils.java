@@ -44,7 +44,7 @@ import org.nervousync.exceptions.zip.ZipException;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 28, 2017 17:34:55 $
+ * @version $Revision: 1.2.0 $ $Date: Nov 28, 2017 17:34:55 $
  */
 public final class RawUtils {
 	/**
@@ -93,7 +93,7 @@ public final class RawUtils {
 	 */
 	public static boolean readBoolean(final byte[] dataBytes, final int position) throws DataInvalidException {
 		if (dataBytes.length <= position) {
-			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
+			throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
 		}
 		return dataBytes[position] == Globals.DEFAULT_STATUS_TRUE;
 	}
@@ -131,7 +131,7 @@ public final class RawUtils {
 	public static void writeBoolean(final byte[] dataBytes, final int position, final boolean value)
 			throws DataInvalidException {
 		if (dataBytes.length <= position) {
-			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
+			throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error", dataBytes.length, position, 1);
 		}
 		dataBytes[position] = (byte) (value ? Globals.DEFAULT_STATUS_TRUE : Globals.DEFAULT_STATUS_FALSE);
 	}
@@ -790,18 +790,18 @@ public final class RawUtils {
 	public static String readString(final byte[] dataBytes, final int position, final int length,
 									final String encoding, final ByteOrder byteOrder) throws DataInvalidException {
 		if (position < 0 || dataBytes == null) {
-			throw new DataInvalidException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+			throw new DataInvalidException(0x000000FF0001L, "Parameter_Invalid_Error");
 		}
 		int readLength = (length == Globals.DEFAULT_VALUE_INT) ? dataBytes.length - position : length;
 		if (dataBytes.length < (position + readLength)) {
-			throw new DataInvalidException(0x000000130002L, "Utils", "Length_Not_Enough_Raw_Error");
+			throw new DataInvalidException(0x000000130002L, "Length_Not_Enough_Raw_Error");
 		}
 		try {
 			byte[] readBytes = new byte[readLength];
 			initBuffer(dataBytes, position, readLength, byteOrder).get(readBytes);
 			return new String(readBytes, encoding);
 		} catch (UnsupportedEncodingException e) {
-			throw new DataInvalidException(0x000000FF0002L, "Utils", "Not_Support_Encoding_Error", e);
+			throw new DataInvalidException(0x000000FF0002L, "Not_Support_Encoding_Error", e);
 		}
 	}
 	/**
@@ -963,11 +963,11 @@ public final class RawUtils {
 			if ((position + valueBytes.length) <= dataBytes.length) {
 				System.arraycopy(valueBytes, 0, dataBytes, position, valueBytes.length);
 			} else {
-				throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+				throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error",
 						dataBytes.length, position, valueBytes.length);
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new DataInvalidException(0x000000FF0002L, "Utils", "Not_Support_Encoding_Error", e);
+			throw new DataInvalidException(0x000000FF0002L, "Not_Support_Encoding_Error", e);
 		}
 	}
 	/**
@@ -1009,15 +1009,15 @@ public final class RawUtils {
 	 */
 	public static byte bitArrayToByte(final int[] bitArray) throws ZipException {
 		if (bitArray == null) {
-			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+			throw new ZipException(0x000000FF0001L, "Parameter_Invalid_Error");
 		}
 
 		if (bitArray.length != 8) {
-			throw new ZipException(0x000000130003L, "Utils", "Length_Bits_Invalid_Raw_Error");
+			throw new ZipException(0x000000130003L, "Length_Bits_Invalid_Raw_Error");
 		}
 
 		if (Arrays.stream(bitArray).anyMatch(bit -> (bit != 0 && bit != 1))) {
-			throw new ZipException(0x000000130004L, "Utils", "Data_Bits_Invalid_Raw_Error");
+			throw new ZipException(0x000000130004L, "Data_Bits_Invalid_Raw_Error");
 		}
 
 		int calValue = 0;
@@ -1069,7 +1069,7 @@ public final class RawUtils {
 	private static ByteBuffer initBuffer(final byte[] dataBytes, final int position, final int length,
 										 final ByteOrder byteOrder) throws DataInvalidException {
 		if (dataBytes.length < (position + length)) {
-			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+			throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error",
 					dataBytes.length, position, length);
 		}
 		return ByteBuffer.wrap(dataBytes, position, length).order(byteOrder);
@@ -1096,11 +1096,11 @@ public final class RawUtils {
 	private static void writeNumber(final byte[] dataBytes, final int position, final int dataSize,
 									final ByteOrder byteOrder, final Object value) throws DataInvalidException {
 		if (dataSize % Byte.SIZE != 0) {
-			throw new DataInvalidException(0x000000130005L, "Utils", "Data_Size_Invalid_Raw_Error");
+			throw new DataInvalidException(0x000000130005L, "Data_Size_Invalid_Raw_Error");
 		}
 		int dataLength = dataSize / Byte.SIZE;
 		if (dataBytes.length < (position + dataLength)) {
-			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+			throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error",
 					dataBytes.length, position, dataLength);
 		}
 		final ByteBuffer byteBuffer = initBuffer(dataBytes, position, dataLength, byteOrder);
@@ -1115,7 +1115,7 @@ public final class RawUtils {
 				byteBuffer.putLong((long) value);
 				break;
 			default:
-				throw new DataInvalidException(0x000000130006L, "Utils", "Data_Size_Unknown_Raw_Error");
+				throw new DataInvalidException(0x000000130006L, "Data_Size_Unknown_Raw_Error");
 		}
 	}
 	/**
@@ -1141,7 +1141,7 @@ public final class RawUtils {
 	private static Object readNumber(final byte[] dataBytes, final int position, final ByteOrder byteOrder,
 									 final int dataLength) throws DataInvalidException {
 		if (dataBytes.length < (position + dataLength)) {
-			throw new DataInvalidException(0x000000130001L, "Utils", "Out_Of_Index_Raw_Error",
+			throw new DataInvalidException(0x000000130001L, "Out_Of_Index_Raw_Error",
 					dataBytes.length, position, 8);
 		}
 		final ByteBuffer byteBuffer = initBuffer(dataBytes, position, dataLength, byteOrder);
@@ -1153,7 +1153,7 @@ public final class RawUtils {
 			case 8:
 				return byteBuffer.getLong();
 			default:
-				throw new DataInvalidException(0x000000130006L, "Utils", "Data_Size_Unknown_Raw_Error");
+				throw new DataInvalidException(0x000000130006L, "Data_Size_Unknown_Raw_Error");
 		}
 	}
 }

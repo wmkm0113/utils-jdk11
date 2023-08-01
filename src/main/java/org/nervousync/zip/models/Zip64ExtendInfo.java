@@ -22,7 +22,7 @@ import org.nervousync.commons.Globals;
  * The type Zip 64 extend info.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:48:01 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 28, 2017 4:48:01 PM $
  */
 public final class Zip64ExtendInfo {
 

@@ -26,7 +26,7 @@ import org.nervousync.exceptions.builder.BuilderException;
  *              <span class="zh-CN">泛型类</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 4, 2018 16:09:54 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 4, 2018 16:09:54 $
  */
 public abstract class AbstractBuilder<T> {
     /**

@@ -25,7 +25,7 @@ import org.nervousync.zip.crypto.Decryptor;
  * Decryptor implement of the standard
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 2, 2017 12:23:51 PM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 12:23:51 PM $
  */
 public class StandardDecryptor implements Decryptor {
 
@@ -41,14 +41,14 @@ public class StandardDecryptor implements Decryptor {
 	public StandardDecryptor(LocalFileHeader localFileHeader, byte[] decryptorHeader)
 			throws ZipException {
 		if (localFileHeader == null) {
-			throw new ZipException(0x0000001B000FL, "Utils", "Null_General_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000FL, "Null_General_File_Header_Zip_Error");
 		}
 
 		this.standardCryptoEngine = new StandardCryptoEngine();
 
 		if (localFileHeader.getPassword() == null
 				|| localFileHeader.getPassword().length == 0) {
-			throw new ZipException(0x0000001B000DL, "Utils", "Wrong_Password_Zip_Error");
+			throw new ZipException(0x0000001B000DL, "Wrong_Password_Zip_Error");
 		}
 		
 		this.standardCryptoEngine.initKeys(localFileHeader.getPassword());
@@ -70,7 +70,7 @@ public class StandardDecryptor implements Decryptor {
 	@Override
 	public int decryptData(byte[] buff, int start, int len) throws ZipException {
 		if (start < 0 || len < 0) {
-			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+			throw new ZipException(0x000000FF0001L, "Parameter_Invalid_Error");
 		}
 		try {
 			for (int i = start ; i < start + len ; i++) {
@@ -81,7 +81,7 @@ public class StandardDecryptor implements Decryptor {
 			}
 			return len;
 		} catch (Exception e) {
-			throw new ZipException(0x0000001B000BL, "Utils", "Decrypt_Crypto_Zip_Error", e);
+			throw new ZipException(0x0000001B000BL, "Decrypt_Crypto_Zip_Error", e);
 		}
 	}
 

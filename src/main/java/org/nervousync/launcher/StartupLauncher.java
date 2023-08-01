@@ -35,7 +35,7 @@ package org.nervousync.launcher;
  * </span>
  *.0
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 3, 2017 16:39:41 $
+ * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 16:39:41 $
  */
 public interface StartupLauncher {
 	/**

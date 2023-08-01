@@ -171,6 +171,7 @@
     <entry key="Process_SSL_Certificate_Request_Error">处理SSL证书出错</entry>
     <entry key="Send_Request_Error">发送请求出错</entry>
     <entry key="Parameter_Null_Register_Security_Error">算法名称或配置信息为null</entry>
+    <entry key="Registered_CRC_Algorithm">已注册的CRC配置信息：{0}</entry>
     <entry key="Lager_CRC_Security_Error">仅支持CRC32以下的算法</entry>
     <entry key="Override_Config_Register_Security_Warn">算法{0}已注册，覆盖现有配置</entry>
     <entry key="Calculate_Value_Security_Error">计算{0}值出错</entry>

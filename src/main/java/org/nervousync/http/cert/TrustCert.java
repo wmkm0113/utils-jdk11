@@ -33,7 +33,7 @@ import java.util.Objects;
  * <h2 class="zh-CN">允许的证书库定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: Oct 30, 2018 15:38:36 $
+ * @version $Revision: 1.0.0 $Date: Oct 30, 2018 15:38:36 $
  */
 public final class TrustCert {
 	/**
@@ -94,7 +94,7 @@ public final class TrustCert {
 			keyManagerFactory.init(clientStore, this.certPassword.toCharArray());
 			return keyManagerFactory.getKeyManagers();
 		} catch (Exception e) {
-			throw new CertInfoException(0x000000010001L, "Utils", "Parse_Certificate_Error", e);
+			throw new CertInfoException(0x000000010001L, "Parse_Certificate_Error", e);
 		}
 	}
     /**

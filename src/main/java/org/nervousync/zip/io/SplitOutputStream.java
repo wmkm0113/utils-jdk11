@@ -21,10 +21,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.exceptions.zip.ZipException;
-import org.nervousync.commons.io.NervousyncRandomAccessFile;
+import org.nervousync.commons.io.NervousyncFile;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.StringUtils;
@@ -33,7 +34,7 @@ import org.nervousync.utils.StringUtils;
  * The type Split output stream.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:57:01 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:57:01 PM $
  */
 public class SplitOutputStream extends OutputStream {
 
@@ -53,7 +54,7 @@ public class SplitOutputStream extends OutputStream {
         HEADER_SIGNATURES[10] = Globals.AESSIG;
     }
 
-    private NervousyncRandomAccessFile dataOutput;
+    private NervousyncFile dataOutput;
     private final String fileName;
     private final String filePath;
     private final String currentFullPath;
@@ -93,7 +94,7 @@ public class SplitOutputStream extends OutputStream {
         }
         this.filePath = savePath.substring(0, beginIndex);
         this.fileName = StringUtils.stripFilenameExtension(savePath.substring(beginIndex + 1));
-        this.dataOutput = new NervousyncRandomAccessFile(savePath, Boolean.TRUE);
+        this.dataOutput = new NervousyncFile(savePath, Boolean.TRUE);
         this.currentFullPath = savePath;
         this.splitLength = splitLength;
         this.currentSplitFileIndex = 0;
@@ -108,7 +109,7 @@ public class SplitOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public void write(@Nonnull byte[] b) throws IOException {
         this.write(b, 0, b.length);
     }
 
@@ -119,7 +120,7 @@ public class SplitOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(@Nonnull byte[] b, int off, int len) throws IOException {
         if (len < 0) {
             return;
         }
@@ -243,6 +244,24 @@ public class SplitOutputStream extends OutputStream {
     }
 
     private void startNextSplitFile() throws IOException {
+        String splitFile = splitPath();
+
+        this.dataOutput.close();
+
+        if (FileUtils.isExists(splitFile)) {
+            throw new IOException("split file: " + splitFile
+                    + " already exists in the current directory, cannot rename this file");
+        }
+
+        if (!FileUtils.moveFile(this.currentFullPath, splitFile)) {
+            throw new IOException("Cannot create split file!");
+        }
+
+        this.dataOutput = new NervousyncFile(this.currentFullPath, Boolean.TRUE);
+        this.currentSplitFileIndex++;
+    }
+
+    private String splitPath() {
         String folderPath;
 
         if (this.filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
@@ -251,26 +270,11 @@ public class SplitOutputStream extends OutputStream {
             folderPath = this.filePath + Globals.DEFAULT_PAGE_SEPARATOR;
         }
 
-        String currentSplitFile;
         if (this.currentSplitFileIndex < 9) {
-            currentSplitFile = folderPath + fileName + ".zip.0" + (this.currentSplitFileIndex + 1);
+            return folderPath + fileName + ".zip.0" + (this.currentSplitFileIndex + 1);
         } else {
-            currentSplitFile = folderPath + fileName + ".zip." + (this.currentSplitFileIndex + 1);
+            return folderPath + fileName + ".zip." + (this.currentSplitFileIndex + 1);
         }
-
-        this.dataOutput.close();
-
-        if (FileUtils.isExists(currentSplitFile)) {
-            throw new IOException("split file: " + currentSplitFile
-                    + " already exists in the current directory, cannot rename this file");
-        }
-
-        if (!FileUtils.moveFile(this.currentFullPath, currentSplitFile)) {
-            throw new IOException("Cannot create split file!");
-        }
-
-        this.dataOutput = new NervousyncRandomAccessFile(this.currentFullPath, Boolean.TRUE);
-        this.currentSplitFileIndex++;
     }
 
     private boolean isHeaderData(byte[] buffer) throws IOException {

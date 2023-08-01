@@ -27,7 +27,7 @@ import org.nervousync.utils.StringUtils;
  * ZIP options
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 29, 2017 3:51:12 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 3:51:12 PM $
  */
 public final class ZipOptions implements Cloneable {
 
@@ -144,7 +144,7 @@ public final class ZipOptions implements Cloneable {
 	 */
 	public static ZipOptions standardEncryptOptions(final String password) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
-			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
+			throw new ZipException(0x0000001B0006L, "Invalid_Password_Zip_Error");
 		}
 		return new ZipOptions(password);
 	}
@@ -170,7 +170,7 @@ public final class ZipOptions implements Cloneable {
 	 */
 	public static ZipOptions aesEncryptOptions(final String password, final int aesKeyLength) throws ZipException {
 		if (StringUtils.isEmpty(password)) {
-			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
+			throw new ZipException(0x0000001B0006L, "Invalid_Password_Zip_Error");
 		}
 
 		switch (aesKeyLength) {
@@ -181,7 +181,7 @@ public final class ZipOptions implements Cloneable {
 			case 256:
 				return new ZipOptions(password, Globals.AES_STRENGTH_256);
 			default:
-				throw new ZipException(0x0000001B0005L, "Utils", "Invalid_Key_Strength_AES_Zip_Error");
+				throw new ZipException(0x0000001B0005L, "Invalid_Key_Strength_AES_Zip_Error");
 		}
 	}
 

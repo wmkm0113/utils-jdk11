@@ -29,7 +29,7 @@ import java.util.Properties;
  * <h2 class="zh-CN">电子邮件接收器的接口</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 10, 2019 15:47:26 $
+ * @version $Revision: 1.0.0 $ $Date: Dec 10, 2019 15:47:26 $
  */
 public interface ReceiveOperator {
     /**

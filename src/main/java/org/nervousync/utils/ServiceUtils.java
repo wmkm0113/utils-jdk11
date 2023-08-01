@@ -53,7 +53,7 @@ import java.util.*;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2020 15:52:33 $
+ * @version $Revision: 1.2.0 $ $Date: Jan 13, 2020 15:52:33 $
  */
 public final class ServiceUtils {
     /**
@@ -229,7 +229,7 @@ public final class ServiceUtils {
             return adapter.marshal(value);
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.error("Utils", "Convert_Object_Error", e);
+                LOGGER.error("Convert_Object_Error", e);
             }
             return Globals.DEFAULT_VALUE_STRING;
         }
@@ -255,7 +255,7 @@ public final class ServiceUtils {
      * <h2 class="zh-CN">Restful服务拦截器调用处理程序</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jan 13, 2020 16:28:15 $
+     * @version $Revision: 1.0.0 $ $Date: Jan 13, 2020 16:28:15 $
      */
     private static final class RestfulInterceptor implements InvocationHandler {
         /**
@@ -618,7 +618,7 @@ public final class ServiceUtils {
                         } else {
                             errorMsg += Globals.DEFAULT_VALUE_STRING;
                         }
-                        LOGGER.debug("Utils", "Response_Message_Debug", response.getStatus(), errorMsg);
+                        LOGGER.debug("Response_Message_Debug", response.getStatus(), errorMsg);
                     }
                     throw new ServiceException(errorMsg);
                 }
@@ -635,7 +635,7 @@ public final class ServiceUtils {
      * <h2 class="zh-CN">JavaBean参数定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jan 13, 2020 16:33:27 $
+     * @version $Revision: 1.0.0 $ $Date: Jan 13, 2020 16:33:27 $
      */
     private static final class BeanParameter {
         /**

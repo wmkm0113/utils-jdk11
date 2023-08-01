@@ -21,7 +21,7 @@ package org.nervousync.enumerations.net;
  * <h2 class="zh-CN">IP协议枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 27, 2017 13:31:26 $
+ * @version $Revision: 1.0.0 $ $Date: Oct 27, 2017 13:31:26 $
  */
 public enum IPProtocol {
 	/**

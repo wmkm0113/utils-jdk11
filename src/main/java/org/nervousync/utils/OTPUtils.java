@@ -41,7 +41,7 @@ import java.security.SecureRandom;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 04, 2019 10:47:28 $
+ * @version $Revision: 1.1.2 $ $Date: Jun 04, 2019 10:47:28 $
  */
 public final class OTPUtils {
     /**
@@ -445,9 +445,9 @@ public final class OTPUtils {
 					secureRandom.generateSeed(size == Globals.DEFAULT_VALUE_INT ? DEFAULT_SECRET_SIZE : size);
 			randomKey = StringUtils.base32Encode(randomKeyBytes, Boolean.FALSE);
 		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("Utils", "Random_Key_Generate_OTP_Error");
+			LOGGER.error("Random_Key_Generate_OTP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 		}
 		return randomKey;
@@ -501,9 +501,9 @@ public final class OTPUtils {
 		try {
 			RawUtils.writeLong(signData, randomCode);
 		} catch (DataInvalidException e) {
-			LOGGER.error("Utils", "Process_Signature_Data_OTP_Error");
+			LOGGER.error("Process_Signature_Data_OTP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_INT;
 		}

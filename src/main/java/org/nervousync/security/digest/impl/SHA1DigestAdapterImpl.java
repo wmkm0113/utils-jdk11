@@ -30,7 +30,7 @@ import java.security.MessageDigest;
  * <h2 class="zh-CN">SHA1摘要算法适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:54:22 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:54:22 $
  */
 public final class SHA1DigestAdapterImpl extends BaseDigestAdapter {
     /**
@@ -73,7 +73,7 @@ public final class SHA1DigestAdapterImpl extends BaseDigestAdapter {
         if ("SHA-1".equalsIgnoreCase(algorithm)) {
             return new SHA1.Digest();
         }
-        throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error");
+        throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error");
     }
     /**
 	 * <h3 class="en">Abstract method for initialize Hmac instance</h3>
@@ -94,6 +94,6 @@ public final class SHA1DigestAdapterImpl extends BaseDigestAdapter {
             hmac.init(new KeyParameter(keyBytes));
             return hmac;
         }
-        throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+        throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
     }
 }

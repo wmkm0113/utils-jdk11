@@ -45,7 +45,7 @@ import java.math.BigInteger;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Aug 15, 2022 16:23:13 $
+ * @version $Revision: 1.2.0 $ $Date: Aug 15, 2022 16:23:13 $
  */
 public final class IPUtils {
 	/**

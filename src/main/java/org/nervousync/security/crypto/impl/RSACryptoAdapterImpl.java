@@ -27,7 +27,7 @@ import org.nervousync.exceptions.crypto.CryptoException;
  * <h2 class="zh-CN">RSA非对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 14:27:46 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 14:27:46 $
  */
 public final class RSACryptoAdapterImpl extends AsymmetricCryptoAdapter {
 

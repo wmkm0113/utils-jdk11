@@ -35,7 +35,7 @@ import java.security.MessageDigest;
  * <h2 class="zh-CN">SHA2摘要算法适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:55:38 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:55:38 $
  */
 public final class SHA2DigestAdapterImpl extends BaseDigestAdapter {
     /**
@@ -67,7 +67,7 @@ public final class SHA2DigestAdapterImpl extends BaseDigestAdapter {
     @Override
     protected MessageDigest initDigest(final String algorithm) throws CryptoException {
         if (StringUtils.isEmpty(algorithm)) {
-            throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error");
+            throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error");
         }
         switch (algorithm.toUpperCase()) {
             case "SHA-224":
@@ -83,7 +83,7 @@ public final class SHA2DigestAdapterImpl extends BaseDigestAdapter {
             case "SHA-512/256":
                 return new SHA512.DigestT256();
             default:
-                throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+                throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
         }
     }
     /**
@@ -101,7 +101,7 @@ public final class SHA2DigestAdapterImpl extends BaseDigestAdapter {
     @Override
     protected Mac initHmac(final String algorithm, final byte[] keyBytes) throws CryptoException {
         if (StringUtils.isEmpty(algorithm) || !algorithm.toUpperCase().endsWith("HMAC")) {
-            throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+            throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
         }
         HMac hmac;
         switch (algorithm.toUpperCase()) {
@@ -124,7 +124,7 @@ public final class SHA2DigestAdapterImpl extends BaseDigestAdapter {
                 hmac = new HMac(new SHA512tDigest(256));
                 break;
             default:
-                throw new CryptoException(0x00000015000DL, "Utils", "Unknown_Algorithm_Digits_Error", algorithm);
+                throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
         }
         hmac.init(new KeyParameter(keyBytes));
         return hmac;

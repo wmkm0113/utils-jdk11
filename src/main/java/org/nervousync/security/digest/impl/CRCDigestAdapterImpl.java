@@ -30,7 +30,7 @@ import java.util.*;
  * <h2 class="zh-CN">CRC摘要算法适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:50:21 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:50:21 $
  */
 public final class CRCDigestAdapterImpl extends SecureAdapter {
     /**
@@ -119,7 +119,7 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
     @Override
     public void append(final byte[] dataBytes, final int position, final int length) throws CryptoException {
         if (dataBytes.length < (position + length)) {
-            throw new CryptoException(0x000000150001L, "Utils", "Length_Not_Enough_Crypto_Error");
+            throw new CryptoException(0x000000150001L, "Length_Not_Enough_Crypto_Error");
         }
         for (int i = position ; i < length ; i++) {
             long crc = (dataBytes[i] < 0) ? ((int)dataBytes[i]) + 256 : dataBytes[i];

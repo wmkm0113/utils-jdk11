@@ -34,7 +34,7 @@ import org.nervousync.exceptions.location.LocationConvertException;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 19, 2017 13:01:14 $
+ * @version $Revision: 1.2.0 $ $Date: Dec 19, 2017 13:01:14 $
  */
 public final class LocationUtils {
 	/**
@@ -95,7 +95,7 @@ public final class LocationUtils {
 	 */
 	public static GeoPoint anyToGPS(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
+			throw new LocationConvertException(0x0000000C0001L, "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -106,7 +106,7 @@ public final class LocationUtils {
 			GeoPoint gcjPoint = BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 			return GCJ02ToGPS(gcjPoint.getLongitude(), gcjPoint.getLatitude());
 			default:
-				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
+				throw new LocationConvertException(0x0000000C0002L, "Not_Support_Type_Location_Error");
 		}
 	}
 	/**
@@ -125,7 +125,7 @@ public final class LocationUtils {
 	 */
 	public static GeoPoint anyToGCJ02(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
+			throw new LocationConvertException(0x0000000C0001L, "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -135,7 +135,7 @@ public final class LocationUtils {
 		case BD_09:
 			return BD09ToGCJ02(currentPoint.getLongitude(), currentPoint.getLatitude());
 			default:
-				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
+				throw new LocationConvertException(0x0000000C0002L, "Not_Support_Type_Location_Error");
 		}
 	}
 	/**
@@ -154,7 +154,7 @@ public final class LocationUtils {
 	 */
 	public static GeoPoint anyToBD09(final GeoPoint currentPoint) throws LocationConvertException {
 		if (currentPoint == null) {
-			throw new LocationConvertException(0x0000000C0001L, "Utils", "Null_Point_Location_Error");
+			throw new LocationConvertException(0x0000000C0001L, "Null_Point_Location_Error");
 		}
 		switch (currentPoint.getLocationType()) {
 		case GPS:
@@ -165,7 +165,7 @@ public final class LocationUtils {
 		case BD_09:
 			return currentPoint;
 			default:
-				throw new LocationConvertException(0x0000000C0002L, "Utils", "Not_Support_Type_Location_Error");
+				throw new LocationConvertException(0x0000000C0002L, "Not_Support_Type_Location_Error");
 		}
 	}
 	/**

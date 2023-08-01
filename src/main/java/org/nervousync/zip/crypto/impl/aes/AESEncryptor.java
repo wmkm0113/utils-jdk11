@@ -26,7 +26,7 @@ import org.nervousync.zip.crypto.Encryptor;
  * Encryptor implement of AES
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 30, 2017 3:42:11 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 30, 2017 3:42:11 PM $
  */
 public final class AESEncryptor extends AESCrypto implements Encryptor {
 	
@@ -47,7 +47,7 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public void encryptData(byte[] buff) throws ZipException {
 		if (buff == null) {
-			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+			throw new ZipException(0x000000FF0001L, "Parameter_Invalid_Error");
 		}
 		this.encryptData(buff, 0, buff.length);
 	}
@@ -55,7 +55,7 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 	@Override
 	public void encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (this.finished) {
-			throw new ZipException(0x0000001B0012L, "Utils", "Finished_Encryptor_AES_Zip_Error");
+			throw new ZipException(0x0000001B0012L, "Finished_Encryptor_AES_Zip_Error");
 		}
 		
 		if (len % 16 != 0) {
@@ -72,7 +72,7 @@ public final class AESEncryptor extends AESCrypto implements Encryptor {
 				this.macBasedPRF.append(buff, i, this.loopCount);
 			}
 		} catch (CryptoException | DataInvalidException e) {
-			throw new ZipException(0x0000001B000CL, "Utils", "Encrypt_Crypto_Zip_Error", e);
+			throw new ZipException(0x0000001B000CL, "Encrypt_Crypto_Zip_Error", e);
 		}
 	}
 

@@ -27,7 +27,7 @@ import java.util.List;
  * <h2 class="zh-CN">分割数据信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 9, 2015 09:43:23 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 9, 2015 09:43:23 $
  */
 @XmlType(name = "segment_info", namespace = "https://nervousync.org/schemas/segment")
 @XmlRootElement(name = "segment_info", namespace = "https://nervousync.org/schemas/segment")

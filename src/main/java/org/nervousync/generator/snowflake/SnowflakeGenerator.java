@@ -28,7 +28,7 @@ import org.nervousync.utils.LoggerUtils;
  * <h2 class="zh-CN">雪花ID生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:44:27 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:44:27 $
  */
 @GeneratorProvider(IDUtils.SNOWFLAKE)
 public final class SnowflakeGenerator implements IGenerator<Long> {
@@ -89,7 +89,7 @@ public final class SnowflakeGenerator implements IGenerator<Long> {
         this.instanceId = (instanceId >= 0L && instanceId <= 64L) ? instanceId : DEFAULT_ID;
         this.sequenceIndex = 0L;
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Utils", "Config_Snowflake_Error",
+            this.logger.debug("Config_Snowflake_Error",
                     this.referenceTime, this.deviceId, this.instanceId);
         }
     }
@@ -124,7 +124,7 @@ public final class SnowflakeGenerator implements IGenerator<Long> {
         this.lastTime = currentTime;
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Utils", "Generate_Snowflake_Debug",
+            this.logger.debug("Generate_Snowflake_Debug",
                     this.lastTime, this.referenceTime, this.deviceId, this.instanceId, this.sequenceIndex);
         }
 

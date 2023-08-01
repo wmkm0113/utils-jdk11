@@ -37,7 +37,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="zh-CN">HTTP请求信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 2, 2018 14:05:04 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 2, 2018 14:05:04 $
  */
 public final class HttpEntity {
 	/**
@@ -107,9 +107,9 @@ public final class HttpEntity {
 				this.boundary = this.generateBoundary();
 			}
 		} catch (FileNotFoundException e) {
-			this.logger.error("Utils", "Upload_File_Not_Found_Error");
+			this.logger.error("Upload_File_Not_Found_Error");
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Utils", "Stack_Message_Error", e);
+				this.logger.debug("Stack_Message_Error", e);
 			}
 		}
 	}
@@ -171,7 +171,7 @@ public final class HttpEntity {
 	public void writeData(final String charset, final OutputStream outputStream) throws IOException {
 		if (this.entityList.isEmpty()) {
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Utils", "Entity_List_Empty_Debug");
+				this.logger.debug("Entity_List_Empty_Debug");
 			}
 			return;
 		}
@@ -212,7 +212,7 @@ public final class HttpEntity {
 			}
 			
 			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("Utils", "Write_Request_Data_Debug", stringBuilder);
+				this.logger.debug("Write_Request_Data_Debug", stringBuilder);
 			}
 			outputStream.write(stringBuilder.substring(1).getBytes(charsetEncoding));
 		}
@@ -258,7 +258,7 @@ public final class HttpEntity {
 	 * <h2 class="zh-CN">HTTP请求参数信息定义</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision: 1.0 $ $Date: Jul 2, 2018 14:08:33 $
+	 * @version $Revision: 1.0.0 $ $Date: Jul 2, 2018 14:08:33 $
 	 */
 	private static final class EntityInfo {
 		/**

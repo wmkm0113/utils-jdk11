@@ -21,7 +21,7 @@ package org.nervousync.enumerations.mail;
  * <h2 class="zh-CN">邮件服务器协议枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: Sep 21, 2018 17:21:28 $
+ * @version $Revision: 1.0.0 $Date: Sep 21, 2018 17:21:28 $
  */
 public enum MailProtocol {
 	/**

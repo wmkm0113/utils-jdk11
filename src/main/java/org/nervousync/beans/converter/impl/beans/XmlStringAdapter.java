@@ -28,7 +28,7 @@ import java.util.Optional;
  * <h2 class="zh-CN">JavaBean数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 25, 2023 12:33:18 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 25, 2023 12:33:18 $
  */
 public class XmlStringAdapter extends AbstractBeanAdapter<String, BeanObject> {
     /**

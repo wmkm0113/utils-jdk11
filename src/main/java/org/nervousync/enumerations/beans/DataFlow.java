@@ -21,7 +21,7 @@ package org.nervousync.enumerations.beans;
  * <h2 class="zh-CN">JavaBean属性值数据流向枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 25, 2023 14:28:27 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 25, 2023 14:28:27 $
  */
 public enum DataFlow {
     /**

@@ -26,7 +26,7 @@ import org.nervousync.utils.LoggerUtils;
  * <span class="zh-CN">仅添加了统一的日志对象实例</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2021 19:01:22 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2021 19:01:22 $
  */
 public abstract class AbstractStartupLauncher implements StartupLauncher {
 	/**

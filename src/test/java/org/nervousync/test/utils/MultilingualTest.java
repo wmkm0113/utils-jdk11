@@ -5,31 +5,25 @@ import org.junit.jupiter.api.Test;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.MultilingualUtils;
 
+import java.util.Locale;
+
 public final class MultilingualTest extends BaseTest {
-    @Test
-    @Order(0)
-    public void register() {
-        this.logger.info("Register zh-CN result: {}",
-                MultilingualUtils.registerResource("Utils", "zh-CN",
-                        "src/main/resources/META-INF/i18n/zh-CN.xml"));
-        this.logger.info("Register en-US result: {}",
-                MultilingualUtils.registerResource("Utils", "en-US",
-                        "src/main/resources/META-INF/i18n/en-US.xml"));
-    }
+
+    private final MultilingualUtils.Agent multiAgent = MultilingualUtils.newAgent("org.nervousync", "utils-jdk11");
 
     @Test
     @Order(10)
     public void message() {
-        this.logger.info(MultilingualUtils.findMessage("Utils", "Not_Support_Type_Location_Error"));
-        this.logger.info(MultilingualUtils.findMessage("Utils", "zh-CN", "Out_Of_Index_Raw_Error", 10, 8, 3));
+        this.logger.info(this.multiAgent.findMessage("Not_Support_Type_Location_Error"));
+        this.logger.info(this.multiAgent.findMessage("Out_Of_Index_Raw_Error", Locale.CHINA, 10, 8, 3));
     }
 
     @Test
     @Order(20)
     public void destroy() {
-        MultilingualUtils.removeResource("Utils", "zh-CN");
-        this.logger.info(MultilingualUtils.findMessage("Utils", "zh-CN", "Out_Of_Index_Raw_Error", 10, 8, 3));
-        MultilingualUtils.removeBundle("Utils");
-        this.logger.info(MultilingualUtils.findMessage("Utils", "Not_Support_Type_Location_Error"));
+        MultilingualUtils.removeResource("org.nervousync", "utils-jdk11", "zh-CN");
+        this.logger.info(this.multiAgent.findMessage("Out_Of_Index_Raw_Error", Locale.CHINA, 10, 8, 3));
+        MultilingualUtils.removeBundle("org.nervousync", "utils-jdk11");
+        this.logger.info(this.multiAgent.findMessage("Not_Support_Type_Location_Error"));
     }
 }

@@ -37,7 +37,7 @@ import java.util.*;
  * <p class="zh-CN">使用单例模式运行。用于在任何配置文件中保护密码。支持的算法：RSA1024/RSA2048/SM2/AES128/AES192/AES256/DES/3DES/SM4</p>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:33:56 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 12:33:56 $
  */
 public final class SecureFactory {
 	/**
@@ -96,7 +96,7 @@ public final class SecureFactory {
                 .filter(SecureNode::isInitialized)
                 .map(secureNode -> {
                     if (FACTORY_NODE != null && LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Utils", "Override_Factory_Config_Debug");
+                        LOGGER.debug("Override_Factory_Config_Debug");
                     }
                     FACTORY_NODE = secureNode;
                     return Boolean.TRUE;
@@ -134,7 +134,7 @@ public final class SecureFactory {
     public static Optional<SecureConfig> initConfig(final SecureAlgorithm secureAlgorithm) {
         final byte[] keyBytes = generate(secureAlgorithm);
         if (keyBytes.length == 0) {
-            LOGGER.error("Utils", "Key_Bytes_Empty_Error");
+            LOGGER.error("Key_Bytes_Empty_Error");
             return Optional.empty();
         }
         byte[] encBytes = initKey(keyBytes, Boolean.TRUE);
@@ -251,9 +251,9 @@ public final class SecureFactory {
                     try {
                         return StringUtils.base64Encode(secureProvider.finish(ConvertUtils.toByteArray(dataContent)));
                     } catch (CryptoException e) {
-                        LOGGER.error("Utils", "Encrypt_Data_Error");
+                        LOGGER.error("Encrypt_Data_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                            LOGGER.debug("Stack_Message_Error", e);
                         }
                         return dataContent;
                     }
@@ -286,9 +286,9 @@ public final class SecureFactory {
                     try {
                         return ConvertUtils.toString(secureProvider.finish(encBytes));
                     } catch (CryptoException e) {
-                        LOGGER.error("Utils", "Encrypt_Data_Error");
+                        LOGGER.error("Encrypt_Data_Error");
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Stack_Message_Error", e);
+                            LOGGER.debug("Stack_Message_Error", e);
                         }
                         return dataContent;
                     }
@@ -313,7 +313,7 @@ public final class SecureFactory {
         }
         SecureAdapter secureAdapter = FACTORY_NODE.initCryptor(encrypt);
         if (secureAdapter == null) {
-            LOGGER.error("Utils", "Security_Factory_Not_Initialized_Error");
+            LOGGER.error("Security_Factory_Not_Initialized_Error");
             return new byte[0];
         }
         try {
@@ -379,7 +379,7 @@ public final class SecureFactory {
      * <h2 class="zh-CN">安全配置信息定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:38:45 $
+     * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 12:38:45 $
      */
     private static final class SecureNode {
         /**
@@ -547,9 +547,9 @@ public final class SecureFactory {
                             break;
                     }
                 } catch (CryptoException e) {
-                    LOGGER.error("Utils", "Init_Crypto_Error");
+                    LOGGER.error("Init_Crypto_Error");
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Utils", "Stack_Message_Error", e);
+                        LOGGER.debug("Stack_Message_Error", e);
                     }
                 }
             }
@@ -571,7 +571,7 @@ public final class SecureFactory {
      * <h2 class="zh-CN">安全算法的枚举类</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jan 13, 2012 12:37:28 $
+     * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 12:37:28 $
      */
     public enum SecureAlgorithm {
         RSA1024, RSA2048, SM2, AES128, AES192, AES256, DES, TRIPLE_DES, SM4

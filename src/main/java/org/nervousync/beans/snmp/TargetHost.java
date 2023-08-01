@@ -29,7 +29,7 @@ import org.nervousync.enumerations.snmp.auth.SNMPPrivProtocol;
  * <h2 class="zh-CN">SNMP目标主机定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 25, 2017 21:47:36 $
+ * @version $Revision: 1.1.2 $ $Date: Sep 25, 2022 21:47:36 $
  */
 public final class TargetHost implements Serializable {
 	/**

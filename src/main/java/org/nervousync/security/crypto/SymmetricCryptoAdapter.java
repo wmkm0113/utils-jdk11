@@ -30,7 +30,7 @@ import java.io.ByteArrayOutputStream;
  * <h2 class="zh-CN">对称加密解密适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:16:24 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:16:24 $
  */
 public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
     /**
@@ -76,7 +76,7 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
     @Override
     public final void append(final byte[] dataBytes, final int position, final int length) throws CryptoException {
         if (dataBytes.length < (position + length)) {
-            throw new CryptoException(0x000000150001L, "Utils", "Length_Not_Enough_Crypto_Error");
+            throw new CryptoException(0x000000150001L, "Length_Not_Enough_Crypto_Error");
         }
         switch (this.cryptoMode) {
             case ENCRYPT:
@@ -84,7 +84,7 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
                 this.byteArrayOutputStream.write(dataBytes, position, length);
                 break;
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
     /**
@@ -115,15 +115,15 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
                     return this.cipher.doFinal(this.byteArrayOutputStream.toByteArray(), Globals.INITIALIZE_INT_VALUE,
                             this.byteArrayOutputStream.size());
                 } catch (IllegalBlockSizeException | BadPaddingException e) {
-                    throw new CryptoException(0x000000150004L, "Utils", "Process_Data_Crypto_Error", e);
+                    throw new CryptoException(0x000000150004L, "Process_Data_Crypto_Error", e);
                 } finally {
                     this.reset();
                 }
             case SIGNATURE:
             case VERIFY:
-                throw new CryptoException(0x00000015000CL, "Utils", "Not_Support_Mode_Crypto_Error");
+                throw new CryptoException(0x00000015000CL, "Not_Support_Mode_Crypto_Error");
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
     /**
@@ -142,7 +142,7 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
      */
     @Override
     public final boolean verify(final byte[] signature) throws CryptoException {
-        throw new CryptoException(0x00000015000CL, "Utils", "Not_Support_Mode_Crypto_Error");
+        throw new CryptoException(0x00000015000CL, "Not_Support_Mode_Crypto_Error");
     }
     /**
 	 * <h3 class="en">Reset current adapter</h3>
@@ -161,7 +161,7 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
                 this.byteArrayOutputStream = new ByteArrayOutputStream();
                 break;
             default:
-                throw new CryptoException(0x000000150003L, "Utils", "Mode_Invalid_Crypto_Error");
+                throw new CryptoException(0x000000150003L, "Mode_Invalid_Crypto_Error");
         }
     }
 }

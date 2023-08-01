@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.zip.options.ZipOptions;
 import org.nervousync.exceptions.zip.ZipException;
@@ -29,7 +30,7 @@ import org.nervousync.zip.ZipFile;
 /**
  * Deflater output stream
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Dec 1, 2017 12:19:07 PM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 1, 2017 12:19:07 PM $
  */
 public class DeflaterOutputStream extends CipherOutputStream {
 
@@ -50,12 +51,12 @@ public class DeflaterOutputStream extends CipherOutputStream {
 	}
 
 	@Override
-	public void write(byte[] b) throws IOException {
+	public void write(@Nonnull byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
 	
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (this.zipOptions.getCompressionMethod() != Globals.COMP_DEFLATE) {
 			super.write(b, off, len);
 		} else {

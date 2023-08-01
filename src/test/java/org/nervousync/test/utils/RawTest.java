@@ -3,6 +3,7 @@ package org.nervousync.test.utils;
 import org.junit.jupiter.api.*;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.test.BaseTest;
+import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.StringUtils;
 
@@ -22,7 +23,7 @@ public class RawTest extends BaseTest {
 
     @AfterEach
     public void print() {
-        this.logger.debug("Data bytes: {}", this.dataBytes);
+        this.logger.debug("Raw_Data_Bytes", ConvertUtils.toHex(this.dataBytes));
     }
 
     @Test

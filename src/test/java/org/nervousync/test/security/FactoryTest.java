@@ -17,7 +17,7 @@ public final class FactoryTest extends BaseTest {
                     SecureConfig parseConfig =
                             StringUtils.stringToObject(secureConfig.toXML(Boolean.TRUE), SecureConfig.class,
                                     "https://nervousync.org/schemas/secure");
-                    this.logger.info("Parsed config: {}", parseConfig.toXML(Boolean.TRUE));
+                    this.logger.info("Secure_Config", parseConfig.toXML(Boolean.TRUE));
                 });
     }
 
@@ -26,14 +26,14 @@ public final class FactoryTest extends BaseTest {
     public void initialize() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.RSA1024)
                 .ifPresent(secureConfig ->
-                        this.logger.info("Initialize result: {}", SecureFactory.initialize(secureConfig)));
+                        this.logger.info("Secure_Init_Result", SecureFactory.initialize(secureConfig)));
     }
 
     @Test
     @Order(20)
     public void config() {
         SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES128)
-                .ifPresent(secureConfig -> this.logger.info("Config result: {}",
+                .ifPresent(secureConfig -> this.logger.info("Secure_Init_Result",
                         SecureFactory.register("TestConfig", secureConfig)));
     }
 
@@ -41,7 +41,7 @@ public final class FactoryTest extends BaseTest {
     @Order(30)
     public void crypto() {
         String encResult = SecureFactory.encrypt("TestConfig", "TestString中文测试");
-        this.logger.info("Encrypt result: {}", encResult);
-        this.logger.info("Decrypt result: {}", SecureFactory.decrypt("TestConfig", encResult));
+        this.logger.info("Secure_Encrypt_Result", encResult);
+        this.logger.info("Secure_Decrypt_Result", SecureFactory.decrypt("TestConfig", encResult));
     }
 }

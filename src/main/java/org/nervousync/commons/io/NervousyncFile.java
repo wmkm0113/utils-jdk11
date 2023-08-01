@@ -35,9 +35,9 @@ import jcifs.smb.SmbRandomAccessFile;
  * <span class="en">支持本地文件和网络文件（协议：smb://）</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 22, 2017 11:49:46 AM $
+ * @version $Revision: 1.1.0 $ $Date: Apr 22, 2022 11:49:46 AM $
  */
-public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closeable {
+public class NervousyncFile implements DataInput, DataOutput, Closeable {
 	/**
      * <span class="en">Current file path</span>
      * <span class="zh-CN">当前文件地址</span>
@@ -73,7 +73,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
      * <span class="en">If target file was not found</span>
      * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
-	public NervousyncRandomAccessFile(final String filePath) throws FileNotFoundException {
+	public NervousyncFile(final String filePath) throws FileNotFoundException {
 		this(filePath, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
@@ -89,7 +89,7 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
      * <span class="en">If target file was not found</span>
      * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
-	public NervousyncRandomAccessFile(final String filePath, final boolean writable) throws FileNotFoundException {
+	public NervousyncFile(final String filePath, final boolean writable) throws FileNotFoundException {
 		this(filePath, writable, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
@@ -109,8 +109,8 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
      * <span class="en">If connect to samba file has error occurs</span>
      * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
-	public NervousyncRandomAccessFile(final String filePath, final String domain,
-	                                  final String userName, final String passWord) throws FileNotFoundException {
+	public NervousyncFile(final String filePath, final String domain,
+						  final String userName, final String passWord) throws FileNotFoundException {
 		this(filePath, Boolean.FALSE, domain, userName, passWord);
 	}
 	/**
@@ -132,8 +132,8 @@ public class NervousyncRandomAccessFile implements DataInput, DataOutput, Closea
      * <span class="en">If connect to samba file has error occurs</span>
      * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
-	public NervousyncRandomAccessFile(final String filePath, final boolean writable, final String domain,
-	                                  final String userName, final String passWord) throws FileNotFoundException {
+	public NervousyncFile(final String filePath, final boolean writable, final String domain,
+						  final String userName, final String passWord) throws FileNotFoundException {
 		this.filePath = filePath;
 		if (this.filePath.startsWith(Globals.SAMBA_PROTOCOL)) {
 			this.domain = domain;

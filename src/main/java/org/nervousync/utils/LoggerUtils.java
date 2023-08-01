@@ -30,7 +30,7 @@ import java.util.*;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Sep 15, 2018 16:54:27 $
+ * @version $Revision: 1.2.0 $ $Date: Sep 15, 2018 16:54:27 $
  */
 public final class LoggerUtils {
 	/**
@@ -100,19 +100,6 @@ public final class LoggerUtils {
      * <h3 class="en">Retrieve i18n logger instance</h3>
      * <h3 class="zh-CN">获取国际化支持的日志实例对象</h3>
      *
-     * @param name  <span class="en">Logger identify name</span>
-     *              <span class="zh-CN">日志识别名称</span>
-     *
-     * @return  <span class="en">Generated logger instance</span>
-     *          <span class="zh-CN">生成的日志实例对象</span>
-     */
-    public static Logger getLogger(final String name) {
-        return new Logger(name);
-    }
-    /**
-     * <h3 class="en">Retrieve i18n logger instance</h3>
-     * <h3 class="zh-CN">获取国际化支持的日志实例对象</h3>
-     *
      * @param clazz <span class="en">Logger identify class</span>
      *              <span class="zh-CN">日志识别类</span>
      *
@@ -127,7 +114,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">包日志定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:28:14 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:28:14 $
      */
     public static final class PackageLogger {
         /**
@@ -179,7 +166,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">有国际化支持的日志定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision: 1.0 $ $Date: Jul 21, 2023 12:59:48 $
+     * @version $Revision: 1.0.0 $ $Date: Jul 21, 2023 12:59:48 $
      */
     public static final class Logger {
         /**
@@ -187,16 +174,7 @@ public final class LoggerUtils {
          * <span class="zh-CN">日志实例</span>
          */
         private final org.slf4j.Logger logger;
-        /**
-         * <h3 class="en">Constructor for MultilingualLogger</h3>
-         * <h3 class="zh-CN">有国际化支持的日志的构造方法</h3>
-         *
-         * @param name  <span class="en">Logger identify name</span>
-         *              <span class="zh-CN">日志识别名称</span>
-         */
-        Logger(final String name) {
-            this.logger = LoggerFactory.getLogger(name);
-        }
+        private final MultilingualUtils.Agent multiAgent;
         /**
          * <h3 class="en">Constructor for MultilingualLogger</h3>
          * <h3 class="zh-CN">有国际化支持的日志的构造方法</h3>
@@ -206,6 +184,7 @@ public final class LoggerUtils {
          */
         Logger(final Class<?> clazz) {
             this.logger = LoggerFactory.getLogger(clazz);
+            this.multiAgent = MultilingualUtils.newAgent(clazz);
         }
         /**
          * <h3 class="en">Logger level is trace enabled</h3>
@@ -218,48 +197,40 @@ public final class LoggerUtils {
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Trace信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          */
-        public void trace(final String bundle, final String messageKey) {
-            this.trace(bundle, messageKey, new Object[0]);
+        public void trace(final String messageKey) {
+            this.trace(messageKey, new Object[0]);
         }
         /**
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Trace信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void trace(final String bundle, final String messageKey, final Object... collections) {
-            this.trace(bundle, messageKey, null, collections);
+        public void trace(final String messageKey, final Object... collections) {
+            this.trace(messageKey, null, collections);
         }
         /**
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Trace信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
          *                      <span class="zh-CN">抛出的异常实例对象</span>
          */
-        public void trace(final String bundle, final String messageKey, Throwable throwable) {
-            this.trace(bundle, messageKey, throwable, new Object[0]);
+        public void trace(final String messageKey, Throwable throwable) {
+            this.trace(messageKey, throwable, new Object[0]);
         }
         /**
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Trace信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
@@ -267,12 +238,12 @@ public final class LoggerUtils {
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void trace(final String bundle, final String messageKey, Throwable throwable, final Object... collections) {
-            this.logger.trace(MultilingualUtils.findMessage(bundle, messageKey, collections));
+        public void trace(final String messageKey, Throwable throwable, final Object... collections) {
+            this.logger.trace(this.multiAgent.findMessage(messageKey, collections));
             if (throwable != null) {
                 String message = Globals.DEFAULT_VALUE_STRING;
                 if (throwable instanceof AbstractException) {
-                    message = MultilingualUtils.findMessage("Utils", "Code_Error",
+                    message = this.multiAgent.findMessage("Code_Error",
                             "0x" + Long.toHexString(((AbstractException) throwable).getErrorCode()));
                 }
                 this.logger.trace(message, throwable);
@@ -289,48 +260,40 @@ public final class LoggerUtils {
          * <h3 class="en">Output debug message</h3>
          * <h3 class="zh-CN">输出Debug信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          */
-        public void debug(final String bundle, final String messageKey) {
-            this.debug(bundle, messageKey, new Object[0]);
+        public void debug(final String messageKey) {
+            this.debug(messageKey, new Object[0]);
         }
         /**
          * <h3 class="en">Output debug message</h3>
          * <h3 class="zh-CN">输出Debug信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void debug(final String bundle, final String messageKey, final Object... collections) {
-            this.debug(bundle, messageKey, null, collections);
+        public void debug(final String messageKey, final Object... collections) {
+            this.debug(messageKey, null, collections);
         }
         /**
          * <h3 class="en">Output debug message</h3>
          * <h3 class="zh-CN">输出Debug信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
          *                      <span class="zh-CN">抛出的异常实例对象</span>
          */
-        public void debug(final String bundle, final String messageKey, Throwable throwable) {
-            this.debug(bundle, messageKey, throwable, new Object[0]);
+        public void debug(final String messageKey, Throwable throwable) {
+            this.debug(messageKey, throwable, new Object[0]);
         }
         /**
          * <h3 class="en">Output debug message</h3>
          * <h3 class="zh-CN">输出Debug信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
@@ -338,12 +301,12 @@ public final class LoggerUtils {
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void debug(final String bundle, final String messageKey, Throwable throwable, final Object... collections) {
-            this.logger.debug(MultilingualUtils.findMessage(bundle, messageKey, collections));
+        public void debug(final String messageKey, Throwable throwable, final Object... collections) {
+            this.logger.debug(this.multiAgent.findMessage(messageKey, collections));
             if (throwable != null) {
                 String message = Globals.DEFAULT_VALUE_STRING;
                 if (throwable instanceof AbstractException) {
-                    message = MultilingualUtils.findMessage("Utils", "Code_Error",
+                    message = this.multiAgent.findMessage("Code_Error",
                             "0x" + Long.toHexString(((AbstractException) throwable).getErrorCode()));
                 }
                 this.logger.debug(message, throwable);
@@ -360,48 +323,40 @@ public final class LoggerUtils {
          * <h3 class="en">Output info message</h3>
          * <h3 class="zh-CN">输出Info信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          */
-        public void info(final String bundle, final String messageKey) {
-            this.info(bundle, messageKey, new Object[0]);
+        public void info(final String messageKey) {
+            this.info(messageKey, new Object[0]);
         }
         /**
          * <h3 class="en">Output info message</h3>
          * <h3 class="zh-CN">输出Info信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void info(final String bundle, final String messageKey, final Object... collections) {
-            this.info(bundle, messageKey, null, collections);
+        public void info(final String messageKey, final Object... collections) {
+            this.info(messageKey, null, collections);
         }
         /**
          * <h3 class="en">Output info message</h3>
          * <h3 class="zh-CN">输出Info信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
          *                      <span class="zh-CN">抛出的异常实例对象</span>
          */
-        public void info(final String bundle, final String messageKey, Throwable throwable) {
-            this.info(bundle, messageKey, throwable, new Object[0]);
+        public void info(final String messageKey, Throwable throwable) {
+            this.info(messageKey, throwable, new Object[0]);
         }
         /**
          * <h3 class="en">Output info message</h3>
          * <h3 class="zh-CN">输出Info信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
@@ -409,12 +364,12 @@ public final class LoggerUtils {
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void info(final String bundle, final String messageKey, Throwable throwable, final Object... collections) {
-            this.logger.info(MultilingualUtils.findMessage(bundle, messageKey, collections));
+        public void info(final String messageKey, Throwable throwable, final Object... collections) {
+            this.logger.info(this.multiAgent.findMessage(messageKey, collections));
             if (throwable != null) {
                 String message = Globals.DEFAULT_VALUE_STRING;
                 if (throwable instanceof AbstractException) {
-                    message = MultilingualUtils.findMessage("Utils", "Code_Error",
+                    message = this.multiAgent.findMessage("Code_Error",
                             "0x" + Long.toHexString(((AbstractException) throwable).getErrorCode()));
                 }
                 this.logger.info(message, throwable);
@@ -431,48 +386,40 @@ public final class LoggerUtils {
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Warn信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          */
-        public void warn(final String bundle, final String messageKey) {
-            this.warn(bundle, messageKey, new Object[0]);
+        public void warn(final String messageKey) {
+            this.warn(messageKey, new Object[0]);
         }
         /**
          * <h3 class="en">Output warn message</h3>
          * <h3 class="zh-CN">输出Warn信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void warn(final String bundle, final String messageKey, final Object... collections) {
-            this.warn(bundle, messageKey, null, collections);
+        public void warn(final String messageKey, final Object... collections) {
+            this.warn(messageKey, null, collections);
         }
         /**
          * <h3 class="en">Output warn message</h3>
          * <h3 class="zh-CN">输出Warn信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
          *                      <span class="zh-CN">抛出的异常实例对象</span>
          */
-        public void warn(final String bundle, final String messageKey, Throwable throwable) {
-            this.warn(bundle, messageKey, throwable, new Object[0]);
+        public void warn(final String messageKey, Throwable throwable) {
+            this.warn(messageKey, throwable, new Object[0]);
         }
         /**
          * <h3 class="en">Output warn message</h3>
          * <h3 class="zh-CN">输出Warn信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
@@ -480,12 +427,12 @@ public final class LoggerUtils {
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void warn(final String bundle, final String messageKey, Throwable throwable, final Object... collections) {
-            this.logger.warn(MultilingualUtils.findMessage(bundle, messageKey, collections));
+        public void warn(final String messageKey, Throwable throwable, final Object... collections) {
+            this.logger.warn(this.multiAgent.findMessage(messageKey, collections));
             if (throwable != null) {
                 String message = Globals.DEFAULT_VALUE_STRING;
                 if (throwable instanceof AbstractException) {
-                    message = MultilingualUtils.findMessage("Utils", "Code_Error",
+                    message = this.multiAgent.findMessage("Code_Error",
                             "0x" + Long.toHexString(((AbstractException) throwable).getErrorCode()));
                 }
                 this.logger.warn(message, throwable);
@@ -502,48 +449,40 @@ public final class LoggerUtils {
          * <h3 class="en">Output trace message</h3>
          * <h3 class="zh-CN">输出Error信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          */
-        public void error(final String bundle, final String messageKey) {
-            this.error(bundle, messageKey, new Object[0]);
+        public void error(final String messageKey) {
+            this.error(messageKey, new Object[0]);
         }
         /**
          * <h3 class="en">Output error message</h3>
          * <h3 class="zh-CN">输出Error信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void error(final String bundle, final String messageKey, final Object... collections) {
-            this.error(bundle, messageKey, null, collections);
+        public void error(final String messageKey, final Object... collections) {
+            this.error(messageKey, null, collections);
         }
         /**
          * <h3 class="en">Output error message</h3>
          * <h3 class="zh-CN">输出Error信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
          *                      <span class="zh-CN">抛出的异常实例对象</span>
          */
-        public void error(final String bundle, final String messageKey, Throwable throwable) {
-            this.error(bundle, messageKey, throwable, new Object[0]);
+        public void error(final String messageKey, Throwable throwable) {
+            this.error(messageKey, throwable, new Object[0]);
         }
         /**
          * <h3 class="en">Output error message</h3>
          * <h3 class="zh-CN">输出Error信息</h3>
          *
-         * @param bundle        <span class="en">Resource bundle name</span>
-         *                      <span class="zh-CN">资源包名</span>
          * @param messageKey    <span class="en">Message identify key</span>
          *                      <span class="zh-CN">信息识别键值</span>
          * @param throwable     <span class="en">Throwable exception instance</span>
@@ -551,12 +490,12 @@ public final class LoggerUtils {
          * @param collections   <span class="en">given parameters of information formatter</span>
          *                      <span class="zh-CN">用于资源信息格式化的参数</span>
          */
-        public void error(final String bundle, final String messageKey, Throwable throwable, final Object... collections) {
-            this.logger.error(MultilingualUtils.findMessage(bundle, messageKey, collections));
+        public void error(final String messageKey, Throwable throwable, final Object... collections) {
+            this.logger.error(this.multiAgent.findMessage(messageKey, collections));
             if (throwable != null) {
                 String message = Globals.DEFAULT_VALUE_STRING;
                 if (throwable instanceof AbstractException) {
-                    message = MultilingualUtils.findMessage("Utils", "Code_Error",
+                    message = this.multiAgent.findMessage("Code_Error",
                             "0x" + Long.toHexString(((AbstractException) throwable).getErrorCode()));
                 }
                 this.logger.error(message, throwable);
@@ -614,7 +553,7 @@ public final class LoggerUtils {
                                 .filter(loggerConfigure ->
                                         StringUtils.notBlank(loggerConfigure.getPackageName())
                                                 && loggerConfigure.getAppenderNames() != null
-                                                && loggerConfigure.getAppenderNames().size() > 0)
+                                                && !loggerConfigure.getAppenderNames().isEmpty())
                                 .forEach(loggerConfigure -> {
                                     LoggerComponentBuilder loggerComponentBuilder =
                                             configurationBuilder.newLogger(loggerConfigure.getPackageName(),
@@ -626,7 +565,7 @@ public final class LoggerUtils {
                                 }));
 
         LoggerConfigure rootLoggerConfigure = logConfig.getRootLoggerConfigure();
-        if (rootLoggerConfigure.getAppenderNames() != null && rootLoggerConfigure.getAppenderNames().size() > 0) {
+        if (rootLoggerConfigure.getAppenderNames() != null && !rootLoggerConfigure.getAppenderNames().isEmpty()) {
             RootLoggerComponentBuilder rootLoggerComponentBuilder =
                     configurationBuilder.newRootLogger(rootLoggerConfigure.getLoggerLevel());
             rootLoggerConfigure.getAppenderNames()
@@ -752,7 +691,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">日志配置定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:30:18 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:30:18 $
      */
     private static final class LogConfig {
         /**
@@ -861,7 +800,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">日志输出格式配置定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:31:06 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:31:06 $
      */
     private static final class PatternLayoutConfigure {
         /**
@@ -926,7 +865,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">日志输出目标配置定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:37:22 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:37:22 $
      */
     private static final class AppenderConfigure {
         /**
@@ -1055,7 +994,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">日志配置定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:43:57 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:43:57 $
      */
     private static final class LoggerConfigure {
         /**
@@ -1130,7 +1069,7 @@ public final class LoggerUtils {
      * <h2 class="zh-CN">组件配置定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Sep 15, 2018 17:55:19 $
+     * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:55:19 $
      */
     private static final class ComponentConfigure {
         /**

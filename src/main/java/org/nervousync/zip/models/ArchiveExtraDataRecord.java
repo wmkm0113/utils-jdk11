@@ -18,7 +18,7 @@ package org.nervousync.zip.models;
 
 /**
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Nov 28, 2017 4:56:08 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 28, 2017 4:56:08 PM $
  */
 public final class ArchiveExtraDataRecord {
 

@@ -43,7 +43,7 @@ import org.nervousync.enumerations.beans.DataFlow;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 25, 2015 14:55:15 $
+ * @version $Revision: 1.2.0 $ $Date: Jun 25, 2015 14:55:15 $
  */
 public final class BeanUtils {
     /**
@@ -72,7 +72,7 @@ public final class BeanUtils {
     public static void removeBeanConfig(final Class<?>... classes) {
         Arrays.asList(classes).forEach(clazz -> BEAN_CONFIG_MAP.remove(ClassUtils.originalClassName(clazz)));
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Utils", "Register_Bean_Config_Count_Debug", BEAN_CONFIG_MAP.size());
+            LOGGER.debug("Register_Bean_Config_Count_Debug", BEAN_CONFIG_MAP.size());
         }
     }
     /**
@@ -88,7 +88,7 @@ public final class BeanUtils {
      */
     public static void copyProperties(final Map<String, Object> originalMap, final Object targetObject) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Utils", "Data_Map_Debug",
+            LOGGER.debug("Data_Map_Debug",
                     StringUtils.objectToString(originalMap, StringUtils.StringType.JSON, Boolean.TRUE));
         }
         checkRegister(targetObject.getClass());
@@ -321,7 +321,7 @@ public final class BeanUtils {
          */
         private void registerProperty(final BeanProperty beanProperty) {
             if (this.propertyMappings.stream().anyMatch(propertyMapping -> propertyMapping.exists(beanProperty))) {
-                LOGGER.warn("Utils", "JavaBean_Property_Mapping_Existed_Warn",
+                LOGGER.warn("JavaBean_Property_Mapping_Existed_Warn",
                         beanProperty.beanClass(), beanProperty.targetField());
             }
             if (Map.class.equals(beanProperty.beanClass())) {
@@ -408,9 +408,9 @@ public final class BeanUtils {
                         return null;
                 }
             } catch (Exception e) {
-                LOGGER.error("Utils", "Convert_Data_Error");
+                LOGGER.error("Convert_Data_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
                 return null;
             }

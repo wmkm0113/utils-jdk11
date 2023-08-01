@@ -26,7 +26,7 @@ import org.nervousync.beans.converter.Adapter;
  * <span class="zh-CN">继承类XmlAdapter，用于兼容JAXB数据转换器</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 21, 2023 10:25:22 $
+ * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 10:25:22 $
  */
 public abstract class AbstractAdapter<ValueType, BoundType> extends XmlAdapter<ValueType, BoundType>
         implements Adapter<ValueType, BoundType> {

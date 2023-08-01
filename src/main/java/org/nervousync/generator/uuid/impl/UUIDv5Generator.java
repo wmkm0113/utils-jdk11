@@ -30,7 +30,7 @@ import java.util.UUID;
  * <h2 class="zh-CN">UUID版本5生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:59:08 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:59:08 $
  */
 @GeneratorProvider(IDUtils.UUIDv5)
 public final class UUIDv5Generator extends UUIDGenerator {

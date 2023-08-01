@@ -20,6 +20,8 @@ import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.utils.ConvertUtils;
 import org.nervousync.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -32,9 +34,14 @@ import java.util.Properties;
  * <h2 class="zh-CN">国际化信息资源定义</h2>
  *.0
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 19, 2023 16:39:41 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 19, 2023 16:39:41 $
  */
 public final class MessageResource {
+    /**
+     * <span class="en">Logger instance</span>
+     * <span class="zh-CN">日志实例</span>
+     */
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     /**
      * <span class="en">Resource information map</span>
      * <span class="zh-CN">资源信息映射表</span>
@@ -55,6 +62,25 @@ public final class MessageResource {
     public MessageResource(@Nonnull final Properties properties) {
         this.resourcesMap = ConvertUtils.toMap(properties);
         this.cachedFormaterMap = new HashMap<>();
+    }
+
+    /**
+	 * <h3 class="en">Update resource messages</h3>
+	 * <h3 class="zh-CN">更新国际化信息内容</h3>
+     *
+     * @param properties    <span class="en">Resource information properties instance</span>
+     *                      <span class="zh-CN">资源信息属性实例对象</span>
+     */
+    public void updateResource(@Nonnull final Properties properties) {
+        ConvertUtils.toMap(properties)
+                .forEach((key, value) -> {
+                    if (this.resourcesMap.containsKey(key)) {
+                        this.cachedFormaterMap.remove(key);
+                        this.logger.warn("Override resource key: {}, original value: {}, new value: {}",
+                                key, this.resourcesMap.get(key), value);
+                    }
+                    this.resourcesMap.put(key, value);
+                });
     }
     /**
 	 * <h3 class="en">Retrieve internationalization information content and formatted by given collections</h3>

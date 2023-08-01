@@ -47,7 +47,7 @@ import java.util.Optional;
  *              <span class="zh-CN">泛型类</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 31, 2022 16:27:18 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:27:18 $
  */
 public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
     /**
@@ -157,7 +157,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
     public AbstractMailConfigBuilder<T> authentication(final String userName, final String password)
             throws BuilderException {
         if (!StringUtils.matches(userName, RegexGlobals.EMAIL_ADDRESS)) {
-            throw new BuilderException(0x0000000E0001L, "Utils", "Username_Invalid_Mail_Error");
+            throw new BuilderException(0x0000000E0001L, "Username_Invalid_Mail_Error");
         }
         String encPassword = Globals.DEFAULT_VALUE_STRING;
         if (StringUtils.notBlank(password)) {
@@ -218,7 +218,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      */
     public AbstractMailConfigBuilder<T> storagePath(String storagePath) throws BuilderException {
         if (StringUtils.isEmpty(storagePath) || !FileUtils.isExists(storagePath)) {
-            throw new BuilderException(0x0000000E0002L, "Utils", "Storage_Path_NotFound_Mail_Error");
+            throw new BuilderException(0x0000000E0002L, "Storage_Path_NotFound_Mail_Error");
         }
         this.mailConfig.setStoragePath(storagePath);
         return this;
@@ -281,7 +281,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      * <h2 class="zh-CN">代理服务器配置信息抽象构造器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jul 31, 2022 16:33:28 $
+     * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:33:28 $
      */
     public static final class ProxyConfigBuilder<T> extends AbstractProxyConfigBuilder<AbstractMailConfigBuilder<T>> {
         /**
@@ -313,7 +313,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      * <h2 class="zh-CN">电子邮件服务器配置信息抽象构造器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jul 31, 2022 16:35:16 $
+     * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:35:16 $
      */
     public static final class ServerConfigBuilder<T> extends AbstractBuilder<AbstractMailConfigBuilder<T>> {
         /**
@@ -485,10 +485,10 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
          */
         protected void build() throws BuilderException {
             if (StringUtils.isEmpty(this.hostName)) {
-                throw new BuilderException(0x0000000E0003L, "Utils", "Host_Address_Unknown_Mail_Error");
+                throw new BuilderException(0x0000000E0003L, "Host_Address_Unknown_Mail_Error");
             }
             if (MailProtocol.UNKNOWN.equals(this.protocolOption)) {
-                throw new BuilderException(0x0000000E0004L, "Utils", "Protocol_Unknown_Mail_Error");
+                throw new BuilderException(0x0000000E0004L, "Protocol_Unknown_Mail_Error");
             }
             MailConfig.ServerConfig serverConfig = new MailConfig.ServerConfig();
             serverConfig.setHostName(this.hostName);

@@ -19,13 +19,14 @@ package org.nervousync.zip.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.zip.ZipFile;
 
 /**
  * The type Zip output stream.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 1, 2017 12:37:14 PM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 1, 2017 12:37:14 PM $
  */
 public class ZipOutputStream extends DeflaterOutputStream {
 
@@ -46,12 +47,12 @@ public class ZipOutputStream extends DeflaterOutputStream {
 	}
 
 	@Override
-	public void write(byte[] b) throws IOException {
+	public void write(@Nonnull byte[] b) throws IOException {
 		this.write(b, 0, b.length);
 	}
 	
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(@Nonnull byte[] b, int off, int len) throws IOException {
 		this.crc.update(b, off, len);
 		this.updateTotalBytesRead(len);
 		super.write(b, off, len);

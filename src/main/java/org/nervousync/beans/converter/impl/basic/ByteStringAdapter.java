@@ -27,7 +27,7 @@ import java.util.Optional;
  * <h2 class="zh-CN">Byte数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 21, 2023 11:28:22 $
+ * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 11:28:22 $
  */
 public final class ByteStringAdapter extends AbstractAdapter<String, Byte> {
     /**

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.zip.ZipException;
 import org.nervousync.zip.crypto.Decryptor;
@@ -30,7 +31,7 @@ import org.nervousync.zip.ZipFile;
  * The type Inflater input stream.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 2, 2017 1:06:01 PM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 1:06:01 PM $
  */
 public class InflaterInputStream extends PartInputStream {
 
@@ -68,12 +69,12 @@ public class InflaterInputStream extends PartInputStream {
 	}
 	
 	@Override
-	public int read(byte[] b) throws IOException {
+	public int read(@Nonnull byte[] b) throws IOException {
 		return this.read(b, 0, b.length);
 	}
 	
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
+	public int read(@Nonnull byte[] b, int off, int len) throws IOException {
 		if (off < 0 || len < 0 || off + len > b.length) {
 			throw new IndexOutOfBoundsException();
 		} else if (b.length == 0) {

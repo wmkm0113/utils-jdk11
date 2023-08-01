@@ -36,7 +36,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="zh-CN">图片工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: May 1, 2018 13:49:46 $
+ * @version $Revision: 1.2.0 $ $Date: May 1, 2018 13:49:46 $
  */
 public final class ImageUtils {
     /**
@@ -66,9 +66,9 @@ public final class ImageUtils {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getWidth(null);
 			} catch (Exception e) {
-				LOGGER.error("Utils", "Read_Image_Error");
+				LOGGER.error("Read_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}
@@ -90,9 +90,9 @@ public final class ImageUtils {
 				BufferedImage srcImage = ImageIO.read(FileUtils.getFile(imagePath));
 				return srcImage.getHeight(null);
 			} catch (Exception e) {
-				LOGGER.error("Utils", "Read_Image_Error");
+				LOGGER.error("Read_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}
@@ -135,11 +135,11 @@ public final class ImageUtils {
 	public static boolean cutImage(final String origPath, final String targetPath, final CutOptions cutOptions) {
 		if (origPath != null && FileUtils.isExists(origPath) && cutOptions != null) {
 			if (cutOptions.getPositionX() + cutOptions.getCutWidth() > ImageUtils.imageWidth(origPath)) {
-				LOGGER.error("Utils", "Width_Exceeds_Original_Image_Error");
+				LOGGER.error("Width_Exceeds_Original_Image_Error");
 				return Boolean.FALSE;
 			}
 			if (cutOptions.getPositionY() + cutOptions.getCutHeight() > ImageUtils.imageHeight(origPath)) {
-				LOGGER.error("Utils", "Height_Exceeds_Original_Image_Error");
+				LOGGER.error("Height_Exceeds_Original_Image_Error");
 				return Boolean.FALSE;
 			}
 
@@ -159,9 +159,9 @@ public final class ImageUtils {
 				return ImageIO.write(bufferedImage, StringUtils.getFilenameExtension(targetPath),
 						FileUtils.getFile(targetPath));
 			} catch (Exception e) {
-				LOGGER.error("Utils", "Cut_Image_Error");
+				LOGGER.error("Cut_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}
@@ -216,9 +216,9 @@ public final class ImageUtils {
 						StringUtils.getFilenameExtension(targetPath),
 						FileUtils.getFile(targetPath));
 			} catch (Exception e) {
-				LOGGER.error("Utils", "Resize_Image_Error");
+				LOGGER.error("Resize_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}
@@ -291,9 +291,9 @@ public final class ImageUtils {
 				return ImageIO.write(processImage(srcImage, resizeWidth, resizeHeight, markOptions),
 						StringUtils.getFilenameExtension(targetPath), FileUtils.getFile(targetPath));
 			} catch (Exception e) {
-				LOGGER.error("Utils", "Resize_Image_Error");
+				LOGGER.error("Resize_Image_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}
@@ -322,9 +322,9 @@ public final class ImageUtils {
 					StringUtils.getFilenameExtension(targetPath),
 					FileUtils.getFile(targetPath));
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Water_Mark_Image_Error");
+			LOGGER.error("Water_Mark_Image_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 		}
 		return Boolean.FALSE;
@@ -385,9 +385,9 @@ public final class ImageUtils {
 		try {
 			return ImageUtils.dHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
-			LOGGER.error("Utils", "Not_Found_File_Error", filePath);
+			LOGGER.error("Not_Found_File_Error", filePath);
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -406,9 +406,9 @@ public final class ImageUtils {
 		try {
 			return ImageUtils.dHash(ImageIO.read(file));
 		} catch (IOException e) {
-			LOGGER.error("Utils", "Read_Files_Error");
+			LOGGER.error("Read_Files_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -454,9 +454,9 @@ public final class ImageUtils {
 		try {
 			return ImageUtils.pHash(FileUtils.getFile(filePath));
 		} catch (FileNotFoundException e) {
-			LOGGER.error("Utils", "Not_Found_File_Error", filePath);
+			LOGGER.error("Not_Found_File_Error", filePath);
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -475,9 +475,9 @@ public final class ImageUtils {
 		try {
 			return ImageUtils.pHash(ImageIO.read(file));
 		} catch (IOException e) {
-			LOGGER.error("Utils", "Read_Files_Error");
+			LOGGER.error("Read_Files_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Globals.DEFAULT_VALUE_STRING;
 		}
@@ -547,9 +547,9 @@ public final class ImageUtils {
 								graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 							}
 						} catch (Exception e) {
-							LOGGER.error("Utils", "Water_Mark_Image_Error");
+							LOGGER.error("Water_Mark_Image_Error");
 							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Utils", "Stack_Message_Error", e);
+								LOGGER.debug("Stack_Message_Error", e);
 							}
 						}
 						break;

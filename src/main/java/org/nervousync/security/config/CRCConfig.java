@@ -21,7 +21,7 @@ package org.nervousync.security.config;
  * <h2 class="zh-CN">CRC设置</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 4, 2018 16:08:46 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 4, 2018 16:08:46 $
  */
 public final class CRCConfig {
     /**

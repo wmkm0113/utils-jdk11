@@ -17,10 +17,11 @@
 package org.nervousync.commons;
 
 /**
- * Regex Library
+ * <h2 class="en">Regular expression library</h2>
+ * <h2 class="zh-CN">正则表达式库</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Apr 10, 2017 5:23:06 PM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 8, 2021 17:23:06 $
  */
 public final class RegexGlobals {
 	/**

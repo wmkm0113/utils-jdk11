@@ -27,7 +27,7 @@ import java.util.Optional;
  * <h2 class="zh-CN">Integer数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 21, 2023 11:31:46 $
+ * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 11:31:46 $
  */
 public final class IntegerStringAdapter extends AbstractAdapter<String, Integer> {
     /**

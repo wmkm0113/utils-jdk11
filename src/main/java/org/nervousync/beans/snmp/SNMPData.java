@@ -30,7 +30,7 @@ import org.snmp4j.smi.VariableBinding;
  * <h2 class="zh-CN">从SNMP读取的数据结果映射</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 25, 2017 21:55:18 $
+ * @version $Revision: 1.1.3 $ $Date: May 25, 2022 21:55:18 $
  */
 public final class SNMPData implements Serializable {
 	/**

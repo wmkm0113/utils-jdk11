@@ -32,7 +32,7 @@ import java.security.Key;
  * <h2 class="zh-CN">加密解密适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 11:30:24 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 11:30:24 $
  */
 public abstract class BaseCryptoAdapter extends SecureAdapter {
     /**
@@ -119,14 +119,14 @@ public abstract class BaseCryptoAdapter extends SecureAdapter {
                     cipherInstance.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
                     break;
                 default:
-                    throw new CryptoException(0x000000150009L, "Utils", "Mode_Invalid_Crypto_Error");
+                    throw new CryptoException(0x000000150009L, "Mode_Invalid_Crypto_Error");
             }
             return cipherInstance;
         } catch (Exception e) {
             if (e instanceof CryptoException) {
                 throw (CryptoException) e;
             }
-            throw new CryptoException(0x00000015000BL, "Utils", "Init_Cipher_Crypto_Error", e);
+            throw new CryptoException(0x00000015000BL, "Init_Cipher_Crypto_Error", e);
         }
     }
 
@@ -135,7 +135,7 @@ public abstract class BaseCryptoAdapter extends SecureAdapter {
      * <h2 class="zh-CN">加密解密密钥定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: Jan 13, 2012 11:32:08 $
+     * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 11:32:08 $
      */
     public static final class CipherKey {
         /**

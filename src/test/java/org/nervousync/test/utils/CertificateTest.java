@@ -39,14 +39,13 @@ public final class CertificateTest extends BaseTest {
     @Test
     @Order(0)
     public void generateCertificate() throws CertificateEncodingException {
-        this.logger.info("Signature Private exponent: {}", ((RSAPrivateKey) SIGN_KEY).getPrivateExponent().toString());
-        this.logger.info("Signature Modulus: {}", ((RSAPrivateKey) SIGN_KEY).getModulus().toString());
+        this.logger.info("Certificate_Sign", ((RSAPrivateKey) SIGN_KEY).getPrivateExponent().toString(), ((RSAPrivateKey) SIGN_KEY).getModulus().toString());
         KeyPair keyPair = SecurityUtils.RSAKeyPair();
         X509Certificate x509Certificate = generateCertificate(keyPair);
         byte[] certBytes = x509Certificate.getEncoded();
-        this.logger.info("Generate certificate base64 encoding: {}", StringUtils.base64Encode(certBytes));
+        this.logger.info("Certificate_Base64", StringUtils.base64Encode(certBytes));
         X509Certificate readCertificate = CertificateUtils.x509(certBytes, VERIFY_KEY);
-        this.logger.info("Read certificate: {}",
+        this.logger.info("Certificate_Read",
                 (readCertificate == null)
                         ? Globals.DEFAULT_VALUE_STRING
                         : StringUtils.base64Encode(readCertificate.getEncoded()));
@@ -64,26 +63,26 @@ public final class CertificateTest extends BaseTest {
                 CertificateUtils.privateKey(FileUtils.readFileBytes(BASE_PATH + STORE_PATH),
                         "CERT", "changeit");
         if (privateKey == null) {
-            this.logger.error("Read private key from PKCS12 bytes error! ");
+            this.logger.error("Certificate_Read_Private_PKCS12_Error");
             return;
         }
-        this.logger.info("Read private key: {}", StringUtils.base64Encode(privateKey.getEncoded()));
+        this.logger.info("Certificate_Read_Private", StringUtils.base64Encode(privateKey.getEncoded()));
         X509Certificate x509Certificate =
                 CertificateUtils.x509(BASE_PATH + STORE_PATH, "CERT", "changeit");
         if (x509Certificate == null) {
-            this.logger.error("Read certificate from PKCS12 error! ");
+            this.logger.error("Certificate_Read_x509_PKCS12_Error");
             return;
         }
-        this.logger.info("Read certificate: {}", StringUtils.base64Encode(x509Certificate.getEncoded()));
+        this.logger.info("Certificate_Read", StringUtils.base64Encode(x509Certificate.getEncoded()));
         PublicKey publicKey = CertificateUtils.publicKey("RSA", VERIFY_KEY.getEncoded());
-        this.logger.info("Certificate verify result: {}", CertificateUtils.verify(x509Certificate, publicKey));
+        this.logger.info("Certificate_Verify", CertificateUtils.verify(x509Certificate, publicKey));
         PrivateKey readKey =
                 CertificateUtils.privateKey(BASE_PATH + STORE_PATH, "CERT", "changeit");
         if (readKey == null) {
-            this.logger.error("Read private key from file error! ");
+            this.logger.error("Certificate_Read_Private_File_Error");
             return;
         }
-        this.logger.info("Read private key: {}", StringUtils.base64Encode(readKey.getEncoded()));
+        this.logger.info("Certificate_Read_Private", StringUtils.base64Encode(readKey.getEncoded()));
     }
 
     private static X509Certificate generateCertificate(final KeyPair keyPair) {

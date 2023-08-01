@@ -21,7 +21,7 @@ package org.nervousync.enumerations.crypto;
  * <h2 class="zh-CN">加密模式枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 28, 2019 14:32:16 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 28, 2019 14:32:16 $
  */
 public enum CryptoMode {
     /**

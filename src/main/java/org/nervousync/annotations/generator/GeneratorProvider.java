@@ -23,7 +23,7 @@ import java.lang.annotation.*;
  * <h2 class="zh-CN">ID生成器实现类的标注</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 10, 2021 15:24:26 $
+ * @version $Revision: 1.0.0 $ $Date: Dec 10, 2021 15:24:26 $
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -27,7 +27,7 @@ import java.util.Optional;
  * <h2 class="zh-CN">Short数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 21, 2023 11:34:52 $
+ * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 11:34:52 $
  */
 public final class ShortStringAdapter extends AbstractAdapter<String, Short> {
     /**

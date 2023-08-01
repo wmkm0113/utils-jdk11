@@ -23,7 +23,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="zh-CN">SNMP处理器配置异常</h2>
  * 
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Oct 25, 2017 22:30:11 $
+ * @version $Revision: 1.0.0 $ $Date: Oct 25, 2017 22:30:11 $
  */
 public final class ProcessorConfigException extends AbstractException {
 	/**
@@ -39,16 +39,14 @@ public final class ProcessorConfigException extends AbstractException {
 	 *
 	 * @param errorCode 	<span class="en">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param bundle        <span class="en">Resource bundle name</span>
-     *                      <span class="zh-CN">资源包名</span>
      * @param messageKey    <span class="en">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
      * @param collections   <span class="en">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	public ProcessorConfigException(final long errorCode, final String bundle, final String messageKey,
+	public ProcessorConfigException(final long errorCode, final String messageKey,
 									final Object... collections) {
-		super(errorCode, bundle, messageKey, collections);
+		super(errorCode, messageKey, collections);
 	}
 	/**
 	 * <h3 class="en">Constructor method for ProcessorConfigException</h3>
@@ -58,8 +56,6 @@ public final class ProcessorConfigException extends AbstractException {
 	 *
 	 * @param errorCode 	<span class="en">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param bundle        <span class="en">Resource bundle name</span>
-     *                      <span class="zh-CN">资源包名</span>
      * @param messageKey    <span class="en">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
 	 * @param cause 		<span class="en">The root cause</span>
@@ -67,8 +63,8 @@ public final class ProcessorConfigException extends AbstractException {
      * @param collections   <span class="en">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	public ProcessorConfigException(final long errorCode, final String bundle, final String messageKey,
+	public ProcessorConfigException(final long errorCode, final String messageKey,
 									final Throwable cause, final Object... collections) {
-		super(errorCode, bundle, messageKey, cause, collections);
+		super(errorCode, messageKey, cause, collections);
 	}
 }

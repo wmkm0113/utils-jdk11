@@ -29,7 +29,7 @@ import org.nervousync.zip.models.header.utils.HeaderOperator;
  * The type Local file header.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 29, 2017 2:29:26 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:29:26 PM $
  */
 public final class LocalFileHeader extends FileHeader {
 
@@ -111,7 +111,7 @@ public final class LocalFileHeader extends FileHeader {
 		try {
 			if (this.getEncryptionMethod() == Globals.ENC_METHOD_AES) {
 				if (this.getAesExtraDataRecord() != null) {
-					byte[] salt = new byte[HeaderOperator.retrieveSaltLength(this.getAesExtraDataRecord().getAesStrength())];
+					byte[] salt = new byte[HeaderOperator.saltLength(this.getAesExtraDataRecord().getAesStrength())];
 					int readLength = Globals.DEFAULT_VALUE_INT;
 					if (input instanceof RandomAccessFile) {
 						((RandomAccessFile) input).seek(this.getOffsetStartOfData());
@@ -144,7 +144,7 @@ public final class LocalFileHeader extends FileHeader {
 				//	Not supported verify password of standard encrypt
 				return Boolean.TRUE;
 			} else {
-				throw new ZipException(0x0000001B0001L, "Utils", "Not_Supported_Encryption_Mode_Zip_Error");
+				throw new ZipException(0x0000001B0001L, "Not_Supported_Encryption_Mode_Zip_Error");
 			}
 		} catch (Exception e) {
 			return Boolean.FALSE;

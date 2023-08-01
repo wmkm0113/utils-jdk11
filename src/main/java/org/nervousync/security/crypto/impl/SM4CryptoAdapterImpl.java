@@ -31,7 +31,7 @@ import java.security.SecureRandom;
  * <h2 class="zh-CN">SM4对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:33:27 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:33:27 $
  */
 public final class SM4CryptoAdapterImpl extends SymmetricCryptoAdapter {
 
@@ -73,7 +73,7 @@ public final class SM4CryptoAdapterImpl extends SymmetricCryptoAdapter {
             if (e instanceof CryptoException) {
                 throw (CryptoException) e;
             }
-            throw new CryptoException(0x00000015000BL, "Utils", "Init_Cipher_Crypto_Error", e);
+            throw new CryptoException(0x00000015000BL, "Init_Cipher_Crypto_Error", e);
         }
     }
 }

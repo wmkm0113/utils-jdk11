@@ -37,7 +37,7 @@ import java.util.List;
  * <h2 class="zh-CN">X509证书管理器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 18, 2020 20:51：28 $
+ * @version $Revision: 1.0.0 $ $Date: Dec 18, 2020 20:51：28 $
  */
 public class GeneX509TrustManager implements X509TrustManager {
 	/**
@@ -158,7 +158,7 @@ public class GeneX509TrustManager implements X509TrustManager {
 		try {
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			if (!FileUtils.isExists(SystemUtils.systemCertPath())) {
-				this.logger.warn("Utils", "System_Certificate_Not_Found_Warn");
+				this.logger.warn("System_Certificate_Not_Found_Warn");
 			} else {
 				keyStore.load(FileUtils.loadFile(SystemUtils.systemCertPath()), this.passPhrase.toCharArray());
 			}
@@ -176,9 +176,9 @@ public class GeneX509TrustManager implements X509TrustManager {
 				}
 			}
 		} catch (Exception e) {
-			throw new CertInfoException(0x000000150001L, "Utils", "Init_Trust_Manager_Certificate_Error", e);
+			throw new CertInfoException(0x000000150001L, "Init_Trust_Manager_Certificate_Error", e);
 		}
 
-		throw new CertInfoException(0x000000150002L, "Utils", "NotFound_X509TrustManager_Certificate_Error");
+		throw new CertInfoException(0x000000150002L, "NotFound_X509TrustManager_Certificate_Error");
 	}
 }

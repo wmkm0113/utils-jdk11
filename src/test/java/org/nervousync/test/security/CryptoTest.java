@@ -38,40 +38,40 @@ public final class CryptoTest extends BaseTest {
     @Order(0)
     public void AES() throws CryptoException {
         byte[] aesKey = SecurityUtils.AES128Key();
-        this.logger.info("AES128 Key: {}", StringUtils.base64Encode(aesKey));
+        this.logger.info("Crypto_Key_Length", "AES128", StringUtils.base64Encode(aesKey));
         for (String cipherMode : AES_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.AESEncryptor(cipherMode, padding, aesKey);
                 encryptProvider.append(ORIGINAL_STRING);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish());
-                this.logger.info("AES/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "AES", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.AESDecryptor(cipherMode, padding, aesKey);
                 decryptProvider.append(StringUtils.base64Decode(encResult));
-                this.logger.info("AES/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "AES", cipherMode, padding,
                         new String(decryptProvider.finish(), StandardCharsets.UTF_8));
             }
         }
         aesKey = SecurityUtils.AES192Key();
-        this.logger.info("AES192 Key: {}", StringUtils.base64Encode(aesKey));
+        this.logger.info("Crypto_Key_Length", "AES192", StringUtils.base64Encode(aesKey));
         for (String cipherMode : AES_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.AESEncryptor(cipherMode, padding, aesKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("AES/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "AES", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.AESDecryptor(cipherMode, padding, aesKey);
-                this.logger.info("AES/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "AES", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
         aesKey = SecurityUtils.AES256Key();
-        this.logger.info("AES256 Key: {}", StringUtils.base64Encode(aesKey));
+        this.logger.info("Crypto_Key_Length", "AES256", StringUtils.base64Encode(aesKey));
         for (String cipherMode : AES_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.AESEncryptor(cipherMode, padding, aesKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("AES/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "AES", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.AESDecryptor(cipherMode, padding, aesKey);
-                this.logger.info("AES/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "AES", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
@@ -81,14 +81,14 @@ public final class CryptoTest extends BaseTest {
     @Order(10)
     public void DES() throws CryptoException {
         byte[] desKey = SecurityUtils.DESKey();
-        this.logger.info("DES Key: {}", StringUtils.base64Encode(desKey));
+        this.logger.info("Crypto_Key_Length", "DES", StringUtils.base64Encode(desKey));
         for (String cipherMode : DES_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.DESEncryptor(cipherMode, padding, desKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("DES/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "DES", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.DESDecryptor(cipherMode, padding, desKey);
-                this.logger.info("DES/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "DES", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
@@ -98,14 +98,14 @@ public final class CryptoTest extends BaseTest {
     @Order(20)
     public void tripleDES() throws CryptoException {
         byte[] desKey = SecurityUtils.TripleDESKey();
-        this.logger.info("TripleDES Key: {}", StringUtils.base64Encode(desKey));
+        this.logger.info("Crypto_Key_Length", "TripleDES", StringUtils.base64Encode(desKey));
         for (String cipherMode : TRIPLE_DES_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.TripleDESEncryptor(cipherMode, padding, desKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("DESede/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "DESede", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.TripleDESDecryptor(cipherMode, padding, desKey);
-                this.logger.info("DESede/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "DESede", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
@@ -115,14 +115,14 @@ public final class CryptoTest extends BaseTest {
     @Order(30)
     public void SM4() throws CryptoException {
         byte[] sm4Key = SecurityUtils.SM4Key();
-        this.logger.info("SM4 Key: {}", StringUtils.base64Encode(sm4Key));
+        this.logger.info("Crypto_Key_Length", "SM4", StringUtils.base64Encode(sm4Key));
         for (String cipherMode : SM4_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.SM4Encryptor(cipherMode, padding, sm4Key);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("SM4/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "SM4", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.SM4Decryptor(cipherMode, padding, sm4Key);
-                this.logger.info("SM4/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "SM4", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
@@ -137,7 +137,7 @@ public final class CryptoTest extends BaseTest {
         byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SHA256withRSA");
-        this.logger.info("RSA certificate: {}", StringUtils.base64Encode(pkcs5));
+        this.logger.info("Certificate_Result", "RSA", StringUtils.base64Encode(pkcs5));
         //  Testing for encrypt and decrypt data using RSA
         for (String padding : RSA_PADDINGS) {
             if (padding.equalsIgnoreCase("OAEPWithSHA-512AndMGF1Padding")) {
@@ -146,19 +146,19 @@ public final class CryptoTest extends BaseTest {
             }
             SecureAdapter encryptProvider = SecurityUtils.RSAEncryptor(padding, keyPair.getPublic());
             String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-            this.logger.info("RSA/ECB/{} encrypt result: {}", padding, encResult);
+            this.logger.info("Encrypt_Result", "RSA", "ECB", padding, encResult);
             SecureAdapter decryptProvider = SecurityUtils.RSADecryptor(padding, keyPair.getPrivate());
             decryptProvider.append(StringUtils.base64Decode(encResult));
-            this.logger.info("RSA/ECB/{} decrypt result: {}", padding,
+            this.logger.info("Decrypt_Result", "RSA", "ECB", padding,
                     new String(decryptProvider.finish(), StandardCharsets.UTF_8));
         }
         String randomString = StringUtils.randomString(128);
         SecureAdapter signProvider = SecurityUtils.RSASigner(keyPair.getPrivate());
         byte[] signBytes = signProvider.finish(randomString);
-        this.logger.info("RSA signature string {} result: {}", randomString, StringUtils.base64Encode(signBytes));
+        this.logger.info("Signature_Result", randomString, "RSA", StringUtils.base64Encode(signBytes));
         SecureAdapter verifyProvider = SecurityUtils.RSAVerifier(keyPair.getPublic());
         verifyProvider.append(randomString);
-        this.logger.info("RSA signature verify result: {}", verifyProvider.verify(signBytes));
+        this.logger.info("Verify_Result", "RSA", verifyProvider.verify(signBytes));
     }
 
     @Test
@@ -169,7 +169,7 @@ public final class CryptoTest extends BaseTest {
         byte[] pkcs5 = CertificateUtils.PKCS12(keyPair, IDUtils.snowflake(),
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SM3withSM2");
-        this.logger.info("SM2 certificate: {}", StringUtils.base64Encode(pkcs5));
+        this.logger.info("Certificate_Result", "SM2", StringUtils.base64Encode(pkcs5));
         X509Certificate x509Certificate =
                 CertificateUtils.x509(pkcs5, "CERT", "changeit", keyPair.getPublic(), Boolean.TRUE);
         if (x509Certificate == null) {
@@ -182,35 +182,35 @@ public final class CryptoTest extends BaseTest {
         String mode0Result = StringUtils.base64Encode(mode0Bytes);
         byte[] mode1Bytes = SecurityUtils.C1C2C3toC1C3C2(mode0Bytes);
         String mode1Result = StringUtils.base64Encode(mode1Bytes);
-        this.logger.info("SM2 encrypt C1C2C3 result: {}", mode0Result);
-        this.logger.info("SM2 encrypt C1C3C2 result: {}", mode1Result);
+        this.logger.info("SM2_Encrypt_Result", mode0Result, "C1C2C3");
+        this.logger.info("SM2_Encrypt_Result", mode1Result, "C1C3C2");
         SecureAdapter decryptProvider = SecurityUtils.SM2Decryptor(keyPair.getPrivate());
-        this.logger.info("SM2 decrypt C1C2C3 result: {}",
-                new String(decryptProvider.finish(StringUtils.base64Decode(mode0Result)), StandardCharsets.UTF_8));
-        this.logger.info("SM2 decrypt C1C3C2 result: {}",
+        this.logger.info("SM2_Decrypt_Result",
+                new String(decryptProvider.finish(StringUtils.base64Decode(mode0Result)), StandardCharsets.UTF_8), "C1C2C3");
+        this.logger.info("SM2_Decrypt_Result",
                 new String(decryptProvider.finish(SecurityUtils.C1C3C2toC1C2C3(StringUtils.base64Decode(mode1Result))),
-                        StandardCharsets.UTF_8));
+                        StandardCharsets.UTF_8), "C1C3C2");
         String randomString = StringUtils.randomString(128);
         SecureAdapter signProvider = SecurityUtils.SM2Signer(keyPair.getPrivate());
         byte[] signBytes = signProvider.finish(randomString);
-        this.logger.info("SM2 signature string {} result: {}", randomString, StringUtils.base64Encode(signBytes));
+        this.logger.info("Signature_Result", randomString, "SM2", StringUtils.base64Encode(signBytes));
         SecureAdapter verifyProvider = SecurityUtils.SM2Verifier(publicKey);
         verifyProvider.append(randomString);
-        this.logger.info("SM2 signature verify result: {}", verifyProvider.verify(signBytes));
+        this.logger.info("Verify_Result", "SM2", verifyProvider.verify(signBytes));
     }
 
     @Test
     @Order(60)
     public void RC2() throws CryptoException {
         byte[] rc2Key = SecurityUtils.RC2Key();
-        this.logger.info("RC2 Key: {}", StringUtils.base64Encode(rc2Key));
+        this.logger.info("Crypto_Key_Length", "RC2", StringUtils.base64Encode(rc2Key));
         for (String cipherMode : RC_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.RC2Encryptor(cipherMode, padding, rc2Key);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("RC2/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "RC2", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.RC2Decryptor(cipherMode, padding, rc2Key);
-                this.logger.info("RC2/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "RC2", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }
@@ -220,12 +220,12 @@ public final class CryptoTest extends BaseTest {
     @Order(70)
     public void RC4() throws CryptoException {
         byte[] rc4Key = SecurityUtils.RC4Key();
-        this.logger.info("RC4 Key: {}", StringUtils.base64Encode(rc4Key));
+        this.logger.info("Crypto_Key_Length", "RC4", StringUtils.base64Encode(rc4Key));
         SecureAdapter encryptProvider = SecurityUtils.RC4Encryptor(rc4Key);
         String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-        this.logger.info("RC4 encrypt result: {}", encResult);
+        this.logger.info("Encrypt_Result", "RC4", encResult);
         SecureAdapter decryptProvider = SecurityUtils.RC4Decryptor(rc4Key);
-        this.logger.info("RC4 decrypt result: {}",
+        this.logger.info("Decrypt_Result", "RC4",
                 new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
     }
 
@@ -233,14 +233,14 @@ public final class CryptoTest extends BaseTest {
     @Order(80)
     public void Blowfish() throws CryptoException {
         byte[] blowfishKey = SecurityUtils.BlowfishKey();
-        this.logger.info("Blowfish Key: {}", StringUtils.base64Encode(blowfishKey));
+        this.logger.info("Crypto_Key_Length", "Blowfish", StringUtils.base64Encode(blowfishKey));
         for (String cipherMode : RC_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.RC2Encryptor(cipherMode, padding, blowfishKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-                this.logger.info("Blowfish/{}/{} encrypt result: {}", cipherMode, padding, encResult);
+                this.logger.info("Encrypt_Result", "Blowfish", cipherMode, padding, encResult);
                 SecureAdapter decryptProvider = SecurityUtils.RC2Decryptor(cipherMode, padding, blowfishKey);
-                this.logger.info("Blowfish/{}/{} decrypt result: {}", cipherMode, padding,
+                this.logger.info("Decrypt_Result", "Blowfish", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }
         }

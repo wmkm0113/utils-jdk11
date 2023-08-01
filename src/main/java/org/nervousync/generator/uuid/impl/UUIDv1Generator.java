@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <h2 class="zh-CN">UUID版本1生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:51:08 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:51:08 $
  */
 @GeneratorProvider(IDUtils.UUIDv1)
 public final class UUIDv1Generator extends UUIDGenerator {

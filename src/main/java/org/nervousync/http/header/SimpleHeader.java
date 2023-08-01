@@ -21,7 +21,7 @@ package org.nervousync.http.header;
  * <h2 class="zh-CN">Cookie信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jan 4, 2018 12:15:18 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 4, 2018 12:15:18 $
  */
 public final class SimpleHeader {
 	/**

@@ -19,23 +19,24 @@ package org.nervousync.zip.io.input;
 import java.io.IOException;
 import java.io.InputStream;
 
+import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.exceptions.zip.ZipException;
-import org.nervousync.commons.io.NervousyncRandomAccessFile;
+import org.nervousync.commons.io.NervousyncFile;
 import org.nervousync.zip.ZipFile;
 
 /**
  * The type Part input stream.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 2, 2017 10:30:23 AM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 10:30:23 AM $
  */
 public class PartInputStream extends InputStream {
 
 	private final ZipFile zipFile;
-	private NervousyncRandomAccessFile input;
+	private NervousyncFile input;
 	private int currentIndex;
 	private long readBytes;
 	private final long length;
@@ -90,7 +91,7 @@ public class PartInputStream extends InputStream {
 	}
 
 	@Override
-	public synchronized int read(byte[] b, int off, int len) throws IOException {
+	public synchronized int read(@Nonnull byte[] b, int off, int len) throws IOException {
 		try {
 			if (len > (this.length - this.readBytes)) {
 				len = (int)(this.length - this.readBytes);

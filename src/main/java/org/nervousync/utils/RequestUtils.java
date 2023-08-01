@@ -72,7 +72,7 @@ import javax.net.ssl.*;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: May 13, 2014 15:36:52 $
+ * @version $Revision: 1.1.4 $ $Date: May 13, 2014 15:36:52 $
  */
 public final class RequestUtils {
     /**
@@ -216,7 +216,7 @@ public final class RequestUtils {
             return stringBuilder.substring(1);
         } catch (UnknownHostException e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Domain_Resolve_Request_Debug", e, domainName);
+                LOGGER.debug("Domain_Resolve_Request_Debug", e, domainName);
             }
         }
         return Globals.DEFAULT_VALUE_STRING;
@@ -254,9 +254,9 @@ public final class RequestUtils {
                         .findFirst()
                         .orElse(null);
             } catch (IOException e) {
-                LOGGER.error("Utils", "Read_Server_Certificate_Request_Error");
+                LOGGER.error("Read_Server_Certificate_Request_Error");
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Stack_Message_Error", e);
+                    LOGGER.debug("Stack_Message_Error", e);
                 }
             }
         }
@@ -312,7 +312,7 @@ public final class RequestUtils {
                         requestBuilder.POST(HttpRequest.BodyPublishers.ofByteArray(byteArrayOutputStream.toByteArray()));
                     } catch (IOException e) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Process_Data_Request_Error", e);
+                            LOGGER.debug("Process_Data_Request_Error", e);
                         }
                         return null;
                     }
@@ -329,7 +329,7 @@ public final class RequestUtils {
                         requestBuilder.PUT(HttpRequest.BodyPublishers.ofByteArray(byteArrayOutputStream.toByteArray()));
                     } catch (IOException e) {
                         if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Utils", "Process_Data_Request_Error", e);
+                            LOGGER.debug("Process_Data_Request_Error", e);
                         }
                         return null;
                     }
@@ -352,7 +352,7 @@ public final class RequestUtils {
                         httpEntity.generateContentType(requestInfo.getCharset(), requestInfo.getMethodOption()));
             } catch (UnsupportedEncodingException e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Process_Content_Type_Request_Error", e);
+                    LOGGER.debug("Process_Content_Type_Request_Error", e);
                 }
             }
             if (!HttpMethodOption.POST.equals(requestInfo.getMethodOption())
@@ -412,7 +412,7 @@ public final class RequestUtils {
                 clientBuilder.sslContext(sslContext);
             } catch (Exception e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Utils", "Process_SSL_Certificate_Request_Error", e);
+                    LOGGER.debug("Process_SSL_Certificate_Request_Error", e);
                 }
             }
         }
@@ -434,9 +434,9 @@ public final class RequestUtils {
                     })
                     .orElse(null);
         } catch (IOException | InterruptedException e) {
-            LOGGER.error("Utils", "Send_Request_Error");
+            LOGGER.error("Send_Request_Error");
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Utils", "Stack_Message_Error", e);
+                LOGGER.debug("Stack_Message_Error", e);
             }
             return null;
         } finally {
@@ -1112,7 +1112,7 @@ public final class RequestUtils {
      * <h2 class="zh-CN">响应体拦截处理器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-     * @version $Revision : 1.0 $ $Date: May 13, 2014 17:22:48 $
+     * @version $Revision: 1.0.0 $ $Date: May 13, 2014 17:22:48 $
      */
     private static final class ResponseContentHandler implements HttpResponse.BodyHandler<Supplier<ResponseInfo>> {
         /**

@@ -33,7 +33,7 @@ import java.security.MessageDigest;
  * <p class="zh-CN">已废弃。建议使用SHA256代替</p>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:52:19 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:52:19 $
  */
 public final class MD5DigestAdapterImpl extends BaseDigestAdapter {
     /**

@@ -31,7 +31,7 @@ import javax.crypto.spec.DESedeKeySpec;
  * <h2 class="zh-CN">TripleDES对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jan 13, 2012 13:37:12 $
+ * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:37:12 $
  */
 public final class TripleDESCryptoAdapterImpl extends SymmetricCryptoAdapter {
 
@@ -66,7 +66,7 @@ public final class TripleDESCryptoAdapterImpl extends SymmetricCryptoAdapter {
             return super.generateCipher(keyFactory.generateSecret(keySpec),
                     this.cipherConfig.getMode().equalsIgnoreCase("ECB") ? 0 : 8);
         } catch (Exception e) {
-            throw new CryptoException(0x00000015000BL, "Utils", "Init_Cipher_Crypto_Error", e);
+            throw new CryptoException(0x00000015000BL, "Init_Cipher_Crypto_Error", e);
         }
     }
 }

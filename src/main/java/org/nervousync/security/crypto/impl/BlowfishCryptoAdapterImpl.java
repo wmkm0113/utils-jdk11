@@ -30,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
  * <h2 class="zh-CN">Blowfish对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 21, 2023 11:56:27 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 21, 2023 11:56:27 $
  */
 public final class BlowfishCryptoAdapterImpl extends SymmetricCryptoAdapter {
     /**

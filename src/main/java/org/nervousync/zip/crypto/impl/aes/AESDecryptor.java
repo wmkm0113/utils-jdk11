@@ -26,7 +26,7 @@ import org.nervousync.zip.crypto.Decryptor;
  * Decryptor implement of AES
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 2, 2017 10:55:30 AM $
+ * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 10:55:30 AM $
  */
 public final class AESDecryptor extends AESCrypto implements Decryptor {
 
@@ -43,18 +43,18 @@ public final class AESDecryptor extends AESCrypto implements Decryptor {
 	public AESDecryptor(LocalFileHeader localFileHeader,
 	                    byte[] salt, byte[] passwordBytes) throws ZipException {
 		if (localFileHeader == null) {
-			throw new ZipException(0x0000001B000EL, "Utils", "Null_Local_File_Header_Zip_Error");
+			throw new ZipException(0x0000001B000EL, "Null_Local_File_Header_Zip_Error");
 		}
 		
 		if (localFileHeader.getAesExtraDataRecord() == null) {
-			throw new ZipException(0x0000001B0010L, "Utils", "Invalid_AES_Extra_Data_Zip_Error");
+			throw new ZipException(0x0000001B0010L, "Invalid_AES_Extra_Data_Zip_Error");
 		}
 
 		super.preInit(localFileHeader.getAesExtraDataRecord().getAesStrength());
 		this.init(salt, localFileHeader.getPassword());
 		
 		if (!this.verifyPassword(passwordBytes)) {
-			throw new ZipException(0x0000001B000DL, "Utils", "Wrong_Password_Zip_Error");
+			throw new ZipException(0x0000001B000DL, "Wrong_Password_Zip_Error");
 		}
 	}
 	
@@ -66,7 +66,7 @@ public final class AESDecryptor extends AESCrypto implements Decryptor {
 	@Override
 	public int decryptData(byte[] buff, int start, int len) throws ZipException {
 		if (this.aesEngine == null) {
-			throw new ZipException(0x0000001B0002L, "Utils", "Not_Initialized_AES_Engine_Zip_Error");
+			throw new ZipException(0x0000001B0002L, "Not_Initialized_AES_Engine_Zip_Error");
 		}
 		try {
 			for (int i = start; i < (start + len); i += Globals.AES_BLOCK_SIZE) {
@@ -77,7 +77,7 @@ public final class AESDecryptor extends AESCrypto implements Decryptor {
 			}
 			return len;
 		} catch (Exception e) {
-			throw new ZipException(0x0000001B000BL, "Utils", "Decrypt_Crypto_Zip_Error", e);
+			throw new ZipException(0x0000001B000BL, "Decrypt_Crypto_Zip_Error", e);
 		}
 	}
 

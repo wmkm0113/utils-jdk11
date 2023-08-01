@@ -104,7 +104,7 @@
     <entry key="Init_Crypto_Error">An error occurs when initializing encryptor</entry>
     <entry key="Register_Bean_Config_Count_Debug">Registered bean config count: {0}</entry>
     <entry key="Data_Map_Debug">Data Map: {0}</entry>
-    <entry key="JavaBean_Property_Mapping_Existed_Warn">JavaBean property mapping was exists! Bean class: {0}, field: {1}</entry>
+    <entry key="JavaBean_Property_Mapping_Existed_Warn">JavaBean property mapping existed! Bean class: {0}, field: {1}</entry>
     <entry key="Convert_Data_Error">An error occurs when convert data</entry>
     <entry key="Key_Size_Invalid_Error">Illegal key size</entry>
     <entry key="Certificate_Invalid_Error">Illegal certificate data</entry>
@@ -171,6 +171,7 @@
     <entry key="Process_SSL_Certificate_Request_Error">An error occurs when processing SSL certificate</entry>
     <entry key="Send_Request_Error">An error occurs when sending request</entry>
     <entry key="Parameter_Null_Register_Security_Error">Algorithm name or configuration information is null</entry>
+    <entry key="Registered_CRC_Algorithm">Registered CRC configure: {0}</entry>
     <entry key="Lager_CRC_Security_Error">Only supports algorithms below CRC32</entry>
     <entry key="Override_Config_Register_Security_Warn">Algorithm name: {0} is already registered, overwriting existing configuration</entry>
     <entry key="Calculate_Value_Security_Error">An error occurs when calculate {0} value</entry>

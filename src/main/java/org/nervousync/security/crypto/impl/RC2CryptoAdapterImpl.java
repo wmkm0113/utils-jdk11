@@ -30,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
  * <h2 class="zh-CN">RC2对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 20, 2023 23:25:53 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 20, 2023 23:25:53 $
  */
 public final class RC2CryptoAdapterImpl extends SymmetricCryptoAdapter {
     /**

@@ -24,7 +24,7 @@ import java.lang.annotation.*;
  * <h2 class="zh-CN">用于标注在Restful服务接口参数的注解，注册数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 26, 2023 10:47:28 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 26, 2023 10:47:28 $
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

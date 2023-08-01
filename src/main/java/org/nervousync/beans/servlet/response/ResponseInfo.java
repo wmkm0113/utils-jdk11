@@ -36,7 +36,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="zh-CN">网络响应信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 11, 2015 12:25:33 $
+ * @version $Revision: 1.1.2 $ $Date: Nov 11, 2022 12:25:33 $
  */
 public final class ResponseInfo {
     /**
@@ -215,7 +215,7 @@ public final class ResponseInfo {
             this.identifiedCode = urlConnection.getHeaderField("identified");
         } catch (IOException e) {
             if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Utils", "Response_Data_Error", e);
+                this.logger.debug("Response_Data_Error", e);
             }
         } finally {
             IOUtils.closeStream(inputStream);
@@ -315,7 +315,7 @@ public final class ResponseInfo {
             return clazz.cast(objectInputStream.readObject());
         } catch (Exception e) {
             if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Utils", "Convert_Object_Error", e);
+                this.logger.debug("Convert_Object_Error", e);
             }
             return null;
         } finally {
@@ -342,7 +342,7 @@ public final class ResponseInfo {
             }
             return string;
         } catch (UnsupportedEncodingException e) {
-            this.logger.error("Utils", "Response_Data_Error", e);
+            this.logger.error("Response_Data_Error", e);
             return Globals.DEFAULT_VALUE_STRING;
         }
     }

@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  * <span class="en">定义输出的数据类型，是否格式化输出的字符串以及输出字符串的编码集</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 25, 2022 14:27:15 $
+ * @version $Revision: 1.0.0 $ $Date: Apr 15, 2023 14:27:15 $
  */
 @Inherited
 @Documented

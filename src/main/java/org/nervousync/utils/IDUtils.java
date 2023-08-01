@@ -32,7 +32,7 @@ import java.util.*;
  * <h2 class="zh-CN">ID生成器工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Sep 13, 2017 11:27:28 $
+ * @version $Revision: 1.2.0 $ $Date: Sep 13, 2017 11:27:28 $
  */
 public final class IDUtils {
 
@@ -91,7 +91,7 @@ public final class IDUtils {
                     }
                 });
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.info("Utils", "Names_Generator_Registered_ID_Info",
+            LOGGER.info("Names_Generator_Registered_ID_Info",
                     String.join(", ", IDUtils.registeredGenerators().toArray(new String[0])));
         }
         Runtime.getRuntime().addShutdownHook(new Thread(IDUtils::destroy));
@@ -262,7 +262,7 @@ public final class IDUtils {
      */
     public static void destroy() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Utils", "Destroy_Generator_Registered_ID_Debug");
+            LOGGER.debug("Destroy_Generator_Registered_ID_Debug");
         }
         INITIALIZE_MAP.values().forEach(IGenerator::destroy);
         INITIALIZE_MAP.clear();

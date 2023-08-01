@@ -24,7 +24,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="zh-CN">CDATA数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $Date: Oct 15, 2018 14:09:27 $
+ * @version $Revision: 1.1.0 $Date: Jun 15, 2020 14:09:27 $
  */
 public final class CDataAdapter extends XmlAdapter<String, String> {
 	/**

@@ -44,7 +44,7 @@ import org.nervousync.exceptions.beans.network.NetworkInfoException;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jul 24, 2015 11:43:24 $
+ * @version $Revision: 1.2.0 $ $Date: Jul 24, 2015 11:43:24 $
  */
 public final class SystemUtils {
     /**
@@ -360,7 +360,7 @@ public final class SystemUtils {
 					}
 				}
 			} catch (final SocketException e) {
-				LOGGER.error("Utils", "Retrieve_MAC_System_Error", e);
+				LOGGER.error("Retrieve_MAC_System_Error", e);
 			}
 			if (macAddress == null || macAddress.length == 0) {
 				// Take only 6 bytes if the address is an IPv6 otherwise will pad with two zero bytes
@@ -393,9 +393,9 @@ public final class SystemUtils {
 			Collections.sort(macAddressList);
 			return ConvertUtils.toHex(SecurityUtils.SHA256(macAddressList));
 		} catch (Exception e) {
-			LOGGER.error("Utils", "Generate_Identified_ID_System_Error");
+			LOGGER.error("Generate_Identified_ID_System_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 		}
 		
@@ -419,9 +419,9 @@ public final class SystemUtils {
 			try {
 				networkList.add(new NetworkInfo(enumeration.nextElement()));
 			} catch (NetworkInfoException e) {
-				LOGGER.error("Utils", "Retrieve_Network_Interface_System_Error");
+				LOGGER.error("Retrieve_Network_Interface_System_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}

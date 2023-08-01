@@ -35,7 +35,7 @@ import java.lang.annotation.*;
  * </span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Dec 25, 2022 14:28:33 $
+ * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:33 $
  */
 @Documented
 @Repeatable(BeanProperties.class)

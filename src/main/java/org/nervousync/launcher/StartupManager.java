@@ -29,7 +29,7 @@ import java.util.*;
  * <span class="en">使用单例模式运行</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Jun 28, 2022 15:25:33 $
+ * @version $Revision: 1.0.0 $ $Date: Jun 28, 2022 15:25:33 $
  */
 public final class StartupManager {
 	/**

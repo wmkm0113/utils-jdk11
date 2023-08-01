@@ -59,7 +59,7 @@ import org.nervousync.exceptions.snmp.ProcessorConfigException;
  * <h2 class="zh-CN">SNMP工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Oct 25, 2017 20:50:34 $
+ * @version $Revision: 1.2.0 $ $Date: Oct 25, 2017 20:50:34 $
  */
 public final class SNMPUtils {
     /**
@@ -167,9 +167,9 @@ public final class SNMPUtils {
 			}
 			return Boolean.TRUE;
 		} catch (IOException e) {
-			LOGGER.error("Utils", "Init_SNMP_Error");
+			LOGGER.error("Init_SNMP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		}
@@ -213,9 +213,9 @@ public final class SNMPUtils {
 					0L, this.period, TimeUnit.MILLISECONDS);
 			return Boolean.TRUE;
 		} catch (ProcessorConfigException e) {
-			LOGGER.error("Utils", "Add_Target_SNMP_Error");
+			LOGGER.error("Add_Target_SNMP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return Boolean.FALSE;
 		}
@@ -275,9 +275,9 @@ public final class SNMPUtils {
 				}
 			}
 		} catch (IOException e) {
-			LOGGER.error("Utils", "Retrieve_Data_SNMP_Error");
+			LOGGER.error("Retrieve_Data_SNMP_Error");
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 		}
 		return new ArrayList<>();
@@ -287,7 +287,7 @@ public final class SNMPUtils {
 	 * <h2 class="zh-CN">SNMP处理器线程</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
-	 * @version $Revision : 1.0 $ $Date: Oct 25, 2017 21:08:26 $
+	 * @version $Revision: 1.0.0 $ $Date: Oct 25, 2017 21:08:26 $
 	 */
 	private static final class SNMPProcessor implements Runnable {
 		/**
@@ -335,7 +335,7 @@ public final class SNMPUtils {
 				throws ProcessorConfigException {
 			if (identifiedKey == null || targetHost == null || pduArray == null
 					|| pduArray.length == 0 || snmpDataOperator == null) {
-				throw new ProcessorConfigException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+				throw new ProcessorConfigException(0x000000FF0001L, "Parameter_Invalid_Error");
 			}
 			this.identifiedKey = identifiedKey;
 			this.protocol = targetHost.getProtocol();

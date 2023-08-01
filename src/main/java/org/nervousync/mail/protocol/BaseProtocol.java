@@ -32,7 +32,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="zh-CN">JavaMail的协议抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 31, 2012 19:07:08 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 19:07:08 $
  */
 public abstract class BaseProtocol implements Serializable {
 	/**

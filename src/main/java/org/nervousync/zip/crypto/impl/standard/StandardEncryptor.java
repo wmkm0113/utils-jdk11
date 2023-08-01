@@ -26,7 +26,7 @@ import org.nervousync.zip.crypto.Encryptor;
  * Encryptor implement of the standard
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 29, 2017 5:08:31 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 5:08:31 PM $
  */
 public final class StandardEncryptor implements Encryptor {
 
@@ -42,7 +42,7 @@ public final class StandardEncryptor implements Encryptor {
 	 */
 	public StandardEncryptor(char[] password, int crc) throws ZipException {
 		if (password == null || password.length == 0) {
-			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
+			throw new ZipException(0x0000001B0006L, "Invalid_Password_Zip_Error");
 		}
 		
 		this.standardCryptoEngine = new StandardCryptoEngine();
@@ -61,7 +61,7 @@ public final class StandardEncryptor implements Encryptor {
 	@Override
 	public void encryptData(byte[] buff, int start, int len) throws ZipException {
 		if (len < 0) {
-			throw new ZipException(0x000000FF0001L, "Utils", "Parameter_Invalid_Error");
+			throw new ZipException(0x000000FF0001L, "Parameter_Invalid_Error");
 		}
 		
 		try {
@@ -69,7 +69,7 @@ public final class StandardEncryptor implements Encryptor {
 				buff[i] = encryptByte(buff[i]);
 			}
 		} catch (Exception e) {
-			throw new ZipException(0x0000001B000CL, "Utils", "Encrypt_Crypto_Zip_Error", e);
+			throw new ZipException(0x0000001B000CL, "Encrypt_Crypto_Zip_Error", e);
 		}
 	}
 
@@ -84,7 +84,7 @@ public final class StandardEncryptor implements Encryptor {
 
 	private void init(char[] password, int crc) throws ZipException {
 		if (password == null || password.length == 0) {
-			throw new ZipException(0x0000001B0006L, "Utils", "Invalid_Password_Zip_Error");
+			throw new ZipException(0x0000001B0006L, "Invalid_Password_Zip_Error");
 		}
 		
 		this.standardCryptoEngine.initKeys(password);

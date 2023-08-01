@@ -25,7 +25,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="zh-CN">输入/输出工具集</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jun 3, 2015 11:20:20 $
+ * @version $Revision: 1.2.0 $ $Date: Jun 3, 2015 11:20:20 $
  */
 public final class IOUtils {
     /**
@@ -99,7 +99,7 @@ public final class IOUtils {
 			content = byteArrayOutputStream.toByteArray();
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			content = new byte[0];
 		} finally {
@@ -149,7 +149,7 @@ public final class IOUtils {
 			}
 		} catch (Exception e) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Utils", "Stack_Message_Error", e);
+				LOGGER.debug("Stack_Message_Error", e);
 			}
 			return returnValue.toString();
 		} finally {
@@ -235,9 +235,9 @@ public final class IOUtils {
 			try {
 				closeable.close();
 			} catch (IOException e) {
-				LOGGER.error("Utils", "Close_Stream_IO_Error");
+				LOGGER.error("Close_Stream_IO_Error");
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Utils", "Stack_Message_Error", e);
+					LOGGER.debug("Stack_Message_Error", e);
 				}
 			}
 		}

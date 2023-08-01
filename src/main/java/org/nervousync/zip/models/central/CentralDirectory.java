@@ -27,7 +27,7 @@ import org.nervousync.utils.FileUtils;
  * The type Central directory.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision : 1.0 $ $Date: Nov 28, 2017 4:52:40 PM $
+ * @version $Revision: 1.0.0 $ $Date: Nov 28, 2017 4:52:40 PM $
  */
 public final class CentralDirectory {
 

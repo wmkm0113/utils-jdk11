@@ -34,11 +34,11 @@ public final class BeanTest extends BaseTest {
     public void copyTest() {
         GenericBean genericBean = new GenericBean();
         BeanUtils.copyTo(generateGeneric(), genericBean);
-        this.logger.info("Copied generic result: {}",
+        this.logger.info("Bean_Copy_Result", "generic",
                 StringUtils.objectToString(genericBean, StringUtils.StringType.JSON, Boolean.TRUE));
         WrapperBean wrapperBean = new WrapperBean();
         BeanUtils.copyTo(generateWrapper(), wrapperBean);
-        this.logger.info("Copied wrapper result: {}",
+        this.logger.info("Bean_Copy_Result", "wrapper",
                 StringUtils.objectToString(wrapperBean, StringUtils.StringType.JSON, Boolean.TRUE));
     }
 
@@ -50,13 +50,13 @@ public final class BeanTest extends BaseTest {
         BeanFour beanFour = new BeanFour();
         BeanFive beanFive = new BeanFive();
         BeanUtils.copyTo(generateBeanOne(), beanTwo, beanThree, beanFour, beanFive);
-        this.logger.info("Copied bean two: {}",
+        this.logger.info("Bean_Copy_Result", "bean two",
                 StringUtils.objectToString(beanTwo, StringUtils.StringType.JSON, Boolean.TRUE));
-        this.logger.info("Copied bean three: {}",
+        this.logger.info("Bean_Copy_Result", "bean three",
                 StringUtils.objectToString(beanThree, StringUtils.StringType.JSON, Boolean.TRUE));
-        this.logger.info("Copied bean four: {}",
+        this.logger.info("Bean_Copy_Result", "bean four",
                 StringUtils.objectToString(beanFour, StringUtils.StringType.JSON, Boolean.TRUE));
-        this.logger.info("Copied bean five: {}",
+        this.logger.info("Bean_Copy_Result", "bean five",
                 StringUtils.objectToString(beanFive, StringUtils.StringType.JSON, Boolean.TRUE));
     }
 
@@ -65,10 +65,10 @@ public final class BeanTest extends BaseTest {
     public void beanCopyFromTest() {
         BeanOne beanOne = new BeanOne();
         BeanUtils.copyFrom(beanOne, generateBeanTwo(), generateBeanThree(), generateBeanFour(), generateBeanFive());
-        this.logger.info("Copied result: {}",
+        this.logger.info("Bean_Copy_Result", "",
                 StringUtils.objectToString(beanOne, StringUtils.StringType.JSON, Boolean.TRUE));
-        this.logger.info("Base64: {}", new String(beanOne.getBeanOneBytes()));
-        this.logger.info("Base32: {}", new String(beanOne.getBase32Bytes()));
+        this.logger.info("Bean_Result", "Base64", new String(beanOne.getBeanOneBytes()));
+        this.logger.info("Bean_Result", "Base32", new String(beanOne.getBase32Bytes()));
     }
 
     @Test
@@ -79,7 +79,7 @@ public final class BeanTest extends BaseTest {
         dataMap.put("innerCode", 227);
         InnerBean innerBean = new InnerBean();
         BeanUtils.copyProperties(dataMap, innerBean);
-        this.logger.info("Copied result: {}",
+        this.logger.info("Bean_Copy_Result", "",
                 StringUtils.objectToString(innerBean, StringUtils.StringType.JSON, Boolean.TRUE));
     }
 

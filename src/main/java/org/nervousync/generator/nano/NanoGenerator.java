@@ -29,7 +29,7 @@ import java.security.SecureRandom;
  * <h2 class="zh-CN">NanoID生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0 $ $Date: Jul 06, 2022 12:39:54 $
+ * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:39:54 $
  */
 @GeneratorProvider(IDUtils.NANO_ID)
 public final class NanoGenerator implements IGenerator<String> {
@@ -75,7 +75,7 @@ public final class NanoGenerator implements IGenerator<String> {
     public void config(final String alphabetConfig, final int generateLength) {
         if (StringUtils.notBlank(alphabetConfig)) {
             if (alphabetConfig.length() > 255) {
-                this.logger.error("Utils", "Alphabet_Nano_Error");
+                this.logger.error("Alphabet_Nano_Error");
             } else {
                 this.alphabetArray = alphabetConfig.toCharArray();
             }
