@@ -19,7 +19,7 @@ package org.nervousync.exceptions.beans.network;
 import org.nervousync.exceptions.AbstractException;
 
 /**
- * <h2 class="en">Network Information Exception</h2>
+ * <h2 class="en-US">Network Information Exception</h2>
  * <h2 class="zh-CN">网络信息异常</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -27,21 +27,21 @@ import org.nervousync.exceptions.AbstractException;
  */
 public final class NetworkInfoException extends AbstractException {
 	/**
-	 * <span class="en">Serial version UID</span>
+	 * <span class="en-US">Serial version UID</span>
 	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -1431511763422513673L;
 	/**
-	 * <h3 class="en">Constructor method for NetworkInfoException</h3>
-	 * <span class="en">Create a new NetworkInfoException with the specified message.</span>
+	 * <h3 class="en-US">Constructor method for NetworkInfoException</h3>
+	 * <span class="en-US">Create a new NetworkInfoException with the specified message.</span>
 	 * <h3 class="zh-CN">NetworkInfoException构造方法</h3>
 	 * <span class="zh-CN">使用特定的信息创建NetworkInfoException实例对象。</span>
 	 *
-	 * @param errorCode 	<span class="en">Error identified code</span>
+	 * @param errorCode 	<span class="en-US">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param messageKey    <span class="en">Message identify key</span>
+     * @param messageKey    <span class="en-US">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
-     * @param collections   <span class="en">given parameters of information formatter</span>
+     * @param collections   <span class="en-US">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
 	public NetworkInfoException(final long errorCode, final String messageKey,
@@ -49,18 +49,18 @@ public final class NetworkInfoException extends AbstractException {
 		super(errorCode, messageKey, collections);
 	}
 	/**
-	 * <h3 class="en">Constructor method for NetworkInfoException</h3>
-	 * <span class="en">Create a new NetworkInfoException with the specified message and root cause.</span>
+	 * <h3 class="en-US">Constructor method for NetworkInfoException</h3>
+	 * <span class="en-US">Create a new NetworkInfoException with the specified message and root cause.</span>
 	 * <h3 class="zh-CN">NetworkInfoException构造方法</h3>
 	 * <span class="zh-CN">使用特定的信息以及异常信息对象实例创建NetworkInfoException实例对象。</span>
 	 *
-	 * @param errorCode 	<span class="en">Error identified code</span>
+	 * @param errorCode 	<span class="en-US">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param messageKey    <span class="en">Message identify key</span>
+     * @param messageKey    <span class="en-US">Message identify key</span>
      *                      <span class="zh-CN">信息识别键值</span>
-	 * @param cause 		<span class="en">The root cause</span>
+	 * @param cause 		<span class="en-US">The root cause</span>
 	 *              		<span class="zh-CN">异常信息对象实例</span>
-     * @param collections   <span class="en">given parameters of information formatter</span>
+     * @param collections   <span class="en-US">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
 	public NetworkInfoException(final long errorCode, final String messageKey,

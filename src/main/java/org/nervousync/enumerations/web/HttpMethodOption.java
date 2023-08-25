@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.web;
 
 /**
- * <h2 class="en">HTTP method option Enumerations</h2>
+ * <h2 class="en-US">HTTP method option Enumerations</h2>
  * <h2 class="zh-CN">HTTP请求方法枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,52 +25,52 @@ package org.nervousync.enumerations.web;
  */
 public enum HttpMethodOption {
 	/**
-     * <span class="en">HTTP method: GET</span>
+     * <span class="en-US">HTTP method: GET</span>
      * <span class="zh-CN">HTTP请求方法：GET</span>
 	 */
 	GET,
 	/**
-     * <span class="en">HTTP method: HEAD</span>
+     * <span class="en-US">HTTP method: HEAD</span>
      * <span class="zh-CN">HTTP请求方法：HEAD</span>
 	 */
 	HEAD,
 	/**
-     * <span class="en">HTTP method: PATCH</span>
+     * <span class="en-US">HTTP method: PATCH</span>
      * <span class="zh-CN">HTTP请求方法：PATCH</span>
 	 */
 	PATCH,
 	/**
-     * <span class="en">HTTP method: PUT</span>
+     * <span class="en-US">HTTP method: PUT</span>
      * <span class="zh-CN">HTTP请求方法：PUT</span>
 	 */
 	PUT,
 	/**
-     * <span class="en">HTTP method: POST</span>
+     * <span class="en-US">HTTP method: POST</span>
      * <span class="zh-CN">HTTP请求方法：POST</span>
 	 */
 	POST,
 	/**
-     * <span class="en">HTTP method: TRACE</span>
+     * <span class="en-US">HTTP method: TRACE</span>
      * <span class="zh-CN">HTTP请求方法：TRACE</span>
 	 */
 	TRACE,
 	/**
-     * <span class="en">HTTP method: OPTIONS</span>
+     * <span class="en-US">HTTP method: OPTIONS</span>
      * <span class="zh-CN">HTTP请求方法：OPTIONS</span>
 	 */
 	OPTIONS,
 	/**
-     * <span class="en">HTTP method: DELETE</span>
+     * <span class="en-US">HTTP method: DELETE</span>
      * <span class="zh-CN">HTTP请求方法：DELETE</span>
 	 */
 	DELETE,
 	/**
-     * <span class="en">HTTP method: DEFAULT</span>
+     * <span class="en-US">HTTP method: DEFAULT</span>
      * <span class="zh-CN">HTTP请求方法：DEFAULT</span>
 	 */
 	DEFAULT,
 	/**
-     * <span class="en">HTTP method: UNKNOWN</span>
+     * <span class="en-US">HTTP method: UNKNOWN</span>
      * <span class="zh-CN">HTTP请求方法：UNKNOWN</span>
 	 */
 	UNKNOWN

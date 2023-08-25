@@ -24,7 +24,7 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
- * <h2 class="en">UUID version 4 generator</h2>
+ * <h2 class="en-US">UUID version 4 generator</h2>
  * <h2 class="zh-CN">UUID版本4生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -33,15 +33,15 @@ import java.util.UUID;
 @GeneratorProvider(IDUtils.UUIDv4)
 public final class UUIDv4Generator extends UUIDGenerator {
     /**
-     * <span class="en">Secure Random instance</span>
+     * <span class="en-US">Secure Random instance</span>
      * <span class="zh-CN">安全随机数对象</span>
      */
     private final SecureRandom secureRandom = new SecureRandom();
     /**
-	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="en-US">Generate ID value</h3>
 	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -55,13 +55,13 @@ public final class UUIDv4Generator extends UUIDGenerator {
         return new UUID(super.highBits(randomBytes), super.lowBits(randomBytes)).toString();
     }
     /**
-	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="en-US">Generate ID value using given parameter</h3>
 	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en">Given parameter</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
      *                      <span class="zh-CN">给定的参数</span>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override

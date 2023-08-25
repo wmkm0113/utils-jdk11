@@ -23,7 +23,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Date;
 
 /**
- * <h2 class="en">DateTime DataConverter</h2>
+ * <h2 class="en-US">DateTime DataConverter</h2>
  * <h2 class="zh-CN">日期时间数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

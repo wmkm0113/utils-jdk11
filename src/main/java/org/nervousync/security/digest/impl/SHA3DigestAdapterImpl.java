@@ -28,7 +28,7 @@ import org.nervousync.utils.StringUtils;
 import java.security.MessageDigest;
 
 /**
- * <h2 class="en">Symmetric SHA3 crypto adapter class</h2>
+ * <h2 class="en-US">Symmetric SHA3 crypto adapter class</h2>
  * <h2 class="zh-CN">SHA3摘要算法适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -36,43 +36,43 @@ import java.security.MessageDigest;
  */
 public final class SHA3DigestAdapterImpl extends BaseDigestAdapter {
     /**
-     * <h3 class="en">Constructor for SHA3DigestAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for SHA3DigestAdapterImpl</h3>
      * <h3 class="zh-CN">SHA3摘要算法适配器实现类类的构造方法</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize adaptor</span>
+     * <span class="en-US">If an error occurs when initialize adaptor</span>
      * <span class="zh-CN">当初始化适配器时出现异常</span>
      */
     public SHA3DigestAdapterImpl(String algorithm) throws CryptoException {
         super(algorithm, new byte[0]);
     }
     /**
-     * <h3 class="en">Constructor for SHA3DigestAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for SHA3DigestAdapterImpl</h3>
      * <h3 class="zh-CN">SHA3摘要算法适配器实现类类的构造方法</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize adaptor</span>
+     * <span class="en-US">If an error occurs when initialize adaptor</span>
      * <span class="zh-CN">当初始化适配器时出现异常</span>
      */
     public SHA3DigestAdapterImpl(String algorithm, byte[] keyBytes) throws CryptoException {
         super(algorithm, keyBytes);
     }
     /**
-	 * <h3 class="en">Abstract method for initialize MessageDigest instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize MessageDigest instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息摘要算法适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
      *
-     * @return  <span class="en">Initialized MessageDigest instance</span>
+     * @return  <span class="en-US">Initialized MessageDigest instance</span>
      *          <span class="zh-CN">初始化的消息摘要算法适配器</span>
      */
     @Override
@@ -98,15 +98,15 @@ public final class SHA3DigestAdapterImpl extends BaseDigestAdapter {
         }
     }
     /**
-	 * <h3 class="en">Abstract method for initialize Hmac instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize Hmac instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息认证码适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
-     * @return  <span class="en">Initialized Hmac instance</span>
+     * @return  <span class="en-US">Initialized Hmac instance</span>
      *          <span class="zh-CN">初始化的消息认证码算法适配器</span>
      */
     @Override

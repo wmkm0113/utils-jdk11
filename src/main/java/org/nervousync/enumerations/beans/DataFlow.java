@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.beans;
 
 /**
- * <h2 class="en">JavaBean Property Data Flow Enumerations</h2>
+ * <h2 class="en-US">JavaBean Property Data Flow Enumerations</h2>
  * <h2 class="zh-CN">JavaBean属性值数据流向枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,12 +25,12 @@ package org.nervousync.enumerations.beans;
  */
 public enum DataFlow {
     /**
-     * <span class="en">Property value from the target JavaBean instance to current JavaBean instance</span>
+     * <span class="en-US">Property value from the target JavaBean instance to current JavaBean instance</span>
      * <span class="zh-CN">属性值从目标JavaBean实例复制到当前JavaBean实例</span>
      */
     IN,
     /**
-     * <span class="en">Property value from current JavaBean instance to the target JavaBean instance</span>
+     * <span class="en-US">Property value from current JavaBean instance to the target JavaBean instance</span>
      * <span class="zh-CN">属性值从当前JavaBean实例复制到目标JavaBean实例</span>
      */
     OUT

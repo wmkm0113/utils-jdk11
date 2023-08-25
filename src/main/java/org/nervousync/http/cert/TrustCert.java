@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * <h2 class="en">Trust Certificate Library Define</h2>
+ * <h2 class="en-US">Trust Certificate Library Define</h2>
  * <h2 class="zh-CN">允许的证书库定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -37,27 +37,27 @@ import java.util.Objects;
  */
 public final class TrustCert {
 	/**
-     * <span class="en">Certificate library data bytes</span>
+     * <span class="en-US">Certificate library data bytes</span>
      * <span class="zh-CN">证书库二进制字节数组</span>
 	 */
 	private byte[] certContent;
 	/**
-     * <span class="en">Certificate password for read</span>
+     * <span class="en-US">Certificate password for read</span>
      * <span class="zh-CN">读取证书的密码</span>
 	 */
 	private String certPassword;
 	/**
-     * <span class="en">SHA256 value of certificate library data bytes</span>
+     * <span class="en-US">SHA256 value of certificate library data bytes</span>
      * <span class="zh-CN">证书库二进制字节数组的SHA256值</span>
 	 */
 	private final String sha256;
 	/**
-	 * <h3 class="en">Private constructor method for TrustCert</h3>
+	 * <h3 class="en-US">Private constructor method for TrustCert</h3>
 	 * <h3 class="zh-CN">TrustCert私有构造方法</h3>
 	 *
-	 * @param certContent 		<span class="en">Certificate library data bytes</span>
+	 * @param certContent 		<span class="en-US">Certificate library data bytes</span>
 	 *                          <span class="zh-CN">证书库二进制字节数组</span>
-	 * @param certPassword      <span class="en">Certificate password for read</span>
+	 * @param certPassword      <span class="en-US">Certificate password for read</span>
 	 *                          <span class="zh-CN">读取证书的密码</span>
 	 */
 	private TrustCert(byte[] certContent, String certPassword) {
@@ -66,21 +66,21 @@ public final class TrustCert {
 		this.sha256 = ConvertUtils.toHex(SecurityUtils.SHA256(certContent));
 	}
 	/**
-	 * <h3 class="en">Static method for generate TrustCert instance</h3>
+	 * <h3 class="en-US">Static method for generate TrustCert instance</h3>
 	 * <h3 class="zh-CN">TrustCert私有构造方法</h3>
 	 *
-	 * @param certContent 		<span class="en">Certificate library data bytes</span>
+	 * @param certContent 		<span class="en-US">Certificate library data bytes</span>
 	 *                          <span class="zh-CN">证书库二进制字节数组</span>
-	 * @param certPassword      <span class="en">Certificate password for read</span>
+	 * @param certPassword      <span class="en-US">Certificate password for read</span>
 	 *                          <span class="zh-CN">读取证书的密码</span>
-	 * @return 	<span class="en">Generated TrustCert instance</span>
+	 * @return 	<span class="en-US">Generated TrustCert instance</span>
 	 * 			<span class="zh-CN">生成的TrustCert实例对象</span>
 	 */
 	public static TrustCert newInstance(byte[] certContent, String certPassword) {
 		return new TrustCert(certContent, certPassword);
 	}
 	/**
-	 * <h3 class="en">Read certificate library and generate key manager array</h3>
+	 * <h3 class="en-US">Read certificate library and generate key manager array</h3>
 	 * <h3 class="zh-CN">读取证书库中的证书并生成密钥管理器数组</h3>
 	 *
 	 * @return the key manager [ ]
@@ -98,50 +98,50 @@ public final class TrustCert {
 		}
 	}
     /**
-	 * <h3 class="en">Getter method for certificate library data bytes</h3>
+	 * <h3 class="en-US">Getter method for certificate library data bytes</h3>
 	 * <h3 class="zh-CN">证书库二进制字节数组的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Certificate library data bytes</span>
+     * @return 	<span class="en-US">Certificate library data bytes</span>
      * 			<span class="zh-CN">证书库二进制字节数组</span>
 	 */
 	public byte[] getCertContent() {
 		return certContent;
 	}
     /**
-	 * <h3 class="en">Setter method for certificate library data bytes</h3>
+	 * <h3 class="en-US">Setter method for certificate library data bytes</h3>
 	 * <h3 class="zh-CN">证书库二进制字节数组的Setter方法</h3>
 	 *
-     * @param certContent 	<span class="en">Certificate library data bytes</span>
+     * @param certContent 	<span class="en-US">Certificate library data bytes</span>
      * 						<span class="zh-CN">证书库二进制字节数组</span>
 	 */
 	public void setCertContent(byte[] certContent) {
 		this.certContent = certContent;
 	}
     /**
-	 * <h3 class="en">Getter method for certificate password</h3>
+	 * <h3 class="en-US">Getter method for certificate password</h3>
 	 * <h3 class="zh-CN">证书读取密码的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Certificate password for read</span>
+     * @return 	<span class="en-US">Certificate password for read</span>
      * 			<span class="zh-CN">读取证书的密码</span>
 	 */
 	public String getCertPassword() {
 		return certPassword;
 	}
     /**
-	 * <h3 class="en">Setter method for certificate password</h3>
+	 * <h3 class="en-US">Setter method for certificate password</h3>
 	 * <h3 class="zh-CN">证书读取密码的Setter方法</h3>
 	 *
-     * @param certPassword 	<span class="en">Certificate password for read</span>
+     * @param certPassword 	<span class="en-US">Certificate password for read</span>
      * 						<span class="zh-CN">读取证书的密码</span>
 	 */
 	public void setCertPassword(String certPassword) {
 		this.certPassword = certPassword;
 	}
     /**
-	 * <h3 class="en">Getter method for SHA256 value</h3>
+	 * <h3 class="en-US">Getter method for SHA256 value</h3>
 	 * <h3 class="zh-CN">SHA256验证值的Getter方法</h3>
 	 *
-     * return 	<span class="en">SHA256 value of certificate library data bytes</span>
+     * return 	<span class="en-US">SHA256 value of certificate library data bytes</span>
      * 			<span class="zh-CN">证书库二进制字节数组的SHA256值</span>
 	 */
 	public String getSha256() {

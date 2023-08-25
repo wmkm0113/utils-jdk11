@@ -24,7 +24,7 @@ import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.LoggerUtils;
 
 /**
- * <h2 class="en">SnowflakeID generator</h2>
+ * <h2 class="en-US">SnowflakeID generator</h2>
  * <h2 class="zh-CN">雪花ID生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -33,54 +33,54 @@ import org.nervousync.utils.LoggerUtils;
 @GeneratorProvider(IDUtils.SNOWFLAKE)
 public final class SnowflakeGenerator implements IGenerator<Long> {
     /**
-     * <span class="en">Logger instance</span>
+     * <span class="en-US">Logger instance</span>
      * <span class="zh-CN">日志实例</span>
      */
     private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
     /**
-     * <span class="en">Default value of ID</span>
+     * <span class="en-US">Default value of ID</span>
      * <span class="zh-CN">默认的ID值</span>
      */
     private static final long DEFAULT_ID = 1L;
     /**
-     * <span class="en">Sequence mask code, sequence id bits: 12</span>
+     * <span class="en-US">Sequence mask code, sequence id bits: 12</span>
      * <span class="zh-CN">序号掩码值，序号ID占用位数：12</span>
      */
     private static final long SEQUENCE_MASK = ~(-1L << 12L);
     /**
-     * <span class="en">Node device ID (between 0 and 63), default value: 1L</span>
+     * <span class="en-US">Node device ID (between 0 and 63), default value: 1L</span>
      * <span class="zh-CN">节点的机器ID（取值范围：0到63），默认值：1L</span>
      */
     private long deviceId = DEFAULT_ID;
     /**
-     * <span class="en">Node instance ID (between 0 and 63), default value: 1L</span>
+     * <span class="en-US">Node instance ID (between 0 and 63), default value: 1L</span>
      * <span class="zh-CN">节点的实例ID（取值范围：0到63），默认值：1L</span>
      */
     private long instanceId = DEFAULT_ID;
     /**
-     * <span class="en">Reference time, default value: 1303315200000L</span>
+     * <span class="en-US">Reference time, default value: 1303315200000L</span>
      * <span class="zh-CN">起始时间戳，默认值：1303315200000L</span>
      */
     private long referenceTime = Globals.DEFAULT_REFERENCE_TIME;
     /**
-     * <span class="en">Sequence index of current time</span>
+     * <span class="en-US">Sequence index of current time</span>
      * <span class="zh-CN">当前时间的序列索引</span>
      */
     private long sequenceIndex = 0L;
     /**
-     * <span class="en">Previous generate time</span>
+     * <span class="en-US">Previous generate time</span>
      * <span class="zh-CN">上次生成ID的时间</span>
      */
     private long lastTime = Globals.DEFAULT_VALUE_LONG;
     /**
-	 * <h3 class="en">Configure current generator</h3>
+	 * <h3 class="en-US">Configure current generator</h3>
 	 * <h3 class="zh-CN">修改当前生成器的配置</h3>
      *
-     * @param referenceTime     <span class="en">Reference time, default value: 1303315200000L</span>
+     * @param referenceTime     <span class="en-US">Reference time, default value: 1303315200000L</span>
      *                          <span class="zh-CN">起始时间戳，默认值：1303315200000L</span>
-     * @param deviceId          <span class="en">Node device ID (between 0 and 63), default value: 1L</span>
+     * @param deviceId          <span class="en-US">Node device ID (between 0 and 63), default value: 1L</span>
      *                          <span class="zh-CN">节点的机器ID（取值范围：0到63），默认值：1L</span>
-     * @param instanceId        <span class="en">Node instance ID (between 0 and 63), default value: 1L</span>
+     * @param instanceId        <span class="en-US">Node instance ID (between 0 and 63), default value: 1L</span>
      *                          <span class="zh-CN">节点的实例ID（取值范围：0到63），默认值：1L</span>
      */
     public void config(final long referenceTime, final long deviceId, final long instanceId) {
@@ -94,10 +94,10 @@ public final class SnowflakeGenerator implements IGenerator<Long> {
         }
     }
     /**
-	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="en-US">Generate ID value</h3>
 	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -132,13 +132,13 @@ public final class SnowflakeGenerator implements IGenerator<Long> {
                 | (this.deviceId << 17L) | (this.instanceId << 12L) | this.sequenceIndex;
     }
     /**
-	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="en-US">Generate ID value using given parameter</h3>
 	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en">Given parameter</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
      *                      <span class="zh-CN">给定的参数</span>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -146,7 +146,7 @@ public final class SnowflakeGenerator implements IGenerator<Long> {
         return this.generate();
     }
     /**
-	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="en-US">Destroy current generator instance</h3>
 	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     @Override

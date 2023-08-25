@@ -23,7 +23,7 @@ import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;
 
 /**
- * <h2 class="en">Asymmetric SM2 crypto adapter class</h2>
+ * <h2 class="en-US">Asymmetric SM2 crypto adapter class</h2>
  * <h2 class="zh-CN">SM2非对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -32,18 +32,18 @@ import org.nervousync.exceptions.crypto.CryptoException;
 public final class SM2CryptoAdapterImpl extends AsymmetricCryptoAdapter {
 
     /**
-     * <h3 class="en">Constructor for SM2CryptoAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for SM2CryptoAdapterImpl</h3>
      * <h3 class="zh-CN">SM2非对称加密解密适配器的实现类的构造方法</h3>
      *
-     * @param cipherConfig  <span class="en">Cipher configure</span>
+     * @param cipherConfig  <span class="en-US">Cipher configure</span>
      *                      <span class="zh-CN">密码设置</span>
-     * @param cryptoMode    <span class="en">Crypto mode</span>
+     * @param cryptoMode    <span class="en-US">Crypto mode</span>
      *                      <span class="zh-CN">加密解密模式</span>
-     * @param cipherKey     <span class="en">Crypto key</span>
+     * @param cipherKey     <span class="en-US">Crypto key</span>
      *                      <span class="zh-CN">加密解密密钥</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize cipher</span>
+     * <span class="en-US">If an error occurs when initialize cipher</span>
      * <span class="zh-CN">当初始化加密解密实例对象时出现异常</span>
      */
     public SM2CryptoAdapterImpl(final CipherConfig cipherConfig, final CryptoMode cryptoMode,

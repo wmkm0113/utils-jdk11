@@ -23,7 +23,7 @@ import org.nervousync.commons.Globals;
 import java.util.Optional;
 
 /**
- * <h2 class="en">Byte DataConverter</h2>
+ * <h2 class="en-US">Byte DataConverter</h2>
  * <h2 class="zh-CN">Byte数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

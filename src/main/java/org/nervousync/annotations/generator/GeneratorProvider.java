@@ -19,7 +19,7 @@ package org.nervousync.annotations.generator;
 import java.lang.annotation.*;
 
 /**
- * <h2 class="en">Annotation class for ID generator implement class</h2>
+ * <h2 class="en-US">Annotation class for ID generator implement class</h2>
  * <h2 class="zh-CN">ID生成器实现类的标注</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -30,10 +30,10 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface GeneratorProvider {
     /**
-     * <span class="en">ID generator implement name</span>
+     * <span class="en-US">ID generator implement name</span>
      * <span class="zh-CN">ID生成器实现名称</span>
      *
-     * @return  <span class="en">Implement name</span>
+     * @return  <span class="en-US">Implement name</span>
      *          <span class="zh-CN">实现名称</span>
      */
     String value();

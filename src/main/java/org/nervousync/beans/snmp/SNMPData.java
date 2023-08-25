@@ -26,7 +26,7 @@ import org.nervousync.utils.DateTimeUtils;
 import org.snmp4j.smi.VariableBinding;
 
 /**
- * <h2 class="en">Reading data maps of SNMP datas</h2>
+ * <h2 class="en-US">Reading data maps of SNMP datas</h2>
  * <h2 class="zh-CN">从SNMP读取的数据结果映射</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -34,28 +34,28 @@ import org.snmp4j.smi.VariableBinding;
  */
 public final class SNMPData implements Serializable {
 	/**
-	 * <span class="en">Serial version UID</span>
+	 * <span class="en-US">Serial version UID</span>
 	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -9033003833049981503L;
 	/**
-	 * <span class="en">Current GMT time in milliseconds</span>
+	 * <span class="en-US">Current GMT time in milliseconds</span>
 	 * <span class="zh-CN">当前GMT时间的毫秒数</span>
 	 */
 	private final long currentGMTTime;
 	/**
-	 * <span class="en">String value of identified key</span>
+	 * <span class="en-US">String value of identified key</span>
 	 * <span class="zh-CN">识别代码字符串</span>
 	 */
 	private String identifiedKey = null;
 	/**
-	 * <span class="en">Reading data key-value map</span>
+	 * <span class="en-US">Reading data key-value map</span>
 	 * <span class="zh-CN">读取数据的键值映射</span>
 	 */
 	private final Map<String, String> dataMap;
 	/**
-     * <h3 class="en">Constructor for SNMPData</h3>
-     * <span class="en">Read current GMT time in milliseconds and initialize data map</span>
+     * <h3 class="en-US">Constructor for SNMPData</h3>
+     * <span class="en-US">Read current GMT time in milliseconds and initialize data map</span>
      * <h3 class="zh-CN">SNMPData的构造函数</h3>
      * <span class="zh-CN">读取当前的GMT时间毫秒数，并初始化数据映射表</span>
 	 */
@@ -64,40 +64,40 @@ public final class SNMPData implements Serializable {
 		this.dataMap = new HashMap<>();
 	}
     /**
-	 * <h3 class="en">Getter method for current GMT time</h3>
+	 * <h3 class="en-US">Getter method for current GMT time</h3>
 	 * <h3 class="zh-CN">当前GMT时间的毫秒数的Getter方法</h3>
 	 *
-	 * @return 	<span class="en">Current GMT time in milliseconds</span>
+	 * @return 	<span class="en-US">Current GMT time in milliseconds</span>
 	 *          <span class="zh-CN">当前GMT时间的毫秒数</span>
      */
 	public long getCurrentGMTTime() {
 		return currentGMTTime;
 	}
     /**
-	 * <h3 class="en">Getter method for identified key</h3>
+	 * <h3 class="en-US">Getter method for identified key</h3>
 	 * <h3 class="zh-CN">识别代码字符串的Getter方法</h3>
 	 *
-	 * @return 	<span class="en">String value of identified key</span>
+	 * @return 	<span class="en-US">String value of identified key</span>
 	 * 			<span class="zh-CN">识别代码字符串</span>
      */
 	public String getIdentifiedKey() {
 		return identifiedKey;
 	}
 	/**
-	 * <h3 class="en">Setter method for identified key</h3>
+	 * <h3 class="en-US">Setter method for identified key</h3>
 	 * <h3 class="zh-CN">识别代码字符串的Setter方法</h3>
 	 *
-	 * @param identifiedKey 	<span class="en">String value of identified key</span>
+	 * @param identifiedKey 	<span class="en-US">String value of identified key</span>
 	 *                          <span class="zh-CN">识别代码字符串</span>
 	 */
 	public void setIdentifiedKey(String identifiedKey) {
 		this.identifiedKey = identifiedKey;
 	}
 	/**
-	 * <h3 class="en">Parse instance of VariableBinding and add data to data map</h3>
+	 * <h3 class="en-US">Parse instance of VariableBinding and add data to data map</h3>
 	 * <h3 class="zh-CN">解析VariableBinding实例对象，并添加数据到数据映射表</h3>
 	 *
-	 * @param variableBinding 	<span class="en">Instance of VariableBinding</span>
+	 * @param variableBinding 	<span class="en-US">Instance of VariableBinding</span>
 	 *                          <span class="zh-CN">VariableBinding实例对象</span>
 	 * @see org.snmp4j.smi.VariableBinding
 	 */
@@ -107,23 +107,23 @@ public final class SNMPData implements Serializable {
 		}
 	}
 	/**
-	 * <h3 class="en">Read data from data map by given oid string</h3>
+	 * <h3 class="en-US">Read data from data map by given oid string</h3>
 	 * <h3 class="zh-CN">根据给定的oid字符串读取数据值</h3>
 	 *
-	 * @param oid 	<span class="en">oid string</span>
+	 * @param oid 	<span class="en-US">oid string</span>
 	 *              <span class="zh-CN">oid字符串</span>
 	 *
-	 * @return 	<span class="en">Mapping data</span>
+	 * @return 	<span class="en-US">Mapping data</span>
 	 * 			<span class="zh-CN">映射数据值</span>
 	 */
 	public String readData(final String oid) {
 		return this.dataMap.get(oid);
 	}
     /**
-	 * <h3 class="en">Retrieve iterator over the elements in data map</h3>
+	 * <h3 class="en-US">Retrieve iterator over the elements in data map</h3>
 	 * <h3 class="zh-CN">获取当前数据集元素的遍历器</h3>
      *
-     * @return 	<span class="en">Iterator instance</span>
+     * @return 	<span class="en-US">Iterator instance</span>
 	 * 			<span class="zh-CN">遍历器实例对象</span>
      */
 	public Iterator<Entry<String, String>> iterator() {

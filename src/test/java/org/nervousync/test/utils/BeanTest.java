@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.nervousync.annotations.beans.BeanProperty;
 import org.nervousync.annotations.beans.BeanProperties;
+import org.nervousync.annotations.beans.Desensitization;
 import org.nervousync.annotations.beans.OutputConfig;
 import org.nervousync.beans.converter.impl.basic.BigIntegerStringAdapter;
 import org.nervousync.beans.converter.impl.basic.BooleanStringAdapter;
@@ -21,6 +22,7 @@ import org.nervousync.beans.core.BeanObject;
 import org.nervousync.enumerations.beans.DataFlow;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.BeanUtils;
+import org.nervousync.utils.ObjectUtils;
 import org.nervousync.utils.StringUtils;
 
 import java.math.BigInteger;
@@ -87,6 +89,20 @@ public final class BeanTest extends BaseTest {
     @Order(40)
     public void removeConfig() {
         BeanUtils.removeBeanConfig(BeanOne.class, BeanTwo.class, BeanThree.class, BeanFour.class, BeanFive.class);
+    }
+
+    @Test
+    @Order(50)
+    public void desensitization() {
+        DesensitizationBean desensitizationBean = new DesensitizationBean();
+        desensitizationBean.setEmail("wmkm0113@gmail.com");
+        desensitizationBean.setBankCode("6226191212250445");
+        desensitizationBean.setChnId("110101198402271983");
+        desensitizationBean.setPhoneNumber("13901234567");
+        desensitizationBean.setSocialCode("91130428304570889D");
+        desensitizationBean.setUserName("wmkm0113");
+        ObjectUtils.desensitization(desensitizationBean);
+        this.logger.info("Desensitization_Data", desensitizationBean.toFormattedJson());
     }
 
     private static GenericBean generateGeneric() {
@@ -643,6 +659,72 @@ public final class BeanTest extends BaseTest {
 
         public void setDataInteger(Integer dataInteger) {
             this.dataInteger = dataInteger;
+        }
+    }
+
+    public static final class DesensitizationBean extends BeanObject {
+
+        private static final long serialVersionUID = -1785932696294018762L;
+
+        @Desensitization(ObjectUtils.SensitiveType.CHN_ID_Code)
+        private String chnId;
+        @Desensitization(ObjectUtils.SensitiveType.CHN_Social_Code)
+        private String socialCode;
+        @Desensitization(ObjectUtils.SensitiveType.PHONE_NUMBER)
+        private String phoneNumber;
+        @Desensitization(ObjectUtils.SensitiveType.E_MAIL)
+        private String email;
+        @Desensitization(ObjectUtils.SensitiveType.Luhn)
+        private String bankCode;
+        @Desensitization
+        private String userName;
+
+        public String getChnId() {
+            return chnId;
+        }
+
+        public void setChnId(String chnId) {
+            this.chnId = chnId;
+        }
+
+        public String getSocialCode() {
+            return socialCode;
+        }
+
+        public void setSocialCode(String socialCode) {
+            this.socialCode = socialCode;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getBankCode() {
+            return bankCode;
+        }
+
+        public void setBankCode(String bankCode) {
+            this.bankCode = bankCode;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
         }
     }
 }

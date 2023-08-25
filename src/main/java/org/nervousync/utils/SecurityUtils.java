@@ -16,35 +16,38 @@
  */
 package org.nervousync.utils;
 
-import java.io.*;
-import java.nio.ByteOrder;
-import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.*;
-import java.util.*;
-
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.nervousync.commons.Globals;
+import org.nervousync.enumerations.crypto.CryptoMode;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.security.api.SecureAdapter;
 import org.nervousync.security.config.CRCConfig;
 import org.nervousync.security.config.CipherConfig;
-import org.nervousync.security.digest.impl.*;
 import org.nervousync.security.crypto.BaseCryptoAdapter;
 import org.nervousync.security.crypto.impl.*;
-import org.nervousync.enumerations.crypto.CryptoMode;
-import org.nervousync.exceptions.crypto.CryptoException;
-
-import org.nervousync.commons.Globals;
+import org.nervousync.security.digest.impl.*;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.ByteOrder;
+import java.security.*;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.*;
 
 /**
- * <h2 class="en">Security utilities</h2>
- * <span class="en">
- *     <span>Current utilities implements features:</span>
+ * <h2 class="en-US">Security utilities</h2>
+ * <span class="en-US">
+ * <span>Current utilities implements features:</span>
  *     <ul>Initialize CRC/Blowfish/MD5/HmacMD5/DES/3DES/SHA/HmacSHA/AES/RSA/SM2/SM3/SM4/RC2/RC4 SecureAdapter</ul>
  *     <ul>Calculate CRC/MD5/HmacMD5/SHA/HmacSHA/SM3/HmacSM3/SHAKE128/SHAKE256 result</ul>
  * </span>
@@ -60,12 +63,12 @@ import javax.crypto.SecretKey;
  */
 public final class SecurityUtils {
     /**
-     * <span class="en">Logger instance</span>
+     * <span class="en-US">Logger instance</span>
      * <span class="zh-CN">日志实例</span>
      */
     private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(SecurityUtils.class);
     /**
-     * <span class="en">Registered CRC configure information</span>
+     * <span class="en-US">Registered CRC configure information</span>
      * <span class="zh-CN">注册的CRC配置值映射表</span>
      */
     private static final Map<String, CRCConfig> REGISTERED_CRC_CONFIG = new HashMap<>();
@@ -277,20 +280,22 @@ public final class SecurityUtils {
         LOGGER.info("Registered_CRC_Algorithm",
                 String.join(",", new ArrayList<>(REGISTERED_CRC_CONFIG.keySet())));
     }
-	/**
-	 * <h3 class="en">Private constructor for SecurityUtils</h3>
-	 * <h3 class="zh-CN">安全工具集的私有构造方法</h3>
-	 */
+
+    /**
+     * <h3 class="en-US">Private constructor for SecurityUtils</h3>
+     * <h3 class="zh-CN">安全工具集的私有构造方法</h3>
+     */
     private SecurityUtils() {
     }
+
     /**
-     * <h3 class="en">Register CRC configure information</h3>
+     * <h3 class="en-US">Register CRC configure information</h3>
      * <h3 class="zh-CN">注册CRC配置信息</h3>
      *
-     * @param algorithm     <span class="en">Algorithm name</span>
-     *                      <span class="zh-CN">算法名称</span>
-     * @param crcConfig     <span class="en">CRC configure information</span>
-     *                      <span class="zh-CN">CRC配置信息</span>
+     * @param algorithm <span class="en-US">Algorithm name</span>
+     *                  <span class="zh-CN">算法名称</span>
+     * @param crcConfig <span class="en-US">CRC configure information</span>
+     *                  <span class="zh-CN">CRC配置信息</span>
      */
     public static void registerConfig(final String algorithm, final CRCConfig crcConfig) {
         if (StringUtils.isEmpty(algorithm) || crcConfig == null) {
@@ -306,30 +311,28 @@ public final class SecurityUtils {
         }
         REGISTERED_CRC_CONFIG.put(algorithm, crcConfig);
     }
+
     /**
-     * <h3 class="en">Registered CRC algorithm name list</h3>
+     * <h3 class="en-US">Registered CRC algorithm name list</h3>
      * <h3 class="zh-CN">已注册的CRC算法名列表</h3>
      *
-     * @return  <span class="en">CRC algorithm name list</span>
-     *          <span class="zh-CN">CRC算法名列表</span>
+     * @return <span class="en-US">CRC algorithm name list</span>
+     * <span class="zh-CN">CRC算法名列表</span>
      */
     public static List<String> registeredCRC() {
         return new ArrayList<>(REGISTERED_CRC_CONFIG.keySet());
     }
 
     /**
-     * <h3 class="en">Initialize CRC secure provider</h3>
+     * <h3 class="en-US">Initialize CRC secure provider</h3>
      * <h3 class="zh-CN">初始化CRC安全适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Algorithm name</span>
-     *                      <span class="zh-CN">算法名称</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If CRC algorithm didn't find</span>
-     * <span class="zh-CN">如果CRC算法未找到</span>
+     * @param algorithm <span class="en-US">Algorithm name</span>
+     *                  <span class="zh-CN">算法名称</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If CRC algorithm didn't find</span>
+     *                         <span class="zh-CN">如果CRC算法未找到</span>
      */
     public static SecureAdapter CRC(final String algorithm) throws CryptoException {
         if (REGISTERED_CRC_CONFIG.containsKey(algorithm)) {
@@ -337,34 +340,32 @@ public final class SecurityUtils {
         }
         throw new CryptoException(0x00000015000DL, "Unknown_Algorithm_Digits_Error", algorithm);
     }
+
     /**
-     * <h3 class="en">Retrieve registered CRC configure information</h3>
+     * <h3 class="en-US">Retrieve registered CRC configure information</h3>
      * <h3 class="zh-CN">查找已注册的CRC配置信息</h3>
      *
-     * @param algorithm     <span class="en">Algorithm name</span>
-     *                      <span class="zh-CN">算法名称</span>
-     *
-     * @return  <span class="en">CRC configure information instance or null if not found</span>
-     *          <span class="zh-CN">找到的CRC配置信息实例对象，如果未找到返回<code>null</code></span>
+     * @param algorithm <span class="en-US">Algorithm name</span>
+     *                  <span class="zh-CN">算法名称</span>
+     * @return <span class="en-US">CRC configure information instance or null if not found</span>
+     * <span class="zh-CN">找到的CRC配置信息实例对象，如果未找到返回<code>null</code></span>
      */
     public static CRCConfig crcConfig(final String algorithm) {
         return REGISTERED_CRC_CONFIG.get(algorithm);
     }
+
     /**
-     * <h3 class="en">Convert crc result from byte arrays to string</h3>
+     * <h3 class="en-US">Convert crc result from byte arrays to string</h3>
      * <h3 class="zh-CN">将CRC结果字节数组转换为字符串</h3>
      *
-     * @param algorithm     <span class="en">Algorithm name</span>
-     *                      <span class="zh-CN">算法名称</span>
-     * @param result        <span class="en">CRC result byte array</span>
-     *                      <span class="zh-CN">CRC结果字节数组</span>
-     *
-     * @return  <span class="en">Converted string result</span>
-     *          <span class="zh-CN">转换后的结果字符串</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If CRC algorithm didn't find</span>
-     * <span class="zh-CN">如果CRC算法未找到</span>
+     * @param algorithm <span class="en-US">Algorithm name</span>
+     *                  <span class="zh-CN">算法名称</span>
+     * @param result    <span class="en-US">CRC result byte array</span>
+     *                  <span class="zh-CN">CRC结果字节数组</span>
+     * @return <span class="en-US">Converted string result</span>
+     * <span class="zh-CN">转换后的结果字符串</span>
+     * @throws CryptoException <span class="en-US">If CRC algorithm didn't find</span>
+     *                         <span class="zh-CN">如果CRC算法未找到</span>
      */
     public static String CRCResult(final String algorithm, final byte[] result) throws DataInvalidException, CryptoException {
         long crc = RawUtils.readLong(result, ByteOrder.LITTLE_ENDIAN);
@@ -381,30 +382,29 @@ public final class SecurityUtils {
     /*
      * Digest Methods
      */
+
     /**
-     * <h3 class="en">Initialize MD5 secure provider</h3>
+     * <h3 class="en-US">Initialize MD5 secure provider</h3>
      * <h3 class="zh-CN">初始化MD5安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     @Deprecated
     public static SecureAdapter MD5() throws CryptoException {
         return new MD5DigestAdapterImpl();
     }
+
     /**
-     * <h3 class="en">Calculate MD5 value of the given source object</h3>
+     * <h3 class="en-US">Calculate MD5 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的MD5值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     @Deprecated
     public static byte[] MD5(final Object source) {
@@ -417,35 +417,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacMD5 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacMD5 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacMD5安全适配器实例对象</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacMD5(final byte[] keyBytes) throws CryptoException {
         return new MD5DigestAdapterImpl(keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacMD5 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacMD5 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacMD5值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacMD5(final byte[] keyBytes, final Object source) {
         try {
@@ -457,30 +454,29 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA1 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA1 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA1安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     @Deprecated
     public static SecureAdapter SHA1() throws CryptoException {
         return new SHA1DigestAdapterImpl();
     }
+
     /**
-     * <h3 class="en">Calculate SHA1 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA1 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA1值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     @Deprecated
     public static byte[] SHA1(final Object source) {
@@ -493,34 +489,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA1 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA1 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA1安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA1(final byte[] keyBytes) throws CryptoException {
         return new SHA1DigestAdapterImpl(keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA1 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA1 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA1值</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA1(final byte[] keyBytes, final Object source) {
         try {
@@ -532,29 +526,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA-224 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA-224 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA-224安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA224() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-224", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA224值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA224(final Object source) {
         try {
@@ -566,34 +559,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA224 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA224 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA224安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA224(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-224/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA224值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA224(final byte[] keyBytes, final Object source) {
         try {
@@ -605,29 +596,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA256 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA256 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA256安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA256() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-256", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA256值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA256(final Object source) {
         try {
@@ -639,34 +629,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA256 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA256 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA256安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA256(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-256/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA256值</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA256(final byte[] keyBytes, final Object source) {
         try {
@@ -678,29 +666,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA384 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA384 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA384安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA384() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-384", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA384 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA384 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA384值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA384(final Object source) {
         try {
@@ -712,34 +699,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA384 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA384 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA384安全适配器实例对象</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA384(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-384/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA384 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA384 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA384值</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA384(final byte[] keyBytes, final Object source) {
         try {
@@ -751,29 +736,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA512 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA512 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA512安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA512() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA512 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA512 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA512值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA512(final Object source) {
         try {
@@ -785,34 +769,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA512 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA512 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA512安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA512(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA512 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA512 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA512值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA512(final byte[] keyBytes, final Object source) {
         try {
@@ -824,29 +806,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA512/224 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA512/224 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA512/224安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA512_224() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512/224", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA512/224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA512/224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA512/224值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA512_224(final Object source) {
         try {
@@ -858,34 +839,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA512/224 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA512/224 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA512/224安全适配器实例对象</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA512_224(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512/224/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA512/224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA512/224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA512/224值</h3>
      *
-     * @param keyBytes  <span class="en">HMAC key bytes</span>
-     *                  <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA512_224(final byte[] keyBytes, final Object source) {
         try {
@@ -897,29 +876,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA512/256 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA512/256 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA512/256安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA512_256() throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512/256", new byte[0]);
     }
+
     /**
-     * <h3 class="en">Calculate SHA512/256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA512/256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA512/256值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA512_256(final Object source) {
         try {
@@ -931,34 +909,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA512/256 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA512/256 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA512/256安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA512_256(final byte[] keyBytes) throws CryptoException {
         return new SHA2DigestAdapterImpl("SHA-512/256/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA512/256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA512/256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA512/256值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA512_256(final byte[] keyBytes, final Object source) {
         try {
@@ -970,29 +946,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA3-224 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA3-224 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA3-224安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA3_224() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-224");
     }
+
     /**
-     * <h3 class="en">Calculate SHA3-224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA3-224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA3-224值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA3_224(final Object source) {
         try {
@@ -1004,34 +979,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA3-224 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA3-224 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA3-224安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA3_224(final byte[] keyBytes) throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-224/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA3-224 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA3-224 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA3-224值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA3_224(final byte[] keyBytes, final Object source) {
         try {
@@ -1043,29 +1016,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA3-256 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA3-256 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA3-256安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA3_256() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-256");
     }
+
     /**
-     * <h3 class="en">Calculate SHA3-256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA3-256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA3-256值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA3_256(final Object source) {
         try {
@@ -1077,34 +1049,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA3-256 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA3-256 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA3-256安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA3_256(final byte[] keyBytes) throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-256/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA3-256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA3-256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA3-256值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA3_256(final byte[] keyBytes, final Object source) {
         try {
@@ -1116,29 +1086,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA3-384 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA3-384 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA3-384安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA3_384() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-384");
     }
+
     /**
-     * <h3 class="en">Calculate SHA3-384 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA3-384 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA3-384值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA3_384(final Object source) {
         try {
@@ -1150,34 +1119,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA3-384 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA3-384 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA3-384安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA3_384(final byte[] keyBytes) throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-384/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA3-384 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA3-384 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA3-384值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA3_384(final byte[] keyBytes, final Object source) {
         try {
@@ -1189,29 +1156,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHA3-512 secure provider</h3>
+     * <h3 class="en-US">Initialize SHA3-512 secure provider</h3>
      * <h3 class="zh-CN">初始化SHA3-512安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHA3_512() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-512");
     }
+
     /**
-     * <h3 class="en">Calculate SHA3-512 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHA3-512 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHA3-512值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHA3_512(final Object source) {
         try {
@@ -1223,34 +1189,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSHA3-512 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSHA3-512 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSHA3-512安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSHA3_512(final byte[] keyBytes) throws CryptoException {
         return new SHA3DigestAdapterImpl("SHA3-512/HMAC", keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSHA3-512 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSHA3-512 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSHA3-512值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSHA3_512(final byte[] keyBytes, final Object source) {
         try {
@@ -1262,29 +1226,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHAKE128 secure provider</h3>
+     * <h3 class="en-US">Initialize SHAKE128 secure provider</h3>
      * <h3 class="zh-CN">初始化SHAKE128安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHAKE128() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHAKE128");
     }
+
     /**
-     * <h3 class="en">Calculate SHAKE128 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHAKE128 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHAKE128值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHAKE128(final Object source) {
         try {
@@ -1296,29 +1259,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SHAKE256 secure provider</h3>
+     * <h3 class="en-US">Initialize SHAKE256 secure provider</h3>
      * <h3 class="zh-CN">初始化SHAKE256安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SHAKE256() throws CryptoException {
         return new SHA3DigestAdapterImpl("SHAKE256");
     }
+
     /**
-     * <h3 class="en">Calculate SHAKE256 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SHAKE256 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SHAKE256值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SHAKE256(final Object source) {
         try {
@@ -1330,29 +1292,28 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SM3 secure provider</h3>
+     * <h3 class="en-US">Initialize SM3 secure provider</h3>
      * <h3 class="zh-CN">初始化SM3安全适配器实例对象</h3>
      *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM3() throws CryptoException {
         return new SM3DigestAdapterImpl();
     }
+
     /**
-     * <h3 class="en">Calculate SM3 value of the given source object</h3>
+     * <h3 class="en-US">Calculate SM3 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的SM3值</h3>
      *
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param source <span class="en-US">source object</span>
+     *               <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] SM3(final Object source) {
         try {
@@ -1364,34 +1325,32 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize HmacSM3 secure provider</h3>
+     * <h3 class="en-US">Initialize HmacSM3 secure provider</h3>
      * <h3 class="zh-CN">初始化HmacSM3安全适配器实例对象</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter HmacSM3(final byte[] keyBytes) throws CryptoException {
         return new SM3DigestAdapterImpl(keyBytes);
     }
+
     /**
-     * <h3 class="en">Calculate HmacSM3 value of the given source object</h3>
+     * <h3 class="en-US">Calculate HmacSM3 value of the given source object</h3>
      * <h3 class="zh-CN">计算给定的原始数据对象的HmacSM3值</h3>
      *
-     * @param keyBytes     <span class="en">HMAC key bytes</span>
-     *                      <span class="zh-CN">HMAC密钥字节数组</span>
-     * @param source    <span class="en">source object</span>
-     *                  <span class="zh-CN">原始数据对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @param keyBytes <span class="en-US">HMAC key bytes</span>
+     *                 <span class="zh-CN">HMAC密钥字节数组</span>
+     * @param source   <span class="en-US">source object</span>
+     *                 <span class="zh-CN">原始数据对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
      */
     public static byte[] HmacSM3(final byte[] keyBytes, final Object source) {
         try {
@@ -1406,98 +1365,91 @@ public final class SecurityUtils {
     /*
      *	Symmetric methods
      */
+
     /**
-     * <h3 class="en">Initialize Blowfish encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize Blowfish encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化Blowfish加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishEncryptor(final byte[] keyBytes) throws CryptoException {
         return BlowfishEncryptor("CBC", "NoPadding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize Blowfish encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize Blowfish encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化Blowfish加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishEncryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new BlowfishCryptoAdapterImpl(new CipherConfig("Blowfish", mode, padding), CryptoMode.ENCRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize Blowfish encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize Blowfish encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化Blowfish解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishDecryptor(final byte[] keyBytes) throws CryptoException {
         return BlowfishDecryptor("CBC", "NoPadding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize Blowfish encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize Blowfish encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化Blowfish解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishDecryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new BlowfishCryptoAdapterImpl(new CipherConfig("Blowfish", mode, padding), CryptoMode.DECRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Generate Blowfish key bytes</h3>
+     * <h3 class="en-US">Generate Blowfish key bytes</h3>
      * <h3 class="zh-CN">生成Blowfish密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] BlowfishKey() {
         try {
@@ -1506,98 +1458,91 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize DES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize DES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化DES加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter DESEncryptor(final byte[] keyBytes) throws CryptoException {
         return DESEncryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize DES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize DES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化DES加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter DESEncryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new DESCryptoAdapterImpl(new CipherConfig("DES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize DES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize DES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化DES解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter DESDecryptor(final byte[] keyBytes) throws CryptoException {
         return DESDecryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize DES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize DES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化DES解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter DESDecryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new DESCryptoAdapterImpl(new CipherConfig("DES", mode, padding), CryptoMode.DECRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Generate DES key bytes</h3>
+     * <h3 class="en-US">Generate DES key bytes</h3>
      * <h3 class="zh-CN">生成DES密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] DESKey() {
         try {
@@ -1606,100 +1551,93 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize TripleDES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize TripleDES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化3DES加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter TripleDESEncryptor(final byte[] keyBytes) throws CryptoException {
         return TripleDESEncryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize TripleDES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize TripleDES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化3DES加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter TripleDESEncryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new TripleDESCryptoAdapterImpl(new CipherConfig("DESede", mode, padding),
                 CryptoMode.ENCRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize TripleDES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize TripleDES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化3DES解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter TripleDESDecryptor(final byte[] keyBytes) throws CryptoException {
         return TripleDESDecryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize TripleDES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize TripleDES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化3DES解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter TripleDESDecryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new TripleDESCryptoAdapterImpl(new CipherConfig("DESede", mode, padding),
                 CryptoMode.DECRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Generate TripleDES key bytes</h3>
+     * <h3 class="en-US">Generate TripleDES key bytes</h3>
      * <h3 class="zh-CN">生成3DES密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] TripleDESKey() {
         try {
@@ -1708,156 +1646,145 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize SM4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Encryptor(final byte[] keyBytes) throws CryptoException {
         return SM4Encryptor("CBC", "NoPadding", keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize SM4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Encryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return SM4Encryptor(mode, padding, keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize SM4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode              <span class="en">Cipher Mode</span>
-     *                          <span class="zh-CN">分组密码模式</span>
-     * @param padding           <span class="en">Padding Mode</span>
-     *                          <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes          <span class="en">key bytes</span>
-     *                          <span class="zh-CN">密钥字节数组</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode            <span class="en-US">Cipher Mode</span>
+     *                        <span class="zh-CN">分组密码模式</span>
+     * @param padding         <span class="en-US">Padding Mode</span>
+     *                        <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes        <span class="en-US">key bytes</span>
+     *                        <span class="zh-CN">密钥字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Encryptor(final String mode, final String padding, final byte[] keyBytes,
                                              final String randomAlgorithm) throws CryptoException {
         return new SM4CryptoAdapterImpl(new CipherConfig("SM4", mode, padding),
                 CryptoMode.ENCRYPT, keyBytes, randomAlgorithm);
     }
+
     /**
-     * <h3 class="en">Initialize SM4 decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Decryptor(final byte[] keyBytes) throws CryptoException {
         return SM4Decryptor("CBC", "PKCS5Padding", keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize SM4 decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Decryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return SM4Decryptor(mode, padding, keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize SM4 decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM4 decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM4解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode              <span class="en">Cipher Mode</span>
-     *                          <span class="zh-CN">分组密码模式</span>
-     * @param padding           <span class="en">Padding Mode</span>
-     *                          <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes          <span class="en">key bytes</span>
-     *                          <span class="zh-CN">密钥字节数组</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode            <span class="en-US">Cipher Mode</span>
+     *                        <span class="zh-CN">分组密码模式</span>
+     * @param padding         <span class="en-US">Padding Mode</span>
+     *                        <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes        <span class="en-US">key bytes</span>
+     *                        <span class="zh-CN">密钥字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Decryptor(final String mode, final String padding, final byte[] keyBytes,
                                              final String randomAlgorithm) throws CryptoException {
         return new SM4CryptoAdapterImpl(new CipherConfig("SM4", mode, padding),
                 CryptoMode.DECRYPT, keyBytes, randomAlgorithm);
     }
+
     /**
-     * <h3 class="en">Generate SM4 key bytes</h3>
+     * <h3 class="en-US">Generate SM4 key bytes</h3>
      * <h3 class="zh-CN">生成SM4密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] SM4Key() {
         try {
@@ -1866,98 +1793,91 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize RC2 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC2 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC2加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Encryptor(final byte[] keyBytes) throws CryptoException {
         return RC2Encryptor("CBC", "NoPadding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize RC2 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC2 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC2加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Encryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new RC2CryptoAdapterImpl(new CipherConfig("RC2", mode, padding), CryptoMode.ENCRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize RC2 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC2 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC2解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Decryptor(final byte[] keyBytes) throws CryptoException {
         return RC2Decryptor("CBC", "NoPadding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize RC2 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC2 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC2解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Decryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new RC2CryptoAdapterImpl(new CipherConfig("RC2", mode, padding), CryptoMode.DECRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Generate RC2 key bytes</h3>
+     * <h3 class="en-US">Generate RC2 key bytes</h3>
      * <h3 class="zh-CN">生成RC2密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] RC2Key() {
         try {
@@ -1966,88 +1886,81 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Initialize RC4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC4加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC4Encryptor(final byte[] keyBytes) throws CryptoException {
         return RC4Encryptor(keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize RC4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC4加密安全适配器实例对象</h3>
      *
-     * @param keyBytes          <span class="en">key bytes</span>
-     *                          <span class="zh-CN">密钥字节数组</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes        <span class="en-US">key bytes</span>
+     *                        <span class="zh-CN">密钥字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC4Encryptor(final byte[] keyBytes, final String randomAlgorithm)
             throws CryptoException {
         return new RC4CryptoAdapterImpl(new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.ENCRYPT, keyBytes, randomAlgorithm);
     }
+
     /**
-     * <h3 class="en">Initialize RC4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC4解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC4Decryptor(final byte[] keyBytes) throws CryptoException {
         return RC4Decryptor(keyBytes, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Initialize RC4 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RC4 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RC4解密安全适配器实例对象</h3>
      *
-     * @param keyBytes          <span class="en">key bytes</span>
-     *                          <span class="zh-CN">密钥字节数组</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes        <span class="en-US">key bytes</span>
+     *                        <span class="zh-CN">密钥字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC4Decryptor(final byte[] keyBytes, final String randomAlgorithm)
             throws CryptoException {
         return new RC4CryptoAdapterImpl(new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.DECRYPT, keyBytes, randomAlgorithm);
     }
+
     /**
-     * <h3 class="en">Generate RC4 key bytes</h3>
+     * <h3 class="en-US">Generate RC4 key bytes</h3>
      * <h3 class="zh-CN">生成RC4密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] RC4Key() {
         try {
@@ -2059,316 +1972,294 @@ public final class SecurityUtils {
     /*
      * Asymmetric methods
      */
+
     /**
-     * <h3 class="en">Initialize RSA encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RSA encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RSA加密安全适配器实例对象</h3>
      *
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSAEncryptor(final Key publicKey) throws CryptoException {
         return RSAEncryptor("PKCS1Padding", publicKey);
     }
+
     /**
-     * <h3 class="en">Initialize RSA encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RSA encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RSA加密安全适配器实例对象</h3>
      * <span>
-     *     padding:  "NoPadding", "PKCS1Padding", "OAEPWithSHA-1AndMGF1Padding",
-     *                              "OAEPWithSHA-224AndMGF1Padding", "OAEPWithSHA-256AndMGF1Padding",
-     *                              "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding",
-     *                              "OAEPWithSHA3-224AndMGF1Padding", "OAEPWithSHA3-256AndMGF1Padding",
-     *                              "OAEPWithSHA3-384AndMGF1Padding", "OAEPWithSHA3-512AndMGF1Padding"
+     * padding:  "NoPadding", "PKCS1Padding", "OAEPWithSHA-1AndMGF1Padding",
+     * "OAEPWithSHA-224AndMGF1Padding", "OAEPWithSHA-256AndMGF1Padding",
+     * "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding",
+     * "OAEPWithSHA3-224AndMGF1Padding", "OAEPWithSHA3-256AndMGF1Padding",
+     * "OAEPWithSHA3-384AndMGF1Padding", "OAEPWithSHA3-512AndMGF1Padding"
      * </span>
      *
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param padding   <span class="en-US">Padding Mode</span>
+     *                  <span class="zh-CN">数据填充模式</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSAEncryptor(final String padding, final Key publicKey) throws CryptoException {
         return new RSACryptoAdapterImpl(new CipherConfig("RSA", "ECB", padding),
                 CryptoMode.ENCRYPT, new BaseCryptoAdapter.CipherKey(publicKey));
     }
+
     /**
-     * <h3 class="en">Initialize RSA decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RSA decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RSA解密安全适配器实例对象</h3>
      *
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSADecryptor(final Key privateKey) throws CryptoException {
         return RSADecryptor("PKCS1Padding", privateKey);
     }
+
     /**
-     * <h3 class="en">Initialize RSA decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize RSA decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化RSA解密安全适配器实例对象</h3>
      * <span>
-     *     padding:  "NoPadding", "PKCS1Padding", "OAEPWithSHA-1AndMGF1Padding",
-     *                              "OAEPWithSHA-224AndMGF1Padding", "OAEPWithSHA-256AndMGF1Padding",
-     *                              "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding",
-     *                              "OAEPWithSHA3-224AndMGF1Padding", "OAEPWithSHA3-256AndMGF1Padding",
-     *                              "OAEPWithSHA3-384AndMGF1Padding", "OAEPWithSHA3-512AndMGF1Padding"
+     * padding:  "NoPadding", "PKCS1Padding", "OAEPWithSHA-1AndMGF1Padding",
+     * "OAEPWithSHA-224AndMGF1Padding", "OAEPWithSHA-256AndMGF1Padding",
+     * "OAEPWithSHA-384AndMGF1Padding", "OAEPWithSHA-512AndMGF1Padding",
+     * "OAEPWithSHA3-224AndMGF1Padding", "OAEPWithSHA3-256AndMGF1Padding",
+     * "OAEPWithSHA3-384AndMGF1Padding", "OAEPWithSHA3-512AndMGF1Padding"
      * </span>
      *
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param padding    <span class="en-US">Padding Mode</span>
+     *                   <span class="zh-CN">数据填充模式</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSADecryptor(final String padding, final Key privateKey) throws CryptoException {
         return new RSACryptoAdapterImpl(new CipherConfig("RSA", "ECB", padding),
                 CryptoMode.DECRYPT, new BaseCryptoAdapter.CipherKey(privateKey));
     }
+
     /**
-     * <h3 class="en">Initialize RSA signer secure provider</h3>
+     * <h3 class="en-US">Initialize RSA signer secure provider</h3>
      * <h3 class="zh-CN">初始化RSA签名安全适配器实例对象</h3>
      *
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSASigner(final PrivateKey privateKey) throws CryptoException {
         return RSASigner("SHA256withRSA", privateKey);
     }
+
     /**
-     * <h3 class="en">Initialize RSA signer secure provider</h3>
+     * <h3 class="en-US">Initialize RSA signer secure provider</h3>
      * <h3 class="zh-CN">初始化RSA签名安全适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Signature algorithm name</span>
-     *                      <span class="zh-CN">签名算法名称</span>
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param algorithm  <span class="en-US">Signature algorithm name</span>
+     *                   <span class="zh-CN">签名算法名称</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSASigner(final String algorithm, final PrivateKey privateKey) throws CryptoException {
         return new RSACryptoAdapterImpl(
                 new CipherConfig(algorithm, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.SIGNATURE, new BaseCryptoAdapter.CipherKey(privateKey));
     }
+
     /**
-     * <h3 class="en">Initialize RSA signature verifier secure provider</h3>
+     * <h3 class="en-US">Initialize RSA signature verifier secure provider</h3>
      * <h3 class="zh-CN">初始化RSA签名验证安全适配器实例对象</h3>
      *
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSAVerifier(final PublicKey publicKey) throws CryptoException {
         return RSAVerifier("SHA256withRSA", publicKey);
     }
+
     /**
-     * <h3 class="en">Initialize RSA signature verifier secure provider</h3>
+     * <h3 class="en-US">Initialize RSA signature verifier secure provider</h3>
      * <h3 class="zh-CN">初始化RSA签名验证安全适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Signature algorithm name</span>
-     *                      <span class="zh-CN">签名算法名称</span>
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param algorithm <span class="en-US">Signature algorithm name</span>
+     *                  <span class="zh-CN">签名算法名称</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RSAVerifier(final String algorithm, final PublicKey publicKey) throws CryptoException {
         return new RSACryptoAdapterImpl(
                 new CipherConfig(algorithm, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.VERIFY, new BaseCryptoAdapter.CipherKey(publicKey));
     }
+
     /**
-     * <h3 class="en">Generate RSA KeyPair</h3>
+     * <h3 class="en-US">Generate RSA KeyPair</h3>
      * <h3 class="zh-CN">生成RSA密钥对</h3>
      *
-     * @return  <span class="en">Generated keypair</span>
-     *          <span class="zh-CN">生成的密钥对</span>
+     * @return <span class="en-US">Generated keypair</span>
+     * <span class="zh-CN">生成的密钥对</span>
      */
     public static KeyPair RSAKeyPair() {
         return RSAKeyPair(1024, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate RSA KeyPair</h3>
+     * <h3 class="en-US">Generate RSA KeyPair</h3>
      * <h3 class="zh-CN">生成RSA密钥对</h3>
      *
-     * @param keySize           <span class="en">Key size</span>
-     *                          <span class="zh-CN">密钥长度</span>
-     *
-     * @return  <span class="en">Generated keypair</span>
-     *          <span class="zh-CN">生成的密钥对</span>
+     * @param keySize <span class="en-US">Key size</span>
+     *                <span class="zh-CN">密钥长度</span>
+     * @return <span class="en-US">Generated keypair</span>
+     * <span class="zh-CN">生成的密钥对</span>
      */
     public static KeyPair RSAKeyPair(final int keySize) {
         return RSAKeyPair(keySize, "SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate RSA KeyPair</h3>
+     * <h3 class="en-US">Generate RSA KeyPair</h3>
      * <h3 class="zh-CN">生成RSA密钥对</h3>
      *
-     * @param keySize           <span class="en">Key size</span>
-     *                          <span class="zh-CN">密钥长度</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated keypair</span>
-     *          <span class="zh-CN">生成的密钥对</span>
+     * @param keySize         <span class="en-US">Key size</span>
+     *                        <span class="zh-CN">密钥长度</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated keypair</span>
+     * <span class="zh-CN">生成的密钥对</span>
      */
     public static KeyPair RSAKeyPair(final int keySize, final String randomAlgorithm) {
         return CertificateUtils.keyPair("RSA", randomAlgorithm, keySize);
     }
+
     /**
-     * <h3 class="en">Initialize SM2 encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM2 encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM2加密安全适配器实例对象</h3>
      *
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM2Encryptor(final PublicKey publicKey) throws CryptoException {
         return new SM2CryptoAdapterImpl(
                 new CipherConfig("SM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.ENCRYPT, new BaseCryptoAdapter.CipherKey(publicKey));
     }
+
     /**
-     * <h3 class="en">Initialize SM2 decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize SM2 decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化SM2解密安全适配器实例对象</h3>
      *
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM2Decryptor(final PrivateKey privateKey) throws CryptoException {
         return new SM2CryptoAdapterImpl(
                 new CipherConfig("SM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.DECRYPT, new BaseCryptoAdapter.CipherKey(privateKey));
     }
+
     /**
-     * <h3 class="en">Initialize SM2 signer secure provider</h3>
+     * <h3 class="en-US">Initialize SM2 signer secure provider</h3>
      * <h3 class="zh-CN">初始化SM2签名安全适配器实例对象</h3>
      *
-     * @param privateKey    <span class="en">Private Key instance</span>
-     *                      <span class="zh-CN">私钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param privateKey <span class="en-US">Private Key instance</span>
+     *                   <span class="zh-CN">私钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM2Signer(final PrivateKey privateKey) throws CryptoException {
         return new SM2CryptoAdapterImpl(
                 new CipherConfig("SM3withSM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.SIGNATURE, new BaseCryptoAdapter.CipherKey(privateKey));
     }
+
     /**
-     * <h3 class="en">Initialize SM2 signature verifier secure provider</h3>
+     * <h3 class="en-US">Initialize SM2 signature verifier secure provider</h3>
      * <h3 class="zh-CN">初始化SM2签名验证安全适配器实例对象</h3>
      *
-     * @param publicKey     <span class="en">Public Key instance</span>
-     *                      <span class="zh-CN">公钥证书实例对象</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param publicKey <span class="en-US">Public Key instance</span>
+     *                  <span class="zh-CN">公钥证书实例对象</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM2Verifier(final PublicKey publicKey) throws CryptoException {
         return new SM2CryptoAdapterImpl(
                 new CipherConfig("SM3withSM2", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
                 CryptoMode.VERIFY, new BaseCryptoAdapter.CipherKey(publicKey));
     }
+
     /**
-     * <h3 class="en">Generate SM2 KeyPair</h3>
+     * <h3 class="en-US">Generate SM2 KeyPair</h3>
      * <h3 class="zh-CN">生成SM2密钥对</h3>
      *
-     * @return  <span class="en">Generated keypair</span>
-     *          <span class="zh-CN">生成的密钥对</span>
+     * @return <span class="en-US">Generated keypair</span>
+     * <span class="zh-CN">生成的密钥对</span>
      */
     public static KeyPair SM2KeyPair() {
         return SM2KeyPair("SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate SM2 KeyPair</h3>
+     * <h3 class="en-US">Generate SM2 KeyPair</h3>
      * <h3 class="zh-CN">生成SM2密钥对</h3>
      *
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated keypair</span>
-     *          <span class="zh-CN">生成的密钥对</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated keypair</span>
+     * <span class="zh-CN">生成的密钥对</span>
      */
     public static KeyPair SM2KeyPair(final String randomAlgorithm) {
         return CertificateUtils.keyPair("EC", randomAlgorithm, Globals.INITIALIZE_INT_VALUE);
     }
+
     /**
-     * <h3 class="en">Convert data bytes from C1|C2|C3 to C1|C3|C2</h3>
+     * <h3 class="en-US">Convert data bytes from C1|C2|C3 to C1|C3|C2</h3>
      * <h3 class="zh-CN">转换字节数组从C1|C2|C3到C1|C3|C2</h3>
      *
-     * @param dataBytes     <span class="en">C1|C2|C3 data bytes</span>
-     *                      <span class="zh-CN">C1|C2|C3格式字节数组</span>
-     *
-     * @return  <span class="en">C1|C3|C2 data bytes</span>
-     *          <span class="zh-CN">C1|C3|C2格式字节数组</span>
+     * @param dataBytes <span class="en-US">C1|C2|C3 data bytes</span>
+     *                  <span class="zh-CN">C1|C2|C3格式字节数组</span>
+     * @return <span class="en-US">C1|C3|C2 data bytes</span>
+     * <span class="zh-CN">C1|C3|C2格式字节数组</span>
      */
     public static byte[] C1C2C3toC1C3C2(final byte[] dataBytes) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
@@ -2377,15 +2268,15 @@ public final class SecurityUtils {
         byteArrayOutputStream.write(dataBytes, 65, 32);
         return byteArrayOutputStream.toByteArray();
     }
+
     /**
-     * <h3 class="en">Convert data bytes from C1|C3|C2 to C1|C2|C3</h3>
+     * <h3 class="en-US">Convert data bytes from C1|C3|C2 to C1|C2|C3</h3>
      * <h3 class="zh-CN">转换字节数组从C1|C2|C3到C1|C3|C2</h3>
      *
-     * @param dataBytes     <span class="en">C1|C3|C2 data bytes</span>
-     *                      <span class="zh-CN">C1|C3|C2格式字节数组</span>
-     *
-     * @return  <span class="en">C1|C2|C3 data bytes</span>
-     *          <span class="zh-CN">C1|C2|C3格式字节数组</span>
+     * @param dataBytes <span class="en-US">C1|C3|C2 data bytes</span>
+     *                  <span class="zh-CN">C1|C3|C2格式字节数组</span>
+     * @return <span class="en-US">C1|C2|C3 data bytes</span>
+     * <span class="zh-CN">C1|C2|C3格式字节数组</span>
      */
     public static byte[] C1C3C2toC1C2C3(final byte[] dataBytes) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataBytes.length);
@@ -2394,87 +2285,79 @@ public final class SecurityUtils {
         byteArrayOutputStream.write(dataBytes, 65, dataBytes.length - 97);
         return byteArrayOutputStream.toByteArray();
     }
+
     /**
-     * <h3 class="en">Initialize AES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize AES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化AES加密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter AESEncryptor(final byte[] keyBytes) throws CryptoException {
         return AESEncryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize AES encryptor secure provider</h3>
+     * <h3 class="en-US">Initialize AES encryptor secure provider</h3>
      * <h3 class="zh-CN">初始化AES加密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter AESEncryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
         return new AESCryptoAdapterImpl(new CipherConfig("AES", mode, padding), CryptoMode.ENCRYPT, keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize AES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize AES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化AES解密安全适配器实例对象</h3>
      *
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter AESDecryptor(final byte[] keyBytes) throws CryptoException {
         return AESDecryptor("CBC", "PKCS5Padding", keyBytes);
     }
+
     /**
-     * <h3 class="en">Initialize AES decryptor secure provider</h3>
+     * <h3 class="en-US">Initialize AES decryptor secure provider</h3>
      * <h3 class="zh-CN">初始化AES解密安全适配器实例对象</h3>
      * <span>
-     *     mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
-     *     padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8", "CFB128", "OFB128"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
      * </span>
      *
-     * @param mode          <span class="en">Cipher Mode</span>
-     *                      <span class="zh-CN">分组密码模式</span>
-     * @param padding       <span class="en">Padding Mode</span>
-     *                      <span class="zh-CN">数据填充模式</span>
-     * @param keyBytes      <span class="en">key bytes</span>
-     *                      <span class="zh-CN">密钥字节数组</span>
-     *
-     * @return  <span class="en">Initialized secure provider instance</span>
-     *          <span class="zh-CN">初始化的安全适配器实例对象</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter AESDecryptor(final String mode, final String padding, final byte[] keyBytes)
             throws CryptoException {
@@ -2483,25 +2366,26 @@ public final class SecurityUtils {
     /*
      * Key generators
      */
+
     /**
-     * <h3 class="en">Generate AES128 key bytes</h3>
+     * <h3 class="en-US">Generate AES128 key bytes</h3>
      * <h3 class="zh-CN">生成AES128密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES128Key() {
         return AES128Key("SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate AES128 key bytes</h3>
+     * <h3 class="en-US">Generate AES128 key bytes</h3>
      * <h3 class="zh-CN">生成AES128密钥字节数组</h3>
      *
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES128Key(final String randomAlgorithm) {
         try {
@@ -2510,25 +2394,26 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Generate AES192 key bytes</h3>
+     * <h3 class="en-US">Generate AES192 key bytes</h3>
      * <h3 class="zh-CN">生成AES192密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES192Key() {
         return AES192Key("SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate AES192 key bytes</h3>
+     * <h3 class="en-US">Generate AES192 key bytes</h3>
      * <h3 class="zh-CN">生成AES192密钥字节数组</h3>
      *
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES192Key(final String randomAlgorithm) {
         try {
@@ -2537,25 +2422,26 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Generate AES256 key bytes</h3>
+     * <h3 class="en-US">Generate AES256 key bytes</h3>
      * <h3 class="zh-CN">生成AES256密钥字节数组</h3>
      *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES256Key() {
         return AES256Key("SHA1PRNG");
     }
+
     /**
-     * <h3 class="en">Generate AES256 key bytes</h3>
+     * <h3 class="en-US">Generate AES256 key bytes</h3>
      * <h3 class="zh-CN">生成AES256密钥字节数组</h3>
      *
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
      */
     public static byte[] AES256Key(final String randomAlgorithm) {
         try {
@@ -2564,15 +2450,15 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
     /**
-     * <h3 class="en">Retrieve RSA Key Size</h3>
+     * <h3 class="en-US">Retrieve RSA Key Size</h3>
      * <h3 class="zh-CN">读取RSA密钥长度</h3>
      *
-     * @param key   <span class="en">RSA key instance</span>
-     *              <span class="zh-CN">RSA密钥实例对象</span>
-     *
-     * @return  <span class="en">Retrieve key size</span>
-     *          <span class="zh-CN">读取的密钥长度</span>
+     * @param key <span class="en-US">RSA key instance</span>
+     *            <span class="zh-CN">RSA密钥实例对象</span>
+     * @return <span class="en-US">Retrieve key size</span>
+     * <span class="zh-CN">读取的密钥长度</span>
      */
     public static int rsaKeySize(final Key key) {
         if (key == null) {
@@ -2589,23 +2475,21 @@ public final class SecurityUtils {
             return Globals.DEFAULT_VALUE_INT;
         }
     }
+
     /**
-     * <h3 class="en">Generate symmetric key bytes</h3>
+     * <h3 class="en-US">Generate symmetric key bytes</h3>
      * <h3 class="zh-CN">生成对称加密密钥字节数组</h3>
      *
-     * @param algorithm         <span class="en">Algorithm name</span>
-     *                          <span class="zh-CN">算法名称</span>
-     * @param keySize           <span class="en">Key size</span>
-     *                          <span class="zh-CN">密钥长度</span>
-     * @param randomAlgorithm   <span class="en">Random algorithm</span>
-     *                          <span class="zh-CN">随机数算法</span>
-     *
-     * @return  <span class="en">Generated key bytes or 0 length byte array if process error</span>
-     *          <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param algorithm       <span class="en-US">Algorithm name</span>
+     *                        <span class="zh-CN">算法名称</span>
+     * @param keySize         <span class="en-US">Key size</span>
+     *                        <span class="zh-CN">密钥长度</span>
+     * @param randomAlgorithm <span class="en-US">Random algorithm</span>
+     *                        <span class="zh-CN">随机数算法</span>
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static byte[] symmetricKey(final String algorithm, final int keySize, final String randomAlgorithm)
             throws CryptoException {
@@ -2637,21 +2521,19 @@ public final class SecurityUtils {
             throw new CryptoException(0x000000150009L, "Init_Key_Crypto_Error", e);
         }
     }
+
     /**
-     * <h3 class="en">Calculate digest result of given object using given secure adapter</h3>
+     * <h3 class="en-US">Calculate digest result of given object using given secure adapter</h3>
      * <h3 class="zh-CN">使用给定的安全适配器计算给定数据的计算结果</h3>
      *
-     * @param source            <span class="en">source object</span>
-     *                          <span class="zh-CN">原始数据对象</span>
-     * @param secureAdapter     <span class="en">Secure provider instance</span>
-     *                          <span class="zh-CN">安全适配器实例对象</span>
-     *
-     * @return  <span class="en">Calculate result or zero-length arrays if processes have error</span>
-     *          <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
-     *
-     * @throws CryptoException
-     * <span class="en">If algorithm didn't find</span>
-     * <span class="zh-CN">如果算法未找到</span>
+     * @param source        <span class="en-US">source object</span>
+     *                      <span class="zh-CN">原始数据对象</span>
+     * @param secureAdapter <span class="en-US">Secure provider instance</span>
+     *                      <span class="zh-CN">安全适配器实例对象</span>
+     * @return <span class="en-US">Calculate result or zero-length arrays if processes have error</span>
+     * <span class="zh-CN">计算结果，如果出现错误则返回长度为0的字节数组</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
      */
     private static byte[] calculate(final Object source, final SecureAdapter secureAdapter) throws CryptoException {
         if (source instanceof File) {

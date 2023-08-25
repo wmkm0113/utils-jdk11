@@ -1,4 +1,23 @@
 Nervousync Java 工具包
+[08/25/2023]
+[添加] 添加xsd映射，用戶可以添加/META-INF/nervousync.schemas來映射namespaceURI和xsd位置文件
+[添加] 添加國際化支持
+[添加] StringUtils添加字符串檢查方法：isLuhn/isChnId/isChnSocialCredit/isMD5/isUUID/isXML/isPhoneNumber
+[添加]LoggerUtils程序初始化Log4j
+[更新] 更新 FileUtils.readFileBytes 支持 jar/zip 文件中的資源路徑
+[更新] 更新 FileUtils.loadFile 支持 jar/zip 文件中的資源路徑
+[更新]更新bouncy-castle版本至1.76，jcifs版本至2.1.36，jaxb版本至4.0.3
+[更新] 更新 XML Schema 定義文件
+[更新] 已棄用 MD5 方法
+[更新] ResponseInfo parseObject 使用內容類型值自動識別數據類型
+[更新] 通過類檢測 i18n 消息資源替換通過捆綁字符串識別消息資源
+[更新]更新MessageResource支持消息更新操作
+[修復] 修復了使用 BigEndian 時從字節數組讀取 long 時出現錯誤值的問題
+[修復] 無法從 jar 文件加載 XML 模式文件
+[刪除] 使用 ByteOrder 刪除 RawUtils.Endian 枚舉
+[測試] 添加RawTest用於測試RawUtils
+[文檔] 格式化所有java doc信息
+
 [03/06/2023]
 [更新] 重寫BeanUtils.java
 [更新] 更新Slf4j版本為2.0.5

@@ -4,8 +4,6 @@ import org.apache.logging.log4j.Level;
 import org.junit.jupiter.api.*;
 import org.nervousync.commons.Globals;
 import org.nervousync.utils.LoggerUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

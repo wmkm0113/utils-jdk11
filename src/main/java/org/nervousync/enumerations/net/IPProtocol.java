@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.net;
 
 /**
- * <h2 class="en">IP protocol Enumerations</h2>
+ * <h2 class="en-US">IP protocol Enumerations</h2>
  * <h2 class="zh-CN">IP协议枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,12 +25,12 @@ package org.nervousync.enumerations.net;
  */
 public enum IPProtocol {
 	/**
-     * <span class="en">TCP Protocol</span>
+     * <span class="en-US">TCP Protocol</span>
      * <span class="zh-CN">TCP协议</span>
 	 */
 	TCP,
 	/**
-     * <span class="en">UDP Protocol</span>
+     * <span class="en-US">UDP Protocol</span>
      * <span class="zh-CN">UDP协议</span>
 	 */
 	UDP

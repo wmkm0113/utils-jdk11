@@ -28,17 +28,17 @@ import org.nervousync.mail.protocol.BaseProtocol;
  */
 public final class SMTPProtocol extends BaseProtocol implements SendOperator {
 	/**
-	 * <span class="en">Serial version UID</span>
+	 * <span class="en-US">Serial version UID</span>
 	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = -5226459745420272131L;
     /**
-     * <h3 class="en">Constructor method for SMTPProtocol</h3>
+     * <h3 class="en-US">Constructor method for SMTPProtocol</h3>
      * <h3 class="zh-CN">SMTPProtocol构造方法</h3>
      *
-     * @param secureName    <span class="en">Secure config name</span>
+     * @param secureName    <span class="en-US">Secure config name</span>
      *                      <span class="zh-CN">安全配置名称</span>
-     * @param proxyConfig   <span class="en">Proxy configure information</span>
+     * @param proxyConfig   <span class="en-US">Proxy configure information</span>
      *                      <span class="zh-CN">代理服务器配置信息</span>
      */
 	public SMTPProtocol(final String secureName, final ProxyConfig proxyConfig) {

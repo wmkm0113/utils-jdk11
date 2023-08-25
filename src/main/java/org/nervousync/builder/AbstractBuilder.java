@@ -19,10 +19,10 @@ package org.nervousync.builder;
 import org.nervousync.exceptions.builder.BuilderException;
 
 /**
- * <h2 class="en">Abstract builder for Generics Type</h2>
+ * <h2 class="en-US">Abstract builder for Generics Type</h2>
  * <h2 class="zh-CN">拥有父构造器的抽象构造器</h2>
  *
- * @param <T>   <span class="en">Generics Type Class</span>
+ * @param <T>   <span class="en-US">Generics Type Class</span>
  *              <span class="zh-CN">泛型类</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -30,37 +30,37 @@ import org.nervousync.exceptions.builder.BuilderException;
  */
 public abstract class AbstractBuilder<T> {
     /**
-     * <span class="en">Generics Type Class</span>
+     * <span class="en-US">Generics Type Class</span>
      * <span class="zh-CN">泛型类</span>
      */
     protected final T parentBuilder;
     /**
-     * <h3 class="en">Protected constructor for AbstractBuilder</h3>
+     * <h3 class="en-US">Protected constructor for AbstractBuilder</h3>
      * <h3 class="zh-CN">AbstractBuilder的构造函数</h3>
      *
-     * @param parentBuilder     <span class="en">Generics Type instance</span>
+     * @param parentBuilder     <span class="en-US">Generics Type instance</span>
      *                          <span class="zh-CN">泛型类实例对象</span>
      */
     protected AbstractBuilder(final T parentBuilder) {
         this.parentBuilder = parentBuilder;
     }
     /**
-     * <h3 class="en">Protected abstract method for build current configure</h3>
+     * <h3 class="en-US">Protected abstract method for build current configure</h3>
      * <h3 class="zh-CN">保护的抽象方法，用于构建当前配置信息</h3>
      *
      * @throws BuilderException
-     * <span class="en">If an occurs when build current configure</span>
+     * <span class="en-US">If an occurs when build current configure</span>
      * <span class="zh-CN">当构建当前配置时时捕获异常</span>
      */
     protected abstract void build() throws BuilderException;
     /**
-     * <h3 class="en">Confirm current configure and return Generics Type instance</h3>
+     * <h3 class="en-US">Confirm current configure and return Generics Type instance</h3>
      * <h3 class="zh-CN">确认当前设置，并返回泛型类实例对象</h3>
      *
-     * @return  <span class="en">Generics Type Class</span>
+     * @return  <span class="en-US">Generics Type Class</span>
      *          <span class="zh-CN">泛型类</span>
      * @throws BuilderException
-     * <span class="en">If an occurs when confirm current configure</span>
+     * <span class="en-US">If an occurs when confirm current configure</span>
      * <span class="zh-CN">当确认当前配置时时捕获异常</span>
      */
     public final T confirm() throws BuilderException {

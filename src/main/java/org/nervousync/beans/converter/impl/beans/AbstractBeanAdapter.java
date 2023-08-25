@@ -19,7 +19,7 @@ package org.nervousync.beans.converter.impl.beans;
 import org.nervousync.beans.converter.impl.AbstractAdapter;
 
 /**
- * <h2 class="en">JavaBean Abstract DataConverter</h2>
+ * <h2 class="en-US">JavaBean Abstract DataConverter</h2>
  * <h2 class="zh-CN">JavaBean数据转换器抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

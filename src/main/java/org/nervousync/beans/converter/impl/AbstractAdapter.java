@@ -20,8 +20,8 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.nervousync.beans.converter.Adapter;
 
 /**
- * <h2 class="en">Abstract adapter for implements IConverter</h2>
- * <span class="en">Extend class XmlAdapter for compatible JAXB data converter</span>
+ * <h2 class="en-US">Abstract adapter for implements IConverter</h2>
+ * <span class="en-US">Extend class XmlAdapter for compatible JAXB data converter</span>
  * <h2 class="zh-CN">实现接口IConverter的抽象转换器</h2>
  * <span class="zh-CN">继承类XmlAdapter，用于兼容JAXB数据转换器</span>
  *

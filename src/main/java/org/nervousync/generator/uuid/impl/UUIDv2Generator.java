@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <h2 class="en">UUID version 2 generator</h2>
+ * <h2 class="en-US">UUID version 2 generator</h2>
  * <h2 class="zh-CN">UUID版本2生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @GeneratorProvider(IDUtils.UUIDv2)
 public final class UUIDv2Generator extends UUIDGenerator {
     /**
-     * <span class="en">Logger instance</span>
+     * <span class="en-US">Logger instance</span>
      * <span class="zh-CN">日志实例</span>
      */
     private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(UUIDv2Generator.class);
@@ -52,20 +52,20 @@ public final class UUIDv2Generator extends UUIDGenerator {
     }
 
     /**
-	 * <h3 class="en">Configure current generator</h3>
+	 * <h3 class="en-US">Configure current generator</h3>
 	 * <h3 class="zh-CN">修改当前生成器的配置</h3>
      *
-     * @param synchronizer  <span class="en">Time synchronizer instance</span>
+     * @param synchronizer  <span class="en-US">Time synchronizer instance</span>
      *                      <span class="zh-CN">时间同步器实例对象</span>
      */
     public void config(final TimeSynchronizer synchronizer) {
         this.uuidTimer.config(synchronizer);
     }
     /**
-	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="en-US">Generate ID value</h3>
 	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -73,13 +73,13 @@ public final class UUIDv2Generator extends UUIDGenerator {
         return new UUID(super.highBits(this.uuidTimer.getTimestamp()), this.lowBits(SystemUtils.localMac())).toString();
     }
     /**
-	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="en-US">Generate ID value using given parameter</h3>
 	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en">Given parameter</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
      *                      <span class="zh-CN">给定的参数</span>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -87,12 +87,12 @@ public final class UUIDv2Generator extends UUIDGenerator {
         return this.generate();
     }
     /**
-	 * <h3 class="en">Calculate low bits of given data bytes</h3>
+	 * <h3 class="en-US">Calculate low bits of given data bytes</h3>
 	 * <h3 class="zh-CN">从给定的二进制数组计算低位值</h3>
      *
-     * @param dataBytes     <span class="en">given data bytes</span>
+     * @param dataBytes     <span class="en-US">given data bytes</span>
      *                      <span class="zh-CN">给定的二进制数组</span>
-     * @return  <span class="en">Low bits value in long</span>
+     * @return  <span class="en-US">Low bits value in long</span>
      *          <span class="zh-CN">long型的低位比特值</span>
      */
     @Override
@@ -127,7 +127,7 @@ public final class UUIDv2Generator extends UUIDGenerator {
         return lowBits;
     }
     /**
-	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="en-US">Destroy current generator instance</h3>
 	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     @Override

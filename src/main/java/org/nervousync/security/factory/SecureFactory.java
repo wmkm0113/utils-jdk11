@@ -28,8 +28,8 @@ import java.security.cert.Certificate;
 import java.util.*;
 
 /**
- * <h2 class="en">Secure factory instance</h2>
- * <p class="en">
+ * <h2 class="en-US">Secure factory instance</h2>
+ * <p class="en-US">
  *     Running in singleton mode. Using for protect password in any configure files.
  *     Supported algorithm: RSA1024/RSA2048/SM2/AES128/AES192/AES256/DES/3DES/SM4
  * </p>
@@ -41,54 +41,54 @@ import java.util.*;
  */
 public final class SecureFactory {
 	/**
-	 * <span class="en">Logger instance</span>
+	 * <span class="en-US">Logger instance</span>
 	 * <span class="zh-CN">日志对象</span>
 	 */
     private static final LoggerUtils.Logger LOGGER = LoggerUtils.getLogger(SecureFactory.class);
 	/**
-	 * <span class="en">Default certificate alias</span>
+	 * <span class="en-US">Default certificate alias</span>
 	 * <span class="zh-CN">默认证书别名</span>
 	 */
     private static final String SECURE_CERTIFICATE_ALIAS = "NSYC";
 	/**
-	 * <span class="en">Default certificate password</span>
+	 * <span class="en-US">Default certificate password</span>
 	 * <span class="zh-CN">默认证书库密码</span>
 	 */
     private static final String SECURE_CERTIFICATE_PASSWORD = "ns0528AO";
 	/**
-	 * <span class="en">Root secure node</span>
+	 * <span class="en-US">Root secure node</span>
 	 * <span class="zh-CN">根安全节点</span>
 	 */
     private static SecureNode FACTORY_NODE = null;
 	/**
-	 * <span class="en">Registered secure node mapping</span>
+	 * <span class="en-US">Registered secure node mapping</span>
 	 * <span class="zh-CN">已注册的安全节点映射</span>
 	 */
     private static final Map<String, SecureNode> REGISTERED_NODE_MAP = new HashMap<>();
     /**
-	 * <h3 class="en">Private constructor method for SecureFactory</h3>
+	 * <h3 class="en-US">Private constructor method for SecureFactory</h3>
 	 * <h3 class="zh-CN">安全工厂的私有构造方法</h3>
      */
     private SecureFactory() {
     }
     /**
-	 * <h3 class="en">Check root secure node was configured</h3>
+	 * <h3 class="en-US">Check root secure node was configured</h3>
 	 * <h3 class="zh-CN">检查根安全节点是否配置成功</h3>
      *
-     * @return  <span class="en">Check result</span>
+     * @return  <span class="en-US">Check result</span>
      *          <span class="zh-CN">检查结果</span>
      */
     public static boolean initialized() {
         return FACTORY_NODE != null && FACTORY_NODE.isInitialized();
     }
     /**
-	 * <h3 class="en">Configure root secure node using given secure config</h3>
+	 * <h3 class="en-US">Configure root secure node using given secure config</h3>
 	 * <h3 class="zh-CN">使用给定的安全配置信息设置安全工厂的根安全节点</h3>
      *
-     * @param secureConfig  <span class="en">Secure config information</span>
+     * @param secureConfig  <span class="en-US">Secure config information</span>
      *                      <span class="zh-CN">安全配置信息</span>
      *
-     * @return  <span class="en">Initialize result</span>
+     * @return  <span class="en-US">Initialize result</span>
      *          <span class="zh-CN">初始化结果</span>
      */
     public static boolean initialize(final SecureConfig secureConfig) {
@@ -104,13 +104,13 @@ public final class SecureFactory {
                 .orElse(Boolean.FALSE);
     }
     /**
-	 * <h3 class="en">Check given secure algorithm was supported</h3>
+	 * <h3 class="en-US">Check given secure algorithm was supported</h3>
 	 * <h3 class="zh-CN">检查给定的安全算法支持状态</h3>
      *
-     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+     * @param secureAlgorithm   <span class="en-US">Secure algorithm</span>
 	 *                          <span class="zh-CN">安全算法</span>
      *
-     * @return  <span class="en">Check result</span>
+     * @return  <span class="en-US">Check result</span>
      *          <span class="zh-CN">检查结果</span>
      */
     public static boolean supportedAlgorithm(final String secureAlgorithm) {
@@ -122,13 +122,13 @@ public final class SecureFactory {
         }
     }
     /**
-	 * <h3 class="en">Generate secure configure information using given secure algorithm</h3>
+	 * <h3 class="en-US">Generate secure configure information using given secure algorithm</h3>
 	 * <h3 class="zh-CN">使用给定的安全算法生成安全配置信息实例对象</h3>
      *
-     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+     * @param secureAlgorithm   <span class="en-US">Secure algorithm</span>
 	 *                          <span class="zh-CN">安全算法</span>
      *
-     * @return  <span class="en">Optional of SecureConfig instance</span>
+     * @return  <span class="en-US">Optional of SecureConfig instance</span>
      *          <span class="zh-CN">Optional包装的安全配置信息实例对象</span>
      */
     public static Optional<SecureConfig> initConfig(final SecureAlgorithm secureAlgorithm) {
@@ -145,10 +145,10 @@ public final class SecureFactory {
         return Optional.of(secureConfig);
     }
     /**
-	 * <h3 class="en">Check given secure name was registered</h3>
+	 * <h3 class="en-US">Check given secure name was registered</h3>
 	 * <h3 class="zh-CN">检查给定的安全名称注册状态</h3>
      *
-     * @param secureName    <span class="en">Secure name</span>
+     * @param secureName    <span class="en-US">Secure name</span>
      *                      <span class="zh-CN">安全名称</span>
      * @return the boolean
      */
@@ -160,15 +160,15 @@ public final class SecureFactory {
     }
 
     /**
-	 * <h3 class="en">Register secure config by given secure name and configure information instance</h3>
+	 * <h3 class="en-US">Register secure config by given secure name and configure information instance</h3>
 	 * <h3 class="zh-CN">将给定的安全名称和安全配置信息实例注册到安全工厂</h3>
      *
-     * @param secureName    <span class="en">Secure name</span>
+     * @param secureName    <span class="en-US">Secure name</span>
      *                      <span class="zh-CN">安全名称</span>
-     * @param secureConfig  <span class="en">Secure config information</span>
+     * @param secureConfig  <span class="en-US">Secure config information</span>
      *                      <span class="zh-CN">安全配置信息</span>
      *
-     * @return  <span class="en">Register result</span>
+     * @return  <span class="en-US">Register result</span>
      *          <span class="zh-CN">注册结果</span>
      */
     public static boolean register(final String secureName, final SecureConfig secureConfig) {
@@ -191,10 +191,10 @@ public final class SecureFactory {
                 .orElse(Boolean.FALSE);
     }
     /**
-	 * <h3 class="en">Deregister secure config by given secure name</h3>
+	 * <h3 class="en-US">Deregister secure config by given secure name</h3>
 	 * <h3 class="zh-CN">将给定的安全名称取消注册</h3>
      *
-     * @param secureName    <span class="en">Secure name</span>
+     * @param secureName    <span class="en-US">Secure name</span>
      *                      <span class="zh-CN">安全名称</span>
      */
     public static void deregister(String secureName) {
@@ -203,17 +203,17 @@ public final class SecureFactory {
         }
     }
     /**
-	 * <h3 class="en">Update secure config protected password data</h3>
+	 * <h3 class="en-US">Update secure config protected password data</h3>
 	 * <h3 class="zh-CN">更新安全配置保护的密码信息</h3>
      *
-     * @param dataContent   <span class="en">Password data</span>
+     * @param dataContent   <span class="en-US">Password data</span>
      *                      <span class="zh-CN">密码信息</span>
-     * @param originalName  <span class="en">Original secure name</span>
+     * @param originalName  <span class="en-US">Original secure name</span>
      *                      <span class="zh-CN">旧安全配置名称</span>
-     * @param secureName    <span class="en">New secure name</span>
+     * @param secureName    <span class="en-US">New secure name</span>
      *                      <span class="zh-CN">新安全配置名称</span>
      *
-     * @return  <span class="en">Updated password data</span>
+     * @return  <span class="en-US">Updated password data</span>
      *          <span class="zh-CN">更新后的密码信息</span>
      */
     public static String update(final String dataContent, final String originalName, final String secureName) {
@@ -229,15 +229,15 @@ public final class SecureFactory {
         }
     }
     /**
-	 * <h3 class="en">Encrypt data content using given secure name</h3>
+	 * <h3 class="en-US">Encrypt data content using given secure name</h3>
 	 * <h3 class="zh-CN">使用给定的安全名称加密密码信息</h3>
      *
-     * @param secureName    <span class="en">New secure name</span>
+     * @param secureName    <span class="en-US">New secure name</span>
      *                      <span class="zh-CN">新安全配置名称</span>
-     * @param dataContent   <span class="en">Password data</span>
+     * @param dataContent   <span class="en-US">Password data</span>
      *                      <span class="zh-CN">密码信息</span>
      *
-     * @return  <span class="en">Encrypted password data</span>
+     * @return  <span class="en-US">Encrypted password data</span>
      *          <span class="zh-CN">加密后的密码信息</span>
      */
     public static String encrypt(final String secureName, final String dataContent) {
@@ -261,15 +261,15 @@ public final class SecureFactory {
                 .orElse(dataContent);
     }
     /**
-	 * <h3 class="en">Decrypt data content using given secure name</h3>
+	 * <h3 class="en-US">Decrypt data content using given secure name</h3>
 	 * <h3 class="zh-CN">使用给定的安全名称解密密码信息</h3>
      *
-     * @param secureName    <span class="en">New secure name</span>
+     * @param secureName    <span class="en-US">New secure name</span>
      *                      <span class="zh-CN">新安全配置名称</span>
-     * @param dataContent   <span class="en">Password data</span>
+     * @param dataContent   <span class="en-US">Password data</span>
      *                      <span class="zh-CN">密码信息</span>
      *
-     * @return  <span class="en">Decrypted password data</span>
+     * @return  <span class="en-US">Decrypted password data</span>
      *          <span class="zh-CN">解密后的密码信息</span>
      */
     public static String decrypt(final String secureName, final String dataContent) {
@@ -296,15 +296,15 @@ public final class SecureFactory {
                 .orElse(dataContent);
     }
     /**
-	 * <h3 class="en">Initialize key bytes</h3>
+	 * <h3 class="en-US">Initialize key bytes</h3>
 	 * <h3 class="zh-CN">初始化加密密钥数据</h3>
      *
-     * @param dataBytes     <span class="en">key bytes</span>
+     * @param dataBytes     <span class="en-US">key bytes</span>
      *                      <span class="zh-CN">加密密钥数据</span>
-     * @param encrypt       <span class="en">Encrypt status</span>
+     * @param encrypt       <span class="en-US">Encrypt status</span>
      *                      <span class="zh-CN">加密密钥数据</span>
      *
-     * @return  <span class="en">Initialized data bytes</span>
+     * @return  <span class="en-US">Initialized data bytes</span>
      *          <span class="zh-CN">初始化的数据</span>
      */
     private static byte[] initKey(final byte[] dataBytes, final boolean encrypt) {
@@ -323,13 +323,13 @@ public final class SecureFactory {
         }
     }
     /**
-	 * <h3 class="en">Generate secure key by given secure algorithm</h3>
+	 * <h3 class="en-US">Generate secure key by given secure algorithm</h3>
 	 * <h3 class="zh-CN">使用给定的安全算法生成安全密钥</h3>
      *
-     * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+     * @param secureAlgorithm   <span class="en-US">Secure algorithm</span>
 	 *                          <span class="zh-CN">安全算法</span>
      *
-     * @return  <span class="en">Generated key data bytes</span>
+     * @return  <span class="en-US">Generated key data bytes</span>
      *          <span class="zh-CN">生成的安全密钥数据</span>
      */
     private static byte[] generate(final SecureAlgorithm secureAlgorithm) {
@@ -357,15 +357,15 @@ public final class SecureFactory {
         }
     }
     /**
-	 * <h3 class="en">Convert asymmetric key pair instance to secure key data bytes, using given signature algorithm</h3>
+	 * <h3 class="en-US">Convert asymmetric key pair instance to secure key data bytes, using given signature algorithm</h3>
 	 * <h3 class="zh-CN">使用给定的签名算法将非对称密钥对实例对象转换为安全密钥数据</h3>
      *
-     * @param keyPair           <span class="en">Asymmetric key pair instance</span>
+     * @param keyPair           <span class="en-US">Asymmetric key pair instance</span>
 	 *                          <span class="zh-CN">非对称密钥对实例对象</span>
-     * @param signAlgorithm     <span class="en">Signature algorithm</span>
+     * @param signAlgorithm     <span class="en-US">Signature algorithm</span>
 	 *                          <span class="zh-CN">签名算法</span>
      *
-     * @return  <span class="en">Generated key data bytes</span>
+     * @return  <span class="en-US">Generated key data bytes</span>
      *          <span class="zh-CN">生成的安全密钥数据</span>
      */
     private static byte[] convertKeyPair(final KeyPair keyPair, final String signAlgorithm) {
@@ -375,7 +375,7 @@ public final class SecureFactory {
                 SECURE_CERTIFICATE_ALIAS, SECURE_CERTIFICATE_PASSWORD, null, signAlgorithm);
     }
     /**
-     * <h2 class="en">Secure Node</h2>
+     * <h2 class="en-US">Secure Node</h2>
      * <h2 class="zh-CN">安全配置信息定义</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -383,37 +383,37 @@ public final class SecureFactory {
      */
     private static final class SecureNode {
         /**
-         * <span class="en">Node initialize status</span>
+         * <span class="en-US">Node initialize status</span>
          * <span class="zh-CN">节点初始化状态</span>
          */
         private final boolean initialized;
         /**
-         * <span class="en">Secure algorithm</span>
+         * <span class="en-US">Secure algorithm</span>
          * <span class="zh-CN">安全算法</span>
          */
         private final SecureAlgorithm secureAlgorithm;
         /**
-         * <span class="en">Secure key data bytes</span>
+         * <span class="en-US">Secure key data bytes</span>
          * <span class="zh-CN">安全密钥数据</span>
          */
         private final byte[] keyBytes;
         /**
-         * <span class="en">Asymmetric private key</span>
+         * <span class="en-US">Asymmetric private key</span>
          * <span class="zh-CN">非对称加密私钥</span>
          */
         private final PrivateKey privateKey;
         /**
-         * <span class="en">Asymmetric public key</span>
+         * <span class="en-US">Asymmetric public key</span>
          * <span class="zh-CN">非对称加密公钥</span>
          */
         private final PublicKey publicKey;
         /**
-         * <h3 class="en">Constructor for SecureNode</h3>
+         * <h3 class="en-US">Constructor for SecureNode</h3>
          * <h3 class="zh-CN">安全节点构造方法</h3>
          *
-         * @param secureAlgorithm   <span class="en">Secure algorithm</span>
+         * @param secureAlgorithm   <span class="en-US">Secure algorithm</span>
          *                          <span class="zh-CN">安全算法</span>
-         * @param dataBytes         <span class="en">Secure key data bytes</span>
+         * @param dataBytes         <span class="en-US">Secure key data bytes</span>
          *                          <span class="zh-CN">安全密钥数据</span>
          */
         private SecureNode(final SecureAlgorithm secureAlgorithm, final byte[] dataBytes) {
@@ -458,13 +458,13 @@ public final class SecureFactory {
             }
         }
         /**
-         * <h3 class="en">Static method for initialize secure node by given secure config</h3>
+         * <h3 class="en-US">Static method for initialize secure node by given secure config</h3>
          * <h3 class="zh-CN">静态方法用于使用给定的安全配置信息初始化安全节点实例</h3>
          *
-         * @param secureConfig  <span class="en">Secure config information</span>
+         * @param secureConfig  <span class="en-US">Secure config information</span>
          *                      <span class="zh-CN">安全配置信息</span>
          *
-         * @return  <span class="en">Optional of SecureNode instance</span>
+         * @return  <span class="en-US">Optional of SecureNode instance</span>
          *          <span class="zh-CN">Optional包装的安全节点实例对象</span>
          */
         public static Optional<SecureNode> initialize(final SecureConfig secureConfig) {
@@ -480,13 +480,13 @@ public final class SecureFactory {
             }
         }
         /**
-         * <h3 class="en">Static method for initialize factory secure node by given secure config</h3>
+         * <h3 class="en-US">Static method for initialize factory secure node by given secure config</h3>
          * <h3 class="zh-CN">静态方法用于使用给定的安全配置信息初始化根安全节点实例</h3>
          *
-         * @param secureConfig  <span class="en">Secure config information</span>
+         * @param secureConfig  <span class="en-US">Secure config information</span>
          *                      <span class="zh-CN">安全配置信息</span>
          *
-         * @return  <span class="en">Optional of SecureNode instance</span>
+         * @return  <span class="en-US">Optional of SecureNode instance</span>
          *          <span class="zh-CN">Optional包装的安全节点实例对象</span>
          */
         private static Optional<SecureNode> initFactory(final SecureConfig secureConfig) {
@@ -502,13 +502,13 @@ public final class SecureFactory {
             }
         }
         /**
-         * <h3 class="en">Initialize secure adapter</h3>
+         * <h3 class="en-US">Initialize secure adapter</h3>
          * <h3 class="zh-CN">初始化加密解密适配器</h3>
          *
-         * @param encrypt   <span class="en">Encrypt status</span>
+         * @param encrypt   <span class="en-US">Encrypt status</span>
          *                  <span class="zh-CN">加密状态</span>
          *
-         * @return  <span class="en">Initialized adapter instance</span>
+         * @return  <span class="en-US">Initialized adapter instance</span>
          *          <span class="zh-CN">初始化的适配器实例对象</span>
          */
         private SecureAdapter initCryptor(boolean encrypt) {
@@ -556,10 +556,10 @@ public final class SecureFactory {
             return secureAdapter;
         }
         /**
-         * <h3 class="en">Getter method for Node initialize status</h3>
+         * <h3 class="en-US">Getter method for Node initialize status</h3>
          * <h3 class="zh-CN">节点初始化状态的Getter方法</h3>
          *
-         * @return  <span class="en">Node initialize status</span>
+         * @return  <span class="en-US">Node initialize status</span>
          *          <span class="zh-CN">节点初始化状态</span>
          */
         public boolean isInitialized() {
@@ -567,7 +567,7 @@ public final class SecureFactory {
         }
     }
     /**
-     * <h2 class="en">Enumeration of Secure Algorithm</h2>
+     * <h2 class="en-US">Enumeration of Secure Algorithm</h2>
      * <h2 class="zh-CN">安全算法的枚举类</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

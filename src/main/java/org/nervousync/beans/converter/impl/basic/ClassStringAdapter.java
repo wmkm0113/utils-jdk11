@@ -22,7 +22,7 @@ import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
- * <h2 class="en">Class DataConverter</h2>
+ * <h2 class="en-US">Class DataConverter</h2>
  * <h2 class="zh-CN">Class数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

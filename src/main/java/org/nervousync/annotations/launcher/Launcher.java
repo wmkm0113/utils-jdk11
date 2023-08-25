@@ -21,7 +21,7 @@ import org.nervousync.commons.Globals;
 import java.lang.annotation.*;
 
 /**
- * <h3 class="en">Annotation class for startup launcher class</h3>
+ * <h3 class="en-US">Annotation class for startup launcher class</h3>
  * <h3 class="zh-CN">启动器类的标注</h3>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -32,10 +32,10 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface Launcher {
 	/**
-	 * <span class="en">Launcher sort code. Sort type: DESC</span>
+	 * <span class="en-US">Launcher sort code. Sort type: DESC</span>
 	 * <span class="zh-CN">启动器排序代码，排序类型：倒叙</span>
 	 *
-	 * @return  <span class="en">Sort code</span>
+	 * @return  <span class="en-US">Sort code</span>
 	 *          <span class="zh-CN">排序代码</span>
 	 */
 	int value() default Globals.DEFAULT_VALUE_INT;

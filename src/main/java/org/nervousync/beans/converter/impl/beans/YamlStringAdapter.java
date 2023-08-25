@@ -24,7 +24,7 @@ import org.nervousync.utils.StringUtils;
 import java.util.Optional;
 
 /**
- * <h2 class="en">JavaBean YamlConverter</h2>
+ * <h2 class="en-US">JavaBean YamlConverter</h2>
  * <h2 class="zh-CN">JavaBean数据Yaml转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

@@ -23,7 +23,7 @@ import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
- * <h2 class="en">Cookie information Define</h2>
+ * <h2 class="en-US">Cookie information Define</h2>
  * <h2 class="zh-CN">Cookie信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -31,50 +31,50 @@ import org.nervousync.utils.StringUtils;
  */
 public final class CookieEntity {
 	/**
-     * <span class="en">Cookie name</span>
+     * <span class="en-US">Cookie name</span>
      * <span class="zh-CN">Cookie名</span>
 	 */
 	private String name = null;
 	/**
-     * <span class="en">Cookie value</span>
+     * <span class="en-US">Cookie value</span>
      * <span class="zh-CN">Cookie值</span>
 	 */
 	private String value = null;
 	/**
-     * <span class="en">Cookie path</span>
+     * <span class="en-US">Cookie path</span>
      * <span class="zh-CN">Cookie目录</span>
 	 */
 	private String path = null;
 	/**
-     * <span class="en">Cookie domain name</span>
+     * <span class="en-US">Cookie domain name</span>
      * <span class="zh-CN">Cookie域名</span>
 	 */
 	private String domain = null;
 	/**
-     * <span class="en">Cookie expire time</span>
+     * <span class="en-US">Cookie expire time</span>
      * <span class="zh-CN">Cookie过期时间</span>
 	 */
 	private long expires = Globals.DEFAULT_VALUE_LONG;
 	/**
-     * <span class="en">Cookie maximum age</span>
+     * <span class="en-US">Cookie maximum age</span>
      * <span class="zh-CN">Cookie最大生命周期</span>
 	 */
 	private long maxAge = Globals.DEFAULT_VALUE_LONG;
 	/**
-     * <span class="en">Cookie secure status</span>
+     * <span class="en-US">Cookie secure status</span>
      * <span class="zh-CN">Cookie是否用于加密传输</span>
 	 */
 	private boolean secure = Boolean.FALSE;
 	/**
-     * <span class="en">Cookie version value</span>
+     * <span class="en-US">Cookie version value</span>
      * <span class="zh-CN">Cookie版本号</span>
 	 */
 	private int version = 0;
 	/**
-	 * <h3 class="en">Constructor method for CookieEntity</h3>
+	 * <h3 class="en-US">Constructor method for CookieEntity</h3>
 	 * <h3 class="zh-CN">CookieEntity构造方法</h3>
 	 *
-	 * @param cookieValue 	<span class="en">Cookie value from response header</span>
+	 * @param cookieValue 	<span class="en-US">Cookie value from response header</span>
 	 *                      <span class="zh-CN">来自响应头的Cookie值</span>
 	 */
 	public CookieEntity(String cookieValue) {
@@ -109,80 +109,80 @@ public final class CookieEntity {
 		}
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie name</h3>
+	 * <h3 class="en-US">Getter method for cookie name</h3>
 	 * <h3 class="zh-CN">Cookie名的Getter方法</h3>
 	 *
-	 * @return 	<span class="en">Cookie name</span>
+	 * @return 	<span class="en-US">Cookie name</span>
      * 			<span class="zh-CN">Cookie名</span>
 	 */
 	public String getName() {
 		return name;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie value</h3>
+	 * <h3 class="en-US">Getter method for cookie value</h3>
 	 * <h3 class="zh-CN">Cookie值的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie value</span>
+     * @return 	<span class="en-US">Cookie value</span>
      * 			<span class="zh-CN">Cookie值</span>
 	 */
 	public String getValue() {
 		return value;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie path</h3>
+	 * <h3 class="en-US">Getter method for cookie path</h3>
 	 * <h3 class="zh-CN">Cookie目录的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie path</span>
+     * @return 	<span class="en-US">Cookie path</span>
      * 			<span class="zh-CN">Cookie目录</span>
 	 */
 	public String getPath() {
 		return path;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie domain name</h3>
+	 * <h3 class="en-US">Getter method for cookie domain name</h3>
 	 * <h3 class="zh-CN">Cookie域名的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie domain name</span>
+     * @return 	<span class="en-US">Cookie domain name</span>
      * 			<span class="zh-CN">Cookie域名</span>
 	 */
 	public String getDomain() {
 		return domain;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie expires</h3>
+	 * <h3 class="en-US">Getter method for cookie expires</h3>
 	 * <h3 class="zh-CN">Cookie过期时间的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie expire time</span>
+     * @return 	<span class="en-US">Cookie expire time</span>
      * 			<span class="zh-CN">Cookie过期时间</span>
 	 */
 	public long getExpires() {
 		return expires;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie maximum age</h3>
+	 * <h3 class="en-US">Getter method for cookie maximum age</h3>
 	 * <h3 class="zh-CN">Cookie最大生命周期的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie maximum age</span>
+     * @return 	<span class="en-US">Cookie maximum age</span>
      * 			<span class="zh-CN">Cookie最大生命周期</span>
 	 */
 	public long getMaxAge() {
 		return maxAge;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie secure status</h3>
+	 * <h3 class="en-US">Getter method for cookie secure status</h3>
 	 * <h3 class="zh-CN">Cookie加密传输的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie secure status</span>
+     * @return 	<span class="en-US">Cookie secure status</span>
      * 			<span class="zh-CN">Cookie是否用于加密传输</span>
 	 */
 	public boolean isSecure() {
 		return secure;
 	}
 	/**
-	 * <h3 class="en">Getter method for cookie version</h3>
+	 * <h3 class="en-US">Getter method for cookie version</h3>
 	 * <h3 class="zh-CN">Cookie版本号的Getter方法</h3>
 	 *
-     * @return 	<span class="en">Cookie version value</span>
+     * @return 	<span class="en-US">Cookie version value</span>
      * 			<span class="zh-CN">Cookie版本号</span>
 	 */
 	public int getVersion() {

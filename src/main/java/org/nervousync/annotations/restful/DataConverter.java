@@ -20,7 +20,7 @@ import org.nervousync.beans.converter.Adapter;
 import java.lang.annotation.*;
 
 /**
- * <h2 class="en">Annotation for Restful service request parameter to register data converter</h2>
+ * <h2 class="en-US">Annotation for Restful service request parameter to register data converter</h2>
  * <h2 class="zh-CN">用于标注在Restful服务接口参数的注解，注册数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -31,13 +31,13 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 public @interface DataConverter {
 	/**
-	 * <h3 class="en">Data converter class</h3>
-	 * <p class="en">Class must implements org.nervousync.beans.converter.IConverter, T is current field type class, U is target bean field type class</p>
+	 * <h3 class="en-US">Data converter class</h3>
+	 * <p class="en-US">Class must implements org.nervousync.beans.converter.IConverter, T is current field type class, U is target bean field type class</p>
 	 * <h3 class="zh-CN">数据转换类</h3>
 	 * <p class="zh-CN">类必须实现接口org.nervousync.beans.converter.IConverter，T是注解属性的数据类型，U是目标属性的数据类型</p>
 	 *
 	 * @see Adapter
-	 * @return	<span class="en">Data converter class</span>
+	 * @return	<span class="en-US">Data converter class</span>
 	 * 			<span class="zh-CN">数据转换类</span>
 	 */
     Class<?> value() default Adapter.class;

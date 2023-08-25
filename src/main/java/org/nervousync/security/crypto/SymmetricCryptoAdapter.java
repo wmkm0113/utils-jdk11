@@ -26,7 +26,7 @@ import javax.crypto.IllegalBlockSizeException;
 import java.io.ByteArrayOutputStream;
 
 /**
- * <h2 class="en">Abstract symmetric crypto adapter class</h2>
+ * <h2 class="en-US">Abstract symmetric crypto adapter class</h2>
  * <h2 class="zh-CN">对称加密解密适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -34,23 +34,23 @@ import java.io.ByteArrayOutputStream;
  */
 public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
     /**
-     * <span class="en">Result data bytes output stream</span>
+     * <span class="en-US">Result data bytes output stream</span>
      * <span class="zh-CN">结果数据二进制数组输出流</span>
      */
     private ByteArrayOutputStream byteArrayOutputStream;
     /**
-     * <h3 class="en">Constructor for SymmetricCryptoAdapter</h3>
+     * <h3 class="en-US">Constructor for SymmetricCryptoAdapter</h3>
      * <h3 class="zh-CN">对称加密解密适配器的抽象类的构造方法</h3>
      *
-     * @param cipherConfig  <span class="en">Cipher configure</span>
+     * @param cipherConfig  <span class="en-US">Cipher configure</span>
      *                      <span class="zh-CN">密码设置</span>
-     * @param cryptoMode    <span class="en">Crypto mode</span>
+     * @param cryptoMode    <span class="en-US">Crypto mode</span>
      *                      <span class="zh-CN">加密解密模式</span>
-     * @param cipherKey     <span class="en">Crypto key</span>
+     * @param cipherKey     <span class="en-US">Crypto key</span>
      *                      <span class="zh-CN">加密解密密钥</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize cipher</span>
+     * <span class="en-US">If an error occurs when initialize cipher</span>
      * <span class="zh-CN">当初始化加密解密实例对象时出现异常</span>
      */
     protected SymmetricCryptoAdapter(final CipherConfig cipherConfig, final CryptoMode cryptoMode,
@@ -59,18 +59,18 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
         this.reset();
     }
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -88,21 +88,21 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
         }
     }
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter and calculate final result</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter and calculate final result</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器并计算最终结果</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
-     * @return  <span class="en">Calculate result data byte array</span>
+     * @return  <span class="en-US">Calculate result data byte array</span>
      *          <span class="zh-CN">计算的二进制字节数组结果</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -127,17 +127,17 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
         }
     }
     /**
-	 * <h3 class="en">Verify given signature data bytes is valid</h3>
+	 * <h3 class="en-US">Verify given signature data bytes is valid</h3>
 	 * <h3 class="zh-CN">验证给定的签名二进制数据是合法的</h3>
      *
-     * @param signature     <span class="en">signature data bytes</span>
+     * @param signature     <span class="en-US">signature data bytes</span>
      *                      <span class="zh-CN">签名二进制数据</span>
      *
-     * @return  <span class="en">Verify result</span>
+     * @return  <span class="en-US">Verify result</span>
      *          <span class="zh-CN">验证结果</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -145,11 +145,11 @@ public abstract class SymmetricCryptoAdapter extends BaseCryptoAdapter {
         throw new CryptoException(0x00000015000CL, "Not_Support_Mode_Crypto_Error");
     }
     /**
-	 * <h3 class="en">Reset current adapter</h3>
+	 * <h3 class="en-US">Reset current adapter</h3>
 	 * <h3 class="zh-CN">重置当前适配器</h3>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override

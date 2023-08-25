@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.snmp.auth;
 
 /**
- * <h2 class="en">SNMP Authentication Type Enumerations</h2>
+ * <h2 class="en-US">SNMP Authentication Type Enumerations</h2>
  * <h2 class="zh-CN">SNMP身份验证类型枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,17 +25,17 @@ package org.nervousync.enumerations.snmp.auth;
  */
 public enum SNMPAuthType {
 	/**
-     * <span class="en">No Authentication</span>
+     * <span class="en-US">No Authentication</span>
      * <span class="zh-CN">无验证</span>
 	 */
 	NOAUTH_NOPRIV,
 	/**
-     * <span class="en">Authentication with No Private</span>
+     * <span class="en-US">Authentication with No Private</span>
      * <span class="zh-CN">验证不使用私有验证</span>
 	 */
 	AUTH_NOPRIV,
 	/**
-     * <span class="en">Authentication with Private</span>
+     * <span class="en-US">Authentication with Private</span>
      * <span class="zh-CN">验证并使用私有验证</span>
 	 */
 	AUTH_PRIV

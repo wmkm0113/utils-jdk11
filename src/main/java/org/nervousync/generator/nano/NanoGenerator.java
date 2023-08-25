@@ -25,7 +25,7 @@ import org.nervousync.utils.StringUtils;
 import java.security.SecureRandom;
 
 /**
- * <h2 class="en">NanoID generator</h2>
+ * <h2 class="en-US">NanoID generator</h2>
  * <h2 class="zh-CN">NanoID生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -34,42 +34,42 @@ import java.security.SecureRandom;
 @GeneratorProvider(IDUtils.NANO_ID)
 public final class NanoGenerator implements IGenerator<String> {
     /**
-     * <span class="en">Logger instance</span>
+     * <span class="en-US">Logger instance</span>
      * <span class="zh-CN">日志实例</span>
      */
     private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
     /**
-     * <span class="en">Default alphabet string</span>
+     * <span class="en-US">Default alphabet string</span>
      * <span class="zh-CN">默认的字母表</span>
      */
     private static final String DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
     /**
-     * <span class="en">Default length of generated result</span>
+     * <span class="en-US">Default length of generated result</span>
      * <span class="zh-CN">默认的生成结果长度</span>
      */
     private static final int DEFAULT_LENGTH = 27;
     /**
-     * <span class="en">Secure Random instance</span>
+     * <span class="en-US">Secure Random instance</span>
      * <span class="zh-CN">安全随机数对象</span>
      */
     private final SecureRandom secureRandom = new SecureRandom();
     /**
-     * <span class="en">Result used alphabet character array</span>
+     * <span class="en-US">Result used alphabet character array</span>
      * <span class="zh-CN">结果用到的字母字符数组</span>
      */
     private char[] alphabetArray = DEFAULT_ALPHABET.toCharArray();
     /**
-     * <span class="en">Generated result length, default length: 27</span>
+     * <span class="en-US">Generated result length, default length: 27</span>
      * <span class="zh-CN">生成结果的长度，默认值：27</span>
      */
     private int generateLength = DEFAULT_LENGTH;
     /**
-	 * <h3 class="en">Configure current generator</h3>
+	 * <h3 class="en-US">Configure current generator</h3>
 	 * <h3 class="zh-CN">修改当前生成器的配置</h3>
      *
-     * @param alphabetConfig    <span class="en">Alphabet configure string</span>
+     * @param alphabetConfig    <span class="en-US">Alphabet configure string</span>
      *                          <span class="zh-CN">输出字符设置</span>
-     * @param generateLength    <span class="en">Generated result length</span>
+     * @param generateLength    <span class="en-US">Generated result length</span>
      *                          <span class="zh-CN">生成结果的长度</span>
      */
     public void config(final String alphabetConfig, final int generateLength) {
@@ -83,10 +83,10 @@ public final class NanoGenerator implements IGenerator<String> {
         this.generateLength = generateLength > 0 ? generateLength : DEFAULT_LENGTH;
     }
     /**
-	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="en-US">Generate ID value</h3>
 	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -111,13 +111,13 @@ public final class NanoGenerator implements IGenerator<String> {
         }
     }
     /**
-	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="en-US">Generate ID value using given parameter</h3>
 	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en">Given parameter</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
      *                      <span class="zh-CN">给定的参数</span>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -125,7 +125,7 @@ public final class NanoGenerator implements IGenerator<String> {
         return this.generate();
     }
     /**
-	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="en-US">Destroy current generator instance</h3>
 	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     @Override

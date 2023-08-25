@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.crypto;
 
 /**
- * <h2 class="en">Crypto Mode Enumerations</h2>
+ * <h2 class="en-US">Crypto Mode Enumerations</h2>
  * <h2 class="zh-CN">加密模式枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,22 +25,22 @@ package org.nervousync.enumerations.crypto;
  */
 public enum CryptoMode {
     /**
-     * <span class="en">Encrypt Mode</span>
+     * <span class="en-US">Encrypt Mode</span>
      * <span class="zh-CN">加密模式</span>
      */
     ENCRYPT,
     /**
-     * <span class="en">Decrypt Mode</span>
+     * <span class="en-US">Decrypt Mode</span>
      * <span class="zh-CN">解密模式</span>
      */
     DECRYPT,
     /**
-     * <span class="en">Signature Mode</span>
+     * <span class="en-US">Signature Mode</span>
      * <span class="zh-CN">签名模式</span>
      */
     SIGNATURE,
     /**
-     * <span class="en">Verify Signature Mode</span>
+     * <span class="en-US">Verify Signature Mode</span>
      * <span class="zh-CN">验证签名模式</span>
      */
     VERIFY

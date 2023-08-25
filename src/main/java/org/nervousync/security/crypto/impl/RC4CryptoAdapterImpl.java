@@ -28,7 +28,7 @@ import javax.crypto.KeyGenerator;
 import java.security.SecureRandom;
 
 /**
- * <h2 class="en">Symmetric RC4 crypto adapter class</h2>
+ * <h2 class="en-US">Symmetric RC4 crypto adapter class</h2>
  * <h2 class="zh-CN">RC4对称加密解密适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -36,17 +36,17 @@ import java.security.SecureRandom;
  */
 public final class RC4CryptoAdapterImpl extends SymmetricCryptoAdapter {
     /**
-     * <h3 class="en">Constructor for RC4CryptoAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for RC4CryptoAdapterImpl</h3>
      * <h3 class="zh-CN">RC4对称加密解密适配器的实现类的构造方法</h3>
      *
-     * @param cipherConfig  <span class="en">Cipher configure</span>
+     * @param cipherConfig  <span class="en-US">Cipher configure</span>
      *                      <span class="zh-CN">密码设置</span>
-     * @param cryptoMode    <span class="en">Crypto mode</span>
+     * @param cryptoMode    <span class="en-US">Crypto mode</span>
      *                      <span class="zh-CN">加密解密模式</span>
-     * @param keyBytes      <span class="en">Key data bytes</span>
+     * @param keyBytes      <span class="en-US">Key data bytes</span>
      *                      <span class="zh-CN">密钥字节数组</span>
      *
-     * @throws CryptoException <span class="en">If an error occurs when initialize cipher</span>
+     * @throws CryptoException <span class="en-US">If an error occurs when initialize cipher</span>
      *                         <span class="zh-CN">当初始化加密解密实例对象时出现异常</span>
      */
     public RC4CryptoAdapterImpl(final CipherConfig cipherConfig, final CryptoMode cryptoMode,

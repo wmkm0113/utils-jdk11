@@ -26,7 +26,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
- * <h2 class="en">Abstract basic digest adapter class</h2>
+ * <h2 class="en-US">Abstract basic digest adapter class</h2>
  * <h2 class="zh-CN">摘要算法适配器的抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -34,31 +34,31 @@ import java.util.Arrays;
  */
 public abstract class BaseDigestAdapter extends SecureAdapter {
     /**
-     * <span class="en">Hash-based Message Authentication Code</span>
+     * <span class="en-US">Hash-based Message Authentication Code</span>
      * <span class="zh-CN">基于密钥的消息认证码算法</span>
      */
     private final boolean macMode;
     /**
-     * <span class="en">MessageDigest instance</span>
+     * <span class="en-US">MessageDigest instance</span>
      * <span class="zh-CN">消息摘要算法实例对象</span>
      */
     private final MessageDigest messageDigest;
     /**
-     * <span class="en">Message Authentication Code instance</span>
+     * <span class="en-US">Message Authentication Code instance</span>
      * <span class="zh-CN">消息认证码算法实例对象</span>
      */
     private final Mac hmac;
     /**
-	 * <h3 class="en">Constructor for BaseDigestAdapter</h3>
+	 * <h3 class="en-US">Constructor for BaseDigestAdapter</h3>
 	 * <h3 class="zh-CN">消息摘要算法适配器的构造方法</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize adaptor</span>
+     * <span class="en-US">If an error occurs when initialize adaptor</span>
      * <span class="zh-CN">当初始化适配器时出现异常</span>
      */
     protected BaseDigestAdapter(final String algorithm, final byte[] keyBytes) throws CryptoException {
@@ -70,50 +70,50 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
         this.hmac = this.macMode ? this.initHmac(algorithm, keyBytes) : null;
     }
     /**
-	 * <h3 class="en">Abstract method for initialize MessageDigest instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize MessageDigest instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息摘要算法适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
      *
-     * @return  <span class="en">Initialized MessageDigest instance</span>
+     * @return  <span class="en-US">Initialized MessageDigest instance</span>
      *          <span class="zh-CN">初始化的消息摘要算法适配器</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize MessageDigest</span>
+     * <span class="en-US">If an error occurs when initialize MessageDigest</span>
      * <span class="zh-CN">当初始化消息摘要算法适配器实例对象时出现异常</span>
      */
     protected abstract MessageDigest initDigest(final String algorithm) throws CryptoException;
     /**
-	 * <h3 class="en">Abstract method for initialize Hmac instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize Hmac instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息认证码适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
-     * @return  <span class="en">Initialized Hmac instance</span>
+     * @return  <span class="en-US">Initialized Hmac instance</span>
      *          <span class="zh-CN">初始化的消息认证码算法适配器</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize Hmac instance</span>
+     * <span class="en-US">If an error occurs when initialize Hmac instance</span>
      * <span class="zh-CN">当初始化消息认证码算法适配器实例对象时出现异常</span>
      */
     protected abstract Mac initHmac(final String algorithm, final byte[] keyBytes) throws CryptoException;
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -128,21 +128,21 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
         }
     }
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter and calculate final result</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter and calculate final result</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器并计算最终结果</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
-     * @return  <span class="en">Calculate result data byte array</span>
+     * @return  <span class="en-US">Calculate result data byte array</span>
      *          <span class="zh-CN">计算的二进制字节数组结果</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -162,13 +162,13 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
         return result;
     }
     /**
-	 * <h3 class="en">Verify given signature data bytes is valid</h3>
+	 * <h3 class="en-US">Verify given signature data bytes is valid</h3>
 	 * <h3 class="zh-CN">验证给定的签名二进制数据是合法的</h3>
      *
-     * @param signature     <span class="en">signature data bytes</span>
+     * @param signature     <span class="en-US">signature data bytes</span>
      *                      <span class="zh-CN">签名二进制数据</span>
      *
-     * @return  <span class="en">Verify result</span>
+     * @return  <span class="en-US">Verify result</span>
      *          <span class="zh-CN">验证结果</span>
      */
     @Override
@@ -185,7 +185,7 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
         return result;
     }
     /**
-	 * <h3 class="en">Reset current adapter</h3>
+	 * <h3 class="en-US">Reset current adapter</h3>
 	 * <h3 class="zh-CN">重置当前适配器</h3>
      */
     @Override
@@ -197,10 +197,10 @@ public abstract class BaseDigestAdapter extends SecureAdapter {
         }
     }
     /**
-	 * <h3 class="en">Retrieve current mac size</h3>
+	 * <h3 class="en-US">Retrieve current mac size</h3>
 	 * <h3 class="zh-CN">读取当前消息认证码的长度</h3>
      *
-     * @return  <span class="en">Mac size</span>
+     * @return  <span class="en-US">Mac size</span>
      *          <span class="zh-CN">消息认证码的长度</span>
      */
     public final int macLength() {

@@ -20,8 +20,8 @@ import org.nervousync.launcher.StartupLauncher;
 import org.nervousync.utils.LoggerUtils;
 
 /**
- * <h2 class="en">Abstract class for startup launcher</h2>
- * <span class="en">Only add an unified logger instance</span>
+ * <h2 class="en-US">Abstract class for startup launcher</h2>
+ * <span class="en-US">Only add an unified logger instance</span>
  * <h2 class="zh-CN">启动器抽象实现类</h2>
  * <span class="zh-CN">仅添加了统一的日志对象实例</span>
  *
@@ -30,7 +30,7 @@ import org.nervousync.utils.LoggerUtils;
  */
 public abstract class AbstractStartupLauncher implements StartupLauncher {
 	/**
-	 * <span class="en">Logger instance</span>
+	 * <span class="en-US">Logger instance</span>
 	 * <span class="zh-CN">日志对象</span>
 	 */
 	protected final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());

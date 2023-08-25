@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.zip;
 
 /**
- * <h2 class="en">Zip Compress Level Enumeration</h2>
+ * <h2 class="en-US">Zip Compress Level Enumeration</h2>
  * <h2 class="zh-CN">Zip压缩等级</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,27 +25,27 @@ package org.nervousync.enumerations.zip;
  */
 public enum CompressLevel {
 	/**
-     * <span class="en">Fastest Compress</span>
+     * <span class="en-US">Fastest Compress</span>
      * <span class="zh-CN">极快压缩</span>
 	 */
 	FASTEST,
 	/**
-     * <span class="en">Fast Compress</span>
+     * <span class="en-US">Fast Compress</span>
      * <span class="zh-CN">快压缩</span>
 	 */
 	FAST,
 	/**
-     * <span class="en">Normal Compress</span>
+     * <span class="en-US">Normal Compress</span>
      * <span class="zh-CN">正常压缩</span>
 	 */
 	NORMAL,
 	/**
-     * <span class="en">Maximum Compress</span>
+     * <span class="en-US">Maximum Compress</span>
      * <span class="zh-CN">最大压缩</span>
 	 */
 	MAXIMUM,
 	/**
-     * <span class="en">Ultra Compress</span>
+     * <span class="en-US">Ultra Compress</span>
      * <span class="zh-CN">极限压缩</span>
 	 */
 	ULTRA

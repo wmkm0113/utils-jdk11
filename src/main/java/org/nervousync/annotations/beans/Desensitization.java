@@ -14,37 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.beans.converter.impl.basic;
+package org.nervousync.annotations.beans;
 
-import org.nervousync.beans.converter.impl.AbstractAdapter;
-import org.nervousync.beans.converter.Adapter;
-import org.nervousync.commons.Globals;
+import org.nervousync.utils.ObjectUtils;
 
-import java.util.Optional;
+import java.lang.annotation.*;
 
 /**
- * <h2 class="en-US">Integer DataConverter</h2>
- * <h2 class="zh-CN">Integer数据转换器</h2>
+ * <h2 class="en-US">JavaBean Property Desensitization Annotation</h2>
+ * <span class="en-US">
+ *     After using this annotation on the properties of JavaBean,
+ *     you can call the desensitization method in ObjectUtils for automatic data desensitization
+ * </span>
+ * <h2 class="zh-CN">JavaBean属性脱敏注解</h2>
+ * <span class="zh-CN">在JavaBean的属性上使用此注解后，可以调用ObjectUtils中的desensitization方法进行数据自动脱敏</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 11:31:46 $
+ * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:33 $
  */
-public final class IntegerStringAdapter extends AbstractAdapter<String, Integer> {
-    /**
-     * @see Adapter#unmarshal(Object)
-     */
-    @Override
-    public String marshal(Integer object) {
-        return Optional.ofNullable(object)
-				.map(Object::toString)
-				.orElse(Globals.DEFAULT_VALUE_STRING);
-    }
-
-    /**
-     * @see Adapter#marshal(Object)
-     */
-    @Override
-    public Integer unmarshal(String object) {
-        return Optional.ofNullable(object).map(Integer::valueOf).orElse(null);
-    }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface Desensitization {
+    ObjectUtils.SensitiveType value() default ObjectUtils.SensitiveType.NORMAL;
 }

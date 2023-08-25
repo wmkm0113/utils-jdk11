@@ -24,7 +24,7 @@ import org.nervousync.utils.StringUtils;
 import java.util.Optional;
 
 /**
- * <h2 class="en">JavaBean JSON Converter</h2>
+ * <h2 class="en-US">JavaBean JSON Converter</h2>
  * <h2 class="zh-CN">JavaBean数据JSON转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

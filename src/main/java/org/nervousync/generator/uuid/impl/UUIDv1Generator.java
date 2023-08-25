@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <h2 class="en">UUID version 1 generator</h2>
+ * <h2 class="en-US">UUID version 1 generator</h2>
  * <h2 class="zh-CN">UUID版本1生成器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -47,16 +47,16 @@ public final class UUIDv1Generator extends UUIDGenerator {
     public static final String UUID_SEQUENCE = "org.nervousync.uuid.UUIDSequence";
     private static final String ASSIGNED_SEQUENCES = "org.nervousync.uuid.AssignedSequences";
     /**
-     * <span class="en">Secure Random instance</span>
+     * <span class="en-US">Secure Random instance</span>
      * <span class="zh-CN">安全随机数对象</span>
      */
     private final SecureRandom secureRandom = new SecureRandom();
     private final AtomicInteger generateCount = new AtomicInteger(0);
     /**
-	 * <h3 class="en">Generate ID value</h3>
+	 * <h3 class="en-US">Generate ID value</h3>
 	 * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -64,13 +64,13 @@ public final class UUIDv1Generator extends UUIDGenerator {
         return new UUID(super.highBits(this.currentTimeMillis()), this.lowBits(SystemUtils.localMac())).toString();
     }
     /**
-	 * <h3 class="en">Generate ID value using given parameter</h3>
+	 * <h3 class="en-US">Generate ID value using given parameter</h3>
 	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en">Given parameter</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
      *                      <span class="zh-CN">给定的参数</span>
      *
-     * @return  <span class="en">Generated value</span>
+     * @return  <span class="en-US">Generated value</span>
      *          <span class="zh-CN">生成的ID值</span>
      */
     @Override
@@ -78,12 +78,12 @@ public final class UUIDv1Generator extends UUIDGenerator {
         return this.generate();
     }
     /**
-	 * <h3 class="en">Calculate low bits of given data bytes</h3>
+	 * <h3 class="en-US">Calculate low bits of given data bytes</h3>
 	 * <h3 class="zh-CN">从给定的二进制数组计算低位值</h3>
      *
-     * @param dataBytes     <span class="en">given data bytes</span>
+     * @param dataBytes     <span class="en-US">given data bytes</span>
      *                      <span class="zh-CN">给定的二进制数组</span>
-     * @return  <span class="en">Low bits value in long</span>
+     * @return  <span class="en-US">Low bits value in long</span>
      *          <span class="zh-CN">long型的低位比特值</span>
      */
     @Override

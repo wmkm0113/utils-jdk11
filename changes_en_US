@@ -1,4 +1,23 @@
 Nervousync Java Utils Package
+[08/25/2023]
+[Add] Add xsd mapping, users can add /META-INF/nervousync.schemas to mapping namespaceURI and xsd location file
+[Add] Add internationalize support
+[Add] StringUtils add string check method: isLuhn/isChnId/isChnSocialCredit/isMD5/isUUID/isXML/isPhoneNumber
+[Add] LoggerUtils program to initialize Log4j
+[Update] Update FileUtils.readFileBytes support resource path in jar/zip file
+[Update] Update FileUtils.loadFile support resource path in jar/zip file
+[Update] Update the bouncy-castle version to 1.76, jcifs version to 2.1.36, jaxb version to 4.0.3
+[Update] Update XML Schema Define file
+[Update] Deprecated MD5 method
+[Update] ResponseInfo parseObject using content-type value to identify data type automatic
+[Update] Detect i18n message resource by class replace identify message resource by bundle string
+[Update] Update MessageResource support message update operate
+[Fix] Fixed read long from byte arrays got error value when using BigEndian
+[Fix] Failed to load XML schema file from jar file
+[Remove] Remove RawUtils.Endian enumeration using ByteOrder instead
+[Test] Add RawTest for testing RawUtils
+[Document] Format all java doc information
+
 [03/06/2023]
 [Update] Rewrite BeanUtils.java
 [Update] Update Slf4j version to 2.0.5

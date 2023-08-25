@@ -17,7 +17,7 @@
 package org.nervousync.enumerations.snmp;
 
 /**
- * <h2 class="en">SNMP Version Enumerations</h2>
+ * <h2 class="en-US">SNMP Version Enumerations</h2>
  * <h2 class="zh-CN">SNMP版本枚举</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -25,17 +25,17 @@ package org.nervousync.enumerations.snmp;
  */
 public enum SNMPVersion {
 	/**
-     * <span class="en">Version 1</span>
+     * <span class="en-US">Version 1</span>
      * <span class="zh-CN">版本1</span>
 	 */
 	VERSION1,
 	/**
-     * <span class="en">Version 2c</span>
+     * <span class="en-US">Version 2c</span>
      * <span class="zh-CN">版本2c</span>
 	 */
 	VERSION2C,
 	/**
-     * <span class="en">Version 3</span>
+     * <span class="en-US">Version 3</span>
      * <span class="zh-CN">版本3</span>
 	 */
 	VERSION3

@@ -24,7 +24,7 @@ import org.nervousync.utils.StringUtils;
 import java.util.Optional;
 
 /**
- * <h2 class="en">Encode Base64 DataConverter</h2>
+ * <h2 class="en-US">Encode Base64 DataConverter</h2>
  * <h2 class="zh-CN">Base64编码数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

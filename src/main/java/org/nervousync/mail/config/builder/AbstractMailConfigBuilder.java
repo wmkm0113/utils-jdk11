@@ -35,15 +35,15 @@ import java.security.cert.X509Certificate;
 import java.util.Optional;
 
 /**
- * <h2 class="en">Abstract mail configure builder for Generics Type</h2>
- * <p class="en">
+ * <h2 class="en-US">Abstract mail configure builder for Generics Type</h2>
+ * <p class="en-US">
  *     Current abstract class is using to integrate to another builder
  *     which configure contains mail configure information.
  * </p>
  * <h2 class="zh-CN">拥有父构造器的电子邮件配置信息抽象构造器</h2>
  * <p class="zh-CN">当前抽象构建器用于整合到包含邮件配置信息的其他配置构建器</p>
  *
- * @param <T>   <span class="en">Generics Type Class</span>
+ * @param <T>   <span class="en-US">Generics Type Class</span>
  *              <span class="zh-CN">泛型类</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -51,17 +51,17 @@ import java.util.Optional;
  */
 public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
     /**
-     * <h2 class="en">Current mail configure information</h2>
+     * <h2 class="en-US">Current mail configure information</h2>
      * <h2 class="zh-CN">当前邮件配置信息</h2>
      */
     protected final MailConfig mailConfig;
     /**
-     * <h3 class="en">Protected constructor for AbstractMailConfigBuilder</h3>
+     * <h3 class="en-US">Protected constructor for AbstractMailConfigBuilder</h3>
      * <h3 class="zh-CN">AbstractMailConfigBuilder的构造函数</h3>
      *
-     * @param parentBuilder     <span class="en">Generics Type instance</span>
+     * @param parentBuilder     <span class="en-US">Generics Type instance</span>
      *                          <span class="zh-CN">泛型类实例对象</span>
-     * @param mailConfig        <span class="en">Mail configure information</span>
+     * @param mailConfig        <span class="en-US">Mail configure information</span>
      *                          <span class="zh-CN">邮件配置信息</span>
      */
     protected AbstractMailConfigBuilder(final T parentBuilder, final MailConfig mailConfig) {
@@ -69,15 +69,15 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         this.mailConfig = (mailConfig == null) ? new MailConfig() : mailConfig;
     }
     /**
-     * <h3 class="en">Configure secure name</h3>
-     * <span class="en">Builder will decrypt (if current configure contains secure name) and encrypt (using new secure name) password automatically</span>
+     * <h3 class="en-US">Configure secure name</h3>
+     * <span class="en-US">Builder will decrypt (if current configure contains secure name) and encrypt (using new secure name) password automatically</span>
      * <h3 class="zh-CN">设置安全名称</h3>
-     * <span class="en">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全名称）密码信息</span>
+     * <span class="en-US">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全名称）密码信息</span>
      *
-     * @param secureName    <span class="en">New secure name</span>
+     * @param secureName    <span class="en-US">New secure name</span>
      *                      <span class="zh-CN">新的安全名称</span>
      *
-     * @return  <span class="en">Current builder instance</span>
+     * @return  <span class="en-US">Current builder instance</span>
      *          <span class="zh-CN">当前构造器实例对象</span>
      */
     public AbstractMailConfigBuilder<T> secureName(final String secureName) {
@@ -100,20 +100,20 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         return this;
     }
     /**
-     * <h3 class="en">Configure custom secure config</h3>
-     * <span class="en">
+     * <h3 class="en-US">Configure custom secure config</h3>
+     * <span class="en-US">
      *     Builder will decrypt (if current configure contains secure name or secure config)
      *     and encrypt (using new secure config) password automatically
      * </span>
      * <h3 class="zh-CN">设置安全名称</h3>
-     * <span class="en">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全配置）密码信息</span>
+     * <span class="en-US">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全配置）密码信息</span>
      *
-     * @param secureName    <span class="en">New secure name</span>
+     * @param secureName    <span class="en-US">New secure name</span>
      *                      <span class="zh-CN">新的安全名称</span>
-     * @param secureConfig  <span class="en">Custom secure config</span>
+     * @param secureConfig  <span class="en-US">Custom secure config</span>
      *                      <span class="zh-CN">新的安全配置</span>
      *
-     * @return  <span class="en">Current builder instance</span>
+     * @return  <span class="en-US">Current builder instance</span>
      *          <span class="zh-CN">当前构造器实例对象</span>
      */
     public AbstractMailConfigBuilder<T> secureConfig(final String secureName, final SecureConfig secureConfig) {
@@ -139,19 +139,19 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         return this;
     }
     /**
-     * <h3 class="en">Configure authenticate information</h3>
+     * <h3 class="en-US">Configure authenticate information</h3>
      * <h3 class="zh-CN">设置身份认证信息</h3>
      *
-     * @param userName  <span class="en">Mail account username</span>
+     * @param userName  <span class="en-US">Mail account username</span>
      *                  <span class="zh-CN">邮件账户用户名</span>
-     * @param password  <span class="en">Mail account password</span>
+     * @param password  <span class="en-US">Mail account password</span>
      *                  <span class="zh-CN">邮件账户密码</span>
      *
-     * @return  <span class="en">Current builder instance</span>
+     * @return  <span class="en-US">Current builder instance</span>
      *          <span class="zh-CN">当前构造器实例对象</span>
      *
      * @throws BuilderException the builder exception
-     * <span class="en">If username string not a valid e-mail address</span>
+     * <span class="en-US">If username string not a valid e-mail address</span>
      * <span class="zh-CN">当用户名不是合法的电子邮件地址时</span>
      */
     public AbstractMailConfigBuilder<T> authentication(final String userName, final String password)
@@ -173,47 +173,47 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         return this;
     }
     /**
-     * <h3 class="en">Using current proxy configure information to create ProxyConfigBuilder instance</h3>
+     * <h3 class="en-US">Using current proxy configure information to create ProxyConfigBuilder instance</h3>
      * <h3 class="zh-CN">使用当前的代理服务器配置信息生成代理服务器配置构建器实例对象</h3>
      *
-     * @return  <span class="en">ProxyConfigBuilder instance</span>
+     * @return  <span class="en-US">ProxyConfigBuilder instance</span>
      *          <span class="zh-CN">代理服务器配置构建器实例对象</span>
      */
     public ProxyConfigBuilder<T> proxyConfig() {
         return new ProxyConfigBuilder<>(this, this.mailConfig.getSecureName(), this.mailConfig.getProxyConfig());
     }
     /**
-     * <h3 class="en">Using current send server configure information to create ServerConfigBuilder instance</h3>
+     * <h3 class="en-US">Using current send server configure information to create ServerConfigBuilder instance</h3>
      * <h3 class="zh-CN">使用当前的发送邮件服务器配置信息生成邮件服务器配置构建器实例对象</h3>
      *
-     * @return  <span class="en">ServerConfigBuilder instance</span>
+     * @return  <span class="en-US">ServerConfigBuilder instance</span>
      *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
      */
     public ServerConfigBuilder<T> sendConfig() {
         return new ServerConfigBuilder<>(this, Boolean.TRUE, this.mailConfig.getSendConfig());
     }
     /**
-     * <h3 class="en">Using current receive server configure information to create ServerConfigBuilder instance</h3>
+     * <h3 class="en-US">Using current receive server configure information to create ServerConfigBuilder instance</h3>
      * <h3 class="zh-CN">使用当前的接收邮件服务器配置信息生成邮件服务器配置构建器实例对象</h3>
      *
-     * @return  <span class="en">ServerConfigBuilder instance</span>
+     * @return  <span class="en-US">ServerConfigBuilder instance</span>
      *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
      */
     public ServerConfigBuilder<T> receiveConfig() {
         return new ServerConfigBuilder<>(this, Boolean.FALSE, this.mailConfig.getReceiveConfig());
     }
     /**
-     * <h3 class="en">Configure save path of mail attachment files</h3>
+     * <h3 class="en-US">Configure save path of mail attachment files</h3>
      * <h3 class="zh-CN">设置电子邮件附件的保存地址</h3>
      *
-     * @param storagePath   <span class="en">Local save path</span>
+     * @param storagePath   <span class="en-US">Local save path</span>
      *                      <span class="zh-CN">本地保存地址</span>
      *
-     * @return  <span class="en">ServerConfigBuilder instance</span>
+     * @return  <span class="en-US">ServerConfigBuilder instance</span>
      *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
      *
      * @throws BuilderException
-     * <span class="en">If storage path is empty string or folder not exists</span>
+     * <span class="en-US">If storage path is empty string or folder not exists</span>
      * <span class="zh-CN">如果本地保存地址为空字符串或目录不存在</span>
      */
     public AbstractMailConfigBuilder<T> storagePath(String storagePath) throws BuilderException {
@@ -225,15 +225,15 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
     }
 
     /**
-     * <h3 class="en">Configure the x509 certificate and private key for mail signature</h3>
+     * <h3 class="en-US">Configure the x509 certificate and private key for mail signature</h3>
      * <h3 class="zh-CN">设置用于电子邮件签名及验签的x509证书及私钥</h3>
      *
-     * @param x509Certificate   <span class="en">x509 certificate using for verify signature</span>
+     * @param x509Certificate   <span class="en-US">x509 certificate using for verify signature</span>
      *                          <span class="zh-CN">x509证书，用于验证电子签名</span>
-     * @param privateKey        <span class="en">Private key instance using for generate signature</span>
+     * @param privateKey        <span class="en-US">Private key instance using for generate signature</span>
      *                          <span class="zh-CN">私钥对象实例，用于生成电子签名</span>
      *
-     * @return  <span class="en">ServerConfigBuilder instance</span>
+     * @return  <span class="en-US">ServerConfigBuilder instance</span>
      *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
      */
     public AbstractMailConfigBuilder<T> signer(final X509Certificate x509Certificate, final PrivateKey privateKey) {
@@ -249,22 +249,22 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         return this;
     }
     /**
-     * <h3 class="en">Confirm proxy configure</h3>
+     * <h3 class="en-US">Confirm proxy configure</h3>
      * <h3 class="zh-CN">确认代理服务器配置</h3>
      *
-     * @param proxyConfig   <span class="en">Proxy configure information</span>
+     * @param proxyConfig   <span class="en-US">Proxy configure information</span>
      *                      <span class="zh-CN">代理服务器配置</span>
      */
     private void proxyConfig(final ProxyConfig proxyConfig) {
         Optional.ofNullable(proxyConfig).ifPresent(this.mailConfig::setProxyConfig);
     }
     /**
-     * <h3 class="en">Confirm mail server configure</h3>
+     * <h3 class="en-US">Confirm mail server configure</h3>
      * <h3 class="zh-CN">确认邮件服务器配置</h3>
      *
-     * @param sendConfig        <span class="en">Is send server configure</span>
+     * @param sendConfig        <span class="en-US">Is send server configure</span>
      *                          <span class="zh-CN">是发送服务器配置信息</span>
-     * @param serverConfig      <span class="en">Server configure information</span>
+     * @param serverConfig      <span class="en-US">Server configure information</span>
      *                          <span class="zh-CN">服务器配置</span>
      */
     private void serverConfig(final boolean sendConfig, final MailConfig.ServerConfig serverConfig) {
@@ -277,7 +277,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         });
     }
     /**
-     * <h2 class="en">Proxy configure builder</h2>
+     * <h2 class="en-US">Proxy configure builder</h2>
      * <h2 class="zh-CN">代理服务器配置信息抽象构造器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -285,14 +285,14 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      */
     public static final class ProxyConfigBuilder<T> extends AbstractProxyConfigBuilder<AbstractMailConfigBuilder<T>> {
         /**
-         * <h3 class="en">Private constructor for ProxyConfigBuilder</h3>
+         * <h3 class="en-US">Private constructor for ProxyConfigBuilder</h3>
          * <h3 class="zh-CN">ProxyConfigBuilder的私有构造函数</h3>
          *
-         * @param parentBuilder     <span class="en">Mail configure builder instance</span>
+         * @param parentBuilder     <span class="en-US">Mail configure builder instance</span>
          *                          <span class="zh-CN">电子邮件配置构造器实例</span>
-         * @param secureName        <span class="en">New secure name</span>
+         * @param secureName        <span class="en-US">New secure name</span>
          *                          <span class="zh-CN">新的安全名称</span>
-         * @param proxyConfig       <span class="en">Proxy configure information</span>
+         * @param proxyConfig       <span class="en-US">Proxy configure information</span>
          *                          <span class="zh-CN">代理服务器配置信息</span>
          */
         private ProxyConfigBuilder(final AbstractMailConfigBuilder<T> parentBuilder, final String secureName,
@@ -300,7 +300,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             super(parentBuilder, secureName, proxyConfig);
         }
         /**
-         * <h2 class="en">Confirm current configure information</h2>
+         * <h2 class="en-US">Confirm current configure information</h2>
          * <h2 class="zh-CN">确认当前配置信息</h2>
          */
         protected void build() {
@@ -309,7 +309,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
     }
 
     /**
-     * <h2 class="en">Mail server configure builder</h2>
+     * <h2 class="en-US">Mail server configure builder</h2>
      * <h2 class="zh-CN">电子邮件服务器配置信息抽象构造器</h2>
      *
      * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -317,54 +317,54 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      */
     public static final class ServerConfigBuilder<T> extends AbstractBuilder<AbstractMailConfigBuilder<T>> {
         /**
-         * <span class="en">Is send server configure</span>
+         * <span class="en-US">Is send server configure</span>
          * <span class="zh-CN">是发送服务器配置信息</span>
          */
         private final boolean sendConfig;
         /**
-         * <span class="en">Mail server domain name</span>
+         * <span class="en-US">Mail server domain name</span>
          * <span class="zh-CN">邮件服务器域名</span>
          */
         private String hostName;
         /**
-         * <span class="en">Mail server port</span>
+         * <span class="en-US">Mail server port</span>
          * <span class="zh-CN">邮件服务器端口号</span>
          */
         private int hostPort = Globals.DEFAULT_VALUE_INT;
         /**
-         * <span class="en">Using secure connection to host server</span>
+         * <span class="en-US">Using secure connection to host server</span>
          * <span class="zh-CN">使用安全连接到邮件服务器</span>
          */
         private boolean ssl;
         /**
-         * <span class="en">Host server authenticate login</span>
+         * <span class="en-US">Host server authenticate login</span>
          * <span class="zh-CN">邮件服务器需要身份验证</span>
          */
         private boolean authLogin;
         /**
-         * <span class="en">Mail server protocol</span>
+         * <span class="en-US">Mail server protocol</span>
          * <span class="zh-CN">邮件服务器协议</span>
          */
         private MailProtocol protocolOption = MailProtocol.UNKNOWN;
         /**
-         * <span class="en">Connection timeout(Unit: seconds)</span>
+         * <span class="en-US">Connection timeout(Unit: seconds)</span>
          * <span class="zh-CN">连接超时时间（单位：秒）</span>
          */
         private int connectionTimeout = 5;
         /**
-         * <span class="en">Process timeout(Unit: seconds)</span>
+         * <span class="en-US">Process timeout(Unit: seconds)</span>
          * <span class="zh-CN">操作超时时间（单位：秒）</span>
          */
         private int processTimeout = 5;
         /**
-         * <h3 class="en">Private constructor for ServerConfigBuilder</h3>
+         * <h3 class="en-US">Private constructor for ServerConfigBuilder</h3>
          * <h3 class="zh-CN">ServerConfigBuilder的私有构造函数</h3>
          *
-         * @param parentBuilder     <span class="en">Mail configure builder instance</span>
+         * @param parentBuilder     <span class="en-US">Mail configure builder instance</span>
          *                          <span class="zh-CN">电子邮件配置构造器实例</span>
-         * @param sendConfig        <span class="en">Is send server configure</span>
+         * @param sendConfig        <span class="en-US">Is send server configure</span>
          *                          <span class="zh-CN">是发送服务器配置信息</span>
-         * @param serverConfig      <span class="en">Server configure information</span>
+         * @param serverConfig      <span class="en-US">Server configure information</span>
          *                          <span class="zh-CN">服务器配置</span>
          */
         private ServerConfigBuilder(final AbstractMailConfigBuilder<T> parentBuilder, final boolean sendConfig,
@@ -382,15 +382,15 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             }
         }
         /**
-         * <h3 class="en">Configure host server information</h3>
+         * <h3 class="en-US">Configure host server information</h3>
          * <h3 class="zh-CN">设置服务器信息</h3>
          *
-         * @param hostAddress   <span class="en">Mail server domain name</span>
+         * @param hostAddress   <span class="en-US">Mail server domain name</span>
          *                      <span class="zh-CN">邮件服务器域名</span>
-         * @param hostPort      <span class="en">Mail server port</span>
+         * @param hostPort      <span class="en-US">Mail server port</span>
          *                      <span class="zh-CN">邮件服务器端口号</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> configHost(String hostAddress, int hostPort) {
@@ -401,13 +401,13 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h3 class="en">Configure using secure connection to host server</h3>
+         * <h3 class="en-US">Configure using secure connection to host server</h3>
          * <h3 class="zh-CN">设置使用安全连接到邮件服务器</h3>
          *
-         * @param useSSL    <span class="en">Using secure connection to host server</span>
+         * @param useSSL    <span class="en-US">Using secure connection to host server</span>
          *                  <span class="zh-CN">使用安全连接到邮件服务器</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> useSSL(boolean useSSL) {
@@ -415,14 +415,14 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h3 class="en">Configure using secure connection to host server</h3>
+         * <h3 class="en-US">Configure using secure connection to host server</h3>
          * <h3 class="zh-CN">设置使用安全连接到邮件服务器</h3>
          *
          * @param authLogin the auth login
-         * <span class="en">Host server authenticate login</span>
+         * <span class="en-US">Host server authenticate login</span>
          * <span class="zh-CN">邮件服务器需要身份验证</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> authLogin(boolean authLogin) {
@@ -430,13 +430,13 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h3 class="en">Configure mail server protocol</h3>
+         * <h3 class="en-US">Configure mail server protocol</h3>
          * <h3 class="zh-CN">设置邮件服务器协议</h3>
          *
-         * @param protocolOption    <span class="en">Mail server protocol</span>
+         * @param protocolOption    <span class="en-US">Mail server protocol</span>
          *                          <span class="zh-CN">邮件服务器协议</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> mailProtocol(final MailProtocol protocolOption) {
@@ -446,13 +446,13 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h3 class="en">Configure connection timeout(Unit: seconds)</h3>
+         * <h3 class="en-US">Configure connection timeout(Unit: seconds)</h3>
          * <h3 class="zh-CN">设置连接超时时间（单位：秒）</h3>
          *
-         * @param connectionTimeout     <span class="en">Connection timeout(Unit: seconds)</span>
+         * @param connectionTimeout     <span class="en-US">Connection timeout(Unit: seconds)</span>
          *                              <span class="zh-CN">连接超时时间（单位：秒）</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> connectionTimeout(int connectionTimeout) {
@@ -462,13 +462,13 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h3 class="en">Configure process timeout(Unit: seconds)</h3>
+         * <h3 class="en-US">Configure process timeout(Unit: seconds)</h3>
          * <h3 class="zh-CN">设置操作超时时间（单位：秒）</h3>
          *
-         * @param processTimeout <span class="en">Process timeout(Unit: seconds)</span>
+         * @param processTimeout <span class="en-US">Process timeout(Unit: seconds)</span>
          *                       <span class="zh-CN">操作超时时间（单位：秒）</span>
          *
-         * @return  <span class="en">ServerConfigBuilder instance</span>
+         * @return  <span class="en-US">ServerConfigBuilder instance</span>
          *          <span class="zh-CN">邮件服务器配置构建器实例对象</span>
          */
         public ServerConfigBuilder<T> processTimeout(int processTimeout) {
@@ -478,7 +478,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
             return this;
         }
         /**
-         * <h2 class="en">Confirm current configure information</h2>
+         * <h2 class="en-US">Confirm current configure information</h2>
          * <h2 class="zh-CN">确认当前配置信息</h2>
          *
          * @throws BuilderException the builder exception

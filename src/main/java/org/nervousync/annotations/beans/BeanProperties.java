@@ -19,10 +19,10 @@ package org.nervousync.annotations.beans;
 import java.lang.annotation.*;
 
 /**
- * <h2 class="en">Annotation for data mapping targets</h2>
- * <span class="en">Mappings for data copy to targets</span>
+ * <h2 class="en-US">Annotation for data mapping targets</h2>
+ * <span class="en-US">Mappings for data copy to targets</span>
  * <h2 class="zh-CN">数据复制目标的注解</h2>
- * <span class="en">标注用于复制数据到指定的多个目标</span>
+ * <span class="en-US">标注用于复制数据到指定的多个目标</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:27 $
@@ -33,11 +33,11 @@ import java.lang.annotation.*;
 public @interface BeanProperties {
 
     /**
-	 * <h3 class="en">BeanProperty annotation array</h3>
+	 * <h3 class="en-US">BeanProperty annotation array</h3>
 	 * <h3 class="zh-CN">BeanProperty注解数组</h3>
      *
      * @see org.nervousync.annotations.beans.BeanProperty
-     * @return  <span class="en">BeanProperty annotation arrays</span>
+     * @return  <span class="en-US">BeanProperty annotation arrays</span>
      *          <span class="zh-CN">BeanProperty注解数组</span>
      */
     BeanProperty[] value();

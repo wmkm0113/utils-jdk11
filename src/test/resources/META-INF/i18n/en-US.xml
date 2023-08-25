@@ -78,4 +78,5 @@
     <entry key="System_Java_Info">Java version: {0}, major version: {1}, Java home: {2}, tmp directory: {3}</entry><!-- "Java version: {}, major version: {}, java home: {}, tmp directory: {}" -->
     <entry key="System_Adaptor">Adaptor {0} {1} address: </entry><!-- "Adaptor {} IPv4 addresses: " -->
     <entry key="System_Adaptor_IP_Info">IP address: {0}: site local: {1}，loopback: {2}, link local: {3}</entry><!-- "Adaptor {} IPv4 addresses: " -->
+    <entry key="Desensitization_Data">Desensitization data: {0}</entry>
 </properties>

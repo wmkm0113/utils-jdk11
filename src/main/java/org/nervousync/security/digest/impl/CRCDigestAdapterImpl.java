@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 /**
- * <h2 class="en">Symmetric CRC crypto adapter class</h2>
+ * <h2 class="en-US">Symmetric CRC crypto adapter class</h2>
  * <h2 class="zh-CN">CRC摘要算法适配器的实现类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -34,38 +34,38 @@ import java.util.*;
  */
 public final class CRCDigestAdapterImpl extends SecureAdapter {
     /**
-     * <span class="en">CRC configure</span>
+     * <span class="en-US">CRC configure</span>
      * <span class="zh-CN">CRC设置</span>
      */
     private final CRCConfig crcConfig;
     /**
-     * <span class="en">CRC polynomial</span>
-     * <span class="en">CRC多项式编码</span>
+     * <span class="en-US">CRC polynomial</span>
+     * <span class="en-US">CRC多项式编码</span>
      */
     private final long polynomial;
     /**
-     * <span class="en">CRC initialize value</span>
-     * <span class="en">CRC初始值</span>
+     * <span class="en-US">CRC initialize value</span>
+     * <span class="en-US">CRC初始值</span>
      */
     private final long init;
     /**
-     * <span class="en">CRC check value</span>
+     * <span class="en-US">CRC check value</span>
      */
     private final long check;
     /**
-     * <span class="en">CRC mask value</span>
+     * <span class="en-US">CRC mask value</span>
      */
     private final long mask;
     /**
-     * <span class="en">CRC result</span>
-     * <span class="en">CRC计算结果</span>
+     * <span class="en-US">CRC result</span>
+     * <span class="en-US">CRC计算结果</span>
      */
     private long crc;
     /**
-     * <h3 class="en">Constructor for CRCDigestAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for CRCDigestAdapterImpl</h3>
      * <h3 class="zh-CN">CRC摘要算法适配器实现类类的构造方法</h3>
      *
-     * @param crcConfig     <span class="en">CRC configure</span>
+     * @param crcConfig     <span class="en-US">CRC configure</span>
      *                      <span class="zh-CN">CRC设置</span>
      */
     public CRCDigestAdapterImpl(final CRCConfig crcConfig) {
@@ -102,18 +102,18 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
         }
     }
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -140,21 +140,21 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
         this.crc &= this.mask;
     }
     /**
-	 * <h3 class="en">Append parts of given binary data array to current adapter and calculate final result</h3>
+	 * <h3 class="en-US">Append parts of given binary data array to current adapter and calculate final result</h3>
 	 * <h3 class="zh-CN">追加给定的二进制字节数组到当前适配器并计算最终结果</h3>
      *
-     * @param dataBytes     <span class="en">binary data array</span>
+     * @param dataBytes     <span class="en-US">binary data array</span>
      *                      <span class="zh-CN">二进制字节数组</span>
-     * @param position      <span class="en">Data begin position</span>
+     * @param position      <span class="en-US">Data begin position</span>
      *                      <span class="zh-CN">数据起始坐标</span>
-     * @param length        <span class="en">Length of data append</span>
+     * @param length        <span class="en-US">Length of data append</span>
      *                      <span class="zh-CN">追加的数据长度</span>
      *
-     * @return  <span class="en">Calculate result data byte array</span>
+     * @return  <span class="en-US">Calculate result data byte array</span>
      *          <span class="zh-CN">计算的二进制字节数组结果</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when process data</span>
+     * <span class="en-US">If an error occurs when process data</span>
      * <span class="zh-CN">当处理数据时出现异常</span>
      */
     @Override
@@ -181,13 +181,13 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
         return result;
     }
     /**
-	 * <h3 class="en">Verify given signature data bytes is valid</h3>
+	 * <h3 class="en-US">Verify given signature data bytes is valid</h3>
 	 * <h3 class="zh-CN">验证给定的签名二进制数据是合法的</h3>
      *
-     * @param signature     <span class="en">signature data bytes</span>
+     * @param signature     <span class="en-US">signature data bytes</span>
      *                      <span class="zh-CN">签名二进制数据</span>
      *
-     * @return  <span class="en">Verify result</span>
+     * @return  <span class="en-US">Verify result</span>
      *          <span class="zh-CN">验证结果</span>
      */
     @Override
@@ -202,7 +202,7 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
         }
     }
     /**
-	 * <h3 class="en">Reset current adapter</h3>
+	 * <h3 class="en-US">Reset current adapter</h3>
 	 * <h3 class="zh-CN">重置当前适配器</h3>
      */
     @Override
@@ -210,15 +210,15 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
         this.crc = this.init;
     }
     /**
-	 * <h3 class="en">Reverse result bit</h3>
+	 * <h3 class="en-US">Reverse result bit</h3>
 	 * <h3 class="zh-CN">反转结果比特位</h3>
      *
-     * @param value     <span class="en">result value</span>
+     * @param value     <span class="en-US">result value</span>
      *                  <span class="zh-CN">结果值</span>
-     * @param bit       <span class="en">Bit value</span>
-     *                  <span class="en">比特位</span>
+     * @param bit       <span class="en-US">Bit value</span>
+     *                  <span class="en-US">比特位</span>
      *
-     * @return  <span class="en">Reverse bit result</span>
+     * @return  <span class="en-US">Reverse bit result</span>
      *          <span class="zh-CN">反转比特位的结果值</span>
      */
     private static long reverseBit(long value, int bit) {

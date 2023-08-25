@@ -27,8 +27,8 @@ import org.nervousync.exceptions.crypto.CryptoException;
 import java.security.MessageDigest;
 
 /**
- * <h2 class="en">Symmetric MD5 crypto adapter class</h2>
- * <p class="en">Deprecated. Suggest using SHA256 instead</p>
+ * <h2 class="en-US">Symmetric MD5 crypto adapter class</h2>
+ * <p class="en-US">Deprecated. Suggest using SHA256 instead</p>
  * <h2 class="zh-CN">MD5摘要算法适配器的实现类</h2>
  * <p class="zh-CN">已废弃。建议使用SHA256代替</p>
  *
@@ -37,11 +37,11 @@ import java.security.MessageDigest;
  */
 public final class MD5DigestAdapterImpl extends BaseDigestAdapter {
     /**
-     * <h3 class="en">Constructor for MD5DigestAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for MD5DigestAdapterImpl</h3>
      * <h3 class="zh-CN">MD5摘要算法适配器实现类类的构造方法</h3>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize adaptor</span>
+     * <span class="en-US">If an error occurs when initialize adaptor</span>
      * <span class="zh-CN">当初始化适配器时出现异常</span>
      */
     public MD5DigestAdapterImpl() throws CryptoException {
@@ -49,27 +49,27 @@ public final class MD5DigestAdapterImpl extends BaseDigestAdapter {
     }
 
     /**
-     * <h3 class="en">Constructor for MD5DigestAdapterImpl</h3>
+     * <h3 class="en-US">Constructor for MD5DigestAdapterImpl</h3>
      * <h3 class="zh-CN">MD5摘要算法适配器实现类类的构造方法</h3>
      *
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
      * @throws CryptoException
-     * <span class="en">If an error occurs when initialize adaptor</span>
+     * <span class="en-US">If an error occurs when initialize adaptor</span>
      * <span class="zh-CN">当初始化适配器时出现异常</span>
      */
     public MD5DigestAdapterImpl(final byte[] keyBytes) throws CryptoException {
         super("MD5/HMAC", keyBytes);
     }
     /**
-	 * <h3 class="en">Abstract method for initialize MessageDigest instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize MessageDigest instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息摘要算法适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
      *
-     * @return  <span class="en">Initialized MessageDigest instance</span>
+     * @return  <span class="en-US">Initialized MessageDigest instance</span>
      *          <span class="zh-CN">初始化的消息摘要算法适配器</span>
      */
     @Override
@@ -77,15 +77,15 @@ public final class MD5DigestAdapterImpl extends BaseDigestAdapter {
         return new MD5.Digest();
     }
     /**
-	 * <h3 class="en">Abstract method for initialize Hmac instance</h3>
+	 * <h3 class="en-US">Abstract method for initialize Hmac instance</h3>
 	 * <h3 class="zh-CN">抽象方法用于初始化消息认证码适配器实例对象</h3>
      *
-     * @param algorithm     <span class="en">Cipher Algorithm</span>
+     * @param algorithm     <span class="en-US">Cipher Algorithm</span>
      *                      <span class="zh-CN">密码算法</span>
-     * @param keyBytes      <span class="en">Hmac key data bytes</span>
+     * @param keyBytes      <span class="en-US">Hmac key data bytes</span>
      *                      <span class="zh-CN">消息认证码算法密钥数据数组</span>
      *
-     * @return  <span class="en">Initialized Hmac instance</span>
+     * @return  <span class="en-US">Initialized Hmac instance</span>
      *          <span class="zh-CN">初始化的消息认证码算法适配器</span>
      */
     @Override

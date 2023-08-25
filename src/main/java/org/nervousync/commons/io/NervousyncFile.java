@@ -29,84 +29,84 @@ import org.nervousync.utils.FileUtils;
 import jcifs.smb.SmbRandomAccessFile;
 
 /**
- * <h2 class="en">Custom RandomAccessFile</h2>
- * <span class="en">Supported local files and NAS files(protocol: smb://)</span>
+ * <h2 class="en-US">Custom RandomAccessFile</h2>
+ * <span class="en-US">Supported local files and NAS files(protocol: smb://)</span>
  * <h2 class="zh-CN">自定义的RandomAccessFile</h2>
- * <span class="en">支持本地文件和网络文件（协议：smb://）</span>
+ * <span class="en-US">支持本地文件和网络文件（协议：smb://）</span>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.1.0 $ $Date: Apr 22, 2022 11:49:46 AM $
  */
 public class NervousyncFile implements DataInput, DataOutput, Closeable {
 	/**
-     * <span class="en">Current file path</span>
+     * <span class="en-US">Current file path</span>
      * <span class="zh-CN">当前文件地址</span>
 	 */
 	private final String filePath;
 	/**
-     * <span class="en">Domain name for NAS file</span>
+     * <span class="en-US">Domain name for NAS file</span>
      * <span class="zh-CN">NAS文件的域名地址</span>
 	 */
 	private final String domain;
 	/**
-     * <span class="en">Username for NAS file</span>
+     * <span class="en-US">Username for NAS file</span>
      * <span class="zh-CN">NAS文件的用户名</span>
 	 */
 	private final String userName;
 	/**
-     * <span class="en">Password for NAS file</span>
+     * <span class="en-US">Password for NAS file</span>
      * <span class="zh-CN">NAS文件的密码</span>
 	 */
 	private final String passWord;
 	/**
-     * <span class="en">Instance of RandomAccessFile/SmbRandomAccessFile</span>
+     * <span class="en-US">Instance of RandomAccessFile/SmbRandomAccessFile</span>
      * <span class="zh-CN">RandomAccessFile的SmbRandomAccessFile的实例对象</span>
 	 */
 	private Object originObject = null;
 	/**
-     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open local file</h3>
+     * <h3 class="en-US">Constructor for using NervousyncRandomAccessFile open local file</h3>
      * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath 	<span class="en">Current file path</span>
+	 * @param filePath 	<span class="en-US">Current file path</span>
 	 *                  <span class="zh-CN">当前文件地址</span>
 	 * @throws FileNotFoundException
-     * <span class="en">If target file was not found</span>
+     * <span class="en-US">If target file was not found</span>
      * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
 	public NervousyncFile(final String filePath) throws FileNotFoundException {
 		this(filePath, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
-     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open local file with writable mode</h3>
+     * <h3 class="en-US">Constructor for using NervousyncRandomAccessFile open local file with writable mode</h3>
      * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath 	<span class="en">Current file path</span>
+	 * @param filePath 	<span class="en-US">Current file path</span>
 	 *                  <span class="zh-CN">当前文件地址</span>
-	 * @param writable 	<span class="en">Open in or not in writable mode</span>
+	 * @param writable 	<span class="en-US">Open in or not in writable mode</span>
 	 *                  <span class="zh-CN">是否以写入模式打开文件</span>
 	 *
 	 * @throws FileNotFoundException
-     * <span class="en">If target file was not found</span>
+     * <span class="en-US">If target file was not found</span>
      * <span class="zh-CN">文件未找到时抛出异常</span>
 	 */
 	public NervousyncFile(final String filePath, final boolean writable) throws FileNotFoundException {
 		this(filePath, writable, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
-     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open samba file</h3>
+     * <h3 class="en-US">Constructor for using NervousyncRandomAccessFile open samba file</h3>
      * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开网络文件</h3>
 	 *
-	 * @param filePath 	<span class="en">Samba file path</span>
+	 * @param filePath 	<span class="en-US">Samba file path</span>
 	 *                  <span class="zh-CN">网络文件地址</span>
-	 * @param domain 	<span class="en">Domain name for NAS file</span>
+	 * @param domain 	<span class="en-US">Domain name for NAS file</span>
      * 					<span class="zh-CN">NAS文件的域名地址</span>
-	 * @param userName 	<span class="en">Username for NAS file</span>
+	 * @param userName 	<span class="en-US">Username for NAS file</span>
      * 					<span class="zh-CN">NAS文件的用户名</span>
-	 * @param passWord 	<span class="en">Password for NAS file</span>
+	 * @param passWord 	<span class="en-US">Password for NAS file</span>
      * 					<span class="zh-CN">NAS文件的密码</span>
 	 *
 	 * @throws FileNotFoundException
-     * <span class="en">If connect to samba file has error occurs</span>
+     * <span class="en-US">If connect to samba file has error occurs</span>
      * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
 	public NervousyncFile(final String filePath, final String domain,
@@ -114,22 +114,22 @@ public class NervousyncFile implements DataInput, DataOutput, Closeable {
 		this(filePath, Boolean.FALSE, domain, userName, passWord);
 	}
 	/**
-     * <h3 class="en">Constructor for using NervousyncRandomAccessFile open smb file with writable mode</h3>
+     * <h3 class="en-US">Constructor for using NervousyncRandomAccessFile open smb file with writable mode</h3>
      * <h3 class="zh-CN">NervousyncRandomAccessFile的构造函数，用于打开本地文件</h3>
 	 *
-	 * @param filePath 	<span class="en">Samba file path</span>
+	 * @param filePath 	<span class="en-US">Samba file path</span>
 	 *                  <span class="zh-CN">网络文件地址</span>
-	 * @param writable 	<span class="en">Open in or not in writable mode</span>
+	 * @param writable 	<span class="en-US">Open in or not in writable mode</span>
 	 *                  <span class="zh-CN">是否以写入模式打开文件</span>
-	 * @param domain 	<span class="en">Domain name for NAS file</span>
+	 * @param domain 	<span class="en-US">Domain name for NAS file</span>
      * 					<span class="zh-CN">NAS文件的域名地址</span>
-	 * @param userName 	<span class="en">Username for NAS file</span>
+	 * @param userName 	<span class="en-US">Username for NAS file</span>
      * 					<span class="zh-CN">NAS文件的用户名</span>
-	 * @param passWord 	<span class="en">Password for NAS file</span>
+	 * @param passWord 	<span class="en-US">Password for NAS file</span>
      * 					<span class="zh-CN">NAS文件的密码</span>
 	 *
 	 * @throws FileNotFoundException
-     * <span class="en">If connect to samba file has error occurs</span>
+     * <span class="en-US">If connect to samba file has error occurs</span>
      * <span class="zh-CN">连接到Samba服务器时抛出异常</span>
 	 */
 	public NervousyncFile(final String filePath, final boolean writable, final String domain,
@@ -147,14 +147,14 @@ public class NervousyncFile implements DataInput, DataOutput, Closeable {
 		this.openFile(writable ? "rw" : "r");
 	}
 	/**
-     * <h3 class="en">Read current file total length</h3>
+     * <h3 class="en-US">Read current file total length</h3>
      * <h3 class="zh-CN">读取当前文件的数据长度</h3>
 	 *
-	 * @return 	<span class="en">Total length</span>
+	 * @return 	<span class="en-US">Total length</span>
 	 * 			<span class="zh-CN">数据长度</span>
 	 *
 	 * @throws IOException
-     * <span class="en">If I/O error occurs when read file length failed</span>
+     * <span class="en-US">If I/O error occurs when read file length failed</span>
      * <span class="zh-CN">读取当前文件的数据长度时出现I/O错误</span>
 	 */
 	public long length() throws IOException {
@@ -162,23 +162,23 @@ public class NervousyncFile implements DataInput, DataOutput, Closeable {
 				FileUtils.generateContext(FileUtils.smbAuthenticator(this.domain, this.userName, this.passWord)));
 	}
     /**
-	 * <h3 class="en">Getter method for current file path</h3>
+	 * <h3 class="en-US">Getter method for current file path</h3>
 	 * <h3 class="zh-CN">当前文件地址的Getter方法</h3>
 	 *
-	 * @return 	<span class="en">Current file path</span>
+	 * @return 	<span class="en-US">Current file path</span>
 	 *          <span class="zh-CN">当前文件地址</span>
      */
 	public String getFilePath() {
 		return filePath;
 	}
 	/**
-	 * <h3 class="en">Getter method for current file read pointer</h3>
+	 * <h3 class="en-US">Getter method for current file read pointer</h3>
 	 * <h3 class="zh-CN">当前文件读取指针位置的Getter方法</h3>
 	 *
-	 * @return 	<span class="en">Current file read pointer</span>
+	 * @return 	<span class="en-US">Current file read pointer</span>
 	 *          <span class="zh-CN">当前文件读取指针位置</span>
 	 * @throws IOException
-     * <span class="en">If I/O error occurs when read file pointer</span>
+     * <span class="en-US">If I/O error occurs when read file pointer</span>
      * <span class="zh-CN">读取当前文件的读取指针时出现I/O错误</span>
 	 */
 	public long getFilePointer() throws IOException {
@@ -189,8 +189,8 @@ public class NervousyncFile implements DataInput, DataOutput, Closeable {
 		}
 	}
 	/**
-	 * <h3 class="en">Sets the file-pointer offset</h3>
-	 * <span class="en">
+	 * <h3 class="en-US">Sets the file-pointer offset</h3>
+	 * <span class="en-US">
 	 *     Measured from the beginning of this file, at which the next read or write occurs.
 	 *     The offset may be set beyond the end of the file.
 	 *     Setting the offset beyond the end of the file does not change the file length.

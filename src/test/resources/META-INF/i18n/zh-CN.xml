@@ -78,4 +78,5 @@
     <entry key="System_Java_Info">Java版本：{0}，主版本号：{1}，Java路径：{2}，临时目录：{3}</entry>
     <entry key="System_Adaptor">适配器{0}的{1}地址：</entry>
     <entry key="System_Adaptor_IP_Info">IP地址：{0}，保留地址：{1}，回环地址：{2}，链路本地地址：{3}</entry>
+    <entry key="Desensitization_Data">脱敏后的数据：{0}</entry>
 </properties>

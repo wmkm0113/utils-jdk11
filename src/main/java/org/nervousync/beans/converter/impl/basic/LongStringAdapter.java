@@ -23,7 +23,7 @@ import org.nervousync.commons.Globals;
 import java.util.Optional;
 
 /**
- * <h2 class="en">Long DataConverter</h2>
+ * <h2 class="en-US">Long DataConverter</h2>
  * <h2 class="zh-CN">Long数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>

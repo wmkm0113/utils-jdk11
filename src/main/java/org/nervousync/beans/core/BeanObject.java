@@ -37,8 +37,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * <h2 class="en">Abstract class of JavaBean</h2>
- * <span class="en">
+ * <h2 class="en-US">Abstract class of JavaBean</h2>
+ * <span class="en-US">
  *     If JavaBean class extends current abstract class, it's can easier convert object to JSON/XML/YAML string.
  *     Default encoding is UTF-8
  *     Convert object to XML must add annotation to class and fields, using JAXB annotation
@@ -57,121 +57,121 @@ import java.util.*;
 @OutputConfig(type = StringUtils.StringType.XML, formatted = true)
 public abstract class BeanObject implements Serializable {
 	/**
-	 * <span class="en">Serial version UID</span>
+	 * <span class="en-US">Serial version UID</span>
 	 * <span class="zh-CN">序列化UID</span>
 	 */
 	private static final long serialVersionUID = 6900853002518080456L;
 	/**
-	 * <span class="en">XML fragment template</span>
+	 * <span class="en-US">XML fragment template</span>
 	 * <span class="zh-CN">XML声明模板</span>
 	 */
 	private static final String FRAGMENT_TEMPLATE = "<?xml version=\"1.0\" encoding=\"{}\"?>";
 	/**
-	 * <span class="en">Logger instance</span>
+	 * <span class="en-US">Logger instance</span>
 	 * <span class="zh-CN">日志对象</span>
 	 */
 	protected transient final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
 	/**
-	 * <h3 class="en">Convert current object to not formatted JSON string</h3>
+	 * <h3 class="en-US">Convert current object to not formatted JSON string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的JSON字符串</h3>
 	 *
-	 * @return 	<span class="en">Converted JSON string</span>
+	 * @return 	<span class="en-US">Converted JSON string</span>
 	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.FALSE);
 	}
 	/**
-	 * <h3 class="en">Convert current object to formatted JSON string</h3>
+	 * <h3 class="en-US">Convert current object to formatted JSON string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为格式化的JSON字符串</h3>
 	 *
-	 * @return 	<span class="en">Converted JSON string</span>
+	 * @return 	<span class="en-US">Converted JSON string</span>
 	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toFormattedJson() {
 		return StringUtils.objectToString(this, StringUtils.StringType.JSON, Boolean.TRUE);
 	}
 	/**
-	 * <h3 class="en">Convert current object to not formatted YAML string</h3>
+	 * <h3 class="en-US">Convert current object to not formatted YAML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的YAML字符串</h3>
 	 *
-	 * @return 	<span class="en">Converted YAML string</span>
+	 * @return 	<span class="en-US">Converted YAML string</span>
 	 * 			<span class="zh-CN">转换后的YAML字符串</span>
 	 */
 	public final String toYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.FALSE);
 	}
 	/**
-	 * <h3 class="en">Convert current object to formatted YAML string</h3>
+	 * <h3 class="en-US">Convert current object to formatted YAML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为格式化的YAML字符串</h3>
 	 *
-	 * @return 	<span class="en">Converted JSON string</span>
+	 * @return 	<span class="en-US">Converted JSON string</span>
 	 * 			<span class="zh-CN">转换后的JSON字符串</span>
 	 */
 	public final String toFormattedYaml() {
 		return StringUtils.objectToString(this, StringUtils.StringType.YAML, Boolean.TRUE);
 	}
 	/**
-	 * <h3 class="en">Convert current object to not formatted XML string</h3>
+	 * <h3 class="en-US">Convert current object to not formatted XML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为未经格式化的XML字符串</h3>
 	 *
-	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * @return 	<span class="en-US">Converted XML string, or empty string "" if an error occurs</span>
 	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
 	public final String toXML() {
 		return this.toXML(Boolean.FALSE);
 	}
 	/**
-	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="en-US">Convert current object to XML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en-US">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * @return 	<span class="en-US">Converted XML string, or empty string "" if an error occurs</span>
 	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
 	public final String toXML(final boolean formattedOutput) {
 		return this.toXML(Boolean.TRUE, formattedOutput);
 	}
 	/**
-	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="en-US">Convert current object to XML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en-US">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @param encoding			<span class="en">Output string encoding</span>
+	 * @param encoding			<span class="en-US">Output string encoding</span>
 	 *                          <span class="zh-CN">输出字符串使用的字符集</span>
-	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * @return 	<span class="en-US">Converted XML string, or empty string "" if an error occurs</span>
 	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
 	public final String toXML(final boolean formattedOutput, final String encoding) {
 		return this.toXML(Boolean.TRUE, formattedOutput, encoding);
 	}
 	/**
-	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="en-US">Convert current object to XML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param outputFragment 	<span class="en">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param outputFragment 	<span class="en-US">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出的XML声明字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en-US">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * @return 	<span class="en-US">Converted XML string, or empty string "" if an error occurs</span>
 	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
 	public final String toXML(final boolean outputFragment, final boolean formattedOutput) {
 		return this.toXML(outputFragment, formattedOutput, Globals.DEFAULT_ENCODING);
 	}
 	/**
-	 * <h3 class="en">Convert current object to XML string</h3>
+	 * <h3 class="en-US">Convert current object to XML string</h3>
 	 * <h3 class="zh-CN">转换当前实例对象为XML字符串</h3>
 	 *
-	 * @param outputFragment 	<span class="en">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param outputFragment 	<span class="en-US">Output XML fragment status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出的XML声明字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @param formattedOutput 	<span class="en">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
+	 * @param formattedOutput 	<span class="en-US">Output formatted XML string status. <code>TRUE</code> or <code>FALSE</code></span>
 	 *                          <span class="zh-CN">输出格式化的XML字符串状态。<code>TRUE</code>或<code>FALSE</code></span>
-	 * @param encoding			<span class="en">Output string encoding</span>
+	 * @param encoding			<span class="en-US">Output string encoding</span>
 	 *                          <span class="zh-CN">输出字符串使用的字符集</span>
-	 * @return 	<span class="en">Converted XML string, or empty string "" if an error occurs</span>
+	 * @return 	<span class="en-US">Converted XML string, or empty string "" if an error occurs</span>
 	 * 			<span class="zh-CN">转换后的XML字符串，如果转换过程中出现异常则返回空字符串</span>
 	 */
 	public final String toXML(final boolean outputFragment, final boolean formattedOutput, final String encoding) {

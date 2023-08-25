@@ -23,7 +23,7 @@ import java.util.Hashtable;
 import java.util.Optional;
 
 /**
- * <h2 class="en">Huffman Tree</h2>
+ * <h2 class="en-US">Huffman Tree</h2>
  * <h2 class="zh-CN">霍夫曼树</h2>
  *.0
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -31,41 +31,41 @@ import java.util.Optional;
  */
 public final class HuffmanTree {
 	/**
-	 * <span class="en">Node counter</span>
+	 * <span class="en-US">Node counter</span>
 	 * <span class="zh-CN">节点计数器</span>
 	 */
 	private int nodeCount = 0;
 	/**
-	 * <span class="en">Root node instance</span>
+	 * <span class="en-US">Root node instance</span>
 	 * <span class="zh-CN">根节点实例对象</span>
 	 */
 	private Node rootNode = null;
 	/**
-	 * <span class="en">Code mapping table</span>
+	 * <span class="en-US">Code mapping table</span>
 	 * <span class="zh-CN">编码映射表</span>
 	 */
 	private Hashtable<String, Object> codeMapping = new Hashtable<>();
 	/**
-	 * <h3 class="en">Constructor method for HuffmanTree</h3>
+	 * <h3 class="en-US">Constructor method for HuffmanTree</h3>
 	 * <h3 class="zh-CN">HuffmanTree构造方法</h3>
 	 */
 	public HuffmanTree() {
 	}
 	/**
-	 * <h3 class="en">Private constructor method for HuffmanTree</h3>
+	 * <h3 class="en-US">Private constructor method for HuffmanTree</h3>
 	 * <h3 class="zh-CN">HuffmanTree私有构造方法</h3>
 	 *
-	 * @param codeMapping 	<span class="en">Code mapping table</span>
+	 * @param codeMapping 	<span class="en-US">Code mapping table</span>
 	 *                      <span class="zh-CN">编码映射表</span>
 	 */
 	private HuffmanTree(Hashtable<String, Object> codeMapping) {
 		this.codeMapping = codeMapping;
 	}
 	/**
-	 * <h3 class="en">Insert huffman node into current huffman tree</h3>
+	 * <h3 class="en-US">Insert huffman node into current huffman tree</h3>
 	 * <h3 class="zh-CN">插入一个霍夫曼节点到当前的霍夫曼树</h3>
 	 *
-	 * @param huffmanNode 	<span class="en">Huffman node who will insert into current huffman tree</span>
+	 * @param huffmanNode 	<span class="en-US">Huffman node who will insert into current huffman tree</span>
 	 *                      <span class="zh-CN">即将插入当前霍夫曼树的霍夫曼节点</span>
 	 */
 	public void insertNode(final Node huffmanNode) {
@@ -98,7 +98,7 @@ public final class HuffmanTree {
 		this.nodeCount++;
 	}
 	/**
-	 * <h3 class="en">Build code mapping table</h3>
+	 * <h3 class="en-US">Build code mapping table</h3>
 	 * <h3 class="zh-CN">构建编码映射表</h3>
 	 */
 	public void build() {
@@ -108,15 +108,15 @@ public final class HuffmanTree {
 		this.buildCodeMapping(this.rootNode, Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
-	 * <h3 class="en">Static method for encode given content string to huffman tree result string using given code mapping</h3>
+	 * <h3 class="en-US">Static method for encode given content string to huffman tree result string using given code mapping</h3>
 	 * <h3 class="zh-CN">静态方法，使用给定的编码映射表将给定的内容字符串编码为霍夫曼结果字符串</h3>
 	 *
-	 * @param codeMapping 	<span class="en">Code mapping table</span>
+	 * @param codeMapping 	<span class="en-US">Code mapping table</span>
 	 *                      <span class="zh-CN">编码映射表</span>
-	 * @param content 		<span class="en">Content string</span>
+	 * @param content 		<span class="en-US">Content string</span>
 	 *                      <span class="zh-CN">内容字符串</span>
 	 *
-	 * @return 	<span class="en">Generated huffman result string or zero length string if content string is empty</span>
+	 * @return 	<span class="en-US">Generated huffman result string or zero length string if content string is empty</span>
 	 * 			<span class="zh-CN">生成的霍夫曼树编码字符串，当内容字符串为空字符串时返回长度为0的空字符串</span>
 	 */
 	public static String encodeString(final Hashtable<String, Object> codeMapping, String content) {
@@ -126,13 +126,13 @@ public final class HuffmanTree {
 				.orElse(Globals.DEFAULT_VALUE_STRING);
 	}
 	/**
-	 * <h3 class="en">Encode given content string to huffman tree result instance using current code mapping</h3>
+	 * <h3 class="en-US">Encode given content string to huffman tree result instance using current code mapping</h3>
 	 * <h3 class="zh-CN">使用当前的编码映射表将给定的内容字符串编码为霍夫曼结果实例对象</h3>
 	 *
-	 * @param content 		<span class="en">Content string</span>
+	 * @param content 		<span class="en-US">Content string</span>
 	 *                      <span class="zh-CN">内容字符串</span>
 	 *
-	 * @return 	<span class="en">Generated huffman result instance or null if content string is empty</span>
+	 * @return 	<span class="en-US">Generated huffman result instance or null if content string is empty</span>
 	 * 			<span class="zh-CN">生成的霍夫曼结果实例对象，当内容字符串为空字符串时返回null</span>
 	 */
 	public Result encodeString(final String content) {
@@ -152,12 +152,12 @@ public final class HuffmanTree {
 		return new Result(this.codeMapping, stringBuilder.toString());
 	}
 	/**
-	 * <h3 class="en">Build code mapping table</h3>
+	 * <h3 class="en-US">Build code mapping table</h3>
 	 * <h3 class="zh-CN">构建编码映射表</h3>
 	 *
-	 * @param currentNode 	<span class="en">Current huffman node</span>
+	 * @param currentNode 	<span class="en-US">Current huffman node</span>
 	 *                      <span class="zh-CN">当前霍夫曼节点</span>
-	 * @param currentCode	<span class="en">Code symbol</span>
+	 * @param currentCode	<span class="en-US">Code symbol</span>
 	 *                      <span class="zh-CN">编码符号</span>
 	 */
 	private void buildCodeMapping(final Node currentNode, final String currentCode) {
@@ -169,7 +169,7 @@ public final class HuffmanTree {
 		}
 	}
 	/**
-	 * <h3 class="en">Merge huffman node which two frequency was lowest</h3>
+	 * <h3 class="en-US">Merge huffman node which two frequency was lowest</h3>
 	 * <h3 class="zh-CN">合并两个权重最低的节点，并将合并后的节点添加到霍夫曼树中</h3>
 	 */
 	private void mergeNode() {
@@ -184,10 +184,10 @@ public final class HuffmanTree {
 		}
 	}
 	/**
-	 * <h3 class="en">Retrieves and removes the head of this queue</h3>
+	 * <h3 class="en-US">Retrieves and removes the head of this queue</h3>
 	 * <h3 class="zh-CN">取出并移除当前队列的第一个节点</h3>
 	 *
-	 * @return 	<span class="en">Retrieved node or returns null if this queue is empty.</span>
+	 * @return 	<span class="en-US">Retrieved node or returns null if this queue is empty.</span>
 	 * 			<span class="zh-CN">取出的节点，如果队列为空则返回null。</span>
 	 */
 	private Node pollNode() {
@@ -200,7 +200,7 @@ public final class HuffmanTree {
 		return removeNode;
 	}
 	/**
-	 * <h2 class="en">Huffman Node</h2>
+	 * <h2 class="en-US">Huffman Node</h2>
 	 * <h2 class="zh-CN">霍夫曼节点</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -208,36 +208,36 @@ public final class HuffmanTree {
 	 */
 	public static final class Node {
 		/**
-		 * <span class="en">Keyword</span>
+		 * <span class="en-US">Keyword</span>
 		 * <span class="zh-CN">关键词</span>
 		 */
 		private String keyword;
 		/**
-		 * <span class="en">Frequency</span>
+		 * <span class="en-US">Frequency</span>
 		 * <span class="zh-CN">权重</span>
 		 *
 		 */
 		private int frequency;
 		/**
-		 * <span class="en">Left Node</span>
+		 * <span class="en-US">Left Node</span>
 		 * <span class="zh-CN">左节点</span>
 		 */
 		private Node leftNode;
 		/**
-		 * <span class="en">Right Node</span>
+		 * <span class="en-US">Right Node</span>
 		 * <span class="zh-CN">右节点</span>
 		 */
 		private Node rightNode;
 		/**
-		 * <span class="en">Next Node, using for chain table</span>
+		 * <span class="en-US">Next Node, using for chain table</span>
 		 * <span class="zh-CN">下一节点，用于链表</span>
 		 */
 		private Node nextNode;
 		/**
-		 * <h3 class="en">Constructor method for HuffmanNode</h3>
+		 * <h3 class="en-US">Constructor method for HuffmanNode</h3>
 		 * <h3 class="zh-CN">HuffmanNode构造方法</h3>
 		 *
-		 * @param frequency 	<span class="en">Frequency</span>
+		 * @param frequency 	<span class="en-US">Frequency</span>
 		 *                      <span class="zh-CN">权重</span>
 		 */
 		public Node(final int frequency) {
@@ -245,12 +245,12 @@ public final class HuffmanTree {
 		}
 
 		/**
-		 * <h3 class="en">Constructor method for HuffmanNode</h3>
+		 * <h3 class="en-US">Constructor method for HuffmanNode</h3>
 		 * <h3 class="zh-CN">HuffmanNode构造方法</h3>
 		 *
-		 * @param keyword 		<span class="en">Keyword</span>
+		 * @param keyword 		<span class="en-US">Keyword</span>
 		 *                      <span class="zh-CN">关键词</span>
-		 * @param frequency 	<span class="en">Frequency</span>
+		 * @param frequency 	<span class="en-US">Frequency</span>
 		 *                      <span class="zh-CN">权重</span>
 		 */
 		public Node(final String keyword, final int frequency) {
@@ -258,100 +258,100 @@ public final class HuffmanTree {
 			this.frequency = frequency;
 		}
 		/**
-		 * <h3 class="en">Getter method for keyword</h3>
+		 * <h3 class="en-US">Getter method for keyword</h3>
 		 * <h3 class="zh-CN">关键词的Getter方法</h3>
 		 *
-		 * @return 		<span class="en">Keyword</span>
+		 * @return 		<span class="en-US">Keyword</span>
 		 *              <span class="zh-CN">关键词</span>
 		 */
 		public String getKeyword() {
 			return keyword;
 		}
 		/**
-		 * <h3 class="en">Setter method for keyword</h3>
+		 * <h3 class="en-US">Setter method for keyword</h3>
 		 * <h3 class="zh-CN">关键词的Setter方法</h3>
 		 *
-		 * @param keyword 		<span class="en">Keyword</span>
+		 * @param keyword 		<span class="en-US">Keyword</span>
 		 *                      <span class="zh-CN">关键词</span>
 		 */
 		public void setKeyword(final String keyword) {
 			this.keyword = keyword;
 		}
 		/**
-		 * <h3 class="en">Getter method for frequency</h3>
+		 * <h3 class="en-US">Getter method for frequency</h3>
 		 * <h3 class="zh-CN">权重的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Frequency</span>
+		 * @return 	<span class="en-US">Frequency</span>
 		 *          <span class="zh-CN">权重</span>
 		 */
 		public int getFrequency() {
 			return frequency;
 		}
 		/**
-		 * <h3 class="en">Setter method for frequency</h3>
+		 * <h3 class="en-US">Setter method for frequency</h3>
 		 * <h3 class="zh-CN">权重的Setter方法</h3>
 		 *
-		 * @param frequency 	<span class="en">Frequency</span>
+		 * @param frequency 	<span class="en-US">Frequency</span>
 		 *                      <span class="zh-CN">权重</span>
 		 */
 		public void setFrequency(final int frequency) {
 			this.frequency = frequency;
 		}
 		/**
-		 * <h3 class="en">Getter method for left node</h3>
+		 * <h3 class="en-US">Getter method for left node</h3>
 		 * <h3 class="zh-CN">左节点的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Left Node</span>
+		 * @return 	<span class="en-US">Left Node</span>
 		 * 			<span class="zh-CN">左节点</span>
 		 */
 		public Node getLeftNode() {
 			return leftNode;
 		}
 		/**
-		 * <h3 class="en">Setter method for left node</h3>
+		 * <h3 class="en-US">Setter method for left node</h3>
 		 * <h3 class="zh-CN">左节点的Setter方法</h3>
 		 *
-		 * @param leftNode 	<span class="en">Left Node</span>
+		 * @param leftNode 	<span class="en-US">Left Node</span>
 		 * 					<span class="zh-CN">左节点</span>
 		 */
 		public void setLeftNode(final Node leftNode) {
 			this.leftNode = leftNode;
 		}
 		/**
-		 * <h3 class="en">Getter method for right node</h3>
+		 * <h3 class="en-US">Getter method for right node</h3>
 		 * <h3 class="zh-CN">右节点的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Right Node</span>
+		 * @return 	<span class="en-US">Right Node</span>
 		 * 			<span class="zh-CN">右节点</span>
 		 */
 		public Node getRightNode() {
 			return rightNode;
 		}
 		/**
-		 * <h3 class="en">Setter method for right node</h3>
+		 * <h3 class="en-US">Setter method for right node</h3>
 		 * <h3 class="zh-CN">右节点的Setter方法</h3>
 		 *
-		 * @param rightNode 	<span class="en">Right Node</span>
+		 * @param rightNode 	<span class="en-US">Right Node</span>
 		 * 						<span class="zh-CN">右节点</span>
 		 */
 		public void setRightNode(final Node rightNode) {
 			this.rightNode = rightNode;
 		}
 		/**
-		 * <h3 class="en">Getter method for next node</h3>
+		 * <h3 class="en-US">Getter method for next node</h3>
 		 * <h3 class="zh-CN">下一节点的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Next Node, using for chain table</span>
+		 * @return 	<span class="en-US">Next Node, using for chain table</span>
 		 * 			<span class="zh-CN">下一节点，用于链表</span>
 		 */
 		public Node getNextNode() {
 			return nextNode;
 		}
 		/**
-		 * <h3 class="en">Setter method for next node</h3>
+		 * <h3 class="en-US">Setter method for next node</h3>
 		 * <h3 class="zh-CN">下一节点的Setter方法</h3>
 		 *
-		 * @param nextNode 	<span class="en">Next Node, using for chain table</span>
+		 * @param nextNode 	<span class="en-US">Next Node, using for chain table</span>
 		 * 					<span class="zh-CN">下一节点，用于链表</span>
 		 */
 		public void setNextNode(final Node nextNode) {
@@ -360,7 +360,7 @@ public final class HuffmanTree {
 	}
 
 	/**
-	 * <h2 class="en">Huffman Result</h2>
+	 * <h2 class="en-US">Huffman Result</h2>
 	 * <h2 class="zh-CN">霍夫曼编码结果</h2>
 	 *
 	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -368,23 +368,23 @@ public final class HuffmanTree {
 	 */
 	public static final class Result {
 		/**
-		 * <span class="en">Code mapping table</span>
+		 * <span class="en-US">Code mapping table</span>
 		 * <span class="zh-CN">编码映射表</span>
 		 */
 		private final Hashtable<String, Object> codeMapping = new Hashtable<>();
 		/**
-		 * <span class="en">Result string</span>
+		 * <span class="en-US">Result string</span>
 		 * <span class="zh-CN">编码字符串</span>
 		 */
 		private final String huffmanValue;
 		/**
-		 * <h3 class="en">Constructor method for HuffmanResult</h3>
+		 * <h3 class="en-US">Constructor method for HuffmanResult</h3>
 		 * <h3 class="zh-CN">HuffmanResult构造方法</h3>
 		 *
 		 *
-		 * @param codeMapping 	<span class="en">Code mapping table</span>
+		 * @param codeMapping 	<span class="en-US">Code mapping table</span>
 		 *                      <span class="zh-CN">编码映射表</span>
-		 * @param huffmanValue 	<span class="en">Result string</span>
+		 * @param huffmanValue 	<span class="en-US">Result string</span>
 		 *                      <span class="zh-CN">编码字符串</span>
 		 */
 		public Result(final Hashtable<String, Object> codeMapping, final String huffmanValue) {
@@ -394,30 +394,30 @@ public final class HuffmanTree {
 			this.huffmanValue = huffmanValue;
 		}
 		/**
-		 * <h3 class="en">Convert coding map to JSON string</h3>
+		 * <h3 class="en-US">Convert coding map to JSON string</h3>
 		 * <h3 class="zh-CN">转换编码映射表为JSON字符串</h3>
 		 *
-		 * @return 	<span class="en">Converted JSON string of current code mapping</span>
+		 * @return 	<span class="en-US">Converted JSON string of current code mapping</span>
 		 * 			<span class="zh-CN">当前编码映射表转换后的JSON字符串</span>
 		 */
 		public String codeMappingToString() {
 			return StringUtils.objectToString(this.codeMapping, StringUtils.StringType.JSON, Boolean.TRUE);
 		}
 		/**
-		 * <h3 class="en">Getter method for code mapping</h3>
+		 * <h3 class="en-US">Getter method for code mapping</h3>
 		 * <h3 class="zh-CN">编码映射表的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Code mapping table</span>
+		 * @return 	<span class="en-US">Code mapping table</span>
 		 *          <span class="zh-CN">编码映射表</span>
 		 */
 		public Hashtable<String, Object> getCodeMapping() {
 			return this.codeMapping;
 		}
 		/**
-		 * <h3 class="en">Getter method for result string</h3>
+		 * <h3 class="en-US">Getter method for result string</h3>
 		 * <h3 class="zh-CN">编码字符串的Getter方法</h3>
 		 *
-		 * @return 	<span class="en">Result string</span>
+		 * @return 	<span class="en-US">Result string</span>
 		 *          <span class="zh-CN">编码字符串</span>
 		 */
 		public String getHuffmanValue() {

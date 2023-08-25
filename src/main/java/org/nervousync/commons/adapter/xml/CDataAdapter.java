@@ -20,7 +20,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.nervousync.utils.StringUtils;
 
 /**
- * <h2 class="en">CData adapter</h2>
+ * <h2 class="en-US">CData adapter</h2>
  * <h2 class="zh-CN">CDATA数据转换器</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -28,12 +28,12 @@ import org.nervousync.utils.StringUtils;
  */
 public final class CDataAdapter extends XmlAdapter<String, String> {
 	/**
-     * <span class="en">Begin string of CDATA</span>
+     * <span class="en-US">Begin string of CDATA</span>
      * <span class="zh-CN">CDATA起始字符串</span>
 	 */
 	public static final String CDATA_BEGIN = "<![CDATA[";
 	/**
-     * <span class="en">End string of CDATA</span>
+     * <span class="en-US">End string of CDATA</span>
      * <span class="zh-CN">CDATA终止字符串</span>
 	 */
 	public static final String CDATA_END = "]]>";

@@ -32,7 +32,7 @@ import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.StringUtils;
 
 /**
- * <h2 class="en">Response information define</h2>
+ * <h2 class="en-US">Response information define</h2>
  * <h2 class="zh-CN">网络响应信息定义</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -40,55 +40,55 @@ import org.nervousync.utils.StringUtils;
  */
 public final class ResponseInfo {
     /**
-     * <span class="en">Logger instance</span>
+     * <span class="en-US">Logger instance</span>
      * <span class="zh-CN">日志实例</span>
      */
     private final LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
     /**
-	 * <span class="en">Response HTTP status code</span>
+	 * <span class="en-US">Response HTTP status code</span>
 	 * <span class="zh-CN">响应的HTTP状态代码</span>
      */
     private int statusCode;
     /**
-	 * <span class="en">Response header information map</span>
+	 * <span class="en-US">Response header information map</span>
 	 * <span class="zh-CN">响应头信息映射表</span>
      */
     private final Map<String, String> headerMaps = new HashMap<>();
     /**
-	 * <span class="en">String value for http response header "Content-Type"</span>
+	 * <span class="en-US">String value for http response header "Content-Type"</span>
 	 * <span class="zh-CN">响应头"Content-Type"的字符串值</span>
      */
     private String contentType;
     /**
-	 * <span class="en">Character encoding for http response data</span>
+	 * <span class="en-US">Character encoding for http response data</span>
 	 * <span class="zh-CN">响应数据使用的编码集</span>
      */
     private String charset = null;
     /**
-	 * <span class="en">String value of response header "identified"</span>
+	 * <span class="en-US">String value of response header "identified"</span>
 	 * <span class="zh-CN">响应头"identified"的字符串值</span>
      */
     private String identifiedCode;
     /**
-	 * <span class="en">Response content length</span>
+	 * <span class="en-US">Response content length</span>
 	 * <span class="zh-CN">响应数据的长度</span>
      */
     private int contentLength;
     /**
-	 * <span class="en">Response content binary data bytes</span>
+	 * <span class="en-US">Response content binary data bytes</span>
 	 * <span class="zh-CN">响应数据的二进制字节数组</span>
      */
     private byte[] responseContent;
     /**
-     * <h3 class="en">Constructor for ResponseInfo</h3>
-     * <span class="en">Parse response information from HttpResponse.ResponseInfo and ResponseBody input stream</span>
+     * <h3 class="en-US">Constructor for ResponseInfo</h3>
+     * <span class="en-US">Parse response information from HttpResponse.ResponseInfo and ResponseBody input stream</span>
      * <h3 class="zh-CN">ResponseInfo的构造函数</h3>
      * <span class="zh-CN">从HttpResponse.ResponseInfo实例对象和响应体输入数据流中解析响应数据</span>
      *
-     * @param responseInfo  <span class="en">Instance of HttpResponse.ResponseInfo</span>
+     * @param responseInfo  <span class="en-US">Instance of HttpResponse.ResponseInfo</span>
      *                      <span class="zh-CN">HttpResponse.ResponseInfo实例对象</span>
      * @see java.net.http.HttpResponse.ResponseInfo
-     * @param inputStream   <span class="en">ResponseBody input stream</span>
+     * @param inputStream   <span class="en-US">ResponseBody input stream</span>
      *                      <span class="zh-CN">响应体输入数据流</span>
      */
     public ResponseInfo(final HttpResponse.ResponseInfo responseInfo, final InputStream inputStream) {
@@ -131,12 +131,12 @@ public final class ResponseInfo {
         this.contentLength = this.responseContent.length;
     }
     /**
-     * <h3 class="en">Constructor for ResponseInfo</h3>
-     * <span class="en">Parse response information from HttpURLConnection instance</span>
+     * <h3 class="en-US">Constructor for ResponseInfo</h3>
+     * <span class="en-US">Parse response information from HttpURLConnection instance</span>
      * <h3 class="zh-CN">ResponseInfo的构造函数</h3>
      * <span class="zh-CN">从HttpURLConnection实例对象解析响应数据</span>
      *
-     * @param urlConnection     <span class="en">Instance of HttpURLConnection</span>
+     * @param urlConnection     <span class="en-US">Instance of HttpURLConnection</span>
      *                          <span class="zh-CN">HttpURLConnection实例对象</span>
      * @see java.net.HttpURLConnection
      */
@@ -223,79 +223,79 @@ public final class ResponseInfo {
         }
     }
     /**
-	 * <h3 class="en">Getter method for response HTTP status code</h3>
+	 * <h3 class="en-US">Getter method for response HTTP status code</h3>
 	 * <h3 class="zh-CN">响应的HTTP状态代码的Getter方法</h3>
      */
     public int getStatusCode() {
         return statusCode;
     }
     /**
-	 * <h3 class="en">Getter method for response header map</h3>
+	 * <h3 class="en-US">Getter method for response header map</h3>
 	 * <h3 class="zh-CN">响应头信息映射表的Getter方法</h3>
      */
     public Map<String, String> getHeaderMaps() {
         return headerMaps;
     }
     /**
-	 * <h3 class="en">Getter method for response content type</h3>
+	 * <h3 class="en-US">Getter method for response content type</h3>
 	 * <h3 class="zh-CN">响应头"Content-Type"字符串值的Getter方法</h3>
      */
     public String getContentType() {
         return contentType;
     }
     /**
-	 * <h3 class="en">Getter method for response character encoding</h3>
+	 * <h3 class="en-US">Getter method for response character encoding</h3>
 	 * <h3 class="zh-CN">响应数据使用的编码集的Getter方法</h3>
      */
     public String getCharset() {
         return charset;
     }
     /**
-	 * <h3 class="en">Getter method for string value of response header "identified"</h3>
+	 * <h3 class="en-US">Getter method for string value of response header "identified"</h3>
 	 * <h3 class="zh-CN">响应头"identified"字符串值的Getter方法</h3>
      */
     public String getIdentifiedCode() {
         return identifiedCode;
     }
     /**
-	 * <h3 class="en">Getter method for response content length</h3>
+	 * <h3 class="en-US">Getter method for response content length</h3>
 	 * <h3 class="zh-CN">响应数据的长度的Getter方法</h3>
      */
     public int getContentLength() {
         return contentLength;
     }
     /**
-	 * <h3 class="en">Getter method for response content binary data bytes</h3>
+	 * <h3 class="en-US">Getter method for response content binary data bytes</h3>
 	 * <h3 class="zh-CN">响应数据的二进制字节数组的Getter方法</h3>
      */
     public byte[] getResponseContent() {
         return responseContent == null ? new byte[0] : responseContent.clone();
     }
     /**
-	 * <h3 class="en">Parse response data to the instance list of given class type</h3>
+	 * <h3 class="en-US">Parse response data to the instance list of given class type</h3>
 	 * <h3 class="zh-CN">转换响应数据为指定类型的对象列表</h3>
      *
-     * @param clazz     <span class="en">Class type</span>
+     * @param clazz     <span class="en-US">Class type</span>
      *                  <span class="zh-CN">数据对象类</span>
-     * @param <T>       <span class="en">Template type of list</span>
+     * @param <T>       <span class="en-US">Template type of list</span>
      *                  <span class="zh-CN">列表的参数化类型</span>
      *
-     * @return  <span class="en">instance list of given class type, or empty list if has error</span>
+     * @return  <span class="en-US">instance list of given class type, or empty list if has error</span>
      *          <span class="zh-CN">数据对象列表，当有异常时返回空列表</span>
      */
     public <T> List<T> parseList(final Class<T> clazz) {
         return StringUtils.stringToList(this.parseString(), this.charset, clazz);
     }
     /**
-	 * <h3 class="en">Parse response data to the instance of given class type</h3>
+	 * <h3 class="en-US">Parse response data to the instance of given class type</h3>
 	 * <h3 class="zh-CN">转换响应数据为指定类型的对象</h3>
      *
-     * @param clazz     <span class="en">Class type</span>
+     * @param clazz     <span class="en-US">Class type</span>
      *                  <span class="zh-CN">数据对象类</span>
-     * @param <T>       <span class="en">Template type of list</span>
+     * @param <T>       <span class="en-US">Template type of list</span>
      *                  <span class="zh-CN">列表的参数化类型</span>
      *
-     * @return  <span class="en">instance of given class type, or null if has error</span>
+     * @return  <span class="en-US">instance of given class type, or null if has error</span>
      *          <span class="zh-CN">转换后的数据实例对象，当有异常时返回null</span>
      */
     public <T> T parseObject(final Class<T> clazz) {
@@ -324,10 +324,10 @@ public final class ResponseInfo {
         }
     }
     /**
-	 * <h3 class="en">Parse response data to string</h3>
+	 * <h3 class="en-US">Parse response data to string</h3>
 	 * <h3 class="zh-CN">转换响应数据为字符串</h3>
      *
-     * @return  <span class="en">String value of response data or empty string if an UnsupportedEncodingException occurs</span>
+     * @return  <span class="en-US">String value of response data or empty string if an UnsupportedEncodingException occurs</span>
      *          <span class="zh-CN">响应数据字符串，当有UnsupportedEncodingException异常时返回空字符串</span>
      */
     public String parseString() {
@@ -347,39 +347,39 @@ public final class ResponseInfo {
         }
     }
     /**
-	 * <h3 class="en">Parse response data to local file and save to target path</h3>
+	 * <h3 class="en-US">Parse response data to local file and save to target path</h3>
 	 * <h3 class="zh-CN">转换响应数据为文件，并写入数据到目标地址</h3>
      *
-     * @param savePath  <span class="en">Target save path</span>
+     * @param savePath  <span class="en-US">Target save path</span>
      *                  <span class="zh-CN">目标地址</span>
      *
-     * @return  <span class="en">Instance of java.io.File</span>
+     * @return  <span class="en-US">Instance of java.io.File</span>
      *          <span class="zh-CN">java.io.File实例对象</span>
      * @throws FileNotFoundException
-	 * <span class="en">If an error occurs when save binary data to target path</span>
+	 * <span class="en-US">If an error occurs when save binary data to target path</span>
 	 * <span class="zh-CN">当写入数据到目标地址时捕获异常</span>
      */
     public File parseFile(final String savePath) throws FileNotFoundException {
         return FileUtils.saveFile(this.getResponseContent(), savePath) ? FileUtils.getFile(savePath) : null;
     }
     /**
-	 * <h3 class="en">Retrieve response header value by given header name</h3>
+	 * <h3 class="en-US">Retrieve response header value by given header name</h3>
 	 * <h3 class="zh-CN">根据给定的响应头键值读取对应的数据值</h3>
      *
-     * @param headerName    <span class="en">Response header name</span>
+     * @param headerName    <span class="en-US">Response header name</span>
      *                      <span class="zh-CN">响应头键值</span>
      *
-     * @return  <span class="en">Response header value or empty string if header name not exists</span>
+     * @return  <span class="en-US">Response header value or empty string if header name not exists</span>
      *          <span class="zh-CN">响应头数据值，如果数据不存在则返回空字符串</span>
      */
     public String getHeader(final String headerName) {
         return this.headerMaps.getOrDefault(headerName.toUpperCase(), Globals.DEFAULT_VALUE_STRING);
     }
     /**
-	 * <h3 class="en">Retrieve response header list</h3>
+	 * <h3 class="en-US">Retrieve response header list</h3>
 	 * <h3 class="zh-CN">获取响应头数据列表</h3>
      *
-     * @return  <span class="en">Response header list. Convert key-value to SimpleHeader instance</span>
+     * @return  <span class="en-US">Response header list. Convert key-value to SimpleHeader instance</span>
      *          <span class="zh-CN">响应头数据列表，转换键-值为SimpleHeader实例对象</span>
      */
     public List<SimpleHeader> headerList() {

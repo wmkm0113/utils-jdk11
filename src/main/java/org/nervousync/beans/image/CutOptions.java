@@ -19,7 +19,7 @@ package org.nervousync.beans.image;
 import org.nervousync.commons.Globals;
 
 /**
- * <h2 class="en">Cut options of image cut operate</h2>
+ * <h2 class="en-US">Cut options of image cut operate</h2>
  * <h2 class="zh-CN">用于图片剪切操作的剪切选项</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -27,36 +27,36 @@ import org.nervousync.commons.Globals;
  */
 public final class CutOptions {
 	/**
-	 * <h3 class="en">Begin position X, default value is 0</h3>
+	 * <h3 class="en-US">Begin position X, default value is 0</h3>
 	 * <h3 class="zh-CN">起始X坐标值，默认为0</h3>
 	 */
 	private final int positionX;
 	/**
-	 * <h3 class="en">Begin position Y, default value is 0</h3>
+	 * <h3 class="en-US">Begin position Y, default value is 0</h3>
 	 * <h3 class="zh-CN">起始Y坐标值，默认为0</h3>
 	 */
 	private final int positionY;
 	/**
-	 * <h3 class="en">Cut width value</h3>
+	 * <h3 class="en-US">Cut width value</h3>
 	 * <h3 class="zh-CN">剪切后的宽度</h3>
 	 */
 	private final int cutWidth;
 	/**
-	 * <h3 class="en">Cut height value</h3>
+	 * <h3 class="en-US">Cut height value</h3>
 	 * <h3 class="zh-CN">剪切后的高度</h3>
 	 */
 	private final int cutHeight;
 	/**
-	 * <h3 class="en">Constructor for CutOptions</h3>
+	 * <h3 class="en-US">Constructor for CutOptions</h3>
 	 * <h3 class="zh-CN">CutOptions的构造方法</h3>
 	 *
-	 * @param positionX		<span class="en">Begin position X, default value is 0</span>
+	 * @param positionX		<span class="en-US">Begin position X, default value is 0</span>
 	 *                      <span class="zh-CN">起始X坐标值，默认为0</span>
-	 * @param positionY     <span class="en">Begin position Y, default value is 0</span>
+	 * @param positionY     <span class="en-US">Begin position Y, default value is 0</span>
 	 * 	 *                  <span class="zh-CN">起始Y坐标值，默认为0</span>
-	 * @param cutWidth		<span class="en">Cut width value</span>
+	 * @param cutWidth		<span class="en-US">Cut width value</span>
 	 *                      <span class="zh-CN">剪切后的宽度</span>
-	 * @param cutHeight		<span class="en">Cut height value</span>
+	 * @param cutHeight		<span class="en-US">Cut height value</span>
 	 *                      <span class="zh-CN">剪切后的高度</span>
 	 */
 	private CutOptions(final int positionX, final int positionY, final int cutWidth, final int cutHeight) {
@@ -66,73 +66,73 @@ public final class CutOptions {
 		this.cutHeight = cutHeight;
 	}
 	/**
-	 * <h3 class="en">Static method for initialize CutOptions from default position (0, 0)</h3>
+	 * <h3 class="en-US">Static method for initialize CutOptions from default position (0, 0)</h3>
 	 * <h3 class="zh-CN">用于初始化CutOptions的静态方法，使用默认起始坐标（0，0）</h3>
 	 *
-	 * @param cutWidth		<span class="en">Cut width value</span>
+	 * @param cutWidth		<span class="en-US">Cut width value</span>
 	 *                      <span class="zh-CN">剪切后的宽度</span>
-	 * @param cutHeight		<span class="en">Cut height value</span>
+	 * @param cutHeight		<span class="en-US">Cut height value</span>
 	 *                      <span class="zh-CN">剪切后的高度</span>
-	 * @return	<span class="en">Initialized CutOptions instance</span>
-	 * 			<span class="en">初始化的CutOptions实例对象</span>
+	 * @return	<span class="en-US">Initialized CutOptions instance</span>
+	 * 			<span class="en-US">初始化的CutOptions实例对象</span>
 	 */
 	public static CutOptions newInstance(final int cutWidth, final int cutHeight) {
 		return newInstance(Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_INT, cutWidth, cutHeight);
 	}
 	/**
-	 * <h3 class="en">Static method for initialize CutOptions by given begin position (positionX, positionY)</h3>
+	 * <h3 class="en-US">Static method for initialize CutOptions by given begin position (positionX, positionY)</h3>
 	 * <h3 class="zh-CN">用于初始化CutOptions的静态方法，使用给定的起始坐标（positionX，positionY）</h3>
 	 *
-	 * @param positionX		<span class="en">Begin position X, default value is 0</span>
+	 * @param positionX		<span class="en-US">Begin position X, default value is 0</span>
 	 *                      <span class="zh-CN">起始X坐标值，默认为0</span>
-	 * @param positionY     <span class="en">Begin position Y, default value is 0</span>
+	 * @param positionY     <span class="en-US">Begin position Y, default value is 0</span>
 	 * 	 *                  <span class="zh-CN">起始Y坐标值，默认为0</span>
-	 * @param cutWidth		<span class="en">Cut width value</span>
+	 * @param cutWidth		<span class="en-US">Cut width value</span>
 	 *                      <span class="zh-CN">剪切后的宽度</span>
-	 * @param cutHeight		<span class="en">Cut height value</span>
+	 * @param cutHeight		<span class="en-US">Cut height value</span>
 	 *                      <span class="zh-CN">剪切后的高度</span>
-	 * @return	<span class="en">Initialized CutOptions instance</span>
-	 * 			<span class="en">初始化的CutOptions实例对象</span>
+	 * @return	<span class="en-US">Initialized CutOptions instance</span>
+	 * 			<span class="en-US">初始化的CutOptions实例对象</span>
 	 */
 	public static CutOptions newInstance(final int positionX, final int positionY,
 	                                     final int cutWidth, final int cutHeight) {
 		return new CutOptions(positionX, positionY, cutWidth, cutHeight);
 	}
 	/**
-	 * <h3 class="en">Getter method for position X</h3>
+	 * <h3 class="en-US">Getter method for position X</h3>
 	 * <h3 class="zh-CN">起始X坐标的Getter方法</h3>
 	 *
-	 * @return    <span class="en">Value of begin position X</span>
+	 * @return    <span class="en-US">Value of begin position X</span>
 	 *            <span class="zh-CN">起始X坐标值</span>
 	 */
 	public int getPositionX() {
 		return positionX;
 	}
 	/**
-	 * <h3 class="en">Getter method for position Y</h3>
+	 * <h3 class="en-US">Getter method for position Y</h3>
 	 * <h3 class="zh-CN">起始Y坐标的Getter方法</h3>
 	 *
-	 * @return    <span class="en">Value of begin position Y</span>
+	 * @return    <span class="en-US">Value of begin position Y</span>
 	 *            <span class="zh-CN">起始Y坐标值</span>
 	 */
 	public int getPositionY() {
 		return positionY;
 	}
 	/**
-	 * <h3 class="en">Getter method for cut width</h3>
+	 * <h3 class="en-US">Getter method for cut width</h3>
 	 * <h3 class="zh-CN">剪切宽度的Getter方法</h3>
 	 *
-	 * @return    <span class="en">Value of cut width</span>
+	 * @return    <span class="en-US">Value of cut width</span>
 	 *            <span class="zh-CN">剪切宽度值</span>
 	 */
 	public int getCutWidth() {
 		return cutWidth;
 	}
 	/**
-	 * <h3 class="en">Getter method for cut height</h3>
+	 * <h3 class="en-US">Getter method for cut height</h3>
 	 * <h3 class="zh-CN">剪切高度的Getter方法</h3>
 	 *
-	 * @return    <span class="en">Value of cut height</span>
+	 * @return    <span class="en-US">Value of cut height</span>
 	 *            <span class="zh-CN">剪切高度值</span>
 	 */
 	public int getCutHeight() {

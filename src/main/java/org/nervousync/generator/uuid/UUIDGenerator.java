@@ -19,7 +19,7 @@ package org.nervousync.generator.uuid;
 import org.nervousync.generator.IGenerator;
 
 /**
- * <h2 class="en">Abstract UUID generator</h2>
+ * <h2 class="en-US">Abstract UUID generator</h2>
  * <h2 class="zh-CN">UUID生成器抽象类</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
@@ -27,12 +27,12 @@ import org.nervousync.generator.IGenerator;
  */
 public abstract class UUIDGenerator implements IGenerator<String> {
     /**
-	 * <h3 class="en">Calculate high bits of given data bytes</h3>
+	 * <h3 class="en-US">Calculate high bits of given data bytes</h3>
 	 * <h3 class="zh-CN">从给定的二进制数组计算高位值</h3>
      *
-     * @param randomBytes   <span class="en">given data bytes</span>
+     * @param randomBytes   <span class="en-US">given data bytes</span>
      *                      <span class="zh-CN">给定的二进制数组</span>
-     * @return  <span class="en">High bits value in long</span>
+     * @return  <span class="en-US">High bits value in long</span>
      *          <span class="zh-CN">long型的高位比特值</span>
      */
     protected final long highBits(byte[] randomBytes) {
@@ -43,12 +43,12 @@ public abstract class UUIDGenerator implements IGenerator<String> {
         return highBits;
     }
     /**
-	 * <h3 class="en">Calculate high bits of given current time milliseconds</h3>
+	 * <h3 class="en-US">Calculate high bits of given current time milliseconds</h3>
 	 * <h3 class="zh-CN">从给定的当前时间戳计算高位值</h3>
      *
-     * @param currentTimeMillis     <span class="en">current time milliseconds</span>
+     * @param currentTimeMillis     <span class="en-US">current time milliseconds</span>
      *                              <span class="zh-CN">当前时间戳</span>
-     * @return  <span class="en">High bits value in long</span>
+     * @return  <span class="en-US">High bits value in long</span>
      *          <span class="zh-CN">long型的高位比特值</span>
      */
     protected final long highBits(long currentTimeMillis) {
@@ -58,12 +58,12 @@ public abstract class UUIDGenerator implements IGenerator<String> {
                 | ((currentTimeMillis & 0xFFF000000000000L) >> 48);
     }
     /**
-	 * <h3 class="en">Calculate low bits of given data bytes</h3>
+	 * <h3 class="en-US">Calculate low bits of given data bytes</h3>
 	 * <h3 class="zh-CN">从给定的二进制数组计算低位值</h3>
      *
-     * @param dataBytes     <span class="en">given data bytes</span>
+     * @param dataBytes     <span class="en-US">given data bytes</span>
      *                      <span class="zh-CN">给定的二进制数组</span>
-     * @return  <span class="en">Low bits value in long</span>
+     * @return  <span class="en-US">Low bits value in long</span>
      *          <span class="zh-CN">long型的低位比特值</span>
      */
     protected long lowBits(byte[] dataBytes) {
@@ -74,7 +74,7 @@ public abstract class UUIDGenerator implements IGenerator<String> {
         return lowBits;
     }
     /**
-	 * <h3 class="en">Destroy current generator instance</h3>
+	 * <h3 class="en-US">Destroy current generator instance</h3>
 	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     @Override
