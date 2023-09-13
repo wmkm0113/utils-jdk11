@@ -62,7 +62,7 @@ public final class UUIDv3Generator extends UUIDGenerator {
             randomBytes[6] &= 0x0F;     /* clear version        */
             randomBytes[6] |= 0x30;     /* set to version 3     */
             randomBytes[8] &= 0x3F;     /* clear variant        */
-            randomBytes[8] |= 0x80;     /* set to IETF variant  */
+            randomBytes[8] |= (byte) 0x80;     /* set to IETF variant  */
             return new UUID(super.highBits(randomBytes), super.lowBits(randomBytes)).toString();
         } catch (NoSuchAlgorithmException e) {
             return Globals.DEFAULT_VALUE_STRING;

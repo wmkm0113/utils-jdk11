@@ -18,6 +18,7 @@ package org.nervousync.utils;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.annotations.beans.Desensitization;
+import org.nervousync.beans.sensitive.SensitiveConfig;
 import org.nervousync.commons.Globals;
 
 import java.lang.reflect.*;
@@ -360,7 +361,7 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (boolean bool : array) {
-            hash = Globals.MULTIPLIER * hash + hashCode(bool);
+            hash = Globals.MULTIPLIER * hash + Boolean.hashCode(bool);
         }
         return hash;
     }
@@ -426,7 +427,7 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (double d : array) {
-            hash = Globals.MULTIPLIER * hash + hashCode(d);
+            hash = Globals.MULTIPLIER * hash + Double.hashCode(d);
         }
         return hash;
     }
@@ -448,7 +449,7 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (float f : array) {
-            hash = Globals.MULTIPLIER * hash + hashCode(f);
+            hash = Globals.MULTIPLIER * hash + Float.hashCode(f);
         }
         return hash;
     }
@@ -470,7 +471,7 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (int i : array) {
-            hash = Globals.MULTIPLIER * hash + i;
+            hash = Globals.MULTIPLIER * hash + Integer.hashCode(i);
         }
         return hash;
     }
@@ -492,7 +493,7 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (long l : array) {
-            hash = Globals.MULTIPLIER * hash + hashCode(l);
+            hash = Globals.MULTIPLIER * hash + Long.hashCode(l);
         }
         return hash;
     }
@@ -514,65 +515,9 @@ public final class ObjectUtils {
         }
         int hash = Globals.INITIALIZE_INT_VALUE;
         for (short s : array) {
-            hash = Globals.MULTIPLIER * hash + s;
+            hash = Globals.MULTIPLIER * hash + Short.hashCode(s);
         }
         return hash;
-    }
-
-    /**
-     * <h3 class="en-US">Return the same value as <code>Boolean#hashCode()</code>.</h3>
-     * <h3 class="zh-CN">返回与 <code>Boolean#hashCode()</code> 相同的值。</h3>
-     *
-     * @param bool <span class="en-US">boolean value</span>
-     *             <span class="zh-CN">布尔值</span>
-     * @return <span class="en-US">object hash code</span>
-     * <span class="zh-CN">对象哈希值</span>
-     * @see Boolean#hashCode()
-     */
-    public static int hashCode(final boolean bool) {
-        return bool ? 1231 : 1237;
-    }
-
-    /**
-     * <h3 class="en-US">Return the same value as <code>Double#hashCode()</code>.</h3>
-     * <h3 class="zh-CN">返回与 <code>Double#hashCode()</code> 相同的值。</h3>
-     *
-     * @param dbl <span class="en-US">double value</span>
-     *            <span class="zh-CN">双精度值</span>
-     * @return <span class="en-US">object hash code</span>
-     * <span class="zh-CN">对象哈希值</span>
-     * @see Double#hashCode()
-     */
-    public static int hashCode(final double dbl) {
-        return hashCode(Double.doubleToLongBits(dbl));
-    }
-
-    /**
-     * <h3 class="en-US">Return the same value as <code>Float#hashCode()</code>.</h3>
-     * <h3 class="zh-CN">返回与 <code>Float#hashCode()</code> 相同的值。</h3>
-     *
-     * @param flt <span class="en-US">float value</span>
-     *            <span class="zh-CN">浮点数值</span>
-     * @return <span class="en-US">object hash code</span>
-     * <span class="zh-CN">对象哈希值</span>
-     * @see Float#hashCode()
-     */
-    public static int hashCode(final float flt) {
-        return Float.floatToIntBits(flt);
-    }
-
-    /**
-     * <h3 class="en-US">Return the same value as <code>Long#hashCode()</code>.</h3>
-     * <h3 class="zh-CN">返回与 <code>Long#hashCode()</code> 相同的值。</h3>
-     *
-     * @param lng <span class="en-US">long value</span>
-     *            <span class="zh-CN">长整形值</span>
-     * @return <span class="en-US">object hash code</span>
-     * <span class="zh-CN">对象哈希值</span>
-     * @see Long#hashCode()
-     */
-    public static int hashCode(final long lng) {
-        return (int) (lng ^ (lng >>> 32));
     }
 
     /**
@@ -587,7 +532,9 @@ public final class ObjectUtils {
      * <span class="zh-CN">对应的类名</span>
      */
     public static String nullSafeClassName(final Object obj) {
-        return obj != null ? nullSafeClassName(obj.getClass()) : Globals.DEFAULT_VALUE_STRING;
+        return Optional.ofNullable(obj)
+                .map(object -> nullSafeClassName(object.getClass()))
+                .orElse(Globals.DEFAULT_VALUE_STRING);
     }
 
     /**
@@ -602,7 +549,9 @@ public final class ObjectUtils {
      * <span class="zh-CN">对应的类名</span>
      */
     public static String nullSafeClassName(final Class<?> clazz) {
-        return (clazz != null ? clazz.getName() : Globals.DEFAULT_VALUE_STRING);
+        return Optional.ofNullable(clazz)
+                .map(Class::getName)
+                .orElse(Globals.DEFAULT_VALUE_STRING);
     }
     //---------------------------------------------------------------------
     // Convenience methods for toString output
@@ -1730,7 +1679,7 @@ public final class ObjectUtils {
         ReflectionUtils.getAllDeclaredFields(object.getClass(), Boolean.TRUE, ReflectionUtils.NON_STATIC_FINAL_MEMBERS)
                 .stream()
                 .filter(field -> sensitiveField(field, object))
-                .forEach(field -> ReflectionUtils.setField(field, object, desensitization(field, object)));
+                .forEach(field -> desensitization(field, object));
     }
 
     /**
@@ -1762,65 +1711,38 @@ public final class ObjectUtils {
      *               <span class="zh-CN">属性实例对象</span>
      * @param object <span class="en-US">JavaBean instance</span>
      *               <span class="zh-CN">JavaBean实例对象</span>
-     * @return <span class="en-US">Desensitized data</span>
-     * <span class="zh-CN">脱敏后的数据</span>
      */
-    private static String desensitization(@Nonnull final Field field, @Nonnull final Object object) {
+    private static void desensitization(@Nonnull final Field field, @Nonnull final Object object) {
         String fieldValue = (String) ReflectionUtils.getFieldValue(field, object);
         if (StringUtils.notBlank(fieldValue)) {
+            Desensitization desensitization = field.getAnnotation(Desensitization.class);
             boolean validate;
-            int beginLength, endLength;
-            switch (field.getAnnotation(Desensitization.class).value()) {
+            switch (desensitization.value()) {
                 case Luhn:
                     validate = StringUtils.isLuhn(fieldValue);
-                    beginLength = 4;
-                    endLength = fieldValue.length() % 4;
-                    if (endLength == 0) {
-                        endLength = 4;
-                    }
                     break;
                 case CHN_ID_Code:
                     validate = StringUtils.isChnId(fieldValue);
-                    beginLength = 3;
-                    endLength = 1;
                     break;
                 case CHN_Social_Code:
                     validate = StringUtils.isChnSocialCredit(fieldValue);
-                    beginLength = 5;
-                    endLength = 1;
                     break;
                 case E_MAIL:
                     validate = StringUtils.isEMail(fieldValue);
-                    beginLength = 1;
-                    endLength = fieldValue.length() - fieldValue.indexOf("@");
                     break;
                 case PHONE_NUMBER:
                     validate = StringUtils.isPhoneNumber(fieldValue);
-                    beginLength = 3;
-                    endLength = 4;
                     break;
                 default:
                     validate = Boolean.TRUE;
-                    if (fieldValue.length() > 2) {
-                        beginLength = endLength = 1;
-                    } else {
-                        beginLength = 1;
-                        endLength = 0;
-                    }
             }
             if (validate) {
-                String prefix = fieldValue.substring(0, beginLength);
-                String suffix = fieldValue.substring(fieldValue.length() - endLength);
-                StringBuilder hidden = new StringBuilder();
-                int hiddenCount = fieldValue.length() - beginLength - endLength;
-                do {
-                    hidden.append("*");
-                    hiddenCount--;
-                } while (hiddenCount > 0);
-                return prefix + hidden + suffix;
+                Optional.ofNullable(SensitiveConfig.newInstance(desensitization.value(), fieldValue))
+                        .map(sensitiveConfig -> StringUtils.desensitize(fieldValue, sensitiveConfig))
+                        .filter(StringUtils::notBlank)
+                        .ifPresent(desensitizedValue -> ReflectionUtils.setField(field, object, desensitizedValue));
             }
         }
-        return fieldValue;
     }
 
     /**

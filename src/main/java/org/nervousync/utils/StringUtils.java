@@ -26,12 +26,14 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import org.nervousync.beans.sensitive.SensitiveConfig;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.RegexGlobals;
 import org.nervousync.huffman.HuffmanTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -40,6 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.lang.Character.UnicodeBlock;
@@ -2252,6 +2255,34 @@ public final class StringUtils {
     }
 
     /**
+     * <h3 class="en-US">Verify that the given XML data conforms to the format of the given XML description file.</h3>
+     * <h3 class="zh-CN">验证给定的XML数据是否符合给定的XML描述文件的格式</h3>
+     *
+     * @param xmlData     <span class="en-US">Given XML data</span>
+     *                    <span class="zh-CN">给定的XML数据</span>
+     * @param schemaPaths <span class="en-US">XML schema path(Maybe schema uri or local path)</span>
+     *                    <span class="zh-CN">XML描述文件路径（可能为描述文件URI或本地文件路径）</span>
+     * @return <span class="en-US">Verify result</span>
+     * <span class="zh-CN">验证结果</span>
+     */
+    public static boolean validate(final String xmlData, final String... schemaPaths) {
+        return Optional.ofNullable(newSchema(schemaPaths))
+                .map(schema -> {
+                    try {
+                        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                        documentBuilderFactory.setNamespaceAware(Boolean.TRUE);
+                        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                        Document document = documentBuilder.parse(new InputSource(new StringReader(xmlData)));
+                        schema.newValidator().validate(new DOMSource(document));
+                        return Boolean.TRUE;
+                    } catch (ParserConfigurationException | SAXException | IOException e) {
+                        return Boolean.FALSE;
+                    }
+                })
+                .orElse(Boolean.FALSE);
+    }
+
+    /**
      * <h3 class="en-US">Parse content of input stream to target JavaBean instance list. </h3>
      * <h3 class="zh-CN">解析输入流中的内容为目标JavaBean实例对象列表</h3>
      *
@@ -2276,32 +2307,10 @@ public final class StringUtils {
         if (StringType.XML.equals(stringType)) {
             try {
                 Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
-                if (schemaPaths.length > 0) {
-                    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    schemaFactory.setResourceResolver(new SchemaResourceResolver());
-                    try {
-                        Source[] sources = new Source[schemaPaths.length];
-                        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                        docFactory.setNamespaceAware(Boolean.TRUE);
-                        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                        for (int i = 0; i < schemaPaths.length; i++) {
-                            String locationPath = SCHEMA_MAPPING.getOrDefault(schemaPaths[i], schemaPaths[i]);
-                            InputStream in = FileUtils.loadFile(locationPath);
-                            Document document = docBuilder.parse(in);
-                            sources[i] = new DOMSource(document, locationPath);
-                            IOUtils.closeStream(in);
-                        }
-                        unmarshaller.setSchema(schemaFactory.newSchema(sources));
-                    } catch (ParserConfigurationException e) {
-                        LOGGER.error("Load_Schemas_Error");
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Stack_Message_Error", e);
-                        }
-                        return null;
-                    }
-                }
+                Optional.ofNullable(newSchema(schemaPaths))
+                        .ifPresent(unmarshaller::setSchema);
                 return beanClass.cast(unmarshaller.unmarshal(inputStream));
-            } catch (JAXBException | SAXException e) {
+            } catch (JAXBException e) {
                 LOGGER.error("Parse_File_Error");
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Stack_Message_Error", e);
@@ -2757,6 +2766,34 @@ public final class StringUtils {
     }
 
     /**
+     * <h3 class="en-US">Handle sensitive information based on given prefix and suffix lengths</h3>
+     * <h3 class="zh-CN">根据给定的前缀和后缀长度处理敏感信息</h3>
+     *
+     * @param sensitiveData     <span class="en-US">Sensitive information string</span>
+     *                 <span class="zh-CN">敏感信息字符串</span>
+     * @param sensitiveConfig   <span class="en-US">Information desensitization configuration</span>
+     *                 <span class="zh-CN">信息脱敏配置</span>
+     * @return <span class="en-US">Desensitized information</span>
+     * <span class="zh-CN">脱敏后的敏感信息</span>
+     */
+    public static String desensitize(final String sensitiveData, final SensitiveConfig sensitiveConfig) {
+        if (StringUtils.isEmpty(sensitiveData) || sensitiveConfig == null
+                || sensitiveData.length() < sensitiveConfig.getPrefixLength()
+                || sensitiveData.length() < sensitiveConfig.getSuffixLength()) {
+            return sensitiveData;
+        }
+        String prefix = sensitiveData.substring(0, sensitiveConfig.getPrefixLength());
+        String suffix = sensitiveData.substring(sensitiveData.length() - sensitiveConfig.getSuffixLength());
+        StringBuilder hidden = new StringBuilder();
+        int hiddenCount = sensitiveData.length() - sensitiveConfig.getPrefixLength() - sensitiveConfig.getSuffixLength();
+        do {
+            hidden.append("*");
+            hiddenCount--;
+        } while (hiddenCount > 0);
+        return prefix + hidden + suffix;
+    }
+
+    /**
      * <h2 class="en-US">Enumeration of String Type</h2>
      * <h2 class="zh-CN">字符串类型的枚举类</h2>
      */
@@ -2856,6 +2893,43 @@ public final class StringUtils {
         ConvertUtils.toMap(url, new HashMap<>())
                 .forEach((key, value) ->
                         SCHEMA_MAPPING.put(key, StringUtils.replace(basePath, SCHEMA_MAPPING_RESOURCE_PATH, value)));
+    }
+
+    /**
+     * <h3 class="en-US">Generate a Schema instance object according to the given XML description file path.</h3>
+     * <h3 class="zh-CN">根据给定的XML描述文件路径，生成Schema实例对象</h3>
+     *
+     * @param schemaPaths <span class="en-US">XML schema path(Maybe schema uri or local path)</span>
+     *                    <span class="zh-CN">XML描述文件路径（可能为描述文件URI或本地文件路径）</span>
+     * @return <span class="en-US">Generated Schema instance</span>
+     * <span class="zh-CN">生成的Schema实例对象</span>
+     */
+    private static Schema newSchema(final String... schemaPaths) {
+        if (CollectionUtils.isEmpty(schemaPaths)) {
+            return null;
+        }
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schemaFactory.setResourceResolver(new SchemaResourceResolver());
+        try {
+            Source[] sources = new Source[schemaPaths.length];
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            docFactory.setNamespaceAware(Boolean.TRUE);
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            for (int i = 0; i < schemaPaths.length; i++) {
+                String locationPath = SCHEMA_MAPPING.getOrDefault(schemaPaths[i], schemaPaths[i]);
+                InputStream in = FileUtils.loadFile(locationPath);
+                Document document = docBuilder.parse(in);
+                sources[i] = new DOMSource(document, locationPath);
+                IOUtils.closeStream(in);
+            }
+            return schemaFactory.newSchema(sources);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error("Load_Schemas_Error");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Stack_Message_Error", e);
+            }
+        }
+        return null;
     }
 
     /**

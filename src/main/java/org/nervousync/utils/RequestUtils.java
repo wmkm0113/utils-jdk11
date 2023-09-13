@@ -224,6 +224,25 @@ public final class RequestUtils {
         return Globals.DEFAULT_VALUE_STRING;
     }
 
+    private static String domainName(final String urlAddress) {
+        if (StringUtils.notBlank(urlAddress)) {
+            int beginIndex, endIndex;
+            if (urlAddress.toLowerCase().startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
+                beginIndex = Globals.SECURE_HTTP_PROTOCOL.length();
+            } else if (urlAddress.toLowerCase().startsWith(Globals.HTTP_PROTOCOL)) {
+                beginIndex = Globals.HTTP_PROTOCOL.length();
+            } else {
+                beginIndex = Globals.INITIALIZE_INT_VALUE;
+            }
+            endIndex = urlAddress.indexOf("/", beginIndex);
+            if (endIndex < 0) {
+                endIndex = urlAddress.length();
+            }
+            return urlAddress.substring(beginIndex, endIndex);
+        }
+        return null;
+    }
+
     /**
      * <h3 class="en-US">Read server certificate by given url address</h3>
      * <h3 class="zh-CN">根据给定的url地址获取服务器证书</h3>
@@ -234,35 +253,25 @@ public final class RequestUtils {
      * <span class="zh-CN">读取的x509证书，如果出现异常则返回<code>null</code></span>
      */
     public static Certificate serverCertificate(final String urlAddress) {
-        if (StringUtils.notBlank(urlAddress)) {
-            try {
-                int beginIndex, endIndex;
-                if (urlAddress.toLowerCase().startsWith(Globals.SECURE_HTTP_PROTOCOL)) {
-                    beginIndex = Globals.SECURE_HTTP_PROTOCOL.length();
-                } else if (urlAddress.toLowerCase().startsWith(Globals.HTTP_PROTOCOL)) {
-                    beginIndex = Globals.HTTP_PROTOCOL.length();
-                } else {
-                    beginIndex = Globals.INITIALIZE_INT_VALUE;
-                }
-                endIndex = urlAddress.indexOf("/", beginIndex);
-                if (endIndex < 0) {
-                    endIndex = urlAddress.length();
-                }
-                final String domainName = urlAddress.substring(beginIndex, endIndex);
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(urlAddress).openConnection();
-                httpsURLConnection.connect();
-                return Arrays.stream(httpsURLConnection.getServerCertificates())
-                        .filter(serverCertificate -> verifyCertificate((X509Certificate) serverCertificate, domainName))
-                        .findFirst()
-                        .orElse(null);
-            } catch (IOException e) {
-                LOGGER.error("Read_Server_Certificate_Request_Error");
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stack_Message_Error", e);
-                }
-            }
-        }
-        return null;
+        return Optional.ofNullable(domainName(urlAddress))
+                .map(domainName -> {
+                    try {
+                        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(urlAddress).openConnection();
+                        httpsURLConnection.connect();
+                        return Arrays.stream(httpsURLConnection.getServerCertificates())
+                                .filter(serverCertificate ->
+                                        verifyCertificate((X509Certificate) serverCertificate, domainName))
+                                .findFirst()
+                                .orElse(null);
+                    } catch (IOException e) {
+                        LOGGER.error("Read_Server_Certificate_Request_Error");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Stack_Message_Error", e);
+                        }
+                    }
+                    return null;
+                })
+                .orElse(null);
     }
 
     /**
@@ -404,7 +413,7 @@ public final class RequestUtils {
             }
         }
 
-        if (requestInfo.getTrustCertInfos() != null && requestInfo.getTrustCertInfos().size() > 0) {
+        if (requestInfo.getTrustCertInfos() != null && !requestInfo.getTrustCertInfos().isEmpty()) {
             try {
                 System.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
                 SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -573,7 +582,7 @@ public final class RequestUtils {
      * <span class="zh-CN">生成的参数映射表</span>
      */
     public static Map<String, String[]> parseParametersFromUri(final String uri, final boolean parseMatrix) {
-        if (ObjectUtils.isNull(uri) || uri.trim().length() == 0) {
+        if (ObjectUtils.isNull(uri) || uri.trim().isEmpty()) {
             return new HashMap<>();
         }
         int qSignPos = uri.indexOf('?');
@@ -593,7 +602,7 @@ public final class RequestUtils {
      * <span class="zh-CN">生成的参数映射表</span>
      */
     public static String getBaseFromUri(final String uri) {
-        if (ObjectUtils.isNull(uri) || uri.trim().length() == 0) {
+        if (ObjectUtils.isNull(uri) || uri.trim().isEmpty()) {
             return Globals.DEFAULT_VALUE_STRING;
         }
         int qSignPos = uri.indexOf('?');
@@ -774,7 +783,7 @@ public final class RequestUtils {
                 String roleName;
                 if (bean instanceof String) {
                     roleName = (String) bean;
-                } else if (property != null && property.trim().length() > 0) {
+                } else if (property != null && !property.trim().isEmpty()) {
                     roleName = String.valueOf(ReflectionUtils.getFieldValue(property, bean));
                 } else {
                     roleName = String.valueOf(bean);
@@ -902,7 +911,7 @@ public final class RequestUtils {
 
         requestUrl.append(getRequestURI(request));
 
-        if (request.getQueryString() != null && request.getQueryString().length() > 0) {
+        if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
             requestUrl.append("?").append(request.getQueryString());
         }
 
@@ -1036,7 +1045,7 @@ public final class RequestUtils {
      * <span class="zh-CN">生成的结果字符串</span>
      */
     private static String generateCookie(final String requestUrl, final List<CookieEntity> cookieList) {
-        if (cookieList == null || cookieList.size() == 0) {
+        if (cookieList == null || cookieList.isEmpty()) {
             return null;
         }
         StringBuilder stringBuilder = new StringBuilder();

@@ -11,8 +11,6 @@ import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.LoggerUtils;
 import org.nervousync.utils.SNMPUtils;
 import org.nervousync.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;

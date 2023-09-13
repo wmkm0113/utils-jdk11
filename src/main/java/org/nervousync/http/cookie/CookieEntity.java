@@ -78,7 +78,7 @@ public final class CookieEntity {
 	 *                      <span class="zh-CN">来自响应头的Cookie值</span>
 	 */
 	public CookieEntity(String cookieValue) {
-		if (cookieValue != null && cookieValue.length() > 0) {
+		if (cookieValue != null && !cookieValue.isEmpty()) {
 			String[] cookieItems = StringUtils.delimitedListToStringArray(cookieValue, ";");
 			for (String cookieItem : cookieItems) {
 				String[] cookieInfo = StringUtils.delimitedListToStringArray(cookieItem, "=");

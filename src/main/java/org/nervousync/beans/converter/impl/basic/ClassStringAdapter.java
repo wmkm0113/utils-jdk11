@@ -30,12 +30,12 @@ import org.nervousync.utils.StringUtils;
  */
 public final class ClassStringAdapter extends AbstractAdapter<String, Class<?>> {
     @Override
-    public Class<?> unmarshal(String className) throws Exception {
+    public Class<?> unmarshal(String className) {
         return StringUtils.isEmpty(className) ? null : ClassUtils.forName(className);
     }
 
     @Override
-    public String marshal(Class<?> clazz) throws Exception {
+    public String marshal(Class<?> clazz) {
         return (clazz == null) ? Globals.DEFAULT_VALUE_STRING : clazz.getName();
     }
 }

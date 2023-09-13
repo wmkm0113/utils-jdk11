@@ -108,12 +108,13 @@ public final class NetworkInfo implements Serializable {
 					.ifPresent(this.ipAddressList::add);
 		}
 	}
+
 	/**
 	 * <h3 class="en-US">Getter method for field virtual</h3>
 	 * <h3 class="zh-CN">虚拟接口状态的Getter方法</h3>
 	 *
-	 * @return    <span class="en-US">Virtual status</span>
-	 *            <span class="zh-CN">虚拟接口状态</span>
+	 * @return <span class="en-US">Virtual status</span>
+	 * <span class="zh-CN">虚拟接口状态</span>
 	 */
 	public boolean isVirtual() {
 		return virtual;

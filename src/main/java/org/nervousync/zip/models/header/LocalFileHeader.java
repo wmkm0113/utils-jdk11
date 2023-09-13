@@ -141,7 +141,7 @@ public final class LocalFileHeader extends FileHeader {
 				}
 				return Boolean.FALSE;
 			} else if (this.getEncryptionMethod() == Globals.ENC_METHOD_STANDARD) {
-				//	Not supported verify password of standard encrypt
+				//	Not supported verify password of standard encrypting
 				return Boolean.TRUE;
 			} else {
 				throw new ZipException(0x0000001B0001L, "Not_Supported_Encryption_Mode_Zip_Error");

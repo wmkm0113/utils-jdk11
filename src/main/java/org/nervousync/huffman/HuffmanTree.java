@@ -143,7 +143,7 @@ public final class HuffmanTree {
 		String string = content;
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		while (string.length() > 0) {
+		while (!string.isEmpty()) {
 			String keyword = String.valueOf(string.charAt(0));
 			stringBuilder.append(this.codeMapping.get(keyword));
 			string = string.substring(1);

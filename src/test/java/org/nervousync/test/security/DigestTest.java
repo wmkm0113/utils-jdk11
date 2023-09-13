@@ -48,11 +48,6 @@ public final class DigestTest extends BaseTest {
     }
 
     @Test
-    @Order(21)
-    public void HmacSHA1() throws CryptoException {
-    }
-
-    @Test
     @Order(30)
     public void SHA224() throws CryptoException {
         SecureAdapter secureAdapter = SecurityUtils.SHA224();

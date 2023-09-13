@@ -20,6 +20,7 @@ import org.nervousync.beans.converter.impl.blob.Base32Adapter;
 import org.nervousync.beans.converter.impl.blob.Base64Adapter;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.enumerations.beans.DataFlow;
+import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.BeanUtils;
 import org.nervousync.utils.ObjectUtils;
@@ -94,6 +95,12 @@ public final class BeanTest extends BaseTest {
     @Test
     @Order(50)
     public void desensitization() {
+        //  Initialize secure factory, ready for encrypting sensitive data
+        SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
+                .ifPresent(secureConfig -> {
+                    SecureFactory.initialize(secureConfig);
+                    SecureFactory.register("sensitiveData", secureConfig);
+                });
         DesensitizationBean desensitizationBean = new DesensitizationBean();
         desensitizationBean.setEmail("wmkm0113@gmail.com");
         desensitizationBean.setBankCode("6226191212250445");
@@ -670,7 +677,7 @@ public final class BeanTest extends BaseTest {
         private String chnId;
         @Desensitization(ObjectUtils.SensitiveType.CHN_Social_Code)
         private String socialCode;
-        @Desensitization(ObjectUtils.SensitiveType.PHONE_NUMBER)
+        @Desensitization(value = ObjectUtils.SensitiveType.PHONE_NUMBER)
         private String phoneNumber;
         @Desensitization(ObjectUtils.SensitiveType.E_MAIL)
         private String email;

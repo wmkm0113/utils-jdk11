@@ -107,7 +107,7 @@ public final class CentralDirectory {
 	 * @return the general file header
 	 */
 	public GeneralFileHeader retrieveGeneralFileHeader(String entryPath) {
-		if (this.fileHeaders != null && this.fileHeaders.size() > 0) {
+		if (this.fileHeaders != null && !this.fileHeaders.isEmpty()) {
 			for (GeneralFileHeader generalFileHeader : this.fileHeaders) {
 				if (FileUtils.matchFilePath(generalFileHeader.getEntryPath(), entryPath, true)) {
 					return generalFileHeader;
@@ -124,7 +124,7 @@ public final class CentralDirectory {
 	 * @return the int
 	 */
 	public int retrieveIndexOfGeneralFileHeader(GeneralFileHeader generalFileHeader) {
-		if (this.fileHeaders != null && this.fileHeaders.size() > 0) {
+		if (this.fileHeaders != null && !this.fileHeaders.isEmpty()) {
 			for (int index = 0 ; index < this.fileHeaders.size() ; index++) {
 				if (FileUtils.matchFilePath(generalFileHeader.getEntryPath(), 
 						this.fileHeaders.get(index).getEntryPath(), true)) {

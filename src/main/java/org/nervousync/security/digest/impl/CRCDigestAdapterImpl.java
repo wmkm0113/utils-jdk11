@@ -223,7 +223,7 @@ public final class CRCDigestAdapterImpl extends SecureAdapter {
      */
     private static long reverseBit(long value, int bit) {
         if (value < 0) {
-            value += Math.pow(2, bit);
+            value += (long) Math.pow(2, bit);
         }
         String reverseValue = new StringBuilder(Long.toString(value, 2)).reverse().toString();
         if (reverseValue.length() < bit) {

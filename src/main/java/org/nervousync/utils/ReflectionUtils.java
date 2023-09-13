@@ -320,6 +320,7 @@ public final class ReflectionUtils {
      */
     public static void setField(final Field field, final Object target, final Object value) {
         try {
+            makeAccessible(field);
             field.set(target, value);
         } catch (IllegalAccessException ex) {
             handleReflectionException(ex);

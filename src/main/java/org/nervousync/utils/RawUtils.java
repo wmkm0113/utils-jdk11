@@ -953,7 +953,7 @@ public final class RawUtils {
 
         int calValue = 0;
         for (int i = 0; i < bitArray.length; i++) {
-            calValue += Math.pow(2, i) * bitArray[i];
+            calValue += (int) (Math.pow(2, i) * bitArray[i]);
         }
         return (byte) calValue;
     }

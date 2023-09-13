@@ -50,6 +50,7 @@
     <entry key="CRC_Result">CRC算法：{0}，结果：{1}</entry>
     <entry key="Digits_Result">摘要算法：{0}，结果：{1}，{2}</entry>
     <entry key="Hmac_Result">摘要算法：{0}，密钥：{1}，结果：{2}，{3}</entry>
+    <entry key="XML_Validate">XML数据验证结果：{0}</entry>
     <entry key="Secure_Config">解析的配置信息：{0}</entry>
     <entry key="Secure_Init_Result">安全配置初始化成功：{0}</entry>
     <entry key="Secure_Encrypt_Result">安全配置加密结果：{0}</entry>
@@ -79,4 +80,5 @@
     <entry key="System_Adaptor">适配器{0}的{1}地址：</entry>
     <entry key="System_Adaptor_IP_Info">IP地址：{0}，保留地址：{1}，回环地址：{2}，链路本地地址：{3}</entry>
     <entry key="Desensitization_Data">脱敏后的数据：{0}</entry>
+    <entry key="Sensitization_Value">隐藏的敏感数据：{0}</entry>
 </properties>

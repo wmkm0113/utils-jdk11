@@ -138,7 +138,7 @@ public final class CryptoTest extends BaseTest {
                 new Date(currentTime), new Date(currentTime + 30 * 24 * 60 * 60 * 1000L),
                 "CERT", "CERT", "changeit", null, "SHA256withRSA");
         this.logger.info("Certificate_Result", "RSA", StringUtils.base64Encode(pkcs5));
-        //  Testing for encrypt and decrypt data using RSA
+        //  Testing for encrypting and decrypt data using RSA
         for (String padding : RSA_PADDINGS) {
             if (padding.equalsIgnoreCase("OAEPWithSHA-512AndMGF1Padding")) {
                 //  Minimum key size was 2048 when padding mode is "OAEPWithSHA-512AndMGF1Padding"
