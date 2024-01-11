@@ -18,7 +18,7 @@ package org.nervousync.security.digest.impl;
 
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.security.api.SecureAdapter;
-import org.nervousync.security.config.CRCConfig;
+import org.nervousync.security.digest.config.CRCConfig;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.utils.RawUtils;
 

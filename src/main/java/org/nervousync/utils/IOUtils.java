@@ -19,6 +19,9 @@ package org.nervousync.utils;
 import org.nervousync.commons.Globals;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 /**
  * <h2 class="en-US">Input/Output Utilities</h2>
@@ -159,6 +162,38 @@ public final class IOUtils {
             closeStream(inputStream);
         }
         return returnValue.toString();
+    }
+
+    /**
+     * <h3 class="en-US">Writes the given string to the specified output stream</h3>
+     * <h3 class="en-US">将给定的字符串写入到指定的输出流中</h3>
+     *
+     * @param content      <span class="en-US">String written to the output stream</span>
+     *                     <span class="zh-CN">写入输出流的字符串</span>
+     * @param breakLine    <span class="en-US">Newline character appended to the end</span>
+     *                     <span class="zh-CN">追加到末尾的换行符</span>
+     * @param outputStream <span class="en-US">Output stream instance</span>
+     *                     <span class="zh-CN">输出流实例对象</span>
+     * @param encoding     <span class="en-US">Charset encoding</span>
+     *                     <span class="zh-CN">字符集编码</span>
+     */
+    public static void writeContent(final String content, final String breakLine,
+                                    final OutputStream outputStream, final String encoding) throws IOException {
+        if (StringUtils.isEmpty(content)) {
+            return;
+        }
+        if (outputStream == null) {
+            throw new IOException("Output stream is null");
+        }
+        Charset charset = Optional.ofNullable(encoding)
+                .filter(StringUtils::notBlank)
+                .map(Charset::forName)
+                .orElse(StandardCharsets.UTF_8);
+        outputStream.write(content.getBytes(charset));
+        if (StringUtils.notBlank(breakLine)) {
+            outputStream.write(breakLine.getBytes(charset));
+        }
+        outputStream.flush();
     }
 
     /**

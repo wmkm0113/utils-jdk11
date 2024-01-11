@@ -2,12 +2,11 @@ package org.nervousync.test.security;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.security.api.SecureAdapter;
-import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.test.BaseTest;
-import org.nervousync.utils.ConvertUtils;
-import org.nervousync.utils.SecurityUtils;
+import org.nervousync.utils.*;
 
 public final class DigestTest extends BaseTest {
 
@@ -56,7 +55,7 @@ public final class DigestTest extends BaseTest {
         this.logger.info("Hmac_Result", "HmacSHA224", "110421",
                 ConvertUtils.toHex(SecurityUtils.HmacSHA224("110421".getBytes()).finish("123456")), "(Provider)");
         this.logger.info("Hmac_Result", "HmacSHA224 key: 110421,",
-                ConvertUtils.toHex(SecurityUtils.HmacSHA224("110421".getBytes(),"123456")), "(Static)");
+                ConvertUtils.toHex(SecurityUtils.HmacSHA224("110421".getBytes(), "123456")), "(Static)");
     }
 
     @Test
@@ -68,7 +67,7 @@ public final class DigestTest extends BaseTest {
         this.logger.info("Hmac_Result", "HmacSHA256", "110421",
                 ConvertUtils.toHex(SecurityUtils.HmacSHA256("110421".getBytes()).finish("123456")), "(Provider)");
         this.logger.info("Hmac_Result", "HmacSHA256 key: 110421,",
-                ConvertUtils.toHex(SecurityUtils.HmacSHA256("110421".getBytes(),"123456")), "(Static)");
+                ConvertUtils.toHex(SecurityUtils.HmacSHA256("110421".getBytes(), "123456")), "(Static)");
     }
 
     @Test
@@ -80,7 +79,7 @@ public final class DigestTest extends BaseTest {
         this.logger.info("Hmac_Result", "HmacSHA384", "110421",
                 ConvertUtils.toHex(SecurityUtils.HmacSHA384("110421".getBytes()).finish("123456")), "(Provider)");
         this.logger.info("Hmac_Result", "HmacSHA384 key: 110421,",
-                ConvertUtils.toHex(SecurityUtils.HmacSHA384("110421".getBytes(),"123456")), "(Static)");
+                ConvertUtils.toHex(SecurityUtils.HmacSHA384("110421".getBytes(), "123456")), "(Static)");
     }
 
     @Test

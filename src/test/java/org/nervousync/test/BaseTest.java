@@ -4,6 +4,9 @@ import org.apache.logging.log4j.Level;
 import org.junit.jupiter.api.*;
 import org.nervousync.commons.Globals;
 import org.nervousync.utils.LoggerUtils;
+import org.nervousync.utils.MultilingualUtils;
+
+import java.util.Locale;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -13,6 +16,14 @@ public abstract class BaseTest {
 
     static {
         LoggerUtils.initLoggerConfigure(Level.DEBUG);
+    }
+
+    protected BaseTest() {
+        this(Locale.getDefault());
+    }
+
+    protected BaseTest(final Locale locale) {
+        MultilingualUtils.defaultLocale(locale);
     }
 
     @BeforeEach

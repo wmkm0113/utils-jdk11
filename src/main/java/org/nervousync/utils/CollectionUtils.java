@@ -341,6 +341,24 @@ public final class CollectionUtils {
     }
 
     /**
+     * <h3 class="en-US">Checks whether the given set contains all candidate element instances.</h3>
+     * <h3 class="zh-CN">检查给定的集合是否包含所有的候选元素实例。</h3>
+     *
+     * @param source     <span class="en-US">the source Collection</span>
+     *                   <span class="zh-CN">源集合</span>
+     * @param candidates <span class="en-US">the candidates to search for</span>
+     *                   <span class="zh-CN">要搜索的候选元素</span>
+     * @return <span class="en-US"><code>true</code> if found, <code>false</code> otherwise</span>
+     * <span class="zh-CN">如果找到返回<code>true</code>，否则返回<code>false</code></span>
+     */
+    public static <T> boolean containsAll(final Collection<T> source, final Collection<T> candidates) {
+        if (isEmpty(source) || isEmpty(candidates)) {
+            return Boolean.FALSE;
+        }
+        return source.containsAll(candidates);
+    }
+
+    /**
      * <h3 class="en-US">Find the first element of the given Collections contains the same element instance.</h3>
      * <h3 class="zh-CN">寻找给定的集合包含的第一个相同的元素实例。</h3>
      *

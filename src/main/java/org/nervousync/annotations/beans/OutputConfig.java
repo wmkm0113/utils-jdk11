@@ -30,7 +30,7 @@ public @interface OutputConfig {
      * @return  <span class="en-US">Enumeration value type of StringUtils.StringType</span>
      *          <span class="zh-CN">StringUtils.StringType枚举类型</span>
      */
-    StringUtils.StringType type() default StringUtils.StringType.SIMPLE;
+    StringUtils.StringType type() default StringUtils.StringType.SERIALIZABLE;
 
     /**
 	 * <h3 class="en-US">Format output string status</h3>

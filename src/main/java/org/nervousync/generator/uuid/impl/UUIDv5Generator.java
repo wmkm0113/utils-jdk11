@@ -16,7 +16,7 @@
  */
 package org.nervousync.generator.uuid.impl;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.commons.Globals;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.utils.IDUtils;
@@ -32,7 +32,7 @@ import java.util.UUID;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:59:08 $
  */
-@GeneratorProvider(IDUtils.UUIDv5)
+@Provider(name = IDUtils.UUIDv5, messageKey = "version5.uuid.id.generator.name")
 public final class UUIDv5Generator extends UUIDGenerator {
     /**
 	 * <h3 class="en-US">Generate ID value</h3>
@@ -60,7 +60,7 @@ public final class UUIDv5Generator extends UUIDGenerator {
         try {
             byte[] randomBytes = MessageDigest.getInstance("SHA1").digest(dataBytes);
             randomBytes[6] &= 0x0F;     /* clear version        */
-            randomBytes[6] |= 0x40;     /* set to version 4     */
+            randomBytes[6] |= 0x50;     /* set to version 5     */
             randomBytes[8] &= 0x3F;     /* clear variant        */
             randomBytes[8] |= (byte) 0x80;     /* set to IETF variant  */
             return new UUID(super.highBits(randomBytes), super.lowBits(randomBytes)).toString();

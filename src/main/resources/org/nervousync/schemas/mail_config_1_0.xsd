@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsd:schema xmlns="https://nervousync.org/schemas/mail" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:proxy="https://nervousync.org/schemas/proxy" xmlns:secure="https://nervousync.org/schemas/secure"
+            xmlns:proxy="https://nervousync.org/schemas/proxy"
             targetNamespace="https://nervousync.org/schemas/mail" elementFormDefault="qualified" version="1.0">
     <xsd:import namespace="https://nervousync.org/schemas/secure" schemaLocation="https://nervousync.org/schemas/secure_config_1.0.xsd" />
     <xsd:import namespace="https://nervousync.org/schemas/proxy" schemaLocation="https://nervousync.org/schemas/proxy_config_1.0.xsd" />
     <xsd:complexType name="mail_config">
         <xsd:all>
-            <xsd:element name="secure_name" type="xsd:string">
-                <xsd:annotation>
-                    <xsd:documentation>Protect password using secure name</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="secure:secure_config" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>Secure config information</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
             <xsd:element name="username" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>Mail account username</xsd:documentation>

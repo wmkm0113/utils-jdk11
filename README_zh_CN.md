@@ -6,9 +6,9 @@
 # Nervousync® Java 工具包
 ## 项目简介:
 
-该项目旨在为Java程序开发人员提供便捷的工具和实用功能。无论是初学者还是经验丰富的开发者，都可以从该工具包中受益。
+本项目旨在为Java程序开发人员提供便捷的工具和实用功能。无论是初学者还是经验丰富的开发者，都可以从该工具包中受益。
 
-该工具包包含了许多常用的功能模块和工具类，涵盖了广泛的应用场景。它提供了一套简洁而强大的API，帮助开发人员更高效地编写Java代码。无论是处理日期和时间、字符串操作、文件操作还是网络请求，该工具包都提供了丰富的功能和方法。
+工具包包含了许多常用的功能模块和工具类，涵盖了广泛的应用场景。它提供了一套简洁而强大的API，帮助开发人员更高效地编写Java代码。无论是处理日期和时间、字符串操作、文件操作还是网络请求，该工具包都提供了丰富的功能和方法。
 
 此外，该工具包还注重代码质量和性能优化。代码经过精心设计和优化，以确保在各种场景下都能提供高效的执行速度和可靠性。
 
@@ -21,6 +21,7 @@
 ## 生命周期:
 
 **此日期后不再添加新功能:** 2026年12月31日
+
 **此日期后不再提供安全更新:** 2029年12月31日
 
 ## 使用方法
@@ -51,30 +52,80 @@ libraryDependencies += "org.nervousync" % "utils-jdk11" % "${version}" % "provid
 ### 1. 创建描述文件和资源文件
 在 META-INF 中创建文件 nervous.i18n，格式如下
 ```
-groupId={Your group id}
-bundle={Your bundle string}
-languages={language string using ',' split}
+{
+    “groupId”: "{您的组织识别代码}",
+    "bundle": "{您的项目识别代码}",
+    "errors": [
+        {
+            "code": "{错误代码 二进制请以0d开头，八进制请以0o开头，16进制请以0x开头}",
+            "key": "{错误代码对应的资源信息键值}"
+        },
+        ...
+    ],
+    "languages": [
+        {
+            "code": "{语言代码（例如：en-US）}",
+            "name": "{语言名称（例如：English）}",
+            "messages": [
+                {
+                    "key": "{资源信息键值}",
+                    "content": "{资源信息英文内容}"
+                },
+                ...
+            ]
+        }，
+        {
+            "code": "{语言代码（例如：zh-CN）}",
+            "name": "{语言名称（例如：简体中文）}",
+            "messages": [
+                {
+                    "key": "{资源信息键值}",
+                    "content": "{资源信息中文内容}"
+                },
+                ...
+            ]
+        }
+    ]
+}
 ```
-添加资源文件到文件夹META-INF/i18n，文件名格式为：{languageCode}.xml，文件格式为Properties
 
-**Example:** META-INF/nervousync.i18n, META-INF/i18n/en-US.xml, META-INF/i18n/zh-CN.xml
+### 2. 在需要的地方添加国际化支持：
+在需要进行国际化的位置，使用 MultilingualUtils.findMessage(messageKey, collections) 读取国际化信息并输出
 
-### 2. 向自定义异常添加国际化支持：
-修改所有自定义异常，使用MultilingualUtils.findMessage(bundle, messageKey, collections)读取异常描述信息，传递给父异常
+### 3. 向自定义异常添加国际化支持：（可选操作）
+将所有自定义异常均继承自org.nervousync.exceptions.AbstractException，
+在构造方法中将错误代码传递给org.nervousync.exceptions.AbstractException，
+系统会自动读取资源文件中的错误信息，实现异常提示信息的国际化。
 
 **Example:** org.nervousync.exceptions.AbstractException
 
-### 3. 向日志中添加国际化支持：
-使用 LoggerUtils.Logger 代替原有的日志对象，使用MultilingualUtils.findMessage(bundle, messageKey, collections)替换原有输出内容
+### 4. 向日志中添加国际化支持：（可选操作）
+使用 LoggerUtils.Logger 代替原有的日志对象，日志对象兼容slf4j的Logger对象，自动替换原有输出内容为多语言内容。
 
 **Example:** BeanUtils, CertificateUtils 等的LoggerUtils.Logger实例
 
-### 4. 向其他需要的地方添加国际化支持：
-使用 MultilingualUtils.findMessage(bundle, messageKey, collections) 读取国际化信息并输出
+### 5. 打包时合并资源文件：（可选操作）
+在多模块开发过程中，需要打包合并国际化资源文件时，需要使用到maven的shade插件，
+添加transformer配置使用org.apache.maven.plugins.shade.resource.I18nResourceTransformer
+并传入参数”groupId“和”bundle“，资源转换器会自动合并国际化资源文件，并输出到合并打包后的文件中
 
 ## BeanObject
 **所在包**: org.nervousync.bean.core  
 任何继承 BeanObject 的 JavaBean 类都可以更轻松地在对象实例和 JSON/XML/YAML 字符串之间进行转换。
+
+## ConfigureManager
+**所在包**: org.nervousync.configs
+提供了一个统一管理的配置信息管理器，使用者可以通过ConfigureManager.initialize(String)静态方法初始化配置信息管理器，
+配置文件的存储路径由参数传入。
+
+如果传入的存储路径为空字符串，则默认在系统当前用户的工作目录中创建名为"configs"的文件夹，作为配置文件的存储路径。
+
+ConfigureManager使用单例模式运行，需要读取配置文件时，使用ConfigureManager.getInstance().readConfigure方法进行读取，
+读取时需要传入配置文件的实体类做为参数，如果需要读取同一实体类的不同配置，还可以传入后缀字符串作为区分。
+需要保存配置文件时，使用ConfigureManager.getInstance().saveConfigure方法进行保存，需要传入配置文件的对象做为参数。
+
+***注意：*** 配置文件的实体类需要继承BeanObject，默认使用XML格式进行数据保存，如果需要使用其他格式（JSON/YAML），
+需要在配置文件的实体类上添加OutputConfig注解，并指定数据类型。
 
 ## ZipFile
 **所在包**: org.nervousync.zip  

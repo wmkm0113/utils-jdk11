@@ -19,6 +19,7 @@ package org.nervousync.proxy;
 import java.net.Proxy.Type;
 
 import jakarta.xml.bind.annotation.*;
+import org.nervousync.annotations.configs.Password;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.Globals;
 
@@ -65,6 +66,7 @@ public final class ProxyConfig extends BeanObject {
      * <span class="en-US">Authenticate password</span>
      * <span class="zh-CN">身份认证密码</span>
      */
+    @Password
     @XmlElement(name = "password")
     private String password = Globals.DEFAULT_VALUE_STRING;
     /**

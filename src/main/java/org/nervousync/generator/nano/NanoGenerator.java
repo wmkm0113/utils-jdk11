@@ -16,7 +16,7 @@
  */
 package org.nervousync.generator.nano;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.generator.IGenerator;
 import org.nervousync.utils.IDUtils;
 import org.nervousync.utils.LoggerUtils;
@@ -31,7 +31,7 @@ import java.security.SecureRandom;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:39:54 $
  */
-@GeneratorProvider(IDUtils.NANO_ID)
+@Provider(name = IDUtils.NANO_ID, messageKey = "nano.id.generator.name")
 public final class NanoGenerator implements IGenerator<String> {
     /**
      * <span class="en-US">Logger instance</span>

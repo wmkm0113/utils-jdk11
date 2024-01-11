@@ -24,7 +24,6 @@ import org.nervousync.commons.Globals;
 import org.nervousync.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.mail.config.MailConfig;
-import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.utils.StringUtils;
 
 /**
@@ -76,11 +75,6 @@ public abstract class BaseProtocol implements Serializable {
 	 */
     protected String timeoutParam;
     /**
-	 * <span class="en-US">Secure config name</span>
-	 * <span class="zh-CN">安全配置名称</span>
-     */
-    private final String secureName;
-    /**
 	 * <span class="en-US">Proxy configure information</span>
 	 * <span class="zh-CN">代理服务器配置信息</span>
      */
@@ -89,13 +83,10 @@ public abstract class BaseProtocol implements Serializable {
      * <h3 class="en-US">Constructor method for BaseProtocol</h3>
      * <h3 class="zh-CN">BaseProtocol构造方法</h3>
      *
-     * @param secureName    <span class="en-US">Secure config name</span>
-     *                      <span class="zh-CN">安全配置名称</span>
      * @param proxyConfig   <span class="en-US">Proxy configure information</span>
      *                      <span class="zh-CN">代理服务器配置信息</span>
      */
-    protected BaseProtocol(final String secureName, final ProxyConfig proxyConfig) {
-        this.secureName = secureName;
+    protected BaseProtocol(final ProxyConfig proxyConfig) {
         this.proxyConfig = proxyConfig;
     }
     /**
@@ -225,8 +216,7 @@ public abstract class BaseProtocol implements Serializable {
                 if (StringUtils.notBlank(this.proxyConfig.getUserName())
                         && StringUtils.notBlank(this.proxyConfig.getPassword())) {
                     properties.setProperty(configPrefix + ".proxy.user", this.proxyConfig.getUserName());
-                    properties.setProperty(configPrefix + ".proxy.password",
-                            SecureFactory.decrypt(this.secureName, this.proxyConfig.getPassword()));
+                    properties.setProperty(configPrefix + ".proxy.password", this.proxyConfig.getPassword());
                 }
                 break;
             case SOCKS:

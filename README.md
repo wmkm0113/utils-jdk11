@@ -30,6 +30,7 @@ Compile：OpenJDK 11
 ## End of Life:
 
 **Features Freeze:** 31, Dec, 2026
+
 **Secure Patch:** 31, Dec, 2029
 
 ## Usage
@@ -60,29 +61,65 @@ libraryDependencies += "org.nervousync" % "utils-jdk11" % "${version}" % "provid
 ### 1. Create declaration and resource files
 Create nervousync.i18n file in META-INF
 ```
-groupId={Your group id}
-bundle={Your bundle string}
-languages={language string using ',' split}
+{
+    “groupId”: "{Your origanization id}",
+    "bundle": "{Your project code}",
+    "errors": [
+        {
+            "code": "{Error code, binary string must begin as '0d', octal string must begin as '0o', hexadecimal string must begin as '0x'}",
+            "key": "{Error message key}"
+        },
+        ...
+    ],
+    "languages": [
+        {
+            "code": "{Language code(Example: en-US)}",
+            "name": "{Language name(Example: English)}",
+            "messages": [
+                {
+                    "key": "{Message key}",
+                    "content": "{Message content in English}"
+                },
+                ...
+            ]
+        }，
+        {
+            "code": "{Language code(Example: zh-CN)}",
+            "name": "{Language name(Example: 简体中文)}",
+            "messages": [
+                {
+                    "key": "{Message key}",
+                    "content": "{Message content in Chinese}"
+                },
+                ...
+            ]
+        }
+    ]
+}
 ```
-Add multilingual message file in META-INF/i18n, file named: {languageCode}.xml, file format is Properties
 
-**Example:** META-INF/nervousync.i18n, META-INF/i18n/en-US.xml, META-INF/i18n/zh-CN.xml
+### 2. Add internationalize support for anything:
+Using MultilingualUtils.findMessage(bundle, messageKey, collections)
+to retrieve the multilingual message which will output
 
-### 2. Add internationalize support for exceptions:
-Modify all Custom exception class, 
-using MultilingualUtils.findMessage(bundle, messageKey, collections) to read the error message.
+### 3. Add internationalize support for exceptions: (Optional)
+Modify all Custom exception class, let custom exception extends org.nervousync.exceptions.AbstractException
+Please transfer the error code to the org.nervousync.exceptions.AbstractException at constructor of custom exception,
+The system will automatically read the error information in the resource file and realize the internationalization of exception prompt information.
 
 **Example:** org.nervousync.exceptions.AbstractException
 
-### 3. Add internationalize support for logger:
+### 4. Add internationalize support for logger: (Optional)
 Using LoggerUtils.Logger instead all the logger instance, 
-replace log content with MultilingualUtils.findMessage(bundle, messageKey, collections)
+logger instance was compatible with the Logger of slf4j, 
+logger instance will replace the log content to multilingual automatically
 
 **Example:** LoggerUtils.Logger instance in BeanUtils, CertificateUtils etc.
 
-### 4. Add internationalize support for anything:
-Using MultilingualUtils.findMessage(bundle, messageKey, collections)
-to retrieve the multilingual message which will output
+### 5. Merge resource files when packaging: (optional operation)
+In the multi-module development process, when you need to package and merge international resource files, you need to use the maven shade plug-in.
+Add transformer configuration using org.apache.maven.plugins.shade.resource.I18nResourceTransformer
+And pass in the parameters "groupId" and "bundle", the resource converter will automatically merge the internationalized resource files and output them to the merged and packaged file.
 
 ## BeanObject
 **Package**: org.nervousync.bean.core  
@@ -115,7 +152,7 @@ Usage: See org.nervousync.test.zip.ZipTest
 **Package**: org.nervousync.utils
 * Check collection is empty
 * Check collection contains target element
-* Check two collection contains the same element
+* Check two collections contain the same element
 * Check collection contains unique element
 * Convert the object to an array list
 * Merge array to list

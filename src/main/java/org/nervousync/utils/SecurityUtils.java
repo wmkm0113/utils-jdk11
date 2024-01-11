@@ -24,8 +24,8 @@ import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.security.api.SecureAdapter;
-import org.nervousync.security.config.CRCConfig;
-import org.nervousync.security.config.CipherConfig;
+import org.nervousync.security.digest.config.CRCConfig;
+import org.nervousync.security.crypto.config.CipherConfig;
 import org.nervousync.security.crypto.BaseCryptoAdapter;
 import org.nervousync.security.crypto.impl.*;
 import org.nervousync.security.digest.impl.*;
@@ -1378,7 +1378,7 @@ public final class SecurityUtils {
      *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishEncryptor(final byte[] keyBytes) throws CryptoException {
-        return BlowfishEncryptor("CBC", "NoPadding", keyBytes);
+        return BlowfishEncryptor("CBC", "PKCS7Padding", keyBytes);
     }
 
     /**
@@ -1417,7 +1417,7 @@ public final class SecurityUtils {
      *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter BlowfishDecryptor(final byte[] keyBytes) throws CryptoException {
-        return BlowfishDecryptor("CBC", "NoPadding", keyBytes);
+        return BlowfishDecryptor("CBC", "PKCS7Padding", keyBytes);
     }
 
     /**
@@ -1659,7 +1659,7 @@ public final class SecurityUtils {
      *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter SM4Encryptor(final byte[] keyBytes) throws CryptoException {
-        return SM4Encryptor("CBC", "NoPadding", keyBytes, "SHA1PRNG");
+        return SM4Encryptor("CBC", "PKCS5Padding", keyBytes, "SHA1PRNG");
     }
 
     /**
@@ -1806,7 +1806,7 @@ public final class SecurityUtils {
      *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Encryptor(final byte[] keyBytes) throws CryptoException {
-        return RC2Encryptor("CBC", "NoPadding", keyBytes);
+        return RC2Encryptor("CBC", "PKCS7Padding", keyBytes);
     }
 
     /**
@@ -1845,7 +1845,7 @@ public final class SecurityUtils {
      *                         <span class="zh-CN">如果算法未找到</span>
      */
     public static SecureAdapter RC2Decryptor(final byte[] keyBytes) throws CryptoException {
-        return RC2Decryptor("CBC", "NoPadding", keyBytes);
+        return RC2Decryptor("CBC", "PKCS7Padding", keyBytes);
     }
 
     /**
@@ -1969,6 +1969,193 @@ public final class SecurityUtils {
             return new byte[0];
         }
     }
+
+    /**
+     * <h3 class="en-US">Initialize RC5 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC5加密安全适配器实例对象</h3>
+     *
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC5Encryptor(final byte[] keyBytes) throws CryptoException {
+        return RC5Encryptor("CBC", "PKCS5Padding", keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC5 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC5加密安全适配器实例对象</h3>
+     * <span>
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * </span>
+     *
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC5Encryptor(final String mode, final String padding, final byte[] keyBytes)
+            throws CryptoException {
+        return new RC5CryptoAdapterImpl(new CipherConfig("RC5", mode, padding), CryptoMode.ENCRYPT, keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC5 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC5解密安全适配器实例对象</h3>
+     *
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC5Decryptor(final byte[] keyBytes) throws CryptoException {
+        return RC5Decryptor("CBC", "PKCS5Padding", keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC5 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC5解密安全适配器实例对象</h3>
+     * <span>
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * </span>
+     *
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC5Decryptor(final String mode, final String padding, final byte[] keyBytes)
+            throws CryptoException {
+        return new RC5CryptoAdapterImpl(new CipherConfig("RC5", mode, padding), CryptoMode.DECRYPT, keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Generate RC5 key bytes</h3>
+     * <h3 class="zh-CN">生成RC5密钥字节数组</h3>
+     *
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     */
+    public static byte[] RC5Key() {
+        try {
+            return symmetricKey("RC5", 128, Globals.DEFAULT_VALUE_STRING);
+        } catch (CryptoException e) {
+            return new byte[0];
+        }
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC6加密安全适配器实例对象</h3>
+     *
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC6Encryptor(final byte[] keyBytes) throws CryptoException {
+        return RC6Encryptor("CBC", "PKCS5Padding", keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC6加密安全适配器实例对象</h3>
+     * <span>
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * </span>
+     *
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC6Encryptor(final String mode, final String padding, final byte[] keyBytes)
+            throws CryptoException {
+        return new RC6CryptoAdapterImpl(new CipherConfig("RC6", mode, padding), CryptoMode.ENCRYPT, keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC6解密安全适配器实例对象</h3>
+     *
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC6Decryptor(final byte[] keyBytes) throws CryptoException {
+        return RC6Decryptor("CBC", "PKCS5Padding", keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
+     * <h3 class="zh-CN">初始化RC6解密安全适配器实例对象</h3>
+     * <span>
+     * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
+     * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
+     * </span>
+     *
+     * @param mode     <span class="en-US">Cipher Mode</span>
+     *                 <span class="zh-CN">分组密码模式</span>
+     * @param padding  <span class="en-US">Padding Mode</span>
+     *                 <span class="zh-CN">数据填充模式</span>
+     * @param keyBytes <span class="en-US">key bytes</span>
+     *                 <span class="zh-CN">密钥字节数组</span>
+     * @return <span class="en-US">Initialized secure provider instance</span>
+     * <span class="zh-CN">初始化的安全适配器实例对象</span>
+     * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
+     *                         <span class="zh-CN">如果算法未找到</span>
+     */
+    public static SecureAdapter RC6Decryptor(final String mode, final String padding, final byte[] keyBytes)
+            throws CryptoException {
+        return new RC6CryptoAdapterImpl(new CipherConfig("RC6", mode, padding), CryptoMode.DECRYPT, keyBytes);
+    }
+
+    /**
+     * <h3 class="en-US">Generate RC6 key bytes</h3>
+     * <h3 class="zh-CN">生成RC6密钥字节数组</h3>
+     *
+     * @return <span class="en-US">Generated key bytes or 0 length byte array if process error</span>
+     * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
+     */
+    public static byte[] RC6Key() {
+        try {
+            return symmetricKey("RC6", 128, Globals.DEFAULT_VALUE_STRING);
+        } catch (CryptoException e) {
+            return new byte[0];
+        }
+    }
+
     /*
      * Asymmetric methods
      */
@@ -2506,6 +2693,8 @@ public final class SecurityUtils {
                     break;
                 case "SM4":
                 case "RC2":
+                case "RC5":
+                case "RC6":
                     keyGenerator.init(keySize, new SecureRandom());
                     break;
                 case "DES":

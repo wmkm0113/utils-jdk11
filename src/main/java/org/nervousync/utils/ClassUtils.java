@@ -16,18 +16,16 @@
  */
 package org.nervousync.utils;
 
+import jakarta.annotation.Nonnull;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import org.nervousync.beans.core.BeanObject;
 import org.nervousync.commons.Globals;
 import org.nervousync.enumerations.xml.DataType;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -168,7 +166,7 @@ public final class ClassUtils {
             return DataType.NUMBER;
         } else if (clazz.equals(String.class)) {
             return DataType.STRING;
-        } else if (BeanObject.class.isAssignableFrom(clazz)
+        } else if (ClassUtils.isAssignable(clazz, BeanObject.class)
                 && (clazz.isAnnotationPresent(XmlType.class) || clazz.isAnnotationPresent(XmlRootElement.class))) {
             return DataType.OBJECT;
         } else if (clazz.isEnum()) {
@@ -190,55 +188,62 @@ public final class ClassUtils {
      *                  <span class="zh-CN">目标数据类</span>
      * @return <span class="en-US">Target class instance</span>
      * <span class="zh-CN">目标类实例对象</span>
-     * @throws ParseException <span class="en-US">If given data value string is null</span>
-     *                        <span class="zh-CN">如果给定的数据值字符串为null</span>
      */
-    public static <T> T parseSimpleData(final String dataValue, final Class<T> typeClass) throws ParseException {
-        Object paramObj = null;
-        if (dataValue == null || typeClass == null || Globals.DEFAULT_VALUE_STRING.equals(dataValue)) {
+    @SuppressWarnings("unchecked")
+    public static <T> T parseSimpleData(final String dataValue, final Class<T> typeClass) {
+        if (StringUtils.isEmpty(dataValue) || typeClass == null) {
             return null;
         }
-        if (BeanObject.class.isAssignableFrom(typeClass)) {
-            paramObj = StringUtils.stringToObject(dataValue, typeClass);
-        } else {
-            DataType dataType = retrieveSimpleDataType(typeClass);
-            switch (dataType) {
-                case BOOLEAN:
-                    paramObj = Boolean.valueOf(dataValue);
-                    break;
-                case DATE:
-                    paramObj = DateTimeUtils.parseSiteMapDate(dataValue);
-                    break;
-                case ENUM:
-                    paramObj = ReflectionUtils.parseEnum(typeClass, dataValue);
-                    break;
-                case NUMBER:
-                    if (typeClass.equals(Integer.class) || typeClass.equals(int.class)) {
-                        paramObj = Integer.valueOf(dataValue);
-                    } else if (typeClass.equals(Float.class) || typeClass.equals(float.class)) {
-                        paramObj = Float.valueOf(dataValue);
-                    } else if (typeClass.equals(Double.class) || typeClass.equals(double.class)) {
-                        paramObj = Double.valueOf(dataValue);
-                    } else if (typeClass.equals(Short.class) || typeClass.equals(short.class)) {
-                        paramObj = Short.valueOf(dataValue);
-                    } else if (typeClass.equals(Long.class) || typeClass.equals(long.class)) {
-                        paramObj = Long.valueOf(dataValue);
-                    } else if (typeClass.equals(BigInteger.class)) {
-                        paramObj = new BigInteger(dataValue);
-                    }
-                    break;
-                case CDATA:
-                    paramObj = StringUtils.formatForText(dataValue).toCharArray();
-                    break;
-                case BINARY:
-                    paramObj = StringUtils.base64Decode(
-                            StringUtils.replace(dataValue, " ", Globals.DEFAULT_VALUE_STRING));
-                    break;
-                default:
-                    paramObj = StringUtils.formatForText(dataValue);
-            }
+        if (ClassUtils.isAssignable(typeClass, BeanObject.class)) {
+            return StringUtils.stringToObject(dataValue, typeClass);
         }
-        return typeClass.cast(paramObj);
+        Object paramObj = null;
+        DataType dataType = retrieveSimpleDataType(typeClass);
+        switch (dataType) {
+            case BOOLEAN:
+                paramObj = Boolean.valueOf(dataValue);
+                break;
+            case DATE:
+                paramObj = DateTimeUtils.parseSiteMapDate(dataValue);
+                break;
+            case ENUM:
+                paramObj = ReflectionUtils.parseEnum(typeClass, dataValue);
+                break;
+            case NUMBER:
+                if (typeClass.equals(Integer.class) || typeClass.equals(int.class)) {
+                    paramObj = Integer.valueOf(dataValue);
+                } else if (typeClass.equals(Float.class) || typeClass.equals(float.class)) {
+                    paramObj = Float.valueOf(dataValue);
+                } else if (typeClass.equals(Double.class) || typeClass.equals(double.class)) {
+                    paramObj = Double.valueOf(dataValue);
+                } else if (typeClass.equals(Short.class) || typeClass.equals(short.class)) {
+                    paramObj = Short.valueOf(dataValue);
+                } else if (typeClass.equals(Long.class) || typeClass.equals(long.class)) {
+                    paramObj = Long.valueOf(dataValue);
+                } else if (typeClass.equals(BigInteger.class)) {
+                    paramObj = new BigInteger(dataValue);
+                } else if (typeClass.equals(BigDecimal.class)) {
+                    paramObj = new BigDecimal(dataValue);
+                }
+                break;
+            case CDATA:
+                paramObj = StringUtils.formatForText(dataValue).toCharArray();
+                break;
+            case BINARY:
+                paramObj = StringUtils.base64Decode(
+                        StringUtils.replace(dataValue, " ", Globals.DEFAULT_VALUE_STRING));
+                break;
+            default:
+                paramObj = StringUtils.formatForText(dataValue);
+        }
+        return Optional.ofNullable(paramObj)
+                .map(value -> {
+                    if (typeClass.isPrimitive()) {
+                        return (T) value;
+                    }
+                    return typeClass.cast(value);
+                })
+                .orElse(null);
     }
 
     /**
@@ -980,10 +985,26 @@ public final class ClassUtils {
     public static Class<?> componentType(final Class<?> clazz) {
         if (clazz.isArray()) {
             return clazz.getComponentType();
-        } else if (Collection.class.isAssignableFrom(clazz)) {
+        } else if (ClassUtils.isAssignable(Collection.class, clazz)) {
             return (Class<?>) ((ParameterizedType) clazz.getGenericInterfaces()[0]).getActualTypeArguments()[0];
         }
-        return clazz;
+        return null;
+    }
+
+    /**
+     * <h3 class="en-US">Parse an array of generic types from the given class.</h3>
+     * <h3 class="zh-CN">从给定类中解析泛型类型数组。</h3>
+     *
+     * @param clazz <span class="en-US">Class instance</span>
+     *              <span class="zh-CN">类实例</span>
+     * @return <span class="en-US">The parsed array of generic types. If it does not contain generic information, an empty array of length 0 is returned.</span>
+     * <span class="zh-CN">解析的泛型类型数组，如果不包含泛型信息则返回长度为0的空数组</span>
+     */
+    public static Class<?>[] componentTypes(final Class<?> clazz) {
+        if (clazz == null) {
+            return new Class<?>[0];
+        }
+        return parseTypeParameters(clazz, new HashMap<>());
     }
 
     /**
@@ -1004,5 +1025,48 @@ public final class ClassUtils {
         }
         buffer.insert(0, currentClass.getName());
         return buffer.toString();
+    }
+
+    /**
+     * <h3 class="en-US">Parse an array of generic types from the given class.</h3>
+     * <h3 class="zh-CN">从给定类中解析泛型类型数组。</h3>
+     *
+     * @param clazz        <span class="en-US">Class instance</span>
+     *                     <span class="zh-CN">类实例</span>
+     * @param typeMappings <span class="en-US">Mapping table of class instances and generic definition names</span>
+     *                     <span class="zh-CN">类实例与泛型定义名称的映射表</span>
+     * @return <span class="en-US">The parsed array of generic types. If it does not contain generic information, an empty array of length 0 is returned.</span>
+     * <span class="zh-CN">解析的泛型类型数组，如果不包含泛型信息则返回长度为0的空数组</span>
+     */
+    private static Class<?>[] parseTypeParameters(@Nonnull final Class<?> clazz,
+                                                  @Nonnull final Map<String, Class<?>> typeMappings) {
+        Type genericType = clazz.getGenericSuperclass();
+        if (!ObjectUtils.nullSafeEquals(genericType, Object.class)) {
+            if (genericType instanceof ParameterizedType) {
+                Type[] actualTypes = ((ParameterizedType) genericType).getActualTypeArguments();
+                if (actualTypes.length != 0) {
+                    TypeVariable<?>[] typeVariables = clazz.getSuperclass().getTypeParameters();
+                    int index = 0;
+                    for (Type type : actualTypes) {
+                        if (type instanceof Class<?>) {
+                            typeMappings.put(typeVariables[index].getTypeName(), (Class<?>) type);
+                        }
+                        index++;
+                    }
+                }
+            }
+            return parseTypeParameters(clazz.getSuperclass(), typeMappings);
+        }
+        TypeVariable<?>[] typeVariables = clazz.getTypeParameters();
+        if (typeVariables.length != 0) {
+            int index = 0;
+            Class<?>[] componentTypes = new Class[typeVariables.length];
+            for (TypeVariable<?> typeVariable : typeVariables) {
+                componentTypes[index] = typeMappings.get(typeVariable.getTypeName());
+                index++;
+            }
+            return componentTypes;
+        }
+        return new Class<?>[0];
     }
 }

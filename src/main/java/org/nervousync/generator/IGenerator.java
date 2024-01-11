@@ -25,27 +25,28 @@ package org.nervousync.generator;
  */
 public interface IGenerator<T> {
     /**
-	 * <h3 class="en-US">Generate ID value</h3>
-	 * <h3 class="zh-CN">生成ID值</h3>
+     * <h3 class="en-US">Generate ID value</h3>
+     * <h3 class="zh-CN">生成ID值</h3>
      *
-     * @return  <span class="en-US">Generated value</span>
-     *          <span class="zh-CN">生成的ID值</span>
+     * @return <span class="en-US">Generated value</span>
+     * <span class="zh-CN">生成的ID值</span>
      */
     T generate();
+
     /**
-	 * <h3 class="en-US">Generate ID value using given parameter</h3>
-	 * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
+     * <h3 class="en-US">Generate ID value using given parameter</h3>
+     * <h3 class="zh-CN">使用给定的参数生成ID值</h3>
      *
-     * @param dataBytes     <span class="en-US">Given parameter</span>
-     *                      <span class="zh-CN">给定的参数</span>
-     *
-     * @return  <span class="en-US">Generated value</span>
-     *          <span class="zh-CN">生成的ID值</span>
+     * @param dataBytes <span class="en-US">Given parameter</span>
+     *                  <span class="zh-CN">给定的参数</span>
+     * @return <span class="en-US">Generated value</span>
+     * <span class="zh-CN">生成的ID值</span>
      */
     T generate(byte[] dataBytes);
+
     /**
-	 * <h3 class="en-US">Destroy current generator instance</h3>
-	 * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
+     * <h3 class="en-US">Destroy current generator instance</h3>
+     * <h3 class="zh-CN">销毁当前生成器实例对象</h3>
      */
     void destroy();
 }

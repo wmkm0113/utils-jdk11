@@ -30,8 +30,6 @@ import org.nervousync.http.entity.HttpEntity;
 import org.nervousync.http.security.GeneX509TrustManager;
 import org.nervousync.proxy.ProxyConfig;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -260,7 +258,7 @@ public final class RequestUtils {
                         httpsURLConnection.connect();
                         return Arrays.stream(httpsURLConnection.getServerCertificates())
                                 .filter(serverCertificate ->
-                                        verifyCertificate((X509Certificate) serverCertificate, domainName))
+                                        CertificateUtils.matchDomain((X509Certificate) serverCertificate, domainName))
                                 .findFirst()
                                 .orElse(null);
                     } catch (IOException e) {
@@ -940,75 +938,6 @@ public final class RequestUtils {
             }
         }
         return rewriteUrl;
-    }
-
-    /**
-     * <h3 class="en-US">Verify x509 certificate contains given domain name</h3>
-     * <h3 class="zh-CN">验证x509证书中包含给定的域名</h3>
-     *
-     * @param x509Certificate <span class="en-US">x509 certificate</span>
-     *                        <span class="zh-CN">x509证书</span>
-     * @param domainName      <span class="en-US">Will check for Domain name</span>
-     *                        <span class="zh-CN">将要检查的域名</span>
-     * @return <span class="en-US">Check result</span>
-     * <span class="zh-CN">检查结果</span>
-     */
-    private static boolean verifyCertificate(final X509Certificate x509Certificate, final String domainName) {
-        if (x509Certificate == null || StringUtils.isEmpty(domainName)) {
-            return Boolean.FALSE;
-        }
-        try {
-            x509Certificate.checkValidity();
-            if (x509Certificate.getVersion() == 3) {
-                Collection<List<?>> collection = x509Certificate.getSubjectAlternativeNames();
-                if (collection != null) {
-                    boolean matchResult;
-                    if (IPUtils.isIPv4Address(domainName) || IPUtils.isIPv6Address(domainName)) {
-                        matchResult = collection.stream()
-                                //  See RFC 5280 section 4.2.1.6
-                                .filter(dataList -> ((Integer) dataList.get(0)) == 7)
-                                .map(dataList -> (String) dataList.get(1))
-                                .anyMatch(domainName::equalsIgnoreCase);
-                    } else {
-                        matchResult = collection.stream()
-                                //  See RFC 5280 section 4.2.1.6
-                                .filter(dataList -> ((Integer) dataList.get(0)) == 2)
-                                .map(dataList -> (String) dataList.get(1))
-                                .anyMatch(matchDomain -> matchDomain(matchDomain, domainName));
-                    }
-                    if (matchResult) {
-                        return Boolean.TRUE;
-                    }
-                }
-            }
-            LdapName ldapName = new LdapName(x509Certificate.getSubjectX500Principal().getName());
-            String matchDomain = ldapName.getRdns().stream()
-                    .filter(rdn -> rdn.getType().equalsIgnoreCase("CN"))
-                    .findFirst()
-                    .map(rdn -> (String) rdn.getValue())
-                    .orElse(Globals.DEFAULT_VALUE_STRING);
-            return matchDomain(matchDomain, domainName);
-        } catch (CertificateNotYetValidException | CertificateExpiredException | InvalidNameException |
-                 CertificateParsingException e) {
-            return Boolean.FALSE;
-        }
-    }
-
-    /**
-     * <h3 class="en-US">Match domain name</h3>
-     * <h3 class="zh-CN">验证泛域名</h3>
-     *
-     * @param matchDomain <span class="en-US">generic domain name</span>
-     *                    <span class="zh-CN">泛域名</span>
-     * @param domainName  <span class="en-US">Will check for Domain name</span>
-     *                    <span class="zh-CN">将要检查的域名</span>
-     * @return <span class="en-US">Check result</span>
-     * <span class="zh-CN">检查结果</span>
-     */
-    private static boolean matchDomain(final String matchDomain, final String domainName) {
-        return matchDomain.startsWith("*")
-                ? domainName.toLowerCase().endsWith(matchDomain.substring(1).toLowerCase())
-                : domainName.equalsIgnoreCase(matchDomain);
     }
 
     /**

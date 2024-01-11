@@ -16,9 +16,6 @@
  */
 package org.nervousync.utils;
 
-import jakarta.annotation.Nonnull;
-import org.nervousync.annotations.beans.Desensitization;
-import org.nervousync.beans.sensitive.SensitiveConfig;
 import org.nervousync.commons.Globals;
 
 import java.lang.reflect.*;
@@ -1662,95 +1659,6 @@ public final class ObjectUtils {
         String split = StringUtils.isEmpty(separator) ? ARRAY_ELEMENT_SEPARATOR : separator;
         Arrays.asList(array).forEach(object -> stringBuilder.append(split).append(object));
         return processCompletion ? stringBuilderCompletion(stringBuilder) : stringBuilder.substring(split.length());
-    }
-
-    /**
-     * <h3 class="en-US">Desensitize the sensitive information of the attributes in the JavaBean object</h3>
-     * <h3 class="zh-CN">将JavaBean对象中属性的敏感信息进行脱敏处理</h3>
-     *
-     * @param object <span class="en-US">JavaBean instance</span>
-     *               <span class="zh-CN">JavaBean实例对象</span>
-     */
-    public static void desensitization(final Object object) {
-        if (object == null) {
-            return;
-        }
-
-        ReflectionUtils.getAllDeclaredFields(object.getClass(), Boolean.TRUE, ReflectionUtils.NON_STATIC_FINAL_MEMBERS)
-                .stream()
-                .filter(field -> sensitiveField(field, object))
-                .forEach(field -> desensitization(field, object));
-    }
-
-    /**
-     * <h3 class="en-US">Checks if the given field instance uses the Desensitization criteria and the data is not <code>null</code> and the data type is string</h3>
-     * <h3 class="zh-CN">检查给定的属性对象是否使用Desensitization标准，并且数据不为 <code>null</code> 且数据类型为字符串</h3>
-     *
-     * @param field  <span class="en-US">Field instance</span>
-     *               <span class="zh-CN">属性实例对象</span>
-     * @param object <span class="en-US">JavaBean instance</span>
-     *               <span class="zh-CN">JavaBean实例对象</span>
-     * @return <span class="en-US">Check result</span>
-     * <span class="zh-CN">检查结果</span>
-     */
-    private static boolean sensitiveField(@Nonnull final Field field, @Nonnull final Object object) {
-        if (field.isAnnotationPresent(Desensitization.class)) {
-            return Optional.ofNullable(ReflectionUtils.getFieldValue(field, object))
-                    .filter(fieldValue -> fieldValue instanceof String)
-                    .map(fieldValue -> Boolean.TRUE)
-                    .orElse(Boolean.FALSE);
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     * <h3 class="en-US">Desensitize the given attribute data, if the data is empty or illegal, return the original text</h3>
-     * <h3 class="zh-CN">将给定的属性数据进行脱敏处理，如果数据为空或数据非法，则返回原文</h3>
-     *
-     * @param field  <span class="en-US">Field instance</span>
-     *               <span class="zh-CN">属性实例对象</span>
-     * @param object <span class="en-US">JavaBean instance</span>
-     *               <span class="zh-CN">JavaBean实例对象</span>
-     */
-    private static void desensitization(@Nonnull final Field field, @Nonnull final Object object) {
-        String fieldValue = (String) ReflectionUtils.getFieldValue(field, object);
-        if (StringUtils.notBlank(fieldValue)) {
-            Desensitization desensitization = field.getAnnotation(Desensitization.class);
-            boolean validate;
-            switch (desensitization.value()) {
-                case Luhn:
-                    validate = StringUtils.isLuhn(fieldValue);
-                    break;
-                case CHN_ID_Code:
-                    validate = StringUtils.isChnId(fieldValue);
-                    break;
-                case CHN_Social_Code:
-                    validate = StringUtils.isChnSocialCredit(fieldValue);
-                    break;
-                case E_MAIL:
-                    validate = StringUtils.isEMail(fieldValue);
-                    break;
-                case PHONE_NUMBER:
-                    validate = StringUtils.isPhoneNumber(fieldValue);
-                    break;
-                default:
-                    validate = Boolean.TRUE;
-            }
-            if (validate) {
-                Optional.ofNullable(SensitiveConfig.newInstance(desensitization.value(), fieldValue))
-                        .map(sensitiveConfig -> StringUtils.desensitize(fieldValue, sensitiveConfig))
-                        .filter(StringUtils::notBlank)
-                        .ifPresent(desensitizedValue -> ReflectionUtils.setField(field, object, desensitizedValue));
-            }
-        }
-    }
-
-    /**
-     * <h2 class="en-US">Enumeration of Sensitive data type</h2>
-     * <h2 class="zh-CN">代码类型的枚举类</h2>
-     */
-    public enum SensitiveType {
-        CHN_Social_Code, CHN_ID_Code, Luhn, E_MAIL, PHONE_NUMBER, NORMAL
     }
 
     /**

@@ -48,15 +48,13 @@ public abstract class AbstractException extends Exception {
 	 *
 	 * @param errorCode 	<span class="en-US">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param messageKey    <span class="en-US">Message identify key</span>
-     *                      <span class="zh-CN">信息识别键值</span>
      * @param collections   <span class="en-US">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	protected AbstractException(final long errorCode, final String messageKey, final Object... collections) {
+	protected AbstractException(final long errorCode, final Object... collections) {
 		super(Globals.DEFAULT_VALUE_STRING);
 		this.errorCode = errorCode;
-		this.detailMessage = this.multiAgent.findMessage(messageKey, collections);
+		this.detailMessage = this.multiAgent.errorMessage(errorCode, collections);
 	}
 	/**
 	 * <h3 class="en-US">Constructor method for NetworkInfoException</h3>
@@ -66,18 +64,15 @@ public abstract class AbstractException extends Exception {
 	 *
 	 * @param errorCode 	<span class="en-US">Error identified code</span>
      *                      <span class="zh-CN">错误识别代码</span>
-     * @param messageKey    <span class="en-US">Message identify key</span>
-     *                      <span class="zh-CN">信息识别键值</span>
 	 * @param cause 		<span class="en-US">The root cause</span>
 	 *              		<span class="zh-CN">异常信息对象实例</span>
      * @param collections   <span class="en-US">given parameters of information formatter</span>
      *                      <span class="zh-CN">用于资源信息格式化的参数</span>
 	 */
-	protected AbstractException(final long errorCode, final String messageKey,
-								final Throwable cause, final Object... collections) {
+	protected AbstractException(final long errorCode, final Throwable cause, final Object... collections) {
 		super(Globals.DEFAULT_VALUE_STRING, cause);
 		this.errorCode = errorCode;
-		this.detailMessage = this.multiAgent.findMessage(messageKey, collections);
+		this.detailMessage = this.multiAgent.errorMessage(errorCode, collections);
 	}
 	/**
 	 * <h3 class="en-US">Getter method for error identified code</h3>

@@ -85,6 +85,29 @@ public final class CertificateTest extends BaseTest {
         this.logger.info("Certificate_Read_Private", StringUtils.base64Encode(readKey.getEncoded()));
     }
 
+    @Test
+    @Order(20)
+    public void readPrivateKeyFromPem() {
+        PrivateKey privateKey = CertificateUtils.privateKey("src/test/resources/private.pem");
+        if (privateKey == null) {
+            this.logger.error("Certificate_Read_PEM_Private_Error");
+            return;
+        }
+        this.logger.info("Certificate_Read_PEM_Private", StringUtils.base64Encode(privateKey.getEncoded()));
+    }
+
+    @Test
+    @Order(30)
+    public void readPublicKeyFromPem() throws CertificateEncodingException {
+        X509Certificate x509Certificate =
+                CertificateUtils.x509("src/test/resources/public.pem", "nervousync.com");
+        if (x509Certificate == null) {
+            this.logger.error("Certificate_Read_PEM_Certificate_Error");
+            return;
+        }
+        this.logger.info("Certificate_Read_PEM_Certificate", StringUtils.base64Encode(x509Certificate.getEncoded()));
+    }
+
     private static X509Certificate generateCertificate(final KeyPair keyPair) {
         long currentTime = DateTimeUtils.currentUTCTimeMillis();
         return CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),

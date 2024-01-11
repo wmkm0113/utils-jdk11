@@ -23,10 +23,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.profile.pegdown.Extensions;
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.data.DataHolder;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import org.nervousync.beans.sensitive.SensitiveConfig;
+import org.nervousync.annotations.beans.OutputConfig;
+import org.nervousync.beans.transfer.cdata.CDataAdapter;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.RegexGlobals;
 import org.nervousync.huffman.HuffmanTree;
@@ -37,11 +44,20 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
@@ -50,7 +66,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
-import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -137,6 +152,11 @@ public final class StringUtils {
      * <span class="zh-CN">中国统一信用代码的结尾字符</span>
      */
     private static final String CHN_SOCIAL_CREDIT_CODE = "0123456789ABCDEFGHJKLMNPQRTUWXY";
+    /**
+     * <span class="en-US">XML fragment template</span>
+     * <span class="zh-CN">XML声明模板</span>
+     */
+    private static final String FRAGMENT_TEMPLATE = "<?xml version=\"1.0\" encoding=\"{}\"?>";
     /**
      * <span class="en-US">XML Schema file mapping resource path</span>
      * <span class="zh-CN">XML约束文档的资源映射文件</span>
@@ -1320,6 +1340,22 @@ public final class StringUtils {
     }
 
     /**
+     * <h3 class="en-US">Convert Markdown string to HTML code</h3>
+     * <h3 class="zh-CN">转换Markdown字符串为HTML代码</h3>
+     *
+     * @param markdown <span class="en-US">Markdown string</span>
+     *                 <span class="zh-CN">Markdown字符串</span>
+     * @return <span class="en-US">Converted HTML code</span>
+     * <span class="zh-CN">转换后的HTML代码</span>
+     */
+    public static String mdToHtml(final String markdown) {
+        DataHolder options = PegdownOptionsAdapter.flexmarkOptions(Boolean.TRUE, Extensions.ALL);
+        Parser parser = Parser.builder(options).build();
+        HtmlRenderer render = HtmlRenderer.builder(options).build();
+        return render.render(parser.parse(markdown));
+    }
+
+    /**
      * <h3 class="en-US">Normalize the path by suppressing sequences like "path/.." and inner simple dots.</h3>
      * <span class="en-US">
      * The result is convenient for path comparison. For other uses, notice that Windows separators ("\") are replaced by simple slashes.
@@ -1337,7 +1373,7 @@ public final class StringUtils {
 
         // Strip prefix from path to analyze, to not treat it as part of the
         // first path element. This is necessary to correctly parse paths like
-        // "file:core/../core/io/Resource.class", where the ".." Should just
+        // "file:core/../core/io/Resource.class", where the ".." Should
         // strip the first "core" directory while keeping the "file:" prefix.
         int prefixIndex = pathToUse.indexOf(":");
         String prefix = Globals.DEFAULT_VALUE_STRING;
@@ -2055,8 +2091,75 @@ public final class StringUtils {
      * <span class="zh-CN">转换后的字符串</span>
      */
     public static String objectToString(final Object object, final StringType stringType, final boolean formatOutput) {
+        return objectToString(object, stringType, formatOutput, Boolean.TRUE, Globals.DEFAULT_ENCODING);
+    }
+
+    /**
+     * <h3 class="en-US">Convenience method to return a JavaBean object as a string. </h3>
+     * <h3 class="zh-CN">将JavaBean实例对象转换为字符串</h3>
+     *
+     * @param object       <span class="en-US">JavaBean object</span>
+     *                     <span class="zh-CN">JavaBean实例对象</span>
+     * @param stringType   <span class="en-US">Target string type</span>
+     *                     <span class="zh-CN">目标字符串类型</span>
+     * @param formatOutput <span class="en-US">format output string</span>
+     *                     <span class="zh-CN">格式化输出字符串</span>
+     * @return <span class="en-US">the converted string</span>
+     * <span class="zh-CN">转换后的字符串</span>
+     */
+    public static String objectToString(final Object object, final StringType stringType, final boolean formatOutput,
+                                        final boolean outputFragment, final String encoding) {
         ObjectMapper objectMapper;
         switch (stringType) {
+            case XML:
+                StringWriter stringWriter = null;
+                try {
+                    String characterEncoding = StringUtils.isEmpty(encoding) ? Globals.DEFAULT_ENCODING : encoding;
+                    stringWriter = new StringWriter();
+                    XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(stringWriter);
+                    CDataStreamWriter streamWriter = new CDataStreamWriter(xmlWriter);
+
+                    JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+                    Marshaller marshaller = jaxbContext.createMarshaller();
+                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatOutput);
+                    marshaller.setProperty(Marshaller.JAXB_ENCODING, characterEncoding);
+                    marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+
+                    marshaller.marshal(object, streamWriter);
+
+                    streamWriter.flush();
+                    streamWriter.close();
+
+                    if (formatOutput) {
+                        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                        transformer.setOutputProperty(OutputKeys.ENCODING, characterEncoding);
+                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                        transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
+
+                        String xml = stringWriter.toString();
+                        stringWriter = new StringWriter();
+
+                        transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(stringWriter));
+                    }
+
+                    StringBuilder stringBuilder = new StringBuilder();
+                    if (outputFragment) {
+                        stringBuilder.append(StringUtils.replace(FRAGMENT_TEMPLATE, "{}", characterEncoding));
+                        if (formatOutput) {
+                            stringBuilder.append(FileUtils.LF);
+                        }
+                    }
+                    stringBuilder.append(stringWriter);
+                    return stringBuilder.toString();
+                } catch (Exception e) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Stack_Message_Error", e);
+                    }
+                    return Globals.DEFAULT_VALUE_STRING;
+                } finally {
+                    IOUtils.closeStream(stringWriter);
+                }
             case JSON:
                 objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
                 break;
@@ -2064,6 +2167,8 @@ public final class StringUtils {
                 objectMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
                         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 break;
+            case SERIALIZABLE:
+                return StringUtils.base64Encode(ConvertUtils.toByteArray(object));
             default:
                 return Globals.DEFAULT_VALUE_STRING;
         }
@@ -2144,13 +2249,19 @@ public final class StringUtils {
             LOGGER.error("Parse_Empty_String_Error");
             return null;
         }
-        if (string.startsWith("<")) {
-            return stringToObject(string, StringType.XML, encoding, beanClass, schemaPaths);
+        if (ClassUtils.isAssignable(Map.class, beanClass)) {
+            return beanClass.cast(StringUtils.dataToMap(string, StringType.JSON));
         }
-        if (string.startsWith("{")) {
-            return stringToObject(string, StringType.JSON, encoding, beanClass, schemaPaths);
+        switch (string.charAt(0)) {
+            case '<':
+                return stringToObject(string, StringType.XML, encoding, beanClass, schemaPaths);
+            case '{':
+                return stringToObject(string, StringType.JSON, encoding, beanClass, schemaPaths);
+            default:
+                return stringToObject(string,
+                        StringUtils.matches(string, RegexGlobals.BASE64) ? StringType.SERIALIZABLE : StringType.YAML,
+                        encoding, beanClass, schemaPaths);
         }
-        return stringToObject(string, StringType.YAML, encoding, beanClass, schemaPaths);
     }
 
     /**
@@ -2202,8 +2313,8 @@ public final class StringUtils {
      *                    <span class="zh-CN">目标JavaBean类</span>
      * @param schemaPaths <span class="en-US">XML schema path(Maybe schema uri or local path)</span>
      *                    <span class="zh-CN">XML描述文件路径（可能为描述文件URI或本地文件路径）</span>
-     * @return <span class="en-US">Converted object instance list</span>
-     * <span class="zh-CN">转换后的实例对象列表</span>
+     * @return <span class="en-US">Converted object instance</span>
+     * <span class="zh-CN">转换后的实例对象</span>
      */
     public static <T> T fileToObject(final String filePath, final Class<T> beanClass, final String... schemaPaths) {
         if (StringUtils.isEmpty(filePath) || !FileUtils.isExists(filePath)) {
@@ -2221,7 +2332,7 @@ public final class StringUtils {
                 case "yaml":
                     return streamToObject(inputStream, StringType.YAML, beanClass, Globals.DEFAULT_VALUE_STRING);
                 default:
-                    return null;
+                    return streamToObject(inputStream, StringType.SERIALIZABLE, beanClass, Globals.DEFAULT_VALUE_STRING);
             }
         } catch (IOException e) {
             LOGGER.error("Parse_File_Error");
@@ -2290,6 +2401,33 @@ public final class StringUtils {
      *                    <span class="zh-CN">目标JavaBean类</span>
      * @param inputStream <span class="en-US">Input stream instance</span>
      *                    <span class="zh-CN">输入流对象实例</span>
+     * @param beanClass   <span class="en-US">target JavaBean class</span>
+     *                    <span class="zh-CN">目标JavaBean类</span>
+     * @param schemaPaths <span class="en-US">XML schema path(Maybe schema uri or local path)</span>
+     *                    <span class="zh-CN">XML描述文件路径（可能为描述文件URI或本地文件路径）</span>
+     * @return <span class="en-US">Converted object instance list</span>
+     * <span class="zh-CN">转换后的实例对象列表</span>
+     * @throws IOException the io exception
+     *                     <span class="en-US">If an error occurs when read data from input stream</span>
+     *                     <span class="zh-CN">如果从输入流中读取数据时出现异常</span>
+     */
+    public static <T> T streamToObject(final InputStream inputStream, final Class<T> beanClass,
+                                       final String... schemaPaths) throws IOException {
+        OutputConfig outputConfig = beanClass.getAnnotation(OutputConfig.class);
+        if (outputConfig == null) {
+            return streamToObject(inputStream, StringType.SERIALIZABLE, beanClass, schemaPaths);
+        }
+        return streamToObject(inputStream, outputConfig.type(), beanClass, schemaPaths);
+    }
+
+    /**
+     * <h3 class="en-US">Parse content of input stream to target JavaBean instance list. </h3>
+     * <h3 class="zh-CN">解析输入流中的内容为目标JavaBean实例对象列表</h3>
+     *
+     * @param <T>         <span class="en-US">target JavaBean class</span>
+     *                    <span class="zh-CN">目标JavaBean类</span>
+     * @param inputStream <span class="en-US">Input stream instance</span>
+     *                    <span class="zh-CN">输入流对象实例</span>
      * @param stringType  <span class="en-US">The string type</span>
      *                    <span class="zh-CN">字符串类型</span>
      * @param beanClass   <span class="en-US">target JavaBean class</span>
@@ -2304,33 +2442,38 @@ public final class StringUtils {
      */
     public static <T> T streamToObject(final InputStream inputStream, final StringType stringType,
                                        final Class<T> beanClass, final String... schemaPaths) throws IOException {
-        if (StringType.XML.equals(stringType)) {
-            try {
-                Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
-                Optional.ofNullable(newSchema(schemaPaths))
-                        .ifPresent(unmarshaller::setSchema);
-                return beanClass.cast(unmarshaller.unmarshal(inputStream));
-            } catch (JAXBException e) {
-                LOGGER.error("Parse_File_Error");
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stack_Message_Error", e);
-                }
-                return null;
-            }
-        } else {
-            ObjectMapper objectMapper;
-            switch (stringType) {
-                case JSON:
-                    objectMapper = new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-                    break;
-                case YAML:
-                    objectMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
-                            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                    break;
-                default:
+        switch (stringType) {
+            case XML:
+                try {
+                    Unmarshaller unmarshaller = JAXBContext.newInstance(beanClass).createUnmarshaller();
+                    Optional.ofNullable(newSchema(schemaPaths))
+                            .ifPresent(unmarshaller::setSchema);
+                    return beanClass.cast(unmarshaller.unmarshal(inputStream));
+                } catch (JAXBException e) {
+                    LOGGER.error("Parse_File_Error");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Stack_Message_Error", e);
+                    }
                     return null;
-            }
-            return objectMapper.readValue(inputStream, beanClass);
+                }
+            case SIMPLE:
+                return ClassUtils.parseSimpleData(IOUtils.readContent(inputStream), beanClass);
+            case SERIALIZABLE:
+                return Optional.of(IOUtils.readContent(inputStream))
+                        .map(StringUtils::base64Decode)
+                        .map(ConvertUtils::toObject)
+                        .filter(object -> ClassUtils.isAssignable(object.getClass(), beanClass))
+                        .map(beanClass::cast)
+                        .orElse(null);
+            case JSON:
+                return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                        .readValue(IOUtils.readContent(inputStream), beanClass);
+            case YAML:
+                return new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                        .readValue(IOUtils.readContent(inputStream), beanClass);
+            default:
+                return null;
         }
     }
 
@@ -2369,50 +2512,6 @@ public final class StringUtils {
         }
 
         return new HashMap<>();
-    }
-
-    /**
-     * <h3 class="en-US">Replace special XMl character with converted character in string.</h3>
-     * <h3 class="zh-CN">替换XML特殊字符为转义字符串</h3>
-     *
-     * @param sourceString <span class="en-US">The string will process</span>
-     *                     <span class="zh-CN">要处理的字符串</span>
-     * @return <span class="en-US">Replaced string</span>
-     * <span class="zh-CN">替换后的字符串</span>
-     */
-    public static String formatTextForXML(final String sourceString) {
-        if (sourceString == null) {
-            return null;
-        }
-        int strLen;
-        StringBuilder reString = new StringBuilder();
-        String deString;
-        strLen = sourceString.length();
-
-        for (int i = 0; i < strLen; i++) {
-            char ch = sourceString.charAt(i);
-            switch (ch) {
-                case '<':
-                    deString = "&lt;";
-                    break;
-                case '>':
-                    deString = "&gt;";
-                    break;
-                case '\"':
-                    deString = "&quot;";
-                    break;
-                case '&':
-                    deString = "&amp;";
-                    break;
-                case 13:
-                    deString = Globals.DEFAULT_VALUE_STRING;
-                    break;
-                default:
-                    deString = Globals.DEFAULT_VALUE_STRING + ch;
-            }
-            reString.append(deString);
-        }
-        return reString.toString();
     }
 
     /**
@@ -2766,39 +2865,11 @@ public final class StringUtils {
     }
 
     /**
-     * <h3 class="en-US">Handle sensitive information based on given prefix and suffix lengths</h3>
-     * <h3 class="zh-CN">根据给定的前缀和后缀长度处理敏感信息</h3>
-     *
-     * @param sensitiveData     <span class="en-US">Sensitive information string</span>
-     *                 <span class="zh-CN">敏感信息字符串</span>
-     * @param sensitiveConfig   <span class="en-US">Information desensitization configuration</span>
-     *                 <span class="zh-CN">信息脱敏配置</span>
-     * @return <span class="en-US">Desensitized information</span>
-     * <span class="zh-CN">脱敏后的敏感信息</span>
-     */
-    public static String desensitize(final String sensitiveData, final SensitiveConfig sensitiveConfig) {
-        if (StringUtils.isEmpty(sensitiveData) || sensitiveConfig == null
-                || sensitiveData.length() < sensitiveConfig.getPrefixLength()
-                || sensitiveData.length() < sensitiveConfig.getSuffixLength()) {
-            return sensitiveData;
-        }
-        String prefix = sensitiveData.substring(0, sensitiveConfig.getPrefixLength());
-        String suffix = sensitiveData.substring(sensitiveData.length() - sensitiveConfig.getSuffixLength());
-        StringBuilder hidden = new StringBuilder();
-        int hiddenCount = sensitiveData.length() - sensitiveConfig.getPrefixLength() - sensitiveConfig.getSuffixLength();
-        do {
-            hidden.append("*");
-            hiddenCount--;
-        } while (hiddenCount > 0);
-        return prefix + hidden + suffix;
-    }
-
-    /**
      * <h2 class="en-US">Enumeration of String Type</h2>
      * <h2 class="zh-CN">字符串类型的枚举类</h2>
      */
     public enum StringType {
-        JSON, YAML, XML, SIMPLE, DEFAULT
+        JSON, YAML, XML, SIMPLE, SERIALIZABLE
     }
 
     /**
@@ -2835,14 +2906,7 @@ public final class StringUtils {
         }
 
         if (StringType.SIMPLE.equals(stringType)) {
-            try {
-                return ClassUtils.parseSimpleData(string, beanClass);
-            } catch (ParseException e) {
-                LOGGER.error("Parse_Simple_Data_Error");
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Stack_Message_Error", e);
-                }
-            }
+            return ClassUtils.parseSimpleData(string, beanClass);
         }
         String stringEncoding = (encoding == null) ? Globals.DEFAULT_ENCODING : encoding;
         try (InputStream inputStream = new ByteArrayInputStream(string.getBytes(stringEncoding))) {
@@ -3172,6 +3236,439 @@ public final class StringUtils {
         @Override
         public void setCertifiedText(boolean certifiedText) {
             this.certifiedText = certifiedText;
+        }
+    }
+
+    /**
+     * Writer for output CData string
+     */
+    private static final class CDataStreamWriter implements XMLStreamWriter {
+
+        private final XMLStreamWriter xmlStreamWriter;
+
+        /**
+         * Instantiates a new C data stream writer.
+         *
+         * @param xmlStreamWriter the xml stream writer
+         */
+        CDataStreamWriter(final XMLStreamWriter xmlStreamWriter) {
+            this.xmlStreamWriter = xmlStreamWriter;
+        }
+
+        /**
+         * Writes a start tag to the output.
+         * All writeStartElement methods open a new scope in the internal namespace context.
+         * Writing the corresponding EndElement causes the scope to be closed.
+         *
+         * @param localName the local name of the tag may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeStartElement(final String localName) throws XMLStreamException {
+            this.xmlStreamWriter.writeStartElement(localName);
+        }
+
+        /**
+         * Writes a start tag to the output
+         *
+         * @param namespaceURI the namespaceURI of the prefix to use, may not be null
+         * @param localName    the local name of the tag may not be null
+         * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
+         *                            javax.xml.stream.isRepairingNamespaces has not been set to true
+         */
+        @Override
+        public void writeStartElement(final String namespaceURI, final String localName) throws XMLStreamException {
+            this.xmlStreamWriter.writeStartElement(namespaceURI, localName);
+        }
+
+        /**
+         * Writes a start tag to the output
+         *
+         * @param prefix       the prefix of the tag may not be null
+         * @param localName    the local name of the tag may not be null
+         * @param namespaceURI the uri to bind the prefix to, may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeStartElement(final String prefix, final String localName, final String namespaceURI)
+                throws XMLStreamException {
+            this.xmlStreamWriter.writeStartElement(prefix, localName, namespaceURI);
+        }
+
+        /**
+         * Writes an empty element tag to the output
+         *
+         * @param namespaceURI the uri to bind the tag to, may not be null
+         * @param localName    the local name of the tag may not be null
+         * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
+         *                            javax.xml.stream.isRepairingNamespaces has not been set to true
+         */
+        @Override
+        public void writeEmptyElement(final String namespaceURI, final String localName) throws XMLStreamException {
+            this.xmlStreamWriter.writeEmptyElement(namespaceURI, localName);
+        }
+
+        /**
+         * Writes an empty element tag to the output
+         *
+         * @param prefix       the prefix of the tag may not be null
+         * @param localName    the local name of the tag may not be null
+         * @param namespaceURI the uri to bind the tag to, may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeEmptyElement(final String prefix, final String localName, final String namespaceURI)
+                throws XMLStreamException {
+            this.xmlStreamWriter.writeEmptyElement(prefix, localName, namespaceURI);
+        }
+
+        /**
+         * Writes an empty element tag to the output
+         *
+         * @param localName the local name of the tag may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeEmptyElement(final String localName) throws XMLStreamException {
+            this.xmlStreamWriter.writeEmptyElement(localName);
+        }
+
+        /**
+         * Writes an end tag to the output relying on the internal
+         * state of the writer to determine the prefix and local name
+         * of the event.
+         *
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeEndElement() throws XMLStreamException {
+            this.xmlStreamWriter.writeEndElement();
+        }
+
+        /**
+         * Closes any start tags and writes corresponding end tags.
+         *
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeEndDocument() throws XMLStreamException {
+            this.xmlStreamWriter.writeEndDocument();
+        }
+
+        /**
+         * Close this writer and free any resources associated with the writer.
+         * This must not close the underlying output stream.
+         *
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void close() throws XMLStreamException {
+            this.xmlStreamWriter.close();
+        }
+
+        /**
+         * Write any cached data to the underlying output mechanism.
+         *
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void flush() throws XMLStreamException {
+            this.xmlStreamWriter.flush();
+        }
+
+        /**
+         * Writes an attribute to the output stream without
+         * a prefix.
+         *
+         * @param localName the local name of the attribute
+         * @param value     the value of the attribute
+         * @throws IllegalStateException if the current state does not allow Attribute writing
+         * @throws XMLStreamException    if the namespace URI has not been bound to a prefix and
+         *                               javax.xml.stream.isRepairingNamespaces has not been set to true
+         */
+        @Override
+        public void writeAttribute(final String localName, final String value) throws XMLStreamException {
+            this.xmlStreamWriter.writeAttribute(localName, value);
+        }
+
+        /**
+         * Writes an attribute to the output stream
+         *
+         * @param prefix       the prefix for this attribute
+         * @param namespaceURI the uri of the prefix for this attribute
+         * @param localName    the local name of the attribute
+         * @param value        the value of the attribute
+         * @throws IllegalStateException if the current state does not allow Attribute writing
+         * @throws XMLStreamException    if the namespace URI has not been bound to a prefix and
+         *                               javax.xml.stream.isRepairingNamespaces has not been set to true
+         */
+        @Override
+        public void writeAttribute(final String prefix, final String namespaceURI,
+                                   final String localName, final String value) throws XMLStreamException {
+            this.xmlStreamWriter.writeAttribute(prefix, namespaceURI, localName, value);
+        }
+
+        /**
+         * Writes an attribute to the output stream
+         *
+         * @param namespaceURI the uri of the prefix for this attribute
+         * @param localName    the local name of the attribute
+         * @param value        the value of the attribute
+         * @throws IllegalStateException if the current state does not allow Attribute writing
+         * @throws XMLStreamException    if the namespace URI has not been bound to a prefix and
+         *                               javax.xml.stream.isRepairingNamespaces has not been set to true
+         */
+        @Override
+        public void writeAttribute(final String namespaceURI, final String localName, final String value)
+                throws XMLStreamException {
+            this.xmlStreamWriter.writeAttribute(namespaceURI, localName, value);
+        }
+
+        /**
+         * Writes a namespace to the output stream
+         * If the prefix argument to this method is the empty string,
+         * "xmlns" or null this method will delegate to writeDefaultNamespace
+         *
+         * @param prefix       the prefix to bind this namespace to
+         * @param namespaceURI the uri to bind the prefix to
+         * @throws IllegalStateException if the current state does not allow Namespace writing
+         * @throws XMLStreamException    XMLStreamException
+         */
+        @Override
+        public void writeNamespace(final String prefix, final String namespaceURI) throws XMLStreamException {
+            this.xmlStreamWriter.writeNamespace(prefix, namespaceURI);
+        }
+
+        /**
+         * Writes the default namespace to the stream
+         *
+         * @param namespaceURI the uri to bind the default namespace to
+         * @throws IllegalStateException if the current state does not allow Namespace writing
+         * @throws XMLStreamException    XMLStreamException
+         */
+        @Override
+        public void writeDefaultNamespace(final String namespaceURI) throws XMLStreamException {
+            this.xmlStreamWriter.writeDefaultNamespace(namespaceURI);
+        }
+
+        /**
+         * Writes a xml comment with the data enclosed
+         *
+         * @param data the data contained in the comment, may be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeComment(final String data) throws XMLStreamException {
+            this.xmlStreamWriter.writeComment(data);
+        }
+
+        /**
+         * Writes a processing instruction
+         *
+         * @param target the target of the processing instruction may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeProcessingInstruction(final String target) throws XMLStreamException {
+            this.xmlStreamWriter.writeProcessingInstruction(target);
+        }
+
+        /**
+         * Writes a processing instruction
+         *
+         * @param target the target of the processing instruction may not be null
+         * @param data   the data contained in the processing instruction, may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeProcessingInstruction(final String target, final String data) throws XMLStreamException {
+            this.xmlStreamWriter.writeProcessingInstruction(target, data);
+        }
+
+        /**
+         * Writes a CData section
+         *
+         * @param data the data contained in the CData Section, may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeCData(final String data) throws XMLStreamException {
+            this.xmlStreamWriter.writeCData(data);
+        }
+
+        /**
+         * Write a DTD section.
+         * This string represents the entire doc type decl production from the XML 1.0 specification.
+         *
+         * @param dtd the DTD to be written
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeDTD(final String dtd) throws XMLStreamException {
+            this.xmlStreamWriter.writeDTD(dtd);
+        }
+
+        /**
+         * Writes an entity reference
+         *
+         * @param name the name of the entity
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeEntityRef(final String name) throws XMLStreamException {
+            this.xmlStreamWriter.writeEntityRef(name);
+        }
+
+        /**
+         * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8
+         *
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeStartDocument() throws XMLStreamException {
+            this.xmlStreamWriter.writeStartDocument();
+        }
+
+        /**
+         * Write the XML Declaration. Defaults the XML version to 1.0
+         *
+         * @param version version of the xml document
+         * @throws XMLStreamException If given encoding does not match encoding
+         *                            of the underlying stream
+         */
+        @Override
+        public void writeStartDocument(final String version) throws XMLStreamException {
+            this.xmlStreamWriter.writeStartDocument(version);
+        }
+
+        /**
+         * Write the XML Declaration.
+         * Note that the encoding parameter does not set the actual encoding of the underlying output.
+         * That must be set when the instance of the XMLStreamWriter is created using the
+         * XMLOutputFactory
+         *
+         * @param encoding encoding of the xml declaration
+         * @param version  version of the xml document
+         * @throws XMLStreamException If given encoding does not match encoding
+         *                            of the underlying stream
+         */
+        @Override
+        public void writeStartDocument(final String encoding, final String version) throws XMLStreamException {
+            this.xmlStreamWriter.writeStartDocument(encoding, version);
+        }
+
+        /**
+         * Write text to the output
+         *
+         * @param text the value to write
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeCharacters(final String text) throws XMLStreamException {
+            if (text.startsWith(CDataAdapter.CDATA_BEGIN) && text.endsWith(CDataAdapter.CDATA_END)) {
+                this.writeCData(text.substring(CDataAdapter.CDATA_BEGIN.length(),
+                        text.length() - CDataAdapter.CDATA_END.length()));
+            } else {
+                this.xmlStreamWriter.writeCharacters(text);
+            }
+        }
+
+        /**
+         * Write text to the output
+         *
+         * @param text  the value to write
+         * @param start the starting position in the array
+         * @param len   the number of characters to write
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void writeCharacters(final char[] text, final int start, final int len) throws XMLStreamException {
+            this.writeCharacters(new String(text, start, len));
+        }
+
+        /**
+         * Gets the prefix the uri is bound to
+         *
+         * @param uri the uri to bind to the prefix
+         * @return the prefix or null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public String getPrefix(final String uri) throws XMLStreamException {
+            return this.xmlStreamWriter.getPrefix(uri);
+        }
+
+        /**
+         * Sets the prefix the uri is bound to.
+         * This prefix is bound in the scope of the current START_ELEMENT / END_ELEMENT pair.
+         * If this method is called before a START_ELEMENT has been written,
+         * the prefix is bound in the root scope.
+         *
+         * @param prefix the prefix to bind to the uri, may not be null
+         * @param uri    the uri to bind to the prefix, may be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void setPrefix(final String prefix, final String uri) throws XMLStreamException {
+            this.xmlStreamWriter.setPrefix(prefix, uri);
+        }
+
+        /**
+         * Binds a URI to the default namespace
+         * This URI is bound
+         * in the scope of the current START_ELEMENT / END_ELEMENT pair.
+         * If this method is called before a START_ELEMENT has been written,
+         * the uri is bound in the root scope.
+         *
+         * @param uri the uri to bind to the default namespace, may be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void setDefaultNamespace(final String uri) throws XMLStreamException {
+            this.xmlStreamWriter.setDefaultNamespace(uri);
+        }
+
+        /**
+         * Sets the current namespace context for prefix and uri bindings.
+         * This context becomes the root namespace context for writing and
+         * will replace the current root namespace context.
+         * Subsequent calls to setPrefix and setDefaultNamespace will bind namespaces using
+         * the context passed to the method as the root context for resolving namespaces.
+         * This method may only be called once at the start of the document.
+         * It does not cause the namespaces to be declared.
+         * If a namespace URI to prefix mapping is found in the namespace
+         * context, it is treated as declared and the prefix may be used
+         * by the StreamWriter.
+         *
+         * @param context the namespace context to use for this writer, may not be null
+         * @throws XMLStreamException XMLStreamException
+         */
+        @Override
+        public void setNamespaceContext(final NamespaceContext context) throws XMLStreamException {
+            this.xmlStreamWriter.setNamespaceContext(context);
+        }
+
+        /**
+         * Returns the current namespace context.
+         *
+         * @return the current NamespaceContext
+         */
+        @Override
+        public NamespaceContext getNamespaceContext() {
+            return this.xmlStreamWriter.getNamespaceContext();
+        }
+
+        /**
+         * Get the value of a feature/property from the underlying implementation
+         *
+         * @param name The name of the property may not be null
+         * @return The value of the property
+         * @throws IllegalArgumentException if the property is not supported
+         * @throws NullPointerException     if the name is null
+         */
+        @Override
+        public Object getProperty(final String name) throws IllegalArgumentException {
+            return this.xmlStreamWriter.getProperty(name);
         }
     }
 }

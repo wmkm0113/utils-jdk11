@@ -18,7 +18,7 @@ package org.nervousync.security.crypto;
 
 import org.nervousync.commons.Globals;
 import org.nervousync.security.api.SecureAdapter;
-import org.nervousync.security.config.CipherConfig;
+import org.nervousync.security.crypto.config.CipherConfig;
 import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;
 import org.nervousync.utils.SecurityUtils;

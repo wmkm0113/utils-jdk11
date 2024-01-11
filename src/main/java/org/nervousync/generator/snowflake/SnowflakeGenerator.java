@@ -16,7 +16,7 @@
  */
 package org.nervousync.generator.snowflake;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.commons.Globals;
 import org.nervousync.generator.IGenerator;
 import org.nervousync.utils.DateTimeUtils;
@@ -30,7 +30,7 @@ import org.nervousync.utils.LoggerUtils;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:44:27 $
  */
-@GeneratorProvider(IDUtils.SNOWFLAKE)
+@Provider(name = IDUtils.SNOWFLAKE, messageKey = "snowflake.id.generator.name")
 public final class SnowflakeGenerator implements IGenerator<Long> {
     /**
      * <span class="en-US">Logger instance</span>

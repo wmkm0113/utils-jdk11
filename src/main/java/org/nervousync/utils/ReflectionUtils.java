@@ -63,7 +63,7 @@ public final class ReflectionUtils {
             }
         }
 
-        if (fieldName != null) {
+        if (StringUtils.notBlank(fieldName)) {
             fieldName = StringUtils.uncapitalized(fieldName);
         }
 

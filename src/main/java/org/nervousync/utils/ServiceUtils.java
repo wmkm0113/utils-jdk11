@@ -26,10 +26,12 @@ import jakarta.ws.rs.core.Response;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.handler.HandlerResolver;
-import org.nervousync.annotations.restful.DataConverter;
-import org.nervousync.beans.converter.Adapter;
+import org.nervousync.annotations.beans.DataTransfer;
+import org.nervousync.beans.config.TransferConfig;
 import org.nervousync.commons.Globals;
 import org.nervousync.enumerations.web.HttpMethodOption;
+import org.nervousync.exceptions.beans.network.NetworkInfoException;
+import org.nervousync.exceptions.utils.DataInvalidException;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
@@ -44,7 +46,7 @@ import java.util.*;
 /**
  * <h2 class="en-US">Service utilities</h2>
  * <span class="en-US">
- *     <span>Current utilities implements features:</span>
+ * <span>Current utilities implements features:</span>
  *     <ul>Generate SOAP Client instance</ul>
  *     <ul>Generate Restful Client and process request</ul>
  * </span>
@@ -78,26 +80,50 @@ public final class ServiceUtils {
      *
      * @param <T>              <span class="en-US">End point interface</span>
      *                         <span class="zh-CN">Web服务的接口</span>
+     * @param serviceLocation  <span class="en-US">Web service location</span>
+     *                         <span class="zh-CN">Web服务地址</span>
+     * @param serviceInterface <span class="en-US">End point interface</span>
+     *                         <span class="zh-CN">Web服务的接口</span>
+     * @return <span class="en-US">Generated client instance</span>
+     * <span class="zh-CN">生成的客户端实例对象</span>
+     * @throws MalformedURLException <span class="en-US">if no protocol is specified, or an unknown protocol is found, or spec is null.</span>
+     *                               <span class="zh-CN">如果没有指定协议，或者发现未知协议，或者spec为空。</span>
+     */
+    public static <T> T SOAPClient(final String serviceLocation, final Class<T> serviceInterface)
+            throws MalformedURLException {
+        return SOAPClient(serviceLocation, serviceInterface, null);
+    }
+
+    /**
+     * <h3 class="en-US">Generate SOAP Client instance</h3>
+     * <h3 class="zh-CN">生成SOAP请求客户端</h3>
+     *
+     * @param <T>              <span class="en-US">End point interface</span>
+     *                         <span class="zh-CN">Web服务的接口</span>
+     * @param serviceLocation  <span class="en-US">Web service location</span>
+     *                         <span class="zh-CN">Web服务地址</span>
      * @param serviceInterface <span class="en-US">End point interface</span>
      *                         <span class="zh-CN">Web服务的接口</span>
      * @param handlerResolver  <span class="en-US">Custom handler resolver instance</span>
      *                         <span class="zh-CN">自定义的处理器实例对象</span>
      * @return <span class="en-US">Generated client instance</span>
      * <span class="zh-CN">生成的客户端实例对象</span>
-     * @throws MalformedURLException <span class="en-US">if no protocol is specified, or an unknown protocol is found, or spec is null.</span>
-     *                               <span class="zh-CN">如果没有指定协议，或者发现未知协议，或者spec为空。</span>
+     * @throws MalformedURLException <span class="en-US">if no service location, protocol is specified, or an unknown protocol is found, or spec is null.</span>
+     *                               <span class="zh-CN">如果没有指定服务地址、协议，或者发现未知协议，或者spec为空。</span>
      */
-    public static <T> T SOAPClient(final Class<T> serviceInterface, final HandlerResolver handlerResolver)
+    public static <T> T SOAPClient(final String serviceLocation, final Class<T> serviceInterface,
+                                   final HandlerResolver handlerResolver)
             throws MalformedURLException {
-        if (!serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
-            return null;
+        if (StringUtils.isEmpty(serviceLocation)
+                || !serviceInterface.isAnnotationPresent(WebServiceClient.class)) {
+            throw new MalformedURLException("Service location is empty or Annotation not found");
         }
 
         WebServiceClient serviceClient = serviceInterface.getAnnotation(WebServiceClient.class);
 
         String namespaceURI = serviceClient.targetNamespace();
         String serviceName = serviceClient.name();
-        URL wsdlLocation = new URL(serviceClient.wsdlLocation());
+        URL wsdlLocation = new URL(serviceLocation + Globals.DEFAULT_RESOURCE_SEPARATOR + serviceClient.wsdlLocation());
 
         if (namespaceURI.isEmpty()) {
             String packageName = serviceInterface.getPackage().getName();
@@ -134,8 +160,11 @@ public final class ServiceUtils {
      *                         <span class="zh-CN">Web服务的接口</span>
      * @return <span class="en-US">Generated client instance</span>
      * <span class="zh-CN">生成的客户端实例对象</span>
+     * @throws MalformedURLException <span class="en-US">if no service location.</span>
+     *                               <span class="zh-CN">如果没有指定服务地址。</span>
      */
-    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceInterface) {
+    public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceInterface)
+            throws MalformedURLException {
         return RestfulClient(targetAddress, serviceInterface, null);
     }
 
@@ -153,11 +182,13 @@ public final class ServiceUtils {
      *                         <span class="zh-CN">请求头部信息映射</span>
      * @return <span class="en-US">Generated client instance</span>
      * <span class="zh-CN">生成的客户端实例对象</span>
+     * @throws MalformedURLException <span class="en-US">if no service location.</span>
+     *                               <span class="zh-CN">如果没有指定服务地址。</span>
      */
     public static <T> T RestfulClient(final String targetAddress, final Class<T> serviceInterface,
-                                      final Map<String, String> headerMap) {
+                                      final Map<String, String> headerMap) throws MalformedURLException {
         if (StringUtils.isEmpty(targetAddress)) {
-            return null;
+            throw new MalformedURLException("Service location is empty");
         }
         String servicePath = targetAddress.toLowerCase().startsWith("http")
                 ? targetAddress
@@ -166,75 +197,6 @@ public final class ServiceUtils {
             servicePath += serviceInterface.getAnnotation(Path.class).value();
         }
         return ObjectUtils.newInstance(serviceInterface, new RestfulInterceptor(servicePath, headerMap));
-    }
-
-    /**
-     * <h3 class="en-US">Find annotation and generate data convert adapter</h3>
-     * <h3 class="zh-CN">寻找注解并生成数据转换适配器</h3>
-     *
-     * @param annotations <span class="en-US">Annotation instance array</span>
-     *                    <span class="zh-CN">注解实例对象数组</span>
-     * @return <span class="en-US">Generated data convert adapter</span>
-     * <span class="zh-CN">生成的数据转换适配器实例对象</span>
-     */
-    private static Adapter<String, Object> newConverter(final Annotation[] annotations) {
-        Adapter<String, Object> adapter = null;
-        for (Annotation annotation : annotations) {
-            if (annotation.annotationType().equals(DataConverter.class)) {
-                adapter = newConverter((DataConverter) annotation);
-            }
-            if (adapter != null) {
-                break;
-            }
-        }
-        return adapter;
-    }
-
-    /**
-     * <h3 class="en-US">Find annotation and generate data convert adapter</h3>
-     * <h3 class="zh-CN">寻找注解并生成数据转换适配器</h3>
-     *
-     * @param dataConverter <span class="en-US">DataConverter annotation instance</span>
-     *                      <span class="zh-CN">数据转换器注解实例对象</span>
-     * @return <span class="en-US">Generated data convert adapter</span>
-     * <span class="zh-CN">生成的数据转换适配器实例对象</span>
-     */
-    @SuppressWarnings("unchecked")
-    private static Adapter<String, Object> newConverter(final DataConverter dataConverter) {
-        return Optional.ofNullable(dataConverter)
-                .map(DataConverter::value)
-                .filter(converterClass ->
-                        Adapter.class.isAssignableFrom(converterClass) && !Adapter.class.equals(converterClass))
-                .map(converterClass -> (Adapter<String, Object>) ObjectUtils.newInstance(converterClass))
-                .orElse(null);
-    }
-
-    /**
-     * <h3 class="en-US">Marshal data using given adapter</h3>
-     * <h3 class="zh-CN">使用给定适配器编组数据</h3>
-     *
-     * @param adapter <span class="en-US">Data convert adapter</span>
-     *                <span class="zh-CN">数据转换适配器实例对象</span>
-     * @param value   <span class="en-US">Data instance will convert</span>
-     *                <span class="zh-CN">将被转换的数据实例对象</span>
-     * @return <span class="en-US">Converted result or empty string if value is <code>null</code> or an error occurs when process marshal</span>
-     * <span class="zh-CN">数据转换结果，如果输入数据为<code>null</code>或转换时出现异常，则返回长度为0的空字符串</span>
-     */
-    private static String marshal(final Adapter<String, Object> adapter, final Object value) {
-        if (value == null) {
-            return Globals.DEFAULT_VALUE_STRING;
-        }
-        if (adapter == null) {
-            return value.toString();
-        }
-        try {
-            return adapter.marshal(value);
-        } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.error("Convert_Object_Error", e);
-            }
-            return Globals.DEFAULT_VALUE_STRING;
-        }
     }
 
     /**
@@ -290,16 +252,9 @@ public final class ServiceUtils {
             }
         }
 
-        /**
-         * (Non-Javadoc)
-         *
-         * @see InvocationHandler#invoke(Object, Method, Object[])
-         */
-        @Override
-        public Object invoke(final Object o, final Method method, final Object[] objects) throws Throwable {
-            HttpMethodOption methodOption = RequestUtils.httpMethodOption(method);
-            if (HttpMethodOption.UNKNOWN.equals(methodOption) || !method.isAnnotationPresent(Path.class)) {
-                throw new Exception("Unknown method! ");
+        private String servicePath(final Method method) throws NetworkInfoException {
+            if (!method.isAnnotationPresent(Path.class)) {
+                throw new NetworkInfoException(0x0000001A0004L, "Unknown_Path_Restful_Service_Method");
             }
 
             String methodName = method.getAnnotation(Path.class).value();
@@ -308,8 +263,21 @@ public final class ServiceUtils {
             } else if (methodName.startsWith("/")) {
                 methodName = methodName.substring(1);
             }
+            return this.requestPath + "/" + methodName;
+        }
 
-            String servicePath = this.requestPath + "/" + methodName;
+        /**
+         * (Non-Javadoc)
+         *
+         * @see InvocationHandler#invoke(Object, Method, Object[])
+         */
+        @Override
+        public Object invoke(final Object o, final Method method, final Object[] objects) throws Throwable {
+            HttpMethodOption methodOption = RequestUtils.httpMethodOption(method);
+            if (HttpMethodOption.UNKNOWN.equals(methodOption)) {
+                throw new NetworkInfoException(0x0000001A0003L, "Unknown_Http_Method");
+            }
+            String servicePath = this.servicePath(method);
 
             Annotation[][] annotations = method.getParameterAnnotations();
             Class<?>[] parameterClasses = method.getParameterTypes();
@@ -331,10 +299,21 @@ public final class ServiceUtils {
                 if (paramObj == null) {
                     continue;
                 }
-                Adapter<String, Object> dataConverter = newConverter(annotations[i]);
+                TransferConfig<Object, Object> transferConfig =
+                        Arrays.stream(annotations[i])
+                                .filter(annotation -> annotation.annotationType().equals(DataTransfer.class))
+                                .findFirst()
+                                .map(annotation -> {
+                                    try {
+                                        return new TransferConfig<>((DataTransfer) annotation);
+                                    } catch (DataInvalidException e) {
+                                        return null;
+                                    }
+                                })
+                                .orElse(new TransferConfig<>(null));
                 if (Arrays.stream(annotations[i])
                         .anyMatch(annotation -> annotation.annotationType().equals(BeanParam.class))) {
-                    BeanParameter beanParameter = new BeanParameter(paramObj, mediaTypes, dataConverter);
+                    BeanParameter beanParameter = new BeanParameter(paramObj, mediaTypes, transferConfig);
                     this.headerMap.putAll(beanParameter.getHeaders());
                     for (Map.Entry<String, String> entry : beanParameter.getPaths().entrySet()) {
                         if (StringUtils.isEmpty(entry.getKey()) || entry.getValue() == null) {
@@ -358,27 +337,27 @@ public final class ServiceUtils {
                             .ifPresent(paramName -> {
                                 if (paramObj.getClass().isArray()) {
                                     Arrays.asList((Object[]) paramObj).forEach(itemValue -> {
-                                        String paramValue = marshal(dataConverter, itemValue);
+                                        String paramValue = (String) transferConfig.convert(itemValue);
                                         matrixParameters.put(paramName,
                                                 appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                         paramValue));
                                     });
                                 } else if (List.class.isAssignableFrom(paramObj.getClass())) {
                                     ((List<?>) paramObj).forEach(itemValue -> {
-                                        String paramValue = marshal(dataConverter, itemValue);
+                                        String paramValue = (String) transferConfig.convert(itemValue);
                                         matrixParameters.put(paramName,
                                                 appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                         paramValue));
                                     });
                                 } else {
-                                    String paramValue = marshal(dataConverter, paramObj);
+                                    String paramValue = (String) transferConfig.convert(paramObj);
                                     matrixParameters.put(paramName,
                                             appendValue(matrixParameters.getOrDefault(paramName, new String[0]),
                                                     paramValue));
                                 }
                             });
                 } else {
-                    String paramValue = marshal(dataConverter, paramObj);
+                    String paramValue = (String) transferConfig.convert(paramObj);
                     if (Arrays.stream(annotations[i])
                             .anyMatch(annotation -> annotation.annotationType().equals(QueryParam.class))) {
                         String paramName =
@@ -672,26 +651,26 @@ public final class ServiceUtils {
          * <h3 class="en-US">Constructor for BeanParameter</h3>
          * <h3 class="zh-CN">BeanParameter的构造方法</h3>
          *
-         * @param beanObject <span class="en-US">JavaBean parameter instance</span>
-         *                   <span class="zh-CN">JavaBean参数信息实例对象</span>
-         * @param mediaTypes <span class="en-US">Request media types array</span>
-         *                   <span class="zh-CN">请求数据类型数组</span>
-         * @param adapter    <span class="en-US">Data convert adapter</span>
-         *                   <span class="zh-CN">数据转换适配器实例对象</span>
+         * @param beanObject     <span class="en-US">JavaBean parameter instance</span>
+         *                       <span class="zh-CN">JavaBean参数信息实例对象</span>
+         * @param mediaTypes     <span class="en-US">Request media types array</span>
+         *                       <span class="zh-CN">请求数据类型数组</span>
+         * @param transferConfig <span class="en-US">Data transfer configure</span>
+         *                       <span class="zh-CN">数据转换配置信息</span>
          */
-        BeanParameter(final Object beanObject, final String[] mediaTypes, final Adapter<String, Object> adapter) {
+        BeanParameter(final Object beanObject, final String[] mediaTypes,
+                      final TransferConfig<Object, Object> transferConfig) {
             ReflectionUtils.getAllDeclaredFields(beanObject.getClass(), Boolean.TRUE).forEach(field -> {
                 Object fieldValue = ReflectionUtils.getFieldValue(field, beanObject);
                 if (field.isAnnotationPresent(BeanParam.class)) {
-                    BeanParameter beanParameter = new BeanParameter(fieldValue, mediaTypes, adapter);
+                    BeanParameter beanParameter = new BeanParameter(fieldValue, mediaTypes, transferConfig);
                     this.formParameters.putAll(beanParameter.getFormParameters());
                     this.queryParameters.putAll(beanParameter.getQueryParameters());
                     this.matrixParameters.putAll(beanParameter.getMatrixParameters());
                     this.headers.putAll(beanParameter.getHeaders());
                     this.paths.putAll(beanParameter.getPaths());
                 } else {
-                    String stringValue = marshal(adapter, fieldValue);
-
+                    String stringValue = (String) transferConfig.convert(fieldValue);
                     if (field.isAnnotationPresent(QueryParam.class)) {
                         this.queryParameters.put(field.getAnnotation(QueryParam.class).value(), stringValue);
                     } else if (field.isAnnotationPresent(FormParam.class)) {

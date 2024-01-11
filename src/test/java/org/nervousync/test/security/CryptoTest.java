@@ -2,8 +2,8 @@ package org.nervousync.test.security;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.nervousync.security.api.SecureAdapter;
 import org.nervousync.exceptions.crypto.CryptoException;
+import org.nervousync.security.api.SecureAdapter;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.*;
 
@@ -204,6 +204,12 @@ public final class CryptoTest extends BaseTest {
     public void RC2() throws CryptoException {
         byte[] rc2Key = SecurityUtils.RC2Key();
         this.logger.info("Crypto_Key_Length", "RC2", StringUtils.base64Encode(rc2Key));
+        SecureAdapter encAdaptor = SecurityUtils.RC2Encryptor(rc2Key);
+        String defaultResult = StringUtils.base64Encode(encAdaptor.finish(ORIGINAL_STRING));
+        this.logger.info("Encrypt_Result", "RC2", "CBC", "PKCS7Padding", defaultResult);
+        SecureAdapter decAdaptor = SecurityUtils.RC2Decryptor(rc2Key);
+        this.logger.info("Decrypt_Result", "RC2", "CBC", "PKCS7Padding",
+                new String(decAdaptor.finish(StringUtils.base64Decode(defaultResult)), StandardCharsets.UTF_8));
         for (String cipherMode : RC_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
                 SecureAdapter encryptProvider = SecurityUtils.RC2Encryptor(cipherMode, padding, rc2Key);
@@ -223,23 +229,75 @@ public final class CryptoTest extends BaseTest {
         this.logger.info("Crypto_Key_Length", "RC4", StringUtils.base64Encode(rc4Key));
         SecureAdapter encryptProvider = SecurityUtils.RC4Encryptor(rc4Key);
         String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-        this.logger.info("Encrypt_Result", "RC4", encResult);
+        this.logger.info("Encrypt_Result", "RC4", "", "", encResult);
         SecureAdapter decryptProvider = SecurityUtils.RC4Decryptor(rc4Key);
-        this.logger.info("Decrypt_Result", "RC4",
+        this.logger.info("Decrypt_Result", "RC4", "", "",
                 new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
     }
 
     @Test
     @Order(80)
+    public void RC5() throws CryptoException {
+        byte[] rc5Key = SecurityUtils.RC5Key();
+        this.logger.info("Crypto_Key_Length", "RC5", StringUtils.base64Encode(rc5Key));
+        SecureAdapter encAdaptor = SecurityUtils.RC5Encryptor(rc5Key);
+        String defaultResult = StringUtils.base64Encode(encAdaptor.finish(ORIGINAL_STRING));
+        this.logger.info("Encrypt_Result", "RC5", "CBC", "PKCS5Padding", defaultResult);
+        SecureAdapter decAdaptor = SecurityUtils.RC5Decryptor(rc5Key);
+        this.logger.info("Decrypt_Result", "RC5", "CBC", "PKCS5Padding",
+                new String(decAdaptor.finish(StringUtils.base64Decode(defaultResult)), StandardCharsets.UTF_8));
+        for (String cipherMode : RC_CIPHER_MODES) {
+            for (String padding : DEFAULT_PADDINGS) {
+                SecureAdapter encryptProvider = SecurityUtils.RC5Encryptor(cipherMode, padding, rc5Key);
+                String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
+                this.logger.info("Encrypt_Result", "RC5", cipherMode, padding, encResult);
+                SecureAdapter decryptProvider = SecurityUtils.RC5Decryptor(cipherMode, padding, rc5Key);
+                this.logger.info("Decrypt_Result", "RC5", cipherMode, padding,
+                        new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
+            }
+        }
+    }
+
+    @Test
+    @Order(90)
+    public void RC6() throws CryptoException {
+        byte[] rc6Key = SecurityUtils.RC6Key();
+        this.logger.info("Crypto_Key_Length", "RC6", StringUtils.base64Encode(rc6Key));
+        SecureAdapter encAdaptor = SecurityUtils.RC6Encryptor(rc6Key);
+        String defaultResult = StringUtils.base64Encode(encAdaptor.finish(ORIGINAL_STRING));
+        this.logger.info("Encrypt_Result", "RC6", "CBC", "PKCS5Padding", defaultResult);
+        SecureAdapter decAdaptor = SecurityUtils.RC6Decryptor(rc6Key);
+        this.logger.info("Decrypt_Result", "RC6", "CBC", "PKCS5Padding",
+                new String(decAdaptor.finish(StringUtils.base64Decode(defaultResult)), StandardCharsets.UTF_8));
+        for (String cipherMode : RC_CIPHER_MODES) {
+            for (String padding : DEFAULT_PADDINGS) {
+                SecureAdapter encryptProvider = SecurityUtils.RC6Encryptor(cipherMode, padding, rc6Key);
+                String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
+                this.logger.info("Encrypt_Result", "RC6", cipherMode, padding, encResult);
+                SecureAdapter decryptProvider = SecurityUtils.RC6Decryptor(cipherMode, padding, rc6Key);
+                this.logger.info("Decrypt_Result", "RC6", cipherMode, padding,
+                        new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
+            }
+        }
+    }
+
+    @Test
+    @Order(100)
     public void Blowfish() throws CryptoException {
         byte[] blowfishKey = SecurityUtils.BlowfishKey();
         this.logger.info("Crypto_Key_Length", "Blowfish", StringUtils.base64Encode(blowfishKey));
+        SecureAdapter encAdaptor = SecurityUtils.BlowfishEncryptor(blowfishKey);
+        String defaultResult = StringUtils.base64Encode(encAdaptor.finish(ORIGINAL_STRING));
+        this.logger.info("Encrypt_Result", "Blowfish", "CBC", "PKCS7Padding", defaultResult);
+        SecureAdapter decAdaptor = SecurityUtils.BlowfishDecryptor(blowfishKey);
+        this.logger.info("Decrypt_Result", "Blowfish", "CBC", "PKCS7Padding",
+                new String(decAdaptor.finish(StringUtils.base64Decode(defaultResult)), StandardCharsets.UTF_8));
         for (String cipherMode : RC_CIPHER_MODES) {
             for (String padding : DEFAULT_PADDINGS) {
-                SecureAdapter encryptProvider = SecurityUtils.RC2Encryptor(cipherMode, padding, blowfishKey);
+                SecureAdapter encryptProvider = SecurityUtils.BlowfishEncryptor(cipherMode, padding, blowfishKey);
                 String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
                 this.logger.info("Encrypt_Result", "Blowfish", cipherMode, padding, encResult);
-                SecureAdapter decryptProvider = SecurityUtils.RC2Decryptor(cipherMode, padding, blowfishKey);
+                SecureAdapter decryptProvider = SecurityUtils.BlowfishDecryptor(cipherMode, padding, blowfishKey);
                 this.logger.info("Decrypt_Result", "Blowfish", cipherMode, padding,
                         new String(decryptProvider.finish(StringUtils.base64Decode(encResult)), StandardCharsets.UTF_8));
             }

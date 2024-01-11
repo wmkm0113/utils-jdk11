@@ -25,7 +25,7 @@ import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
-import org.nervousync.beans.ip.path.TargetPath;
+import org.nervousync.beans.path.TargetPath;
 import org.nervousync.beans.xml.files.SegmentationBlock;
 import org.nervousync.beans.xml.files.SegmentationInfo;
 import org.nervousync.commons.Globals;

@@ -55,7 +55,6 @@ import org.nervousync.mail.operator.SendOperator;
 import org.nervousync.mail.protocol.impl.IMAPProtocol;
 import org.nervousync.mail.protocol.impl.POP3Protocol;
 import org.nervousync.mail.protocol.impl.SMTPProtocol;
-import org.nervousync.security.factory.SecureFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -184,14 +183,14 @@ public final class MailUtils {
          */
         private Agent(final MailConfig mailConfig) {
             this.userName = mailConfig.getUserName().toLowerCase();
-            this.passWord = SecureFactory.decrypt(mailConfig.getSecureName(), mailConfig.getPassword());
+            this.passWord = mailConfig.getPassword();
             if (mailConfig.getSendConfig() == null
                     || !MailProtocol.SMTP.equals(mailConfig.getSendConfig().getProtocolOption())) {
                 this.sendConfig = null;
                 this.sendOperator = null;
             } else {
                 this.sendConfig = mailConfig.getSendConfig();
-                this.sendOperator = new SMTPProtocol(mailConfig.getSecureName(), mailConfig.getProxyConfig());
+                this.sendOperator = new SMTPProtocol(mailConfig.getProxyConfig());
             }
             if (mailConfig.getReceiveConfig() == null) {
                 this.receiveConfig = null;
@@ -200,10 +199,10 @@ public final class MailUtils {
                 this.receiveConfig = mailConfig.getReceiveConfig();
                 switch (this.receiveConfig.getProtocolOption()) {
                     case IMAP:
-                        this.receiveOperator = new IMAPProtocol(mailConfig.getSecureName(), mailConfig.getProxyConfig());
+                        this.receiveOperator = new IMAPProtocol(mailConfig.getProxyConfig());
                         break;
                     case POP3:
-                        this.receiveOperator = new POP3Protocol(mailConfig.getSecureName(), mailConfig.getProxyConfig());
+                        this.receiveOperator = new POP3Protocol(mailConfig.getProxyConfig());
                         break;
                     default:
                         this.receiveOperator = null;

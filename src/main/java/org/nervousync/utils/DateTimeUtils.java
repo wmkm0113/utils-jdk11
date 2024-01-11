@@ -125,10 +125,8 @@ public final class DateTimeUtils {
      *               <span class="zh-CN">格式化的日期时间字符串</span>
      * @return <span class="en-US">date instance</span>
      * <span class="zh-CN">日期实例对象</span>
-     * @throws ParseException <span class="en-US">If parameter string is null or empty string</span>
-     *                        <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
      */
-    public static Date parseSiteMapDate(final String string) throws ParseException {
+    public static Date parseSiteMapDate(final String string) {
         return parseDate(string, DEFAULT_DATETIME_PATTERN_ISO8601 + DateTimeUtils.getTimeZone());
     }
 
@@ -168,10 +166,8 @@ public final class DateTimeUtils {
      *               <span class="zh-CN">格式化的日期时间字符串</span>
      * @return <span class="en-US">date instance</span>
      * <span class="zh-CN">日期实例对象</span>
-     * @throws ParseException <span class="en-US">If parameter string is null or empty string</span>
-     *                        <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
      */
-    public static Date parseGMTDate(final String string) throws ParseException {
+    public static Date parseGMTDate(final String string) {
         return parseDate(string, COOKIE_DATETIME_PATTERN);
     }
 
@@ -185,16 +181,31 @@ public final class DateTimeUtils {
      *               <span class="zh-CN">日期时间格式</span>
      * @return <span class="en-US">date instance</span>
      * <span class="zh-CN">日期实例对象</span>
-     * @throws ParseException <span class="en-US">If parameter string is null or empty string</span>
-     *                        <span class="zh-CN">如果格式化的日期时间字符串为null或者为空字符串</span>
      */
-    public static Date parseDate(final String string, final String format) throws ParseException {
-        if (string == null || string.isEmpty()) {
-            throw new ParseException("Date string is null", 0);
+    public static Date parseDate(final String string, final String format) {
+        if (StringUtils.isEmpty(string)) {
+            return null;
         }
         String datetimeFormat = StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format;
         return Date.from(LocalDate.parse(string, DateTimeFormatter.ofPattern(datetimeFormat))
                 .atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * <h3 class="en-US">Converts the given UTC timestamp to local time</h3>
+     * <h3 class="zh-CN">转换给定的UTC时间戳为本地时间</h3>
+     *
+     * @param utcTime <span class="en-US">UTC timestamp (unit: milliseconds)</span>
+     *                <span class="zh-CN">UTC时间戳（单位：毫秒）</span>
+     * @return <span class="en-US">Converted LocalDateTime instance</span>
+     * <span class="zh-CN">转换后的本地日期时间实例对象</span>
+     */
+    public static LocalDateTime utcToLocal(final long utcTime) {
+        if (utcTime < 0L) {
+            return null;
+        }
+        TimeZone timeZone = Calendar.getInstance().getTimeZone();
+        return Instant.ofEpochMilli(utcTime + timeZone.getRawOffset()).atZone(timeZone.toZoneId()).toLocalDateTime();
     }
 
     /**

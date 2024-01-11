@@ -17,6 +17,7 @@
 package org.nervousync.commons;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Locale;
 
 /**
@@ -42,6 +43,11 @@ public final class Globals {
 	 * <span class="zh-CN">文件读取的默认缓冲区大小</span>
 	 */
 	public static final int READ_FILE_BUFFER_SIZE = 32768;
+	/**
+	 * <span class="en-US">Default traversal step value</span>
+	 * <span class="zh-CN">默认遍历步进值</span>
+	 */
+	public static final int DEFAULT_STEP_VALUE = 1;
 	/**
 	 * <span class="en-US">Default value of timeout</span>
 	 * <span class="zh-CN">默认超时时间</span>
@@ -82,6 +88,36 @@ public final class Globals {
 	 * <span class="zh-CN">默认起始时间戳值，用于雪花算法ID生成器</span>
 	 */
 	public static final long DEFAULT_REFERENCE_TIME = 1303315200000L;
+	/**
+	 * <span class="en-US">Default value of boolean value FALSE to int</span>
+	 * <span class="zh-CN">默认的布尔值FALSE，用int表示</span>
+	 */
+	public static final int DEFAULT_STATUS_FALSE = 0;
+	/**
+	 * <span class="en-US">Default value of boolean value TRUE to int</span>
+	 * <span class="zh-CN">默认的布尔值TRUE，用int表示</span>
+	 */
+	public static final int DEFAULT_STATUS_TRUE = 1;
+	/**
+	 * <span class="en-US">Initialize value of primitive type int</span>
+	 * <span class="zh-CN">int类型的初始值</span>
+	 */
+	public static final int INITIALIZE_INT_VALUE = 0;
+	/**
+	 * <span class="en-US">Default scheduled task delay</span>
+	 * <span class="zh-CN">默认的调度任务延时</span>
+	 */
+	public static final long DEFAULT_SCHEDULE_DELAY = 0L;
+	/**
+	 * <span class="en-US">Default scheduled task interval(Unit: millisecond)</span>
+	 * <span class="zh-CN">默认的调度任务间隔（单位：毫秒）</span>
+	 */
+	public static final long DEFAULT_SCHEDULE_PERIOD = 5 * 60 * 1000L;
+	/**
+	 * <span class="en-US">Default value for XML annotations</span>
+	 * <span class="zh-CN">XML注解的默认值</span>
+	 */
+	public static final String DEFAULT_XML_ANNOTATION_NAME = "##default";
 	/**
 	 * <span class="en-US">The constant value of SAMBA protocol prefix</span>
 	 * <span class="zh-CN">Samba协议的起始前缀值</span>
@@ -156,7 +192,7 @@ public final class Globals {
 	 * <span class="en-US">The constant value of current system character encoding</span>
 	 * <span class="zh-CN">当前系统的默认字符集编码</span>
 	 */
-	public static final String DEFAULT_SYSTEM_CHARSET = System.getProperty("file.encoding");
+	public static final String DEFAULT_SYSTEM_CHARSET = Charset.defaultCharset().displayName();
 	/**
 	 * <span class="en-US">The constant value of default split separator</span>
 	 * <span class="zh-CN">默认的分割字符</span>
@@ -238,21 +274,6 @@ public final class Globals {
 	 * <span class="zh-CN">默认的日志文件路径</span>
 	 */
 	public static final String DEFAULT_LOG_FILE_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "nervousync-log.log";
-	/**
-	 * <span class="en-US">Default value of boolean value FALSE to int</span>
-	 * <span class="zh-CN">默认的布尔值FALSE，用int表示</span>
-	 */
-	public static final int DEFAULT_STATUS_FALSE = 0;
-	/**
-	 * <span class="en-US">Default value of boolean value TRUE to int</span>
-	 * <span class="zh-CN">默认的布尔值TRUE，用int表示</span>
-	 */
-	public static final int DEFAULT_STATUS_TRUE = 1;
-	/**
-	 * <span class="en-US">Initialize value of primitive type int</span>
-	 * <span class="zh-CN">int类型的初始值</span>
-	 */
-	public static final int INITIALIZE_INT_VALUE = 0;
 	/*
 	 * Header signatures
 	 */

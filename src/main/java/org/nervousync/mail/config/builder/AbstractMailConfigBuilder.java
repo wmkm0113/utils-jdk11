@@ -24,8 +24,6 @@ import org.nervousync.proxy.ProxyConfig;
 import org.nervousync.enumerations.mail.MailProtocol;
 import org.nervousync.exceptions.builder.BuilderException;
 import org.nervousync.mail.config.MailConfig;
-import org.nervousync.security.factory.SecureConfig;
-import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.StringUtils;
 
@@ -69,76 +67,6 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         this.mailConfig = (mailConfig == null) ? new MailConfig() : mailConfig;
     }
     /**
-     * <h3 class="en-US">Configure secure name</h3>
-     * <span class="en-US">Builder will decrypt (if current configure contains secure name) and encrypt (using new secure name) password automatically</span>
-     * <h3 class="zh-CN">设置安全名称</h3>
-     * <span class="en-US">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全名称）密码信息</span>
-     *
-     * @param secureName    <span class="en-US">New secure name</span>
-     *                      <span class="zh-CN">新的安全名称</span>
-     *
-     * @return  <span class="en-US">Current builder instance</span>
-     *          <span class="zh-CN">当前构造器实例对象</span>
-     */
-    public AbstractMailConfigBuilder<T> secureName(final String secureName) {
-        if (StringUtils.notBlank(secureName) && SecureFactory.registeredConfig(secureName)) {
-            if (StringUtils.notBlank(this.mailConfig.getPassword())) {
-                String newPassword =
-                        SecureFactory.update(this.mailConfig.getPassword(), this.mailConfig.getSecureName(), secureName);
-                this.mailConfig.setPassword(newPassword);
-            }
-            Optional.ofNullable(this.mailConfig.getProxyConfig())
-                    .filter(proxyConfig -> StringUtils.notBlank(proxyConfig.getPassword()))
-                    .ifPresent(proxyConfig -> {
-                        String newPassword = SecureFactory.update(proxyConfig.getPassword(),
-                                this.mailConfig.getSecureName(), secureName);
-                        proxyConfig.setPassword(newPassword);
-                        this.mailConfig.setProxyConfig(proxyConfig);
-                    });
-            this.mailConfig.setSecureName(secureName);
-        }
-        return this;
-    }
-    /**
-     * <h3 class="en-US">Configure custom secure config</h3>
-     * <span class="en-US">
-     *     Builder will decrypt (if current configure contains secure name or secure config)
-     *     and encrypt (using new secure config) password automatically
-     * </span>
-     * <h3 class="zh-CN">设置安全名称</h3>
-     * <span class="en-US">构造器会解密（如果当前配置信息中包含安全名称）并加密（使用新的安全配置）密码信息</span>
-     *
-     * @param secureName    <span class="en-US">New secure name</span>
-     *                      <span class="zh-CN">新的安全名称</span>
-     * @param secureConfig  <span class="en-US">Custom secure config</span>
-     *                      <span class="zh-CN">新的安全配置</span>
-     *
-     * @return  <span class="en-US">Current builder instance</span>
-     *          <span class="zh-CN">当前构造器实例对象</span>
-     */
-    public AbstractMailConfigBuilder<T> secureConfig(final String secureName, final SecureConfig secureConfig) {
-        if (StringUtils.notBlank(secureName) && secureConfig != null) {
-            if (StringUtils.notBlank(this.mailConfig.getPassword())) {
-                String newPassword;
-                if (SecureFactory.registeredConfig(secureName)) {
-                    SecureFactory.register(Globals.DEFAULT_TEMPORARY_SECURE_NAME, secureConfig);
-                    newPassword = SecureFactory.update(this.mailConfig.getPassword(), this.mailConfig.getSecureName(),
-                            Globals.DEFAULT_TEMPORARY_SECURE_NAME);
-                    SecureFactory.deregister(Globals.DEFAULT_TEMPORARY_SECURE_NAME);
-                    SecureFactory.register(secureName, secureConfig);
-                } else {
-                    SecureFactory.register(secureName, secureConfig);
-                    newPassword = SecureFactory.update(this.mailConfig.getPassword(), this.mailConfig.getSecureName(),
-                            secureName);
-                }
-                this.mailConfig.setPassword(newPassword);
-            }
-            this.mailConfig.setSecureName(secureName);
-            this.mailConfig.setSecureConfig(secureConfig);
-        }
-        return this;
-    }
-    /**
      * <h3 class="en-US">Configure authenticate information</h3>
      * <h3 class="zh-CN">设置身份认证信息</h3>
      *
@@ -159,17 +87,8 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
         if (!StringUtils.matches(userName, RegexGlobals.EMAIL_ADDRESS)) {
             throw new BuilderException(0x0000000E0001L, "Username_Invalid_Mail_Error");
         }
-        String encPassword = Globals.DEFAULT_VALUE_STRING;
-        if (StringUtils.notBlank(password)) {
-            if (StringUtils.notBlank(this.mailConfig.getSecureName())
-                    && SecureFactory.registeredConfig(this.mailConfig.getSecureName())) {
-                encPassword = SecureFactory.encrypt(this.mailConfig.getSecureName(), password);
-            } else {
-                encPassword = password;
-            }
-        }
         this.mailConfig.setUserName(userName);
-        this.mailConfig.setPassword(encPassword);
+        this.mailConfig.setPassword(password);
         return this;
     }
     /**
@@ -180,7 +99,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      *          <span class="zh-CN">代理服务器配置构建器实例对象</span>
      */
     public ProxyConfigBuilder<T> proxyConfig() {
-        return new ProxyConfigBuilder<>(this, this.mailConfig.getSecureName(), this.mailConfig.getProxyConfig());
+        return new ProxyConfigBuilder<>(this, this.mailConfig.getProxyConfig());
     }
     /**
      * <h3 class="en-US">Using current send server configure information to create ServerConfigBuilder instance</h3>
@@ -290,14 +209,11 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
          *
          * @param parentBuilder     <span class="en-US">Mail configure builder instance</span>
          *                          <span class="zh-CN">电子邮件配置构造器实例</span>
-         * @param secureName        <span class="en-US">New secure name</span>
-         *                          <span class="zh-CN">新的安全名称</span>
          * @param proxyConfig       <span class="en-US">Proxy configure information</span>
          *                          <span class="zh-CN">代理服务器配置信息</span>
          */
-        private ProxyConfigBuilder(final AbstractMailConfigBuilder<T> parentBuilder, final String secureName,
-                                   final ProxyConfig proxyConfig) {
-            super(parentBuilder, secureName, proxyConfig);
+        private ProxyConfigBuilder(final AbstractMailConfigBuilder<T> parentBuilder, final ProxyConfig proxyConfig) {
+            super(parentBuilder, proxyConfig);
         }
         /**
          * <h2 class="en-US">Confirm current configure information</h2>

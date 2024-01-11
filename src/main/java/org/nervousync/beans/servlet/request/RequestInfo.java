@@ -291,7 +291,7 @@ public final class RequestInfo {
          *                          <span class="zh-CN">RequestBuilder实例对象</span>
          */
         private RequestProxyBuilder(@Nonnull final RequestBuilder requestBuilder) {
-            super(requestBuilder, Globals.DEFAULT_VALUE_STRING, requestBuilder.proxyConfig);
+            super(requestBuilder, requestBuilder.proxyConfig);
         }
         /**
          * <h3 class="en-US">Confirm proxy configure</h3>

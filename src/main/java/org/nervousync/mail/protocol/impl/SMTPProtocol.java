@@ -36,13 +36,11 @@ public final class SMTPProtocol extends BaseProtocol implements SendOperator {
      * <h3 class="en-US">Constructor method for SMTPProtocol</h3>
      * <h3 class="zh-CN">SMTPProtocol构造方法</h3>
      *
-     * @param secureName    <span class="en-US">Secure config name</span>
-     *                      <span class="zh-CN">安全配置名称</span>
      * @param proxyConfig   <span class="en-US">Proxy configure information</span>
      *                      <span class="zh-CN">代理服务器配置信息</span>
      */
-	public SMTPProtocol(final String secureName, final ProxyConfig proxyConfig) {
-		super(secureName, proxyConfig);
+	public SMTPProtocol(final ProxyConfig proxyConfig) {
+		super(proxyConfig);
 		this.hostParam = "mail.smtp.host";
 		this.portParam = "mail.smtp.port";
 		this.connectionTimeoutParam = "mail.smtp.connectiontimeout";

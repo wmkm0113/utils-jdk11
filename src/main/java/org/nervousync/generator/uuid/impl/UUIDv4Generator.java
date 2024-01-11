@@ -16,7 +16,7 @@
  */
 package org.nervousync.generator.uuid.impl;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.utils.IDUtils;
 
@@ -30,7 +30,7 @@ import java.util.UUID;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:57:28 $
  */
-@GeneratorProvider(IDUtils.UUIDv4)
+@Provider(name = IDUtils.UUIDv4, messageKey = "version4.uuid.id.generator.name")
 public final class UUIDv4Generator extends UUIDGenerator {
     /**
      * <span class="en-US">Secure Random instance</span>

@@ -16,7 +16,7 @@
  */
 package org.nervousync.utils;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.commons.Globals;
 import org.nervousync.generator.IGenerator;
 import org.nervousync.generator.nano.NanoGenerator;
@@ -85,15 +85,20 @@ public final class IDUtils {
     static {
         //  Using Java SPI to loading ID generator implements classes
         ServiceLoader.load(IGenerator.class)
-                .forEach(iGenerator -> {
-                    Class<?> generatorClass = iGenerator.getClass();
-                    if (generatorClass.isAnnotationPresent(GeneratorProvider.class)) {
-                        INITIALIZE_MAP.put(generatorClass.getAnnotation(GeneratorProvider.class).value(), iGenerator);
-                    }
-                });
+                .forEach(iGenerator ->
+                        Optional.ofNullable(iGenerator.getClass().getAnnotation(Provider.class))
+                                .ifPresent(provider -> INITIALIZE_MAP.put(provider.name(), iGenerator)));
         if (LOGGER.isDebugEnabled()) {
+            List<String> providerCodes = IDUtils.registeredGenerators();
             LOGGER.info("Names_Generator_Registered_ID_Info",
-                    String.join(", ", IDUtils.registeredGenerators().toArray(new String[0])));
+                    String.join(", ", providerCodes.toArray(new String[0])));
+            if (LOGGER.isDebugEnabled()) {
+                List<String> providerNames = new ArrayList<>();
+                INITIALIZE_MAP.values().forEach(provider ->
+                        providerNames.add(MultilingualUtils.providerName(provider.getClass())));
+                LOGGER.info("Names_Generator_Registered_Name_Info",
+                        String.join(", ", providerNames.toArray(new String[0])));
+            }
         }
         Runtime.getRuntime().addShutdownHook(new Thread(IDUtils::destroy));
     }
@@ -146,8 +151,8 @@ public final class IDUtils {
     }
 
     /**
-     * <h3 class="en-US">Static method for configure UUIDv2 generator</h3>
-     * <h3 class="zh-CN">静态方法用于设置UUIDv2生成器</h3>
+     * <h3 class="en-US">Static method for configure time synchronizer of UUIDv2 generator</h3>
+     * <h3 class="zh-CN">静态方法用于设置UUIDv2生成器的时间同步器</h3>
      *
      * @param synchronizer <span class="en-US">Time synchronizer instance</span>
      *                     <span class="zh-CN">时间同步器实例对象</span>
@@ -258,11 +263,31 @@ public final class IDUtils {
     }
 
     /**
-     * <h3 class="en-US">Read the registered generator name list</h3>
-     * <h3 class="zh-CN">读取已注册的生成器提供名列表</h3>
+     * <h3 class="en-US">Static method for generate value by the given generator name</h3>
+     * <h3 class="zh-CN">静态方法用于生成指定生成器的值</h3>
      *
-     * @return <span class="en-US">Registered generator name list</span>
-     * <span class="zh-CN">注册的生成器名称列表</span>
+     * @param generatorName <span class="en-US">Given generator name</span>
+     *                      <span class="zh-CN">生成器名称</span>
+     * @param dataBytes     <span class="en-US">Given parameter</span>
+     *                      <span class="zh-CN">给定的参数</span>
+     * @return <span class="en-US">Generated value</span>
+     * <span class="zh-CN">生成的值</span>
+     */
+    public static Object generate(final String generatorName, final byte[] dataBytes) {
+        if (StringUtils.isEmpty(generatorName)) {
+            return Globals.DEFAULT_VALUE_STRING;
+        }
+        return Optional.ofNullable(INITIALIZE_MAP.get(generatorName))
+                .map(iGenerator -> (Object) iGenerator.generate(dataBytes))
+                .orElse(Globals.DEFAULT_VALUE_STRING);
+    }
+
+    /**
+     * <h3 class="en-US">Read the registered generator code list</h3>
+     * <h3 class="zh-CN">读取已注册的生成器代码列表</h3>
+     *
+     * @return <span class="en-US">Registered generator code list</span>
+     * <span class="zh-CN">注册的生成器代码列表</span>
      */
     public static List<String> registeredGenerators() {
         return new ArrayList<>(INITIALIZE_MAP.keySet());

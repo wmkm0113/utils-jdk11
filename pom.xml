@@ -3,10 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nervousync</groupId>
     <artifactId>utils-jdk11</artifactId>
-    <version>1.2.0.3</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <name>Nervousync Java Utility Collections</name>
     <url>https://gene.nervousync.org/index.shtml</url>
+    <inceptionYear>2016</inceptionYear>
     <description>Java utility collections, development by Nervousync Studio (NSYC)</description>
     <issueManagement>
         <url>https://github.com/wmkm0113/Gene/issues</url>
@@ -20,7 +21,7 @@
         </license>
     </licenses>
     <scm>
-        <tag>v1.2.0</tag>
+        <tag>v1.2.1</tag>
         <url>https://github.com/wmkm0113/utils-jdk11</url>
         <connection>scm:git:https://github.com/wmkm0113/utils-jdk11.git</connection>
         <developerConnection>scm:git:https://github.com/wmkm0113/utils-jdk11.git</developerConnection>
@@ -50,18 +51,20 @@
         <angus.version>2.0.2</angus.version>
         <jakarta.webservice.version>3.1.0</jakarta.webservice.version>
         <jakarta.xml.webservice.version>4.0.0</jakarta.xml.webservice.version>
-        <jakarta.xml.binding.version>4.0.0</jakarta.xml.binding.version>
-        <jaxb.version>4.0.3</jaxb.version>
-        <jakarta.xml.soap.version>3.0.0</jakarta.xml.soap.version>
-        <bcprov.version>1.76</bcprov.version>
-        <log4j.version>2.20.0</log4j.version>
+        <jakarta.xml.binding.version>4.0.1</jakarta.xml.binding.version>
+        <jaxb.version>4.0.4</jaxb.version>
+        <jakarta.xml.soap.version>3.0.1</jakarta.xml.soap.version>
+        <bcprov.version>1.77</bcprov.version>
+        <log4j.version>2.22.0</log4j.version>
         <slf4j.version>2.0.9</slf4j.version>
-        <jackson.version>2.15.2</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
         <yaml.version>2.2</yaml.version>
-        <jersey.version>3.1.3</jersey.version>
+        <jersey.version>3.1.5</jersey.version>
         <hk2.version>3.0.4</hk2.version>
         <snmp4j.version>3.7.7</snmp4j.version>
-        <jcifs.version>2.1.36</jcifs.version>
+        <jcifs.version>2.1.37</jcifs.version>
+        <poi.version>5.2.5</poi.version>
+        <zxing.version>3.5.2</zxing.version>
     </properties>
     <dependencies>
         <dependency>
@@ -79,7 +82,25 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.1.1</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>5.0.1</version>
             <scope>provided</scope>
         </dependency>
         <!-- Java WebService -->
@@ -489,6 +510,84 @@
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk18on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Office Support-->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-jsoup-dom-converter</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jsoup</groupId>
+                    <artifactId>jsoup</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Barcode Support -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+        <!-- Markdown Support -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.64.8</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Replace with JCL-over-slf4j -->
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jsoup</artifactId>
+                    <groupId>org.jsoup</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

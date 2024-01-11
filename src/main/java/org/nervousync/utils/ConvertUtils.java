@@ -172,11 +172,9 @@ public final class ConvertUtils {
             return (byte[]) object;
         }
 
-        ByteArrayOutputStream outputStream = null;
-        ObjectOutputStream objectOutputStream = null;
-        try {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)){
             outputStream = new ByteArrayOutputStream();
-            objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(object);
             return outputStream.toByteArray();
         } catch (Exception e) {
@@ -185,7 +183,6 @@ public final class ConvertUtils {
                 LOGGER.debug("Stack_Message_Error", e);
             }
         } finally {
-            IOUtils.closeStream(objectOutputStream);
             IOUtils.closeStream(outputStream);
         }
 

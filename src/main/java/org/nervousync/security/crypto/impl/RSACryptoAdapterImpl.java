@@ -17,7 +17,7 @@
 package org.nervousync.security.crypto.impl;
 
 import org.nervousync.commons.Globals;
-import org.nervousync.security.config.CipherConfig;
+import org.nervousync.security.crypto.config.CipherConfig;
 import org.nervousync.security.crypto.AsymmetricCryptoAdapter;
 import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;

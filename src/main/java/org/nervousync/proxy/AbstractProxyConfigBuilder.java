@@ -17,7 +17,6 @@
 package org.nervousync.proxy;
 
 import org.nervousync.builder.AbstractBuilder;
-import org.nervousync.security.factory.SecureFactory;
 
 import java.net.Proxy;
 
@@ -38,11 +37,6 @@ import java.net.Proxy;
  */
 public abstract class AbstractProxyConfigBuilder<T> extends AbstractBuilder<T> {
     /**
-     * <span class="en-US">New secure name</span>
-     * <span class="zh-CN">新的安全名称</span>
-     */
-    private final String secureName;
-    /**
      * <span class="en-US">Proxy configure information</span>
      * <span class="zh-CN">代理服务器配置信息</span>
      */
@@ -53,15 +47,11 @@ public abstract class AbstractProxyConfigBuilder<T> extends AbstractBuilder<T> {
      *
      * @param parentBuilder     <span class="en-US">Generics Type instance</span>
      *                          <span class="zh-CN">泛型类实例对象</span>
-     * @param secureName        <span class="en-US">New secure name</span>
-     *                          <span class="zh-CN">新的安全名称</span>
      * @param proxyConfig       <span class="en-US">Proxy configure information</span>
      *                          <span class="zh-CN">代理服务器配置信息</span>
      */
-    protected AbstractProxyConfigBuilder(final T parentBuilder, final String secureName,
-                                         final ProxyConfig proxyConfig) {
+    protected AbstractProxyConfigBuilder(final T parentBuilder, final ProxyConfig proxyConfig) {
         super(parentBuilder);
-        this.secureName = secureName;
         this.proxyConfig = proxyConfig;
     }
     /**
@@ -112,7 +102,7 @@ public abstract class AbstractProxyConfigBuilder<T> extends AbstractBuilder<T> {
     public final AbstractProxyConfigBuilder<T> authenticator(final String userName, final String passWord) {
         if (!Proxy.Type.DIRECT.equals(this.proxyConfig.getProxyType())) {
             this.proxyConfig.setUserName(userName);
-            this.proxyConfig.setPassword(SecureFactory.encrypt(this.secureName, passWord));
+            this.proxyConfig.setPassword(passWord);
         }
         return this;
     }

@@ -6,24 +6,20 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.nervousync.annotations.beans.BeanProperty;
-import org.nervousync.annotations.beans.BeanProperties;
-import org.nervousync.annotations.beans.Desensitization;
-import org.nervousync.annotations.beans.OutputConfig;
-import org.nervousync.beans.converter.impl.basic.BigIntegerStringAdapter;
-import org.nervousync.beans.converter.impl.basic.BooleanStringAdapter;
-import org.nervousync.beans.converter.impl.beans.BeanStringAdapter;
-import org.nervousync.beans.converter.impl.beans.JsonStringAdapter;
-import org.nervousync.beans.converter.impl.beans.XmlStringAdapter;
-import org.nervousync.beans.converter.impl.beans.YamlStringAdapter;
-import org.nervousync.beans.converter.impl.blob.Base32Adapter;
-import org.nervousync.beans.converter.impl.blob.Base64Adapter;
+import org.nervousync.annotations.beans.*;
 import org.nervousync.beans.core.BeanObject;
-import org.nervousync.enumerations.beans.DataFlow;
-import org.nervousync.security.factory.SecureFactory;
+import org.nervousync.beans.transfer.basic.BigDecimalAdapter;
+import org.nervousync.beans.transfer.basic.BigIntegerAdapter;
+import org.nervousync.beans.transfer.basic.BooleanAdapter;
+import org.nervousync.beans.transfer.beans.BeanObjectAdapter;
+import org.nervousync.beans.transfer.beans.JsonBeanAdapter;
+import org.nervousync.beans.transfer.beans.XmlBeanAdapter;
+import org.nervousync.beans.transfer.beans.YamlBeanAdapter;
+import org.nervousync.beans.transfer.blob.Base32Adapter;
+import org.nervousync.beans.transfer.blob.Base64Adapter;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.BeanUtils;
-import org.nervousync.utils.ObjectUtils;
+import org.nervousync.utils.ClassUtils;
 import org.nervousync.utils.StringUtils;
 
 import java.math.BigInteger;
@@ -34,13 +30,21 @@ public final class BeanTest extends BaseTest {
 
     @Test
     @Order(0)
+    public void testConverter() {
+        printTypes(BigDecimalAdapter.class);
+        printTypes(BigIntegerAdapter.class);
+        printTypes(XmlBeanAdapter.class);
+    }
+
+    @Test
+    @Order(5)
     public void copyTest() {
         GenericBean genericBean = new GenericBean();
-        BeanUtils.copyTo(generateGeneric(), genericBean);
+        BeanUtils.copyData(generateGeneric(), genericBean);
         this.logger.info("Bean_Copy_Result", "generic",
                 StringUtils.objectToString(genericBean, StringUtils.StringType.JSON, Boolean.TRUE));
         WrapperBean wrapperBean = new WrapperBean();
-        BeanUtils.copyTo(generateWrapper(), wrapperBean);
+        BeanUtils.copyData(generateWrapper(), wrapperBean);
         this.logger.info("Bean_Copy_Result", "wrapper",
                 StringUtils.objectToString(wrapperBean, StringUtils.StringType.JSON, Boolean.TRUE));
     }
@@ -76,40 +80,28 @@ public final class BeanTest extends BaseTest {
 
     @Test
     @Order(30)
-    public void beanCopyPropertiesTest() {
+    public void beanCopyDataTest() {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("innerName", "Map name");
         dataMap.put("innerCode", 227);
         InnerBean innerBean = new InnerBean();
-        BeanUtils.copyProperties(dataMap, innerBean);
-        this.logger.info("Bean_Copy_Result", "",
+        BeanUtils.copyData(dataMap, innerBean);
+        this.logger.info("Bean_Copy_Result", InnerBean.class.getSimpleName(),
                 StringUtils.objectToString(innerBean, StringUtils.StringType.JSON, Boolean.TRUE));
     }
 
     @Test
     @Order(40)
     public void removeConfig() {
-        BeanUtils.removeBeanConfig(BeanOne.class, BeanTwo.class, BeanThree.class, BeanFour.class, BeanFive.class);
+        BeanUtils.removeBeanConfig(BeanOne.class, BeanTwo.class, BeanThree.class, BeanFour.class, BeanFive.class, InnerBean.class);
     }
 
-    @Test
-    @Order(50)
-    public void desensitization() {
-        //  Initialize secure factory, ready for encrypting sensitive data
-        SecureFactory.initConfig(SecureFactory.SecureAlgorithm.AES256)
-                .ifPresent(secureConfig -> {
-                    SecureFactory.initialize(secureConfig);
-                    SecureFactory.register("sensitiveData", secureConfig);
-                });
-        DesensitizationBean desensitizationBean = new DesensitizationBean();
-        desensitizationBean.setEmail("wmkm0113@gmail.com");
-        desensitizationBean.setBankCode("6226191212250445");
-        desensitizationBean.setChnId("110101198402271983");
-        desensitizationBean.setPhoneNumber("13901234567");
-        desensitizationBean.setSocialCode("91130428304570889D");
-        desensitizationBean.setUserName("wmkm0113");
-        ObjectUtils.desensitization(desensitizationBean);
-        this.logger.info("Desensitization_Data", desensitizationBean.toFormattedJson());
+    private void printTypes(final Class<?> clazz) {
+        StringBuilder stringBuilder = new StringBuilder("Class name: ").append(clazz.getName()).append(" component types: ");
+        for (Class<?> type : ClassUtils.componentTypes(clazz)) {
+            stringBuilder.append(type.getName()).append(",");
+        }
+        System.out.println(stringBuilder);
     }
 
     private static GenericBean generateGeneric() {
@@ -127,7 +119,7 @@ public final class BeanTest extends BaseTest {
         return origBean;
     }
 
-    private static WrapperBean generateWrapper() {
+    private WrapperBean generateWrapper() {
         WrapperBean origBean = new WrapperBean();
 
         origBean.setTestBoolean(Boolean.TRUE);
@@ -140,10 +132,11 @@ public final class BeanTest extends BaseTest {
         origBean.setTestShort((short) 27);
         origBean.setTestString("Wrapper String");
 
+        this.logger.info("Bean_Generate_Result", WrapperBean.class.getSimpleName(), origBean.toFormattedJson());
         return origBean;
     }
 
-    private static BeanOne generateBeanOne() {
+    private BeanOne generateBeanOne() {
         BeanOne beanOne = new BeanOne();
 
         beanOne.setBigDecimal(new BigInteger("118780004724419996989429615970374578883474102254846312217089877064957697359398223816415470410537952768340788639333520018858322611268697324924284122922861084721701382204388754353490531964939619229367235555092986351934218308741070678024241774816537500600817420694474429968745794894382877413238661224377537419983"));
@@ -153,48 +146,53 @@ public final class BeanTest extends BaseTest {
         beanOne.setBeanOneBoolean(Boolean.TRUE);
         beanOne.setDataBean(generateDataBean());
 
+        this.logger.info("Bean_Generate_Result", BeanOne.class.getSimpleName(), beanOne.toFormattedJson());
         return beanOne;
     }
 
-    private static InnerBean generateInnerBean() {
+    private InnerBean generateInnerBean() {
         InnerBean innerBean = new InnerBean();
 
         innerBean.setInnerCode(227);
         innerBean.setInnerName("Inner name");
 
+        this.logger.info("Bean_Generate_Result", InnerBean.class.getSimpleName(), innerBean.toFormattedJson());
         return innerBean;
     }
 
-    private static DataBean generateDataBean() {
+    private DataBean generateDataBean() {
         DataBean dataBean = new DataBean();
 
         dataBean.setDataInteger(227);
         dataBean.setDataString("Data String");
 
+        this.logger.info("Bean_Generate_Result", DataBean.class.getSimpleName(), dataBean.toFormattedJson());
         return dataBean;
     }
 
-    private static BeanTwo generateBeanTwo() {
+    private BeanTwo generateBeanTwo() {
         BeanTwo beanTwo = new BeanTwo();
 
         beanTwo.setBigDecimal(new BigInteger("118780004724419996989429615970374578883474102254846312217089877064957697359398223816415470410537952768340788639333520018858322611268697324924284122922861084721701382204388754353490531964939619229367235555092986351934218308741070678024241774816537500600817420694474429968745794894382877413238661224377537419983"));
         beanTwo.setBeanString("Bean Two String");
         beanTwo.setBeanInner(generateInnerBean());
 
+        this.logger.info("Bean_Generate_Result", BeanTwo.class.getSimpleName(), beanTwo.toFormattedJson());
         return beanTwo;
     }
 
-    private static BeanThree generateBeanThree() {
+    private BeanThree generateBeanThree() {
         BeanThree beanThree = new BeanThree();
 
         beanThree.setBase64Data(StringUtils.base64Encode("Bean Three Base64".getBytes()));
         beanThree.setBooleanString("True");
         beanThree.setJsonString("{\"dataString\":\"Data String\",\"dataInteger\":227}");
 
+        this.logger.info("Bean_Generate_Result", BeanThree.class.getSimpleName(), beanThree.toFormattedJson());
         return beanThree;
     }
 
-    private static BeanFour generateBeanFour() {
+    private BeanFour generateBeanFour() {
         BeanFour beanFour = new BeanFour();
 
         beanFour.setDecimalString("118780004724419996989429615970374578883474102254846312217089877064957697359398223816415470410537952768340788639333520018858322611268697324924284122922861084721701382204388754353490531964939619229367235555092986351934218308741070678024241774816537500600817420694474429968745794894382877413238661224377537419983");
@@ -202,16 +200,18 @@ public final class BeanTest extends BaseTest {
         beanFour.setXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><data_bean><data_string>Data String</data_string><data_integer>227</data_integer></data_bean>");
         beanFour.setBase32Data(StringUtils.base32Encode("Bean Four Base32".getBytes()));
 
+        this.logger.info("Bean_Generate_Result", BeanFour.class.getSimpleName(), beanFour.toFormattedJson());
         return beanFour;
     }
 
-    private static BeanFive generateBeanFive() {
+    private BeanFive generateBeanFive() {
         BeanFive beanFive = new BeanFive();
 
         beanFive.setBeanFiveBoolean(Boolean.TRUE);
         beanFive.setYamlString("dataString: \"Data String\"\ndataInteger: 227\n");
         beanFive.setOrigBean(generateDataBean());
 
+        this.logger.info("Bean_Generate_Result", BeanFive.class.getSimpleName(), beanFive.toFormattedJson());
         return beanFive;
     }
 
@@ -407,33 +407,28 @@ public final class BeanTest extends BaseTest {
     public static final class BeanOne extends BeanObject {
 
         private static final long serialVersionUID = 2148709510427702608L;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanFour.class, targetField = "decimalString", converter = BigIntegerStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanTwo.class, targetField = "bigDecimal")
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFour.class, targetField = "decimalString", converter = BigIntegerStringAdapter.class)
+        @BeanProperty(targetBean = BeanTwo.class, targetField = "bigDecimal")
+        @BeanProperty(targetBean = BeanFour.class, targetField = "decimalString", transfer = @DataTransfer(adapter = BigIntegerAdapter.class))
         private BigInteger bigDecimal;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanTwo.class, targetField = "beanString")
-        @BeanProperties(@BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanTwo.class, targetField = "beanString"))
+        @BeanProperties(@BeanProperty(targetBean = BeanTwo.class, targetField = "beanString"))
         private String beanOneString;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanTwo.class, targetField = "beanInner")
-        @BeanProperties(@BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanTwo.class, targetField = "beanInner"))
+        @BeanProperties(@BeanProperty(targetBean = BeanTwo.class, targetField = "beanInner"))
         private InnerBean innerBean;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanThree.class, targetField = "base64Data", converter = Base64Adapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanThree.class, targetField = "base64Data", converter = Base64Adapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFour.class, targetField = "base32Data", converter = Base32Adapter.class)
+        @BeanProperty(targetBean = BeanThree.class, targetField = "base64Data", transfer = @DataTransfer(adapter = Base64Adapter.class))
+        @BeanProperty(targetBean = BeanFour.class, targetField = "base32Data", transfer = @DataTransfer(adapter = Base32Adapter.class))
         private byte[] beanOneBytes;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanFour.class, targetField = "base32Data", converter = Base32Adapter.class)
         private byte[] base32Bytes;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanThree.class, targetField = "booleanString", converter = BooleanStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanThree.class, targetField = "booleanString", converter = BooleanStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFour.class, targetField = "beanFourBoolean")
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFive.class, targetField = "beanFiveBoolean")
+        @BeanProperty(targetBean = BeanThree.class, targetField = "booleanString", transfer = @DataTransfer(adapter = BooleanAdapter.class))
+        @BeanProperty(targetBean = BeanFour.class, targetField = "beanFourBoolean")
+        @BeanProperty(targetBean = BeanFive.class, targetField = "beanFiveBoolean")
         private boolean beanOneBoolean;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanThree.class, targetField = "jsonString", converter = BeanStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanThree.class, targetField = "jsonString", converter = JsonStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFour.class, targetField = "xmlString", converter = XmlStringAdapter.class)
-        @BeanProperty(dataFlow = DataFlow.OUT, beanClass = BeanFive.class, targetField = "yamlString", converter = YamlStringAdapter.class)
+        @BeanProperty(targetBean = BeanThree.class, targetField = "jsonString",
+                transfer = @DataTransfer(adapter = JsonBeanAdapter.class, initParam = "org.nervousync.test.utils.BeanTest$DataBean"))
+        @BeanProperty(targetBean = BeanFour.class, targetField = "xmlString",
+                transfer = @DataTransfer(adapter = XmlBeanAdapter.class, initParam = "org.nervousync.test.utils.BeanTest$DataBean"))
+        @BeanProperty(targetBean = BeanFive.class, targetField = "yamlString",
+                transfer = @DataTransfer(adapter = YamlBeanAdapter.class, initParam = "org.nervousync.test.utils.BeanTest$DataBean"))
         private DataBean dataBean;
-        @BeanProperty(dataFlow = DataFlow.IN, beanClass = BeanFive.class, targetField = "origBean")
         private DataBean fromBean;
 
         public BigInteger getBigDecimal() {
@@ -504,8 +499,11 @@ public final class BeanTest extends BaseTest {
     @OutputConfig(type = StringUtils.StringType.JSON)
     public static final class BeanTwo extends BeanObject {
         private static final long serialVersionUID = -3903310914229238786L;
+        @BeanProperty(targetBean = BeanOne.class, transfer = @DataTransfer(adapter = BigIntegerAdapter.class))
         private BigInteger bigDecimal;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "beanOneString")
         private String beanString;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "innerBean")
         private InnerBean beanInner;
 
         public BigInteger getBigDecimal() {
@@ -537,8 +535,12 @@ public final class BeanTest extends BaseTest {
     public static final class BeanThree extends BeanObject {
 
         private static final long serialVersionUID = 2676597737207266268L;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "beanOneBytes", transfer = @DataTransfer(adapter = Base64Adapter.class))
         private String base64Data;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "BeanOneBoolean", transfer = @DataTransfer(adapter = BooleanAdapter.class))
         private String booleanString;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "dataBean",
+                transfer = @DataTransfer(adapter = BeanObjectAdapter.class, initParam = "org.nervousync.test.utils.BeanTest$DataBean"))
         private String jsonString;
 
         public String getBase64Data() {
@@ -570,7 +572,9 @@ public final class BeanTest extends BaseTest {
     public static final class BeanFour extends BeanObject {
 
         private static final long serialVersionUID = 2131533619703353105L;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "bigDecimal", transfer = @DataTransfer(adapter = BigIntegerAdapter.class))
         private String decimalString;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "base32Bytes", transfer = @DataTransfer(adapter = Base32Adapter.class))
         private String base32Data;
         private boolean beanFourBoolean;
         private String xmlString;
@@ -614,6 +618,7 @@ public final class BeanTest extends BaseTest {
         private static final long serialVersionUID = -2793808469846338003L;
         private boolean beanFiveBoolean;
         private String yamlString;
+        @BeanProperty(targetBean = BeanOne.class, targetField = "fromBean")
         private DataBean origBean;
 
         public boolean isBeanFiveBoolean() {
@@ -666,72 +671,6 @@ public final class BeanTest extends BaseTest {
 
         public void setDataInteger(Integer dataInteger) {
             this.dataInteger = dataInteger;
-        }
-    }
-
-    public static final class DesensitizationBean extends BeanObject {
-
-        private static final long serialVersionUID = -1785932696294018762L;
-
-        @Desensitization(ObjectUtils.SensitiveType.CHN_ID_Code)
-        private String chnId;
-        @Desensitization(ObjectUtils.SensitiveType.CHN_Social_Code)
-        private String socialCode;
-        @Desensitization(value = ObjectUtils.SensitiveType.PHONE_NUMBER)
-        private String phoneNumber;
-        @Desensitization(ObjectUtils.SensitiveType.E_MAIL)
-        private String email;
-        @Desensitization(ObjectUtils.SensitiveType.Luhn)
-        private String bankCode;
-        @Desensitization
-        private String userName;
-
-        public String getChnId() {
-            return chnId;
-        }
-
-        public void setChnId(String chnId) {
-            this.chnId = chnId;
-        }
-
-        public String getSocialCode() {
-            return socialCode;
-        }
-
-        public void setSocialCode(String socialCode) {
-            this.socialCode = socialCode;
-        }
-
-        public String getPhoneNumber() {
-            return phoneNumber;
-        }
-
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getBankCode() {
-            return bankCode;
-        }
-
-        public void setBankCode(String bankCode) {
-            this.bankCode = bankCode;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public void setUserName(String userName) {
-            this.userName = userName;
         }
     }
 }

@@ -46,13 +46,11 @@ public final class POP3Protocol extends BaseProtocol implements ReceiveOperator 
      * <h3 class="en-US">Constructor method for POP3Protocol</h3>
      * <h3 class="zh-CN">POP3Protocol构造方法</h3>
      *
-     * @param secureName    <span class="en-US">Secure config name</span>
-     *                      <span class="zh-CN">安全配置名称</span>
      * @param proxyConfig   <span class="en-US">Proxy configure information</span>
      *                      <span class="zh-CN">代理服务器配置信息</span>
      */
-	public POP3Protocol(final String secureName, final ProxyConfig proxyConfig) {
-		super(secureName, proxyConfig);
+	public POP3Protocol(final ProxyConfig proxyConfig) {
+		super(proxyConfig);
 		this.hostParam = "mail.pop3.host";
 		this.portParam = "mail.pop3.port";
 		this.connectionTimeoutParam = "mail.pop3.connectiontimeout";

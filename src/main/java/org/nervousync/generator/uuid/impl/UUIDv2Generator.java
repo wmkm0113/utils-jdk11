@@ -16,7 +16,7 @@
  */
 package org.nervousync.generator.uuid.impl;
 
-import org.nervousync.annotations.generator.GeneratorProvider;
+import org.nervousync.annotations.provider.Provider;
 import org.nervousync.generator.uuid.UUIDGenerator;
 import org.nervousync.generator.uuid.timer.TimeSynchronizer;
 import org.nervousync.utils.IDUtils;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:53:06 $
  */
-@GeneratorProvider(IDUtils.UUIDv2)
+@Provider(name = IDUtils.UUIDv2, messageKey = "version2.uuid.id.generator.name")
 public final class UUIDv2Generator extends UUIDGenerator {
     /**
      * <span class="en-US">Logger instance</span>

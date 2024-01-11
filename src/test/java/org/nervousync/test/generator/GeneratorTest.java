@@ -6,10 +6,16 @@ import org.nervousync.test.BaseTest;
 import org.nervousync.utils.DateTimeUtils;
 import org.nervousync.utils.IDUtils;
 
+import java.util.Optional;
+
 public final class GeneratorTest extends BaseTest {
 
+    public GeneratorTest() {
+//        super(Locale.CHINA);
+    }
+
     @Test
-	@Order(0)
+    @Order(0)
     public void nano() {
         this.logger.info("Nano_Random", IDUtils.nano());
         IDUtils.nanoConfig("abcdefghijklmnopqrstuvwxyz".toUpperCase(), 16);
@@ -17,15 +23,16 @@ public final class GeneratorTest extends BaseTest {
     }
 
     @Test
-	@Order(10)
-    public void snowflake() throws Exception {
+    @Order(10)
+    public void snowflake() {
         this.logger.info("Snowflake_Random", IDUtils.snowflake());
-        IDUtils.snowflakeConfig(DateTimeUtils.parseDate("20030421", "yyyyMMdd").getTime(), 2L, 5L);
+        Optional.ofNullable(DateTimeUtils.parseDate("20030421", "yyyyMMdd"))
+                .ifPresent(date -> IDUtils.snowflakeConfig(date.getTime(), 2L, 5L));
         this.logger.info("Snowflake_Reconfigure_Random", IDUtils.snowflake());
     }
 
     @Test
-	@Order(20)
+    @Order(20)
     public void UUID() {
         this.logger.info("UUID_Random", 1, IDUtils.UUIDv1());
         this.logger.info("UUID_Random", 2, IDUtils.UUIDv2());

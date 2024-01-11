@@ -16,9 +16,8 @@
  */
 package org.nervousync.annotations.beans;
 
-import org.nervousync.beans.converter.Adapter;
+import org.nervousync.beans.transfer.AbstractAdapter;
 import org.nervousync.commons.Globals;
-import org.nervousync.enumerations.beans.DataFlow;
 
 import java.lang.annotation.*;
 
@@ -53,22 +52,13 @@ public @interface BeanProperty {
 	 */
 	int sortCode() default Globals.INITIALIZE_INT_VALUE;
 	/**
-	 * <h3 class="en-US">Enumeration value of JavaBean property data flow</h3>
-	 * <h3 class="zh-CN">JavaBean属性数据流向的枚举值</h3>
-	 *
-	 * @see org.nervousync.enumerations.beans.DataFlow
-	 * @return	<span class="en-US">Enumeration value</span>
-	 * 			<span class="zh-CN">枚举值</span>
-	 */
-	DataFlow dataFlow();
-	/**
 	 * <h3 class="en-US">Target bean class</h3>
 	 * <h3 class="zh-CN">目标对象类</h3>
 	 *
 	 * @return	<span class="en-US">Target bean class</span>
 	 * 			<span class="zh-CN">目标对象类</span>
 	 */
-	Class<?> beanClass();
+	Class<?> targetBean();
 	/**
 	 * <h3 class="en-US">Target field name</h3>
 	 * <h3 class="zh-CN">目标属性名</h3>
@@ -83,9 +73,9 @@ public @interface BeanProperty {
 	 * <h3 class="zh-CN">数据转换类</h3>
 	 * <p class="zh-CN">类必须实现接口org.nervousync.beans.converter.IConverter，T是注解属性的数据类型，U是目标属性的数据类型</p>
 	 *
-	 * @see Adapter
+	 * @see AbstractAdapter
 	 * @return	<span class="en-US">Data converter class</span>
 	 * 			<span class="zh-CN">数据转换类</span>
 	 */
-	Class<?> converter() default Adapter.class;
+	DataTransfer transfer() default @DataTransfer;
 }
