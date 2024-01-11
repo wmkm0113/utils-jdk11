@@ -14,27 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.nervousync.annotations.beans;
 
-import org.nervousync.utils.ObjectUtils;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.nervousync.commons.Globals;
 
 import java.lang.annotation.*;
 
 /**
- * <h2 class="en-US">JavaBean Property Desensitization Annotation</h2>
- * <span class="en-US">
- *     After using this annotation on the properties of JavaBean,
- *     you can call the desensitization method in ObjectUtils for automatic data desensitization
- * </span>
- * <h2 class="zh-CN">JavaBean属性脱敏注解</h2>
- * <span class="zh-CN">在JavaBean的属性上使用此注解后，可以调用ObjectUtils中的desensitization方法进行数据自动脱敏</span>
+ * <h2 class="en-US">The annotation of data transfer configure</h2>
+ * <h2 class="zh-CN">数据传输配置的注解</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:33 $
+ * @version $Revision: 1.0.0 $ $Date: Ayg 7, 2023 15:32:18 $
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface Desensitization {
-    ObjectUtils.SensitiveType value() default ObjectUtils.SensitiveType.NORMAL;
+public @interface DataTransfer {
+
+    /**
+     * @return <span class="en-US">Data converter class</span>
+     * <span class="zh-CN">数据转换类</span>
+     */
+    Class<?> adapter() default XmlAdapter.class;
+
+    /**
+     * @return <span class="en-US">Data conversion class constructor parameters, the default empty string is the parameterless constructor</span>
+     * <span class="zh-CN">数据转换类构造方法参数，默认空字符串为无参构造方法</span>
+     */
+    String initParam() default Globals.DEFAULT_VALUE_STRING;
 }

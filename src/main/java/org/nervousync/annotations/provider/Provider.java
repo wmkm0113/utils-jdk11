@@ -14,24 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nervousync.enumerations.beans;
+
+package org.nervousync.annotations.provider;
+
+import java.lang.annotation.*;
 
 /**
- * <h2 class="en-US">JavaBean Property Data Flow Enumerations</h2>
- * <h2 class="zh-CN">JavaBean属性值数据流向枚举</h2>
+ * <h2 class="en-US">Universal Adapter Annotation</h2>
+ * <h2 class="zh-CN">通用适配器注解</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0.0 $ $Date: Jun 25, 2023 14:28:27 $
+ * @version $Revision: 1.0.0 $ $Date: Dec 10, 2021 15:24:26 $
  */
-public enum DataFlow {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface Provider {
+
     /**
-     * <span class="en-US">Property value from the target JavaBean instance to current JavaBean instance</span>
-     * <span class="zh-CN">属性值从目标JavaBean实例复制到当前JavaBean实例</span>
+     * <span class="en-US">Provider identification code</span>
+     * <span class="zh-CN">适配器识别代码</span>
+     *
+     * @return  <span class="en-US">Identification code</span>
+     *          <span class="zh-CN">识别代码</span>
      */
-    IN,
+    String name();
+
     /**
-     * <span class="en-US">Property value from current JavaBean instance to the target JavaBean instance</span>
-     * <span class="zh-CN">属性值从当前JavaBean实例复制到目标JavaBean实例</span>
+     * <span class="en-US">Multilingual key value for provider name</span>
+     * <span class="zh-CN">适配器名称的多语言键值</span>
+     *
+     * @return  <span class="en-US">Multilingual key value</span>
+     *          <span class="zh-CN">多语言键值</span>
      */
-    OUT
+    String messageKey();
 }
