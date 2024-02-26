@@ -1,10 +1,9 @@
+# Java 工具包
+
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/)
 [![License](https://img.shields.io/github/license/wmkm0113/utils-jdk11.svg)](https://github.com/wmkm0113/utils-jdk11/blob/mainline/LICENSE)
 ![Language](https://img.shields.io/badge/language-Java-green)
 [![Twitter:wmkm0113](https://img.shields.io/twitter/follow/wmkm0113?label=Follow)](https://twitter.com/wmkm0113)
-
-# Nervousync® Java 工具包
-## 项目简介:
 
 本项目旨在为Java程序开发人员提供便捷的工具和实用功能。无论是初学者还是经验丰富的开发者，都可以从该工具包中受益。
 
@@ -16,16 +15,15 @@
 欢迎您贡献您的想法、建议和代码，以进一步增强此工具包。
 
 ## JDK版本：
-编译：OpenJDK 11
+编译：OpenJDK 11   
+运行：OpenJDK 11+ 或兼容版本
 
 ## 生命周期:
-
-**此日期后不再添加新功能:** 2026年12月31日
-
-**此日期后不再提供安全更新:** 2029年12月31日
+**功能冻结：** 2026年12月31日   
+**安全更新：** 2029年12月31日
 
 ## 使用方法
-### Maven:
+**Maven：**
 ```
 <dependency>
     <groupId>org.nervousync</groupId>
@@ -33,16 +31,16 @@
     <version>${version}</version>
 </dependency>
 ```
-### Gradle:
+**Gradle：**
 ```
 Manual: compileOnly group: 'org.nervousync', name: 'utils-jdk11', version: '${version}'
 Short: compileOnly 'org.nervousync:utils-jdk11:${version}'
 ```
-### SBT:
+**SBT：**
 ```
 libraryDependencies += "org.nervousync" % "utils-jdk11" % "${version}" % "provided"
 ```
-### Ivy:
+**Ivy：**
 ```
 <dependency org="org.nervousync" name="utils-jdk11" rev="${version}"/>
 ```
@@ -278,7 +276,19 @@ ConfigureManager使用单例模式运行，需要读取配置文件时，使用C
 * 根据规则截取字符串
 * 验证给定的字符串是否符合代码类型
 
-# 特别感谢
+## 贡献与反馈
+欢迎各位朋友将此文档及项目中的提示信息、错误信息等翻译为更多语言，以帮助更多的使用者更好地了解与使用此工具包。   
+如果在使用过程中发现问题或需要改进、添加相关功能，请提交issue到本项目或发送电子邮件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=bugs_and_features)   
+为了更好地沟通，请在提交issue或发送电子邮件时，写明如下信息：   
+1、目的是：发现Bug/功能改进/添加新功能   
+2、请粘贴以下信息（如果存在）：传入数据，预期结果，错误堆栈信息   
+3、您认为可能是哪里的代码出现问题（如提供可以帮助我们尽快地找到并解决问题）   
+如果您提交的是添加新功能的相关信息，请确保需要添加的功能是一般性的通用需求，即添加的新功能可以帮助到大多数使用者。
+
+如果您需要添加的是定制化的特殊需求，我将收取一定的定制开发费用，具体费用金额根据定制化的特殊需求的工作量进行评估。   
+定制化特殊需求请直接发送电子邮件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features)，同时请尽量在邮件中写明您可以负担的开发费用预算金额。
+
+## 赞助与鸣谢
 <span id="JetBrains">
     <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="100px" height="100px" alt="JetBrains Logo (Main) logo.">
     <span>非常感谢 <a href="https://www.jetbrains.com/">JetBrains</a> 通过许可证赞助我们的开源项目。</span>

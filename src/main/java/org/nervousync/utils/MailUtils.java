@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -19,6 +19,7 @@ package org.nervousync.utils;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
+import jakarta.annotation.Nonnull;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
@@ -107,9 +108,8 @@ public final class MailUtils {
      * @return <span class="en-US">Generated Mail Agent instance</span>
      * <span class="zh-CN">生成的电子邮件代理实例对象</span>
      */
-    public static Agent mailAgent(final MailConfig mailConfig) {
-        if (mailConfig == null || StringUtils.isEmpty(mailConfig.getUserName())
-                || StringUtils.isEmpty(mailConfig.getPassword())) {
+    public static Agent mailAgent(@Nonnull final MailConfig mailConfig) {
+        if (StringUtils.isEmpty(mailConfig.getUserName()) || StringUtils.isEmpty(mailConfig.getPassword())) {
             return null;
         }
         return new Agent(mailConfig);

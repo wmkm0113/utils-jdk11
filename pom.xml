@@ -44,23 +44,23 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <argLine>-Dfile.encoding=UTF-8</argLine>
-        <junit.jupiter.version>5.10.0</junit.jupiter.version>
-        <junit.platform.version>1.10.0</junit.platform.version>
+        <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <junit.platform.version>1.10.1</junit.platform.version>
         <jakarta.activation.version>2.1.2</jakarta.activation.version>
         <jakarta.mail.version>2.1.2</jakarta.mail.version>
         <angus.version>2.0.2</angus.version>
         <jakarta.webservice.version>3.1.0</jakarta.webservice.version>
-        <jakarta.xml.webservice.version>4.0.0</jakarta.xml.webservice.version>
+        <jakarta.xml.webservice.version>4.0.1</jakarta.xml.webservice.version>
         <jakarta.xml.binding.version>4.0.1</jakarta.xml.binding.version>
         <jaxb.version>4.0.4</jaxb.version>
         <jakarta.xml.soap.version>3.0.1</jakarta.xml.soap.version>
         <bcprov.version>1.77</bcprov.version>
-        <log4j.version>2.22.0</log4j.version>
+        <log4j.version>2.22.1</log4j.version>
         <slf4j.version>2.0.9</slf4j.version>
-        <jackson.version>2.16.0</jackson.version>
+        <jackson.version>2.16.1</jackson.version>
         <yaml.version>2.2</yaml.version>
         <jersey.version>3.1.5</jersey.version>
-        <hk2.version>3.0.4</hk2.version>
+        <hk2.version>3.0.6</hk2.version>
         <snmp4j.version>3.7.7</snmp4j.version>
         <jcifs.version>2.1.37</jcifs.version>
         <poi.version>5.2.5</poi.version>
@@ -537,6 +537,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.26.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
@@ -556,6 +561,10 @@
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- Barcode Support -->
@@ -573,7 +582,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.17.1</version>
+            <version>1.17.2</version>
         </dependency>
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>

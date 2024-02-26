@@ -693,10 +693,6 @@
           "content": "Resolving TYPE: {0}, NAMESPACE_URI: {1}, PUBLIC_ID: {2}, SYSTEM_ID: {3}, BASE_URI: {4}"
         },
         {
-          "key": "Secure_Base_Path_Not_Found",
-          "content": "Secure factory retrieve default folder path error"
-        },
-        {
           "key": "Override_Factory_Config_Debug",
           "content": "Override factory configuration information"
         },
@@ -1509,10 +1505,6 @@
         {
           "key": "Resolving_Schema_Debug",
           "content": "正在解析类型：{0}，NAMESPACE_URI：{1}，PUBLIC_ID：{2}，SYSTEM_ID：{3}。 BASE_URI：{4}"
-        },
-        {
-          "key": "Secure_Base_Path_Not_Found",
-          "content": "安全配置工厂获取默认目录失败"
         },
         {
           "key": "Override_Factory_Config_Debug",

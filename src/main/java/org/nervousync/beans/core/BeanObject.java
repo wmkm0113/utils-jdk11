@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -16,6 +16,9 @@
  */
 package org.nervousync.beans.core;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlTransient;
 import org.nervousync.annotations.beans.OutputConfig;
 import org.nervousync.commons.Globals;
 import org.nervousync.utils.*;
@@ -44,6 +47,8 @@ import java.util.Optional;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 6, 2021 17:10:23 $
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.NONE)
 @OutputConfig(type = StringUtils.StringType.XML, formatted = true)
 public abstract class BeanObject implements Serializable {
     /**

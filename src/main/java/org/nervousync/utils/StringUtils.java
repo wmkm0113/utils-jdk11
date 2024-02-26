@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -36,7 +36,7 @@ import org.nervousync.annotations.beans.OutputConfig;
 import org.nervousync.beans.transfer.cdata.CDataAdapter;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.RegexGlobals;
-import org.nervousync.huffman.HuffmanTree;
+import org.nervousync.tree.huffman.HuffmanTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;

@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -173,7 +174,7 @@ public final class ConvertUtils {
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)){
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
             outputStream = new ByteArrayOutputStream();
             objectOutputStream.writeObject(object);
             return outputStream.toByteArray();
@@ -187,6 +188,29 @@ public final class ConvertUtils {
         }
 
         return new byte[0];
+    }
+
+    /**
+     * <h3 class="en-US">Convert given data mapping instance to object instance</h3>
+     * <h3 class="zh-CN">转换数据映射表为实例对象</h3>
+     *
+     * @param <T>       <span class="en-US">define class</span>
+     *                  <span class="zh-CN">定义类</span>
+     * @param beanClass <span class="en-US">define class</span>
+     *                  <span class="zh-CN">定义类</span>
+     * @param dataMap   <span class="en-US">Data mapping instance</span>
+     *                  <span class="zh-CN">数据映射表</span>
+     *
+     * @return <span class="en-US">Converted object instance</span>
+     * <span class="zh-CN">转换后的对象实例</span>
+     */
+    public static <T> T toObject(final Class<T> beanClass, final Map<String, Object> dataMap) {
+        return Optional.ofNullable(ObjectUtils.newInstance(beanClass))
+                .map(object -> {
+                    BeanUtils.copyData(dataMap, object);
+                    return object;
+                })
+                .orElse(null);
     }
 
     /**

@@ -49,3 +49,4 @@ Temporary Items
 /bin/
 /.idea/
 *.iml
+/src/test/resources/mail.xml

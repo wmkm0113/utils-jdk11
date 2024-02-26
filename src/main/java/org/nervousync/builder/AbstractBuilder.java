@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -28,12 +28,13 @@ import org.nervousync.exceptions.builder.BuilderException;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 4, 2018 16:09:54 $
  */
-public abstract class AbstractBuilder<T> {
+public abstract class AbstractBuilder<T> implements Builder<T> {
     /**
      * <span class="en-US">Generics Type Class</span>
      * <span class="zh-CN">泛型类</span>
      */
     protected final T parentBuilder;
+
     /**
      * <h3 class="en-US">Protected constructor for AbstractBuilder</h3>
      * <h3 class="zh-CN">AbstractBuilder的构造函数</h3>
@@ -44,6 +45,7 @@ public abstract class AbstractBuilder<T> {
     protected AbstractBuilder(final T parentBuilder) {
         this.parentBuilder = parentBuilder;
     }
+
     /**
      * <h3 class="en-US">Protected abstract method for build current configure</h3>
      * <h3 class="zh-CN">保护的抽象方法，用于构建当前配置信息</h3>
@@ -53,6 +55,7 @@ public abstract class AbstractBuilder<T> {
      * <span class="zh-CN">当构建当前配置时时捕获异常</span>
      */
     protected abstract void build() throws BuilderException;
+
     /**
      * <h3 class="en-US">Confirm current configure and return Generics Type instance</h3>
      * <h3 class="zh-CN">确认当前设置，并返回泛型类实例对象</h3>
@@ -63,6 +66,7 @@ public abstract class AbstractBuilder<T> {
      * <span class="en-US">If an occurs when confirm current configure</span>
      * <span class="zh-CN">当确认当前配置时时捕获异常</span>
      */
+    @Override
     public final T confirm() throws BuilderException {
         this.build();
         return this.parentBuilder;
