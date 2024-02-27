@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements. See the NOTICE file distributed with
+ * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@XmlSchema(namespace = "https://nervousync.org/schemas/secure", elementFormDefault = XmlNsForm.QUALIFIED,
-		location = "https://nervousync.org/schemas/secure_config_1_0.xsd",
-		xmlns = @XmlNs(prefix = "secure", namespaceURI = "https://nervousync.org/schemas/secure")
-)
-package org.nervousync.security.factory;
 
-import jakarta.xml.bind.annotation.XmlNs;
-import jakarta.xml.bind.annotation.XmlNsForm;
-import jakarta.xml.bind.annotation.XmlSchema;
+package org.nervousync.enumerations.launcher;
+
+/**
+ * <h2 class="en-US">Enumeration value of startup type</h2>
+ * <h2 class="zh-CN">启动类型枚举值</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @version $Revision: 1.0.0 $Date: Feb 27, 2024 10:49:12 $
+ */
+public enum StartupType {
+	AUTO, MANUAL, DISABLE
+}

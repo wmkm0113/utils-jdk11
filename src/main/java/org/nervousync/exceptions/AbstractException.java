@@ -104,8 +104,9 @@ public abstract class AbstractException extends Exception {
 		}
 		if (ObjectUtils.nullSafeEquals(other.getClass(), this.getClass())) {
 			AbstractException otherBe = (AbstractException) other;
-			return (ObjectUtils.nullSafeEquals(this.getMessage(), otherBe.getMessage()) &&
-					ObjectUtils.nullSafeEquals(this.getCause(), otherBe.getCause()));
+			return (this.errorCode == otherBe.getErrorCode()
+					&& ObjectUtils.nullSafeEquals(this.getMessage(), otherBe.getMessage())
+					&& ObjectUtils.nullSafeEquals(this.getCause(), otherBe.getCause()));
 		}
 		return Boolean.FALSE;
 	}

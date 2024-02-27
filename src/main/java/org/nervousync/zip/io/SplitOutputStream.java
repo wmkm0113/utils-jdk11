@@ -25,7 +25,7 @@ import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
 import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.exceptions.zip.ZipException;
-import org.nervousync.commons.io.NervousyncFile;
+import org.nervousync.commons.io.StandardFile;
 import org.nervousync.utils.FileUtils;
 import org.nervousync.utils.RawUtils;
 import org.nervousync.utils.StringUtils;
@@ -34,7 +34,7 @@ import org.nervousync.utils.StringUtils;
  * The type Split output stream.
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
- * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:57:01 PM $
+ * @version $Revision: 1.0.0 \r\n * @date: Nov 29, 2017 2:57:01 PM $
  */
 public class SplitOutputStream extends OutputStream {
 
@@ -54,7 +54,7 @@ public class SplitOutputStream extends OutputStream {
         HEADER_SIGNATURES[10] = Globals.AESSIG;
     }
 
-    private NervousyncFile dataOutput;
+    private StandardFile dataOutput;
     private final String fileName;
     private final String filePath;
     private final String currentFullPath;
@@ -94,7 +94,7 @@ public class SplitOutputStream extends OutputStream {
         }
         this.filePath = savePath.substring(0, beginIndex);
         this.fileName = StringUtils.stripFilenameExtension(savePath.substring(beginIndex + 1));
-        this.dataOutput = new NervousyncFile(savePath, Boolean.TRUE);
+        this.dataOutput = new StandardFile(savePath, Boolean.TRUE);
         this.currentFullPath = savePath;
         this.splitLength = splitLength;
         this.currentSplitFileIndex = 0;
@@ -257,7 +257,7 @@ public class SplitOutputStream extends OutputStream {
             throw new IOException("Cannot create split file!");
         }
 
-        this.dataOutput = new NervousyncFile(this.currentFullPath, Boolean.TRUE);
+        this.dataOutput = new StandardFile(this.currentFullPath, Boolean.TRUE);
         this.currentSplitFileIndex++;
     }
 

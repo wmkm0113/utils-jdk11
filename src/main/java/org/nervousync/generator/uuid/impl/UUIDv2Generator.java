@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:53:06 $
  */
-@Provider(name = IDUtils.UUIDv2, messageKey = "version2.uuid.id.generator.name")
+@Provider(name = IDUtils.UUIDv2, titleKey = "version2.uuid.id.generator.name")
 public final class UUIDv2Generator extends UUIDGenerator {
     /**
      * <span class="en-US">Logger instance</span>

@@ -303,7 +303,8 @@ public final class SecureFactory extends AutoConfigLauncher {
 		if (StringUtils.isEmpty(secureName)) {
 			return dataContent;
 		}
-		return Optional.ofNullable(this.registeredNodes.get(secureName))
+		String secName = StringUtils.isEmpty(secureName) ? SYSTEM_SECURE_NAME : secureName;
+		return Optional.ofNullable(this.registeredNodes.get(secName))
 				.map(secureNode -> secureNode.initCryptor(encrypt))
 				.map(secureAdapter -> {
 					String returnValue;

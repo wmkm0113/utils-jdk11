@@ -38,16 +38,15 @@ package org.nervousync.launcher;
  * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 16:39:41 $
  */
 public interface StartupLauncher {
+
 	/**
 	 * <h3 class="en-US">Startup method</h3>
 	 * <span class=“en“>StartupManager invoke this method to execute current launcher</span>
 	 * <h3 class="zh-CN">启动方法</h3>
 	 * <span class=“zhs“>启动管理器调用此方法来执行当前的启动器</span>
-	 *
-	 * @param basePath	<span class="en-US">Base path for launcher execute</span>
-	 *                  <span class="zh-CN">启动器执行的基本目录</span>
 	 */
-	void startup(final String basePath);
+	void startup();
+
 	/**
 	 * <h3 class="en-US">Destroy current launcher instance</h3>
 	 * <h3 class="zh-CN">销毁当前启动器实例</h3>

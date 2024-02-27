@@ -177,7 +177,7 @@ public final class MultilingualUtils {
     public static String providerName(final Class<?> clazz, final String languageCode) {
         return Optional.ofNullable(clazz)
                 .map(providerClass -> providerClass.getAnnotation(Provider.class))
-                .map(provider -> newAgent(clazz).findMessage(provider.messageKey(), languageCode))
+                .map(provider -> newAgent(clazz).findMessage(provider.titleKey(), languageCode))
                 .orElse(Globals.DEFAULT_VALUE_STRING);
     }
 

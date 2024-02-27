@@ -24,7 +24,7 @@ import org.nervousync.commons.Globals;
 import org.nervousync.zip.crypto.Decryptor;
 import org.nervousync.zip.crypto.impl.aes.AESDecryptor;
 import org.nervousync.exceptions.zip.ZipException;
-import org.nervousync.commons.io.NervousyncFile;
+import org.nervousync.commons.io.StandardFile;
 import org.nervousync.zip.ZipFile;
 
 /**
@@ -36,7 +36,7 @@ import org.nervousync.zip.ZipFile;
 public class PartInputStream extends InputStream {
 
 	private final ZipFile zipFile;
-	private NervousyncFile input;
+	private StandardFile input;
 	private int currentIndex;
 	private long readBytes;
 	private final long length;

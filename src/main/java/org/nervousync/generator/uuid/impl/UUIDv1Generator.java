@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:51:08 $
  */
-@Provider(name = IDUtils.UUIDv1, messageKey = "version1.uuid.id.generator.name")
+@Provider(name = IDUtils.UUIDv1, titleKey = "version1.uuid.id.generator.name")
 public final class UUIDv1Generator extends UUIDGenerator {
 
     private static final long INTERVAL = 0x01B21DD213814000L;

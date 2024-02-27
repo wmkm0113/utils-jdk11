@@ -122,8 +122,10 @@ public final class ConfigureManager {
      *                   <span class="zh-CN">配置信息存储路径</span>
      */
     public static void initialize(final String customPath) {
+        boolean registerHook = Boolean.TRUE;
         if (INSTANCE != null) {
             destroy();
+            registerHook = Boolean.FALSE;
         }
         String storagePath;
         if (StringUtils.isEmpty(customPath)) {
@@ -144,7 +146,9 @@ public final class ConfigureManager {
             return;
         }
         INSTANCE = new ConfigureManager(storagePath);
-        Runtime.getRuntime().addShutdownHook(new Thread(ConfigureManager::destroy));
+        if (registerHook) {
+            Runtime.getRuntime().addShutdownHook(new Thread(ConfigureManager::destroy));
+        }
     }
 
     /**
@@ -231,6 +235,9 @@ public final class ConfigureManager {
         Optional.ofNullable(this.securityFieldsMap.get(className))
                 .ifPresent(fieldMap ->
                         fieldMap.forEach((fieldName, secureName) -> {
+                            if (!SecureFactory.registeredConfig(secureName)) {
+                                return;
+                            }
                             Object fieldValue = ReflectionUtils.getFieldValue(fieldName, beanObject);
                             if (fieldValue instanceof BeanObject) {
                                 this.securityFields((BeanObject) fieldValue, encrypt);
@@ -402,7 +409,6 @@ public final class ConfigureManager {
                                 Optional.ofNullable(field.getAnnotation(Password.class))
                                         .map(Password::value)
                                         .filter(StringUtils::notBlank)
-                                        .filter(SecureFactory::registeredConfig)
                                         .orElse(Globals.DEFAULT_VALUE_STRING)));
         this.securityFieldsMap.put(className, fieldMap);
     }

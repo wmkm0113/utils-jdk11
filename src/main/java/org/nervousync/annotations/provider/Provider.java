@@ -47,5 +47,5 @@ public @interface Provider {
      * @return  <span class="en-US">Multilingual key value</span>
      *          <span class="zh-CN">多语言键值</span>
      */
-    String messageKey();
+    String titleKey();
 }

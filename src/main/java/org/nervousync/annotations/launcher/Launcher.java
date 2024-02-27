@@ -1,6 +1,6 @@
 /*
  * Licensed to the Nervousync Studio (NSYC) under one or more
- * contributor license agreements. See the NOTICE file distributed with
+ * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -16,7 +16,7 @@
  */
 package org.nervousync.annotations.launcher;
 
-import org.nervousync.commons.Globals;
+import org.nervousync.enumerations.launcher.StartupType;
 
 import java.lang.annotation.*;
 
@@ -32,11 +32,11 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface Launcher {
 	/**
-	 * <span class="en-US">Launcher sort code. Sort type: DESC</span>
-	 * <span class="zh-CN">启动器排序代码，排序类型：倒叙</span>
+	 * <span class="en-US">Enumeration value of startup type, default value: MANUAL</span>
+	 * <span class="zh-CN">启动类型枚举值，默认：手动（MANUAL）</span>
 	 *
-	 * @return  <span class="en-US">Sort code</span>
-	 *          <span class="zh-CN">排序代码</span>
+	 * @return <span class="en-US">Enumeration value of startup type</span>
+	 * <span class="zh-CN">启动类型枚举值</span>
 	 */
-	int value() default Globals.DEFAULT_VALUE_INT;
+	StartupType value() default StartupType.MANUAL;
 }
