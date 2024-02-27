@@ -1,9 +1,13 @@
+# Nervousync® Java Utilities Package
+
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.nervousync/utils-jdk11/)
 [![License](https://img.shields.io/github/license/wmkm0113/utils-jdk11.svg)](https://github.com/wmkm0113/utils-jdk11/blob/mainline/LICENSE)
 ![Language](https://img.shields.io/badge/language-Java-green)
 [![Twitter:wmkm0113](https://img.shields.io/twitter/follow/wmkm0113?label=Follow)](https://twitter.com/wmkm0113)
 
-# Nervousync® Java Utilities Package
+English
+[简体中文](README_zh_CN.md)
+
 ## Description:
 
 This project aims to provide convenient tools and utility functions for Java program development. 
@@ -276,7 +280,23 @@ and create file named: org.nervousync.generator.IGenerator save to META-INF/serv
 * Substring given input string by rule
 * Validate given string is match code type
 
-# Thanks For
+## Contributions and feedback
+Friends are welcome to translate the prompt information, error messages, 
+etc. in this document and project into more languages to help more users better understand and use this toolkit.   
+If you find problems during use or need to improve or add related functions, 
+please submit an issue to this project or send an email to [wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=bugs_and_features)   
+For better communication, please include the following information when submitting an issue or sending an email:
+1. The purpose is: discover bugs/function improvements/add new features   
+2. Please paste the following information (if it exists): incoming data, expected results, error stack information   
+3. Where do you think there may be a problem with the code (if provided, it can help us find and solve the problem as soon as possible)
+
+If you are submitting information about adding new features, please ensure that the features to be added are general needs, that is, the new features can help most users.
+
+If you need to add customized special requirements, I will charge a certain custom development fee.
+The specific fee amount will be assessed based on the workload of the customized special requirements.   
+For customized special features, please send an email directly to [wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features). At the same time, please try to indicate the budget amount of development cost you can afford in the email.
+
+## Sponsorship and Thanks To
 <span id="JetBrains">
     <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="100px" height="100px" alt="JetBrains Logo (Main) logo.">
     <span>Many thanks to <a href="https://www.jetbrains.com/">JetBrains</a> for sponsoring our Open Source projects with a license.</span>

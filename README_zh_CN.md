@@ -5,12 +5,12 @@
 ![Language](https://img.shields.io/badge/language-Java-green)
 [![Twitter:wmkm0113](https://img.shields.io/twitter/follow/wmkm0113?label=Follow)](https://twitter.com/wmkm0113)
 
+[English](README.md)
+简体中文
+
 增强工具包是为了提供接口稳定、集成简单、可重用的工具包，同时优化了第三方类库的引用。工具包中包含了很多经常用到的工具类和功能模块，涵盖了广泛的应用场景， 
 工具包提供了一套简洁而强大的API，帮助开发人员更高效地编写Java代码，无论是处理日期和时间、字符串操作、文件操作或网络请求的发送与处理，还是发送电子邮件、使用SNMP进行性能监控、统一的配置文件管理，
 又或者是一次性密码支持、X.509证书的操作、任务管理器等，该工具包都提供了丰富的模块、功能和方法。
-
-[English](README.md)
-简体中文
 
 ## 目录
 * [JDK版本](#JDK版本)
