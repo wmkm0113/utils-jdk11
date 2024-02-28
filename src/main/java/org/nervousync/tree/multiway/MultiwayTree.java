@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.tree.node;
+package org.nervousync.tree.multiway;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.enumerations.tree.RecursionType;
@@ -30,7 +30,7 @@ import java.util.*;
  * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 17:15:52 $
  */
-public final class TreeNode<T> {
+public final class MultiwayTree<T> {
 
 	/**
 	 * <span class="en-US">Node value</span>
@@ -41,12 +41,12 @@ public final class TreeNode<T> {
 	 * <span class="en-US">Parent node</span>
 	 * <span class="zh-CN">父节点</span>
 	 */
-	private TreeNode<T> parentNode;
+	private MultiwayTree<T> parentNode;
 	/**
 	 * <span class="en-US">Child node list</span>
 	 * <span class="zh-CN">子节点列表</span>
 	 */
-	private final List<TreeNode<T>> childNodes;
+	private final List<MultiwayTree<T>> childNodes;
 
 	/**
 	 * <h3 class="en-US">Constructor method for multi-node tree</h3>
@@ -55,7 +55,7 @@ public final class TreeNode<T> {
 	 * @param nodeValue <span class="en-US">Node value</span>
 	 *                  <span class="zh-CN">节点值</span>
 	 */
-	public TreeNode(final T nodeValue) {
+	public MultiwayTree(final T nodeValue) {
 		this(nodeValue, null);
 	}
 
@@ -68,7 +68,7 @@ public final class TreeNode<T> {
 	 * @param parentNode <span class="en-US">Parent node</span>
 	 *                   <span class="zh-CN">父节点</span>
 	 */
-	public TreeNode(final T nodeValue, final TreeNode<T> parentNode) {
+	public MultiwayTree(final T nodeValue, final MultiwayTree<T> parentNode) {
 		this.nodeValue = nodeValue;
 		this.parentNode = parentNode;
 		this.childNodes = new ArrayList<>();
@@ -103,7 +103,7 @@ public final class TreeNode<T> {
 	 * @return <span class="en-US">Parent node</span>
 	 * <span class="zh-CN">父节点</span>
 	 */
-	public TreeNode<T> getParentNode() {
+	public MultiwayTree<T> getParentNode() {
 		return parentNode;
 	}
 
@@ -114,7 +114,7 @@ public final class TreeNode<T> {
 	 * @param parentNode <span class="en-US">Parent node</span>
 	 *                   <span class="zh-CN">父节点</span>
 	 */
-	public void setParentNode(TreeNode<T> parentNode) {
+	public void setParentNode(MultiwayTree<T> parentNode) {
 		this.parentNode = parentNode;
 	}
 
@@ -125,7 +125,7 @@ public final class TreeNode<T> {
 	 * @return <span class="en-US">Child node list</span>
 	 * <span class="zh-CN">子节点列表</span>
 	 */
-	public List<TreeNode<T>> getChildNodes() {
+	public List<MultiwayTree<T>> getChildNodes() {
 		return childNodes;
 	}
 
@@ -139,7 +139,7 @@ public final class TreeNode<T> {
 	public void addChild(final T nodeValue) {
 		if (this.childNodes.stream().noneMatch(treeNode ->
 				ObjectUtils.nullSafeEquals(treeNode.getNodeValue(), nodeValue))) {
-			this.childNodes.add(new TreeNode<>(nodeValue, this));
+			this.childNodes.add(new MultiwayTree<>(nodeValue, this));
 		}
 	}
 
@@ -167,7 +167,7 @@ public final class TreeNode<T> {
 	 * @param treeNode <span class="en-US">Child node instance</span>
 	 *                 <span class="zh-CN">子节点</span>
 	 */
-	public void addChild(@Nonnull final TreeNode<T> treeNode) {
+	public void addChild(@Nonnull final MultiwayTree<T> treeNode) {
 		treeNode.setParentNode(this);
 		if (this.childNodes.stream().noneMatch(existNode ->
 				ObjectUtils.nullSafeEquals(treeNode.getNodeValue(), existNode.getNodeValue()))) {
@@ -227,7 +227,7 @@ public final class TreeNode<T> {
 	 * @param treeNode <span class="en-US">Current traversal node</span>
 	 *                 <span class="zh-CN">当前遍历节点</span>
 	 */
-	private static <T> void normal(@Nonnull final Queue<T> queue, @Nonnull final TreeNode<T> treeNode) {
+	private static <T> void normal(@Nonnull final Queue<T> queue, @Nonnull final MultiwayTree<T> treeNode) {
 		queue.offer(treeNode.getNodeValue());
 		treeNode.getChildNodes().forEach(childNode -> normal(queue, childNode));
 	}
@@ -241,11 +241,11 @@ public final class TreeNode<T> {
 	 * @param treeNode <span class="en-US">Current traversal node</span>
 	 *                 <span class="zh-CN">当前遍历节点</span>
 	 */
-	private static <T> void breadth(@Nonnull final Queue<T> queue, @Nonnull final TreeNode<T> treeNode) {
-		Deque<TreeNode<T>> nodeQueue = new LinkedList<>();
+	private static <T> void breadth(@Nonnull final Queue<T> queue, @Nonnull final MultiwayTree<T> treeNode) {
+		Deque<MultiwayTree<T>> nodeQueue = new LinkedList<>();
 		nodeQueue.push(treeNode);
 		while (!nodeQueue.isEmpty()) {
-			TreeNode<T> node = nodeQueue.pop();
+			MultiwayTree<T> node = nodeQueue.pop();
 			queue.offer(node.getNodeValue());
 			nodeQueue.addAll(node.getChildNodes());
 		}
@@ -260,13 +260,13 @@ public final class TreeNode<T> {
 	 * @param treeNode <span class="en-US">Current traversal node</span>
 	 *                 <span class="zh-CN">当前遍历节点</span>
 	 */
-	private static <T> void depth(@Nonnull final Queue<T> queue, @Nonnull final TreeNode<T> treeNode) {
-		Deque<TreeNode<T>> nodeQueue = new LinkedList<>();
+	private static <T> void depth(@Nonnull final Queue<T> queue, @Nonnull final MultiwayTree<T> treeNode) {
+		Deque<MultiwayTree<T>> nodeQueue = new LinkedList<>();
 		nodeQueue.push(treeNode);
 		while (!nodeQueue.isEmpty()) {
-			TreeNode<T> node = nodeQueue.pop();
+			MultiwayTree<T> node = nodeQueue.pop();
 			queue.offer(node.getNodeValue());
-			List<TreeNode<T>> childNodes = new ArrayList<>(node.getChildNodes());
+			List<MultiwayTree<T>> childNodes = new ArrayList<>(node.getChildNodes());
 			Collections.reverse(childNodes);
 			nodeQueue.addAll(childNodes);
 		}

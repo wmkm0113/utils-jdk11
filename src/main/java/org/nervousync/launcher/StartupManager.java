@@ -119,7 +119,52 @@ public final class StartupManager {
 	 * <span class="en-US">启动管理器实例对象</span>
 	 */
 	public static StartupManager getInstance() {
+		if (StartupManager.INSTANCE == null) {
+			initialize();
+		}
 		return StartupManager.INSTANCE;
+	}
+
+	/**
+	 * <h3 class="en-US">Obtain registered launcher configure information list</h3>
+	 * <h3 class="zh-CN">获取已注册的启动器配置信息列表</h3>
+	 *
+	 * @return <span class="en-US">Launcher configure information list</span>
+	 * <span class="en-US">启动器配置信息列表</span>
+	 */
+	public List<LauncherConfig> registeredLaunchers() {
+		return this.startupConfig.getRegisteredLaunchers();
+	}
+
+	public void config(final String className, final StartupType startupType) {
+		final AtomicBoolean modified = new AtomicBoolean(Boolean.FALSE);
+		long startTime = DateTimeUtils.currentUTCTimeMillis();
+
+		while (true) {
+			if (!this.running) {
+				this.running = Boolean.TRUE;
+				break;
+			}
+			if (1000L < (DateTimeUtils.currentUTCTimeMillis() - startTime)) {
+				return;
+			}
+		}
+		List<LauncherConfig> registeredLaunchers = this.startupConfig.getRegisteredLaunchers();
+		registeredLaunchers.replaceAll(launcherConfig -> {
+			if (ObjectUtils.nullSafeEquals(className, launcherConfig.getLauncherClass().getName())
+					&& !ObjectUtils.nullSafeEquals(launcherConfig.getStartupType(), startupType)) {
+				launcherConfig.setStartupType(startupType);
+				modified.set(Boolean.TRUE);
+			}
+			return launcherConfig;
+		});
+
+		if (modified.get()) {
+			this.startupConfig.setRegisteredLaunchers(registeredLaunchers);
+			this.saveConfig();
+		}
+
+		this.running = Boolean.FALSE;
 	}
 
 	/**
@@ -137,6 +182,7 @@ public final class StartupManager {
 				.stream()
 				.filter(launcherConfig ->
 						ObjectUtils.nullSafeEquals(className, launcherConfig.getLauncherClass().getName()))
+				.filter(launcherConfig -> !StartupType.DISABLE.equals(launcherConfig.getStartupType()))
 				.forEach(this::startLauncher);
 	}
 
@@ -153,11 +199,12 @@ public final class StartupManager {
 					.stream()
 					.filter(launcherConfig ->
 							ObjectUtils.nullSafeEquals(className, launcherConfig.getLauncherClass().getName()))
+					.filter(launcherConfig -> !StartupType.DISABLE.equals(launcherConfig.getStartupType()))
 					.forEach(launcherConfig ->
 							this.runningLaunchers.removeIf(startupLauncher -> {
 								if (ObjectUtils.nullSafeEquals(launcherConfig.getLauncherClass(),
 										startupLauncher.getClass())) {
-									startupLauncher.destroy();
+									startupLauncher.stop();
 									return Boolean.TRUE;
 								}
 								return Boolean.FALSE;
@@ -177,6 +224,7 @@ public final class StartupManager {
 				.stream()
 				.filter(launcherConfig ->
 						ObjectUtils.nullSafeEquals(className, launcherConfig.getLauncherClass().getName()))
+				.filter(launcherConfig -> !StartupType.DISABLE.equals(launcherConfig.getStartupType()))
 				.forEach(launcherConfig -> {
 					if (this.runningLauncher(className)) {
 						this.runningLaunchers.stream()
@@ -184,7 +232,7 @@ public final class StartupManager {
 										ObjectUtils.nullSafeEquals(launcherConfig.getLauncherClass(),
 												startupLauncher.getClass()))
 								.forEach(startupLauncher -> {
-									startupLauncher.destroy();
+									startupLauncher.stop();
 									startupLauncher.startup();
 								});
 					} else {
@@ -213,23 +261,6 @@ public final class StartupManager {
 			startupLauncher.startup();
 			this.runningLaunchers.add(startupLauncher);
 		}
-	}
-
-	/**
-	 * <h3 class="en-US">Stop registered launcher</h3>
-	 * <h3 class="zh-CN">停止注册的启动器</h3>
-	 *
-	 * @param launcherConfig <span class="en-US">Launcher configure information instance</span>
-	 *                       <span class="en-US">启动器配置信息实例对象</span>
-	 */
-	private void stopLauncher(@Nonnull final LauncherConfig launcherConfig) {
-		this.runningLaunchers.removeIf(startupLauncher -> {
-			if (ObjectUtils.nullSafeEquals(launcherConfig.getLauncherClass(), startupLauncher.getClass())) {
-				startupLauncher.destroy();
-				return Boolean.TRUE;
-			}
-			return Boolean.FALSE;
-		});
 	}
 
 	/**
@@ -279,12 +310,17 @@ public final class StartupManager {
 			modified.set(Boolean.TRUE);
 		}
 		if (modified.get()) {
-			this.startupConfig.setLastModify(DateTimeUtils.currentUTCTimeMillis());
 			this.startupConfig.setRegisteredLaunchers(registeredLaunchers);
-			ConfigureManager.getInstance().saveConfigure(this.startupConfig);
+			this.saveConfig();
 		}
 
 		this.running = Boolean.FALSE;
+	}
+
+	private void saveConfig() {
+		this.startupConfig.setLastModify(DateTimeUtils.currentUTCTimeMillis());
+		Optional.ofNullable(ConfigureManager.getInstance())
+				.ifPresent(configureManager -> configureManager.saveConfigure(this.startupConfig));
 	}
 
 	/**
