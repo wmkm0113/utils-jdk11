@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
  * <h2 class="zh-CN">实现接口IConverter的抽象转换器</h2>
  * <span class="zh-CN">继承类XmlAdapter，用于兼容JAXB数据转换器</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 10:25:22 $
  */
 public abstract class AbstractAdapter<BoundType> extends XmlAdapter<String, BoundType> {

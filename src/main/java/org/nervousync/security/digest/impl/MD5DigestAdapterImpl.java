@@ -32,7 +32,7 @@ import java.security.MessageDigest;
  * <h2 class="zh-CN">MD5摘要算法适配器的实现类</h2>
  * <p class="zh-CN">已废弃。建议使用SHA256代替</p>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:52:19 $
  */
 public final class MD5DigestAdapterImpl extends BaseDigestAdapter {

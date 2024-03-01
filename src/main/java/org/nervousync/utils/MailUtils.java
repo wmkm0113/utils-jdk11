@@ -88,7 +88,7 @@ import java.util.*;
  *     <ul>添加电子签名到邮件</ul>
  * </span>
  *
- * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee     <a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.5 $ $Date: Jul 31, 2012 20:54:04 $
  */
 public final class MailUtils {
@@ -119,7 +119,7 @@ public final class MailUtils {
      * <h2 class="en-US">E-Mail Agent</h2>
      * <h2 class="zh-CN">电子邮件代理</h2>
      *
-     * @author Steven Wee     <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee     <a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 21:03:46 $
      */
     public static final class Agent {

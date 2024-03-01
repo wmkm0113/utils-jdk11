@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.*;
  * <h2 class="zh-CN">安全配置信息定义</h2>
  * <p class="zh-CN">用于在任何配置文件中保护密码</p>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 12, 2020 23:05:27 $
  */
 @XmlRootElement(name = "secure_config", namespace = "https://nervousync.org/schemas/secure")

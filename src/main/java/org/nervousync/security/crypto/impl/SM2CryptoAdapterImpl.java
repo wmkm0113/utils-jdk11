@@ -26,7 +26,7 @@ import org.nervousync.exceptions.crypto.CryptoException;
  * <h2 class="en-US">Asymmetric SM2 crypto adapter class</h2>
  * <h2 class="zh-CN">SM2非对称加密解密适配器的实现类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 14:33:28 $
  */
 public final class SM2CryptoAdapterImpl extends AsymmetricCryptoAdapter {

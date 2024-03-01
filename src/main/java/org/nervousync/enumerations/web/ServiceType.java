@@ -21,7 +21,7 @@ package org.nervousync.enumerations.web;
  * <h2 class="en-US">网络服务类型</h2>
  * <h2 class="zh-CN">Web Service类型</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 24, 2023 10:21:02 $
  */
 public enum ServiceType {

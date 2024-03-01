@@ -28,7 +28,7 @@ import org.nervousync.zip.models.header.utils.HeaderOperator;
 /**
  * The type Local file header.
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:29:26 PM $
  */
 public final class LocalFileHeader extends FileHeader {

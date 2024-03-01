@@ -53,7 +53,7 @@ import java.util.Map;
  *     <ul>写入数据到Excel文件</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 13, 2023 15:13:37 $
  */
 public final class OfficeUtils {

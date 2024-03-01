@@ -25,7 +25,7 @@ import org.nervousync.zip.crypto.Decryptor;
 /**
  * Decryptor implement of AES
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 10:55:30 AM $
  */
 public final class AESDecryptor extends AESCrypto implements Decryptor {

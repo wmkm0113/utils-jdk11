@@ -33,7 +33,7 @@ import java.lang.annotation.*;
  *     <p>如果用于Mappings注解的参数，表示将数据复制到目标对象</p>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:33 $
  */
 @Documented

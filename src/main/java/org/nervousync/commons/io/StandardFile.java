@@ -35,7 +35,7 @@ import jcifs.smb.SmbRandomAccessFile;
  * <h2 class="zh-CN">自定义的RandomAccessFile</h2>
  * <span class="en-US">支持本地文件和网络文件（协议：smb://）</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.0 $ $Date: Apr 22, 2022 11:49:46 AM $
  */
 public class StandardFile implements DataInput, DataOutput, Closeable {

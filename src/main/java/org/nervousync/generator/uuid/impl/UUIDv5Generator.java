@@ -29,7 +29,7 @@ import java.util.UUID;
  * <h2 class="en-US">UUID version 5 generator</h2>
  * <h2 class="zh-CN">UUID版本5生成器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:59:08 $
  */
 @Provider(name = IDUtils.UUIDv5, titleKey = "version5.uuid.id.generator.name")

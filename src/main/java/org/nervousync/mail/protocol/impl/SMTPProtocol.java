@@ -23,7 +23,7 @@ import org.nervousync.mail.protocol.BaseProtocol;
 /**
  * Implement SMTP protocol
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 8:10:30 PM $
  */
 public final class SMTPProtocol extends BaseProtocol implements SendOperator {

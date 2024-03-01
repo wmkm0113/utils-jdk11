@@ -23,7 +23,7 @@ import jakarta.servlet.jsp.tagext.TagSupport;
  * <h2 class="en-US">Abstract class used to determine tags</h2>
  * <h2 class="zh-CN">用于判断标签的抽象类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 26, 2023 19:05:28 $
  */
 public abstract class ConditionTag extends TagSupport {

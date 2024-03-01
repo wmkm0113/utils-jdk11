@@ -27,7 +27,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="en-US">Proxy server configure</h2>
  * <h2 class="zh-CN">代理服务器配置信息</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 4, 2018 16:05:54 $
  */
 @XmlRootElement(name = "proxy_config", namespace = "https://nervousync.org/schemas/proxy")

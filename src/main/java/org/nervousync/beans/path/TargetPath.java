@@ -23,7 +23,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="en-US">Jar path define</h2>
  * <h2 class="zh-CN">Jar路径定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 31, 2023 16:27:08 $
  */
 public class TargetPath {

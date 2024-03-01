@@ -36,7 +36,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="en-US">Http Entity Define</h2>
  * <h2 class="zh-CN">HTTP请求信息定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 2, 2018 14:05:04 $
  */
 public final class HttpEntity {
@@ -257,7 +257,7 @@ public final class HttpEntity {
 	 * <h2 class="en-US">Http Entity Information Define</h2>
 	 * <h2 class="zh-CN">HTTP请求参数信息定义</h2>
 	 *
-	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+	 * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
 	 * @version $Revision: 1.0.0 $ $Date: Jul 2, 2018 14:08:33 $
 	 */
 	private static final class EntityInfo {

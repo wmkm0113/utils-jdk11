@@ -34,7 +34,7 @@ import java.util.List;
  * <h2 class="en-US">Abstract class for traversing data labels</h2>
  * <h2 class="zh-CN">用于遍历数据标签的抽象类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 26, 2023 19:02:27 $
  */
 public abstract class CollectionTag extends SimpleTagSupport {

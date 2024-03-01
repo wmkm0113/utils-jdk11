@@ -39,7 +39,7 @@ import java.util.*;
  *     <ul>根据BeanProperty注解从源数据对象复制数据到目标数据对象数组</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jun 25, 2015 14:55:15 $
  */
 public final class BeanUtils {

@@ -45,7 +45,7 @@ import java.util.*;
  *     <ul>从集合中寻找第一个符合要求的元素</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 13, 2010 16:27:49 $
  */
 public final class CollectionUtils {

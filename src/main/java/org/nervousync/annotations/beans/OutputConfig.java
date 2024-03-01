@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * <h2 class="zh-CN">标注用于数据输出的配置</h2>
  * <span class="en-US">定义输出的数据类型，是否格式化输出的字符串以及输出字符串的编码集</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Apr 15, 2023 14:27:15 $
  */
 @Inherited

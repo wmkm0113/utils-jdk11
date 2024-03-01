@@ -58,7 +58,7 @@ import java.util.*;
  *     <ul>计算CRC/MD5/HmacMD5/SHA/HmacSHA/SM3/HmacSM3/SHAKE128/SHAKE256结果</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.3 $ $Date: Jan 13, 2010 11:23:13 $
  */
 public final class SecurityUtils {

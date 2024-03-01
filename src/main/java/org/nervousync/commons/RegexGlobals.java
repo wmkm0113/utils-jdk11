@@ -20,7 +20,7 @@ package org.nervousync.commons;
  * <h2 class="en-US">Regular expression library</h2>
  * <h2 class="zh-CN">正则表达式库</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 8, 2021 17:23:06 $
  */
 public final class RegexGlobals {

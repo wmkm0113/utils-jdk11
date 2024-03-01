@@ -32,6 +32,13 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
+/**
+ * <h2 class="en-US">Transformer implement class which using for merge internationalization resource file</h2>
+ * <h2 class="zh-CN">用于合并国际化资源文件的传送器实现</h2>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
+ * @version $Revision: 1.0.0 $ $Date: Oct 21, 2023 09:05:28 $
+ */
 public final class I18nResourceTransformer extends AbstractCompatibilityTransformer {
     private final BundleResource bundleResource = new BundleResource();
 

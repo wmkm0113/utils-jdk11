@@ -27,7 +27,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="en-US">Mark options of image mark operate</h2>
  * <h2 class="zh-CN">用于图片水印操作的剪切选项</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.2 $ $Date: Dec 10, 2021 16:11:01 $
  */
 public final class MarkOptions {

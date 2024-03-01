@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * <h2 class="en-US">SAX event-driven Excel file reader</h2>
  * <h2 class="zh-CN">SAX事件驱动的Excel文件读取器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Nov 13, 2023 10:45:33 $
  */
 public final class EventModelReaderImpl extends AbstractExcelReader {
@@ -187,7 +187,7 @@ public final class EventModelReaderImpl extends AbstractExcelReader {
      * <h2 class="en-US">Data processor to read maximum number of rows</h2>
      * <h2 class="zh-CN">读取最大行数的数据处理器</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.2.0 $ $Date: Nov 13, 2023 10:53:16 $
      */
     private static final class MaxRowHandler extends DefaultHandler {
@@ -213,7 +213,7 @@ public final class EventModelReaderImpl extends AbstractExcelReader {
      * <h2 class="en-US">Data processor to read detailed information</h2>
      * <h2 class="zh-CN">读取详细信息的数据处理器</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.2.0 $ $Date: Nov 13, 2023 10:59:28 $
      */
     private static final class SheetHandler extends DefaultHandler {

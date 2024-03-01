@@ -7,7 +7,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.nervousync.commons.Globals;
 
 /**
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0 $ $Date: Jul 13, 2016 4:41:24 PM $
  */
 public final class CodeOptions {

@@ -33,7 +33,7 @@ import org.nervousync.exceptions.location.LocationConvertException;
  *     <ul>计算两个物理坐标之间的距离，单位：公里</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Dec 19, 2017 13:01:14 $
  */
 public final class LocationUtils {

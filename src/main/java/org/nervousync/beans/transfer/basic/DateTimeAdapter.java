@@ -26,7 +26,7 @@ import java.util.Date;
  * <h2 class="en-US">DateTime DataConverter</h2>
  * <h2 class="zh-CN">日期时间数据转换器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.0 $Date: 2018-10-15 14:31
  */
 public final class DateTimeAdapter extends AbstractAdapter<Date> {

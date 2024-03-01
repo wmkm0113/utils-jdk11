@@ -40,7 +40,7 @@ import java.security.SecureRandom;
  *     <ul>验证基于HMAC算法加密的一次性密码/基于时间戳算法的一次性密码值</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.2 $ $Date: Jun 04, 2019 10:47:28 $
  */
 public final class OTPUtils {

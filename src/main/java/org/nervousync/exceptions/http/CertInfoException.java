@@ -22,7 +22,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="en-US">Certification Information Exception</h2>
  * <h2 class="zh-CN">证书信息异常</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $Date: Oct 30, 2018 15:53:06 $
  */
 public final class CertInfoException extends AbstractException {

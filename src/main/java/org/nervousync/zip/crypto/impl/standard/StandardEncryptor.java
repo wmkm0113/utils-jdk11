@@ -25,7 +25,7 @@ import org.nervousync.zip.crypto.Encryptor;
 /**
  * Encryptor implement of the standard
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 5:08:31 PM $
  */
 public final class StandardEncryptor implements Encryptor {

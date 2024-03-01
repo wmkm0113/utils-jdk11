@@ -32,7 +32,7 @@ import java.net.Proxy;
  * @param <T>   <span class="en-US">Generics Type Class</span>
  *              <span class="zh-CN">泛型类</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 4, 2019 16:22:54 $
  */
 public abstract class AbstractProxyConfigBuilder<T> extends AbstractBuilder<T> {

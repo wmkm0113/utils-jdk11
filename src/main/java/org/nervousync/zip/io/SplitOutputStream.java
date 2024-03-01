@@ -33,7 +33,7 @@ import org.nervousync.utils.StringUtils;
 /**
  * The type Split output stream.
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 \r\n * @date: Nov 29, 2017 2:57:01 PM $
  */
 public class SplitOutputStream extends OutputStream {

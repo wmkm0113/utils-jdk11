@@ -22,7 +22,7 @@ import org.nervousync.mail.config.MailConfig;
  * <h2 class="en-US">Mail configure builder</h2>
  * <h2 class="zh-CN">电子邮件配置信息构造器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:52:27 $
  */
 public final class MailConfigBuilder extends AbstractMailConfigBuilder<MailConfig> {

@@ -27,7 +27,7 @@ import java.util.*;
  * <h2 class="en-US">Multi-node Tree</h2>
  * <h2 class="zh-CN">多叉树</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 17:15:52 $
  */
 public final class MultiwayTree<T> {

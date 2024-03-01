@@ -98,7 +98,7 @@ import java.util.regex.Pattern;
  *     <ul>验证给定的字符串是否符合代码类型</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 13, 2010 15:53:41 $
  */
 public final class StringUtils {

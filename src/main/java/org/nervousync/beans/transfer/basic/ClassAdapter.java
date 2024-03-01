@@ -25,7 +25,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="en-US">Class DataConverter</h2>
  * <h2 class="zh-CN">Class数据转换器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 29, 2023 17:19:28 $
  */
 public final class ClassAdapter extends AbstractAdapter<Class<?>> {

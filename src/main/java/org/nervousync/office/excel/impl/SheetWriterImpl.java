@@ -29,7 +29,7 @@ import java.util.List;
  * <h2 class="en-US">Sheet data writer implementation class</h2>
  * <h2 class="zh-CN">数据表数据写入器实现类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Nov 13, 2023 14:10:05 $
  */
 public final class SheetWriterImpl implements SheetWriter {

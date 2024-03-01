@@ -29,7 +29,7 @@ import java.util.*;
  * <h2 class="en-US">Symmetric CRC crypto adapter class</h2>
  * <h2 class="zh-CN">CRC摘要算法适配器的实现类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jan 13, 2012 13:50:21 $
  */
 public final class CRCDigestAdapterImpl extends SecureAdapter {

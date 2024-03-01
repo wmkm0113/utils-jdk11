@@ -46,7 +46,7 @@ import java.util.Properties;
  *     <ul>转换属性信息为数据映射表</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 12, 2010 15:12:05 $
  */
 public final class ConvertUtils {

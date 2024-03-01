@@ -31,7 +31,7 @@ import java.util.*;
  * <h2 class="en-US">ID generator utilities</h2>
  * <h2 class="zh-CN">ID生成器工具集</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Sep 13, 2017 11:27:28 $
  */
 public final class IDUtils {

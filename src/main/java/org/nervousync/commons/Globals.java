@@ -24,7 +24,7 @@ import java.util.Locale;
  * <h2 class="en-US">Globals constants Value</h2>
  * <h2 class="zh-CN">全局常量值</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.4 $ $Date: Jul 2, 2018 18:44:29 $
  */
 public final class Globals {

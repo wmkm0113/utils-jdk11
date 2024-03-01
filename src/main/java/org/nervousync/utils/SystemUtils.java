@@ -42,7 +42,7 @@ import java.util.*;
  *     <ul>生成当前系统的唯一标识ID</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jul 24, 2015 11:43:24 $
  */
 public final class SystemUtils {

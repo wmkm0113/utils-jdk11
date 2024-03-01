@@ -24,7 +24,7 @@ import java.lang.annotation.*;
  * <h2 class="zh-CN">数据复制目标的注解</h2>
  * <span class="en-US">标注用于复制数据到指定的多个目标</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Sep 25, 2022 14:28:27 $
  */
 @Documented

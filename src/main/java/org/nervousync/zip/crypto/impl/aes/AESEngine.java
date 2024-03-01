@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * AES Engine
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 30, 2017 2:55:56 PM $
  */
 public final class AESEngine {

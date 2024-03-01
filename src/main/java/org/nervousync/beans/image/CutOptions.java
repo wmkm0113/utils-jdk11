@@ -22,7 +22,7 @@ import org.nervousync.commons.Globals;
  * <h2 class="en-US">Cut options of image cut operate</h2>
  * <h2 class="zh-CN">用于图片剪切操作的剪切选项</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.0 $ $Date: Sep 22, 2022 17:36:55 $
  */
 public final class CutOptions {

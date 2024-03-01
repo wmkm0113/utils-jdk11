@@ -22,7 +22,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="en-US">Builder Exception</h2>
  * <h2 class="zh-CN">构建器异常</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Apr 25, 2017 18:30:42 $
  */
 public final class BuilderException extends AbstractException {

@@ -26,7 +26,7 @@ import java.util.*;
  * <h2 class="en-US">Reflection Operate Utilities</h2>
  * <h2 class="zh-CN">反射操作工具集</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.4 $ $Date: Jan 13, 2010 16:26:58 $
  */
 public final class ReflectionUtils {
@@ -1187,7 +1187,7 @@ public final class ReflectionUtils {
      * <h2 class="en-US">Callback interface invoked on each method in the hierarchy.</h2>
      * <h2 class="zh-CN">在层次结构中的每个方法上调用回调接口。</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 15, 2010 10:27:42 $
      */
     public interface MethodCallback {
@@ -1208,7 +1208,7 @@ public final class ReflectionUtils {
      * <h2 class="en-US">Callback interface invoked on each field in the hierarchy.</h2>
      * <h2 class="zh-CN">在层次结构中的每个字段上调用回调接口。</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 15, 2010 10:29:21 $
      */
     public interface FieldCallback {
@@ -1232,7 +1232,7 @@ public final class ReflectionUtils {
      * <h2 class="en-US">Callback optionally used to filter members to be operated on by a member callback.</h2>
      * <h2 class="zh-CN">回调可选地用于过滤要由成员回调操作的成员。</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 15, 2010 10:30:15 $
      */
     public interface MemberFilter {
@@ -1252,7 +1252,7 @@ public final class ReflectionUtils {
      * <h2 class="en-US">Callback optionally used to filter classes to be operated on super class.</h2>
      * <h2 class="zh-CN">回调可选地用于过滤要在超类上操作的类。</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 15, 2010 10:31:08 $
      */
     public interface ClassFilter {
@@ -1272,7 +1272,7 @@ public final class ReflectionUtils {
      * <h2 class="en-US">Pre-build ClassFilter that matches classes was annotation by anyone of given Annotation class array.</h2>
      * <h2 class="zh-CN">匹配类的预构建 ClassFilter 是由给定 Annotation 类数组的任何一个进行注释的。</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 15, 2010 10:33:28 $
      */
     public static final class AnnotationClassFilter implements ClassFilter {

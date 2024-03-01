@@ -29,7 +29,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="en-US">Data convert configure</h2>
  * <h2 class="zh-CN">数据转换配置信息</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Oct 26, 2023 15:12:21 $
  */
 public final class TransferConfig<ValueType, BoundType> {

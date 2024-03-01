@@ -20,7 +20,7 @@ package org.nervousync.enumerations.zip;
  * <h2 class="en-US">Zip Compress Level Enumeration</h2>
  * <h2 class="zh-CN">Zip压缩等级</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Sep 28, 2016 12:32:27 $
  */
 public enum CompressLevel {

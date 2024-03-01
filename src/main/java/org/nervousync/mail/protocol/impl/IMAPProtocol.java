@@ -34,7 +34,7 @@ import java.util.List;
  * <h2 class="en-US">Implements class of JavaMail IMAP protocol</h2>
  * <h2 class="zh-CN">JavaMail的IMAP协议类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 31, 2012 19:58:05 $
  */
 public final class IMAPProtocol extends BaseProtocol implements SendOperator, ReceiveOperator {

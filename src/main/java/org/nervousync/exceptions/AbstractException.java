@@ -24,7 +24,7 @@ import org.nervousync.utils.ObjectUtils;
  * <h2 class="en-US">Abstract Exception</h2>
  * <h2 class="zh-CN">异常抽象类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2023 12:56:26 $
  */
 public abstract class AbstractException extends Exception {

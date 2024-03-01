@@ -25,7 +25,7 @@ import java.util.Optional;
  * <h2 class="en-US">Long DataConverter</h2>
  * <h2 class="zh-CN">Long数据转换器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.0 $ $Date: Jun 21, 2023 11:33:21 $
  */
 public final class LongAdapter extends AbstractAdapter<Long> {

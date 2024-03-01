@@ -33,7 +33,7 @@ import java.util.Objects;
  * <h2 class="en-US">Segment Data Block Define</h2>
  * <h2 class="zh-CN">分割数据块定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $Date: Oct 15, 2018 12:41:27 $
  */
 @XmlType(name = "segment_block", namespace = "https://nervousync.org/schemas/segment")

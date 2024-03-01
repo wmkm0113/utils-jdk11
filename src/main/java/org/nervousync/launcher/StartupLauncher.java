@@ -34,7 +34,7 @@ package org.nervousync.launcher;
  *     用于调整启动器的执行顺序，排序方式为：倒叙
  * </span>
  *.0
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 3, 2017 16:39:41 $
  */
 public interface StartupLauncher {

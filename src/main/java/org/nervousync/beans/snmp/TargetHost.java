@@ -28,7 +28,7 @@ import org.nervousync.enumerations.snmp.auth.SNMPPrivProtocol;
  * <h2 class="en-US">SNMP Target Host Define</h2>
  * <h2 class="zh-CN">SNMP目标主机定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.2 $ $Date: Sep 25, 2022 21:47:36 $
  */
 public final class TargetHost implements Serializable {

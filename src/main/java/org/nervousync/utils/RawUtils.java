@@ -43,7 +43,7 @@ import java.util.Arrays;
  *     <ul>转换位数组为字节</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Nov 28, 2017 17:34:55 $
  */
 public final class RawUtils {

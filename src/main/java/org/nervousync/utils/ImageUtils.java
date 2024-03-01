@@ -32,7 +32,7 @@ import java.util.Optional;
  * <h2 class="en-US">Image Utilities</h2>
  * <h2 class="zh-CN">图片工具集</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: May 1, 2018 13:49:46 $
  */
 public final class ImageUtils {

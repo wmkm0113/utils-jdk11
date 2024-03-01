@@ -23,7 +23,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="en-US">Zip Exception</h2>
  * <h2 class="zh-CN">ZIP异常</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 22, 2017 4:08:31 PM $
  */
 public final class ZipException extends AbstractException {

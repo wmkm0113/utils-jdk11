@@ -26,7 +26,7 @@ import org.nervousync.zip.models.Zip64ExtendInfo;
 /**
  * The type File header.
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:30:48 PM $
  */
 public class FileHeader {

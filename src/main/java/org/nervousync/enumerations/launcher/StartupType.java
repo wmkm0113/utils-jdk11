@@ -21,7 +21,7 @@ package org.nervousync.enumerations.launcher;
  * <h2 class="en-US">Enumeration value of startup type</h2>
  * <h2 class="zh-CN">启动类型枚举值</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $Date: Feb 27, 2024 10:49:12 $
  */
 public enum StartupType {

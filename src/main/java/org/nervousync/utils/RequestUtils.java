@@ -70,7 +70,7 @@ import java.util.function.Supplier;
  *     <ul>检查用户的角色信息，使用<code>request.isUserInRole</code>实现</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.4 $ $Date: May 13, 2014 15:36:52 $
  */
 public final class RequestUtils {
@@ -1056,7 +1056,7 @@ public final class RequestUtils {
      * <h2 class="en-US">Response Content Handler</h2>
      * <h2 class="zh-CN">响应体拦截处理器</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: May 13, 2014 17:22:48 $
      */
     private static final class ResponseContentHandler implements HttpResponse.BodyHandler<Supplier<ResponseInfo>> {

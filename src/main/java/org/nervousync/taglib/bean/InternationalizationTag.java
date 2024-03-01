@@ -28,7 +28,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="en-US">International information output</h2>
  * <h2 class="zh-CN">国际化信息输出</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 26, 2023 18:32:15 $
  */
 public final class InternationalizationTag extends TagSupport {

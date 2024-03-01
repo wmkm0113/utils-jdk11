@@ -27,7 +27,7 @@ import org.nervousync.security.factory.SecureFactory;
  * <h2 class="en-US">Abstract class of security configuration information</h2>
  * <h2 class="zh-CN">安全配置信息抽象类</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 12, 2020 22:10:21 $
  */
 @XmlAccessorType(XmlAccessType.NONE)

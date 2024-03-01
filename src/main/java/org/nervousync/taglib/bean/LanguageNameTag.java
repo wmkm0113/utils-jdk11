@@ -27,7 +27,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="en-US">Language name output</h2>
  * <h2 class="zh-CN">语言名称输出</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 26, 2023 18:34:06 $
  */
 public final class LanguageNameTag extends TagSupport {

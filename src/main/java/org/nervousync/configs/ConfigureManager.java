@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * <h2 class="en-US">Configuration Information Manager</h2>
  * <h2 class="zh-CN">配置信息管理器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Oct 09, 2023 09:48:31 $
  */
 public final class ConfigureManager {

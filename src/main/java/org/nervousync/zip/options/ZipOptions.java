@@ -26,7 +26,7 @@ import org.nervousync.utils.StringUtils;
 /**
  * ZIP options
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 3:51:12 PM $
  */
 public final class ZipOptions implements Cloneable {

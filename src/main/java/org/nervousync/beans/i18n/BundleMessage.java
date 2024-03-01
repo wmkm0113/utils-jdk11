@@ -28,7 +28,7 @@ import org.nervousync.utils.StringUtils;
  * <h2 class="zh-CN">国际化信息数据</h2>
  * .0
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 19, 2023 16:51:46 $
  */
 @OutputConfig(type = StringUtils.StringType.JSON)

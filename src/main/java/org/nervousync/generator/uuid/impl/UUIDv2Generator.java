@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * <h2 class="en-US">UUID version 2 generator</h2>
  * <h2 class="zh-CN">UUID版本2生成器</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 06, 2022 12:53:06 $
  */
 @Provider(name = IDUtils.UUIDv2, titleKey = "version2.uuid.id.generator.name")

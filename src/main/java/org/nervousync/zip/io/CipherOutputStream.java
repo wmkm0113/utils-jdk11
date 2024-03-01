@@ -48,7 +48,7 @@ import org.nervousync.utils.StringUtils;
 /**
  * The type Cipher output stream.
  *
- * @author Steven Wee <a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee <a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 29, 2017 2:39:25 PM $
  */
 public class CipherOutputStream extends OutputStream {

@@ -20,7 +20,7 @@ package org.nervousync.enumerations.xml;
  * <h2 class="en-US">XML Data Type Enumerations</h2>
  * <h2 class="zh-CN">XML数据类型枚举</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Sep 28, 2009 14:32:00 $
  */
 public enum DataType {

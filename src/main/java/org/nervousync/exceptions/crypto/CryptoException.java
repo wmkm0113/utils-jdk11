@@ -22,7 +22,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="en-US">Crypto Exception</h2>
  * <h2 class="zh-CN">加密异常</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Apr 22, 2017 16:27:22 $
  */
 public final class CryptoException extends AbstractException {

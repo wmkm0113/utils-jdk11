@@ -22,7 +22,7 @@ import org.nervousync.exceptions.AbstractException;
  * <h2 class="en-US">Data Invalid Exception</h2>
  * <h2 class="zh-CN">数据非法异常</h2>
  * 
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Oct 25, 2017 22:32:28 $
  */
 public final class DataInvalidException extends AbstractException {

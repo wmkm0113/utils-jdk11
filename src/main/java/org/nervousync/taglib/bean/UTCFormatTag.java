@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter;
  * <h2 class="en-US">Format UTC timestamp to local time output</h2>
  * <h2 class="zh-CN">格式化UTC时间戳为本地时间输出</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 26, 2023 18:21:49 $
  */
 public final class UTCFormatTag extends TagSupport {

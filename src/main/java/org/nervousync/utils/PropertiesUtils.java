@@ -43,7 +43,7 @@ import java.util.Properties;
  *     <ul>将属性文件保存到目标地址</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 14, 2010 11:47:08 $
  */
 public final class PropertiesUtils {

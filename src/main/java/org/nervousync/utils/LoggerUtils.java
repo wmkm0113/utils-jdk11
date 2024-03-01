@@ -29,7 +29,7 @@ import java.util.*;
  *     <ul>支持国际化的日志输出</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Sep 15, 2018 16:54:27 $
  */
 public final class LoggerUtils {
@@ -117,7 +117,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Package logger define</h2>
      * <h2 class="zh-CN">包日志定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:28:14 $
      */
     public static final class PackageLogger {
@@ -173,7 +173,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Logger define for support i18n</h2>
      * <h2 class="zh-CN">有国际化支持的日志定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jul 21, 2023 12:59:48 $
      */
     public static final class Logger {
@@ -727,7 +727,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Log configure define</h2>
      * <h2 class="zh-CN">日志配置定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:30:18 $
      */
     private static final class LogConfig {
@@ -845,7 +845,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Pattern layout configure define</h2>
      * <h2 class="zh-CN">日志输出格式配置定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:31:06 $
      */
     private static final class PatternLayoutConfigure {
@@ -916,7 +916,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Appender configure define</h2>
      * <h2 class="zh-CN">日志输出目标配置定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:37:22 $
      */
     private static final class AppenderConfigure {
@@ -1054,7 +1054,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Logger configure define</h2>
      * <h2 class="zh-CN">日志配置定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:43:57 $
      */
     private static final class LoggerConfigure {
@@ -1135,7 +1135,7 @@ public final class LoggerUtils {
      * <h2 class="en-US">Component configure define</h2>
      * <h2 class="zh-CN">组件配置定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Sep 15, 2018 17:55:19 $
      */
     private static final class ComponentConfigure {

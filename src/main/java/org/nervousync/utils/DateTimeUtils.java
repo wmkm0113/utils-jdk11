@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * <h2 class="en-US">Date time utilities</h2>
  * <h2 class="zh-CN">日期时间工具集</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 13, 2010 11:15:20 $
  */
 public final class DateTimeUtils {
@@ -980,7 +980,7 @@ public final class DateTimeUtils {
      * <h2 class="en-US">UTC Clock</h2>
      * <h2 class="zh-CN">UTC时钟</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 13, 2010 11:46:19 $
      */
     private static final class UTCClock {

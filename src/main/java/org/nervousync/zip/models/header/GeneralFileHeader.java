@@ -19,7 +19,7 @@ package org.nervousync.zip.models.header;
 /**
  * The type General file header.
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Nov 28, 2017 4:44:25 PM $
  */
 public final class GeneralFileHeader extends FileHeader {

@@ -44,7 +44,7 @@ import java.util.Optional;
  * @param <T>   <span class="en-US">Generics Type Class</span>
  *              <span class="zh-CN">泛型类</span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:27:18 $
  */
 public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
@@ -199,7 +199,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      * <h2 class="en-US">Proxy configure builder</h2>
      * <h2 class="zh-CN">代理服务器配置信息抽象构造器</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:33:28 $
      */
     public static final class ProxyConfigBuilder<T> extends AbstractProxyConfigBuilder<AbstractMailConfigBuilder<T>> {
@@ -228,7 +228,7 @@ public abstract class AbstractMailConfigBuilder<T> extends AbstractBuilder<T> {
      * <h2 class="en-US">Mail server configure builder</h2>
      * <h2 class="zh-CN">电子邮件服务器配置信息抽象构造器</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jul 31, 2022 16:35:16 $
      */
     public static final class ServerConfigBuilder<T> extends AbstractBuilder<AbstractMailConfigBuilder<T>> {

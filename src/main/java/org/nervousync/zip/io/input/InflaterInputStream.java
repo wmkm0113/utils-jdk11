@@ -30,7 +30,7 @@ import org.nervousync.zip.ZipFile;
 /**
  * The type Inflater input stream.
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Dec 2, 2017 1:06:01 PM $
  */
 public class InflaterInputStream extends PartInputStream {

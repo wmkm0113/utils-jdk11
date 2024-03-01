@@ -33,7 +33,7 @@ import org.nervousync.utils.IPUtils;
  * <h2 class="en-US">System NetworkInterface information define</h2>
  * <h2 class="zh-CN">系统网卡信息定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.3 $ $Date: Apr 06, 2020 11:53:10 $
  */
 public final class NetworkInfo implements Serializable {
@@ -186,7 +186,7 @@ public final class NetworkInfo implements Serializable {
 	 * <h3 class="en-US">IP address information define</h3>
 	 * <h3 class="zh-CN">IP地址信息定义</h3>
 	 *
-	 * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+	 * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
 	 * @version $Revision: 1.0.0 $ $Date: Jul 2, 2018 09:22:28 $
 	 */
 	public static final class IPAddressInfo implements Serializable {

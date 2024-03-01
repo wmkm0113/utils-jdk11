@@ -29,7 +29,7 @@ import org.snmp4j.smi.VariableBinding;
  * <h2 class="en-US">Reading data maps of SNMP datas</h2>
  * <h2 class="zh-CN">从SNMP读取的数据结果映射</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.1.3 $ $Date: May 25, 2022 21:55:18 $
  */
 public final class SNMPData implements Serializable {

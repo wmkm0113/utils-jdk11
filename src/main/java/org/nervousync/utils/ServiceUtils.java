@@ -57,7 +57,7 @@ import java.util.*;
  *     <ul>生成Restful请求客户端并处理请求</ul>
  * </span>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.2.0 $ $Date: Jan 13, 2020 15:52:33 $
  */
 public final class ServiceUtils {
@@ -220,7 +220,7 @@ public final class ServiceUtils {
      * <h2 class="en-US">Restful service interceptor invocation handler</h2>
      * <h2 class="zh-CN">Restful服务拦截器调用处理程序</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 13, 2020 16:28:15 $
      */
     private static final class RestfulInterceptor implements InvocationHandler {
@@ -617,7 +617,7 @@ public final class ServiceUtils {
      * <h2 class="en-US">JavaBean parameter define</h2>
      * <h2 class="zh-CN">JavaBean参数定义</h2>
      *
-     * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+     * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
      * @version $Revision: 1.0.0 $ $Date: Jan 13, 2020 16:33:27 $
      */
     private static final class BeanParameter {

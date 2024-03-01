@@ -30,7 +30,7 @@ import org.nervousync.enumerations.launcher.StartupType;
  * <h2 class="en-US">Startup Launcher configure information</h2>
  * <h2 class="zh-CN">启动器注册信息</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Feb 27, 2024 11:07:46 $
  */
 @XmlType(name = "launcher_config")

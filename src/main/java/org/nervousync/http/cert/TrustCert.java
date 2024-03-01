@@ -32,7 +32,7 @@ import java.util.Objects;
  * <h2 class="en-US">Trust Certificate Library Define</h2>
  * <h2 class="zh-CN">允许的证书库定义</h2>
  *
- * @author Steven Wee	<a href="mailto:wmkm0113@Hotmail.com">wmkm0113@Hotmail.com</a>
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $Date: Oct 30, 2018 15:38:36 $
  */
 public final class TrustCert {
