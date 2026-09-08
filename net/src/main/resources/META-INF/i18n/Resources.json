@@ -1,6 +1,10 @@
 {
   "groupId": "org.nervousync",
   "bundle": "utils",
+  "alias": {
+    "en": "en-US",
+    "zh": "zh-CN"
+  },
   "errors": {
     "0x0000001A0003": "Unknown_Http_Method",
     "0x0000001A0004": "Unknown_Path_Restful_Service_Method",

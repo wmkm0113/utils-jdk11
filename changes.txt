@@ -6,7 +6,7 @@ Nervousync Java Utils Package
 [Update] Update AbstractBuilder support the parent builder
 [Update] Update UTCClock resolve the scheduled thread pool executor not destroy when exit
 [Update] Move all transfer adapter implement class to test package
-[Update] Update Junit version to 5.13.3
+[Update] Update JUnit version to 5.13.3
 [Update] Update bcprov version to 1.81
 [Update] Update Jcifs version to 2.1.40
 [Update] Update log4j version to 2.25.1
@@ -25,7 +25,7 @@ Nervousync Java Utils Package
 [Add] Add LocationTest for testing the LocationUtils
 [Add] Add Immutable support
 [Update] BeanObject add digital signature support
-[Update] Update the Junit version to 5.12.1
+[Update] Update the JUnit version to 5.12.1
 [Update] Update the slf4j version to 2.0.17
 [Update] Update the jackson version to 2.18.3
 [Update] Update the YAML version to 2.4
@@ -87,8 +87,8 @@ Nervousync Java Utils Package
 
 [06/02/2022]
 [Remove] FileExtensionInfo.java using URLConnection to find mimetype
-[Add] Add Bcjmail-jdk18on to support jakarta mail signature
-[Add] CertificateUtils.java add simplified chinese comment
+[Add] Add Bcjmail-jdk18on to support Jakarta mail signature
+[Add] CertificateUtils.java add Simplified Chinese comment
 [Add] MailUtils add generate/verify digital signature support
 [Update] Bcprov artifactId from bcprov-jdk15on to bcprov-jdk18on and version to 1.71
 [Update] Bcpkix artifactId from bcpkix-jdk15on to bcpkix-jdk18on and version to 1.71

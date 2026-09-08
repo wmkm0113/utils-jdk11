@@ -1,13 +1,13 @@
-# Contributing to utils-jdk11
+# Contributing to utils
 
-First, thank you for considering contributing to utils-jdk11 🎉  
+First, thank you for considering contributing to utils 🎉  
 Any kind of contribution — bug reports, feature requests, documentation improvements, or code — is welcome.
 
 This document explains how to contribute effectively and safely.
 
 # 📌 Project Scope & Philosophy
 
-utils-jdk11 is a general-purpose Java 11 utility library intended to provide:
+utils is a general-purpose Java 11 utility library intended to provide:
 
 + Stable, reusable APIs
 + Clear behavior and safe defaults
@@ -104,7 +104,7 @@ Small, focused PRs are preferred over large ones.
 
 # 🔒 Backward Compatibility Policy
 
-Because utils-jdk11 is published to Maven Central:
+Because utils is published to Maven Central:
 
 + **Breaking changes require a major version bump**
 + Behavioral changes must be documented
@@ -116,5 +116,5 @@ By contributing to this project, you agree that your contributions will be licen
 
 # 🙏 Thank You
 
-Your contributions help make utils-jdk11 better and more reliable for everyone.
+Your contributions help make utils better and more reliable for everyone.
 We appreciate your time and effort!

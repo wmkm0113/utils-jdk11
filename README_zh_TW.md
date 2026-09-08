@@ -4,7 +4,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.nervousync/utils-bom?color=green&label=Release)](https://mvnrepository.com/artifact/org.nervousync/utils-bom)
 ![Maven Snapshot](https://img.shields.io/maven-metadata/v?label=Snapshot&metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Forg%2Fnervousync%2Futils-bom%2Fmaven-metadata.xml)
-[![License](https://img.shields.io/github/license/wmkm0113/utils-jdk11)](https://github.com/wmkm0113/utils/blob/mainline/LICENSE)
+[![License](https://img.shields.io/github/license/wmkm0113/utils)](https://github.com/wmkm0113/utils/blob/mainline/LICENSE)
 ![Language](https://img.shields.io/badge/language-Java-green)
 [![Twitter:wmkm0113](https://img.shields.io/twitter/follow/wmkm0113?label=Follow)](https://twitter.com/wmkm0113)
 
@@ -79,20 +79,20 @@
 
 ## 模組
 
-| 模組             | 概述                                               |
-|----------------|--------------------------------------------------|
-| utils-bom      | BOM模組                                            |
-| utils-core     | 核心模組、基礎工具                                        |
-| utils-beans    | JavaBean 與不同資料格式（XML/JSON/YAML）的轉換工具             |
-| utils-config   | 統一的設定檔管理、啟動項目的管理                                 |
-| utils-i18n     | 國際化引擎（支援多語言、國際化、在地化）                             |
-| utils-log4j    | 使用Log4j2實現的日誌配置                                  |
-| utils-mail     | 電子郵件工具                                           |
-| utils-net      | 網路存取工具（包括網路請求、網路檔案、SNMP監控）                       |
-| utils-office   | Excel 檔案操作支援                                     |
+| 模組           | 概述                                                                                          |
+|----------------|-----------------------------------------------------------------------------------------------|
+| utils-bom      | BOM模組                                                                                       |
+| utils-core     | 核心模組、基礎工具                                                                            |
+| utils-beans    | JavaBean 與不同資料格式（XML/JSON/YAML）的轉換工具                                            |
+| utils-config   | 統一的設定檔管理、啟動項目的管理                                                              |
+| utils-i18n     | 國際化引擎（支援多語言、國際化、在地化）                                                      |
+| utils-log4j    | 使用Log4j2實現的日誌配置                                                                      |
+| utils-mail     | 電子郵件工具                                                                                  |
+| utils-net      | 網路存取工具（包括網路請求、網路檔案、SNMP監控）                                              |
+| utils-office   | Excel 檔案操作支援                                                                            |
 | utils-security | 安全工具（包括加密、解密、簽署、驗證、金鑰管理）、OTP工具、安全工廠（用於設定檔的自動加解密） |
-| utils-zip      | Zip壓縮檔的存取支援                                      |
-| utils-all      | 包含所有模組                                           |
+| utils-zip      | Zip壓縮檔的存取支援                                                                           |
+| utils-all      | 包含所有模組                                                                                  |
 
 每個模組均可獨立使用。
 
@@ -326,12 +326,12 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 
 ## 同類產品比較
 
-| Feature  | Nervousync | Apache Commons | Hutool  |
-|----------|------------|----------------|---------|
-| 統一配置資訊管理 | ✔          | ✘              | Partial |
-| 內建的國際化引擎 | ✔          | ✘              | ✘       |
-| 一次性密碼支援  | ✔          | ✘              | ✔       |
-| 無重型框架依賴  | ✔          | ✔              | ✔       |
+| Feature          | Nervousync | Apache Commons | Hutool  |
+|------------------|------------|----------------|---------|
+| 統一配置資訊管理 | ✔         | ✘             | Partial |
+| 內建的國際化引擎 | ✔         | ✘             | ✘      |
+| 一次性密碼支援   | ✔         | ✘             | ✔      |
+| 無重型框架依賴   | ✔         | ✔             | ✔      |
 
 本專案著重於結構化的企業能力，而不是通用輔助工具。
 

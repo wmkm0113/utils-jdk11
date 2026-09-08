@@ -79,20 +79,20 @@
 
 ## 模块
 
-| 模块             | 概述                                                |
-|----------------|---------------------------------------------------|
-| utils-bom      | BOM模块                                             |
-| utils-core     | 核心模块、基础工具                                         |
-| utils-beans    | JavaBean 与不同数据格式（XML/JSON/YAML）的转换工具              |
-| utils-config   | 统一的配置文件管理、启动项的管理                                  |
-| utils-i18n     | 国际化引擎（支持多语言、国际化、本地化）                              |
-| utils-log4j    | 使用Log4j2实现的日志配置                                   |
-| utils-mail     | 电子邮件工具                                            |
-| utils-net      | 网络访问工具（包括网络请求、网络文件、SNMP监控）                        |
-| utils-office   | Excel 文件操作支持                                      |
+| 模块           | 概述                                                                                            |
+|----------------|-------------------------------------------------------------------------------------------------|
+| utils-bom      | BOM模块                                                                                         |
+| utils-core     | 核心模块、基础工具                                                                              |
+| utils-beans    | JavaBean 与不同数据格式（XML/JSON/YAML）的转换工具                                              |
+| utils-config   | 统一的配置文件管理、启动项的管理                                                                |
+| utils-i18n     | 国际化引擎（支持多语言、国际化、本地化）                                                        |
+| utils-log4j    | 使用Log4j2实现的日志配置                                                                        |
+| utils-mail     | 电子邮件工具                                                                                    |
+| utils-net      | 网络访问工具（包括网络请求、网络文件、SNMP监控）                                                |
+| utils-office   | Excel 文件操作支持                                                                              |
 | utils-security | 安全工具（包括加密、解密、签名、验证、密钥管理）、OTP工具、安全工厂（用于配置文件的自动加解密） |
-| utils-zip      | Zip压缩文件的访问支持                                      |
-| utils-all      | 包含所有模块                                            |
+| utils-zip      | Zip压缩文件的访问支持                                                                           |
+| utils-all      | 包含所有模块                                                                                    |
 
 每个模块均可独立使用。
 
@@ -327,12 +327,12 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 
 ## 同类产品比较
 
-| Feature  | Nervousync | Apache Commons | Hutool  |
-|----------|------------|----------------|---------|
-| 统一配置信息管理 | ✔          | ✘              | Partial |
-| 内置的国际化引擎 | ✔          | ✘              | ✘       |
-| 一次性密码支持  | ✔          | ✘              | ✔       |
-| 无重型框架依赖  | ✔          | ✔              | ✔       |
+| Feature          | Nervousync | Apache Commons | Hutool  |
+|------------------|------------|----------------|---------|
+| 统一配置信息管理 | ✔         | ✘             | Partial |
+| 内置的国际化引擎 | ✔         | ✘             | ✘      |
+| 一次性密码支持   | ✔         | ✘             | ✔      |
+| 无重型框架依赖   | ✔         | ✔             | ✔      |
 
 本项目侧重于结构化的企业能力，而不是通用辅助工具。
 

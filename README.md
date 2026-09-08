@@ -339,10 +339,10 @@ Users can choose different algorithms; the default is HMAC-SHA1. It supports bot
 
 | Feature               | Nervousync | Apache Commons | Hutool  |
 |-----------------------|------------|----------------|---------|
-| Unified Configuration | ✔          | ✘              | Partial |
-| Built-in i18n Engine  | ✔          | ✘              | ✘       |
-| OTP Support           | ✔          | ✘              | ✔       |
-| Framework Agnostic    | ✔          | ✔              | ✔       |
+| Unified Configuration | ✔         | ✘             | Partial |
+| Built-in i18n Engine  | ✔         | ✘             | ✘      |
+| OTP Support           | ✔         | ✘             | ✔      |
+| Framework Agnostic    | ✔         | ✔             | ✔      |
 
 This project focuses on structured enterprise capabilities rather than general-purpose helpers.
 

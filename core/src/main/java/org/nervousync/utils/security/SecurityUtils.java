@@ -1750,6 +1750,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor DESEncryptor(final byte[] keyBytes) throws CryptoException {
 		return DESEncryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -1773,6 +1774,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor DESEncryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.encryptor(new CipherConfig("DES", mode, padding),
@@ -1790,6 +1792,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor DESDecryptor(final byte[] keyBytes) throws CryptoException {
 		return DESDecryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -1813,6 +1816,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor DESDecryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.decryptor(new CipherConfig("DES", mode, padding),
@@ -1826,6 +1830,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] DESKey() {
 		try {
 			return SECURITY_ADAPTOR.symmetricKey("DES", Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_STRING);
@@ -1845,6 +1850,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] DESEncrypt(final byte[] keyBytes, final Object source) {
 		return DESEncrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -1864,6 +1870,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] DESEncrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.ENCRYPT, new CipherConfig("DES", mode, padding),
@@ -1881,6 +1888,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] DESDecrypt(final byte[] keyBytes, final Object source) {
 		return DESDecrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -1900,6 +1908,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] DESDecrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.DECRYPT, new CipherConfig("DES", mode, padding),
@@ -1919,6 +1928,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor TripleDESEncryptor(final byte[] keyBytes) throws CryptoException {
 		return TripleDESEncryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -1944,6 +1954,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor TripleDESEncryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.encryptor(new CipherConfig("DESede", mode, padding),
@@ -1963,6 +1974,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor TripleDESDecryptor(final byte[] keyBytes) throws CryptoException {
 		return TripleDESDecryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -1988,6 +2000,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor TripleDESDecryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.decryptor(new CipherConfig("DESede", mode, padding),
@@ -2003,6 +2016,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] TripleDESKey() {
 		try {
 			return SECURITY_ADAPTOR.symmetricKey("DESede", Globals.DEFAULT_VALUE_INT, Globals.DEFAULT_VALUE_STRING);
@@ -2024,6 +2038,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] TripleDESEncrypt(final byte[] keyBytes, final Object source) {
 		return TripleDESEncrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -2045,6 +2060,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] TripleDESEncrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                      final Object source) {
 		return process(CryptoMode.ENCRYPT, new CipherConfig("DESede", mode, padding),
@@ -2064,6 +2080,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] TripleDESDecrypt(final byte[] keyBytes, final Object source) {
 		return TripleDESDecrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -2085,6 +2102,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] TripleDESDecrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                      final Object source) {
 		return process(CryptoMode.DECRYPT, new CipherConfig("DESede", mode, padding),
@@ -2368,6 +2386,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC2Encryptor(final byte[] keyBytes) throws CryptoException {
 		return RC2Encryptor("CBC", "PKCS7Padding", keyBytes);
 	}
@@ -2391,6 +2410,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC2Encryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.encryptor(new CipherConfig("RC2", mode, padding),
@@ -2408,6 +2428,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC2Decryptor(final byte[] keyBytes) throws CryptoException {
 		return RC2Decryptor("CBC", "PKCS7Padding", keyBytes);
 	}
@@ -2431,6 +2452,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC2Decryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.decryptor(new CipherConfig("RC2", mode, padding),
@@ -2444,6 +2466,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC2Key() {
 		try {
 			return SECURITY_ADAPTOR.symmetricKey("RC2", 128, Globals.DEFAULT_VALUE_STRING);
@@ -2463,6 +2486,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC2Encrypt(final byte[] keyBytes, final Object source) {
 		return RC2Encrypt("CBC", "PKCS7Padding", keyBytes, source);
 	}
@@ -2482,6 +2506,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC2Encrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.ENCRYPT, new CipherConfig("RC2", mode, padding),
@@ -2499,6 +2524,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC2Decrypt(final byte[] keyBytes, final Object source) {
 		return RC2Decrypt("CBC", "PKCS7Padding", keyBytes, source);
 	}
@@ -2518,6 +2544,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC2Decrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.DECRYPT, new CipherConfig("RC2", mode, padding),
@@ -2535,6 +2562,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC4Encryptor(final byte[] keyBytes) throws CryptoException {
 		return RC4Encryptor(keyBytes, Globals.DEFAULT_VALUE_STRING);
 	}
@@ -2552,6 +2580,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC4Encryptor(final byte[] keyBytes, final String randomAlgorithm)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.encryptor(new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
@@ -2569,6 +2598,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC4Decryptor(final byte[] keyBytes) throws CryptoException {
 		return RC4Decryptor(keyBytes, Globals.DEFAULT_VALUE_STRING);
 	}
@@ -2586,6 +2616,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC4Decryptor(final byte[] keyBytes, final String randomAlgorithm)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.decryptor(new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
@@ -2599,6 +2630,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC4Key() {
 		try {
 			return SECURITY_ADAPTOR.symmetricKey("RC4", 128, Globals.DEFAULT_VALUE_STRING);
@@ -2618,6 +2650,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC4Encrypt(final byte[] keyBytes, final Object source) {
 		return RC4Encrypt(keyBytes, Globals.DEFAULT_VALUE_STRING, source);
 	}
@@ -2635,6 +2668,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC4Encrypt(final byte[] keyBytes, final String randomAlgorithm, final Object source) {
 		return process(CryptoMode.ENCRYPT,
 				new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
@@ -2653,6 +2687,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC4Decrypt(final byte[] keyBytes, final Object source) {
 		return RC4Decrypt(keyBytes, Globals.DEFAULT_VALUE_STRING, source);
 	}
@@ -2670,6 +2705,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC4Decrypt(final byte[] keyBytes, final String randomAlgorithm, final Object source) {
 		return process(CryptoMode.DECRYPT,
 				new CipherConfig("RC4", Globals.DEFAULT_VALUE_STRING, Globals.DEFAULT_VALUE_STRING),
@@ -2690,6 +2726,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC5Encryptor(final byte[] keyBytes) throws CryptoException {
 		return RC5Encryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -2715,6 +2752,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC5Encryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.encryptor(new CipherConfig("RC5", mode, padding),
@@ -2734,6 +2772,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC5Decryptor(final byte[] keyBytes) throws CryptoException {
 		return RC5Decryptor("CBC", "PKCS5Padding", keyBytes);
 	}
@@ -2759,6 +2798,7 @@ public final class SecurityUtils {
 	 * @throws CryptoException <span class="en-US">If algorithm didn't find</span>
 	 *                         <span class="zh-CN">如果算法未找到</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static CryptoAdaptor RC5Decryptor(final String mode, final String padding, final byte[] keyBytes)
 			throws CryptoException {
 		return SECURITY_ADAPTOR.decryptor(new CipherConfig("RC5", mode, padding),
@@ -2774,6 +2814,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC5Key() {
 		try {
 			return SECURITY_ADAPTOR.symmetricKey("RC5", 128, Globals.DEFAULT_VALUE_STRING);
@@ -2795,6 +2836,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC5Encrypt(final byte[] keyBytes, final Object source) {
 		return RC5Encrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -2816,6 +2858,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC5Encrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.ENCRYPT, new CipherConfig("RC5", mode, padding),
@@ -2835,6 +2878,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC5Decrypt(final byte[] keyBytes, final Object source) {
 		return RC5Decrypt("CBC", "PKCS5Padding", keyBytes, source);
 	}
@@ -2856,6 +2900,7 @@ public final class SecurityUtils {
 	 * @return <span class="en-US">Binary data bytes of calculate result</span>
 	 * <span class="zh-CN">计算结果的字节数组</span>
 	 */
+	@Deprecated(since = "1.4.0")
 	public static byte[] RC5Decrypt(final String mode, final String padding, final byte[] keyBytes,
 	                                final Object source) {
 		return process(CryptoMode.DECRYPT, new CipherConfig("RC5", mode, padding),
@@ -2864,9 +2909,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">初始化RC6加密安全适配器实例对象</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param keyBytes <span class="en-US">key bytes</span>
 	 *                 <span class="zh-CN">密钥字节数组</span>
@@ -2881,9 +2924,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">初始化RC6加密安全适配器实例对象</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 * <span>
 	 * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
 	 * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
@@ -2908,9 +2949,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">初始化RC6解密安全适配器实例对象</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param keyBytes <span class="en-US">key bytes</span>
 	 *                 <span class="zh-CN">密钥字节数组</span>
@@ -2925,9 +2964,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Initialize RC6 encryptor secure provider</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">初始化RC6解密安全适配器实例对象</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 * <span>
 	 * mode: "ECB", "CBC", "CTR", "CTS", "CFB", "OFB", "CFB8", "OFB8"
 	 * padding: "PKCS5Padding", "PKCS7Padding", "ISO10126Padding", "X9.23Padding"
@@ -2952,9 +2989,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Generate RC6 key bytes</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">生成RC6密钥字节数组</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @return <span class="en-US">Generated key bytes or zero length byte array if process error</span>
 	 * <span class="zh-CN">生成的密钥字节数组，如果出现异常则返回长度为0的字节数组</span>
@@ -2969,9 +3004,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Perform RC6 encryption operation</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">执行 RC6 加密操作</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param keyBytes <span class="en-US">key bytes</span>
 	 *                 <span class="zh-CN">密钥字节数组</span>
@@ -2986,9 +3019,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Perform RC6 encryption operation</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">执行 RC6 加密操作</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param mode     <span class="en-US">Cipher Mode</span>
 	 *                 <span class="zh-CN">分组密码模式</span>
@@ -3009,9 +3040,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Perform RC6 decryption operation</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">执行 RC6 解密操作</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param keyBytes <span class="en-US">key bytes</span>
 	 *                 <span class="zh-CN">密钥字节数组</span>
@@ -3026,9 +3055,7 @@ public final class SecurityUtils {
 
 	/**
 	 * <h3 class="en-US">Perform RC6 decryption operation</h3>
-	 * <span class="en-US">Since 1.4.0, using AES instead</span>
 	 * <h3 class="zh-CN">执行 RC6 解密操作</h3>
-	 * <span class="zh-CN">从 1.4.0 版本开始废弃，使用 AES 代替</span>
 	 *
 	 * @param mode     <span class="en-US">Cipher Mode</span>
 	 *                 <span class="zh-CN">分组密码模式</span>

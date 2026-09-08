@@ -6,7 +6,7 @@ Nervousync Java 工具包
 [更新] 更新 AbstractBuilder 现在支持父构建器
 [更新] 更新 UTCClock 解决线程调用器未销毁的问题
 [更新] 将所有数据转换器实现类转移到测试目录
-[更新] 更新 Junit 版本为 5.13.3
+[更新] 更新 JUnit 版本为 5.13.3
 [更新] 更新 bcprov 版本为 1.81
 [更新] 更新 Jcifs 版本为 2.1.40
 [更新] 更新 log4j 版本为 2.25.1
@@ -25,7 +25,7 @@ Nervousync Java 工具包
 [添加] 添加LocationTest用于测试LocationUtils
 [添加] 添加不可变数据支持
 [更新] BeanObject增加数字签名
-[更新] 更新 Junit 版本为 5.12.1
+[更新] 更新 JUnit 版本为 5.12.1
 [更新] 更新 slf4j 版本为 2.0.17
 [更新] 更新 jackson 版本为 2.18.3
 [更新] 更新 yaml 版本为 2.4

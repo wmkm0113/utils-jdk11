@@ -143,6 +143,7 @@ public final class CookieUtils {
 	                             final HttpServletRequest request, final HttpServletResponse response) {
 		response.addCookie(getCookie(cookieName, request)
 				.map(cookie -> {
+					secureCheck(cookie);
 					cookie.setValue(cookieValue);
 					return cookie;
 				})
@@ -213,6 +214,7 @@ public final class CookieUtils {
 	public static void delCookie(final Cookie cookie, final HttpServletResponse response) {
 		if (cookie != null) {
 			cookie.setMaxAge(0);
+			secureCheck(cookie);
 			response.addCookie(cookie);
 		}
 	}
@@ -237,16 +239,20 @@ public final class CookieUtils {
 	private static Cookie newCookie(final String cookieName, final String cookieValue, final String domainName,
 	                                final String cookiePath, final Integer lifeCycle) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
+		secureCheck(cookie);
 		cookie.setPath(StringUtils.isEmpty(cookiePath) ? "/" : cookiePath);
-		if (StringUtils.notBlank(domainName)) {
-			cookie.setDomain("." + domainName);
-		}
 		Optional.ofNullable(lifeCycle)
 				.filter(cycle -> cycle >= 0)
 				.map(cycle -> 60 * 60 * cycle)
 				.ifPresent(cookie::setMaxAge);
 		cookie.setValue(cookieValue);
 		return cookie;
+	}
+
+	private static void secureCheck(final Cookie cookie) {
+		if ("secure".equalsIgnoreCase(cookie.getName())) {
+			cookie.setSecure(Boolean.TRUE);
+		}
 	}
 
 	/**

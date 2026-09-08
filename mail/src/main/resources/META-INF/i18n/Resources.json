@@ -1,6 +1,10 @@
 {
   "groupId": "org.nervousync",
   "bundle": "utils",
+  "alias": {
+    "en": "en-US",
+    "zh": "zh-CN"
+  },
   "errors": {
     "0x0000000E0001": "EMail_Address_Not_Valid",
     "0x0000000E0002": "Receive_Protocol_Unknown",

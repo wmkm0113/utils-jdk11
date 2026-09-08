@@ -462,6 +462,7 @@ public final class SecureFactory {
 	 * @return <span class="en-US">Generated key data bytes</span>
 	 * <span class="zh-CN">生成的安全密钥数据</span>
 	 */
+	@SuppressWarnings("deprecation")
 	private static byte[] generate(final SecureAlgorithm secureAlgorithm) {
 		switch (secureAlgorithm) {
 			case RSA2048:
@@ -593,6 +594,7 @@ public final class SecureFactory {
 		 * @return <span class="en-US">Initialized adapter instance</span>
 		 * <span class="zh-CN">初始化的适配器实例对象</span>
 		 */
+		@SuppressWarnings("deprecation")
 		private Optional<CryptoAdaptor> initCryptor(final boolean encrypt) {
 			CryptoAdaptor secureAdapter = null;
 			if (this.initialized) {

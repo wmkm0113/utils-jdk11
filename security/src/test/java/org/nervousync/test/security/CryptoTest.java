@@ -89,6 +89,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(20)
+    @Deprecated(since = "1.4.0")
     public void tripleDES() throws CryptoException {
         byte[] desKey = SecurityUtils.TripleDESKey();
         this.logger.info("Crypto_Key_Length", "TripleDES", StringUtils.base64Encode(desKey));
@@ -215,6 +216,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(80)
+    @Deprecated(since = "1.4.0")
     public void RC5() throws CryptoException {
         byte[] rc5Key = SecurityUtils.RC5Key();
         this.logger.info("Crypto_Key_Length", "RC5", StringUtils.base64Encode(rc5Key));

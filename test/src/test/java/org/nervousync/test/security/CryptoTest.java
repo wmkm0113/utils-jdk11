@@ -36,6 +36,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(10)
+    @Deprecated(since = "1.4.0")
     public void DES() throws CryptoException {
         byte[] desKey = SecurityUtils.DESKey();
         this.logger.info("Crypto_Key_Length", "DES", StringUtils.base64Encode(desKey));
@@ -112,6 +113,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(20)
+    @Deprecated(since = "1.4.0")
     public void tripleDES() throws CryptoException {
         byte[] desKey = SecurityUtils.TripleDESKey();
         this.logger.info("Crypto_Key_Length", "TripleDES", StringUtils.base64Encode(desKey));
@@ -165,6 +167,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(60)
+    @Deprecated(since = "1.4.0")
     public void RC2() throws CryptoException {
         byte[] rc2Key = SecurityUtils.RC2Key();
         this.logger.info("Crypto_Key_Length", "RC2", StringUtils.base64Encode(rc2Key));
@@ -186,6 +189,7 @@ public final class CryptoTest extends BaseTest {
 
     @Test
     @Order(80)
+    @Deprecated(since = "1.4.0")
     public void RC5() throws CryptoException {
         byte[] rc5Key = SecurityUtils.RC5Key();
         for (String cipherMode : RC_CIPHER_MODES) {

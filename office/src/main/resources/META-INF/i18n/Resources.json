@@ -1,6 +1,10 @@
 {
   "groupId": "org.nervousync",
   "bundle": "utils",
+  "alias": {
+    "en": "en-US",
+    "zh": "zh-CN"
+  },
   "errors": {
     "0x000000AE0001": "Office_Ext_Name_Invalid",
     "0x000000AE0002": "Office_Excel_File_Not_Exists"
