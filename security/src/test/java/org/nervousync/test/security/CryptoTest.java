@@ -134,7 +134,7 @@ public final class CryptoTest extends BaseTest {
         this.logger.info("Certificate_Result", "RSA", StringUtils.base64Encode(pkcs5));
         //  Testing for encrypting and decrypt data using RSA
         for (String padding : RSA_PADDINGS) {
-            if (padding.equalsIgnoreCase("OAEPWithSHA-512AndMGF1Padding")) {
+            if (padding.equalsIgnoreCase("OAEPWithSHA-256AndMGF1Padding")) {
                 //  The minimum key size was 2048 when padding mode is "OAEPWithSHA-512AndMGF1Padding"
                 keyPair = SecurityUtils.RSAKeyPair(2048);
             }
@@ -168,11 +168,12 @@ public final class CryptoTest extends BaseTest {
         PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
         CryptoAdaptor encryptProvider = SecurityUtils.RSAEncryptor("PKCS1Padding", publicKey);
         String encResult = StringUtils.base64Encode(encryptProvider.finish(ORIGINAL_STRING));
-        this.logger.info("Encrypt_Result", "RSA", "ECB", "PKCS1Padding", encResult);
+        this.logger.info("Encrypt_Result", "RSA", "None", "PKCS1Padding", encResult);
 
-        CryptoAdaptor decryptProvider = SecurityUtils.RSADecryptor("PKCS1Padding", privateKey);
+        encResult = "MDPhu/kIwQzdlLNkJkYxyYdqz8w5CqcWBWNEuodal/pdoAHsc/U5BcPKFZdskGjJ0rVJZMivlnc0UDBhpo9WgJvOA8qm2lkfaQfSlZxtUjSxchsdsKlzsjiMaCXxacXI22wg9lbWbjmuxs1hFfmnLrwThyBwp+TkIxgaDugmk38=";
+        CryptoAdaptor decryptProvider = SecurityUtils.RSADecryptor("NoPadding", privateKey);
         decryptProvider.append(StringUtils.base64Decode(encResult));
-        this.logger.info("Decrypt_Result", "RSA", "ECB", "PKCS1Padding",
+        this.logger.info("Decrypt_Result", "RSA", "None", "NoPadding",
                 new String(decryptProvider.finish(), StandardCharsets.UTF_8));
     }
 

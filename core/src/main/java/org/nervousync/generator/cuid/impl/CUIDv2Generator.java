@@ -84,7 +84,8 @@ public final class CUIDv2Generator extends CUIDGenerator {
 		final String data =
 				timestamp + processPadding(Integer.toString(this.counter, DEFAULT_RADIX), 4) + MACHINE_FINGERPRINT;
 		byte[] result = SecurityUtils.SHA3_256((data + SALT(length)).getBytes(StandardCharsets.UTF_8));
-		int maxLength = Math.min(length, 32);char[] buffer = new char[maxLength];
+		int maxLength = Math.min(length, 32);
+		char[] buffer = new char[maxLength];
 		buffer[0] = firstChar;
 		long currentWindow = 0;
 		int bitsInWindow = 0, byteIndex = 0, charIndex = 1;

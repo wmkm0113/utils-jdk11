@@ -40,15 +40,24 @@
                     <xsd:documentation>Receive attaches file save path</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="certificate" type="xsd:string">
+            <xsd:element name="key_store_path" type="xsd:string">
                 <xsd:annotation>
-                    <xsd:documentation>Verify digital signature using certificate, base64 encoded.
-                    </xsd:documentation>
+                    <xsd:documentation>Key store path</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="private_key" type="xsd:string">
+            <xsd:element name="key_store_password" type="xsd:string">
                 <xsd:annotation>
-                    <xsd:documentation>Signature the mail using private key, base64 encoded.</xsd:documentation>
+                    <xsd:documentation>Key store password</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="alias_name" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Item alias name</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="key_password" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Private key password</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             <xsd:element name="last_modified" type="xsd:long">

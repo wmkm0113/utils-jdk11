@@ -48,11 +48,7 @@ public final class DefaultSecurityAdaptorImpl extends BaseSecurityAdaptorImpl {
 
 	@Override
 	public CryptoAdaptor initDigest(@Nonnull final CipherConfig cipherConfig, final CipherKey cipherKey) {
-		BaseDigestAdaptorImpl adaptor = super.adaptor(cipherConfig.getAlgorithm(), BaseDigestAdaptorImpl.class);
-		if (adaptor == null) {
-			adaptor = new DigestAdaptorImpl(cipherConfig, cipherKey);
-			super.register(cipherConfig.getAlgorithm(), adaptor);
-		}
+		BaseDigestAdaptorImpl adaptor = new DigestAdaptorImpl(cipherConfig);
 		if (adaptor.isMacMode()) {
 			adaptor.initHmac(cipherConfig.getAlgorithm(), cipherKey.getKeyBytes());
 		}
@@ -62,23 +58,9 @@ public final class DefaultSecurityAdaptorImpl extends BaseSecurityAdaptorImpl {
 	@Override
 	public CryptoAdaptor initCipher(@Nonnull final CipherConfig cipherConfig, @Nonnull final CryptoMode cryptoMode,
 	                                @Nonnull final CipherKey cipherKey) {
-		if (cipherConfig.isAsymmetric()) {
-			AsymmetricAdaptorImpl adaptor = super.adaptor(cipherConfig.getAlgorithm(), AsymmetricAdaptorImpl.class);
-			if (adaptor == null) {
-				adaptor = new AsymmetricAdaptorImpl(cipherConfig, cryptoMode, cipherKey);
-			} else {
-				adaptor.config(cipherConfig, cryptoMode, cipherKey);
-			}
-			return adaptor;
-		} else {
-			SymmetricAdaptorImpl adaptor = super.adaptor(cipherConfig.getAlgorithm(), SymmetricAdaptorImpl.class);
-			if (adaptor == null) {
-				adaptor = new SymmetricAdaptorImpl(cipherConfig, cryptoMode, cipherKey);
-			} else {
-				adaptor.config(cipherConfig, cryptoMode, cipherKey);
-			}
-			return adaptor;
-		}
+		return cipherConfig.isAsymmetric()
+				? new AsymmetricAdaptorImpl(cipherConfig, cryptoMode, cipherKey)
+				: new SymmetricAdaptorImpl(cipherConfig, cryptoMode, cipherKey);
 	}
 
 	/**
@@ -102,13 +84,11 @@ public final class DefaultSecurityAdaptorImpl extends BaseSecurityAdaptorImpl {
 		 *
 		 * @param cipherConfig <span class="en-US">Signature verifier cipher config instance object</span>
 		 *                     <span class="zh-CN">签名验证算法配置信息</span>
-		 * @param cipherKey    <span class="en-US">Signature verifier cipher key instance object</span>
-		 *                     <span class="zh-CN">签名验证密钥实例对象</span>
 		 * @throws CryptoException <span class="en-US">If an error occurs when initialize adaptor</span>
 		 *                         <span class="zh-CN">当初始化适配器时出现异常</span>
 		 */
-		DigestAdaptorImpl(final CipherConfig cipherConfig, final CipherKey cipherKey) {
-			super(cipherConfig, cipherKey);
+		DigestAdaptorImpl(final CipherConfig cipherConfig) {
+			super(cipherConfig);
 		}
 
 		@Override

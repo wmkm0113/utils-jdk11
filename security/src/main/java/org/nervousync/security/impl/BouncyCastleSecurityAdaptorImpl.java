@@ -60,7 +60,11 @@ public final class BouncyCastleSecurityAdaptorImpl extends BaseSecurityAdaptorIm
 
 	@Override
 	public CryptoAdaptor initDigest(@Nonnull final CipherConfig cipherConfig, final CipherKey cipherKey) {
-		return new DigestAdapterImpl(cipherConfig, cipherKey);
+		DigestAdapterImpl adaptor = new DigestAdapterImpl(cipherConfig);
+		if (adaptor.isMacMode()) {
+			adaptor.initHmac(cipherConfig.getAlgorithm(), cipherKey.getKeyBytes());
+		}
+		return adaptor;
 	}
 
 	@Override
@@ -126,13 +130,11 @@ public final class BouncyCastleSecurityAdaptorImpl extends BaseSecurityAdaptorIm
 		 *
 		 * @param cipherConfig <span class="en-US">Signature verifier cipher config instance object</span>
 		 *                     <span class="zh-CN">签名验证算法配置信息</span>
-		 * @param cipherKey    <span class="en-US">Signature verifier cipher key instance object</span>
-		 *                     <span class="zh-CN">签名验证密钥实例对象</span>
 		 * @throws CryptoException <span class="en-US">If an error occurs when initialize adaptor</span>
 		 *                         <span class="zh-CN">当初始化适配器时出现异常</span>
 		 */
-		public DigestAdapterImpl(@Nonnull final CipherConfig cipherConfig, final CipherKey cipherKey) throws CryptoException {
-			super(cipherConfig, cipherKey);
+		public DigestAdapterImpl(@Nonnull final CipherConfig cipherConfig) throws CryptoException {
+			super(cipherConfig);
 		}
 
 		/**

@@ -34,7 +34,6 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.mail.smime.SMIMEException;
@@ -60,6 +59,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateParsingException;
@@ -102,6 +102,11 @@ public final class MailClient implements Closeable {
 	 * <span class="zh-CN">附件文件的保存地址</span>
 	 */
 	private final String storagePath;
+	/**
+	 * <span class="en-US">Trust key store</span>
+	 * <span class="zh-CN">信任证书库</span>
+	 */
+	private final KeyStore keyStore;
 	/**
 	 * <span class="en-US">x509 certificate Using for email signature verify</span>
 	 * <span class="zh-CN">x509证书用于电子邮件签名验证</span>
@@ -154,7 +159,7 @@ public final class MailClient implements Closeable {
 		} else {
 			this.receiveConfig = mailConfig.getReceiveConfig();
 			Properties properties = MailUtils.mailProperties(this.receiveConfig, mailConfig.getProxyConfig());
-			this.recvSession = Session.getDefaultInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
+			this.recvSession = Session.getInstance(properties, new DefaultAuthenticator(this.userName, this.passWord));
 			this.receiveProtocol = properties.getProperty(MailUtils.MAIL_STORE_PROTOCOL);
 			this.connect();
 		}
@@ -163,12 +168,37 @@ public final class MailClient implements Closeable {
 		if (StringUtils.notBlank(this.storagePath)) {
 			FileUtils.makeDir(this.storagePath);
 		}
-		this.x509Certificate = StringUtils.notBlank(mailConfig.getCertificate())
-				? CertificateUtils.x509(StringUtils.base64Decode(mailConfig.getCertificate()))
-				: null;
-		this.privateKey = StringUtils.notBlank(mailConfig.getPrivateKey())
-				? CertificateUtils.privateKey("RSA", StringUtils.base64Decode(mailConfig.getPrivateKey()))
-				: null;
+		if (StringUtils.notBlank(mailConfig.getStorePath())) {
+			this.keyStore = CertificateUtils.loadKeyStore(mailConfig.getStorePath(), mailConfig.getStorePassword());
+			if (this.keyStore == null) {
+				throw new MailException(0x0000000E0003L);
+			}
+			try {
+				if (this.keyStore.containsAlias(mailConfig.getAliasName())) {
+					this.x509Certificate = (X509Certificate) this.keyStore.getCertificate(mailConfig.getAliasName());
+					this.privateKey =
+							(PrivateKey) this.keyStore.getKey(mailConfig.getAliasName(),
+									mailConfig.getKeyPassword().toCharArray());
+				} else {
+					throw new MailException(0x0000000E0003L);
+				}
+			} catch (Exception e) {
+				if (e instanceof MailException) {
+					throw (MailException) e;
+				}
+				throw new MailException(0x0000000E0003L, e);
+			}
+		} else {
+			try {
+				this.keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				this.keyStore.load(null, null);
+			} catch (Exception e) {
+				throw new MailException(0x0000000E0003L, e);
+			}
+
+			this.x509Certificate = null;
+			this.privateKey = null;
+		}
 	}
 
 	/**
@@ -377,8 +407,8 @@ public final class MailClient implements Closeable {
 				return folder.getMessageCount();
 			}
 		} catch (Exception e) {
-			LOGGER.error("Receive_Mail_Error");
 			if (LOGGER.isDebugEnabled()) {
+				LOGGER.warn("Receive_Mail_Error");
 				LOGGER.debug("Stack_Message_Error", e);
 			}
 		}
@@ -734,20 +764,31 @@ public final class MailClient implements Closeable {
 				return Boolean.TRUE;
 			}
 
-			org.bouncycastle.util.Store<?> certificates = signedParser.getCertificates();
+			String senderAddress = Arrays.stream(signedMessage.getFrom())
+					.filter(InternetAddress.class::isInstance)
+					.map(InternetAddress.class::cast)
+					.map(InternetAddress::getAddress)
+					.filter(StringUtils::notBlank)
+					.findFirst()
+					.orElseThrow(() -> new MessagingException("Missing sender address"));
+
+			List<X509Certificate> certificates = new ArrayList<>();
+			org.bouncycastle.util.Store<X509CertificateHolder> certStore = signedParser.getCertificates();
+			for (X509CertificateHolder holder : certStore.getMatches(null)) {
+				certificates.add(new JcaX509CertificateConverter().setProvider("BC").getCertificate(holder));
+			}
 			for (SignerInformation signerInformation : signedParser.getSignerInfos().getSigners()) {
-				Collection<?> certCollection = certificates.getMatches(signerInformation.getSID());
+				Collection<?> certCollection = certStore.getMatches(signerInformation.getSID());
 				X509Certificate certificate =
 						new JcaX509CertificateConverter().setProvider("BC")
 								.getCertificate((X509CertificateHolder) certCollection.iterator().next());
 
 				try {
-					SignerInformationVerifier signerInformationVerifier =
-							new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certificate);
-					return signerInformation.verify(signerInformationVerifier);
+					return CertificateUtils.verify(certificate, certificates, this.keyStore, senderAddress, Boolean.TRUE)
+							&& signerInformation.verify(new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(certificate));
 				} catch (Exception e) {
-					LOGGER.error("Verify_Signature_Mail_Error");
 					if (LOGGER.isDebugEnabled()) {
+						LOGGER.error("Verify_Signature_Mail_Error");
 						LOGGER.debug("Stack_Message_Error", e);
 					}
 				}
@@ -891,10 +932,9 @@ public final class MailClient implements Closeable {
 			}
 			if (StringUtils.notBlank(bodyPart.getFileName())) {
 				String disposition = bodyPart.getDisposition();
-				if (disposition != null
-						&& (disposition.equals(Part.ATTACHMENT) || disposition.equals(Part.INLINE))) {
-					String savePath = this.storagePath + Globals.DEFAULT_PAGE_SEPARATOR
-							+ MimeUtility.decodeText(bodyPart.getFileName());
+				if (disposition != null && (disposition.equals(Part.ATTACHMENT) || disposition.equals(Part.INLINE))) {
+					String fileName = StringUtils.getFilename(MimeUtility.decodeText(bodyPart.getFileName()));
+					String savePath = this.storagePath + Globals.DEFAULT_PAGE_SEPARATOR + fileName;
 					if (!savePath.toLowerCase().endsWith("p7s")) {
 						boolean saveFile = FileUtils.saveFile(bodyPart.getInputStream(), savePath);
 						if (saveFile) {

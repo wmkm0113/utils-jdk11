@@ -70,17 +70,8 @@
       "Mail_Drop": {
         "pattern": "Drop e-mail UID: {0} result: {1}"
       },
-      "Inbox_Count": {
-        "pattern": "Inbox mail count: {0}"
-      },
-      "Spam_Count": {
-        "pattern": "Spam mail count: {0}"
-      },
-      "Drafts_Count": {
-        "pattern": "Drafts mail count: {0}"
-      },
-      "Sent_Count": {
-        "pattern": "Sent mail count: {0}"
+      "Mail_Folder_Count": {
+        "pattern": "Folder: {0} mail count: {1}"
       }
     },
     "zh-CN": {
@@ -141,20 +132,8 @@
       "Mail_Drop": {
         "pattern": "彻底删除邮件UID：{0} 成功：{1}"
       },
-      "Inbox_Count": {
-        "pattern": "收件箱邮件数：{0}"
-      },
-      "Spam_Count": {
-        "pattern": "垃圾邮件数：{0}"
-      },
-      "Drafts_Count": {
-        "pattern": "草稿箱邮件数：{0}"
-      },
-      "Sent_Count": {
-        "pattern": "已发送邮件数：{0}"
-      },
-      "Trash": {
-        "pattern": "已删除邮件数：{0}"
+      "Mail_Folder_Count": {
+        "pattern": "目录 {0} 邮件数：{1}"
       }
     }
   }

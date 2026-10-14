@@ -111,7 +111,8 @@ public final class EnhanceBeanConverterImpl implements BeanConverter {
 
 	@Override
 	public <T> T streamToObject(@Nonnull final InputStream inputStream, final StringType stringType,
-	                            final String encoding, final Class<T> beanClass, final String... schemaPaths) {
+	                            final String encoding, final String filter, final Class<T> beanClass,
+	                            final String... schemaPaths) {
 		T readObject;
 		try {
 			switch (stringType) {
@@ -122,7 +123,8 @@ public final class EnhanceBeanConverterImpl implements BeanConverter {
 					readObject = YAML_MAPPER.readValue(inputStream, beanClass);
 					break;
 				default:
-					readObject = DEFAULT_BEAN_CONVERTER.streamToObject(inputStream, stringType, encoding, beanClass, schemaPaths);
+					readObject = DEFAULT_BEAN_CONVERTER.streamToObject(inputStream, stringType, encoding,
+							filter, beanClass, schemaPaths);
 					break;
 			}
 		} catch (IOException e) {

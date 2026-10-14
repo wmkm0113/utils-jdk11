@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.utils.jmx;
+package org.nervousync.utils.net;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.annotations.jmx.Monitor;

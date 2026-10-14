@@ -16,10 +16,7 @@ import org.nervousync.mail.config.MailConfigBuilder;
 import org.nervousync.security.factory.SecureFactory;
 import org.nervousync.test.BaseTest;
 import org.nervousync.utils.cert.CertificateUtils;
-import org.nervousync.utils.core.BeanUtils;
-import org.nervousync.utils.core.DateTimeUtils;
-import org.nervousync.utils.core.FileUtils;
-import org.nervousync.utils.core.StringUtils;
+import org.nervousync.utils.core.*;
 import org.nervousync.utils.i18n.MultilingualUtils;
 import org.nervousync.utils.id.IDUtils;
 import org.nervousync.utils.mail.MailClient;
@@ -28,12 +25,11 @@ import org.nervousync.utils.properties.PropertiesUtils;
 import org.nervousync.utils.security.SecurityUtils;
 
 //import java.net.Proxy;
+import java.io.FileOutputStream;
 import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public final class MailTest extends BaseTest {
 
@@ -42,21 +38,52 @@ public final class MailTest extends BaseTest {
 	private static final String MAIL_CONTENT =
 			MultilingualUtils.newAgent(MailTest.class).findMessage("Mail_Content");
 
+	private static final String TMP_PATH;
+	private static final String STORE_PATH = Globals.DEFAULT_PAGE_SEPARATOR + "mailKeyStore.p12";
+	private static final String PASSWORD = "changeit";
+	private static final String ALIAS_NAME = "aliasName";
+
 	private static Properties PROPERTIES = null;
 	private static ConfigureManager CONFIGURE_MANAGER = null;
+	private final List<String> folderNames = new ArrayList<>();
 
 	private static boolean SKIP_TEST = Boolean.FALSE;
+
+	static {
+		String tmpPath = SystemUtils.JAVA_TMP_DIR;
+		if (tmpPath.endsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
+			tmpPath = tmpPath.substring(0, tmpPath.length() - Globals.DEFAULT_PAGE_SEPARATOR.length());
+		}
+		TMP_PATH = tmpPath;
+	}
 
 	@BeforeAll
 	public static void initialize() {
 		SKIP_TEST = !FileUtils.isExists("src/test/resources/mail.xml");
 		CONFIGURE_MANAGER = ConfigureManager.getInstance();
+
+		long currentTime = DateTimeUtils.currentUTCTimeMillis();
+		KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
+		X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
+				new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
+		try {
+			KeyStore keyStore = KeyStore.getInstance("PKCS12");
+			keyStore.load(null, null);
+
+			keyStore.setKeyEntry(ALIAS_NAME, keyPair.getPrivate(), PASSWORD.toCharArray(), new X509Certificate[]{x509Certificate});
+			try (FileOutputStream fos = new FileOutputStream(TMP_PATH + STORE_PATH)) {
+				keyStore.store(fos, PASSWORD.toCharArray());
+			}
+		} catch (Exception e) {
+			SKIP_TEST = Boolean.TRUE;
+		}
 	}
 
 	@AfterAll
 	public static void clear() {
 		CONFIGURE_MANAGER.removeConfigure(MailConfig.class);
 		CONFIGURE_MANAGER.removeConfigure(SecureSettings.class);
+		FileUtils.removeFile(TMP_PATH + STORE_PATH);
 	}
 
 	@Test
@@ -67,11 +94,8 @@ public final class MailTest extends BaseTest {
 			return;
 		}
 		SecureFactory.systemConfig(SecureFactory.SecureAlgorithm.AES128);
-		long currentTime = DateTimeUtils.currentUTCTimeMillis();
-		KeyPair keyPair = SecurityUtils.RSAKeyPair(1024);
-		X509Certificate x509Certificate = CertificateUtils.x509(keyPair.getPublic(), IDUtils.snowflake(),
-				new Date(currentTime), new Date(currentTime + 365 * 24 * 60 * 60 * 1000L), "TestCert", keyPair.getPrivate(), "SHA1withRSA");
 		PROPERTIES = PropertiesUtils.loadProperties("src/test/resources/mail.xml");
+
 		SecureProtocol sendSecureProtocol =
 				Optional.ofNullable(PROPERTIES.getProperty("config.send.secure.protocol"))
 						.filter(StringUtils::notBlank)
@@ -106,22 +130,13 @@ public final class MailTest extends BaseTest {
 				.confirm()
 				.authentication(PROPERTIES.getProperty("config.userName"), PROPERTIES.getProperty("config.passWord"))
 				.storagePath(PROPERTIES.getProperty("config.storagePath"))
-				.signer(x509Certificate, keyPair.getPrivate())
+				.signer(TMP_PATH + STORE_PATH, PASSWORD, ALIAS_NAME, PASSWORD)
 				.build();
 		String xmlContent = BeanUtils.objectToString(mailConfig, StringType.XML);
-		this.logger.info("Mail_Generate_Config_Info", xmlContent);
 		MailConfig parseConfig = BeanUtils.stringToObject(xmlContent, StringType.XML, MailConfig.class,
 				"https://nervousync.org/schemas/mail");
 		this.logger.info("Mail_Config_Validate", BeanUtils.validate(parseConfig));
 		CONFIGURE_MANAGER.saveConfigure(mailConfig);
-		CONFIGURE_MANAGER.readConfigure(MailConfig.class)
-				.ifPresent(readConfig ->
-						this.logger.info("Mail_Parse_Config_Info",
-								BeanUtils.objectToString(readConfig, StringType.JSON)));
-
-		AutomaticConfig automaticConfig = new AutomaticConfig();
-		this.logger.info("Mail_Generate_Config_Info",
-				BeanUtils.objectToString(automaticConfig.getMailConfig(), StringType.JSON));
 	}
 
 	@Test
@@ -130,12 +145,15 @@ public final class MailTest extends BaseTest {
 		if (SKIP_TEST) {
 			return;
 		}
-		Optional.ofNullable(CONFIGURE_MANAGER)
-				.flatMap(manager -> manager.readConfigure(MailConfig.class))
+		AutomaticConfig automaticConfig = new AutomaticConfig();
+		Optional.ofNullable(automaticConfig.getMailConfig())
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					mailAgent.folderList().forEach(folderName -> this.logger.info("Mail_Folder", folderName));
+					mailAgent.folderList().forEach(folderName -> {
+						this.logger.info("Mail_Folder", folderName);
+						this.folderNames.add(folderName);
+					});
 				});
 	}
 
@@ -184,7 +202,7 @@ public final class MailTest extends BaseTest {
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX, 0, 10)
 							.stream()
 							.filter(uid ->
 									Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
@@ -215,7 +233,7 @@ public final class MailTest extends BaseTest {
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX, 0, 10)
 							.stream()
 							.filter(uid ->
 									Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
@@ -249,7 +267,7 @@ public final class MailTest extends BaseTest {
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_TRASH)
+					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_TRASH, 0, 10)
 							.stream()
 							.filter(uid ->
 									Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_TRASH, uid))
@@ -272,7 +290,7 @@ public final class MailTest extends BaseTest {
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX)
+					mailAgent.mailUids(Globals.DEFAULT_EMAIL_FOLDER_INBOX, 0, 10)
 							.stream()
 							.filter(uid ->
 									Optional.ofNullable(mailAgent.readMail(Globals.DEFAULT_EMAIL_FOLDER_INBOX, uid))
@@ -302,11 +320,9 @@ public final class MailTest extends BaseTest {
 				.ifPresent(mailConfig -> {
 					MailClient mailAgent = MailUtils.client(mailConfig);
 					Assertions.assertNotNull(mailAgent);
-					this.logger.info("Inbox_Count", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_INBOX));
-					this.logger.info("Spam_Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_SPAM));
-					this.logger.info("Drafts_Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_DRAFTS));
-					this.logger.info("Send_Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_SENT));
-					this.logger.info("Trash_Count: {}", mailAgent.mailCount(Globals.DEFAULT_EMAIL_FOLDER_TRASH));
+					for (String folderName : this.folderNames) {
+						this.logger.info("Mail_Folder_Count", folderName, mailAgent.mailCount(folderName));
+					}
 				});
 	}
 

@@ -39,8 +39,5 @@
     <entry key="Mail_Flag_Delete">Set e-mail delete status result: {0}</entry>
     <entry key="Mail_Recovery">Recovery deleted e-mail UID: {0} result: {1}</entry>
     <entry key="Mail_Drop">Drop e-mail UID: {0} result: {1}</entry>
-    <entry key="Inbox_Count">Inbox mail count: {0}</entry>
-    <entry key="Spam_Count">Spam mail count: {0}</entry>
-    <entry key="Drafts_Count">Drafts mail count: {0}</entry>
-    <entry key="Sent_Count">Sent mail count: {0}</entry>
+    <entry key="Mail_Folder_Count">Folder: {0} mail count: {1}</entry>
 </properties>
