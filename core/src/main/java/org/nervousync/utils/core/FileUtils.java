@@ -2373,7 +2373,7 @@ public final class FileUtils {
 	 */
 	private static String replacePageSeparator(String path) {
 		String replacePath = StringUtils.replace(path, Globals.DEFAULT_PAGE_SEPARATOR, "|");
-		replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_ZIP_PAGE_SEPARATOR, "|");
+		replacePath = StringUtils.replace(replacePath, "\\", "|");
 		replacePath = StringUtils.replace(replacePath, Globals.DEFAULT_JAR_PAGE_SEPARATOR, "|");
 		if (replacePath.endsWith("|")) {
 			replacePath = replacePath.substring(0, replacePath.length() - 1);
