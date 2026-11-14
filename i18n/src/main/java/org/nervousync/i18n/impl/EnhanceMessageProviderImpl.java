@@ -24,7 +24,7 @@ import org.nervousync.commons.Globals;
 import org.nervousync.commons.i18n.InternationalizationGlobals;
 import org.nervousync.i18n.MessageAgent;
 import org.nervousync.i18n.MessageProvider;
-import org.nervousync.utils.core.ClassUtils;
+import org.nervousync.utils.commons.ClassUtils;
 import org.nervousync.utils.i18n.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,6 @@ import java.util.*;
  * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Jul 19, 2023 16:39:41 $
  */
-@SuppressWarnings("unused")
 @Provider(name = "enhanceI18NProvider", titleKey = "enhance.i18n.provider.title", descriptionKey = "enhance.i18n.provider.description")
 public final class EnhanceMessageProviderImpl implements MessageProvider {
 
@@ -208,7 +207,7 @@ public final class EnhanceMessageProviderImpl implements MessageProvider {
 			if (this.messageResource != null) {
 				messageKey = this.messageResource.errorKey(errorCode);
 			}
-			if (LocaleUtils.isEmpty(messageKey)) {
+			if (LocaleUtils.isEmpty(messageKey) && this.defaultResource != null) {
 				messageKey = this.defaultResource.errorKey(errorCode);
 			}
 			if (LocaleUtils.isEmpty(messageKey)) {

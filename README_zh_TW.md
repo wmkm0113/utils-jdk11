@@ -15,18 +15,21 @@
 ---
 
 ## 目錄
+
 * [專案概覽](#專案概覽)
 * [JDK版本相容](#JDK版本相容)
 * [設計理念](#設計理念)
 * [模組](#模組)
 * [安裝引用](#安裝引用)
 * [快速開始](#快速開始)
+
 + [JavaBean 與不同資料的相互轉換](#JavaBean-與不同資料的相互轉換)
 + [隨機ID生成](#隨機ID生成)
 + [地理資訊](#地理資訊)
 + [統一管理的設定文件](#統一管理的設定文件)
 + [國際化的支持](#國際化的支持)
 + [OTP產生與驗證](#OTP產生與驗證)
+
 * [架構概覽](#架構概覽)
 * [同類產品比較](#同類產品比較)
 * [適用場景](#適用場景)
@@ -38,9 +41,11 @@
 
 ## 專案概覽
 
-**Nervousync Utils** 是一個以企業為基礎的 Java 工具庫，旨在為後端系統提供可重複使用的基礎架構功能。
+**Nervousync Utils** 是一個以企業為基礎的 Java
+工具庫，旨在為後端系統提供可重複使用的基礎架構功能。
 
-與輕量級輔助庫不同，此專案專注於**功能層面的抽象**，例如組態管理、國際化、安全工具、HTTP 通訊、生命週期管理和結構化資料轉換。
+與輕量級輔助庫不同，此專案專注於**功能層面的抽象**
+，例如組態管理、國際化、安全工具、HTTP 通訊、生命週期管理和結構化資料轉換。
 
 它與特定框架無關，可以輕鬆方便的整合到以下系統中：
 
@@ -52,10 +57,9 @@
 ---
 
 ## JDK版本相容
-**編譯：** OpenJDK 11
-**測試：** OpenJDK 11 / 17 / 21
-**運行：** OpenJDK 11+ 或相容版本
-**Jakarta EE平台：** 10
+
+**編譯：** OpenJDK 11 **測試：** OpenJDK 11 / 17 / 21
+**運行：** OpenJDK 11+ 或相容版本 **Jakarta EE平台：** 10
 
 ---
 
@@ -69,7 +73,8 @@
 
 - 提供完善的進階安全特性
 
-專案提供了多種最新的加密演算法支持，同時也提供了完整的 OTP（支援 TOTP 和 HOTP） 支持
+專案提供了多種最新的加密演算法支持，同時也提供了完整的 OTP（支援
+TOTP 和 HOTP） 支持
 
 - 與框架無關
 
@@ -81,25 +86,31 @@
 
 | 模組           | 概述                                                                                          |
 |----------------|-----------------------------------------------------------------------------------------------|
+| utils-archive  | 歸檔文件操作工具                                                                              |
 | utils-bom      | BOM模組                                                                                       |
-| utils-core     | 核心模組、基礎工具                                                                            |
+| utils-commons  | 基本模組、基礎工具                                                                            |
 | utils-beans    | JavaBean 與不同資料格式（XML/JSON/YAML）的轉換工具                                            |
 | utils-config   | 統一的設定檔管理、啟動項目的管理                                                              |
 | utils-i18n     | 國際化引擎（支援多語言、國際化、在地化）                                                      |
+| utils-id       | ID 生成器工具                                                                                 |
 | utils-log4j    | 使用Log4j2實現的日誌配置                                                                      |
 | utils-mail     | 電子郵件工具                                                                                  |
 | utils-net      | 網路存取工具（包括網路請求、網路檔案、SNMP監控）                                              |
 | utils-office   | Excel 檔案操作支援                                                                            |
 | utils-security | 安全工具（包括加密、解密、簽署、驗證、金鑰管理）、OTP工具、安全工廠（用於設定檔的自動加解密） |
-| utils-zip      | Zip壓縮檔的存取支援                                                                           |
+| utils-zip      | Zip壓縮檔的存取支援  （從 1.4.0 版本開始，使用 utils-archive 代替 utils-zip）                 |
 | utils-all      | 包含所有模組                                                                                  |
 
 每個模組均可獨立使用。
 
 ---
+
 ## 安裝引用
+
 **Maven：**
+
 ### 直接引用
+
 ```
 <dependency>
  <groupId>org.nervousync</groupId>
@@ -107,7 +118,9 @@
  <version>${版本號}</version>
 </dependency>
 ```
+
 ### 使用 BOM 管理
+
 ```
 <!-- 匯入 BOM，使用 platform -->
 <dependencyManagement>
@@ -131,52 +144,67 @@
  …
 </dependencies>
 ```
+
 **Gradle：**
 Gradle 5.0+ 支援將 Maven BOM 匯入為 platform 以對齊相依性版本。
+
 ### 直接引用
+
 ```
 implementation 'org.nervousync:${模組名}:${版本號}'
 ```
+
 ### 使用 BOM 管理
+
 ```
 // 匯入 BOM，使用 platform
 implementation platform('org.nervousync:utils-bom:${版本號}')
 // 依賴項不需要寫版本號
 implementation 'org.nervousync:${模組名}'
 ```
+
 **SBT：**
+
 ```
 libraryDependencies += "org.nervousync" % "${模組名稱}" % "${版本號碼}" % "provided"
 ```
+
 **Ivy：**
+
 ```
 <dependency org="org.nervousync" name="${模組名稱}" rev="${版本號碼}"/>
 ```
 
 ## 快速開始
+
 ### JavaBean 與不同資料的相互轉換
 
-`utils-core（使用jsonb）`支援 XML 和 JSON 格式的數據，`utils-beans（使用Jackson）`支援 XML、JSON 和 YAML 格式的數據
+`utils-commons（使用jsonb）`支援 XML 和 JSON 格式的數據，
+`utils-beans（使用Jackson）`支援 XML、JSON 和 YAML 格式的數據
 
 首先定義一個簡單的 JavaBean，並加入對應的註解：
+
 ```java
 // 使用 OutputConfig 註解來宣告資料的格式類型
 @OutputConfig(type = StringType.JSON)
 @XmlRootElement(name = "user")
 public class User {
- @XmlElement
- private String name;
- @XmlElement
- private int age;
- // getters and setters
+	@XmlElement
+	private String name;
+	@XmlElement
+	private int age;
+	// getters and setters
 }
 ```
+
 只需一行程式碼，即可將 JavaBean 實例物件轉換為對應的字串：
+
 ```java
 String string = BeanUtils.objectToString(user);
 ```
 
 需要將字串轉換為 JavaBean，也只需要一行程式碼：
+
 ```java
 User user = BeanUtils.stringToObject(string, User.class);
 ```
@@ -184,6 +212,7 @@ User user = BeanUtils.stringToObject(string, User.class);
 ### 隨機ID生成
 
 在日常開發中，經常會有需要產生隨機ID的需求，現在您只需要：
+
 ```java
 UUID uuid = IDUtils.UUIDv4();
 ULID ulid = IDUtils.ULID();
@@ -195,6 +224,7 @@ String nano = IDUtils.nano();
 ### 地理資訊
 
 轉換座標系：
+
 ```java
 GeoPoint gpsPoint = LocationUtils.anyToGPS(currentPoint);
 GeoPoint gcj02Point = LocationUtils.anyToGCJ02(currentPoint);
@@ -202,6 +232,7 @@ GeoPoint bd09Point = LocationUtils.anyToBD09(currentPoint);
 ```
 
 計算兩個座標點的距離（單位：公尺）：
+
 ```java
 double distance = LocationUtils.distance(beginPoint, endPoint);
 ```
@@ -245,13 +276,14 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
 此功能需要`utils-i18n`模組
 
 1. 定義資源檔案訊息   
-多語言的資源檔案儲存路徑為 jar 套件內的 META-INF/i18n/Resources.json，具體格式如下：
+   多語言的資源檔案儲存路徑為 jar 套件內的
+   META-INF/i18n/Resources.json，具體格式如下：
     ```json
     {
      "groupId": "org.nervousync",
      "bundle": "utils",
      "errors": {
-     "0x000000150001": "Length_Not_Enough_Crypto_Error",
+     "0x000000150001": "Length_Not_Enough_Crypto_Error"
      },
      "messages": {
      "en-US": {
@@ -280,6 +312,7 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
     LoggerUtils.Logger logger = LoggerUtils.getLogger(this.getClass());
     logger.info("Load_Schema_Mapping_Error", "/opt/schemas/file.xsd");
     ```
+
 資源檔案中支援使用 Plurals 表達式
 
 ### OTP產生與驗證
@@ -287,42 +320,45 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
 此功能需要`utils-security`模組
 
 產生 OTP 金鑰：
+
 ```java
 String secret = OTPUtils.generateRandomKey();
 ```
 
 計算 TOTP 使用者與伺服器的時間偏移
+
 ```java
 long fixedTime = OTPUtils.calculateFixedTime(secret, authCode);
 ```
 
 驗證 TOTP 資料：
+
 ```java
 boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 ```
 
-使用者可以選擇不同的演算法，預設為 HMAC-SHA1。支援基於時間的標準一次性密碼演算法（TOTP）和基於計數器的一次性密碼演算法（HOTP）。
+使用者可以選擇不同的演算法，預設為
+HMAC-SHA1。支援基於時間的標準一次性密碼演算法（TOTP）和基於計數器的一次性密碼演算法（HOTP）。
 
 ---
 
 ## 架構概覽
 
 ```
- +------------------+
- | utils-core |
- +------------------+
- / | \
- / | \
- v v v
- utils-config utils-i18n utils-security
- \ | /
- \ | /
- v v v
- utils-net utils-launcher
+          +------------------+
+          |   utils-commons  |
+          +------------------+
+             /     |     \
+            /      |      \
+           v       v       v
+  utils-config  utils-i18n  utils-security
+          \          |           /
+           \         |          /
+            v        v         v
+              utils-net   utils-launcher
 ```
 
 ---
-
 
 ## 同類產品比較
 
@@ -334,7 +370,6 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 | 無重型框架依賴   | ✔         | ✔             | ✔      |
 
 本專案著重於結構化的企業能力，而不是通用輔助工具。
-
 
 ## 適用場景
 
@@ -356,6 +391,7 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 - 補丁版本號 (PATCH) – 錯誤修復和細微改進
 
 ---
+
 ## 貢獻與回饋
 
 歡迎各位朋友將此文件及項目中的提示訊息、錯誤訊息等翻譯為更多語言，以幫助更多的使用者更了解與使用此工具包。
@@ -379,7 +415,8 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 - 已考慮向後相容性
 
 如果您需要添加的是客製化的特殊需求，我將收取一定的客製化開發費用，具體​​費用金額根據客製化的特殊需求的工作量進行評估。
-客製化特殊需求請直接發送電子郵件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features)，同時請盡量在郵件中寫明您可以負擔的開發費用預算金額。
+客製化特殊需求請直接發送電子郵件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features)
+，同時請盡量在郵件中寫明您可以負擔的開發費用預算金額。
 
 ---
 
@@ -391,14 +428,17 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 ---
 
 ## 捐款
+
 為了支持此項目，您可以向以下地址捐款：
 
 * 比特幣地址: bc1q3nfj9gafu3x25ea260g7cyhh5s9gnx347tznsf
 * 以太坊地址: 0x849D143e943bAA6Dd078d02ebAEc205E2b00a7CA
 * Solana 地址: 4Fvujk8DEkVAtYwzim1vrobNm4s72Ra6Xrsu83v2hqE2
 * BNB 地址: 0x849D143e943bAA6Dd078d02ebAEc205E2b00a7CA
+
 ---
 
 ## 結語
 
-本專案旨在為企業級 Java 系統提供穩定、可重複使用的基礎架構，如果您希望建立可維護的後端平台，並對配置、安全性、國際化等方面有需求，那麼本專案正是為此而設計的。
+本專案旨在為企業級 Java
+系統提供穩定、可重複使用的基礎架構，如果您希望建立可維護的後端平台，並對配置、安全性、國際化等方面有需求，那麼本專案正是為此而設計的。

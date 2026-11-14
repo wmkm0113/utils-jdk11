@@ -15,18 +15,19 @@
 ---
 
 ## 目录
+
 * [项目概览](#项目概览)
 * [JDK版本兼容](#JDK版本兼容)
 * [设计理念](#设计理念)
 * [模块](#模块)
 * [安装引用](#安装引用)
 * [快速开始](#快速开始)
-  + [JavaBean 与不同数据的相互转换](#JavaBean-与不同数据的相互转换)
-  + [随机ID生成](#随机ID生成)
-  + [地理信息](#地理信息)
-  + [统一管理的配置文件](#统一管理的配置文件)
-  + [国际化的支持](#国际化的支持)
-  + [OTP生成与验证](#OTP生成与验证)
+    + [JavaBean 与不同数据的相互转换](#JavaBean-与不同数据的相互转换)
+    + [随机ID生成](#随机ID生成)
+    + [地理信息](#地理信息)
+    + [统一管理的配置文件](#统一管理的配置文件)
+    + [国际化的支持](#国际化的支持)
+    + [OTP生成与验证](#OTP生成与验证)
 * [架构概览](#架构概览)
 * [同类产品比较](#同类产品比较)
 * [适用场景](#适用场景)
@@ -38,9 +39,11 @@
 
 ## 项目概览
 
-**Nervousync Utils** 是一个面向企业的 Java 工具库，旨在为后端系统提供可重用的基础设施功能。
+**Nervousync Utils** 是一个面向企业的 Java
+工具库，旨在为后端系统提供可重用的基础设施功能。
 
-与轻量级辅助库不同，该项目专注于**功能层面的抽象**，例如配置管理、国际化、安全工具、HTTP 通信、生命周期管理和结构化数据转换。
+与轻量级辅助库不同，该项目专注于**功能层面的抽象**
+，例如配置管理、国际化、安全工具、HTTP 通信、生命周期管理和结构化数据转换。
 
 它与特定框架无关，可以轻松方便的集成到以下系统中：
 
@@ -52,6 +55,7 @@
 ---
 
 ## JDK版本兼容
+
 **编译：** OpenJDK 11   
 **测试：** OpenJDK 11 / 17 / 21  
 **运行：** OpenJDK 11+ 或兼容版本  
@@ -61,7 +65,7 @@
 
 ## 设计理念
 
-本项目基于以下工程原则构建：  
+本项目基于以下工程原则构建：
 
 - 模块化设计
 
@@ -69,7 +73,8 @@
 
 - 提供完善的高级安全特性
 
-项目提供了多种最新的加密算法支持，同时还提供了完整的 OTP（支持 TOTP 和 HOTP） 支持
+项目提供了多种最新的加密算法支持，同时还提供了完整的 OTP（支持
+TOTP 和 HOTP） 支持
 
 - 与框架无关
 
@@ -81,17 +86,19 @@
 
 | 模块           | 概述                                                                                            |
 |----------------|-------------------------------------------------------------------------------------------------|
+| utils-archive  | 归档文件操作工具                                                                                |
 | utils-bom      | BOM模块                                                                                         |
-| utils-core     | 核心模块、基础工具                                                                              |
+| utils-commons  | 通用基础模块、基础工具                                                                          |
 | utils-beans    | JavaBean 与不同数据格式（XML/JSON/YAML）的转换工具                                              |
 | utils-config   | 统一的配置文件管理、启动项的管理                                                                |
 | utils-i18n     | 国际化引擎（支持多语言、国际化、本地化）                                                        |
+| utils-id       | ID 生成工具                                                                                     |
 | utils-log4j    | 使用Log4j2实现的日志配置                                                                        |
 | utils-mail     | 电子邮件工具                                                                                    |
 | utils-net      | 网络访问工具（包括网络请求、网络文件、SNMP监控）                                                |
 | utils-office   | Excel 文件操作支持                                                                              |
 | utils-security | 安全工具（包括加密、解密、签名、验证、密钥管理）、OTP工具、安全工厂（用于配置文件的自动加解密） |
-| utils-zip      | Zip压缩文件的访问支持                                                                           |
+| utils-zip      | Zip压缩文件的访问支持（从 1.4.0 版本开始，使用 utils-archive 代替 utils-zip）                   |
 | utils-all      | 包含所有模块                                                                                    |
 
 每个模块均可独立使用。
@@ -99,8 +106,11 @@
 ---
 
 ## 安装引用
+
 **Maven：**
+
 ### 直接引用
+
 ```
 <dependency>
     <groupId>org.nervousync</groupId>
@@ -108,7 +118,9 @@
     <version>${版本号}</version>
 </dependency>
 ```
+
 ### 使用 BOM 管理
+
 ```
 <!-- 导入 BOM，使用 platform -->
 <dependencyManagement>
@@ -132,52 +144,67 @@
     ...
 </dependencies>
 ```
+
 **Gradle：**
 Gradle 5.0+ 支持将 Maven BOM 导入为 platform 以对齐依赖项版本。
+
 ### 直接引用
+
 ```
 implementation 'org.nervousync:${模块名}:${版本号}'
 ```
+
 ### 使用 BOM 管理
+
 ```
 // 导入 BOM，使用 platform
 implementation platform('org.nervousync:utils-bom:${版本号}')
 // 依赖项不需要写版本号
 implementation 'org.nervousync:${模块名}'
 ```
+
 **SBT：**
+
 ```
 libraryDependencies += "org.nervousync" % "${模块名}" % "${版本号}" % "provided"
 ```
+
 **Ivy：**
+
 ```
 <dependency org="org.nervousync" name="${模块名}" rev="${版本号}"/>
 ```
 
 ## 快速开始
+
 ### JavaBean 与不同数据的相互转换
 
-`utils-core（使用jsonb）`支持 XML 和 JSON 格式的数据，`utils-beans（使用Jackson）`支持 XML、JSON 和 YAML 格式的数据
+`utils-commons（使用jsonb）`支持 XML 和 JSON 格式的数据，
+`utils-beans（使用Jackson）`支持 XML、JSON 和 YAML 格式的数据
 
 首先定义一个简单的 JavaBean，并添加相应的注解：
+
 ```java
 //  使用 OutputConfig 注解来声明数据的格式类型
 @OutputConfig(type = StringType.JSON)
 @XmlRootElement(name = "user")
 public class User {
-    @XmlElement
-    private String name;
-    @XmlElement
-    private int age;
-    // getters and setters
+	@XmlElement
+	private String name;
+	@XmlElement
+	private int age;
+	// getters and setters
 }
 ```
+
 仅需一行代码，即可将 JavaBean 实例对象转换为对应的字符串：
+
 ```java
 String string = BeanUtils.objectToString(user);
 ```
 
 需要将字符串转换为 JavaBean，也仅需要一行代码：
+
 ```java
 User user = BeanUtils.stringToObject(string, User.class);
 ```
@@ -185,6 +212,7 @@ User user = BeanUtils.stringToObject(string, User.class);
 ### 随机ID生成
 
 在日常开发中，经常会有需要生成随机ID的需求，现在您只需要：
+
 ```java
 UUID uuid = IDUtils.UUIDv4();
 ULID ulid = IDUtils.ULID();
@@ -196,6 +224,7 @@ String nano = IDUtils.nano();
 ### 地理信息
 
 转换坐标系：
+
 ```java
 GeoPoint gpsPoint = LocationUtils.anyToGPS(currentPoint);
 GeoPoint gcj02Point = LocationUtils.anyToGCJ02(currentPoint);
@@ -203,6 +232,7 @@ GeoPoint bd09Point = LocationUtils.anyToBD09(currentPoint);
 ```
 
 计算两个坐标点的距离（单位：米）：
+
 ```java
 double distance = LocationUtils.distance(beginPoint, endPoint);
 ```
@@ -245,13 +275,14 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
 此功能需要`utils-i18n`模块
 
 1. 定义资源文件信息   
-多语言的资源文件存储路径为 jar 包内的 META-INF/i18n/Resources.json，具体格式如下：
+   多语言的资源文件存储路径为 jar 包内的
+   META-INF/i18n/Resources.json，具体格式如下：
     ```json
     {
       "groupId": "org.nervousync",
       "bundle": "utils",
       "errors": {
-        "0x000000150001": "Length_Not_Enough_Crypto_Error",
+        "0x000000150001": "Length_Not_Enough_Crypto_Error"
       },
       "messages": {
         "en-US": {
@@ -267,7 +298,7 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
       }
     }
     ```
-   
+
 2. 引用多语言信息：
     ```java
     //  使用资源文件中定义的 groupId 和 bundle 来获取对应的多语言信息代理
@@ -288,21 +319,25 @@ double distance = LocationUtils.distance(beginPoint, endPoint);
 此功能需要`utils-security`模块
 
 生成 OTP 密钥：
+
 ```java
 String secret = OTPUtils.generateRandomKey();
 ```
 
 计算 TOTP 用户与服务器的时间偏移
+
 ```java
 long fixedTime = OTPUtils.calculateFixedTime(secret, authCode);
 ```
 
 验证 TOTP 数据：
+
 ```java
 boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 ```
 
-使用者可以选择不同的算法，默认为 HMAC-SHA1。支持基于时间的标准一次性密码算法（TOTP）和基于计数器的一次性密码算法（HOTP）。
+使用者可以选择不同的算法，默认为
+HMAC-SHA1。支持基于时间的标准一次性密码算法（TOTP）和基于计数器的一次性密码算法（HOTP）。
 
 ---
 
@@ -310,7 +345,7 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 
 ```
           +------------------+
-          |   utils-core     |
+          |   utils-commons  |
           +------------------+
              /     |     \
             /      |      \
@@ -324,7 +359,6 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 
 ---
 
-
 ## 同类产品比较
 
 | Feature          | Nervousync | Apache Commons | Hutool  |
@@ -335,7 +369,6 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 | 无重型框架依赖   | ✔         | ✔             | ✔      |
 
 本项目侧重于结构化的企业能力，而不是通用辅助工具。
-
 
 ## 适用场景
 
@@ -381,7 +414,8 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 - 已考虑向后兼容性
 
 如果您需要添加的是定制化的特殊需求，我将收取一定的定制开发费用，具体费用金额根据定制化的特殊需求的工作量进行评估。   
-定制化特殊需求请直接发送电子邮件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features)，同时请尽量在邮件中写明您可以负担的开发费用预算金额。
+定制化特殊需求请直接发送电子邮件到[wmkm0113\@gmail.com](mailto:wmkm0113@gmail.com?subject=payment_features)
+，同时请尽量在邮件中写明您可以负担的开发费用预算金额。
 
 ---
 
@@ -393,14 +427,17 @@ boolean result = OTPUtils.validateTOTPCode(secret, authCode, fixedTime);
 ---
 
 ## 捐款
+
 为了支持此项目，您可以向以下地址捐款：
 
 * 比特币地址: bc1q3nfj9gafu3x25ea260g7cyhh5s9gnx347tznsf
 * 以太坊地址: 0x849D143e943bAA6Dd078d02ebAEc205E2b00a7CA
 * Solana 地址: 4Fvujk8DEkVAtYwzim1vrobNm4s72Ra6Xrsu83v2hqE2
 * BNB 地址: 0x849D143e943bAA6Dd078d02ebAEc205E2b00a7CA
+
 ---
 
 ## 结语
 
-本项目旨在为企业级 Java 系统提供稳定、可重用的基础架构，如果您希望构建可维护的后端平台，并对配置、安全性、国际化等方面有需求，那么本项目正是为此而设计的。
+本项目旨在为企业级 Java
+系统提供稳定、可重用的基础架构，如果您希望构建可维护的后端平台，并对配置、安全性、国际化等方面有需求，那么本项目正是为此而设计的。

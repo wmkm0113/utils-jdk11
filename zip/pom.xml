@@ -5,57 +5,19 @@
     <parent>
         <groupId>org.nervousync</groupId>
         <artifactId>utils-parent</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.0</version>
     </parent>
     <artifactId>utils-zip</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>Nervousync Java Zip compress Utilities</name>
-    <properties>
-        <jcifs.version>2.1.40</jcifs.version>
-    </properties>
-    <dependencies>
-        <dependency>
+    <distributionManagement>
+        <relocation>
             <groupId>org.nervousync</groupId>
-            <artifactId>utils-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.nervousync</groupId>
-            <artifactId>utils-net</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.nervousync</groupId>
-            <artifactId>utils-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-        </dependency>
-        <!-- Security Support -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-        </dependency>
-        <!-- SMB Support -->
-        <dependency>
-            <groupId>org.codelibs</groupId>
-            <artifactId>jcifs</artifactId>
-            <version>${jcifs.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk18on</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
-
+            <artifactId>utils-archive</artifactId>
+            <message>
+                utils-zip has moved to utils-archive.
+                org.nervousync.zip remains available during the 1.x transition.
+            </message>
+        </relocation>
+    </distributionManagement>
 </project>
