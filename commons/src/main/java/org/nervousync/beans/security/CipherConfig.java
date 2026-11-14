@@ -18,6 +18,7 @@ package org.nervousync.beans.security;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.commons.Globals;
+import org.nervousync.utils.commons.StringUtils;
 
 import java.io.Serializable;
 
@@ -132,6 +133,8 @@ public final class CipherConfig implements Serializable {
 	 */
 	@Override
 	public @Nonnull String toString() {
-		return String.join("/", this.algorithm, this.mode, this.padding);
+		return StringUtils.isEmpty(this.mode) && StringUtils.isEmpty(this.padding)
+				? this.algorithm
+				: String.join("/", this.algorithm, this.mode, this.padding);
 	}
 }
