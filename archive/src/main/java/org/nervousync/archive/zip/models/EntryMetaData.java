@@ -88,6 +88,10 @@ public final class EntryMetaData {
 	public static void applyBeforePublish(final Path target, final FileHeader fileHeader,
 	                                      final ExtractOptions extractOptions,
 	                                      final ArchiveOptions archiveOptions, final ZipOptions zipOptions) throws IOException {
+		if (Files.isSymbolicLink(target)) {
+			return;
+		}
+
 		if (extractOptions.isPreserveTimestamp()) {
 			final Instant[] times = EntryTimes.read(fileHeader, archiveOptions.isStrict());
 
@@ -104,7 +108,7 @@ public final class EntryMetaData {
 			}
 		}
 
-		if (!extractOptions.isPreservePermissions() || Files.isSymbolicLink(target)) {
+		if (!extractOptions.isPreservePermissions()) {
 			return;
 		}
 
