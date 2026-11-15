@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io;
+package org.nervousync.archive.io.zip;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.archive.core.DataFile;
@@ -43,10 +43,10 @@ import java.util.regex.Pattern;
 public final class ZipArchiveInputStream extends InputStream {
 
 	/**
-	 * <span class="en-US">.z00X match pattern</span>
-	 * <span class="zh-CN">.z00X验证规则</span>
+	 * <span class="en-US">.z0X match pattern</span>
+	 * <span class="zh-CN">.z0X验证规则</span>
 	 */
-	private static final Pattern Z_PART_PATTERN =
+	private static final Pattern NATIVE_PART_PATTERN =
 			Pattern.compile("^(.*)\\.z([0-9]+)$", Pattern.CASE_INSENSITIVE);
 
 	/**
@@ -116,18 +116,18 @@ public final class ZipArchiveInputStream extends InputStream {
 			String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
 			SplitType splitType = zipOptions.getSplitType();
 			if (splitType == SplitType.DETECT) {
-				if (fileName.toLowerCase(Locale.ROOT).endsWith(".zip") || Z_PART_PATTERN.matcher(fileName).matches()) {
+				if (fileName.toLowerCase(Locale.ROOT).endsWith(".zip") || NATIVE_PART_PATTERN.matcher(fileName).matches()) {
 					splitType = SplitType.NATIVE;
 				} else if (NUMBER_PART_PATTERN.matcher(fileName).matches()) {
-					splitType = SplitType.SEVEN_ZIP;
+					splitType = SplitType.NUMBERED;
 				}
 			}
 			Pattern pattern;
 			switch (splitType) {
 				case NATIVE:
-					pattern = Z_PART_PATTERN;
+					pattern = NATIVE_PART_PATTERN;
 					break;
-				case SEVEN_ZIP:
+				case NUMBERED:
 					pattern = NUMBER_PART_PATTERN;
 					break;
 				default:
@@ -516,7 +516,7 @@ public final class ZipArchiveInputStream extends InputStream {
 
 	private boolean numberedArchive() {
 		return this.splitPathMapping.values().stream()
-				.anyMatch(splitFile -> splitFile.getType() == SplitType.SEVEN_ZIP);
+				.anyMatch(splitFile -> splitFile.getType() == SplitType.NUMBERED);
 	}
 
 	/**

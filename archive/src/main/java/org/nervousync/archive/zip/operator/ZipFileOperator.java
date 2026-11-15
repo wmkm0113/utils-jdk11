@@ -23,12 +23,13 @@ import org.nervousync.archive.core.DataFile;
 import org.nervousync.archive.enumerations.AesVendor;
 import org.nervousync.archive.enumerations.StrongAccessMode;
 import org.nervousync.archive.exceptions.ArchiveException;
+import org.nervousync.archive.io.bzip2.BZip2InputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.BoundedInputStream;
-import org.nervousync.archive.zip.io.ZipArchiveInputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongInputStream;
+import org.nervousync.archive.io.zip.BoundedInputStream;
+import org.nervousync.archive.io.zip.ZipArchiveInputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongInputStream;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.archive.zip.models.crypto.AesEncryptionInfo;
 import org.nervousync.archive.zip.models.ExtraDataRecord;
@@ -80,6 +81,7 @@ public final class ZipFileOperator implements AutoCloseable {
 	public static final int MAX_COMMENT_LENGTH = 0xFFFF;
 	public static final int MAX_SEARCH_LENGTH = MAX_COMMENT_LENGTH + FIXED_SIZE;
 	private static final int LOCAL_FILE_HEADER_FIXED_SIZE = 30;
+	private static final int CENTRAL_FILE_HEADER_FIXED_SIZE = 46;
 
 	private static final Provider BC_PROVIDER = new BouncyCastleProvider();
 
@@ -139,8 +141,7 @@ public final class ZipFileOperator implements AutoCloseable {
 	 * <h3 class="en-US">Getter method for the strong decryption header</h3>
 	 * <h3 class="zh-CN">解密头信息的 Getter 方法</h3>
 	 *
-	 * @return
-	 * <span class="en-US">Strong decryption header</span>
+	 * @return <span class="en-US">Strong decryption header</span>
 	 * <span class="zh-CN">解密头信息</span>
 	 */
 	public StrongDecryptionHeader getCentralDecryptionHeader() {
@@ -462,8 +463,20 @@ public final class ZipFileOperator implements AutoCloseable {
 			protection = zip64EndCentralDirectory.getProtection();
 		}
 
+		long maxEntries = this.options.getArchiveLimit().getMaxEntries();
+		if (totalEntries < 0L) {
+			throw new ArchiveException(0x0000001A001FL);
+		}
+		if (totalEntries > maxEntries) {
+			throw new ArchiveException(0x0000001A003EL, maxEntries, totalEntries);
+		}
+
 		long headerSize = (protection == null) ? centralDirectorySize : protection.getUncompressedSize();
 		validateHeaderSize(headerSize, this.options.getArchiveLimit().getMaxHeaderBytes());
+
+		if (totalEntries > headerSize / CENTRAL_FILE_HEADER_FIXED_SIZE) {
+			throw new ArchiveException(0x0000001A001CL);
+		}
 
 		if (protection == null) {
 			return this.readPlainCentralDirectory(diskNumber, offset, totalEntries, centralDirectorySize);
@@ -495,7 +508,7 @@ public final class ZipFileOperator implements AutoCloseable {
 			this.centralDecryptionHeader = decryptionHeader;
 			inputStream = StrongInputStream.centralDirectory(this.inputStream.archivePath(), physicalInputStream,
 					protection, this.options.getPasswordProvider(), this.options.getCertificateProvider(),
-					this.options.getPasswordEncoding(), decryptionHeader);
+					decryptionHeader);
 		} else {
 			inputStream = new BoundedInputStream(physicalInputStream, protection.getCompressedSize());
 		}
@@ -1158,6 +1171,7 @@ public final class ZipFileOperator implements AutoCloseable {
 		switch (compressionMethod) {
 			case ZipGlobals.COMP_STORE:
 			case ZipGlobals.COMP_DEFLATE:
+			case ZipGlobals.COMP_BZIP2:
 				return true;
 			default:
 				return false;
@@ -1277,16 +1291,28 @@ public final class ZipFileOperator implements AutoCloseable {
 
 		InputStream inputStream = decryptedStream;
 		Inflater inflater = null;
+		BufferedInputStream sourceStream = null;
 		CRC32 crc = null;
 		MessageDigest digest = null;
 
 		try {
 			if (protection.compressed()) {
-				if (supportedCompressionMethod(protection.getCompressionMethod())) {
-					inflater = new Inflater(true);
-					inputStream = new InflaterInputStream(inputStream, inflater, Globals.DEFAULT_BUFFER_SIZE);
-				} else {
-					throw new ArchiveException(0x0000001B004AL);
+				switch (protection.getCompressionMethod()) {
+					case ZipGlobals.COMP_STORE:
+						if (protection.getCompressedSize() != protection.getUncompressedSize()) {
+							throw new ArchiveException(0x0000001A001FL);
+						}
+						break;
+					case ZipGlobals.COMP_DEFLATE:
+						inflater = new Inflater(true);
+						inputStream = new InflaterInputStream(inputStream, inflater, Globals.DEFAULT_BUFFER_SIZE);
+						break;
+					case ZipGlobals.COMP_BZIP2:
+						sourceStream = new BufferedInputStream(decryptedStream, Globals.DEFAULT_BUFFER_SIZE);
+						inputStream = new BZip2InputStream(sourceStream);
+						break;
+					default:
+						throw new ArchiveException(0x0000001B004AL);
 				}
 			} else if (protection.getCompressedSize() != protection.getUncompressedSize()) {
 				throw new ArchiveException(0x0000001A001FL);
@@ -1339,13 +1365,14 @@ public final class ZipFileOperator implements AutoCloseable {
 				throw new ArchiveException(0x0000001A001FL);
 			}
 
-			if (inflater != null) {
-				boolean trailingData = inflater.getRemaining() > 0;
+			if (inflater != null || sourceStream != null) {
+				boolean trailingData = inflater != null && inflater.getRemaining() > 0;
+				InputStream trailingSource = sourceStream != null ? sourceStream : decryptedStream;
 
 				byte[] drainBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 				int readLength;
 
-				while ((readLength = decryptedStream.read(drainBuffer)) != -1) {
+				while ((readLength = trailingSource.read(drainBuffer)) != -1) {
 					if (readLength > 0) {
 						trailingData = true;
 					}
@@ -1435,12 +1462,15 @@ public final class ZipFileOperator implements AutoCloseable {
 	                                                     @Nonnull final ArchiveOptions options,
 	                                                     @Nonnull final ZipOptions zipOptions) throws IOException {
 		long remaining = centralDirectorySize;
+		InputStream directoryStream =
+				new BufferedInputStream(new BoundedInputStream(sourceStream, centralDirectorySize),
+						Globals.DEFAULT_BUFFER_SIZE);
 		CentralDirectory centralDirectory = new CentralDirectory(zipOptions.getDuplicatePolicy());
 
 		byte[] readBuffer;
 		DataInputStream inputStream;
 		if (remaining >= 8L) {
-			PushbackInputStream pushbackInputStream = new PushbackInputStream(sourceStream, 8);
+			PushbackInputStream pushbackInputStream = new PushbackInputStream(directoryStream, 8);
 			inputStream = new DataInputStream(pushbackInputStream);
 			readBuffer = new byte[8];
 			inputStream.readFully(readBuffer);
@@ -1457,20 +1487,20 @@ public final class ZipFileOperator implements AutoCloseable {
 				pushbackInputStream.unread(readBuffer);
 			}
 		} else {
-			inputStream = new DataInputStream(sourceStream);
+			inputStream = new DataInputStream(directoryStream);
 		}
 
+		readBuffer = new byte[CENTRAL_FILE_HEADER_FIXED_SIZE];
 		List<GeneralFileHeader> fileHeaders = new ArrayList<>();
 		for (long i = 0; i < totalEntries; i++) {
-			if (remaining < 46L) {
+			if (remaining < CENTRAL_FILE_HEADER_FIXED_SIZE) {
 				throw new ArchiveException(0x0000001A001CL);
 			}
-			readBuffer = new byte[46];
 			inputStream.readFully(readBuffer);
 			if (RawUtils.readInt(readBuffer, 0, ByteOrder.LITTLE_ENDIAN) != ZipGlobals.CENSIG) {
 				throw new ArchiveException(0x0000001A000CL);
 			}
-			remaining -= 46L;
+			remaining -= CENTRAL_FILE_HEADER_FIXED_SIZE;
 
 			GeneralFileHeader fileHeader = new GeneralFileHeader();
 			fileHeader.setMadeVersion(RawUtils.readUnsignedShort(readBuffer, 4, ByteOrder.LITTLE_ENDIAN));

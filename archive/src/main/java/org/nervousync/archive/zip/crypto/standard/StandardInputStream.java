@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.standard;
+package org.nervousync.archive.zip.crypto.standard;
 
-import org.nervousync.archive.zip.io.crypto.CryptoInputStream;
+import org.nervousync.archive.zip.crypto.CryptoInputStream;
 import org.nervousync.commons.Globals;
 
 import java.io.IOException;

@@ -63,11 +63,6 @@ public final class ArchiveOptions {
 	 */
 	private final CertificateProvider certificateProvider;
 	/**
-	 * <span class="en-US">Password encoding</span>
-	 * <span class="zh-CN">密码编码类型</span>
-	 */
-	private final ZipCrypto.PasswordEncoding passwordEncoding;
-	/**
 	 * <span class="en-US">Verify flag</span>
 	 * <span class="zh-CN">验证标记</span>
 	 */
@@ -89,7 +84,6 @@ public final class ArchiveOptions {
 		this.charset = builder.charset;
 		this.streamOwner = builder.streamOwner;
 		this.archiveLimit = builder.archiveLimit;
-		this.passwordEncoding = builder.passwordEncoding;
 		this.passwordProvider = builder.passwordProvider;
 		this.certificateProvider = builder.certificateProvider;
 		this.verify = builder.verify;
@@ -176,17 +170,6 @@ public final class ArchiveOptions {
 	}
 
 	/**
-	 * <h3 class="en-US">Getter method for the password encoding</h3>
-	 * <h3 class="zh-CN">密码编码类型的 Getter 方法</h3>
-	 *
-	 * @return <span class="en-US">Password encoding</span>
-	 * <span class="zh-CN">密码编码类型</span>
-	 */
-	public ZipCrypto.PasswordEncoding getPasswordEncoding() {
-		return this.passwordEncoding;
-	}
-
-	/**
 	 * <h3 class="en-US">Getter method for the verify flag</h3>
 	 * <h3 class="zh-CN">验证标记的 Getter 方法</h3>
 	 *
@@ -243,11 +226,6 @@ public final class ArchiveOptions {
 		 */
 		private CertificateProvider certificateProvider = CertificateProvider.none();
 		/**
-		 * <span class="en-US">Password encoding</span>
-		 * <span class="zh-CN">密码编码类型</span>
-		 */
-		private ZipCrypto.PasswordEncoding passwordEncoding = ZipCrypto.PasswordEncoding.UTF8;
-		/**
 		 * <span class="en-US">Verify flag</span>
 		 * <span class="zh-CN">验证标记</span>
 		 */
@@ -272,7 +250,6 @@ public final class ArchiveOptions {
 				this.archiveLimit = options.archiveLimit;
 				this.passwordProvider = options.passwordProvider;
 				this.certificateProvider = options.certificateProvider;
-				this.passwordEncoding = options.passwordEncoding;
 				this.verify = options.verify;
 				this.strict = options.strict;
 			}
@@ -346,21 +323,6 @@ public final class ArchiveOptions {
 		public Builder certificateProvider(final CertificateProvider certificateProvider) {
 			Objects.requireNonNull(certificateProvider, "certificateProvider");
 			this.certificateProvider = certificateProvider;
-			return this;
-		}
-
-		/**
-		 * <h3 class="en-US">Setting the password encoding</h3>
-		 * <h3 class="zh-CN">设置密码编码类型</h3>
-		 *
-		 * @param passwordEncoding <span class="en-US">Password encoding</span>
-		 *                         <span class="zh-CN">密码编码类型</span>
-		 * @return <span class="en-US">Current builder instance object</span>
-		 * <span class="zh-CN">当前构建器实例对象</span>
-		 */
-		public Builder passwordEncoding(final ZipCrypto.PasswordEncoding passwordEncoding) {
-			Objects.requireNonNull(passwordEncoding, "passwordEncoding");
-			this.passwordEncoding = passwordEncoding;
 			return this;
 		}
 

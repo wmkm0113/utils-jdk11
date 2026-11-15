@@ -22,6 +22,7 @@ import org.nervousync.archive.core.ResourceReader;
 import org.nervousync.archive.enumerations.EntryType;
 import org.nervousync.archive.enumerations.PasswordPurpose;
 import org.nervousync.archive.exceptions.ArchiveException;
+import org.nervousync.archive.io.bzip2.BZip2InputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -30,12 +31,12 @@ import org.nervousync.archive.security.password.PasswordRequest;
 import org.nervousync.archive.zip.ZipAdaptor;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.AbstractFilterInputStream;
-import org.nervousync.archive.zip.io.BoundedInputStream;
-import org.nervousync.archive.zip.io.ZipArchiveInputStream;
-import org.nervousync.archive.zip.io.crypto.aes.AesInputStream;
-import org.nervousync.archive.zip.io.crypto.standard.StandardInputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongInputStream;
+import org.nervousync.archive.io.zip.AbstractFilterInputStream;
+import org.nervousync.archive.io.zip.BoundedInputStream;
+import org.nervousync.archive.io.zip.ZipArchiveInputStream;
+import org.nervousync.archive.zip.crypto.aes.AesInputStream;
+import org.nervousync.archive.zip.crypto.standard.StandardInputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongInputStream;
 import org.nervousync.archive.zip.models.EntryMetaData;
 import org.nervousync.archive.zip.models.crypto.AesEncryptionInfo;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
@@ -83,11 +84,6 @@ public final class ZipEntryResourceReader implements ResourceReader {
 	 */
 	private final ZipOptions zipOptions;
 	/**
-	 * <span class="en-US">Password encoding</span>
-	 * <span class="zh-CN">密码编码类型</span>
-	 */
-	private final ZipCrypto.PasswordEncoding passwordEncoding;
-	/**
 	 * <span class="en-US">Archive entry</span>
 	 * <span class="zh-CN">归档条目</span>
 	 */
@@ -122,21 +118,17 @@ public final class ZipEntryResourceReader implements ResourceReader {
 	 *                         <span class="zh-CN">Zip 选项</span>
 	 * @param fileHeader       <span class="en-US">Local file header</span>
 	 *                         <span class="zh-CN">本地文件头</span>
-	 * @param passwordEncoding <span class="en-US">Password encoding</span>
-	 *                         <span class="zh-CN">密码的编码方式</span>
 	 * @param metadataHeader   <span class="en-US">Full Item Attributes</span>
 	 *                         <span class="zh-CN">完整条目属性</span>
 	 */
 	public ZipEntryResourceReader(final ZipArchiveInputStream inputStream, final ZipAdaptor zipAdaptor,
 	                              final ArchiveOptions options, final ZipOptions zipOptions,
-	                              final LocalFileHeader fileHeader, final ZipCrypto.PasswordEncoding passwordEncoding,
-	                              final FileHeader metadataHeader) {
+	                              final LocalFileHeader fileHeader, final FileHeader metadataHeader) {
 		this.inputStream = inputStream;
 		this.zipAdaptor = zipAdaptor;
 		this.options = options;
 		this.zipOptions = zipOptions;
 		this.fileHeader = fileHeader;
-		this.passwordEncoding = passwordEncoding;
 		this.metadataHeader = Objects.requireNonNull(metadataHeader, "metadataHeader");
 	}
 
@@ -155,7 +147,7 @@ public final class ZipEntryResourceReader implements ResourceReader {
 								this.options.getArchiveLimit().getMaxHeaderBytes());
 				inputStream = StrongInputStream.entry(this.inputStream.archivePath(), this.fileHeader.getEntryPath(),
 						inputStream, fileHeader.getCompressedSize(), this.options.getPasswordProvider(),
-						this.options.getCertificateProvider(), this.passwordEncoding,
+						this.options.getCertificateProvider(),
 						(StrongEncryptionInfo) this.fileHeader.getEncryptionInfo(), decryptionHeader);
 			} else {
 				PasswordRequest request =
@@ -168,7 +160,7 @@ public final class ZipEntryResourceReader implements ResourceReader {
 								     .orElseThrow(() ->
 										     new ArchiveException(0x0000001B004CL, this.fileHeader.getEntryPath()))) {
 					password = credentials.copyPassword();
-					passwordBytes = ZipCrypto.encodePassword(password, this.passwordEncoding);
+					passwordBytes = ZipCrypto.encodePassword(password, credentials.isUtf8Encoding());
 					switch (this.fileHeader.encryptionMethod()) {
 						case ZipGlobals.ENC_METHOD_AES:
 							inputStream =
@@ -213,6 +205,13 @@ public final class ZipEntryResourceReader implements ResourceReader {
 						new InflaterInputStream(inputStream, new Inflater(true), Globals.DEFAULT_BUFFER_SIZE),
 						this.fileHeader.getUncompressedSize(), this.fileHeader.getCompressedSize(),
 						this.options.getArchiveLimit(), this.fileHeader.getCrc32(),
+						this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));
+				break;
+			case ZipGlobals.COMP_BZIP2:
+				inputStream = new BufferedInputStream(inputStream, Globals.DEFAULT_BUFFER_SIZE);
+				this.entryStream = new EntryVerificationInputStream(
+						new BZip2InputStream(inputStream), this.fileHeader.getUncompressedSize(),
+						this.fileHeader.getCompressedSize(), this.options.getArchiveLimit(), this.fileHeader.getCrc32(),
 						this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));
 				break;
 			default:

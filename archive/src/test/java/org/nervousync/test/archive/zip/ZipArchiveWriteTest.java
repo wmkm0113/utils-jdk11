@@ -101,7 +101,7 @@ final class ZipArchiveWriteTest {
 		Path target = this.directory.resolve("tiny.zip");
 		byte[] bytes = {1, 2, 3, 4, 5};
 		ZipOptions options = ZipOptions.newBuilder().splitArchive(true, sliceSize)
-				.splitType(SplitType.SEVEN_ZIP).zip64Mode(Zip64Mode.ALWAYS).aesCrypto(128).build();
+				.splitType(SplitType.NUMBERED).zip64Mode(Zip64Mode.ALWAYS).aesCrypto(128).build();
 		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(target.toString(), "rw"),
 				archiveOptions(), options)) {
 			writeEntry(archive, "tiny.txt", bytes);

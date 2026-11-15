@@ -543,7 +543,7 @@ final class Zip64ProtectedCentralDirectoryTest {
 			randomData[i] = (byte) (0x40 + i);
 		}
 
-		byte[] masterSessionKey = cipher.deriveKey(ZipCrypto.encodePassword(PASSWORD, ZipCrypto.PasswordEncoding.UTF8), keyBitLength);
+		byte[] masterSessionKey = cipher.deriveKey(ZipCrypto.encodePassword(PASSWORD, true), keyBitLength);
 
 		byte[] encryptedRandomData = cipher.encryptRandomData(randomData, masterSessionKey, ivData);
 

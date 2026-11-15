@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io;
+package org.nervousync.archive.io.zip;
 
 import org.nervousync.commons.Globals;
 

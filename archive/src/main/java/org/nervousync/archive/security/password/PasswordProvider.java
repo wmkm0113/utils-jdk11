@@ -35,7 +35,7 @@ public interface PasswordProvider {
 	 * <h3 class="zh-CN">通过密码请求初始化密码凭证实例对象</h3>
 	 *
 	 * @param request <span class="en-US">Password request</span>
-	 *                 <span class="zh-CN">密码请求</span>
+	 *                <span class="zh-CN">密码请求</span>
 	 * @return <span class="en-US">Password provider instance object</span>
 	 * <span class="zh-CN">密码提供适配器实例对象</span>
 	 */
@@ -56,15 +56,30 @@ public interface PasswordProvider {
 	 * <h3 class="en-US">Static method for initialize the non-interactive password provision adapter</h3>
 	 * <h3 class="zh-CN">静态方法用于初始化非交互式的密码提供适配器</h3>
 	 *
-	 * @param password <span class="en-US">Password</span>
-	 *                 <span class="zh-CN">密码</span>
+	 * @param password     <span class="en-US">Password</span>
+	 *                     <span class="zh-CN">密码</span>
 	 * @return <span class="en-US">Password provider instance object</span>
 	 * <span class="zh-CN">密码提供适配器实例对象</span>
 	 */
 	static PasswordProvider fixed(final char[] password) {
+		return fixed(password, false);
+	}
+
+	/**
+	 * <h3 class="en-US">Static method for initialize the non-interactive password provision adapter</h3>
+	 * <h3 class="zh-CN">静态方法用于初始化非交互式的密码提供适配器</h3>
+	 *
+	 * @param password     <span class="en-US">Password</span>
+	 *                     <span class="zh-CN">密码</span>
+	 * @param utf8Encoding <span class="en-US">Using UTF-8 encoding flag</span>
+	 *                     <span class="zh-CN">使用 UTF-8 编码标记</span>
+	 * @return <span class="en-US">Password provider instance object</span>
+	 * <span class="zh-CN">密码提供适配器实例对象</span>
+	 */
+	static PasswordProvider fixed(final char[] password, final boolean utf8Encoding) {
 		Objects.requireNonNull(password, "Password");
 
 		final char[] storedPassword = password.clone();
-		return request -> Optional.of(PasswordCredentials.of(storedPassword));
+		return request -> Optional.of(PasswordCredentials.of(storedPassword, utf8Encoding));
 	}
 }

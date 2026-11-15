@@ -22,7 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.nervousync.archive.data.LocalDataFile;
 import org.nervousync.archive.enumerations.SplitType;
 import org.nervousync.archive.zip.ZipOptions;
-import org.nervousync.archive.zip.io.ZipArchiveOutputStream;
+import org.nervousync.archive.io.zip.ZipArchiveOutputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -91,7 +91,7 @@ final class ZipArchiveOutputStreamWriteTest {
 		for (int i = 0; i < payload.length; i++) {
 			payload[i] = (byte) i;
 		}
-		ZipOptions options = ZipOptions.newBuilder().splitArchive(true, 7).splitType(SplitType.SEVEN_ZIP).build();
+		ZipOptions options = ZipOptions.newBuilder().splitArchive(true, 7).splitType(SplitType.NUMBERED).build();
 		try (LocalDataFile source = new LocalDataFile(target.toString(), "rw");
 		     ZipArchiveOutputStream output = new ZipArchiveOutputStream(staging, source, options)) {
 			output.write(payload);

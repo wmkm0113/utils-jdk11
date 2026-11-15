@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io;
+package org.nervousync.archive.io.zip;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.archive.core.DataFile;
@@ -146,7 +146,7 @@ public final class ZipArchiveOutputStream extends OutputStream {
 					&& (splitLength < 0x10000L || splitLength > ZipGlobals.ZIP_64_LIMIT)) {
 				throw new IllegalArgumentException("Native ZIP split length must be between 65536 and 0xFFFFFFFF");
 			}
-			if (this.zipOptions.getSplitType() == SplitType.SEVEN_ZIP) {
+			if (this.zipOptions.getSplitType() == SplitType.NUMBERED) {
 				this.templatePath =
 						tempDirectory.toAbsolutePath().normalize() + Globals.DEFAULT_PAGE_SEPARATOR + fileName + ".";
 			} else {
@@ -254,7 +254,7 @@ public final class ZipArchiveOutputStream extends OutputStream {
 			return Globals.DEFAULT_VALUE_STRING;
 		}
 		StringBuilder number = new StringBuilder(Long.toString(splitCount));
-		int minLength = (this.zipOptions.getSplitType() == SplitType.SEVEN_ZIP) ? 3 : 2;
+		int minLength = (this.zipOptions.getSplitType() == SplitType.NUMBERED) ? 3 : 2;
 		while (number.length() < minLength) {
 			number.insert(0, "0");
 		}
@@ -464,7 +464,7 @@ public final class ZipArchiveOutputStream extends OutputStream {
 	}
 
 	public long offset() throws IOException {
-		if (this.zipOptions.isSplitArchive() && this.zipOptions.getSplitType() == SplitType.SEVEN_ZIP) {
+		if (this.zipOptions.isSplitArchive() && this.zipOptions.getSplitType() == SplitType.NUMBERED) {
 			return this.totalSize;
 		}
 		return this.dataFile.getFilePointer();

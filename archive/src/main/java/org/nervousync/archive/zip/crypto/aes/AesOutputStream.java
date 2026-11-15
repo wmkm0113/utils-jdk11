@@ -15,38 +15,43 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.standard;
+package org.nervousync.archive.zip.crypto.aes;
 
-import org.nervousync.archive.zip.io.crypto.CryptoOutputStream;
+import org.nervousync.archive.zip.crypto.CryptoOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * <h2 class="en-US">Standard encryption output stream</h2>
- * <h2 class="zh-CN">标准数据加密输出流</h2>
+ * <h2 class="en-US">AES encryption output stream</h2>
+ * <h2 class="zh-CN">AES 数据加密输出流</h2>
  *
  * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
  * @version $Revision: 1.0.0 $ $Date: Oct 26, 2026 09:37:28 $
  */
-public final class StandardOutputStream extends CryptoOutputStream<StandardCryptoEngine> {
+public final class AesOutputStream extends CryptoOutputStream<AesCryptoEngine> {
 
 	/**
-	 * <h3 class="en-US">Constructor method for the standard encryption output stream</h3>
-	 * <h3 class="zh-CN">标准数据加密输出流的构造方法</h3>
+	 * <h3 class="en-US">Constructor method for the AES encryption output stream</h3>
+	 * <h3 class="zh-CN">AES 数据加密输出流的构造方法</h3>
 	 *
 	 * @param sourceStream <span class="en-US">Source output stream</span>
 	 *                     <span class="zh-CN">源输出流</span>
+	 * @param strength     <span class="en-US">AES strength</span>
+	 *                     <span class="zh-CN">AES 强度</span>
 	 * @param password     <span class="en-US">Password</span>
 	 *                     <span class="zh-CN">密码</span>
-	 * @param crc          <span class="en-US">CRC value</span>
-	 *                     <span class="zh-CN">CRC 值</span>
-	 * @throws IOException <span class="en-US">If an error occurs when write header information</span>
-	 *                     <span class="zh-CN">写入加密头数据时出错</span>
+	 * @throws IOException <span class="en-US">Data invalid</span>
+	 *                     <span class="zh-CN">数据错误</span>
 	 */
-	public StandardOutputStream(final OutputStream sourceStream, final byte[] password, final int crc)
+	public AesOutputStream(final OutputStream sourceStream, final int strength, final byte[] password)
 			throws IOException {
-		super(sourceStream, new StandardCryptoEngine(password, crc));
-		this.writeHeader(this.engine.getHeaderBytes().clone());
+		super(sourceStream, AesCryptoEngine.newEngine(strength, password));
+		this.writeHeader(this.engine.getHeaderBytes());
+	}
+
+	@Override
+	protected void writeTrailer() throws IOException {
+		this.writeResult(this.engine.calculateAuthentication());
 	}
 }

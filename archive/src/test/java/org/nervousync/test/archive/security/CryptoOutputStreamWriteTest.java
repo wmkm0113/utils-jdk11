@@ -26,12 +26,12 @@ import org.nervousync.archive.enumerations.AesVendor;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.crypto.aes.AesInputStream;
-import org.nervousync.archive.zip.io.crypto.aes.AesOutputStream;
-import org.nervousync.archive.zip.io.crypto.standard.StandardInputStream;
-import org.nervousync.archive.zip.io.crypto.standard.StandardOutputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongInputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongOutputStream;
+import org.nervousync.archive.zip.crypto.aes.AesInputStream;
+import org.nervousync.archive.zip.crypto.aes.AesOutputStream;
+import org.nervousync.archive.zip.crypto.standard.StandardInputStream;
+import org.nervousync.archive.zip.crypto.standard.StandardOutputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongInputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongOutputStream;
 import org.nervousync.archive.zip.models.crypto.AesEncryptionInfo;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.archive.zip.models.header.StrongDecryptionHeader;
@@ -124,7 +124,7 @@ final class CryptoOutputStreamWriteTest {
 		ByteArrayInputStream source = new ByteArrayInputStream(encrypted);
 		StrongDecryptionHeader header = ZipCrypto.readStrongDecryptionHeader(new DataInputStream(source), ArchiveLimit.DEFAULT_LIMIT.getMaxHeaderBytes());
 		try (StrongInputStream input = StrongInputStream.entry("archive.zip", "entry", source, encrypted.length,
-				PasswordProvider.fixed(PASSWORD.toCharArray()), null, ZipCrypto.PasswordEncoding.UTF8,
+				PasswordProvider.fixed(PASSWORD.toCharArray()), null,
 				new StrongEncryptionInfo(algorithm, keyBits, 1, new byte[0]), header)) {
 			assertArrayEquals(plain, input.readAllBytes(), name);
 		}

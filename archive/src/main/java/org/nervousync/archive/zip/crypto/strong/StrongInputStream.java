@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.strong;
+package org.nervousync.archive.zip.crypto.strong;
 
 import org.nervousync.archive.enumerations.PasswordPurpose;
 import org.nervousync.archive.enumerations.StrongAccessMode;
@@ -27,7 +27,7 @@ import org.nervousync.archive.security.password.PasswordCredentials;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.security.password.PasswordRequest;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.crypto.CryptoInputStream;
+import org.nervousync.archive.zip.crypto.CryptoInputStream;
 import org.nervousync.archive.zip.models.central.Zip64EndCentralDirectory;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.archive.zip.models.header.StrongDecryptionHeader;
@@ -95,7 +95,6 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 	                                                 final Zip64EndCentralDirectory.Protection protection,
 	                                                 final PasswordProvider passwordProvider,
 	                                                 final CertificateProvider certificateProvider,
-	                                                 final ZipCrypto.PasswordEncoding passwordEncoding,
 	                                                 final StrongDecryptionHeader decryptionHeader) throws IOException {
 		Objects.requireNonNull(archivePath, "archivePath");
 		Objects.requireNonNull(sourceStream, "sourceStream");
@@ -125,7 +124,7 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 		}
 		return new StrongInputStream(sourceStream, encryptedSize,
 				initEngine(archivePath, Globals.DEFAULT_VALUE_STRING, passwordProvider, certificateProvider,
-						passwordEncoding, PasswordPurpose.READ_HEADER, cipher, ivData, plainSize, decryptionHeader));
+						PasswordPurpose.READ_HEADER, cipher, ivData, plainSize, decryptionHeader));
 	}
 
 	/**
@@ -156,7 +155,6 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 	public static StrongInputStream entry(final String archivePath, final String entryPath, final InputStream sourceStream,
 	                                      final long storedSize, final PasswordProvider passwordProvider,
 	                                      final CertificateProvider certificateProvider,
-	                                      final ZipCrypto.PasswordEncoding passwordEncoding,
 	                                      final StrongEncryptionInfo encryptionInfo,
 	                                      final StrongDecryptionHeader decryptionHeader) throws IOException {
 		Objects.requireNonNull(archivePath, "archivePath");
@@ -197,7 +195,7 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 			}
 		}
 		return new StrongInputStream(sourceStream, encryptedSize,
-				initEngine(archivePath, entryPath, passwordProvider, certificateProvider, passwordEncoding,
+				initEngine(archivePath, entryPath, passwordProvider, certificateProvider,
 						PasswordPurpose.READ_ENTRY, cipher, decryptionHeader.getIvData(),
 						Globals.DEFAULT_VALUE_LONG, decryptionHeader));
 	}
@@ -205,7 +203,6 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 	private static StrongCryptoEngine initEngine(final String archivePath, final String entryPath,
 	                                             final PasswordProvider passwordProvider,
 	                                             final CertificateProvider certificateProvider,
-	                                             final ZipCrypto.PasswordEncoding passwordEncoding,
 	                                             final PasswordPurpose purpose,
 	                                             final EncryptionProvider cipher, final byte[] ivData, final long expectSize,
 	                                             final StrongDecryptionHeader decryptionHeader) throws IOException {
@@ -237,7 +234,7 @@ public final class StrongInputStream extends CryptoInputStream<StrongCryptoEngin
 				if (value.isPresent()) {
 					try (PasswordCredentials credentials = value.get()) {
 						chars = credentials.copyPassword();
-						bytes = ZipCrypto.encodePassword(chars, passwordEncoding);
+						bytes = ZipCrypto.encodePassword(chars, credentials.isUtf8Encoding());
 						if (bytes.length != 0) {
 							candidates.add(erdCipher.deriveKey(bytes, erdBits));
 						}

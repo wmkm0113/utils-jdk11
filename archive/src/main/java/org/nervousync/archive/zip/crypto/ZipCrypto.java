@@ -24,7 +24,6 @@ import org.nervousync.archive.zip.security.EncryptionProvider;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.zip.ZipGlobals;
 import org.nervousync.exceptions.crypto.CryptoException;
-import org.nervousync.exceptions.utils.DataInvalidException;
 import org.nervousync.security.CryptoAdaptor;
 import org.nervousync.utils.commons.RawUtils;
 import org.nervousync.utils.security.DigestUtils;
@@ -49,87 +48,42 @@ import java.util.Objects;
  */
 public final class ZipCrypto {
 
-	public enum PasswordEncoding {
-		UTF8, LEGACY_LOW_BYTE
-	}
-
 	/**
 	 * <h3 class="en-US">Convert the password from character array to bytes array</h3>
 	 * <h3 class="zh-CN">转换密码字符数组为字节数组</h3>
 	 *
 	 * @param password <span class="en-US">Password</span>
 	 *                 <span class="zh-CN">密码</span>
-	 * @param encoding <span class="en-US">Password encoding</span>
-	 *                 <span class="zh-CN">编码类型</span>
+	 * @param utf8Encoding <span class="en-US">Using UTF-8 encoding flag</span>
+	 *                     <span class="zh-CN">使用 UTF-8 编码标记</span>
 	 * @return <span class="en-US">Bytes array</span>
 	 * <span class="zh-CN">字节数组</span>
-	 * @throws ArchiveException <span class="en-US">If an error occurs when convert data</span>
-	 *                          <span class="zh-CN">转换编码过程中出错</span>
 	 */
-	public static byte[] encodePassword(final char[] password, final PasswordEncoding encoding) throws ArchiveException {
+	public static byte[] encodePassword(final char[] password, final boolean utf8Encoding) throws ArchiveException {
 		Objects.requireNonNull(password, "password cannot be null");
 		if (password.length == 0) {
 			throw new ArchiveException(0x0000001B0006L);
 		}
-		switch (encoding) {
-			case UTF8:
-				return encodeUTF8(password);
-			case LEGACY_LOW_BYTE:
-				return encodeLegacy(password);
-			default:
-				throw new ArchiveException(0x0000001A0027L);
-		}
+		return utf8Encoding ? encodeUTF8(password) : encodeLegacy(password);
 	}
 
 	/**
-	 * <h3 class="en-US">Convert the password from character array to bytes array</h3>
-	 * <h3 class="zh-CN">转换密码字符数组为字节数组</h3>
+	 * <h3 class="en-US">Derive key</h3>
+	 * <h3 class="zh-CN">派生密钥</h3>
 	 *
-	 * @param password <span class="en-US">Password</span>
-	 *                 <span class="zh-CN">密码</span>
-	 * @return <span class="en-US">Bytes array</span>
-	 * <span class="zh-CN">字节数组</span>
-	 * @throws ArchiveException <span class="en-US">If an error occurs when convert data</span>
-	 *                          <span class="zh-CN">转换编码过程中出错</span>
+	 * @param saltBytes <span class="en-US">Salt bytes array</span>
+	 *                 <span class="zh-CN">盐字节数组</span>
+	 * @param password <span class="en-US">Password bytes array</span>
+	 *                 <span class="zh-CN">密码字节数组</span>
+	 * @param dkLen <span class="en-US">Derive key length</span>
+	 *                 <span class="zh-CN">派生密钥长度</span>
+	 * @return <span class="en-US">Derive key</span>
+	 *                 <span class="zh-CN">派生密钥</span>
+	 * @throws CryptoException <span class="en-US">If an error occurs when process data</span>
+	 *                         <span class="zh-CN">当处理数据时出现异常</span>
 	 */
-	private static byte[] encodeUTF8(final char[] password) throws ArchiveException {
-		ByteBuffer encoded = null;
-		try {
-			encoded = StandardCharsets.UTF_8.newEncoder()
-					.onMalformedInput(CodingErrorAction.REPORT)
-					.onUnmappableCharacter(CodingErrorAction.REPORT)
-					.encode(CharBuffer.wrap(password));
-			byte[] result = new byte[encoded.remaining()];
-			encoded.get(result);
-			return result;
-		} catch (CharacterCodingException e) {
-			throw new ArchiveException(0x0000001A0027L, e);
-		} finally {
-			if (encoded != null && encoded.hasArray()) {
-				Arrays.fill(encoded.array(), (byte) 0);
-			}
-		}
-	}
-
-	/**
-	 * <h3 class="en-US">Convert the password from character array to bytes array</h3>
-	 * <h3 class="zh-CN">转换密码字符数组为字节数组</h3>
-	 *
-	 * @param password <span class="en-US">Password</span>
-	 *                 <span class="zh-CN">密码</span>
-	 * @return <span class="en-US">Bytes array</span>
-	 * <span class="zh-CN">字节数组</span>
-	 */
-	private static byte[] encodeLegacy(final char[] password) {
-		byte[] result = new byte[password.length];
-		for (int i = 0; i < password.length; i++) {
-			result[i] = (byte) password[i];
-		}
-		return result;
-	}
-
 	public static byte[] deriveKey(final byte[] saltBytes, final byte[] password, final int dkLen)
-			throws CryptoException, DataInvalidException {
+			throws CryptoException {
 		//	PBKDF2
 		if (password == null || password.length == 0) {
 			throw new NullPointerException();
@@ -143,12 +97,34 @@ public final class ZipCrypto {
 			byte[] salt = (saltBytes == null) ? new byte[0] : saltBytes;
 
 			int length = digestProvider.macLength();
-			int l = ceil(dkLength, length);
+			int m = 0;
+			if (dkLength % length > 0) {
+				m = 1;
+			}
+			int l = dkLength / length + m;
 			int r = dkLength - (l - 1) * length;
 			tempBytes = new byte[l * length];
 			int offset = 0;
 			for (int i = 1; i <= l; i++) {
-				process(digestProvider, tempBytes, offset, salt, i);
+				int len = digestProvider.macLength();
+				byte[] tmpBytes = new byte[len];
+				byte[] intTmpBytes = new byte[salt.length + 4];
+				try {
+					System.arraycopy(salt, Globals.INITIALIZE_INT_VALUE, intTmpBytes, Globals.INITIALIZE_INT_VALUE, salt.length);
+					RawUtils.writeInt(intTmpBytes, salt.length, i);
+					int round = 1000;
+					while (round > 0) {
+						intTmpBytes = digestProvider.finish(intTmpBytes);
+						for (int j = 0; j < tmpBytes.length; j++) {
+							tmpBytes[j] ^= intTmpBytes[j];
+						}
+						round--;
+					}
+					System.arraycopy(tmpBytes, Globals.INITIALIZE_INT_VALUE, tempBytes, offset, length);
+				} finally {
+					RawUtils.clear(tmpBytes);
+					RawUtils.clear(intTmpBytes);
+				}
 				offset += length;
 			}
 
@@ -161,41 +137,6 @@ public final class ZipCrypto {
 		} finally {
 			RawUtils.clear(passwordBytes);
 			RawUtils.clear(tempBytes);
-		}
-	}
-
-	private static int ceil(final int a, final int b) {
-		int m = 0;
-		if (a % b > 0) {
-			m = 1;
-		}
-		return a / b + m;
-	}
-
-	private static void process(final CryptoAdaptor digestProvider,
-	                            final byte[] dest, final int offset, final byte[] source, final int blockIndex)
-			throws CryptoException, DataInvalidException {
-		int length = digestProvider.macLength();
-		byte[] tempBytes = new byte[length];
-		byte[] intTmpBytes = new byte[source.length + 4];
-		try {
-			System.arraycopy(source, Globals.INITIALIZE_INT_VALUE, intTmpBytes, Globals.INITIALIZE_INT_VALUE, source.length);
-			RawUtils.writeInt(intTmpBytes, source.length, blockIndex);
-
-			for (int i = 0; i < 1000; i++) {
-				intTmpBytes = digestProvider.finish(intTmpBytes);
-				XOR(tempBytes, intTmpBytes);
-			}
-			System.arraycopy(tempBytes, Globals.INITIALIZE_INT_VALUE, dest, offset, length);
-		} finally {
-			RawUtils.clear(tempBytes);
-			RawUtils.clear(intTmpBytes);
-		}
-	}
-
-	private static void XOR(final byte[] dest, final byte[] source) {
-		for (int i = 0; i < dest.length; i++) {
-			dest[i] ^= source[i];
 		}
 	}
 
@@ -247,5 +188,52 @@ public final class ZipCrypto {
 		byte[] validation = new byte[validationSize];
 		body.get(validation);
 		return new StrongDecryptionHeader(iv, algorithm, bits, flags, erd, validation, serializedSize, recipients);
+	}
+
+	/**
+	 * <h3 class="en-US">Convert the password from character array to bytes array</h3>
+	 * <h3 class="zh-CN">转换密码字符数组为字节数组</h3>
+	 *
+	 * @param password <span class="en-US">Password</span>
+	 *                 <span class="zh-CN">密码</span>
+	 * @return <span class="en-US">Bytes array</span>
+	 * <span class="zh-CN">字节数组</span>
+	 * @throws ArchiveException <span class="en-US">If an error occurs when convert data</span>
+	 *                          <span class="zh-CN">转换编码过程中出错</span>
+	 */
+	private static byte[] encodeUTF8(final char[] password) throws ArchiveException {
+		ByteBuffer encoded = null;
+		try {
+			encoded = StandardCharsets.UTF_8.newEncoder()
+					.onMalformedInput(CodingErrorAction.REPORT)
+					.onUnmappableCharacter(CodingErrorAction.REPORT)
+					.encode(CharBuffer.wrap(password));
+			byte[] result = new byte[encoded.remaining()];
+			encoded.get(result);
+			return result;
+		} catch (CharacterCodingException e) {
+			throw new ArchiveException(0x0000001A0027L, e);
+		} finally {
+			if (encoded != null && encoded.hasArray()) {
+				Arrays.fill(encoded.array(), (byte) 0);
+			}
+		}
+	}
+
+	/**
+	 * <h3 class="en-US">Convert the password from character array to bytes array</h3>
+	 * <h3 class="zh-CN">转换密码字符数组为字节数组</h3>
+	 *
+	 * @param password <span class="en-US">Password</span>
+	 *                 <span class="zh-CN">密码</span>
+	 * @return <span class="en-US">Bytes array</span>
+	 * <span class="zh-CN">字节数组</span>
+	 */
+	private static byte[] encodeLegacy(final char[] password) {
+		byte[] result = new byte[password.length];
+		for (int i = 0; i < password.length; i++) {
+			result[i] = (byte) password[i];
+		}
+		return result;
 	}
 }

@@ -64,7 +64,7 @@ final class ZipWriteTestSupport {
 		ZipOptions.Builder builder = ZipOptions.newBuilder().algorithm(algorithm).zip64Mode(mode);
 		if (layout != Layout.SINGLE) {
 			builder.splitArchive(true, 65536)
-					.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.SEVEN_ZIP);
+					.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.NUMBERED);
 		}
 		switch (encryption) {
 			case STANDARD:

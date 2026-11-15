@@ -83,7 +83,7 @@ public class ZipEntryMetadataTest {
 			default: break;
 		}
 		if (layout != Layout.SINGLE) builder.splitArchive(true,65536)
-				.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.SEVEN_ZIP);
+				.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.NUMBERED);
 		return builder.build();
 	}
 

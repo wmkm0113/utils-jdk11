@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.strong;
+package org.nervousync.archive.zip.crypto.strong;
 
 import org.nervousync.archive.enumerations.StrongAccessMode;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.security.StrongKey;
-import org.nervousync.archive.zip.io.crypto.CryptoOutputStream;
+import org.nervousync.archive.zip.crypto.CryptoOutputStream;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.archive.zip.models.crypto.StrongRecipientTable;
 import org.nervousync.archive.zip.security.EncryptionProvider;

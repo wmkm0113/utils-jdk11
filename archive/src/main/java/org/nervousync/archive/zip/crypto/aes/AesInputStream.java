@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.aes;
+package org.nervousync.archive.zip.crypto.aes;
 
 import org.nervousync.archive.exceptions.ArchiveException;
-import org.nervousync.archive.zip.io.crypto.CryptoInputStream;
+import org.nervousync.archive.zip.crypto.CryptoInputStream;
 import org.nervousync.archive.zip.models.crypto.AesEncryptionInfo;
 import org.nervousync.commons.zip.ZipGlobals;
 import org.nervousync.exceptions.crypto.CryptoException;

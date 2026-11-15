@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.nervousync.archive.ArchiveEntry;
 import org.nervousync.archive.ArchiveFile;
 import org.nervousync.archive.core.ResourceReader;
-import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.data.LocalDataFile;
 import org.nervousync.archive.enumerations.AesVendor;
 import org.nervousync.archive.enumerations.SplitType;
@@ -55,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ZipFileTest extends BaseTest {
 
-	private enum Layout { SINGLE, NATIVE, NUMBERED }
+	public enum Layout { SINGLE, NATIVE, NUMBERED }
 
 	@TempDir
 	static Path tempDirectory;
@@ -117,8 +116,7 @@ public class ZipFileTest extends BaseTest {
 	                                                final int keyBitLength, final Layout layout) throws Exception {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "strong-" + name + "-" + layout + ".zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions.Builder optionsBuilder = ZipOptions.newBuilder()
 				.enableCentralDirectoryCompress()
@@ -128,7 +126,7 @@ public class ZipFileTest extends BaseTest {
 				optionsBuilder.splitArchive(true, 1024 * 1024L).splitType(SplitType.NATIVE);
 				break;
 			case NUMBERED:
-				optionsBuilder.splitArchive(true, 1024 * 1024L).splitType(SplitType.SEVEN_ZIP);
+				optionsBuilder.splitArchive(true, 1024 * 1024L).splitType(SplitType.NUMBERED);
 				break;
 			case SINGLE:
 				optionsBuilder.splitArchive(false, Globals.DEFAULT_VALUE_LONG);
@@ -160,8 +158,7 @@ public class ZipFileTest extends BaseTest {
 	public void createEncFile() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoEnc.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().standardCrypto().build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -174,8 +171,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes128File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes128.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(128).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -188,8 +184,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes192File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes192.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(192).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -202,8 +197,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes256File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes256.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(256).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -216,8 +210,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes1_128File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes1_128.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(128, AesVendor.AE_1).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -230,8 +223,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes1_192File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes1_192.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(192, AesVendor.AE_1).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -244,8 +236,7 @@ public class ZipFileTest extends BaseTest {
 	public void createAes1_256File() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demoAes1_256.zip";
 		ArchiveOptions archiveOptions = ArchiveOptions.newBuilder()
-				.passwordProvider(request ->
-						Optional.of(PasswordCredentials.of("Nervousync".toCharArray())))
+				.passwordProvider(PasswordProvider.fixed("Nervousync".toCharArray()))
 				.build();
 		ZipOptions zipOptions = ZipOptions.newBuilder().aesCrypto(256, AesVendor.AE_1).build();
 		this.createFile(filePath, archiveOptions, zipOptions);
@@ -267,7 +258,7 @@ public class ZipFileTest extends BaseTest {
 	@Order(45)
 	public void create7zSplitFile() throws IOException {
 		String filePath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "demo7zSplit.zip";
-		ZipOptions zipOptions = ZipOptions.newBuilder().splitArchive(true, 1024 * 1024L).splitType(SplitType.SEVEN_ZIP).build();
+		ZipOptions zipOptions = ZipOptions.newBuilder().splitArchive(true, 1024 * 1024L).splitType(SplitType.NUMBERED).build();
 		this.createFile(filePath, ArchiveOptions.newBuilder().build(), zipOptions);
 		this.validateFile(filePath + ".001", ArchiveOptions.newBuilder().build(), zipOptions);
 		this.logger.info("Zip_Create_Success");
@@ -277,17 +268,8 @@ public class ZipFileTest extends BaseTest {
 			throws IOException {
 		try (ArchiveFile archiveFile =
 				     ArchiveFile.zipFile(new LocalDataFile(filePath, "rw"), archiveOptions, zipOptions)) {
-			String folderPath = tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip";
-			for (String itemPath : FileUtils.listFiles(folderPath)) {
-				String entryPath =
-						StringUtils.replace(itemPath.substring(folderPath.length() + 1),
-								Globals.DEFAULT_PAGE_SEPARATOR, ZipGlobals.DEFAULT_ZIP_PAGE_SEPARATOR);
-				try (ResourceWriter writer =
-						     archiveFile.openWriter(entryPath, Globals.DEFAULT_VALUE_STRING).orElseThrow()) {
-					writer.write(itemPath);
-					writer.finish();
-				}
-			}
+			archiveFile.addDirectory("", tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip")
+					.addDirectory("TestZip", tempDirectory + Globals.DEFAULT_PAGE_SEPARATOR + "TestZip");
 		} catch (Exception e) {
 			throw (e instanceof IOException) ? (IOException) e : new IOException(e);
 		}
@@ -307,7 +289,13 @@ public class ZipFileTest extends BaseTest {
 				     InputStream entryStream = reader.openStream();
 					 InputStream originalStream = FileUtils.loadFile(itemPath)) {
 					byte[] readBytes = IOUtils.readBytes(entryStream), originalBytes = IOUtils.readBytes(originalStream);
-
+					assertArrayEquals(readBytes, originalBytes);
+				}
+				ArchiveEntry folderEntry = archiveFile.entry("TestZip" + ZipGlobals.DEFAULT_ZIP_PAGE_SEPARATOR + entryPath).orElseThrow();
+				try (ResourceReader reader = archiveFile.openReader(folderEntry).orElseThrow();
+				     InputStream entryStream = reader.openStream();
+				     InputStream originalStream = FileUtils.loadFile(itemPath)) {
+					byte[] readBytes = IOUtils.readBytes(entryStream), originalBytes = IOUtils.readBytes(originalStream);
 					assertArrayEquals(readBytes, originalBytes);
 				}
 			}
@@ -318,8 +306,7 @@ public class ZipFileTest extends BaseTest {
 				|| zipOptions.getCentralDirectoryEncryptionAlgorithm() != ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE) {
 			assertThrows(IOException.class, () -> {
 				ArchiveOptions incorrectOptions = ArchiveOptions.newBuilder()
-						.passwordProvider(request ->
-								Optional.of(PasswordCredentials.of("Incorrect-password".toCharArray())))
+						.passwordProvider(PasswordProvider.fixed("Incorrect-password".toCharArray()))
 						.build();
 				try (ArchiveFile archiveFile =
 						     ArchiveFile.zipFile(new LocalDataFile(filePath, "r"), incorrectOptions, zipOptions)) {

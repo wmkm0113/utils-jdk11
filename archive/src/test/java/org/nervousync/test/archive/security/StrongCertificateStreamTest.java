@@ -32,7 +32,7 @@ import org.nervousync.archive.security.certificate.CertificateProvider;
 import org.nervousync.archive.security.certificate.PKCS12CertificateProvider;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.zip.ZipOptions;
-import org.nervousync.archive.zip.io.crypto.strong.StrongOutputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongOutputStream;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.commons.zip.ZipGlobals;
 

@@ -22,6 +22,7 @@ import org.nervousync.archive.ArchiveEntry;
 import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
+import org.nervousync.archive.io.bzip2.BZip2OutputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.security.StrongKey;
 import org.nervousync.archive.security.password.PasswordCredentials;
@@ -29,10 +30,10 @@ import org.nervousync.archive.security.password.PasswordRequest;
 import org.nervousync.archive.zip.ZipAdaptor;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.ZipEntryOutputStream;
-import org.nervousync.archive.zip.io.crypto.aes.AesOutputStream;
-import org.nervousync.archive.zip.io.crypto.standard.StandardOutputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongOutputStream;
+import org.nervousync.archive.io.zip.ZipEntryOutputStream;
+import org.nervousync.archive.zip.crypto.aes.AesOutputStream;
+import org.nervousync.archive.zip.crypto.standard.StandardOutputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongOutputStream;
 import org.nervousync.archive.zip.models.EntryTimes;
 import org.nervousync.archive.zip.models.ExtraDataRecord;
 import org.nervousync.archive.zip.models.crypto.AesEncryptionInfo;
@@ -86,11 +87,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 	 * <span class="zh-CN">Zip 选项</span>
 	 */
 	private final ZipOptions zipOptions;
-	/**
-	 * <span class="en-US">Password encoding</span>
-	 * <span class="zh-CN">密码编码类型</span>
-	 */
-	private final ZipCrypto.PasswordEncoding passwordEncoding;
 	/**
 	 * <span class="en-US">Entry path</span>
 	 * <span class="zh-CN">条目路径</span>
@@ -152,7 +148,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 		this.temporaryFile = Files.createTempFile(tempDirectory, "entry-", ".bin");
 		this.options = options;
 		this.zipOptions = zipOptions;
-		this.passwordEncoding = options.getPasswordEncoding();
 		this.entryPath = entryPath;
 		this.comment = StringUtils.isEmpty(comment) ? Globals.DEFAULT_VALUE_STRING : comment;
 	}
@@ -232,7 +227,7 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 						     this.options.getPasswordProvider().credentials(request)
 								     .orElseThrow(() -> new ArchiveException(0x0000001B004CL, this.entryPath))) {
 					password = credentials.copyPassword();
-					passwordBytes = ZipCrypto.encodePassword(password, this.passwordEncoding);
+					passwordBytes = ZipCrypto.encodePassword(password, credentials.isUtf8Encoding());
 					switch (encryptionMethod) {
 						case ZipGlobals.ENC_METHOD_AES:
 							outputStream =
@@ -268,6 +263,9 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 					outputStream = new DeflaterOutputStream(outputStream, this.deflater);
 					break;
 				case BZIP2:
+					outputStream =
+							new BZip2OutputStream(outputStream, Math.max(1, this.zipOptions.getCompressionLevel()));
+					break;
 				case LZMA1:
 				case LZMA2:
 					//  Not support at this time
@@ -377,6 +375,9 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 			case DEFLATE:
 				method = ZipGlobals.COMP_DEFLATE;
 				break;
+			case BZIP2:
+				method = ZipGlobals.COMP_BZIP2;
+				break;
 			default:
 				throw new IOException(
 						"Unsupported ZIP compression: " + this.zipOptions.getAlgorithm());
@@ -387,6 +388,9 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 
 		int flags = StandardCharsets.UTF_8.equals(this.options.getCharset()) ? 0x0800 : 0;
 		int version = 20;
+		if (method == ZipGlobals.COMP_BZIP2) {
+			version = 46;
+		}
 		long crc32 = this.outputStream.getCrc();
 
 		switch (this.isDirectoryEntry() ? ZipGlobals.ENC_NO_ENCRYPTION : this.zipOptions.getEncryptionMethod()) {
@@ -398,13 +402,11 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 			case ZipGlobals.ENC_METHOD_AES:
 				flags |= 0x0001;
 				version = 51;
-
 				AesVendor aesVendor = this.zipOptions.getAesVendor();
 				if (aesVendor == AesVendor.AE_2) {
 					//  AE-2
 					crc32 = 0L;
 				}
-
 				int strength = this.zipOptions.getAesKeyStrength();
 				header.setEncryptionInfo(new AesEncryptionInfo(aesVendor, strength));
 
@@ -418,7 +420,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 				extras.add(new ExtraDataRecord(ZipGlobals.AES_ENC_HEADER_ID, aesBuffer.array()));
 				method = 99;
 				break;
-
 			case ZipGlobals.ENC_METHOD_STRONG:
 				flags |= 0x0001 | 0x0040;
 				version = 63;

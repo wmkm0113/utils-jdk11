@@ -230,7 +230,7 @@ public class AESCrypto {
 	private void initCrypto(final char[] password) throws CryptoException, ZipException {
 		byte[] keyBytes;
 		try {
-			keyBytes = ZipCrypto.deriveKey(this.saltBytes, ZipCrypto.encodePassword(password, ZipCrypto.PasswordEncoding.UTF8),
+			keyBytes = ZipCrypto.deriveKey(this.saltBytes, ZipCrypto.encodePassword(password, true),
 					this.keyLength + this.macLength + ZipGlobals.PASSWORD_VERIFIER_LENGTH);
 		} catch (DataInvalidException | ArchiveException e) {
 			throw new ZipException(0x0000001B000AL, e);

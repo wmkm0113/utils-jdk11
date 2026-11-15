@@ -32,6 +32,10 @@ import org.nervousync.archive.options.ExtractOptions;
 import org.nervousync.archive.tar.TarAdaptor;
 import org.nervousync.archive.zip.ZipAdaptor;
 import org.nervousync.archive.zip.ZipOptions;
+import org.nervousync.commons.Globals;
+import org.nervousync.commons.zip.ZipGlobals;
+import org.nervousync.utils.commons.FileUtils;
+import org.nervousync.utils.commons.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -179,6 +183,58 @@ public final class ArchiveFile implements AutoCloseable {
 	}
 
 	/**
+	 * <h3 class="en-US">Add file to current archive file</h3>
+	 * <h3 class="zh-CN">添加文件到当前压缩包</h3>
+	 *
+	 * @param entryPath <span class="en-US">Entry path</span>
+	 *                  <span class="zh-CN">条目路径</span>
+	 * @param filePath  <span class="en-US">The target path</span>
+	 *                  <span class="zh-CN">目标地址</span>
+	 * @param comment   <span class="en-US">Comment string</span>
+	 *                  <span class="zh-CN">批注信息</span>
+	 * @return <span class="en-US">Current archive file instance object</span>
+	 * <span class="zh-CN">当前归档文件实例对象</span>
+	 * @throws IOException <span class="en-US">If an error occurs when add file to archive file</span>
+	 *                     <span class="zh-CN">执行中出错</span>
+	 */
+	public ArchiveFile addFile(final String entryPath, final String filePath, final String comment) throws IOException {
+		try (ResourceWriter writer = this.openWriter(entryPath, comment).orElseThrow()) {
+			writer.write(filePath);
+			writer.finish();
+		} catch (Exception e) {
+			throw (e instanceof IOException) ? (IOException) e : new IOException(e);
+		}
+		return this;
+	}
+
+	/**
+	 * <h3 class="en-US">Add folder to current archive file</h3>
+	 * <h3 class="zh-CN">添加文件夹到当前压缩包</h3>
+	 *
+	 * @param rootPath   <span class="en-US">Entry root path</span>
+	 *                   <span class="zh-CN">条目根路径</span>
+	 * @param folderPath <span class="en-US">Folder path</span>
+	 *                   <span class="zh-CN">文件夹路径</span>
+	 * @return <span class="en-US">Current archive file instance object</span>
+	 * <span class="zh-CN">当前归档文件实例对象</span>
+	 * @throws IOException <span class="en-US">If an error occurs when add folder to archive file</span>
+	 *                     <span class="zh-CN">执行中出错</span>
+	 */
+	public ArchiveFile addDirectory(final String rootPath, final String folderPath) throws IOException {
+		for (String filePath : FileUtils.listFiles(folderPath)) {
+			String itemPath = filePath.substring(folderPath.length());
+			if (itemPath.startsWith(Globals.DEFAULT_PAGE_SEPARATOR)) {
+				itemPath = itemPath.substring(1);
+			}
+			String entryPath = StringUtils.isEmpty(rootPath)
+					? itemPath
+					: rootPath + ZipGlobals.DEFAULT_ZIP_PAGE_SEPARATOR + itemPath;
+			this.addFile(entryPath, filePath, Globals.DEFAULT_VALUE_STRING);
+		}
+		return this;
+	}
+
+	/**
 	 * <h3 class="en-US">Extract to the target path</h3>
 	 * <h3 class="zh-CN">释放到目标地址</h3>
 	 *
@@ -235,9 +291,10 @@ public final class ArchiveFile implements AutoCloseable {
 	 * @throws IOException <span class="en-US">If an error occurs when open resource reader</span>
 	 *                     <span class="zh-CN">执行中出错</span>
 	 */
-	public void remove(final ArchiveEntry archiveEntry) throws IOException {
+	public ArchiveFile remove(final ArchiveEntry archiveEntry) throws IOException {
 		this.ensureWritable();
 		this.adaptor.remove(archiveEntry);
+		return this;
 	}
 
 	/**
@@ -294,7 +351,6 @@ public final class ArchiveFile implements AutoCloseable {
 				throw e;
 			}
 		}
-
 	}
 
 	/**
@@ -312,7 +368,8 @@ public final class ArchiveFile implements AutoCloseable {
 	 * @throws IOException <span class="en-US">If an error occurs when check target existed</span>
 	 *                     <span class="zh-CN">执行中出错</span>
 	 */
-	public static boolean existsTarget(final Path target, final OverrideMode mode, final Instant lastModified) throws IOException {
+	public static boolean existsTarget(final Path target, final OverrideMode mode, final Instant lastModified)
+			throws IOException {
 		if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
 			switch (mode) {
 				case NEVER:

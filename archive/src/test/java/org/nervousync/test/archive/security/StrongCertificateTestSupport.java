@@ -36,8 +36,8 @@ import org.nervousync.archive.security.certificate.CertificateProvider;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.crypto.strong.StrongInputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongOutputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongInputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongOutputStream;
 import org.nervousync.archive.zip.models.crypto.StrongEncryptionInfo;
 import org.nervousync.archive.zip.models.header.StrongDecryptionHeader;
 import org.nervousync.commons.zip.ZipGlobals;
@@ -135,7 +135,7 @@ final class StrongCertificateTestSupport {
 				.centralDirectoryHash(ZipGlobals.ZIP64_HEADER_HASH_ALGORITHM_SHA256);
 		if (layout != Layout.SINGLE) {
 			builder.splitArchive(true, 65536)
-					.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.SEVEN_ZIP);
+					.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.NUMBERED);
 		}
 		return builder;
 	}
@@ -190,7 +190,7 @@ final class StrongCertificateTestSupport {
 		StrongDecryptionHeader header = ZipCrypto.readStrongDecryptionHeader(
 				new DataInputStream(bytes), 1024L * 1024L);
 		try (InputStream input = StrongInputStream.entry("test.zip", ENTRY_PATH, bytes, stored.bytes.length,
-				passwordProvider, certificateProvider, ZipCrypto.PasswordEncoding.UTF8, stored.info, header)) {
+				passwordProvider, certificateProvider, stored.info, header)) {
 			return input.readAllBytes();
 		}
 	}

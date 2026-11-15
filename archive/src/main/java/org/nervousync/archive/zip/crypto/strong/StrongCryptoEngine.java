@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto.strong;
+package org.nervousync.archive.zip.crypto.strong;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.zip.security.EncryptionProvider;
-import org.nervousync.archive.zip.io.crypto.CryptoEngine;
+import org.nervousync.archive.zip.crypto.CryptoEngine;
 import org.nervousync.commons.Globals;
 import org.nervousync.enumerations.crypto.CryptoMode;
 import org.nervousync.exceptions.crypto.CryptoException;

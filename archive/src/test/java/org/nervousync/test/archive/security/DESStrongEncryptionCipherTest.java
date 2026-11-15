@@ -18,7 +18,7 @@ package org.nervousync.test.archive.security;
 
 import org.junit.jupiter.api.Test;
 import org.nervousync.archive.exceptions.ArchiveException;
-import org.nervousync.archive.zip.io.crypto.strong.StrongCryptoEngine;
+import org.nervousync.archive.zip.crypto.strong.StrongCryptoEngine;
 import org.nervousync.archive.zip.security.EncryptionProvider;
 import org.nervousync.commons.zip.ZipGlobals;
 import org.nervousync.enumerations.crypto.CryptoMode;

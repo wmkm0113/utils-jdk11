@@ -27,6 +27,7 @@ import org.nervousync.archive.core.ResourceReader;
 import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
+import org.nervousync.archive.io.bzip2.BZip2OutputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -35,10 +36,10 @@ import org.nervousync.archive.security.password.PasswordCredentials;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.security.password.PasswordRequest;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
-import org.nervousync.archive.zip.io.BoundedInputStream;
-import org.nervousync.archive.zip.io.ZipArchiveInputStream;
-import org.nervousync.archive.zip.io.ZipArchiveOutputStream;
-import org.nervousync.archive.zip.io.crypto.strong.StrongOutputStream;
+import org.nervousync.archive.io.zip.BoundedInputStream;
+import org.nervousync.archive.io.zip.ZipArchiveInputStream;
+import org.nervousync.archive.io.zip.ZipArchiveOutputStream;
+import org.nervousync.archive.zip.crypto.strong.StrongOutputStream;
 import org.nervousync.archive.zip.models.EntryMetaData;
 import org.nervousync.archive.zip.models.ExtraDataRecord;
 import org.nervousync.archive.zip.models.central.CentralDirectory;
@@ -364,11 +365,9 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 			throw new ArchiveException(0x0000001A0001L);
 		}
 		String path = StringUtils.replace(entryPath.trim(), "\\", ZipGlobals.DEFAULT_ZIP_PAGE_SEPARATOR);
-
 		if (path.indexOf('\0') >= 0 || path.startsWith("/")) {
 			throw new ArchiveException(0x0000001A0034L, entryPath);
 		}
-
 		if (path.length() >= 2) {
 			char first = path.charAt(0);
 			boolean driveLetter = (first >= 'A' && first <= 'Z') || (first >= 'a' && first <= 'z');
@@ -376,13 +375,11 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				throw new ArchiveException(0x0000001A0034L, entryPath);
 			}
 		}
-
 		for (String segment : path.split(ZipGlobals.DEFAULT_ZIP_PAGE_SEPARATOR, -1)) {
 			if ("..".equals(segment)) {
 				throw new ArchiveException(0x0000001A001FL, entryPath);
 			}
 		}
-
 		return path;
 	}
 
@@ -586,6 +583,13 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		this.ensureActive();
 		if (!this.removeEntries.contains(archiveEntry.getEntryPath())) {
 			this.removeEntries.add(archiveEntry.getEntryPath());
+			if (archiveEntry.getEntryType() == EntryType.DIRECTORY) {
+				for (String entryPath : this.entries.keySet()) {
+					if (entryPath.startsWith(archiveEntry.getEntryPath()) && !this.removeEntries.contains(entryPath)) {
+						this.removeEntries.add(entryPath);
+					}
+				}
+			}
 		}
 	}
 
@@ -869,6 +873,9 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				case ZipGlobals.COMP_DEFLATE:
 					optionsBuilder.algorithm(CompressionAlgorithm.DEFLATE).enableCentralDirectoryCompress();
 					break;
+				case ZipGlobals.COMP_BZIP2:
+					optionsBuilder.algorithm(CompressionAlgorithm.BZIP2).enableCentralDirectoryCompress();
+					break;
 				default:
 					throw new ArchiveException(0x0000001B004AL);
 			}
@@ -1012,7 +1019,7 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 			localFileHeader = (LocalFileHeader) fileHeader;
 		}
 		return new ZipEntryResourceReader(this.operator.inputStream(), this, this.options,
-				this.zipOptions, localFileHeader, this.options.getPasswordEncoding(), fileHeader);
+				this.zipOptions, localFileHeader, fileHeader);
 	}
 
 	/**
@@ -1904,6 +1911,21 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		}
 	}
 
+	/**
+	 * <h3 class="en-US">Open strong encryption output stream</h3>
+	 * <h3 class="zh-CN">打开强加密输出流</h3>
+	 *
+	 * @param targetStream <span class="en-US">Output stream</span>
+	 *                     <span class="zh-CN">输出流</span>
+	 * @param archivePath  <span class="en-US">Archive file path</span>
+	 *                     <span class="zh-CN">归档文件地址</span>
+	 * @param zipOptions   <span class="en-US">Zip options</span>
+	 *                     <span class="zh-CN">Zip 选项</span>
+	 * @return <span class="en-US">Strong encryption output stream</span>
+	 * <span class="zh-CN">强加密输出流</span>
+	 * @throws IOException <span class="en-US">If an error occurs when open stream</span>
+	 *                     <span class="zh-CN">操作过程中出错</span>
+	 */
 	private StrongOutputStream openCentralDirectoryEncryption(final OutputStream targetStream, final String archivePath,
 	                                                          final ZipOptions zipOptions) throws IOException {
 
@@ -1916,7 +1938,6 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		}
 
 		PasswordProvider passwordProvider = this.options.getPasswordProvider();
-
 		PasswordRequest request =
 				new PasswordRequest(PasswordPurpose.WRITE_HEADER, archivePath, Globals.DEFAULT_VALUE_STRING, 1);
 
@@ -1926,7 +1947,7 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		try (PasswordCredentials credentials =
 				     passwordProvider.credentials(request).orElseThrow(() -> new ArchiveException(0x0000001B004CL, archivePath))) {
 			password = credentials.copyPassword();
-			passwordBytes = ZipCrypto.encodePassword(password, this.options.getPasswordEncoding());
+			passwordBytes = ZipCrypto.encodePassword(password, credentials.isUtf8Encoding());
 
 			return StrongOutputStream.create(targetStream, zipOptions.getCentralDirectoryEncryptionAlgorithm(),
 					zipOptions.getCentralDirectoryKeyBitLength(), mode, passwordBytes,
@@ -1962,7 +1983,10 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		OutputStream centralDirectoryOutputStream = outputStream;
 		Deflater deflater = null;
 		DeflaterOutputStream deflaterOutputStream = null;
+		BZip2OutputStream bZip2OutputStream = null;
+		CentralDirectoryCountingOutputStream countingOutputStream = null;
 		StrongOutputStream cryptoOutputStream = null;
+		int centralDirectoryCompressionMethod = ZipGlobals.COMP_STORE;
 		if (protectionCentralDirectory) {
 			if (zipOptions.getCentralDirectoryEncryptionAlgorithm() != ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE) {
 				cryptoOutputStream =
@@ -1978,8 +2002,15 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 						deflater = new Deflater(zipOptions.getCompressionLevel(), true);
 						deflaterOutputStream = new DeflaterOutputStream(centralDirectoryOutputStream, deflater);
 						centralDirectoryOutputStream = deflaterOutputStream;
+						centralDirectoryCompressionMethod = ZipGlobals.COMP_DEFLATE;
 						break;
 					case BZIP2:
+						countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
+						bZip2OutputStream =
+								new BZip2OutputStream(countingOutputStream, Math.max(1, zipOptions.getCompressionLevel()));
+						centralDirectoryOutputStream = bZip2OutputStream;
+						centralDirectoryCompressionMethod = ZipGlobals.COMP_BZIP2;
+						break;
 					case LZMA1:
 					case LZMA2:
 					default:
@@ -2049,6 +2080,11 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 
 				compressedSize = deflater.getBytesWritten();
 				uncompressedSize = deflater.getBytesRead();
+			} else if (bZip2OutputStream != null) {
+				bZip2OutputStream.finish();
+
+				compressedSize = countingOutputStream.getCount();
+				uncompressedSize = centralDirectoryOriginalSize;
 			} else {
 				compressedSize = centralDirectoryOriginalSize;
 				uncompressedSize = centralDirectoryOriginalSize;
@@ -2074,7 +2110,7 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 			protection = new Zip64EndCentralDirectory.Protection();
 
 			boolean encryptedCentralDirectory = cryptoOutputStream != null;
-			protection.setCompressionMethod(deflaterOutputStream != null ? ZipGlobals.COMP_DEFLATE : ZipGlobals.COMP_STORE);
+			protection.setCompressionMethod(centralDirectoryCompressionMethod);
 			protection.setAlgorithm(encryptedCentralDirectory
 					? zipOptions.getCentralDirectoryEncryptionAlgorithm()
 					: ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE);
@@ -2339,6 +2375,45 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		 */
 		private UnsafeEntryException(long errorCode, String entryPath) {
 			super(errorCode, entryPath);
+		}
+	}
+
+	private static final class CentralDirectoryCountingOutputStream extends OutputStream {
+
+		private final OutputStream output;
+		private long count;
+
+		private CentralDirectoryCountingOutputStream(final OutputStream output) {
+			this.output = Objects.requireNonNull(output, "output");
+		}
+
+		@Override
+		public void write(final int value) throws IOException {
+			this.output.write(value);
+			this.addCount(1);
+		}
+
+		@Override
+		public void write(@Nonnull final byte[] bytes, final int offset, final int length) throws IOException {
+			this.output.write(bytes, offset, length);
+			this.addCount(length);
+		}
+
+		@Override
+		public void flush() throws IOException {
+			this.output.flush();
+		}
+
+		private void addCount(final int length) throws IOException {
+			try {
+				this.count = Math.addExact(this.count, length);
+			} catch (ArithmeticException e) {
+				throw new IOException("Compressed central directory size overflow", e);
+			}
+		}
+
+		private long getCount() {
+			return this.count;
 		}
 	}
 

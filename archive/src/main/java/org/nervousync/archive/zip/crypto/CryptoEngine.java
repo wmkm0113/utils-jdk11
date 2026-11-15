@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.io.crypto;
+package org.nervousync.archive.zip.crypto;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.enumerations.crypto.CryptoMode;

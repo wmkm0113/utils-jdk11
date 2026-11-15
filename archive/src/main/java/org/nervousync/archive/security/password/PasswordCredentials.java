@@ -38,6 +38,11 @@ public final class PasswordCredentials extends SecurityCredentials implements De
 	 */
 	private char[] password;
 	/**
+	 * <span class="en-US">Using UTF-8 encoding flag</span>
+	 * <span class="zh-CN">使用 UTF-8 编码标记</span>
+	 */
+	private final boolean utf8Encoding;
+	/**
 	 * <span class="en-US">Destroyed flag</span>
 	 * <span class="zh-CN">销毁标记</span>
 	 */
@@ -47,25 +52,54 @@ public final class PasswordCredentials extends SecurityCredentials implements De
 	 * <h3 class="en-US">Constructor method for the password credentials</h3>
 	 * <h3 class="zh-CN">密码凭据的构造方法</h3>
 	 *
-	 * @param password <span class="en-US">Password</span>
-	 *                 <span class="zh-CN">密码</span>
+	 * @param password     <span class="en-US">Password</span>
+	 *                     <span class="zh-CN">密码</span>
+	 * @param utf8Encoding <span class="en-US">Using UTF-8 encoding flag</span>
+	 *                     <span class="zh-CN">使用 UTF-8 编码标记</span>
 	 */
-	private PasswordCredentials(final char[] password) {
+	private PasswordCredentials(final char[] password, final boolean utf8Encoding) {
 		Objects.requireNonNull(password, "password");
 		this.password = Arrays.copyOf(password, password.length);
+		this.utf8Encoding = utf8Encoding;
 	}
+
+//	/**
+//	 * <h3 class="en-US">Static method for initialize password credentials</h3>
+//	 * <h3 class="zh-CN">静态方法用于初始化密码凭据</h3>
+//	 *
+//	 * @param password <span class="en-US">Password</span>
+//	 *                 <span class="zh-CN">密码</span>
+//	 * @return <span class="en-US">Password credentials instance object</span>
+//	 * <span class="zh-CN">密码凭据实例对象</span>
+//	 */
+//	public static PasswordCredentials of(final char[] password) {
+//		return new PasswordCredentials(password, false);
+//	}
 
 	/**
 	 * <h3 class="en-US">Static method for initialize password credentials</h3>
 	 * <h3 class="zh-CN">静态方法用于初始化密码凭据</h3>
 	 *
-	 * @param password <span class="en-US">Password</span>
-	 *                 <span class="zh-CN">密码</span>
+	 * @param password     <span class="en-US">Password</span>
+	 *                     <span class="zh-CN">密码</span>
+	 * @param utf8Encoding <span class="en-US">Using UTF-8 encoding flag</span>
+	 *                     <span class="zh-CN">使用 UTF-8 编码标记</span>
 	 * @return <span class="en-US">Password credentials instance object</span>
 	 * <span class="zh-CN">密码凭据实例对象</span>
 	 */
-	public static PasswordCredentials of(final char[] password) {
-		return new PasswordCredentials(password);
+	public static PasswordCredentials of(final char[] password, final boolean utf8Encoding) {
+		return new PasswordCredentials(password, utf8Encoding);
+	}
+
+	/**
+	 * <h3 class="en-US">Getter method for the using UTF-8 encoding flag</h3>
+	 * <h3 class="zh-CN">使用 UTF-8 编码标记的 Getter 方法</h3>
+	 *
+	 * @return <span class="en-US">Using UTF-8 encoding flag</span>
+	 * <span class="zh-CN">使用 UTF-8 编码标记</span>
+	 */
+	public boolean isUtf8Encoding() {
+		return this.utf8Encoding;
 	}
 
 	/**
