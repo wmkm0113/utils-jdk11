@@ -38,7 +38,7 @@ final class ZipBZip2IntegrationTest {
 	void writesAndReadsBzip2Entry() throws Exception {
 		Path path = directory.resolve("native.zip");
 		byte[] bytes = payload(120017);
-		ZipOptions options = ZipOptions.newBuilder().algorithm(CompressionAlgorithm.BZIP2).build();
+		ZipOptions options = ZipOptions.newBuilder().compressionAlgorithm(CompressionAlgorithm.BZIP2).build();
 		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), options)) {
 			writeEntry(archive, "payload.bin", bytes);
 		}
@@ -77,7 +77,7 @@ final class ZipBZip2IntegrationTest {
 	void writesCompleteBzhStreamAndIsReadableByCommonsCompress(int level) throws Exception {
 		Path path = directory.resolve("reference.zip");
 		byte[] bytes = "ZIP BZip2 interoperability\n".repeat(3000).getBytes(StandardCharsets.UTF_8);
-		ZipOptions options = ZipOptions.newBuilder().algorithm(CompressionAlgorithm.BZIP2)
+		ZipOptions options = ZipOptions.newBuilder().compressionAlgorithm(CompressionAlgorithm.BZIP2)
 				.compressionLevel(level).zip64Mode(Zip64Mode.ALWAYS).build();
 		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), options)) {
 			writeEntry(archive, "payload.bin", bytes);
@@ -130,7 +130,7 @@ final class ZipBZip2IntegrationTest {
 	void preservesAesMethodMetadataAndVerifiesAuthentication() throws Exception {
 		Path path = directory.resolve("aes.zip");
 		byte[] bytes = payload(120017);
-		ZipOptions options = ZipOptions.newBuilder().algorithm(CompressionAlgorithm.BZIP2).aesCrypto(256).build();
+		ZipOptions options = ZipOptions.newBuilder().compressionAlgorithm(CompressionAlgorithm.BZIP2).aesCrypto(256).build();
 		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), archiveOptions(), options)) {
 			writeEntry(archive, "payload.bin", bytes);
 		}
@@ -164,7 +164,7 @@ final class ZipBZip2IntegrationTest {
 	void preservesBzip2EntryAcrossUpdateAndDeletion() throws Exception {
 		Path path = directory.resolve("edit.zip");
 		byte[] kept = payload(12345), replacement = payload(7777);
-		ZipOptions options = ZipOptions.newBuilder().algorithm(CompressionAlgorithm.BZIP2).build();
+		ZipOptions options = ZipOptions.newBuilder().compressionAlgorithm(CompressionAlgorithm.BZIP2).build();
 		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), options)) {
 			writeEntry(archive, "keep.bin", kept);
 			writeEntry(archive, "change.bin", new byte[] {1, 2});

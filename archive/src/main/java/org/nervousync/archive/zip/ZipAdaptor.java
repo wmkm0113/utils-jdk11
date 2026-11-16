@@ -28,6 +28,7 @@ import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2OutputStream;
+import org.nervousync.archive.io.deflate.DeflateOutputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -52,9 +53,9 @@ import org.nervousync.archive.zip.models.header.FileHeader;
 import org.nervousync.archive.zip.models.header.GeneralFileHeader;
 import org.nervousync.archive.zip.models.header.LocalFileHeader;
 import org.nervousync.archive.zip.models.header.StrongDecryptionHeader;
-import org.nervousync.archive.zip.reader.ZipEntryResourceReader;
+import org.nervousync.archive.zip.resource.ZipEntryResourceReader;
 import org.nervousync.archive.zip.operator.ZipFileOperator;
-import org.nervousync.archive.zip.writer.ZipEntryResourceWriter;
+import org.nervousync.archive.zip.resource.ZipEntryResourceWriter;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.zip.ZipGlobals;
 import org.nervousync.enumerations.zip.Zip64Mode;
@@ -74,8 +75,6 @@ import java.security.Provider;
 import java.time.Instant;
 import java.util.*;
 import java.util.zip.CRC32;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 /**
  * <h2 class="en-US">ZIP adaptor</h2>
@@ -858,7 +857,7 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 	private ZipOptions mergeOptions() throws IOException {
 		ZipOptions.Builder optionsBuilder =
 				ZipOptions.newBuilder().splitArchive(false, Globals.DEFAULT_VALUE_LONG)
-						.algorithm(this.zipOptions.getAlgorithm())
+						.compressionAlgorithm(this.zipOptions.getAlgorithm())
 						.compressionLevel(this.zipOptions.getCompressionLevel())
 						.zip64Mode((this.zip64EndCentralDirectory == null)
 								? this.zipOptions.getZip64Mode()
@@ -871,10 +870,13 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				case ZipGlobals.COMP_STORE:
 					break;
 				case ZipGlobals.COMP_DEFLATE:
-					optionsBuilder.algorithm(CompressionAlgorithm.DEFLATE).enableCentralDirectoryCompress();
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE).enableCentralDirectoryCompress();
+					break;
+				case ZipGlobals.COMP_DEFLATE64:
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE64).enableCentralDirectoryCompress();
 					break;
 				case ZipGlobals.COMP_BZIP2:
-					optionsBuilder.algorithm(CompressionAlgorithm.BZIP2).enableCentralDirectoryCompress();
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.BZIP2).enableCentralDirectoryCompress();
 					break;
 				default:
 					throw new ArchiveException(0x0000001B004AL);
@@ -1981,48 +1983,53 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 						|| zipOptions.getCentralDirectoryEncryptionAlgorithm() != ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE
 						|| zipOptions.getCentralDirectoryHashAlgorithm() != ZipGlobals.ZIP64_HEADER_HASH_ALGORITHM_NONE;
 		OutputStream centralDirectoryOutputStream = outputStream;
-		Deflater deflater = null;
-		DeflaterOutputStream deflaterOutputStream = null;
+		DeflateOutputStream deflateOutputStream = null;
 		BZip2OutputStream bZip2OutputStream = null;
 		CentralDirectoryCountingOutputStream countingOutputStream = null;
 		StrongOutputStream cryptoOutputStream = null;
 		int centralDirectoryCompressionMethod = ZipGlobals.COMP_STORE;
-		if (protectionCentralDirectory) {
-			if (zipOptions.getCentralDirectoryEncryptionAlgorithm() != ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE) {
-				cryptoOutputStream =
-						this.openCentralDirectoryEncryption(centralDirectoryOutputStream,
-								outputStream.archivePath(), zipOptions);
-				centralDirectoryOutputStream = cryptoOutputStream;
-			}
-			if (zipOptions.isCompressCentralDirectory()) {
-				switch (zipOptions.getAlgorithm()) {
-					case STORE:
-						break;
-					case DEFLATE:
-						deflater = new Deflater(zipOptions.getCompressionLevel(), true);
-						deflaterOutputStream = new DeflaterOutputStream(centralDirectoryOutputStream, deflater);
-						centralDirectoryOutputStream = deflaterOutputStream;
-						centralDirectoryCompressionMethod = ZipGlobals.COMP_DEFLATE;
-						break;
-					case BZIP2:
-						countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
-						bZip2OutputStream =
-								new BZip2OutputStream(countingOutputStream, Math.max(1, zipOptions.getCompressionLevel()));
-						centralDirectoryOutputStream = bZip2OutputStream;
-						centralDirectoryCompressionMethod = ZipGlobals.COMP_BZIP2;
-						break;
-					case LZMA1:
-					case LZMA2:
-					default:
-						throw new ArchiveException(0x0000001A0021L, zipOptions.getAlgorithm());
-
-				}
-			}
-		}
-		long centralDirectoryOriginalSize = 0L;
+		long centralDirectoryOriginalSize = 0L, compressedSize, uncompressedSize;
 		CRC32 crc = null;
 		MessageDigest digest = null;
 		try {
+			if (protectionCentralDirectory) {
+				if (zipOptions.getCentralDirectoryEncryptionAlgorithm() != ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_NONE) {
+					cryptoOutputStream =
+							this.openCentralDirectoryEncryption(centralDirectoryOutputStream,
+									outputStream.archivePath(), zipOptions);
+					centralDirectoryOutputStream = cryptoOutputStream;
+				}
+				if (zipOptions.isCompressCentralDirectory()) {
+					switch (zipOptions.getAlgorithm()) {
+						case STORE:
+							break;
+						case DEFLATE:
+						case DEFLATE64:
+							deflateOutputStream = new DeflateOutputStream(centralDirectoryOutputStream,
+									zipOptions.getAlgorithm() == CompressionAlgorithm.DEFLATE64,
+									zipOptions.getCompressionLevel());
+							centralDirectoryOutputStream = deflateOutputStream;
+							centralDirectoryCompressionMethod =
+									(zipOptions.getAlgorithm() == CompressionAlgorithm.DEFLATE64)
+											? ZipGlobals.COMP_DEFLATE64
+											: ZipGlobals.COMP_DEFLATE;
+							break;
+						case BZIP2:
+							countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
+							bZip2OutputStream =
+									new BZip2OutputStream(countingOutputStream, Math.max(1, zipOptions.getCompressionLevel()));
+							centralDirectoryOutputStream = bZip2OutputStream;
+							centralDirectoryCompressionMethod = ZipGlobals.COMP_BZIP2;
+							break;
+						case LZMA1:
+						case LZMA2:
+						default:
+							throw new ArchiveException(0x0000001A0021L, zipOptions.getAlgorithm());
+
+					}
+				}
+			}
+
 			switch (zipOptions.getCentralDirectoryHashAlgorithm()) {
 				case ZipGlobals.ZIP64_HEADER_HASH_ALGORITHM_NONE:
 					break;
@@ -2054,7 +2061,6 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 			throw new ArchiveException(0x0000001A001FL, e);
 		}
 
-		long compressedSize, uncompressedSize;
 		try {
 			GeneralFileHeader generalFileHeader = headerQueue.poll();
 			while (generalFileHeader != null) {
@@ -2075,11 +2081,11 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				generalFileHeader = headerQueue.poll();
 			}
 
-			if (deflaterOutputStream != null) {
-				deflaterOutputStream.finish();
+			if (deflateOutputStream != null) {
+				deflateOutputStream.finish();
 
-				compressedSize = deflater.getBytesWritten();
-				uncompressedSize = deflater.getBytesRead();
+				compressedSize = deflateOutputStream.getBytesWritten();
+				uncompressedSize = deflateOutputStream.getBytesRead();
 			} else if (bZip2OutputStream != null) {
 				bZip2OutputStream.finish();
 
@@ -2094,8 +2100,8 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				cryptoOutputStream.finish();
 			}
 		} finally {
-			if (deflater != null) {
-				deflater.end();
+			if (deflateOutputStream != null) {
+				deflateOutputStream.release();
 			}
 		}
 

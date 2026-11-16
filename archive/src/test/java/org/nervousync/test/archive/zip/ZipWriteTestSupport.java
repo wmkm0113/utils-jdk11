@@ -61,7 +61,7 @@ final class ZipWriteTestSupport {
 
 	static ZipOptions options(final CompressionAlgorithm algorithm, final Zip64Mode mode,
 	                          final Layout layout, final Encryption encryption) throws Exception {
-		ZipOptions.Builder builder = ZipOptions.newBuilder().algorithm(algorithm).zip64Mode(mode);
+		ZipOptions.Builder builder = ZipOptions.newBuilder().compressionAlgorithm(algorithm).zip64Mode(mode);
 		if (layout != Layout.SINGLE) {
 			builder.splitArchive(true, 65536)
 					.splitType(layout == Layout.NATIVE ? SplitType.NATIVE : SplitType.NUMBERED);

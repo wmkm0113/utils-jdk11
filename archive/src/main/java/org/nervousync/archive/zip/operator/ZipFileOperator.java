@@ -24,6 +24,7 @@ import org.nervousync.archive.enumerations.AesVendor;
 import org.nervousync.archive.enumerations.StrongAccessMode;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2InputStream;
+import org.nervousync.archive.io.deflate.DeflateInputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
@@ -57,8 +58,6 @@ import java.security.*;
 import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
 
 /**
  * <h2 class="en-US">Zip file operator</h2>
@@ -1171,6 +1170,7 @@ public final class ZipFileOperator implements AutoCloseable {
 		switch (compressionMethod) {
 			case ZipGlobals.COMP_STORE:
 			case ZipGlobals.COMP_DEFLATE:
+			case ZipGlobals.COMP_DEFLATE64:
 			case ZipGlobals.COMP_BZIP2:
 				return true;
 			default:
@@ -1290,7 +1290,6 @@ public final class ZipFileOperator implements AutoCloseable {
 		}
 
 		InputStream inputStream = decryptedStream;
-		Inflater inflater = null;
 		BufferedInputStream sourceStream = null;
 		CRC32 crc = null;
 		MessageDigest digest = null;
@@ -1304,8 +1303,10 @@ public final class ZipFileOperator implements AutoCloseable {
 						}
 						break;
 					case ZipGlobals.COMP_DEFLATE:
-						inflater = new Inflater(true);
-						inputStream = new InflaterInputStream(inputStream, inflater, Globals.DEFAULT_BUFFER_SIZE);
+					case ZipGlobals.COMP_DEFLATE64:
+						sourceStream = new BufferedInputStream(decryptedStream, Globals.DEFAULT_BUFFER_SIZE);
+						inputStream = new DeflateInputStream(sourceStream,
+								protection.getCompressionMethod() == ZipGlobals.COMP_DEFLATE64);
 						break;
 					case ZipGlobals.COMP_BZIP2:
 						sourceStream = new BufferedInputStream(decryptedStream, Globals.DEFAULT_BUFFER_SIZE);
@@ -1365,14 +1366,12 @@ public final class ZipFileOperator implements AutoCloseable {
 				throw new ArchiveException(0x0000001A001FL);
 			}
 
-			if (inflater != null || sourceStream != null) {
-				boolean trailingData = inflater != null && inflater.getRemaining() > 0;
-				InputStream trailingSource = sourceStream != null ? sourceStream : decryptedStream;
-
+			if (sourceStream != null) {
+				boolean trailingData = false;
 				byte[] drainBuffer = new byte[Globals.DEFAULT_BUFFER_SIZE];
 				int readLength;
 
-				while ((readLength = trailingSource.read(drainBuffer)) != -1) {
+				while ((readLength = sourceStream.read(drainBuffer)) != -1) {
 					if (readLength > 0) {
 						trailingData = true;
 					}
@@ -1408,9 +1407,6 @@ public final class ZipFileOperator implements AutoCloseable {
 			return centralDirectory;
 		} finally {
 			IOUtils.closeStream(inputStream);
-			if (inflater != null) {
-				inflater.end();
-			}
 		}
 	}
 

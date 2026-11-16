@@ -1,5 +1,7 @@
 # utils-archive
 
+[English](README.md) | [简体中文](README_zh_CN.md) | [繁體中文](README_zh_TW.md)
+
 `utils-archive` is the archive module of Nervousync Java Utilities. Its current implementation focuses on ZIP creation, reading, extraction, editing, and merging split archives, with support for passwords, certificates, and central directory protection.
 
 This guide focuses on the `org.nervousync.archive` interfaces in the current branch. The module also retains the legacy `org.nervousync.zip` interfaces. Options and models from the two interfaces are not interchangeable.
@@ -35,7 +37,7 @@ This guide focuses on the `org.nervousync.archive` interfaces in the current bra
 |----------------|----------------------------------------------------------------------|
 | ZIP creation and reading | Local files and random-access data sources based on `DataFile` |
 | File and directory writing | Files, explicit directory entries, symbolic links, and streaming writes with metadata |
-| Compression methods | STORE and DEFLATE for reading and writing ZIP entries |
+| Compression methods | STORE, DEFLATE, DEFLATE64, and BZIP2 for reading and writing ZIP entries |
 | Lookup and extraction | Lookup by path, entry input streams, individual entry extraction, and whole-archive extraction |
 | Editing | Add, replace, and remove entries in existing archives; rewrite and publish changes when the session closes |
 | Large files | ZIP64 AUTO, ALWAYS, and NEVER; sizes and offsets use `long` |
@@ -126,7 +128,6 @@ import org.nervousync.archive.security.certificate.PKCS12CertificateProvider;
 import org.nervousync.archive.security.password.PasswordCredentials;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.zip.ZipOptions;
-import org.nervousync.archive.zip.crypto.ZipCrypto;
 import org.nervousync.archive.zip.models.central.CentralDirectory;
 import org.nervousync.archive.zip.models.central.EndCentralDirectoryRecord;
 import org.nervousync.archive.zip.models.central.Zip64EndCentralDirectory;
@@ -163,7 +164,7 @@ The Java blocks below contain methods or nested interfaces that can be placed in
 | Option | Default |
 |------------------------------------|---------------------------------------------|
 | Entry name/comment character set | UTF-8 |
-| Password encoding | `ZipCrypto.PasswordEncoding.UTF8` |
+| Password encoding | Legacy low-byte encoding for `PasswordProvider.fixed(password)`; pass `true` for UTF-8 |
 | `ArchiveOptions.verify` / `strict` | `true` / `true`                             |
 | Password/certificate providers | `none()` |
 | Compression method/level | DEFLATE / 5 |
@@ -362,14 +363,34 @@ Regular files are extracted to temporary files first. Data verification and attr
 
 ## Compression Methods and Levels
 
+The current ZIP entry reader/writer and protected central directory support the following methods:
+
+| Algorithm | ZIP method ID | Level behavior |
+|-----------|---------------|----------------|
+| `STORE` | 0 | Stores bytes unchanged; the level has no effect |
+| `DEFLATE` | 8 | `0..9`; compression uses the JDK in raw mode |
+| `DEFLATE64` | 9 | `0` writes stored blocks; `1..9` increase the match-length search bound using fixed Huffman coding |
+| `BZIP2` | 12 | `1..9` select block capacities of 100000..900000 bytes; `0` is mapped to `1` |
+
+`ZipOptions.Builder.compressionLevel(...)` accepts only `0..9`; the default is `5`. It does not accept the JDK's special level `-1`. BZip2 level `0` still compresses data; select `STORE` to disable compression.
+
 ```java
-static ZipOptions compressionOptions(boolean store, int level) throws Exception {
+static ZipOptions compressionOptions(CompressionAlgorithm algorithm, int level) throws Exception {
 	return ZipOptions.newBuilder()
-			.algorithm(store ? CompressionAlgorithm.STORE : CompressionAlgorithm.DEFLATE)
+			.compressionAlgorithm(algorithm)
 			.compressionLevel(level)
 			.build();
 }
+
+static void createBzip2Zip(Path target, Path source) throws Exception {
+	writeArchive(target, ArchiveOptions.newBuilder().build(),
+			compressionOptions(CompressionAlgorithm.BZIP2, 9), archive -> {
+				archive.addFile("data/payload.bin", source.toString(), "BZip2 payload");
+			});
+}
 ```
+
+Pass `CompressionAlgorithm.DEFLATE64` to the same helper to select Deflate64. For central directory compression with the same algorithm and level, copy these options with `ZipOptions.newBuilder(options).enableCentralDirectoryCompress().build()`.
 
 To use a fixed time zone for DOS timestamps or adjust an existing configuration, copy the options:
 
@@ -381,11 +402,12 @@ static ZipOptions utcOptions(ZipOptions source) throws Exception {
 }
 ```
 
-- STORE saves data without compression; DEFLATE uses the JDK's raw DEFLATE stream.
-- JDK DEFLATE levels are `-1` or `0..9`; this module defaults to level 5. STORE does not use a compression level.
+- DEFLATE and Deflate64 share `DeflateInputStream` and `DeflateOutputStream`. Decoding supports stored, fixed-Huffman, and dynamic-Huffman blocks. The Deflate64 encoder currently emits stored or fixed-Huffman blocks; its compression ratio need not match encoders that generate dynamic tables.
+- BZip2 uses the module's own `BZip2InputStream` and `BZip2OutputStream`. ZIP entry CRC-32 and the BZip2 block/member CRCs are separate integrity checks.
 - Directory entries are written using STORE, without entry data encryption.
-- The presence of BZIP2, LZMA1, and LZMA2 in the enumeration does not mean the current ZIP Writer/Reader implements them. Operations using those methods will fail.
-- Compression methods and levels are currently configured through `ZipOptions`, not read from `ArchiveEntry`. A dedicated configuration entry point for selecting a different algorithm for each entry within one session is not yet available.
+- Compression methods and levels are configured through `ZipOptions`, not read from `ArchiveEntry`. A dedicated configuration entry point for selecting a different algorithm for each entry within one session is not yet available.
+- `LZMA1` and `LZMA2` are reserved enumeration values without working ZIP codecs. XZ and Zstandard are not implemented. Do not treat descriptors or enumeration values as implemented format support.
+- Use DEFLATE when broad ZIP interoperability is the priority. Verify the consuming tool's support before selecting Deflate64, BZip2, or protected central directories.
 
 ## Password Encryption
 
@@ -396,8 +418,7 @@ Provide passwords through `ArchiveOptions.passwordProvider(...)`, rather than st
 ```java
 static ArchiveOptions passwordOptions(char[] password) {
 	return ArchiveOptions.newBuilder()
-			.passwordProvider(PasswordProvider.fixed(password))
-			.passwordEncoding(ZipCrypto.PasswordEncoding.UTF8)
+			.passwordProvider(PasswordProvider.fixed(password, true))
 			.build();
 }
 ```
@@ -411,14 +432,14 @@ static ArchiveOptions separatePasswords(char[] entryPassword, char[] directoryPa
 	return ArchiveOptions.newBuilder().passwordProvider(request -> {
 		boolean directory = request.getPurpose() == PasswordPurpose.READ_HEADER
 				|| request.getPurpose() == PasswordPurpose.WRITE_HEADER;
-		return Optional.of(PasswordCredentials.of(directory ? directoryPassword : entryPassword));
+		return Optional.of(PasswordCredentials.of(directory ? directoryPassword : entryPassword, true));
 	}).build();
 }
 ```
 
 Return `Optional.empty()` when no password is available. The `attempt` field alone does not imply automatic prompts or retry loops; the application must organize interaction and retries.
 
-`LEGACY_LOW_BYTE` is an optional legacy password byte encoding. When processing old files, it must match the encoding used to create them. File name character sets and password encodings are independent.
+`PasswordProvider.fixed(password)` uses legacy low-byte encoding by default; pass `true` as its second argument to select UTF-8, as in the example above. For a custom Provider, set the same flag in `PasswordCredentials.of(password, utf8Encoding)`. Match the encoding used to create the archive. File name character sets and password encodings are independent.
 
 ### ZipCrypto and WinZip AES
 
@@ -578,7 +599,7 @@ static ZipOptions hashedDirectoryOptions() throws Exception {
 }
 ```
 
-Central directory compression reuses the compression method and level from the ZIP options; STORE/DEFLATE are currently supported. The hash is calculated over the central directory bytes before transformation. It is separate from the AES entry authentication code and is not a digital signature.
+Central directory compression reuses the compression method and level from the ZIP options; STORE, DEFLATE, DEFLATE64, and BZIP2 are supported. BZIP2 level `0` is mapped to block size `1`, just as for entry compression. Editing and split-archive merging can read and regenerate directories compressed with these methods. The hash is calculated over the central directory bytes before transformation. It is separate from the AES entry authentication code and is not a digital signature.
 
 Supported hash constant suffixes are `NONE`, `CRC32`, `MD5`, `SHA1`, `RIPEMD160`, `SHA256`, `SHA384`, and `SHA512`, with the prefix `ZIP64_HEADER_HASH_ALGORITHM_`.
 
@@ -587,7 +608,7 @@ Supported hash constant suffixes are `NONE`, `CRC32`, `MD5`, `SHA1`, `RIPEMD160`
 ```java
 static ZipOptions protectedDirectoryOptions() throws Exception {
 	return ZipOptions.newBuilder()
-			.algorithm(CompressionAlgorithm.DEFLATE)
+			.compressionAlgorithm(CompressionAlgorithm.DEFLATE)
 			.compressionLevel(5)
 			.strongCrypto(ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_AES_256, 256)
 			.enableCentralDirectoryCompress()
@@ -696,7 +717,9 @@ static void editZip(Path target, Path replacement,
                     ArchiveOptions options, ZipOptions zipOptions) throws Exception {
 	writeArchive(target, options, zipOptions, archive -> {
 		Optional<ArchiveEntry> obsolete = archive.entry("obsolete.txt");
-		obsolete.ifPresent(archiveEntry -> archive.remove(archiveEntry));
+		if (obsolete.isPresent()) {
+			archive.remove(obsolete.get());
+		}
 		archive.addFile("documents/current.txt", replacement.toString(), "替换内容");
 	});
 }
@@ -769,9 +792,10 @@ static void addEmptyDirectory(Path target) throws Exception {
 			.lastModified(Instant.now())
 			.build();
 	writeArchive(target, ArchiveOptions.newBuilder().build(), ZipOptions.newBuilder().build(), archive -> {
-		try (ResourceWriter writer = archive.openWriter(directory.getEntryPath(), "").orElseThrow();
-		     OutputStream output = writer.openStream(directory)) {
-			// 目录条目不写数据。
+		try (ResourceWriter writer = archive.openWriter(directory.getEntryPath(), "").orElseThrow()) {
+			try (OutputStream output = writer.openStream(directory)) {
+				// Directory entries have no payload.
+			}
 			writer.finish();
 		}
 	});
@@ -837,7 +861,7 @@ static ArchiveOptions limitedOptions() throws Exception {
 }
 ```
 
-Entries carrying the UTF-8 flag are decoded as UTF-8. Other names and comments use the configured character set. Non-ASCII password encoding is controlled separately by `passwordEncoding(...)`.
+Entries carrying the UTF-8 flag are decoded as UTF-8. Other names and comments use the configured character set. Non-ASCII password encoding is controlled separately by `PasswordCredentials.of(password, utf8Encoding)`.
 
 ### Path Safety and Error Policies
 
@@ -903,6 +927,10 @@ For callers inspecting structures, diagnosing compatibility issues, or extending
 | `StandardInputStream` / `StandardOutputStream` | ZipCrypto streams |
 | `AesInputStream` / `AesOutputStream` | WinZip AES streams |
 | `StrongInputStream` / `StrongOutputStream` | PKWARE Strong Encryption streams |
+| `DeflateInputStream` / `DeflateOutputStream` | Raw DEFLATE/Deflate64 codecs; no ZIP, zlib, or GZIP framing |
+| `BZip2InputStream` / `BZip2OutputStream` | Complete BZh streams, usable independently of ZIP |
+
+The standalone BZip2 decoder reads one member by default; its two-argument constructor can enable concatenated members. It supports legacy randomized blocks, while the encoder writes non-randomized blocks. Read to EOF to validate all BZip2 block/member CRCs: closing the standalone decoder does not drain unread data. ZIP entry and central directory readers use single-member decoding; the protected central directory reader also rejects trailing data. For both codec output streams, `finish()` completes compressed output while keeping the delegate open; `close()` also closes the delegate. `DeflateOutputStream.release()` only releases codec resources and does not finish output. Standalone codec users must enforce their own output-size and compression-ratio limits.
 
 A custom `DataFile` must correctly implement `seek()`, `getFilePointer()`, `length()`, `newFile()`, and `splitFiles()` in addition to normal reads and writes. Splitting code opens other volumes with the same configuration through `newFile()` and locates volumes through `splitFiles()`. Independent Readers also create separate seekable handles. A network stream supporting only sequential reads cannot directly replace this interface.
 
@@ -915,6 +943,7 @@ Preserving Digital Signature bytes does not implement digital signature verifica
 The module retains `org.nervousync.zip.ZipFile` and `org.nervousync.zip.options.ZipOptions`, providing legacy methods for creation, adding, reading, extraction, deletion, password settings, comments, and merging split archives.
 
 - The legacy `ZipFile.openZipFile(...)` and the new `ArchiveFile.zipFile(...)` are different entry points.
+- The compression support described above applies to `org.nervousync.archive`; the retained legacy ZIP pipeline has not acquired Deflate64/BZip2 support through this refactor.
 - The examples in this guide use `org.nervousync.archive.zip.ZipOptions`.
 - Header models and options from the legacy package cannot be passed directly to the new interfaces.
 - Use the new interfaces for the certificate, dual Provider, and central directory Protection workflows described here. Do not assume equivalent capabilities in the legacy interfaces.
@@ -941,12 +970,20 @@ To enable the large-ZIP tests controlled by a flag:
 mvn -pl archive -am -DrunLargeZipTest=true test
 ```
 
+Compression tests include `DeflateStreamTest`, `Deflate64ZipTest`, `Deflate64CentralDirectoryTest`, `BZip2StreamTest`, `ZipBZip2IntegrationTest`, `ZipBZip2FailureTest`, and `ZipBZip2CentralDirectoryTest`. They cover independent decoder/fixture interoperability, compression levels, malformed and truncated data, encryption, splitting, editing, merging, and protected central directories. Fixture provenance is documented in [`src/test/resources/deflate/README.md`](src/test/resources/deflate/README.md) and [`src/test/resources/bzip2/README.md`](src/test/resources/bzip2/README.md).
+
+Run the focused compression tests from the repository root:
+
+```shell
+mvn -pl archive -am "-Dtest=DeflateStreamTest,Deflate64ZipTest,Deflate64CentralDirectoryTest,BZip2StreamTest,ZipBZip2IntegrationTest,ZipBZip2FailureTest,ZipBZip2CentralDirectoryTest" -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
 Tests are located in `src/test/java/org/nervousync/test/archive` and cover regular reads/writes, ZIP64, splitting, editing, merging, paths and links, file attributes, password/certificate credential matrices, AES/Strong Encryption, and central directory protection. Some link tests may be aborted because of local file-system or privilege limitations. Assess coverage alongside actual CI results.
 
 Also note the following current limitations:
 
 1. ZIP is the main usable container. The TAR adapter is unfinished, and no 7z container implementation is provided.
-2. ZIP entry compression currently supports STORE/DEFLATE. Support for BZIP, LZMA, and other methods will be added in the future.
+2. ZIP entries and protected central directories support STORE/DEFLATE/DEFLATE64/BZIP2. LZMA1/LZMA2, XZ, and Zstandard are not implemented; Deflate64 writing currently uses stored or fixed-Huffman blocks.
 3. `WritableOptions`, some legacy directory-selection fields, and `StreamOwner` exist but are not fully integrated into the new `ArchiveFile` workflow. `streamOwner(CALLER)` does not guarantee that a supplied `DataFile` will remain open.
 4. Fields such as `readHiddenFiles`, `includeRootFolder`, `rootFolderInZip`, and `fileNameInZip` do not form a unified directory-selection workflow in the new write path. Control entry names through `addDirectory` arguments or the archive path passed to `openWriter`, and organize hidden-file filtering explicitly in the calling application.
 5. Hard-link creation, full ACL/ownership/arbitrary extended-attribute restoration, automatic certificate revocation checks, and certificate trust-chain policies are outside the current high-level implementation.

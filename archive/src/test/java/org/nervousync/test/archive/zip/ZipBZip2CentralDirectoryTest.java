@@ -212,6 +212,55 @@ final class ZipBZip2CentralDirectoryTest {
 		assertThrows(IOException.class, () -> readFixture(path, limited));
 	}
 
+	/** 哈希保护范围应覆盖解压后的中央目录，篡改哈希不能被正常 BZip2 CRC 掩盖。 */
+	@ParameterizedTest
+	@ValueSource(booleans = {false, true})
+	void rejectsCorruptedCentralDirectoryHash(boolean encrypted) throws Exception {
+		ZipOptions options = optionsFor(Layout.SINGLE, Zip64Mode.AUTO,
+				encrypted ? ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_AES_256 : 0,
+				ZipGlobals.ZIP64_HEADER_HASH_ALGORITHM_SHA256);
+		Path path = directory.resolve("bad-hash.zip");
+		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), archiveOptions(), options)) {
+			writeEntry(archive, "entry", new byte[] {1, 2, 3});
+		}
+		byte[] bytes = Files.readAllBytes(path);
+		ByteBuffer raw = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+		int locator = bytes.length - 22 - 20;
+		assertEquals(0x07064B50, raw.getInt(locator));
+		int zip64 = Math.toIntExact(raw.getLong(locator + 8));
+		assertEquals(0x06064B50, raw.getInt(zip64));
+		assertEquals(32, Short.toUnsignedInt(raw.getShort(zip64 + 82)));
+		bytes[zip64 + 84] ^= 1;
+		Files.write(path, bytes);
+		assertThrows(IOException.class, () -> readFixture(path, archiveOptions()));
+	}
+
+	/** 压缩尺寸必须准确限定 BZip2 成员边界，少一字节或多一字节都应拒绝。 */
+	@ParameterizedTest
+	@ValueSource(ints = {-1, 1})
+	void rejectsIncorrectCompressedSize(int delta) throws Exception {
+		byte[] plain = plainCentral(), compressed = compress(plain);
+		byte[] bytes = fixture(compressed, plain.length);
+		ByteBuffer raw = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+		raw.putLong(compressed.length + 58, compressed.length + delta);
+		Path path = directory.resolve("bad-compressed-size.zip");
+		Files.write(path, bytes);
+		assertThrows(IOException.class, () -> readFixture(path, ArchiveOptions.newBuilder().build()));
+	}
+
+	@Test
+	void rejectsWrongPasswordForBzip2CentralDirectory() throws Exception {
+		ZipOptions options = optionsFor(Layout.SINGLE, Zip64Mode.AUTO,
+				ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_AES_256, ZipGlobals.ZIP64_HEADER_HASH_ALGORITHM_SHA256);
+		Path path = directory.resolve("wrong-password.zip");
+		try (ArchiveFile archive = ArchiveFile.zipFile(new LocalDataFile(path.toString(), "rw"), archiveOptions(), options)) {
+			writeEntry(archive, "entry", new byte[] {1, 2, 3});
+		}
+		ArchiveOptions wrong = ArchiveOptions.newBuilder().passwordProvider(
+				org.nervousync.archive.security.password.PasswordProvider.fixed("incorrect".toCharArray())).build();
+		assertThrows(IOException.class, () -> readFixture(path, wrong));
+	}
+
 	private static ZipFileOperator operator(Path path, ZipOptions options) throws Exception {
 		return new ZipFileOperator(new LocalDataFile(path.toString(), "r"), archiveOptions(), options);
 	}

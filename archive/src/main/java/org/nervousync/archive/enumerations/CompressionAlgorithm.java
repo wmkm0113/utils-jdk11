@@ -25,5 +25,5 @@ package org.nervousync.archive.enumerations;
  * @version $Revision: 1.0.0 $ $Date: Oct 26, 2026 09:37:28 $
  */
 public enum CompressionAlgorithm {
-	STORE, DEFLATE, BZIP2, LZMA1, LZMA2
+	STORE, DEFLATE, DEFLATE64, BZIP2, LZMA1, LZMA2
 }

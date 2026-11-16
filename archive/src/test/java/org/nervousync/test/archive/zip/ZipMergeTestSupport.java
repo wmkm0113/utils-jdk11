@@ -148,7 +148,7 @@ final class ZipMergeTestSupport {
 	}
 
 	static ZipOptions maskedOptions() throws Exception {
-		return ZipOptions.newBuilder(splitOptions(Layout.NATIVE)).algorithm(CompressionAlgorithm.STORE)
+		return ZipOptions.newBuilder(splitOptions(Layout.NATIVE)).compressionAlgorithm(CompressionAlgorithm.STORE)
 				.centralDirectoryCrypto(ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_AES_256, 256).build();
 	}
 

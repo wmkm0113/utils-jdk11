@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.writer;
+package org.nervousync.archive.zip.resource;
 
 import jakarta.annotation.Nonnull;
 import org.nervousync.archive.ArchiveEntry;
@@ -23,6 +23,7 @@ import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2OutputStream;
+import org.nervousync.archive.io.deflate.DeflateOutputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.security.StrongKey;
 import org.nervousync.archive.security.password.PasswordCredentials;
@@ -55,8 +56,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 /**
  * <h2 class="en-US">ZIP entry resource writer implement class</h2>
@@ -102,11 +101,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 	 * <span class="zh-CN">Zip 条目输出流</span>
 	 */
 	private ZipEntryOutputStream outputStream = null;
-	/**
-	 * <span class="en-US">Deflater</span>
-	 * <span class="zh-CN">压缩器</span>
-	 */
-	private Deflater deflater = null;
 	private int dosTime;
 	private ArchiveEntry sourceEntry = null;
 	private LocalFileHeader completedHeader = null;
@@ -259,8 +253,10 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 				case STORE:
 					break;
 				case DEFLATE:
-					this.deflater = new Deflater(this.zipOptions.getCompressionLevel(), true);
-					outputStream = new DeflaterOutputStream(outputStream, this.deflater);
+				case DEFLATE64:
+					outputStream = new DeflateOutputStream(outputStream,
+							this.zipOptions.getAlgorithm() == CompressionAlgorithm.DEFLATE64,
+							this.zipOptions.getCompressionLevel());
 					break;
 				case BZIP2:
 					outputStream =
@@ -281,11 +277,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 				outputStream.close();
 			} catch (IOException | RuntimeException ex) {
 				e.addSuppressed(ex);
-			} finally {
-				if (this.deflater != null) {
-					this.deflater.end();
-					this.deflater = null;
-				}
 			}
 			throw e;
 		}
@@ -325,10 +316,6 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 			this.abort = true;
 			throw e;
 		} finally {
-			if (this.deflater != null) {
-				this.deflater.end();
-				this.deflater = null;
-			}
 			this.closed = true;
 		}
 	}
@@ -375,19 +362,21 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 			case DEFLATE:
 				method = ZipGlobals.COMP_DEFLATE;
 				break;
+			case DEFLATE64:
+				method = ZipGlobals.COMP_DEFLATE64;
+				break;
 			case BZIP2:
 				method = ZipGlobals.COMP_BZIP2;
 				break;
 			default:
-				throw new IOException(
-						"Unsupported ZIP compression: " + this.zipOptions.getAlgorithm());
+				throw new IOException("Unsupported ZIP compression: " + this.zipOptions.getAlgorithm());
 		}
 
 		LocalFileHeader header = new LocalFileHeader();
 		List<ExtraDataRecord> extras = new ArrayList<>();
 
 		int flags = StandardCharsets.UTF_8.equals(this.options.getCharset()) ? 0x0800 : 0;
-		int version = 20;
+		int version = method == ZipGlobals.COMP_DEFLATE64 ? 21 : 20;
 		if (method == ZipGlobals.COMP_BZIP2) {
 			version = 46;
 		}

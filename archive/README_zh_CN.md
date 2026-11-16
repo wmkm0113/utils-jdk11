@@ -1,5 +1,7 @@
 # utils-archive
 
+[English](README.md) | [简体中文](README_zh_CN.md) | [繁體中文](README_zh_TW.md)
+
 `utils-archive` 是 Nervousync Java Utilities 的归档模块，当前主要实现
 ZIP 的创建、读取、解压、修改和分卷合并，并提供密码、证书及中央目录保护功能。
 
@@ -37,7 +39,7 @@ ZIP 的创建、读取、解压、修改和分卷合并，并提供密码、证�
 |----------------|----------------------------------------------------------------------|
 | ZIP 创建与读取 | 支持本地文件和基于 `DataFile` 的可随机访问数据源                     |
 | 文件与目录写入 | 支持文件、显式目录条目、符号链接及带元数据的流式写入                 |
-| 压缩算法       | ZIP 条目读写支持 STORE、DEFLATE                                      |
+| 压缩算法 | ZIP 条目读写支持 STORE、DEFLATE、DEFLATE64、BZIP2 |
 | 查询与解压     | 按路径查询、条目输入流、单条目提取、整包解压                         |
 | 修改           | 在已有包中新增、替换、删除条目，关闭会话时重写并发布                 |
 | 大文件         | ZIP64 AUTO、ALWAYS、NEVER；大小与偏移使用 `long`                     |
@@ -138,7 +140,6 @@ import org.nervousync.archive.security.certificate.PKCS12CertificateProvider;
 import org.nervousync.archive.security.password.PasswordCredentials;
 import org.nervousync.archive.security.password.PasswordProvider;
 import org.nervousync.archive.zip.ZipOptions;
-import org.nervousync.archive.zip.crypto.ZipCrypto;
 import org.nervousync.archive.zip.models.central.CentralDirectory;
 import org.nervousync.archive.zip.models.central.EndCentralDirectoryRecord;
 import org.nervousync.archive.zip.models.central.Zip64EndCentralDirectory;
@@ -177,7 +178,7 @@ import java.util.TimeZone;
 | 选项                               | 默认值                                      |
 |------------------------------------|---------------------------------------------|
 | 条目名/注释字符集                  | UTF-8                                       |
-| 密码编码                           | `ZipCrypto.PasswordEncoding.UTF8`           |
+| 密码编码                           | `PasswordProvider.fixed(password)` 默认为旧式低字节编码，传入 `true` 使用 UTF-8           |
 | `ArchiveOptions.verify` / `strict` | `true` / `true`                             |
 | 密码/证书提供器                    | `none()`                                    |
 | 压缩方法/等级                      | DEFLATE / 5                                 |
@@ -405,14 +406,34 @@ static void extractOne(Path source, String entryPath, Path target,
 
 ## 压缩算法与压缩等级
 
+当前 ZIP 条目读写和受保护中央目录支持以下压缩方法：
+
+| 算法 | ZIP 方法编号 | 等级行为 |
+|------|--------------|----------|
+| `STORE` | 0 | 原样保存数据，压缩等级不生效 |
+| `DEFLATE` | 8 | `0..9`，压缩使用 JDK 原始 DEFLATE 模式 |
+| `DEFLATE64` | 9 | `0` 输出未压缩块；`1..9` 提高匹配长度搜索上限，使用固定 Huffman 编码 |
+| `BZIP2` | 12 | `1..9` 对应 100000..900000 字节的块容量；`0` 映射为 `1` |
+
+`ZipOptions.Builder.compressionLevel(...)` 仅接受 `0..9`，默认值为 `5`，不接受 JDK 的特殊等级 `-1`。BZip2 等级 `0` 仍会压缩数据；需要禁用压缩时请选择 `STORE`。
+
 ```java
-static ZipOptions compressionOptions(boolean store, int level) throws Exception {
+static ZipOptions compressionOptions(CompressionAlgorithm algorithm, int level) throws Exception {
 	return ZipOptions.newBuilder()
-			.algorithm(store ? CompressionAlgorithm.STORE : CompressionAlgorithm.DEFLATE)
+			.compressionAlgorithm(algorithm)
 			.compressionLevel(level)
 			.build();
 }
+
+static void createBzip2Zip(Path target, Path source) throws Exception {
+	writeArchive(target, ArchiveOptions.newBuilder().build(),
+			compressionOptions(CompressionAlgorithm.BZIP2, 9), archive -> {
+				archive.addFile("data/payload.bin", source.toString(), "BZip2 数据");
+			});
+}
 ```
+
+向同一辅助方法传入 `CompressionAlgorithm.DEFLATE64` 即可选择 Deflate64。需要按相同算法和等级压缩中央目录时，可用 `ZipOptions.newBuilder(options).enableCentralDirectoryCompress().build()` 复制并调整选项。
 
 需要固定 DOS 时间的时区或在现有配置上调整参数时，可以复制选项：
 
@@ -424,14 +445,12 @@ static ZipOptions utcOptions(ZipOptions source) throws Exception {
 }
 ```
 
-- STORE 直接保存数据；DEFLATE 使用 JDK 原始 DEFLATE 流。
-- JDK DEFLATE 等级取值为 `-1` 或 `0..9`，模块默认等级为
-  5；STORE 不使用压缩等级。
+- DEFLATE 与 Deflate64 共用 `DeflateInputStream` 和 `DeflateOutputStream`。解码支持未压缩块、固定 Huffman 块和动态 Huffman 块；Deflate64 编码当前输出未压缩块或固定 Huffman 块，压缩率不保证与生成动态表的编码器一致。
+- BZip2 使用模块自身的 `BZip2InputStream` 和 `BZip2OutputStream`。ZIP 条目 CRC-32 与 BZip2 的块/成员 CRC 是分别执行的完整性检查。
 - 目录条目按 STORE 写入，且不进行条目数据加密。
-- 枚举中的 BZIP2、LZMA1、LZMA2 不代表当前 ZIP Writer/Reader
-  已实现这些算法，使用它们会在对应操作中失败。
-- 当前压缩方法与等级通过 `ZipOptions` 配置，不是从
-  `ArchiveEntry` 读取。需要在同一个会话中逐条选择不同算法的专用配置入口尚未提供。
+- 压缩方法与等级通过 `ZipOptions` 配置，不是从 `ArchiveEntry` 读取。同一个会话中逐条选择不同算法的专用配置入口尚未提供。
+- `LZMA1`、`LZMA2` 仅为预留枚举值，尚无可用的 ZIP 编解码实现；XZ、Zstandard 也未实现。描述器或枚举存在不代表相应格式已经可用。
+- 优先考虑 ZIP 通用兼容性时使用 DEFLATE。选择 Deflate64、BZip2 或受保护中央目录前，应确认接收工具支持对应扩展。
 
 ## 密码加密
 
@@ -443,8 +462,7 @@ static ZipOptions utcOptions(ZipOptions source) throws Exception {
 ```java
 static ArchiveOptions passwordOptions(char[] password) {
 	return ArchiveOptions.newBuilder()
-			.passwordProvider(PasswordProvider.fixed(password))
-			.passwordEncoding(ZipCrypto.PasswordEncoding.UTF8)
+			.passwordProvider(PasswordProvider.fixed(password, true))
 			.build();
 }
 ```
@@ -460,7 +478,7 @@ static ArchiveOptions separatePasswords(char[] entryPassword, char[] directoryPa
 	return ArchiveOptions.newBuilder().passwordProvider(request -> {
 		boolean directory = request.getPurpose() == PasswordPurpose.READ_HEADER
 				|| request.getPurpose() == PasswordPurpose.WRITE_HEADER;
-		return Optional.of(PasswordCredentials.of(directory ? directoryPassword : entryPassword));
+		return Optional.of(PasswordCredentials.of(directory ? directoryPassword : entryPassword, true));
 	}).build();
 }
 ```
@@ -468,8 +486,7 @@ static ArchiveOptions separatePasswords(char[] entryPassword, char[] directoryPa
 没有可用密码时返回 `Optional.empty()`。当前不能仅凭 `attempt`
 字段推断模块会自动弹窗或循环重试；交互和重试应由业务组织。
 
-`LEGACY_LOW_BYTE`
-是可选的旧密码字节编码方式，处理旧文件时需要与其生成方式匹配。文件名字符集与密码编码相互独立。
+`PasswordProvider.fixed(password)` 默认使用旧式低字节编码；第二个参数传入 `true` 可选择 UTF-8，如上例所示。自定义 Provider 应在 `PasswordCredentials.of(password, utf8Encoding)` 中设置同一标记。读取时需匹配压缩包生成时使用的编码。文件名字符集与密码编码相互独立。
 
 ### ZipCrypto 与 WinZip AES
 
@@ -647,9 +664,7 @@ static ZipOptions hashedDirectoryOptions() throws Exception {
 }
 ```
 
-中央目录压缩复用 ZIP 选项的压缩方法与等级，当前实际支持
-STORE/DEFLATE。哈希针对变换前的中央目录字节计算；它与 AES
-条目认证码是不同机制，也不等同于数字签名。
+中央目录压缩复用 ZIP 选项的压缩方法与等级，支持 STORE、DEFLATE、DEFLATE64、BZIP2。与条目压缩一致，BZIP2 等级 `0` 映射为块大小 `1`。编辑和分卷合并可以读取并重新生成这些方法压缩的中央目录。哈希针对变换前的中央目录字节计算；它与 AES 条目认证码是不同机制，也不等同于数字签名。
 
 支持的哈希常量后缀包括 `NONE`、`CRC32`、`MD5`、`SHA1`、
 `RIPEMD160`、`SHA256`、`SHA384`、`SHA512`，前缀为
@@ -660,7 +675,7 @@ STORE/DEFLATE。哈希针对变换前的中央目录字节计算；它与 AES
 ```java
 static ZipOptions protectedDirectoryOptions() throws Exception {
 	return ZipOptions.newBuilder()
-			.algorithm(CompressionAlgorithm.DEFLATE)
+			.compressionAlgorithm(CompressionAlgorithm.DEFLATE)
 			.compressionLevel(5)
 			.strongCrypto(ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_AES_256, 256)
 			.enableCentralDirectoryCompress()
@@ -788,7 +803,9 @@ static void editZip(Path target, Path replacement,
                     ArchiveOptions options, ZipOptions zipOptions) throws Exception {
 	writeArchive(target, options, zipOptions, archive -> {
 		Optional<ArchiveEntry> obsolete = archive.entry("obsolete.txt");
-		obsolete.ifPresent(archiveEntry -> archive.remove(archiveEntry));
+		if (obsolete.isPresent()) {
+			archive.remove(obsolete.get());
+		}
 		archive.addFile("documents/current.txt", replacement.toString(), "替换内容");
 	});
 }
@@ -871,9 +888,10 @@ static void addEmptyDirectory(Path target) throws Exception {
 			.lastModified(Instant.now())
 			.build();
 	writeArchive(target, ArchiveOptions.newBuilder().build(), ZipOptions.newBuilder().build(), archive -> {
-		try (ResourceWriter writer = archive.openWriter(directory.getEntryPath(), "").orElseThrow();
-		     OutputStream output = writer.openStream(directory)) {
-			// 目录条目不写数据。
+		try (ResourceWriter writer = archive.openWriter(directory.getEntryPath(), "").orElseThrow()) {
+			try (OutputStream output = writer.openStream(directory)) {
+				// 目录条目不写数据。
+			}
 			writer.finish();
 		}
 	});
@@ -946,7 +964,7 @@ static ArchiveOptions limitedOptions() throws Exception {
 ```
 
 对使用 UTF-8 标志的条目，读取时按 UTF-8 解码；其余名称和注释使用配置字符集。非
-ASCII 密码另由 `passwordEncoding(...)` 控制。
+ASCII 密码另由 `PasswordCredentials.of(password, utf8Encoding)` 控制。
 
 ### 路径安全与错误策略
 
@@ -1025,6 +1043,10 @@ Writer，也不要让提交、关闭或回滚与工作线程重叠。失败时�
 | `StandardInputStream` / `StandardOutputStream`    | ZipCrypto 数据流                                        |
 | `AesInputStream` / `AesOutputStream`              | WinZip AES 数据流                                       |
 | `StrongInputStream` / `StrongOutputStream`        | PKWARE 强加密数据流                                     |
+| `DeflateInputStream` / `DeflateOutputStream` | 原始 DEFLATE/Deflate64 编解码，不包含 ZIP、zlib 或 GZIP 格式封装 |
+| `BZip2InputStream` / `BZip2OutputStream` | 完整 BZh 数据流，可独立于 ZIP 使用 |
+
+独立 BZip2 解码器默认只读取一个成员，可通过双参数构造方法启用串接成员。解码支持旧版随机化块，编码器输出非随机化块。完整验证 BZip2 块/成员 CRC 需要读取至 EOF；关闭独立解码器不会主动读取剩余数据。ZIP 条目和中央目录采用单成员解码；受保护中央目录读取器还会拒绝尾随数据。两种编码输出流的 `finish()` 都会完成压缩而保留底层流，`close()` 还会关闭底层流。`DeflateOutputStream.release()` 只释放编码资源，不会完成输出。独立使用编解码流时，调用方需自行限制输出大小和压缩比。
 
 自定义 `DataFile` 时，除了普通读写，还需要正确实现 `seek()`、
 `getFilePointer()`、`length()`、`newFile()` 和 `splitFiles()`
@@ -1050,6 +1072,7 @@ Record 与 Digital Signature 数据。
 
 - 旧的 `ZipFile.openZipFile(...)` 与新的
   `ArchiveFile.zipFile(...)` 是不同入口。
+- 上述压缩支持适用于 `org.nervousync.archive`；保留的旧 ZIP 调用链没有因本次重构而获得 Deflate64/BZip2 支持。
 - 新文档示例使用的是
   `org.nervousync.archive.zip.ZipOptions`。
 - 旧包中的头模型和选项不能直接传入新接口。
@@ -1078,6 +1101,14 @@ mvn -pl archive -am -Dtest=ZipFileTest -Dsurefire.failIfNoSpecifiedTests=false t
 mvn -pl archive -am -DrunLargeZipTest=true test
 ```
 
+压缩相关测试包括 `DeflateStreamTest`、`Deflate64ZipTest`、`Deflate64CentralDirectoryTest`、`BZip2StreamTest`、`ZipBZip2IntegrationTest`、`ZipBZip2FailureTest` 和 `ZipBZip2CentralDirectoryTest`，覆盖独立解码器/样本互操作、压缩等级、非法及截断数据、加密、分卷、编辑、合并和受保护中央目录。样本来源见 [`src/test/resources/deflate/README.md`](src/test/resources/deflate/README.md) 与 [`src/test/resources/bzip2/README.md`](src/test/resources/bzip2/README.md)。
+
+在仓库根目录执行压缩相关测试：
+
+```shell
+mvn -pl archive -am "-Dtest=DeflateStreamTest,Deflate64ZipTest,Deflate64CentralDirectoryTest,BZip2StreamTest,ZipBZip2IntegrationTest,ZipBZip2FailureTest,ZipBZip2CentralDirectoryTest" -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
 测试代码位于 `src/test/java/org/nervousync/test/archive`
 ，覆盖普通读写、ZIP64、分卷、修改、合并、路径与链接、文件属性、密码/证书凭据矩阵、AES/强加密及中央目录保护。部分链接用例可能因本机文件系统或权限不足而中止，应结合
 CI 的实际执行结果判断覆盖情况。
@@ -1085,7 +1116,7 @@ CI 的实际执行结果判断覆盖情况。
 当前使用时还需了解：
 
 1. 当前可用容器主要为 ZIP；TAR 适配器未完成，未提供 7z 容器实现。
-2. ZIP 条目实际压缩方法为 STORE/DEFLATE；未来会提供BZIP、LZMA等支持。
+2. ZIP 条目和受保护中央目录支持 STORE/DEFLATE/DEFLATE64/BZIP2；LZMA1/LZMA2、XZ、Zstandard 尚未实现，Deflate64 写入当前采用未压缩块或固定 Huffman 块。
 3. `WritableOptions`、部分旧式目录选择字段和 `StreamOwner`
    已存在，但尚未完整接入新 `ArchiveFile` 工作流。
    `streamOwner(CALLER)` 不能作为传入 `DataFile` 一定不被关闭的保证。

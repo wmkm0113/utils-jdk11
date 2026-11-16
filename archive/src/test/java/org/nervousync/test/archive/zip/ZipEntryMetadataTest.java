@@ -75,7 +75,7 @@ public class ZipEntryMetadataTest {
 	}
 
 	private ZipOptions options(Layout layout, Crypto crypto, CompressionAlgorithm algorithm) throws Exception {
-		ZipOptions.Builder builder = ZipOptions.newBuilder().algorithm(algorithm).timezone(TimeZone.getTimeZone("UTC"));
+		ZipOptions.Builder builder = ZipOptions.newBuilder().compressionAlgorithm(algorithm).timezone(TimeZone.getTimeZone("UTC"));
 		switch (crypto) {
 			case STANDARD: builder.standardCrypto(); break;
 			case AES: builder.aesCrypto(256); break;

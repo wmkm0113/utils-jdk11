@@ -89,9 +89,9 @@
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
         <jakarta.activation.version>2.1.4</jakarta.activation.version>
         <jakarta.json.bind.version>3.0.3</jakarta.json.bind.version>
-        <jackson.version>2.22.4</jackson.version>
+        <jackson.version>2.23.0</jackson.version>
         <junit.jupiter.version>5.14.4</junit.jupiter.version>
-        <bcprov.version>1.86</bcprov.version>
+        <bcprov.version>1.87</bcprov.version>
         <asm.version>9.11.1</asm.version>
     </properties>
     <dependencyManagement>
@@ -110,11 +110,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.nervousync</groupId>-->
-<!--                <artifactId>utils-core</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.nervousync</groupId>
                 <artifactId>utils-archive</artifactId>

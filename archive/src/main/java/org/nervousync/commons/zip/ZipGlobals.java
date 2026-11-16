@@ -216,6 +216,10 @@ public final class ZipGlobals {
 	 * <span class="zh-CN">ZIP64 版本2解压需要的最低版本号</span>
 	 */
 	public static final int ZIP_64_VERSION_2 = 62;
+	/**
+	 * <span class="en-US">Maximum recipients limit</span>
+	 * <span class="zh-CN">最大接收者数量</span>
+	 */
 	public static final int MAX_RECIPIENTS = 1024;
 	/**
 	 * <span class="en-US">Central directory file header signature, read as a little-endian number</span>
@@ -282,6 +286,11 @@ public final class ZipGlobals {
 	 * <span class="zh-CN">压缩类型：DEFLATE</span>
 	 */
 	public static final int COMP_DEFLATE = 8;
+	/**
+	 * <span class="en-US">Compression Type: DEFLATE64</span>
+	 * <span class="zh-CN">压缩类型：DEFLATE64</span>
+	 */
+	public static final int COMP_DEFLATE64 = 9;
 	/**
 	 * <span class="en-US">Compression Type: BZIP2</span>
 	 * <span class="zh-CN">压缩类型：BZIP2</span>

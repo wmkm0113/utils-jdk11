@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.nervousync.archive.zip.reader;
+package org.nervousync.archive.zip.resource;
 
 import org.nervousync.archive.ArchiveFile;
 import org.nervousync.archive.core.ResourceReader;
@@ -23,6 +23,7 @@ import org.nervousync.archive.enumerations.EntryType;
 import org.nervousync.archive.enumerations.PasswordPurpose;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2InputStream;
+import org.nervousync.archive.io.deflate.DeflateInputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -51,8 +52,6 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.Objects;
 import java.util.zip.CRC32;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
 
 /**
  * <h2 class="en-US">ZIP entry resource reader implement class</h2>
@@ -201,8 +200,11 @@ public final class ZipEntryResourceReader implements ResourceReader {
 						this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));
 				break;
 			case ZipGlobals.COMP_DEFLATE:
+			case ZipGlobals.COMP_DEFLATE64:
 				this.entryStream = new EntryVerificationInputStream(
-						new InflaterInputStream(inputStream, new Inflater(true), Globals.DEFAULT_BUFFER_SIZE),
+						new DeflateInputStream(
+								new BufferedInputStream(inputStream, Globals.DEFAULT_BUFFER_SIZE),
+								this.fileHeader.getCompressionMethod() == ZipGlobals.COMP_DEFLATE64),
 						this.fileHeader.getUncompressedSize(), this.fileHeader.getCompressedSize(),
 						this.options.getArchiveLimit(), this.fileHeader.getCrc32(),
 						this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));

@@ -88,7 +88,7 @@ final class StrongCertificateArchiveTest {
 	void supportsStoredEntries(final StrongAccessMode mode) throws Exception {
 		Path target = this.directory.resolve("stored.zip");
 		ZipOptions zip = zipBuilder(AES256, 256, mode, Layout.SINGLE)
-				.algorithm(CompressionAlgorithm.STORE).build();
+				.compressionAlgorithm(CompressionAlgorithm.STORE).build();
 		createArchive(target, zip, mode);
 		assertArrayEquals(PAYLOAD, readEntry(target, zip, writeOptions(mode), ENTRY_PATH));
 	}

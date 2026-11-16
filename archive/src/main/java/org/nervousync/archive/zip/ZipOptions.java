@@ -765,7 +765,7 @@ public final class ZipOptions {
 		 * @return <span class="en-US">Current builder instance object</span>
 		 * <span class="zh-CN">当前构建器实例对象</span>
 		 */
-		public Builder algorithm(final CompressionAlgorithm algorithm) {
+		public Builder compressionAlgorithm(final CompressionAlgorithm algorithm) {
 			Objects.requireNonNull(algorithm, "algorithm");
 			this.algorithm = algorithm;
 			return this;
