@@ -24,6 +24,7 @@ import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2OutputStream;
 import org.nervousync.archive.io.deflate.DeflateOutputStream;
+import org.nervousync.archive.io.lzma.LZMAOutputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.security.StrongKey;
 import org.nervousync.archive.security.password.PasswordCredentials;
@@ -263,6 +264,8 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 							new BZip2OutputStream(outputStream, Math.max(1, this.zipOptions.getCompressionLevel()));
 					break;
 				case LZMA1:
+					outputStream = new LZMAOutputStream(outputStream, this.zipOptions.getCompressionLevel());
+					break;
 				case LZMA2:
 					//  Not support at this time
 					break;
@@ -368,6 +371,9 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 			case BZIP2:
 				method = ZipGlobals.COMP_BZIP2;
 				break;
+			case LZMA1:
+				method = ZipGlobals.COMP_LZMA;
+				break;
 			default:
 				throw new IOException("Unsupported ZIP compression: " + this.zipOptions.getAlgorithm());
 		}
@@ -422,6 +428,11 @@ public final class ZipEntryResourceWriter implements ResourceWriter {
 				break;
 			default:
 				throw new ArchiveException(0x0000001A0023L);
+		}
+
+		if (!this.isDirectoryEntry() && this.zipOptions.getAlgorithm() == CompressionAlgorithm.LZMA1) {
+			flags |= 0x0002;
+			version = Math.max(version, 63);
 		}
 
 		if (zip64) {

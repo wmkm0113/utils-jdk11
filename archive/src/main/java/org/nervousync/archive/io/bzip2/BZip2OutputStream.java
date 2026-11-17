@@ -56,6 +56,9 @@ import java.util.Objects;
  * <p class="zh-CN">此类不是线程安全的。finish() 写完成员但不关闭底层流；flush() 只刷新
  * 已经编码的完整字节，不结束重复段、数据块或成员；close() 在可行时完成编码并关闭
  * 底层流。构造失败时，底层流仍由调用方负责关闭。</p>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
+ * @version $Revision: 1.0.0 $ $Date: Oct 26, 2026 09:37:28 $
  */
 public final class BZip2OutputStream extends OutputStream {
 

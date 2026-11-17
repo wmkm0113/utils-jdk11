@@ -49,6 +49,9 @@ import java.util.zip.Deflater;
  * that destination, allowing an archive writer to append its remaining structures.</p>
  * <p class="zh-CN">本类不是线程安全的。构造成功后由本流负责关闭目标输出流。
  * finish() 完成压缩并排出输出缓冲，但保留目标流，以便归档写入器继续写入后续结构。</p>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
+ * @version $Revision: 1.0.0 $ $Date: Oct 26, 2026 09:37:28 $
  */
 public final class DeflateOutputStream extends OutputStream {
 

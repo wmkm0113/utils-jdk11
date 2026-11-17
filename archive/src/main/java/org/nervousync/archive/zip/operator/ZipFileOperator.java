@@ -25,6 +25,7 @@ import org.nervousync.archive.enumerations.StrongAccessMode;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2InputStream;
 import org.nervousync.archive.io.deflate.DeflateInputStream;
+import org.nervousync.archive.io.lzma.LZMAInputStream;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.zip.ZipOptions;
 import org.nervousync.archive.zip.crypto.ZipCrypto;
@@ -1172,6 +1173,7 @@ public final class ZipFileOperator implements AutoCloseable {
 			case ZipGlobals.COMP_DEFLATE:
 			case ZipGlobals.COMP_DEFLATE64:
 			case ZipGlobals.COMP_BZIP2:
+			case ZipGlobals.COMP_LZMA:
 				return true;
 			default:
 				return false;
@@ -1311,6 +1313,10 @@ public final class ZipFileOperator implements AutoCloseable {
 					case ZipGlobals.COMP_BZIP2:
 						sourceStream = new BufferedInputStream(decryptedStream, Globals.DEFAULT_BUFFER_SIZE);
 						inputStream = new BZip2InputStream(sourceStream);
+						break;
+					case ZipGlobals.COMP_LZMA:
+						sourceStream = new BufferedInputStream(decryptedStream, Globals.DEFAULT_BUFFER_SIZE);
+						inputStream = LZMAInputStream.knownSize(sourceStream, protection.getUncompressedSize());
 						break;
 					default:
 						throw new ArchiveException(0x0000001B004AL);

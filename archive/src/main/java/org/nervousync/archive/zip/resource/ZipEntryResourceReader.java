@@ -24,6 +24,7 @@ import org.nervousync.archive.enumerations.PasswordPurpose;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2InputStream;
 import org.nervousync.archive.io.deflate.DeflateInputStream;
+import org.nervousync.archive.io.lzma.LZMAInputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -46,6 +47,7 @@ import org.nervousync.archive.zip.models.header.LocalFileHeader;
 import org.nervousync.archive.zip.models.header.StrongDecryptionHeader;
 import org.nervousync.commons.Globals;
 import org.nervousync.commons.zip.ZipGlobals;
+import org.nervousync.utils.commons.IOUtils;
 import org.nervousync.utils.commons.RawUtils;
 
 import java.io.*;
@@ -215,6 +217,19 @@ public final class ZipEntryResourceReader implements ResourceReader {
 						new BZip2InputStream(inputStream), this.fileHeader.getUncompressedSize(),
 						this.fileHeader.getCompressedSize(), this.options.getArchiveLimit(), this.fileHeader.getCrc32(),
 						this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));
+				break;
+			case ZipGlobals.COMP_LZMA:
+				try {
+					this.entryStream = new EntryVerificationInputStream(
+							new LZMAInputStream(inputStream, this.fileHeader.getUncompressedSize(),
+									(this.fileHeader.getGeneralPurpose() & 0x0002) != 0),
+							this.fileHeader.getUncompressedSize(), this.fileHeader.getCompressedSize(),
+							this.options.getArchiveLimit(), this.fileHeader.getCrc32(),
+							this.options.isVerify() && ZipAdaptor.verifyCRC(this.fileHeader));
+				} catch (IOException | RuntimeException e) {
+					IOUtils.closeStream(inputStream);
+					throw e;
+				}
 				break;
 			default:
 				inputStream.close();

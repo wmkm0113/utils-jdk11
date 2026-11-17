@@ -58,6 +58,9 @@ import java.util.Objects;
  * construction fails, closing the delegate remains the caller's responsibility.</p>
  * <p class="zh-CN">此类不是线程安全的。单成员模式不会主动读取该成员之后的字节。
  * 构造成功后本流负责关闭底层流；构造失败时，仍由调用方负责关闭底层流。</p>
+ *
+ * @author Steven Wee	<a href="mailto:wmkm0113@gmail.com">wmkm0113@gmail.com</a>
+ * @version $Revision: 1.0.0 $ $Date: Oct 26, 2026 09:37:28 $
  */
 public final class BZip2InputStream extends InputStream {
 

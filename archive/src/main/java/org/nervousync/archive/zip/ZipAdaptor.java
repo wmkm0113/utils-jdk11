@@ -29,6 +29,7 @@ import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
 import org.nervousync.archive.io.bzip2.BZip2OutputStream;
 import org.nervousync.archive.io.deflate.DeflateOutputStream;
+import org.nervousync.archive.io.lzma.LZMAOutputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -870,16 +871,25 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 				case ZipGlobals.COMP_STORE:
 					break;
 				case ZipGlobals.COMP_DEFLATE:
-					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE).enableCentralDirectoryCompress();
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE);
 					break;
 				case ZipGlobals.COMP_DEFLATE64:
-					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE64).enableCentralDirectoryCompress();
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.DEFLATE64);
 					break;
 				case ZipGlobals.COMP_BZIP2:
-					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.BZIP2).enableCentralDirectoryCompress();
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.BZIP2);
+					break;
+				case ZipGlobals.COMP_LZMA:
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.LZMA1);
 					break;
 				default:
 					throw new ArchiveException(0x0000001B004AL);
+			}
+
+			if (protection.compressed()) {
+				optionsBuilder.enableCentralDirectoryCompress();
+			} else {
+				optionsBuilder.disableCentralDirectoryCompress();
 			}
 
 			if (protection.encrypted()) {
@@ -1985,6 +1995,7 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		OutputStream centralDirectoryOutputStream = outputStream;
 		DeflateOutputStream deflateOutputStream = null;
 		BZip2OutputStream bZip2OutputStream = null;
+		LZMAOutputStream lzmaOutputStream = null;
 		CentralDirectoryCountingOutputStream countingOutputStream = null;
 		StrongOutputStream cryptoOutputStream = null;
 		int centralDirectoryCompressionMethod = ZipGlobals.COMP_STORE;
@@ -2022,6 +2033,12 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 							centralDirectoryCompressionMethod = ZipGlobals.COMP_BZIP2;
 							break;
 						case LZMA1:
+							countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
+							lzmaOutputStream = new LZMAOutputStream(countingOutputStream, zipOptions.getCompressionLevel());
+
+							centralDirectoryOutputStream = lzmaOutputStream;
+							centralDirectoryCompressionMethod = ZipGlobals.COMP_LZMA;
+							break;
 						case LZMA2:
 						default:
 							throw new ArchiveException(0x0000001A0021L, zipOptions.getAlgorithm());
@@ -2086,6 +2103,11 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 
 				compressedSize = deflateOutputStream.getBytesWritten();
 				uncompressedSize = deflateOutputStream.getBytesRead();
+			} else if (lzmaOutputStream != null) {
+				lzmaOutputStream.finish();
+
+				compressedSize = countingOutputStream.getCount();
+				uncompressedSize = centralDirectoryOriginalSize;
 			} else if (bZip2OutputStream != null) {
 				bZip2OutputStream.finish();
 
@@ -2194,6 +2216,9 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 			if (protection != null
 					&& (protection.getAlgorithm() == ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_BLOWFISH
 					|| protection.getAlgorithm() == ZipGlobals.ZIP64_HEADER_ENC_ALGORITHM_TWOFISH)) {
+				extractNeeded = 63;
+			}
+			if (zipOptions.getAlgorithm() == CompressionAlgorithm.LZMA1) {
 				extractNeeded = 63;
 			}
 			int hostSystem;
