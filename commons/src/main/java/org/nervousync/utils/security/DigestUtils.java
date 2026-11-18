@@ -260,6 +260,8 @@ public final class DigestUtils extends SecurityUtils {
 				CRCConfig.newInstance(32, 0x04C11DB7, 0xFFFFFFFFL, 0x00000000, Boolean.FALSE, Boolean.FALSE));
 		registerConfig("CRC-32/XFER",
 				CRCConfig.newInstance(32, 0x000000AF, 0x00000000, 0x00000000, Boolean.FALSE, Boolean.FALSE));
+		registerConfig("CRC-64/XZ",
+				CRCConfig.newInstance(64, 0x42F0E1EBA9EA3693L, 0xFFFFFFFFFFFFFFFFL, 0xFFFFFFFFFFFFFFFFL, Boolean.TRUE, Boolean.TRUE));
 		LOGGER.info("Registered_CRC_Algorithm",
 				String.join(",", new ArrayList<>(REGISTERED_CRC_CONFIG.keySet())));
 	}
@@ -278,7 +280,7 @@ public final class DigestUtils extends SecurityUtils {
 			LOGGER.error("Parameter_Null_Register_Security_Error");
 			return;
 		}
-		if (crcConfig.getBit() > 32) {
+		if (crcConfig.getBit() > Long.SIZE) {
 			LOGGER.error("Lager_CRC_Security_Error");
 			return;
 		}
@@ -362,7 +364,7 @@ public final class DigestUtils extends SecurityUtils {
 		long crc = RawUtils.readLong(result, ByteOrder.LITTLE_ENDIAN);
 		return Optional.ofNullable(DigestUtils.crcConfig(algorithm))
 				.map(crcConfig -> {
-					StringBuilder stringBuilder = new StringBuilder(Long.toString(crc, 16));
+					StringBuilder stringBuilder = new StringBuilder(Long.toUnsignedString(crc, 16));
 					while (stringBuilder.length() < crcConfig.getOutLength()) {
 						stringBuilder.insert(0, "0");
 					}

@@ -27,9 +27,11 @@ import org.nervousync.archive.core.ResourceReader;
 import org.nervousync.archive.core.ResourceWriter;
 import org.nervousync.archive.enumerations.*;
 import org.nervousync.archive.exceptions.ArchiveException;
+import org.nervousync.archive.io.CountingOutputStream;
 import org.nervousync.archive.io.bzip2.BZip2OutputStream;
 import org.nervousync.archive.io.deflate.DeflateOutputStream;
 import org.nervousync.archive.io.lzma.LZMAOutputStream;
+import org.nervousync.archive.io.xz.XZOutputStream;
 import org.nervousync.archive.options.ArchiveLimit;
 import org.nervousync.archive.options.ArchiveOptions;
 import org.nervousync.archive.options.ExtractOptions;
@@ -881,6 +883,9 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 					break;
 				case ZipGlobals.COMP_LZMA:
 					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.LZMA1);
+					break;
+				case ZipGlobals.COMP_XZ:
+					optionsBuilder.compressionAlgorithm(CompressionAlgorithm.LZMA2);
 					break;
 				default:
 					throw new ArchiveException(0x0000001B004AL);
@@ -1996,7 +2001,8 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		DeflateOutputStream deflateOutputStream = null;
 		BZip2OutputStream bZip2OutputStream = null;
 		LZMAOutputStream lzmaOutputStream = null;
-		CentralDirectoryCountingOutputStream countingOutputStream = null;
+		XZOutputStream xzOutputStream = null;
+		CountingOutputStream countingOutputStream = null;
 		StrongOutputStream cryptoOutputStream = null;
 		int centralDirectoryCompressionMethod = ZipGlobals.COMP_STORE;
 		long centralDirectoryOriginalSize = 0L, compressedSize, uncompressedSize;
@@ -2026,20 +2032,26 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 											: ZipGlobals.COMP_DEFLATE;
 							break;
 						case BZIP2:
-							countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
+							countingOutputStream = new CountingOutputStream(centralDirectoryOutputStream);
 							bZip2OutputStream =
 									new BZip2OutputStream(countingOutputStream, Math.max(1, zipOptions.getCompressionLevel()));
 							centralDirectoryOutputStream = bZip2OutputStream;
 							centralDirectoryCompressionMethod = ZipGlobals.COMP_BZIP2;
 							break;
 						case LZMA1:
-							countingOutputStream = new CentralDirectoryCountingOutputStream(centralDirectoryOutputStream);
+							countingOutputStream = new CountingOutputStream(centralDirectoryOutputStream);
 							lzmaOutputStream = new LZMAOutputStream(countingOutputStream, zipOptions.getCompressionLevel());
 
 							centralDirectoryOutputStream = lzmaOutputStream;
 							centralDirectoryCompressionMethod = ZipGlobals.COMP_LZMA;
 							break;
 						case LZMA2:
+							countingOutputStream = new CountingOutputStream(centralDirectoryOutputStream);
+							xzOutputStream = new XZOutputStream(countingOutputStream, zipOptions.getCompressionLevel());
+
+							centralDirectoryOutputStream = xzOutputStream;
+							centralDirectoryCompressionMethod = ZipGlobals.COMP_XZ;
+							break;
 						default:
 							throw new ArchiveException(0x0000001A0021L, zipOptions.getAlgorithm());
 
@@ -2103,6 +2115,11 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 
 				compressedSize = deflateOutputStream.getBytesWritten();
 				uncompressedSize = deflateOutputStream.getBytesRead();
+			} else if (xzOutputStream != null) {
+				xzOutputStream.finish();
+
+				compressedSize = countingOutputStream.getCount();
+				uncompressedSize = centralDirectoryOriginalSize;
 			} else if (lzmaOutputStream != null) {
 				lzmaOutputStream.finish();
 
@@ -2406,45 +2423,6 @@ public final class ZipAdaptor extends ArchiveAdaptor {
 		 */
 		private UnsafeEntryException(long errorCode, String entryPath) {
 			super(errorCode, entryPath);
-		}
-	}
-
-	private static final class CentralDirectoryCountingOutputStream extends OutputStream {
-
-		private final OutputStream output;
-		private long count;
-
-		private CentralDirectoryCountingOutputStream(final OutputStream output) {
-			this.output = Objects.requireNonNull(output, "output");
-		}
-
-		@Override
-		public void write(final int value) throws IOException {
-			this.output.write(value);
-			this.addCount(1);
-		}
-
-		@Override
-		public void write(@Nonnull final byte[] bytes, final int offset, final int length) throws IOException {
-			this.output.write(bytes, offset, length);
-			this.addCount(length);
-		}
-
-		@Override
-		public void flush() throws IOException {
-			this.output.flush();
-		}
-
-		private void addCount(final int length) throws IOException {
-			try {
-				this.count = Math.addExact(this.count, length);
-			} catch (ArithmeticException e) {
-				throw new IOException("Compressed central directory size overflow", e);
-			}
-		}
-
-		private long getCount() {
-			return this.count;
 		}
 	}
 

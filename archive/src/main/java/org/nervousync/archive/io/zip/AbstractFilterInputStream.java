@@ -78,6 +78,8 @@ public abstract class AbstractFilterInputStream extends FilterInputStream {
 			do {
 				readLength = this.read(buffer, 0, buffer.length);
 			} while (readLength >= 0);
+		} catch (IOException e) {
+			throw new IOException("Failed to drain input stream during close", e);
 		} finally {
 			this.closed = true;
 			super.close();
